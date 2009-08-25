@@ -49,3 +49,5 @@
 	Exits application when main window is closed even if log, preferences, or PVR is still open.
 	Feedback engine enabled.
 	Added ability to include log when using the feedback engine.
+1.0 RC2
+	Sparkle Enabled
