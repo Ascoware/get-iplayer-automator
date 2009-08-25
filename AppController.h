@@ -1,0 +1,126 @@
+//
+//  AppController.h
+//  Get_iPlayer GUI
+//
+//  Created by Thomas Willson on 7/10/09.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
+//
+
+#import <Cocoa/Cocoa.h>
+#import "Download.h"
+#import "Series.h"
+
+bool runDownloads=NO;
+bool runUpdate=NO;
+
+@interface AppController : NSObject {
+	//General
+	NSString *getiPlayerPath;
+	NSString *noWarningArg;
+	NSString *profileDirArg;
+	NSString *listFormat;
+	NSString *currentTypeArgument;
+	IBOutlet NSWindow *mainWindow;
+	IBOutlet NSApplication *application;
+	
+	//Log Components
+	IBOutlet NSTextView *log;
+	IBOutlet NSWindow *logWindow;
+	IBOutlet NSScrollView *logScroll;
+	NSMutableAttributedString *log_value;
+	
+	//Update Components
+	NSTask *getiPlayerUpdateTask;
+	NSPipe *getiPlayerUpdatePipe;
+	NSArray *getiPlayerUpdateArgs;
+	BOOL didUpdate;
+	BOOL runSinceChange;
+	
+	//Main Window: Search
+	IBOutlet NSTextField *searchField;
+	IBOutlet NSProgressIndicator *searchIndicator;
+	IBOutlet NSArrayController *resultsController;
+	NSMutableArray *searchResultsArray;
+	NSTask *searchTask;
+	NSPipe *searchPipe;
+	NSMutableString *searchData;
+	
+	//PVR
+	IBOutlet NSTextField *pvrSearchField;
+	IBOutlet NSProgressIndicator *pvrSearchIndicator;
+	IBOutlet NSArrayController *pvrResultsController;
+	IBOutlet NSArrayController *pvrQueueController;
+	NSMutableArray *pvrSearchResultsArray;
+	NSTask *pvrSearchTask;
+	NSPipe *pvrSearchPipe;
+	NSMutableString *pvrSearchData;
+	NSMutableArray *pvrQueueArray;
+	
+	//Queue
+	IBOutlet NSButton *addToQueue;
+	IBOutlet NSArrayController *queueController;
+	IBOutlet NSButton *getNamesButton;
+	NSMutableArray *queueArray;
+	
+	//Main Window: Status
+	IBOutlet NSProgressIndicator *overallIndicator;
+	IBOutlet NSProgressIndicator *currentIndicator;
+	IBOutlet NSTextField *overallProgress;
+	IBOutlet NSTextField *currentProgress;
+	
+	//Download Controller
+	Download *currentDownload;
+	IBOutlet NSToolbarItem *stopButton;
+	IBOutlet NSToolbarItem *startButton;
+}
+//Update
+- (void)getiPlayerUpdateFinished;
+- (IBAction)updateCache:(id)sender;
+- (IBAction)forceUpdate:(id)sender;
+//Log Components
+- (IBAction)showLog:(id)sender;
+- (IBAction)copyLog:(id)sender;
+- (void)addToLog:(NSString *)string :(id)sender;
+
+//Search
+- (IBAction)pvrSearch:(id)sender;
+- (IBAction)mainSearch:(id)sender;
+
+//PVR
+- (IBAction)addToAutoRecord:(id)sender;
+
+//Misc.
+- (void)addToiTunes:(Programme *)show;
+- (void)cleanUpPath:(Programme *)show;
+- (void)seasonEpisodeInfo:(Programme *)show;
+- (IBAction)chooseDownloadPath:(id)sender;
+- (IBAction)showFeedback:(id)sender;
+
+//Queue
+- (IBAction)addToQueue:(id)sender;
+- (IBAction)getName:(id)sender;
+- (void)getNameForProgramme:(Programme *)pro;
+- (void)processGetNameData:(NSString *)getNameData forProgramme:(Programme *)p;
+- (IBAction)getCurrentWebpage:(id)sender;
+- (void)setQueueArray:(NSArray *)queue;
+- (NSArray *)queueArray;
+- (IBAction)removeFromQueue:(id)sender;
+
+//Arguments
+- (NSString *)typeArgument:(id)sender;
+- (NSString *)cacheExpiryArgument:(id)sender;
+- (IBAction)typeChanged:(id)sender;
+
+//Download Controller
+- (IBAction)startDownloads:(id)sender;
+- (IBAction)stopDownloads:(id)sender;
+
+//PVR
+- (IBAction)addSeriesLinkToQueue:(id)sender;
+- (void)processAutoRecordData:(NSString *)autoRecordData2 forSeries:(Series *)series2;
+
+//Key-Value Coding
+@property (readwrite, assign) NSMutableAttributedString *log_value;
+@property (readonly) NSString *getiPlayerPath;
+
+@end
