@@ -278,8 +278,7 @@
 							<key>PBXSmartGroupTreeModuleOutlineStateSelectionKey</key>
 							<array>
 								<array>
-									<integer>5</integer>
-									<integer>3</integer>
+									<integer>2</integer>
 									<integer>0</integer>
 								</array>
 							</array>
@@ -323,7 +322,7 @@
 								<key>PBXProjectModuleGUID</key>
 								<string>1CE0B20306471E060097A5F4</string>
 								<key>PBXProjectModuleLabel</key>
-								<string>AppController.m</string>
+								<string>Changelog.txt</string>
 								<key>PBXSplitModuleInNavigatorKey</key>
 								<dict>
 									<key>Split0</key>
@@ -331,11 +330,11 @@
 										<key>PBXProjectModuleGUID</key>
 										<string>1CE0B20406471E060097A5F4</string>
 										<key>PBXProjectModuleLabel</key>
-										<string>AppController.m</string>
+										<string>Changelog.txt</string>
 										<key>_historyCapacity</key>
 										<integer>0</integer>
 										<key>bookmark</key>
-										<string>D9D0E0EC1044DB810059F044</string>
+										<string>D9D0E1031044DEDC0059F044</string>
 										<key>history</key>
 										<array>
 											<string>D9CC156C0FF9075400D819E2</string>
@@ -373,16 +372,16 @@
 											<string>D9D0DF171040AD350059F044</string>
 											<string>D9D0DF1A1040AD350059F044</string>
 											<string>D9D0DF631040AF230059F044</string>
-											<string>D9D0DF72104163CE0059F044</string>
 											<string>D9D0DF97104493DD0059F044</string>
 											<string>D9D0DFFD10449A8B0059F044</string>
 											<string>D9D0DFFE10449A8B0059F044</string>
 											<string>D9D0E0531044B6580059F044</string>
 											<string>D9D0E0611044BF290059F044</string>
 											<string>D9D0E0D61044D97C0059F044</string>
-											<string>D9D0E0D71044D97C0059F044</string>
-											<string>D9D0E0E71044DB490059F044</string>
-											<string>D9D0E0CB1044CA8C0059F044</string>
+											<string>D9D0E0F61044DEDC0059F044</string>
+											<string>D9D0E0F71044DEDC0059F044</string>
+											<string>D9D0E0F81044DEDC0059F044</string>
+											<string>D9D0E0F91044DEDC0059F044</string>
 										</array>
 										<key>prevStack</key>
 										<array>
@@ -445,6 +444,15 @@
 											<string>D9D0E0DB1044D97C0059F044</string>
 											<string>D9D0E0DC1044D97C0059F044</string>
 											<string>D9D0E0E81044DB490059F044</string>
+											<string>D9D0E0FA1044DEDC0059F044</string>
+											<string>D9D0E0FB1044DEDC0059F044</string>
+											<string>D9D0E0FC1044DEDC0059F044</string>
+											<string>D9D0E0FD1044DEDC0059F044</string>
+											<string>D9D0E0FE1044DEDC0059F044</string>
+											<string>D9D0E0FF1044DEDC0059F044</string>
+											<string>D9D0E1001044DEDC0059F044</string>
+											<string>D9D0E1011044DEDC0059F044</string>
+											<string>D9D0E1021044DEDC0059F044</string>
 										</array>
 									</dict>
 									<key>SplitCount</key>
@@ -641,9 +649,9 @@
 		<string>D9D0E0DF1044DA8D0059F044</string>
 		<string>D9D0E0B11044C8420059F044</string>
 		<string>D9D0E0B21044C8420059F044</string>
+		<string>1C78EAAD065D492600B07095</string>
 		<string>1CD10A99069EF8BA00B06720</string>
 		<string>D9CCC4890DD942540002F404</string>
-		<string>1C78EAAD065D492600B07095</string>
 		<string>/Users/thomaswillson/Code/Get iPlayer Automator/Get_iPlayer GUI.xcodeproj</string>
 	</array>
 	<key>WindowString</key>
@@ -1020,7 +1028,7 @@
 			<key>WindowToolGUID</key>
 			<string>1C78EAAD065D492600B07095</string>
 			<key>WindowToolIsVisible</key>
-			<true/>
+			<false/>
 		</dict>
 		<dict>
 			<key>FirstTimeWindowDisplayed</key>

@@ -1258,6 +1258,7 @@
 										   priority:0
 										   isSticky:NO
 									   clickContext:nil];
+			[[SUUpdater sharedUpdater] checkForUpdatesInBackground];
 			
 			return;
 		}
