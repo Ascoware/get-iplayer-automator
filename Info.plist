@@ -19,9 +19,9 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>4</string>
+	<string>6</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0 RC1</string>
+	<string>1.0_RC2</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
@@ -34,6 +34,8 @@
 	<string>4000</string>
 	<key>SUPublicDSAKeyFile</key>
 	<string>dsa_pub.pem</string>
+	<key>SUEnableAutomaticChecks</key>
+	<string>NO</string>
 	<key>JRFeedbackURL</key>
 	<string>http://tom-tech.com/get_iplayer/feedback.php</string>
 </dict>

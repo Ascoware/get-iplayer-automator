@@ -15,7 +15,6 @@
 #import "Sparkle.framework/Headers/Sparkle.h"
 #import "JRFeedbackController.h"
 
-
 @implementation AppController
 #pragma mark Overriden Methods
 - (id)description
@@ -444,6 +443,10 @@
 	{
 		[self addSeriesLinkToQueue:self];
 	}
+	
+	//Check for Updates - Don't want to prompt the user when updates are running.
+	SUUpdater *updater = [SUUpdater sharedUpdater];
+	[updater checkForUpdatesInBackground];
 }
 - (IBAction)forceUpdate:(id)sender
 {
