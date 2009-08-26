@@ -10,10 +10,10 @@
 	};
 	29B97313FDCFA39411CA2CEA /* Project object */ = {
 		activeArchitecturePreference = i386;
-		activeBuildConfigurationName = Release;
+		activeBuildConfigurationName = Debug;
 		activeExecutable = D9CC15540FF9000A00D819E2 /* Get iPlayer Automator */;
 		activeSDKPreference = macosx10.5;
-		activeTarget = D9D0E01310449DE70059F044 /* Distribution */;
+		activeTarget = 8D1107260486CEB800E47090 /* Get iPlayer Automator */;
 		addToTargets = (
 			8D1107260486CEB800E47090 /* Get iPlayer Automator */,
 		);
@@ -314,6 +314,10 @@
 			D9D0E0DC1044D97C0059F044 /* PBXTextBookmark */ = D9D0E0DC1044D97C0059F044 /* PBXTextBookmark */;
 			D9D0E0DD1044D97C0059F044 /* PlistBookmark */ = D9D0E0DD1044D97C0059F044 /* PlistBookmark */;
 			D9D0E0E51044DAA20059F044 /* PlistBookmark */ = D9D0E0E51044DAA20059F044 /* PlistBookmark */;
+			D9D0E0E71044DB490059F044 /* PlistBookmark */ = D9D0E0E71044DB490059F044 /* PlistBookmark */;
+			D9D0E0E81044DB490059F044 /* PlistBookmark */ = D9D0E0E81044DB490059F044 /* PlistBookmark */;
+			D9D0E0E91044DB490059F044 /* PBXTextBookmark */ = D9D0E0E91044DB490059F044 /* PBXTextBookmark */;
+			D9D0E0EC1044DB810059F044 /* PBXTextBookmark */ = D9D0E0EC1044DB810059F044 /* PBXTextBookmark */;
 			D9DA523A1037CA7F00C260EC = D9DA523A1037CA7F00C260EC /* PBXTextBookmark */;
 			D9F668C6102C540300A9449B = D9F668C6102C540300A9449B /* PBXTextBookmark */;
 			D9F6696F102C5E3300A9449B = D9F6696F102C5E3300A9449B /* PBXTextBookmark */;
@@ -2174,6 +2178,48 @@
 		rLen = 0;
 		rLoc = 2147483647;
 	};
+	D9D0E0E71044DB490059F044 /* PlistBookmark */ = {
+		isa = PlistBookmark;
+		fRef = 8D1107310486CEB800E47090 /* Info.plist */;
+		fallbackIsa = PBXBookmark;
+		isK = 0;
+		kPath = (
+		);
+		name = "/Users/thomaswillson/Code/Get iPlayer Automator/Info.plist";
+		rLen = 0;
+		rLoc = 2147483647;
+	};
+	D9D0E0E81044DB490059F044 /* PlistBookmark */ = {
+		isa = PlistBookmark;
+		fRef = 8D1107310486CEB800E47090 /* Info.plist */;
+		fallbackIsa = PBXBookmark;
+		isK = 0;
+		kPath = (
+		);
+		name = "/Users/thomaswillson/Code/Get iPlayer Automator/Info.plist";
+		rLen = 0;
+		rLoc = 2147483647;
+	};
+	D9D0E0E91044DB490059F044 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = D9FEB87510077790003BADF8 /* AppController.m */;
+		name = "AppController.m: 455";
+		rLen = 0;
+		rLoc = 16854;
+		rType = 0;
+		vrLen = 1344;
+		vrLoc = 16490;
+	};
+	D9D0E0EC1044DB810059F044 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = D9FEB87510077790003BADF8 /* AppController.m */;
+		name = "AppController.m: 454";
+		rLen = 0;
+		rLoc = 16854;
+		rType = 0;
+		vrLen = 1404;
+		vrLoc = 16490;
+	};
 	D9DA523A1037CA7F00C260EC /* PBXTextBookmark */ = {
 		isa = PBXTextBookmark;
 		fRef = D9F66962102C5DB800A9449B /* GetOperaURL.applescript */;
@@ -2264,9 +2310,9 @@
 	};
 	D9FEB87510077790003BADF8 /* AppController.m */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {1411, 23660}}";
-			sepNavSelRange = "{13295, 0}";
-			sepNavVisRange = "{12603, 1778}";
+			sepNavIntBoundsRect = "{{0, 0}, {1411, 23744}}";
+			sepNavSelRange = "{16854, 0}";
+			sepNavVisRange = "{16490, 1404}";
 			sepNavWindowFrame = "{{93, 31}, {910, 747}}";
 		};
 	};

@@ -231,8 +231,6 @@
 			<key>Layout</key>
 			<array>
 				<dict>
-					<key>BecomeActive</key>
-					<true/>
 					<key>ContentConfiguration</key>
 					<dict>
 						<key>PBXBottomSmartGroupGIDs</key>
@@ -280,6 +278,8 @@
 							<key>PBXSmartGroupTreeModuleOutlineStateSelectionKey</key>
 							<array>
 								<array>
+									<integer>5</integer>
+									<integer>3</integer>
 									<integer>0</integer>
 								</array>
 							</array>
@@ -316,12 +316,14 @@
 					<key>Dock</key>
 					<array>
 						<dict>
+							<key>BecomeActive</key>
+							<true/>
 							<key>ContentConfiguration</key>
 							<dict>
 								<key>PBXProjectModuleGUID</key>
 								<string>1CE0B20306471E060097A5F4</string>
 								<key>PBXProjectModuleLabel</key>
-								<string>Info.plist</string>
+								<string>AppController.m</string>
 								<key>PBXSplitModuleInNavigatorKey</key>
 								<dict>
 									<key>Split0</key>
@@ -329,11 +331,11 @@
 										<key>PBXProjectModuleGUID</key>
 										<string>1CE0B20406471E060097A5F4</string>
 										<key>PBXProjectModuleLabel</key>
-										<string>Info.plist</string>
+										<string>AppController.m</string>
 										<key>_historyCapacity</key>
 										<integer>0</integer>
 										<key>bookmark</key>
-										<string>D9D0E0E51044DAA20059F044</string>
+										<string>D9D0E0EC1044DB810059F044</string>
 										<key>history</key>
 										<array>
 											<string>D9CC156C0FF9075400D819E2</string>
@@ -377,10 +379,10 @@
 											<string>D9D0DFFE10449A8B0059F044</string>
 											<string>D9D0E0531044B6580059F044</string>
 											<string>D9D0E0611044BF290059F044</string>
-											<string>D9D0E0CB1044CA8C0059F044</string>
 											<string>D9D0E0D61044D97C0059F044</string>
 											<string>D9D0E0D71044D97C0059F044</string>
-											<string>D9D0E0D81044D97C0059F044</string>
+											<string>D9D0E0E71044DB490059F044</string>
+											<string>D9D0E0CB1044CA8C0059F044</string>
 										</array>
 										<key>prevStack</key>
 										<array>
@@ -442,6 +444,7 @@
 											<string>D9D0E0DA1044D97C0059F044</string>
 											<string>D9D0E0DB1044D97C0059F044</string>
 											<string>D9D0E0DC1044D97C0059F044</string>
+											<string>D9D0E0E81044DB490059F044</string>
 										</array>
 									</dict>
 									<key>SplitCount</key>

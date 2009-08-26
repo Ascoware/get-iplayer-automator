@@ -195,7 +195,7 @@ NSString *JRFeedbackType[JRFeedbackController_SectionCount] = {
                                  [sectionStrings[currentSection] string], @"feedback",
                                  [[[NSBundle bundleForClass:[self class]] infoDictionary] objectForKey:@"CFBundleName"], @"appName",
                                  [[[NSBundle bundleForClass:[self class]] infoDictionary] objectForKey:@"CFBundleIdentifier"], @"bundleID",
-                                 [[[NSBundle bundleForClass:[self class]] infoDictionary] objectForKey:@"CFBundleVersion"], @"version",
+                                 [[[NSBundle bundleForClass:[self class]] infoDictionary] objectForKey:@"CFBundleShortVersionString"], @"version",
                                  nil];
     if (systemProfile) {
         [form setObject:systemProfile forKey:@"systemProfile"];
