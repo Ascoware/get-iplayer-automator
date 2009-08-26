@@ -1571,8 +1571,8 @@
 	NSString *episodeName = [originalEpisodeName stringByReplacingOccurrencesOfString:@":" withString:@" -"];
 	
 	//Replace /'s with _'s
-	NSString *showName = [showName stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
-	NSString *episodeName = [episodeName stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
+	showName = [showName stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
+	episodeName = [episodeName stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
 	
 	if (![[show path] isEqualToString:@"Unknown"])
 	{
