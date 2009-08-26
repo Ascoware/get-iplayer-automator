@@ -1554,6 +1554,7 @@
 	{
 		[self addToLog:@"Unable to Add to iTunes" :self];
 		NSLog(@"Unable %@ to iTunes",show);
+		[show setValue:@"Complete, Could not add to iTunes." forKey:@"status"];
 	}
 }
 - (void)cleanUpPath:(Programme *)show

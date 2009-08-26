@@ -56,3 +56,4 @@
 1.0 RC3
 	Check for Updates after downloads complete.
 	Use short version string in feedback subject.
+	Sets status to unable to add to iTunes if error occurs.
