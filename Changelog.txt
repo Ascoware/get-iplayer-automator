@@ -58,3 +58,4 @@
 	Use short version string in feedback subject.
 	Sets status to unable to add to iTunes if error occurs.
 	Replace /'s with _'s in an attempt to fix an issue first seen with University Challenge where the file isn't successfully moved.
+		NOTE: Was successful
