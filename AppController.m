@@ -358,29 +358,35 @@
 	NSArray *tempQueue = [queueController arrangedObjects];
 	for (Programme *show in tempQueue)
 	{
+		NSLog([show description]);
 		if ([[show showName] length] > 0)
 			{
+				NSLog(@"Should be initializing task");
 				NSTask *pipeTask = [[NSTask alloc] init];
-				NSPipe *newPipe = [NSPipe pipe];
-				NSFileHandle *readHandle = [newPipe fileHandleForReading];
-				NSData *inData = nil;
-				
-				NSScanner *scanner = [NSScanner scannerWithString:[show showName]];
+				NSPipe *newPipe = [[NSPipe alloc] init];
+				NSFileHandle *readHandle2 = [newPipe fileHandleForReading];
+				NSData *someData;
+		
+				NSString *name = [[show showName] copy];
+				NSScanner *scanner = [NSScanner scannerWithString:name];
 				NSString *searchArgument;
-				[scanner scanUpToString:@":" intoString:&searchArgument];
+				[scanner scanUpToString:@" - " intoString:&searchArgument];
+				NSLog(searchArgument);
 				// write handle is closed to this process
 				[pipeTask setStandardOutput:newPipe];
+				[pipeTask setStandardError:newPipe];
 				[pipeTask setLaunchPath:@"/usr/bin/perl"];
-				[pipeTask setArguments:[NSArray arrayWithObjects:getiPlayerPath,[self typeArgument:nil],[self cacheExpiryArgument:nil],noWarningArg,listFormat,profileDirArg,
+				[pipeTask setArguments:[NSArray arrayWithObjects:getiPlayerPath,profileDirArg,noWarningArg,[self typeArgument:nil],[self cacheExpiryArgument:nil],listFormat,
 										searchArgument,nil]];
-				[pipeTask launch];
 				NSMutableString *taskData = [[NSMutableString alloc] initWithString:@""];
-				
-				while ((inData = [readHandle availableData]) && [inData length]) {
-					[taskData appendString:[[NSString alloc] initWithData:inData
+				[pipeTask launch];
+				while ((someData = [readHandle2 availableData]) && [someData length]) {
+					NSLog(@"data1");
+					[taskData appendString:[[NSString alloc] initWithData:someData
 																 encoding:NSUTF8StringEncoding]];
+					NSLog(@"data");
 				}
-				[pipeTask release];
+				NSLog(@"Task Data = %@", taskData);
 				NSString *string = [NSString stringWithString:taskData];
 				NSUInteger length = [string length];
 				NSUInteger paraStart = 0, paraEnd = 0, contentsEnd = 0;
@@ -401,15 +407,15 @@
 							Programme *p = [[Programme alloc] init];
 							NSString *temp_pid, *temp_showName, *temp_tvNetwork;
 							[myScanner scanUpToString:@":" intoString:&temp_pid];
-							[myScanner scanUpToCharactersFromSet:[NSCharacterSet letterCharacterSet] intoString:NULL];
 							[myScanner scanUpToString:@"," intoString:NULL];
-							[myScanner scanUpToCharactersFromSet:[NSCharacterSet letterCharacterSet] intoString:NULL];
-							[myScanner scanUpToString:@"," intoString:&temp_showName];
-							[myScanner scanUpToCharactersFromSet:[NSCharacterSet letterCharacterSet] intoString:NULL];
-							[myScanner scanUpToString:@"," intoString:&temp_tvNetwork];
+							[myScanner scanString:@", ~" intoString:NULL];
+							[myScanner scanUpToString:@"~," intoString:&temp_showName];
+							[myScanner scanString:@"~," intoString:NULL];
+							[myScanner scanUpToString:@"jkhjjhkjh" intoString:&temp_tvNetwork];
 							[p setValue:temp_pid forKey:@"pid"];
 							[p setValue:temp_showName forKey:@"showName"];
 							[p setValue:temp_tvNetwork forKey:@"tvNetwork"];
+							NSLog(@"Original = %@, Result = %@", [show showName], [p showName]);
 							if ([[p showName] isEqualToString:[show showName]])
 							{
 								[show setValue:[p pid] forKey:@"pid"];

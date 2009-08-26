@@ -52,3 +52,4 @@
 1.0 RC2
 	Sparkle Enabled
 	Now only prompts to update after the Index update has completed.
+	Fixed regression with index numbers no longer being updated after the cache is updated.
