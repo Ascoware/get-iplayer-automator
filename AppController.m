@@ -1570,6 +1570,10 @@
 	NSString *showName = [originalShowName stringByReplacingOccurrencesOfString:@":" withString:@" -"];
 	NSString *episodeName = [originalEpisodeName stringByReplacingOccurrencesOfString:@":" withString:@" -"];
 	
+	//Replace /'s with _'s
+	NSString *showName = [showName stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
+	NSString *episodeName = [episodeName stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
+	
 	if (![[show path] isEqualToString:@"Unknown"])
 	{
 		NSLog(@"Original Path = %@", [show path]);
