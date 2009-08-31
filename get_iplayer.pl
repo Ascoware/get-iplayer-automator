@@ -24,7 +24,7 @@
 #
 #
 package main;
-my $version = 2.16;
+my $version = 2.22;
 #
 # Help:
 #	./get_iplayer --help | --longhelp
@@ -40,16 +40,12 @@ my $version = 2.16;
 # * Index/Record live radio streams w/schedule feeds to assist timing
 # * Remove all rtsp/mplayer/lame/tee dross when realaudio streams become obselete (not quite yet)
 # ** all global vars into a class???
-# ** Cut down 'use' clauses in each class 
+# ** Cut down 'use' clauses in each class
 # ** Globalise %prog, %got_cache so that they aren't repopulated for every PVR run
 # * Correctly handle connection priorities in mediaselector metadata for each mode for iplayer
-# * Create template parsers for each BBC iPlayer CDN as the parsing does appear to be similar
 # * stdout streaming with mms
 #
 # Known Issues:
-# * rtmpdump (v1.2) of flashaudio fails at end of stream => non-zero exit code
-# * rtmpdump-v1.3 doesn't work correctly for flashhigh mode - keeps hanging on streaming
-# * --player and --stdout streaming does not work properly on windows.
 
 use Env qw[@PATH];
 use Fcntl;
@@ -101,14 +97,14 @@ my %user_agent = (
 #	'desc'		=> <Long Description>,
 #	'available'	=> <Date/Time made available or remaining>,
 #	'duration'	=> <duration in HH:MM:SS>
-#	'versions'	=> <comma separated list of versions, e.g default, signed>
+#	'versions'	=> <comma separated list of versions, e.g default, signed, audiodescribed>
 #	'thumbnail'	=> <programme thumbnail url>
 #	'channel	=> <channel>
 #	'categories'	=> <Comma separated list of categories>
 # 	'type'		=> <prog_type>
 #	'timeadded'	=> <timestamp when programme was added to cache>
 #	'longname'	=> <Long name (only parsed in stage 1)>,
-#	'version'	=> <selected version e.g default, signed, etc - only set before recording>
+#	'version'	=> <selected version e.g default, signed, audiodescribed, etc - only set before recording>
 #	'filename'	=> <Path and Filename of saved file - set only while recording>
 #	'dir'		=> <Filename Directory of saved file - set only while recording>
 #	'fileprefix'	=> <Filename Prefix of saved file - set only while recording>
@@ -150,10 +146,12 @@ my $opt_format = {
 	listplugins	=> [ 1, "listplugins", 'Display', '--listplugins', "Display a list of currently available plugins or programme types"],
 	long		=> [ 0, "long|l", 'Search', '--long, -l', "Additionally search & display long programme descriptions / episode names"],
 	manpage		=> [ 1, "manpage=s", 'Display', '--manpage <file>', "Create man page based on current help text"],
-	metadata	=> [ 1, "metadata=s", 'Output', '--metadata <type>', "Create metadata info file after download. Valid types are: xbmc, generic"],
+	metadata	=> [ 1, "metadata=s", 'Output', '--metadata <type>', "Create metadata info file after recording. Valid types are: xbmc, xbmc_movie, generic"],
+	metadataonly	=> [ 1, "metadataonly", 'Output', '--metadataonly', "Create specified metadata info file without any recording or streaming (can also be used with thumbnail option)."],
 	modes		=> [ 0, "modes=s", 'Recording', '--modes <mode>,<mode>,...', "Recoding modes: iphone,flashhd,flashvhigh,flashhigh,flashstd,flashnormal,flashlow,n95_wifi,flashaac,flashaudio,realaudio,wma"],
 	mp3audio	=> [ 0, "mp3audio", 'Deprecated', '--mp3audio', "Old way of specifying mp3 Radio radiomode"],
 	mplayer		=> [ 0, "mplayer=s", 'External Program', '--mplayer <path>', "Location of mplayer binary"],
+	multimode	=> [ 1, "multimode", 'Recording', '--multimode', "Allow the recording of more than one mode for the same programme - WARNING: will record all specified/default modes!!"],
 	mythtv		=> [ 1, "mythtv=s", 'Output', '--mythtv <file>', "Create Mythtv streams XML of matching programmes in specified file"],
 	nocopyright	=> [ 1, "nocopyright", 'Misc', '--nocopyright', "Don't display copyright header"],
 	nopurge		=> [ 0, "no-purge|nopurge", 'Config', '--nopurge', "Don't ask to delete programmes recorded over 30 days ago"],	
@@ -162,7 +160,7 @@ my $opt_format = {
 	overwrite	=> [ 1, "overwrite|over-write", 'Recording', '--overwrite', "Overwrite recordings if they already exist"],
 	partialproxy	=> [ 1, "partial-proxy", 'Recording', '--partial-proxy', "Only uses web proxy where absolutely required (try this extra option if your proxy fails)"],
 	pid		=> [ 0, "pid|url=s", 'Recording', '--pid, --url [<type>:]<pid|URL>', "Record an arbitrary pid that does not necessarily appear in the index. Also used to stream live programmes"],
-	packagemanager	=> [ 0, "packagemanager=s", 'Misc', '--packagemanager <string>', "Tell the updater that we were installed using a package manager and don't update"],
+	packagemanager	=> [ 1, "packagemanager=s", 'Misc', '--packagemanager <string>', "Tell the updater that we were installed using a package manager and don't update (use either: apt,rpm,deb,yum,disable)"],
 	player		=> [ 0, "player=s", 'Output', "--player \'<command> <options>\'", "Use specified command to directly play the stream"],
 	pluginsupdate	=> [ 0, "pluginsupdate|plugins-update", 'Config', '--plugins-update', "Update get_iplayer plugins to the latest"],
 	prefsadd	=> [ 0, "addprefs|add-prefs|prefsadd|prefs-add", 'Config', '--prefs-add', "Add/Change specified saved user or preset options"],
@@ -197,7 +195,7 @@ my $opt_format = {
 	tree		=> [ 0, "tree", 'Display', '--tree', "Display Programme listings in a tree view"],
 	type		=> [ 0, "type=s", 'Search', '--type <type>', "Only search in these types of programmes: ".join(',', keys %prog_types).",all (tv is default)"],
 	update		=> [ 0, "update|u", 'Config', '--update, -u', "Update get_iplayer if a newer one exists"],
-	versionlist	=> [ 1, "versionlist|versions|version-list=s", 'Search', '--versions <versions>', "Version of programme to search or record (e.g. '--versions signed,default')"],
+	versionlist	=> [ 1, "versionlist|versions|version-list=s", 'Search', '--versions <versions>', "Version of programme to search or record (e.g. '--versions signed,audiodescribed,default')"],
 	verbose		=> [ 1, "verbose|v", 'Config', '--verbose, -v', "Verbose"],
 	warranty	=> [ 1, "warranty", 'Misc', '--warranty', 'Displays warranty section of GPL'],
 	webrequest	=> [ 1, "webrequest=s", 'Misc', '--webrequest <urlencoded string>', 'Specify all options as a urlencoded string of "name=val&name=val&..."' ],
@@ -277,8 +275,10 @@ if ( defined $ENV{GETIPLAYERUSERPREFS} && $ENV{GETIPLAYERSYSPREFS} ) {
 # Options on unix-like systems
 } elsif ( defined $ENV{HOME} ) {
 	$profile_dir = $opt_pre->{profiledir} || $ENV{HOME}.'/.get_iplayer';
-	$optfile_system = '/etc/get_iplayer/options';
-
+	$optfile_system = '/var/lib/get_iplayer/options';
+	if ( -f '/etc/get_iplayer/options' ) {
+		logger "WARNING: System-wide options in /etc/get_iplayer/options are now ignored, please use /var/lib/get_iplayer/options instead\n";
+	}
 # Otherwise look for windows style file locations
 } elsif ( defined $ENV{USERPROFILE} ) {
 	$profile_dir = $opt_pre->{profiledir} || $ENV{USERPROFILE}.'/.get_iplayer';
@@ -421,8 +421,6 @@ for ( progclass() ) {
 	# Set maximum index number
 	$max_index = progclass($_)->index_max if progclass($_)->index_max > $max_index;
 }
-my $min_download_size = 1024000;
-
 
 # Setup signal handlers
 $SIG{INT} = $SIG{PIPE} =\&cleanup;
@@ -659,8 +657,8 @@ sub find_matches {
 			@try_types = (keys %type);
 		}
 		logger "INFO: Will try prog types: ".(join ',', @try_types)."\n" if $opt->{verbose};
-		return 0 if check_download_history( $pid ) && ! $opt->{subsonly};
-		
+		return 0 if ( ! $opt->{subsonly} ) && ( ! $opt->{multimode} ) && ( ! $opt->{metadataonly} ) && check_download_history( $pid );
+	
 		# Maybe we don't want to populate caches - this slows down --pid recordings ...
 		# Populate cache with all specified prog types (strange perl bug?? - @try_types is empty after these calls if done in a $_ 'for' loop!!)
 		# only get links and possibly refresh caches if > 1 type is specified
@@ -670,7 +668,7 @@ sub find_matches {
 		for my $t ( @try_types ) {
 			get_links( \%prog, \%index_prog, $t, $load_from_file_only );
 		}
-		
+
 		# Try to get pid using each speficied prog type
 		my $retcode;
 		for my $prog_type ( @try_types ) {
@@ -686,11 +684,15 @@ sub find_matches {
 					$this->clean_pid;
 					logger " New: '$this->{pid}'\n" if $opt->{verbose};
 				}
+				# Display pid for recording
+				list_progs( \%type, $this );
 				$retcode = $this->download_retry_loop();
 				last if ! $retcode;
 			} else {
 				logger "INFO: pid found in cache\n";
 				$this = $prog{$pid};
+				# Display pid for recording
+				list_progs( \%type, $this );
 				$retcode = $this->download_retry_loop();
 				last if ! $retcode;
 				# If it is in the cache then we'll not need to try the other types regardless of success
@@ -783,13 +785,11 @@ sub find_matches {
 		}
 	}
 
-	# De-dup matches and retain order (don't ask!)
-	my %seen = ();
-	my @unique = grep { ! $seen{ $_ }++ } @match_list;
-	@match_list = @unique;
+	# De-dup matches and retain order
+	@match_list = main::make_array_unique_ordered( @match_list );
 
-	# Prune out pids already recorded if opt{hide} is specified
-	if ( $opt->{hide} && not $opt->{force} ) {
+	# Prune out pids already recorded if opt{hide} is specified (cannot hide for multimode)
+	if ( $opt->{hide} && ( not $opt->{force} ) && ( not $opt->{multimode} ) ) {
 		my @pruned;
 		for my $this (@match_list) {
 			# If the prog object exists with pid in history delete it from the prog list
@@ -850,20 +850,35 @@ sub list_progs {
 
 	logger "Matches:\n" if $#_ >= 0;
 	for my $this (@_) {
-		if (! defined $names{ $this->{name} }) {
-			$this->list_entry( '', 0, $number_of_types );
-		} else {
-			$this->list_entry( '', 1, $number_of_types );
+		# Only display if the prog name is set
+		if ( $this->{name} ) {
+			if (! defined $names{ $this->{name} }) {
+				$this->list_entry( '', 0, $number_of_types );
+			} else {
+				$this->list_entry( '', 1, $number_of_types );
+			}
+			$names{ $this->{name} } = 1;
 		}
-		$names{ $this->{name} } = 1;
 		if ( $opt->{info} ) {
 			$this->get_metadata_general();
 			$this->get_metadata( $ua );
 			# display all attribs except 'streams'
 			$this->display_metadata( sort keys %{ $this } );
 		}
+		# Create metadata file (i.e. don't stream/record)
+		if ( $opt->{metadataonly} ) {
+			$this->get_metadata_general();
+			$this->get_metadata( $ua );
+			# Search versions for versionlist versions
+			my @versions = $this->generate_version_list;
+			# Use first version in list if a version list is not specified
+			$this->{version} = $versions[0] || 'default';
+			$this->generate_filenames( $ua, $this->file_prefix_format() );
+			$this->create_metadata_file;
+			$this->download_thumbnail if $opt->{thumb} && $this->{thumbnail};
+		}
 	}
-	logger "\nINFO: ".($#_ + 1)." Matching Programmes\n" if $opt->{pvr} && $#_ >= 0;
+	logger "\nINFO: ".($#_ + 1)." Matching Programmes\n" if ( $opt->{pvr} && $#_ >= 0 ) || ! $opt->{pvr};
 }
 
 
@@ -993,6 +1008,16 @@ sub sort_index {
 		$counter++;
 	}
 	return 0;
+}
+
+
+
+sub make_array_unique_ordered {
+	# De-dup array and retain order (don't ask!)
+	my ( @array ) = ( @_ );
+	my %seen = ();
+	my @unique = grep { ! $seen{ $_ }++ } @array;
+	return @unique;
 }
 
 
@@ -1543,6 +1568,8 @@ sub update_script {
 		} elsif ( $opt->{packagemanager} =~ /rpm/i ) {
 			logger "INFO: Please run the following command as root to update get_iplayer using $opt->{packagemanager}\n".
 			"  rpm -Uvh http://linuxcentre.net/get_iplayer/packages/get_iplayer-current.noarch.rpm\n";
+		} elsif ( $opt->{packagemanager} =~ /disable/i ) {
+			logger "ERROR: get_iplayer should only be updated using your local package management system, for more information see http://linuxcentre.net/installation\n";
 		} else {
 			logger "ERROR: get_iplayer was installed using '$opt->{packagemanager}' package manager please refer to the update documentation at http://linuxcentre.net/getiplayer/installation/\n";
 		}
@@ -2047,31 +2074,41 @@ sub load_download_history {
 # Checks history for previous download of this pid
 sub check_download_history {
 	my $pid = shift;
-	my ($matchedpid, $name, $episode);
+	my $mode = shift;
 	return 0 if ! $pid;
-		
+
 	# Return if force option specified or stdout streaming only
 	return 0 if $opt->{force} || $opt->{stdout} || $opt->{nowrite};
-	
+
 	if ( ! open(HIST, "< $historyfile") ) {
 		logger "WARNING: Cannot read $historyfile\n\n" if $opt->{verbose};
 		return 0;
 	}
+	my @entries = grep /^$pid/, <HIST>;
+	close HIST;
 
-	# Find and parse first matching line
-	($matchedpid, $name, $episode) = ( split /\|/, (grep /^$pid/, <HIST>)[0] )[0,1,2];
-	if ( $matchedpid ) {
+	# Find and parse first matching history lines
+	for my $entry ( @entries ) {
+		my ( $name, $episode, $histmode ) = ( split /\|/, $entry )[1,2,5];
 		chomp $name;
 		chomp $episode;
-		logger "INFO: $name - $episode ($pid) Already in download history ($historyfile) - use --force to override\n";
-		close HIST;
-		return 1;
-
-	} else {
-		logger "INFO: Programme not in download history\n" if $opt->{verbose};
-		close HIST;
-		return 0;
+		chomp $histmode;
+		main::logger "DEBUG: Found PID='$pid' with MODE='$histmode' in download history\n" if $opt->{debug};
+		if ( $opt->{multimode} ) {
+			# Strip any number off the end of the mode names for the comparison
+			$mode =~ s/\d+$//g;
+			$histmode =~ s/\d+$//g;
+			if ( $mode eq $histmode ) {
+				logger "INFO: $name - $episode ($pid / $mode) Already in download history ($historyfile) - use --force to override\n";
+				return 1;
+			}
+		} else {
+			logger "INFO: $name - $episode ($pid) Already in download history ($historyfile) - use --force to override\n";
+			return 1;
+		}
 	}
+	logger "INFO: Programme not in download history\n" if $opt->{verbose};
+	return 0;
 }
 
 
@@ -2402,8 +2439,8 @@ sub usage {
 
 	# Build the help usage text
 	# Each section
-	for my $section ( 'Search', 'Display', 'Recording', 'Output', 'PVR', 'Config', 'External Program' ) {
-	#for my $section ( keys %section_name ) {
+	for my $section ( 'Search', 'Display', 'Recording', 'Output', 'PVR', 'Config', 'External Program', 'Misc' ) {
+		next if not defined $section_name{$section};
 		my @lines;
 		my @manlines;
 		my @dumplines;
@@ -2906,6 +2943,36 @@ sub download_subtitles {
 
 
 
+# Usage: generate_version_list ($prog)
+# Returns sorted array of versions
+sub generate_version_list {
+	my $prog = shift;
+	
+	# Default Order with which to search for programme versions (can be overridden by --versionlist option)
+	my @version_search_order = qw/ default original signed audiodescribed opensubtitled shortened lengthened other /;
+	@version_search_order = split /,/, $opt->{versionlist} if $opt->{versionlist};
+
+	# check here for no matching verpids for specified version search list???
+	my $got = 0;
+	my @version_list;
+	for my $version ( @version_search_order ) {
+		if ( defined $prog->{verpids}->{$version} ) {
+			$got++;
+			push @version_list, $version;
+		}
+	}
+
+	if ( $got == 0 ) {
+		main::logger "INFO: No versions of this programme were selected (".(join ',', sort keys %{ $prog->{verpids} })." are available)\n";
+	} else {
+		main::logger "INFO: Will search for versions: ".(join ',', @version_list)."\n" if $opt->{verbose};
+	}
+	#main::logger "INFO: Versions available: ".(join ',', sort keys %{ $prog->{verpids} })."\n";
+	return @version_list;
+}
+
+
+
 # Retry the recording of a programme
 # Usage: download_retry_loop ( $prog )
 sub download_retry_loop {
@@ -2914,7 +2981,11 @@ sub download_retry_loop {
 	# Run the type init
 	$prog->init();
 
-	return 0 if ( ! $opt->{streaminfo} ) && main::check_download_history( $prog->{pid} ) && ! $opt->{subsonly};
+	# return if metadataonly
+	return 0 if $opt->{metadataonly};
+
+	# If already downloaded then return (unless its for subsonly, multimode or streaminfo)
+	return 0 if ( ! $opt->{streaminfo} ) && ( ! $opt->{subsonly} ) && ( ! $opt->{multimode} ) && main::check_download_history( $prog->{pid} );
 
 	# Skip and warn if there is no pid
 	if ( ! $prog->{pid} ) {
@@ -2940,28 +3011,9 @@ sub download_retry_loop {
 		return 1;
 	}
 
-	# Default Order with which to search for programme versions (can be overridden by --versionlist option)
-	my @version_search_list	= qw/ default original signed audiodescribed opensubtitled shortened lengthened other /;
-	@version_search_list = keys %{ $prog->{verpids} } if defined $opt->{versionlist};
-	my @new_version_search_list;
-	for my $version ( split /,/, $opt->{versionlist} ) {
-		push @new_version_search_list, grep /^$version/i, @version_search_list;
-		main::logger "DEBUG: version search added ".(join ',', grep /^$version/i, @version_search_list)." to version_search_list\n" if $opt->{debug};
-	}
-	@version_search_list = @new_version_search_list if $opt->{versionlist};
-	main::logger "INFO: Will look for versions: ".(join ',', @version_search_list)."\n" if $opt->{verbose};
 
-	# check here for no matching verpids for specified version search list???
-	my $got = 0;
-	for my $version ( @version_search_list ) {
-		$got++ if defined $prog->{verpids}->{$version};
-	}
-	if ( $got == 0 ) {
-		main::logger "INFO: No versions of this programme were selected for download\n";
-		return 1;
-	}
-	
-	#main::logger "INFO: Versions available: ".(join ',', sort keys %{ $prog->{verpids} })."\n";
+	my @version_search_list = $prog->generate_version_list;
+	return 1 if $#version_search_list < 0;
 
 	# Get all possible (or user overridden) modes for this prog recording
 	my $modelist = $prog->modelist;
@@ -3014,12 +3066,15 @@ sub download_retry_loop {
 				main::logger "INFO: Trying $mode mode to record $prog->{type}: $prog->{name} - $prog->{episode}\n";
 				$prog->{mode} = $mode;
 
+				# If multimode is used, skip only modes which are in the history
+				next if $opt->{multimode} && main::check_download_history( $prog->{pid}, $mode );
+
 				# try the recording for this mode (rtn==0 -> success, rtn==1 -> next mode, rtn==2 -> next prog)
 				$retcode = mode_ver_download_retry_loop( $prog, $ua, $mode, $version, $prog->{verpids}->{$version} );
 				main::logger "DEBUG: mode_ver_download_retry_loop retcode = $retcode\n" if $opt->{debug};
 
-				# quit if successful or skip
-				last if $retcode == 0 || $retcode == 2;
+				# quit if successful or skip (unless --multimode selected)
+				last if ( $retcode == 0 || $retcode == 2 ) && ! $opt->{multimode};
 
 				# Only need to try one mode for subs
 				last if $opt->{subsonly};
@@ -3082,7 +3137,7 @@ sub mode_ver_download_retry_loop {
 				$prog->download_thumbnail if $opt->{thumb};
 				$prog->create_metadata_file if $opt->{metadata};
 			}
-			$prog->run_user_command( $opt->{command} ) if $opt->{command} && ! $opt->{subsonly};
+			$prog->run_user_command( $opt->{command} ) if $opt->{command} && (! $opt->{subsonly});
 			$prog->report() if $opt->{pvr};
 			return 0;
 
@@ -3147,13 +3202,16 @@ sub create_metadata_file {
 	<movie>
 		<title>[name] - [episode]</title>
 		<outline>[desc]</outline>
+		<plot>[desc]</plot>
 		<tagline></tagline>
 		<runtime>[duration]</runtime>
 		<thumb>[thumbnail]</thumb>
 		<id>[pid]</id>
-		<filenameandpath>[dir]/[fileprefix]/[ext]</filenameandpath>
+		<filenameandpath>[dir]/[fileprefix].[ext]</filenameandpath>
 		<trailer></trailer>
 		<genre>[categories]</genre>
+		<year>[firstbcast]</year>
+		<credits>[channel]</credits>
         </movie>
 	';
 
@@ -3284,6 +3342,9 @@ sub generate_filenames {
 	
 	$prog->{dir} = $opt->{ 'output'.$prog->{type} } || $opt->{output} || $ENV{IPLAYER_OUTDIR} || '.';
 
+	# Add modename to default format string if multimode option is used
+	$format .= ' <mode>' if $opt->{multimode};
+
 	$prog->{fileprefix} = $opt->{fileprefix} || $format;
 
 	# If we dont have longname defined just set it to name
@@ -3337,7 +3398,7 @@ sub generate_filenames {
 	}
 
 	# If the file already exists
-	if ( (! $opt->{subsonly}) && -f $prog->{filename} && stat($prog->{filename})->size > $prog->min_download_size() ) {
+	if ( (! $opt->{metadataonly}) && (! $opt->{subsonly}) && -f $prog->{filename} && stat($prog->{filename})->size > $prog->min_download_size() ) {
 		if ( $opt->{overwrite} ) {
 			main::logger("INFO: Overwriting file $prog->{filename}\n\n");
 			unlink $prog->{filename};
@@ -3691,7 +3752,7 @@ sub get_verpids {
 
 	# Detect noItems or no programmes
 	if ( $xml =~ m{<noItems\s+reason="noMedia"} || $xml !~ m{kind="(programme|radioProgramme)"} ) {
-		main::logger "\rWARNING: No programmes are available for this pid\n\n";
+		main::logger "\rWARNING: No programmes are available for this pid\n";
 		return 0;
 	}
 
@@ -3784,7 +3845,7 @@ sub get_metadata {
 	my $entry;
 	my $prog_feed_url = 'http://feeds.bbc.co.uk/iplayer/episode/'; # $pid
 
-	my ($name, $episode, $duration, $available, $channel, $expiry, $longdesc, $versions, $guidance, $prog_type, $categories, $player, $thumbnail);
+	my ($name, $episode, $duration, $available, $channel, $expiry, $longdesc, $summary, $versions, $guidance, $prog_type, $categories, $player, $thumbnail);
 
 	# This URL works for all prog types:
 	# http://www.bbc.co.uk/iplayer/playlist/${pid}
@@ -3876,6 +3937,7 @@ sub get_metadata {
 	$prog_type = 'tv' if $prog_type eq 'video';
 	$prog_type = 'radio' if $prog_type eq 'audio';
 	$longdesc = $1 if $entry =~ m{<media:description>\s*(.*?)\s*<\/media:description>};
+	$summary = $1 if $entry =~ m{<summary>\s*(.*?)\s*</summary>};
 	$guidance = $1 if $entry =~ m{<media:rating scheme="urn:simple">(.+?)<\/media:rating>};
 	$player = $1 if $entry =~ m{<media:player\s*url=\"(.*?)\"\s*\/>};
 	$thumbnail = $1 if $entry =~ m{<media:thumbnail url="([^"]+?)"\s+width="150"\s+height="84"\s*/>};
@@ -3970,7 +4032,7 @@ sub get_metadata {
 	$prog->{versions}	= $versions;
 	$prog->{guidance}	= $guidance || $prog->{guidance};
 	$prog->{categories}	= $categories || $prog->{categories};
-	$prog->{desc}		= $longdesc || $prog->{desc};
+	$prog->{desc}		= $longdesc || $prog->{desc} || $summary;
 	$prog->{player}		= $player;
 	$prog->{thumbnail}	= $thumbnail || $prog->{thumbnail};
 	$prog->{modes}		= $modes;
@@ -4167,6 +4229,7 @@ sub get_stream_data_cdn {
 		# Unknown CDN
 		} else {
 			new_stream_report($mattribs, $cattribs) if $opt->{verbose};
+			next;
 		}
 
 		get_stream_set_type( $conn, $mattribs, $cattribs );
@@ -4475,6 +4538,7 @@ sub channels {
 		'categories/sport/tv'		=> 'BBC Sport',
 	#	'categories/tv'			=> 'All',
 		'categories/signed'		=> 'Signed',
+		'categories/audiodescribed'	=> 'Audio Described',
 	};
 }
 
@@ -4586,7 +4650,7 @@ sub get_links {
 	my $prog_type = shift;
 	# Hack to get correct 'channels' method because this methods is being shared with Programme::radio
 	my %channels = %{ main::progclass($prog_type)->channels() };
-	my $channel_feed_url = 'http://feeds.bbc.co.uk/iplayer'; # /$channel/list/limit/400
+	my $channel_feed_url = 'http://feeds.bbc.co.uk/iplayer'; # /$channel/list
 	my $bbc_prog_page_prefix = 'http://www.bbc.co.uk/programmes'; # /$pid
 	my $thumbnail_prefix = 'http://www.bbc.co.uk/iplayer/images/episode';
 
@@ -4604,7 +4668,7 @@ sub get_links {
 	push @channel_list, grep  /categor/, keys %channels;
 	for ( @channel_list ) {
 
-		my $url = "${channel_feed_url}/$_/list/limit/400";
+		my $url = "${channel_feed_url}/$_/list";
 		main::logger "DEBUG: Getting feed $url\n" if $opt->{verbose};
 		$xml = main::request_url_retry($ua, $url, 3, '.', "WARNING: Failed to get programme index feed for $_ from iplayer site\n");
 		main::logger "INFO: Got ".(grep /<entry/, split /\n/, $xml)." programmes\n" if $opt->{verbose};
@@ -4660,8 +4724,8 @@ sub get_links {
 		shift @entries;
 
 		foreach my $entry (@entries) {
-			my ( $name, $episode, $desc, $pid, $available, $channel, $duration, $thumbnail, $versions, $guidance );
-
+			my ( $name, $episode, $desc, $pid, $available, $channel, $duration, $thumbnail, $version, $guidance );
+			
 			my $entry_flat = $entry;
 			$entry_flat =~ s/\n/ /g;
 
@@ -4698,7 +4762,7 @@ sub get_links {
 			# Merge and Skip if this pid is a duplicate
 			if ( defined $progref->{$pid} ) {
 				main::logger "WARNING: '$pid, $progref->{$pid}->{name} - $progref->{$pid}->{episode}, $progref->{$pid}->{channel}' already exists (this channel = $channel)\n" if $opt->{verbose};
-				# Since we use the 'Signed' channel to get sign zone data, merge the categories from this entry to the existing entry
+				# Since we use the 'Signed' (or 'Audio Described') channel to get sign zone/audio described data, merge the categories from this entry to the existing entry
 				if ( $progref->{$pid}->{categories} ne join(',', @category) ) {
 					my %cats;
 					$cats{$_} = 1 for ( split /,/, $progref->{$pid}->{categories} );
@@ -4707,28 +4771,30 @@ sub get_links {
 					$progref->{$pid}->{categories} = join(',', sort keys %cats);
 				}
 				# If this is a dupicate pid and the channel is now Signed then both versions are available
-				$progref->{$pid}->{versions} = 'default,signed' if $channel eq 'Signed';
+				$version = 'signed' if $channel eq 'Signed';
+				$version = 'audiodescribed' if $channel eq 'Audio Described';
+				# Add version to versions for existing prog
+				$progref->{$pid}->{versions} = join ',', main::make_array_unique_ordered( (split /,/, $progref->{$pid}->{versions}), $version );
 				next;
 			}
 
 			# Set guidance based on category
 			$guidance = 'Yes' if grep /guidance/i, @category;
 
-			# Check for signed-only version from Channel
-			if ($channel eq 'Signed') {
-				$versions = 'signed';
-			# Else if not channel 'Signed' then this must also have both versions available
-			} elsif ( grep /Sign Zone/, @category ) {
-				$versions = 'default,signed';
+			# Check for signed-only or audiodescribed-only version from Channel
+			if ( $channel eq 'Signed' ) {
+				$version = 'signed';
+			} elsif ( $channel eq 'Audio Described' ) {
+				$version = 'audiodescribed';
 			} else {
-				$versions = 'default';
+				$version = 'default';
 			}
 
 			# build data structure
 			$progref->{$pid} = main::progclass($prog_type)->new(
 				'pid'		=> $pid,
 				'name'		=> $name,
-				'versions'	=> $versions,
+				'versions'	=> $version,
 				'episode'	=> $episode,
 				'desc'		=> $desc,
 				'guidance'	=> $guidance,
@@ -6955,7 +7021,8 @@ sub queue {
 	# PID and TYPE specified
 	if ( $opt_cmdline->{pid} ) {
 		if ( $opt_cmdline->{type} && $opt_cmdline->{type} !~ ',' ) {
-			$pvr->add( "ONCE_$opt_cmdline->{pid}" ) if ! main::check_download_history( $opt_cmdline->{pid} );
+			# Add to PVR if not already in download history (unless multimode specified)
+			$pvr->add( "ONCE_$opt_cmdline->{pid}" ) if ( ! main::check_download_history( $opt_cmdline->{pid} ) ) || $opt->{multimode};
 		} else {
 			main::logger "ERROR: Cannot add a pid to the PVR queue without a single --type specified\n";
 			return 1;
@@ -6989,7 +7056,7 @@ sub add {
 		return 1;
 	}
 	# Parse valid options and create array (ignore options from the options files that have not been overriden on the cmdline)
-	for ( grep !/(webrequest|nocopyright|^test|subsonly|stdout|^get|update|^save|^prefs|help|expiry|nowrite|tree|terse|streaminfo|listformat|^list|showoptions|hide|info|pvr.*)$/, sort {lc $a cmp lc $b} keys %{$opt_cmdline} ) {
+	for ( grep !/(webrequest|nocopyright|^test|metadataonly|subsonly|stdout|^get|update|^save|^prefs|help|expiry|nowrite|tree|terse|streaminfo|listformat|^list|showoptions|hide|info|pvr.*)$/, sort {lc $a cmp lc $b} keys %{$opt_cmdline} ) {
 		if ( defined $opt_cmdline->{$_} ) {
 				push @options, "$_ $opt_cmdline->{$_}";
 				main::logger "DEBUG: Adding option $_ = $opt_cmdline->{$_}\n" if $opt->{debug};
