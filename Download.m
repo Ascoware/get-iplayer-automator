@@ -264,91 +264,94 @@
 }
 - (void)processError
 {
-	NSString *outp = [errorCache copy];
-	errorCache = [NSMutableString stringWithString:@""];
-    if ([outp length] > 0) {
-		BOOL status=YES;
-		NSString *outpt = [[NSString alloc] initWithString:outp];
-		NSString *string = [NSString stringWithString:outpt];
-		NSUInteger length = [string length];
-		NSUInteger paraStart = 0, paraEnd = 0, contentsEnd = 0;
-		NSMutableArray *array = [NSMutableArray array];
-		NSRange currentRange;
-		while (paraEnd < length) {
-			[string getParagraphStart:&paraStart end:&paraEnd
-						  contentsEnd:&contentsEnd forRange:NSMakeRange(paraEnd, 0)];
-			currentRange = NSMakeRange(paraStart, contentsEnd - paraStart);
-			[array addObject:[string substringWithRange:currentRange]];
-		}
-		for (NSString *s in array)
-		{
-			NSString *s2;
-			NSScanner *scanner = [NSScanner scannerWithString:s];
-			//Check if BBC Flash status Message
-			if (![scanner scanFloat:nil])
+	if (running)
+	{
+		NSString *outp = [errorCache copy];
+		errorCache = [NSMutableString stringWithString:@""];
+		if ([outp length] > 0) {
+			BOOL status=YES;
+			NSString *outpt = [[NSString alloc] initWithString:outp];
+			NSString *string = [NSString stringWithString:outpt];
+			NSUInteger length = [string length];
+			NSUInteger paraStart = 0, paraEnd = 0, contentsEnd = 0;
+			NSMutableArray *array = [NSMutableArray array];
+			NSRange currentRange;
+			while (paraEnd < length) {
+				[string getParagraphStart:&paraStart end:&paraEnd
+							  contentsEnd:&contentsEnd forRange:NSMakeRange(paraEnd, 0)];
+				currentRange = NSMakeRange(paraStart, contentsEnd - paraStart);
+				[array addObject:[string substringWithRange:currentRange]];
+			}
+			for (NSString *s in array)
 			{
-				if ([s length] != 0)
+				NSString *s2;
+				NSScanner *scanner = [NSScanner scannerWithString:s];
+				//Check if BBC Flash status Message
+				if (![scanner scanFloat:nil])
 				{
-					//If not...
-					s2 = @"0.0% - (0.0 MB/~0.0 MB) -- Initializing...";
-					[self addToLog:s noTag:YES];
-					status=NO;
-					[scanner setScanLocation:0];
-					if ([s hasPrefix:@"ERROR:"] || [s hasPrefix:@"\rERROR:"] || [s hasPrefix:@"\nERROR:"])
+					if ([s length] != 0)
 					{
-						NSLog(@"here");
-						if ([scanner scanUpToString:@"corrupt file!" intoString:nil])
+						//If not...
+						s2 = @"0.0% - (0.0 MB/~0.0 MB) -- Initializing...";
+						[self addToLog:s noTag:YES];
+						status=NO;
+						[scanner setScanLocation:0];
+						if ([s hasPrefix:@"ERROR:"] || [s hasPrefix:@"\rERROR:"] || [s hasPrefix:@"\nERROR:"])
 						{
-							NSAlert *alert = [NSAlert alertWithMessageText:@"Unresumable File!" 
-															 defaultButton:nil 
-														   alternateButton:nil 
-															   otherButton:nil 
-												 informativeTextWithFormat:@"Try this download again. If it fails with the same message again, please move or rename the partial file for %@",[show showName]];
-							[task interrupt];
-							[alert runModal];
+							NSLog(@"here");
+							if ([scanner scanUpToString:@"corrupt file!" intoString:nil])
+							{
+								NSAlert *alert = [NSAlert alertWithMessageText:@"Unresumable File!" 
+																 defaultButton:nil 
+															   alternateButton:nil 
+																   otherButton:nil 
+													 informativeTextWithFormat:@"Try this download again. If it fails with the same message again, please move or rename the partial file for %@",[show showName]];
+								[task interrupt];
+								[alert runModal];
+							}
 						}
+					}
+					else
+					{
+						status=NO;
+						s2=nil;
+						[scanner setScanLocation:0];
 					}
 				}
 				else
 				{
-					status=NO;
-					s2=nil;
+					//If so...
 					[scanner setScanLocation:0];
+					[scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:nil];
+					status=YES;
 				}
-			}
-			else
-			{
-				//If so...
-				[scanner setScanLocation:0];
-				[scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:nil];
-				status=YES;
-			}
-			//If An FLVStreamer Status Message...
-			double downloaded, elapsed, percent, total;
-			if ([scanner scanDouble:&downloaded] && status)
-			{
-				[scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:nil];
-				if (![scanner scanDouble:&elapsed]) elapsed=0.0;
-				[scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:nil];
-				if (![scanner scanDouble:&percent]) percent=0.0;
-				if (downloaded>0 && percent>0) total = ((downloaded/1024)/(percent/100));
-				else total=0;
-				[self setCurrentProgress:[NSString stringWithFormat:@"%.1f%% - (%.2f MB/~%.0f MB) -- %@",percent,(downloaded/1024),total,[show valueForKey:@"showName"]]];
-				[self setPercentage:percent];
-				[show setValue:[NSString stringWithFormat:@"Downloading: %.1f%%", percent] forKey:@"status"];
-			}
-			else
-			{	
-				//Otherwise, use the indeterminate display.
-				if (s2 != nil) 
+				//If An FLVStreamer Status Message...
+				double downloaded, elapsed, percent, total;
+				if ([scanner scanDouble:&downloaded] && status)
 				{
-					[self setCurrentProgress:s2];
-					[self setPercentage:102];
-					[show setValue:@"Downloading" forKey:@"status"];
+					[scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:nil];
+					if (![scanner scanDouble:&elapsed]) elapsed=0.0;
+					[scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:nil];
+					if (![scanner scanDouble:&percent]) percent=0.0;
+					if (downloaded>0 && percent>0) total = ((downloaded/1024)/(percent/100));
+					else total=0;
+					[self setCurrentProgress:[NSString stringWithFormat:@"%.1f%% - (%.2f MB/~%.0f MB) -- %@",percent,(downloaded/1024),total,[show valueForKey:@"showName"]]];
+					[self setPercentage:percent];
+					[show setValue:[NSString stringWithFormat:@"Downloading: %.1f%%", percent] forKey:@"status"];
+				}
+				else
+				{	
+					//Otherwise, use the indeterminate display.
+					if (s2 != nil) 
+					{
+						[self setCurrentProgress:s2];
+						[self setPercentage:102];
+						[show setValue:@"Downloading" forKey:@"status"];
+					}
 				}
 			}
+			
 		}
-		
 	}
 }	
 - (void)cancelDownload:(id)sender
