@@ -335,6 +335,7 @@
 				else total=0;
 				[self setCurrentProgress:[NSString stringWithFormat:@"%.1f%% - (%.2f MB/~%.0f MB) -- %@",percent,(downloaded/1024),total,[show valueForKey:@"showName"]]];
 				[self setPercentage:percent];
+				[show setValue:[NSString stringWithFormat:@"Downloading: %.1f%%", percent] forKey:@"status"];
 			}
 			else
 			{	
