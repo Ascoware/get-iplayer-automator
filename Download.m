@@ -303,7 +303,7 @@
 															 defaultButton:nil 
 														   alternateButton:nil 
 															   otherButton:nil 
-												 informativeTextWithFormat:@"Please move or rename the partial file for %@",[show showName]];
+												 informativeTextWithFormat:@"Try this download again. If it fails with the same message again, please move or rename the partial file for %@",[show showName]];
 							[task interrupt];
 							[alert runModal];
 						}
