@@ -59,3 +59,7 @@
 	Sets status to unable to add to iTunes if error occurs.
 	Replace /'s with _'s in an attempt to fix an issue first seen with University Challenge where the file isn't successfully moved.
 		NOTE: Was successful
+1.0 RC4
+	More informative message for the resumable file error.
+	Displays percentage in queue for Flash downloads (like for iPhone downloads).
+	Fixes error where the status is left as downloading after some flash shows complete.
