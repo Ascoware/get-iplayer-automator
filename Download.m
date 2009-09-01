@@ -198,6 +198,7 @@
 				}
 				NSString *lastLine = [array objectAtIndex:([array count]-1)];
 				NSLog(@"Last Line = %@", lastLine);
+				NSScanner *scn = [NSScanner scannerWithString:lastLine];
 				if ([lastLine hasPrefix:@"INFO: Recorded"])
 				{
 					NSLog(@"Download: Success");
@@ -227,6 +228,15 @@
 					[show setValue:[NSNumber numberWithBool:YES] forKey:@"successful"];
 					[show setValue:@"Download Complete" forKey:@"status"];
 					[show setPath:@"Unknown"];
+				}
+				else if ([scn scanUpToString:@"Already in download history" intoString:nil] && 
+						 [scn scanString:@"Already in" intoString:nil])
+				{
+					NSLog(@"In History");
+					[show setValue:[NSNumber numberWithBool:YES] forKey:@"complete"];
+					[show setValue:[NSNumber numberWithBool:NO] forKey:@"successful"];
+					[show setValue:@"Failed: Download in History" forKey:@"status"];
+					[self addToLog:[NSString stringWithFormat:@"%@ Failed",[show showName]]];
 				}
 				else
 				{

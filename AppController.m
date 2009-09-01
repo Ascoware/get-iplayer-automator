@@ -267,11 +267,13 @@
 		NSLog(@"NO UI");
 	}
 	getiPlayerUpdateArgs = [[NSArray alloc] initWithObjects:getiPlayerPath,cacheExpiryArg,typeArgument,profileDirArg,nil];
+	NSLog(@"%@", getiPlayerUpdateArgs);
 	getiPlayerUpdateTask = [[NSTask alloc] init];
 	[getiPlayerUpdateTask setLaunchPath:@"/usr/bin/perl"];
 	[getiPlayerUpdateTask setArguments:getiPlayerUpdateArgs];
 	getiPlayerUpdatePipe = [[NSPipe alloc] init];
 	[getiPlayerUpdateTask setStandardOutput:getiPlayerUpdatePipe];
+	[getiPlayerUpdateTask setStandardError:getiPlayerUpdatePipe];
 	
 	NSFileHandle *fh = [getiPlayerUpdatePipe fileHandleForReading];
 	NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
@@ -565,6 +567,7 @@
 
 - (void)searchDataReady:(NSNotification *)n
 {
+	NSLog(@"data");
     NSData *d;
     d = [[n userInfo] valueForKey:NSFileHandleNotificationDataItem];
 	
@@ -572,6 +575,7 @@
 		NSString *s = [[NSString alloc] initWithData:d
 											encoding:NSUTF8StringEncoding];
 		[searchData appendString:s];
+		NSLog(s);
 	}
 	else
 	{
