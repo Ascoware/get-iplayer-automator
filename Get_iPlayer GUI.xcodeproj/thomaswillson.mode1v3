@@ -331,7 +331,7 @@
 										<key>_historyCapacity</key>
 										<integer>0</integer>
 										<key>bookmark</key>
-										<string>D9ABF4F51057689C00E4D930</string>
+										<string>D9ABF519105768F600E4D930</string>
 										<key>history</key>
 										<array>
 											<string>D9CC156C0FF9075400D819E2</string>
@@ -373,7 +373,7 @@
 											<string>D9ABF4F11057689C00E4D930</string>
 											<string>D9ABF4F21057689C00E4D930</string>
 											<string>D9ABF4F31057689C00E4D930</string>
-											<string>D9ABF4F41057689C00E4D930</string>
+											<string>D9ABF4F51057689C00E4D930</string>
 										</array>
 									</dict>
 									<key>SplitCount</key>
@@ -385,14 +385,14 @@
 							<key>GeometryConfiguration</key>
 							<dict>
 								<key>Frame</key>
-								<string>{{0, 0}, {946, 502}}</string>
+								<string>{{0, 0}, {946, 497}}</string>
 								<key>RubberWindowFrame</key>
 								<string>0 86 1280 692 0 0 1280 778 </string>
 							</dict>
 							<key>Module</key>
 							<string>PBXNavigatorGroup</string>
 							<key>Proportion</key>
-							<string>502pt</string>
+							<string>497pt</string>
 						</dict>
 						<dict>
 							<key>ContentConfiguration</key>
@@ -405,14 +405,14 @@
 							<key>GeometryConfiguration</key>
 							<dict>
 								<key>Frame</key>
-								<string>{{0, 507}, {946, 144}}</string>
+								<string>{{0, 502}, {946, 149}}</string>
 								<key>RubberWindowFrame</key>
 								<string>0 86 1280 692 0 0 1280 778 </string>
 							</dict>
 							<key>Module</key>
 							<string>XCDetailModule</string>
 							<key>Proportion</key>
-							<string>144pt</string>
+							<string>149pt</string>
 						</dict>
 					</array>
 					<key>Proportion</key>
@@ -431,9 +431,9 @@
 			</array>
 			<key>TableOfContents</key>
 			<array>
-				<string>D9ABF4F61057689C00E4D930</string>
+				<string>D9ABF51A105768F600E4D930</string>
 				<string>1CE0B1FE06471DED0097A5F4</string>
-				<string>D9ABF4F71057689C00E4D930</string>
+				<string>D9ABF51B105768F600E4D930</string>
 				<string>1CE0B20306471E060097A5F4</string>
 				<string>1CE0B20506471E060097A5F4</string>
 			</array>
@@ -569,9 +569,14 @@
 	<integer>5</integer>
 	<key>WindowOrderList</key>
 	<array>
+		<string>D9ABF525105768F600E4D930</string>
+		<string>D9ABF526105768F600E4D930</string>
+		<string>D9ABF527105768F600E4D930</string>
+		<string>1CD10A99069EF8BA00B06720</string>
 		<string>D9CCC4890DD942540002F404</string>
 		<string>D9D0E0DF1044DA8D0059F044</string>
 		<string>/Users/thomaswillson/Code/Get iPlayer Automator/Get_iPlayer GUI.xcodeproj</string>
+		<string>1C78EAAD065D492600B07095</string>
 	</array>
 	<key>WindowString</key>
 	<string>0 86 1280 692 0 0 1280 778 </string>
@@ -651,7 +656,7 @@
 			<key>TableOfContents</key>
 			<array>
 				<string>D9CCC4890DD942540002F404</string>
-				<string>D9ABF4F81057689C00E4D930</string>
+				<string>D9ABF51C105768F600E4D930</string>
 				<string>1CD0528F0623707200166675</string>
 				<string>XCMainBuildResultsModuleGUID</string>
 			</array>
@@ -745,10 +750,10 @@
 									<key>Frame</key>
 									<string>{{316, 0}, {378, 203}}</string>
 									<key>RubberWindowFrame</key>
-									<string>35 335 694 422 0 0 1680 1028 </string>
+									<string>21 208 694 422 0 0 1280 778 </string>
 								</dict>
 								<key>RubberWindowFrame</key>
-								<string>35 335 694 422 0 0 1680 1028 </string>
+								<string>21 208 694 422 0 0 1280 778 </string>
 							</dict>
 							<key>Module</key>
 							<string>PBXDebugSessionModule</string>
@@ -771,18 +776,18 @@
 			<key>TableOfContents</key>
 			<array>
 				<string>1CD10A99069EF8BA00B06720</string>
-				<string>D9E7542310520F42007A7FD8</string>
+				<string>D9ABF51D105768F600E4D930</string>
 				<string>1C162984064C10D400B95A72</string>
-				<string>D9E7542410520F42007A7FD8</string>
-				<string>D9E7542510520F42007A7FD8</string>
-				<string>D9E7542610520F42007A7FD8</string>
-				<string>D9E7542710520F42007A7FD8</string>
-				<string>D9E7542810520F42007A7FD8</string>
+				<string>D9ABF51E105768F600E4D930</string>
+				<string>D9ABF51F105768F600E4D930</string>
+				<string>D9ABF520105768F600E4D930</string>
+				<string>D9ABF521105768F600E4D930</string>
+				<string>D9ABF522105768F600E4D930</string>
 			</array>
 			<key>ToolbarConfiguration</key>
 			<string>xcode.toolbar.config.debugV3</string>
 			<key>WindowString</key>
-			<string>35 335 694 422 0 0 1680 1028 </string>
+			<string>21 208 694 422 0 0 1280 778 </string>
 			<key>WindowToolGUID</key>
 			<string>1CD10A99069EF8BA00B06720</string>
 			<key>WindowToolIsVisible</key>
@@ -896,6 +901,8 @@
 					<key>Dock</key>
 					<array>
 						<dict>
+							<key>BecomeActive</key>
+							<true/>
 							<key>ContentConfiguration</key>
 							<dict>
 								<key>PBXProjectModuleGUID</key>
@@ -908,7 +915,7 @@
 								<key>Frame</key>
 								<string>{{0, 0}, {957, 322}}</string>
 								<key>RubberWindowFrame</key>
-								<string>-1231 494 957 363 -1280 26 1280 1024 </string>
+								<string>49 300 957 363 0 0 1280 778 </string>
 							</dict>
 							<key>Module</key>
 							<string>PBXDebugCLIModule</string>
@@ -931,17 +938,17 @@
 			<key>TableOfContents</key>
 			<array>
 				<string>1C78EAAD065D492600B07095</string>
-				<string>D9D0E19A104C97400059F044</string>
+				<string>D9ABF523105768F600E4D930</string>
 				<string>1C78EAAC065D492600B07095</string>
 			</array>
 			<key>ToolbarConfiguration</key>
 			<string>xcode.toolbar.config.consoleV3</string>
 			<key>WindowString</key>
-			<string>-1231 494 957 363 -1280 26 1280 1024 </string>
+			<string>49 300 957 363 0 0 1280 778 </string>
 			<key>WindowToolGUID</key>
 			<string>1C78EAAD065D492600B07095</string>
 			<key>WindowToolIsVisible</key>
-			<false/>
+			<true/>
 		</dict>
 		<dict>
 			<key>FirstTimeWindowDisplayed</key>
@@ -1038,6 +1045,8 @@
 							<string>79pt</string>
 						</dict>
 						<dict>
+							<key>BecomeActive</key>
+							<true/>
 							<key>ContentConfiguration</key>
 							<dict>
 								<key>PBXCVSModuleFilterTypeKey</key>
@@ -1075,7 +1084,7 @@
 			<key>TableOfContents</key>
 			<array>
 				<string>D9D0E0DF1044DA8D0059F044</string>
-				<string>D9ABF4F91057689C00E4D930</string>
+				<string>D9ABF524105768F600E4D930</string>
 				<string>1C78EAB2065D492600B07095</string>
 				<string>1CD052920623707200166675</string>
 			</array>
