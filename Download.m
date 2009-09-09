@@ -15,6 +15,7 @@
 	[super init];
 	runAgain = NO;
 	running=YES;
+	foundLastLine=NO;
 	errorCache = [[NSMutableString alloc] init];
 	processErrorCache = [NSTimer scheduledTimerWithTimeInterval:.25 target:self selector:@selector(processError) userInfo:nil repeats:YES];
 	
@@ -186,18 +187,27 @@
 			pipe = nil;
 			if (runDownloads)
 			{
-				unsigned length = [log length];
-				unsigned paraStart = 0, paraEnd = 0, contentsEnd = 0;
-				NSMutableArray *array = [NSMutableArray array];
-				NSRange currentRange;
-				while (paraEnd < length) {
-					[log getParagraphStart:&paraStart end:&paraEnd
-								  contentsEnd:&contentsEnd forRange:NSMakeRange(paraEnd, 0)];
-					currentRange = NSMakeRange(paraStart, contentsEnd - paraStart);
-					[array addObject:[log substringWithRange:currentRange]];
+				NSString *lastLine;
+				if (!foundLastLine)
+				{
+					unsigned length = [log length];
+					unsigned paraStart = 0, paraEnd = 0, contentsEnd = 0;
+					NSMutableArray *array = [NSMutableArray array];
+					NSRange currentRange;
+					while (paraEnd < length) {
+						[log getParagraphStart:&paraStart end:&paraEnd
+									  contentsEnd:&contentsEnd forRange:NSMakeRange(paraEnd, 0)];
+						currentRange = NSMakeRange(paraStart, contentsEnd - paraStart);
+						[array addObject:[log substringWithRange:currentRange]];
+					}
+					lastLine = [array objectAtIndex:([array count]-1)];
+					NSLog(@"Last Line = %@", lastLine);
 				}
-				NSString *lastLine = [array objectAtIndex:([array count]-1)];
-				NSLog(@"Last Line = %@", lastLine);
+				else 
+				{
+					lastLine = LastLine;
+				}
+
 				NSScanner *scn = [NSScanner scannerWithString:lastLine];
 				if ([lastLine hasPrefix:@"INFO: Recorded"])
 				{
@@ -392,7 +402,12 @@
 	//Parse each line individually.
 	for (NSString *output in array)
 	{
-		if ([output hasPrefix:@"INFO:"] || [output hasPrefix:@"WARNING:"] || [output hasPrefix:@"ERROR:"] || 
+		if ([output hasPrefix:@"INFO: Recorded"])
+		{
+			LastLine = [NSString stringWithString:output];
+			foundLastLine=YES;
+		}
+		else if ([output hasPrefix:@"INFO:"] || [output hasPrefix:@"WARNING:"] || [output hasPrefix:@"ERROR:"] || 
 			[output hasSuffix:@"default"] || [output hasPrefix:[show pid]])
 		{
 			//Add Status Message to Log

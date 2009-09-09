@@ -33,6 +33,9 @@ extern bool runDownloads;
 	BOOL runAgain;
 	BOOL running;
 	int i;
+	
+	BOOL foundLastLine;
+	NSString *LastLine;
 }
 - (id)initWithProgramme:(Programme *)tempShow :(id)sender;
 - (void)cancelDownload:(id)sender;
