@@ -360,6 +360,7 @@
 	NSArray *tempQueue = [queueController arrangedObjects];
 	for (Programme *show in tempQueue)
 	{
+		BOOL foundMatch=NO;
 		NSLog([show description]);
 		if ([[show showName] length] > 0)
 			{
@@ -404,7 +405,8 @@
 				{
 					if (![string isEqualToString:@"Matches:"] && ![string hasPrefix:@"INFO:"] && ![string hasPrefix:@"WARNING:"] && [string length]>0)
 					{
-						@try {
+						@try 
+						s{
 							NSScanner *myScanner = [NSScanner scannerWithString:string];
 							Programme *p = [[Programme alloc] init];
 							NSString *temp_pid, *temp_showName, *temp_tvNetwork;
@@ -421,10 +423,12 @@
 							if ([[p showName] isEqualToString:[show showName]])
 							{
 								[show setValue:[p pid] forKey:@"pid"];
+								foundMatch=YES;
 								break;
 							}
 						}
-						@catch (NSException *e) {
+						@catch (NSException *e) 
+						{
 							NSAlert *searchException = [[NSAlert alloc] init];
 							[searchException addButtonWithTitle:@"OK"];
 							[searchException setMessageText:[NSString stringWithFormat:@"Invalid Output!"]];
@@ -441,6 +445,13 @@
 							NSLog(@"Unknown Option");
 						}
 					}
+				}
+				if (!foundMatch)
+				{
+					[show setValue:@"No Longer Available" forKey:@"status"];
+					[show setValue:[NSNumber numberWithBool:YES] forKey:@"complete"];
+					[show setValue:[NSNumber numberWithBool:YES] forKey:@"successful"];
+					NSLog(@"%@ not found in cache", [show name]);
 				}
 		}
 		
