@@ -406,7 +406,7 @@
 					if (![string isEqualToString:@"Matches:"] && ![string hasPrefix:@"INFO:"] && ![string hasPrefix:@"WARNING:"] && [string length]>0)
 					{
 						@try 
-						s{
+						{
 							NSScanner *myScanner = [NSScanner scannerWithString:string];
 							Programme *p = [[Programme alloc] init];
 							NSString *temp_pid, *temp_showName, *temp_tvNetwork;
@@ -427,8 +427,7 @@
 								break;
 							}
 						}
-						@catch (NSException *e) 
-						{
+						@catch (NSException *e) {
 							NSAlert *searchException = [[NSAlert alloc] init];
 							[searchException addButtonWithTitle:@"OK"];
 							[searchException setMessageText:[NSString stringWithFormat:@"Invalid Output!"]];
@@ -451,7 +450,7 @@
 					[show setValue:@"No Longer Available" forKey:@"status"];
 					[show setValue:[NSNumber numberWithBool:YES] forKey:@"complete"];
 					[show setValue:[NSNumber numberWithBool:YES] forKey:@"successful"];
-					NSLog(@"%@ not found in cache", [show name]);
+					NSLog(@"%@ not found in cache", [show showName]);
 				}
 		}
 		
