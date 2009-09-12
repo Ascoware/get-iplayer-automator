@@ -1575,8 +1575,8 @@
 	NSString *episodeName = [originalEpisodeName stringByReplacingOccurrencesOfString:@":" withString:@" -"];
 	
 	//Replace /'s with _'s
-	showName = [showName stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
-	episodeName = [episodeName stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
+	showName = [showName stringByReplacingOccurrencesOfString:@"/" withString:@"-"];
+	episodeName = [episodeName stringByReplacingOccurrencesOfString:@"/" withString:@"-"];
 	
 	if (![[show path] isEqualToString:@"Unknown"])
 	{
@@ -1602,7 +1602,7 @@
 			//Perform File Operations
 			NSFileManager *fileManager = [NSFileManager defaultManager];
 			[fileManager createDirectoryAtPath:newFolder attributes:nil];
-			[fileManager copyItemAtPath:[show path] toPath:newFile error:NULL];
+			[fileManager moveItemAtPath:[show path] toPath:newFile error:NULL];
 			[fileManager removeItemAtPath:originalFolder error:NULL];
 		}
 		else 
