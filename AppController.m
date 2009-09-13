@@ -1612,8 +1612,9 @@
 			//Perform File Operations
 			NSFileManager *fileManager = [NSFileManager defaultManager];
 			[fileManager createDirectoryAtPath:newFolder attributes:nil];
-			[fileManager moveItemAtPath:[show path] toPath:newFile error:NULL];
-			[fileManager removeItemAtPath:originalFolder error:NULL];
+			NSError *copyError;
+			if ([fileManager moveItemAtPath:[show path] toPath:newFile error:&copyError]) [fileManager removeItemAtPath:originalFolder error:NULL];
+			else NSLog(@"Clean Up Path Error: %@", copyError);
 		}
 		else 
 		{
