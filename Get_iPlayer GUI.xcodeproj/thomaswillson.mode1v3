@@ -231,8 +231,6 @@
 			<key>Layout</key>
 			<array>
 				<dict>
-					<key>BecomeActive</key>
-					<true/>
 					<key>ContentConfiguration</key>
 					<dict>
 						<key>PBXBottomSmartGroupGIDs</key>
@@ -278,11 +276,14 @@
 							<key>PBXSmartGroupTreeModuleOutlineStateSelectionKey</key>
 							<array>
 								<array>
+									<integer>32</integer>
+									<integer>27</integer>
+									<integer>21</integer>
 									<integer>0</integer>
 								</array>
 							</array>
 							<key>PBXSmartGroupTreeModuleOutlineStateVisibleRectKey</key>
-							<string>{{0, 0}, {312, 633}}</string>
+							<string>{{0, 0}, {312, 883}}</string>
 						</dict>
 						<key>PBXTopSmartGroupGIDs</key>
 						<array/>
@@ -294,7 +295,7 @@
 					<key>GeometryConfiguration</key>
 					<dict>
 						<key>Frame</key>
-						<string>{{0, 0}, {329, 651}}</string>
+						<string>{{0, 0}, {329, 901}}</string>
 						<key>GroupTreeTableConfiguration</key>
 						<array>
 							<string>SCMStatusColumn</string>
@@ -303,7 +304,7 @@
 							<real>290</real>
 						</array>
 						<key>RubberWindowFrame</key>
-						<string>58 295 1280 692 0 0 1680 1028 </string>
+						<string>0 86 1680 942 0 0 1680 1028 </string>
 					</dict>
 					<key>Module</key>
 					<string>PBXSmartGroupTreeModule</string>
@@ -314,12 +315,14 @@
 					<key>Dock</key>
 					<array>
 						<dict>
+							<key>BecomeActive</key>
+							<true/>
 							<key>ContentConfiguration</key>
 							<dict>
 								<key>PBXProjectModuleGUID</key>
 								<string>1CE0B20306471E060097A5F4</string>
 								<key>PBXProjectModuleLabel</key>
-								<string>AppController.m</string>
+								<string>Diff Local vs. HEAD — get_iplayer.pl</string>
 								<key>PBXSplitModuleInNavigatorKey</key>
 								<dict>
 									<key>Split0</key>
@@ -327,11 +330,11 @@
 										<key>PBXProjectModuleGUID</key>
 										<string>1CE0B20406471E060097A5F4</string>
 										<key>PBXProjectModuleLabel</key>
-										<string>AppController.m</string>
+										<string>Diff Local vs. HEAD — get_iplayer.pl</string>
 										<key>_historyCapacity</key>
 										<integer>0</integer>
 										<key>bookmark</key>
-										<string>D9F2D4CB1066CD960047BC81</string>
+										<string>D9F2D5111066E2700047BC81</string>
 										<key>history</key>
 										<array>
 											<string>D9CC156C0FF9075400D819E2</string>
@@ -371,13 +374,24 @@
 											<string>D9D0E0D61044D97C0059F044</string>
 											<string>D9D0E0F61044DEDC0059F044</string>
 											<string>D9ABF4F21057689C00E4D930</string>
-											<string>D9ABF4F31057689C00E4D930</string>
-											<string>D98125D0106328FF00D9D431</string>
-											<string>D9F2D4CA1066CD960047BC81</string>
+											<string>D9F2D4E01066D04E0047BC81</string>
+											<string>D9F2D4E11066D04E0047BC81</string>
+											<string>D9F2D4E21066D04E0047BC81</string>
+											<string>D9F2D4F31066E15E0047BC81</string>
+											<string>D9F2D4F41066E15E0047BC81</string>
+											<string>D9F2D50D1066E2700047BC81</string>
+											<string>D9F2D50E1066E2700047BC81</string>
 										</array>
 										<key>prevStack</key>
 										<array>
 											<string>D98125D2106328FF00D9D431</string>
+											<string>D9F2D4E41066D04E0047BC81</string>
+											<string>D9F2D4E71066D04E0047BC81</string>
+											<string>D9F2D4E91066D04E0047BC81</string>
+											<string>D9F2D4EA1066D04E0047BC81</string>
+											<string>D9F2D4F61066E15E0047BC81</string>
+											<string>D9F2D4F71066E15E0047BC81</string>
+											<string>D9F2D5101066E2700047BC81</string>
 										</array>
 									</dict>
 									<key>SplitCount</key>
@@ -389,14 +403,14 @@
 							<key>GeometryConfiguration</key>
 							<dict>
 								<key>Frame</key>
-								<string>{{0, 0}, {946, 497}}</string>
+								<string>{{0, 0}, {1346, 747}}</string>
 								<key>RubberWindowFrame</key>
-								<string>58 295 1280 692 0 0 1680 1028 </string>
+								<string>0 86 1680 942 0 0 1680 1028 </string>
 							</dict>
 							<key>Module</key>
 							<string>PBXNavigatorGroup</string>
 							<key>Proportion</key>
-							<string>497pt</string>
+							<string>747pt</string>
 						</dict>
 						<dict>
 							<key>ContentConfiguration</key>
@@ -409,9 +423,9 @@
 							<key>GeometryConfiguration</key>
 							<dict>
 								<key>Frame</key>
-								<string>{{0, 502}, {946, 149}}</string>
+								<string>{{0, 752}, {1346, 149}}</string>
 								<key>RubberWindowFrame</key>
-								<string>58 295 1280 692 0 0 1680 1028 </string>
+								<string>0 86 1680 942 0 0 1680 1028 </string>
 							</dict>
 							<key>Module</key>
 							<string>XCDetailModule</string>
@@ -420,7 +434,7 @@
 						</dict>
 					</array>
 					<key>Proportion</key>
-					<string>946pt</string>
+					<string>1346pt</string>
 				</dict>
 			</array>
 			<key>Name</key>
@@ -435,9 +449,9 @@
 			</array>
 			<key>TableOfContents</key>
 			<array>
-				<string>D9F2D4CC1066CD960047BC81</string>
+				<string>D9F2D4F91066E15E0047BC81</string>
 				<string>1CE0B1FE06471DED0097A5F4</string>
-				<string>D9F2D4CD1066CD960047BC81</string>
+				<string>D9F2D4FA1066E15E0047BC81</string>
 				<string>1CE0B20306471E060097A5F4</string>
 				<string>1CE0B20506471E060097A5F4</string>
 			</array>
@@ -579,7 +593,7 @@
 		<string>/Users/thomaswillson/Code/Get iPlayer Automator/Get_iPlayer GUI.xcodeproj</string>
 	</array>
 	<key>WindowString</key>
-	<string>58 295 1280 692 0 0 1680 1028 </string>
+	<string>0 86 1680 942 0 0 1680 1028 </string>
 	<key>WindowToolsV3</key>
 	<array>
 		<dict>
@@ -609,7 +623,7 @@
 								<key>Frame</key>
 								<string>{{0, 0}, {1280, 187}}</string>
 								<key>RubberWindowFrame</key>
-								<string>400 331 1280 689 0 0 1680 1028 </string>
+								<string>130 295 1280 689 0 0 1680 1028 </string>
 							</dict>
 							<key>Module</key>
 							<string>PBXNavigatorGroup</string>
@@ -617,10 +631,10 @@
 							<string>187pt</string>
 						</dict>
 						<dict>
-							<key>BecomeActive</key>
-							<true/>
 							<key>ContentConfiguration</key>
 							<dict>
+								<key>PBXBuildLogShowsTranscriptDefaultKey</key>
+								<string>{{0, 105}, {1280, 351}}</string>
 								<key>PBXProjectModuleGUID</key>
 								<string>XCMainBuildResultsModuleGUID</string>
 								<key>PBXProjectModuleLabel</key>
@@ -635,7 +649,7 @@
 								<key>Frame</key>
 								<string>{{0, 192}, {1280, 456}}</string>
 								<key>RubberWindowFrame</key>
-								<string>400 331 1280 689 0 0 1680 1028 </string>
+								<string>130 295 1280 689 0 0 1680 1028 </string>
 							</dict>
 							<key>Module</key>
 							<string>PBXBuildResultsModule</string>
@@ -658,14 +672,14 @@
 			<key>TableOfContents</key>
 			<array>
 				<string>D9CCC4890DD942540002F404</string>
-				<string>D9F2D4B41066CD090047BC81</string>
+				<string>D9F2D4FB1066E15E0047BC81</string>
 				<string>1CD0528F0623707200166675</string>
 				<string>XCMainBuildResultsModuleGUID</string>
 			</array>
 			<key>ToolbarConfiguration</key>
 			<string>xcode.toolbar.config.buildV3</string>
 			<key>WindowString</key>
-			<string>400 331 1280 689 0 0 1680 1028 </string>
+			<string>130 295 1280 689 0 0 1680 1028 </string>
 			<key>WindowToolGUID</key>
 			<string>D9CCC4890DD942540002F404</string>
 			<key>WindowToolIsVisible</key>
@@ -778,13 +792,13 @@
 			<key>TableOfContents</key>
 			<array>
 				<string>1CD10A99069EF8BA00B06720</string>
-				<string>D9F2D4CE1066CD960047BC81</string>
+				<string>D9F2D4FC1066E15E0047BC81</string>
 				<string>1C162984064C10D400B95A72</string>
-				<string>D9F2D4CF1066CD960047BC81</string>
-				<string>D9F2D4D01066CD960047BC81</string>
-				<string>D9F2D4D11066CD960047BC81</string>
-				<string>D9F2D4D21066CD960047BC81</string>
-				<string>D9F2D4D31066CD960047BC81</string>
+				<string>D9F2D4FD1066E15E0047BC81</string>
+				<string>D9F2D4FE1066E15E0047BC81</string>
+				<string>D9F2D4FF1066E15E0047BC81</string>
+				<string>D9F2D5001066E15E0047BC81</string>
+				<string>D9F2D5011066E15E0047BC81</string>
 			</array>
 			<key>ToolbarConfiguration</key>
 			<string>xcode.toolbar.config.debugV3</string>
@@ -938,7 +952,7 @@
 			<key>TableOfContents</key>
 			<array>
 				<string>1C78EAAD065D492600B07095</string>
-				<string>D9F2D4D41066CD960047BC81</string>
+				<string>D9F2D5021066E15E0047BC81</string>
 				<string>1C78EAAC065D492600B07095</string>
 			</array>
 			<key>ToolbarConfiguration</key>
