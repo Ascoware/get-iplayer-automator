@@ -515,13 +515,6 @@
 		isa = PBXBookmark;
 		fRef = D948C40B103436DE000CF853 /* icon.icns */;
 	};
-	D950FAE71030389400D80650 /* Changelog.txt */ = {
-		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {1285, 910}}";
-			sepNavSelRange = "{3210, 0}";
-			sepNavVisRange = "{458, 2981}";
-		};
-	};
 	D98125D2106328FF00D9D431 /* PlistBookmark */ = {
 		isa = PlistBookmark;
 		fRef = 8D1107310486CEB800E47090 /* Info.plist */;
@@ -692,6 +685,7 @@
 			sepNavIntBoundsRect = "{{0, 0}, {1025, 504}}";
 			sepNavSelRange = "{864, 0}";
 			sepNavVisRect = "{{0, 0}, {1025, 504}}";
+			sepNavWindowFrame = "{{38, 89}, {1479, 913}}";
 		};
 	};
 	D9CCF54B1025AAF9009205BE /* Growl Registration Ticket.growlRegDict */ = {
@@ -1066,9 +1060,9 @@
 	};
 	D9FEB87510077790003BADF8 /* AppController.m */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {1285, 23996}}";
-			sepNavSelRange = "{12979, 0}";
-			sepNavVisRange = "{12718, 2299}";
+			sepNavIntBoundsRect = "{{0, 0}, {1285, 24066}}";
+			sepNavSelRange = "{59694, 0}";
+			sepNavVisRange = "{58541, 1914}";
 			sepNavWindowFrame = "{{93, 31}, {910, 747}}";
 		};
 	};

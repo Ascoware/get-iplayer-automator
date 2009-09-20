@@ -47,7 +47,6 @@
 		D941D9A01025DDCF0012A75F /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D941D99F1025DDCF0012A75F /* SystemConfiguration.framework */; };
 		D941DA131025ED3F0012A75F /* plugins in Resources */ = {isa = PBXBuildFile; fileRef = D941DA0F1025ED3E0012A75F /* plugins */; };
 		D948C40C103436DE000CF853 /* icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = D948C40B103436DE000CF853 /* icon.icns */; };
-		D950FAE81030389400D80650 /* Changelog.txt in Resources */ = {isa = PBXBuildFile; fileRef = D950FAE71030389400D80650 /* Changelog.txt */; };
 		D9A4509D102FF8090011E175 /* Credits.html in Resources */ = {isa = PBXBuildFile; fileRef = D9A4509C102FF8090011E175 /* Credits.html */; };
 		D9A450A4102FFDC00011E175 /* LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = D9A450A3102FFDC00011E175 /* LICENSE.txt */; };
 		D9CC15680FF9071700D819E2 /* Play.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D9CC15670FF9071700D819E2 /* Play.tiff */; };
@@ -123,7 +122,6 @@
 		D941D99F1025DDCF0012A75F /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = /System/Library/Frameworks/SystemConfiguration.framework; sourceTree = "<absolute>"; };
 		D941DA0F1025ED3E0012A75F /* plugins */ = {isa = PBXFileReference; lastKnownFileType = folder; path = plugins; sourceTree = "<group>"; };
 		D948C40B103436DE000CF853 /* icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = icon.icns; sourceTree = "<group>"; };
-		D950FAE71030389400D80650 /* Changelog.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Changelog.txt; sourceTree = "<group>"; };
 		D9A4509C102FF8090011E175 /* Credits.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = Credits.html; sourceTree = "<group>"; };
 		D9A450A3102FFDC00011E175 /* LICENSE.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 		D9BE0870103563530011CF40 /* Camino.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Camino.h; sourceTree = "<group>"; };
@@ -207,7 +205,6 @@
 			isa = PBXGroup;
 			children = (
 				D9CCF52E10259DED009205BE /* Features.rtf */,
-				D950FAE71030389400D80650 /* Changelog.txt */,
 				080E96DDFE201D6D7F000001 /* Classes */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,
 				29B97317FDCFA39411CA2CEA /* Resources */,
@@ -387,7 +384,6 @@
 				D941DA131025ED3F0012A75F /* plugins in Resources */,
 				D9A4509D102FF8090011E175 /* Credits.html in Resources */,
 				D9A450A4102FFDC00011E175 /* LICENSE.txt in Resources */,
-				D950FAE81030389400D80650 /* Changelog.txt in Resources */,
 				D948C40C103436DE000CF853 /* icon.icns in Resources */,
 				D9DA536D1039669900C260EC /* lib in Resources */,
 			);
