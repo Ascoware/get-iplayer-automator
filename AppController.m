@@ -266,7 +266,7 @@
 	@catch (NSException *e) {
 		NSLog(@"NO UI");
 	}
-	getiPlayerUpdateArgs = [[NSArray alloc] initWithObjects:getiPlayerPath,cacheExpiryArg,typeArgument,profileDirArg,nil];
+	getiPlayerUpdateArgs = [[NSArray alloc] initWithObjects:getiPlayerPath,cacheExpiryArg,typeArgument,@"--nopurge",profileDirArg,nil];
 	NSLog(@"%@", getiPlayerUpdateArgs);
 	getiPlayerUpdateTask = [[NSTask alloc] init];
 	[getiPlayerUpdateTask setLaunchPath:@"/usr/bin/perl"];
@@ -552,7 +552,7 @@
 		NSString *searchArgument = [[NSString alloc] initWithString:searchTerms];
 		NSString *cacheExpiryArg = [self cacheExpiryArgument:nil];
 		NSString *typeArgument = [self typeArgument:nil];
-		NSArray *args = [[NSArray alloc] initWithObjects:getiPlayerPath,noWarningArg,cacheExpiryArg,typeArgument,listFormat,@"--long",searchArgument,profileDirArg,nil];
+		NSArray *args = [[NSArray alloc] initWithObjects:getiPlayerPath,noWarningArg,cacheExpiryArg,typeArgument,listFormat,@"--long",@"--nopurge",searchArgument,profileDirArg,nil];
 		[searchTask setArguments:args];
 		
 		[searchTask setStandardOutput:searchPipe];
@@ -704,7 +704,7 @@
 	
 	NSString *listArgument = [[NSString alloc] initWithFormat:@"--listformat=<index> <pid> <name> - <episode>", [pro valueForKey:@"pid"]];
 	NSString *cacheExpiryArg = [self cacheExpiryArgument:nil];
-	NSArray *args = [[NSArray alloc] initWithObjects:getiPlayerPath,noWarningArg,cacheExpiryArg,[self typeArgument:nil],listArgument,profileDirArg,nil];
+	NSArray *args = [[NSArray alloc] initWithObjects:getiPlayerPath,noWarningArg,@"--nopurge",cacheExpiryArg,[self typeArgument:nil],listArgument,profileDirArg,nil];
 	[getNameTask setArguments:args];
 	[getNameTask setLaunchPath:@"/usr/bin/perl"];
 	
@@ -1294,7 +1294,7 @@
 		NSString *searchArgument = [[NSString alloc] initWithString:searchTerms];
 		NSString *cacheExpiryArg = [self cacheExpiryArgument:nil];
 		NSString *typeArgument = [self typeArgument:nil];
-		NSArray *args = [[NSArray alloc] initWithObjects:getiPlayerPath,noWarningArg,cacheExpiryArg,typeArgument,
+		NSArray *args = [[NSArray alloc] initWithObjects:getiPlayerPath,noWarningArg,cacheExpiryArg,typeArgument,@"--nopurge",
 						  @"--listformat=<index>: <type>, ~<name> - <episode>~, <channel>, <timeadded>",searchArgument,profileDirArg,nil];
 		[pvrSearchTask setArguments:args];
 		
@@ -1429,7 +1429,7 @@
 		NSString *cacheExpiryArgument = [self cacheExpiryArgument:nil];
 		NSString *typeArgument = [self typeArgument:nil];
 		
-		NSMutableArray *autoRecordArgs = [[NSMutableArray alloc] initWithObjects:getiPlayerPath, noWarningArg,
+		NSMutableArray *autoRecordArgs = [[NSMutableArray alloc] initWithObjects:getiPlayerPath, noWarningArg,@"--nopurge",
 										 @"--listformat=<index>: <type>, ~<name> - <episode>~, <channel>, <timeadded>", cacheExpiryArgument, 
 										  typeArgument, profileDirArg,@"--hide",[series showName],nil];
 		
