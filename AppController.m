@@ -1615,7 +1615,10 @@
 			NSError *copyError;
 			if ([fileManager moveItemAtPath:[show path] toPath:newFile error:&copyError]) 
 			{
-				[fileManager removeItemAtPath:originalFolder error:NULL];
+				if (![newFolder isEqualToString:originalFolder])
+				{
+					[fileManager removeItemAtPath:originalFolder error:NULL];
+				}
 				[show setValue:newFile forKey:@"path"];
 			}
 			else NSLog(@"Clean Up Path Error: %@", copyError);

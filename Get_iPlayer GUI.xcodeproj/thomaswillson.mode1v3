@@ -332,7 +332,7 @@
 										<key>_historyCapacity</key>
 										<integer>0</integer>
 										<key>bookmark</key>
-										<string>D97D921D10673FE3006ECD39</string>
+										<string>D97D929D1069E018006ECD39</string>
 										<key>history</key>
 										<array>
 											<string>D9CC156C0FF9075400D819E2</string>
@@ -378,7 +378,7 @@
 											<string>D9F2D5511066EC490047BC81</string>
 											<string>D9F2D5531066EC490047BC81</string>
 											<string>D97D921910673FE3006ECD39</string>
-											<string>D97D921A10673FE3006ECD39</string>
+											<string>D97D929C1069E018006ECD39</string>
 										</array>
 										<key>prevStack</key>
 										<array>
@@ -389,8 +389,6 @@
 											<string>D9F2D4EA1066D04E0047BC81</string>
 											<string>D9F2D5101066E2700047BC81</string>
 											<string>D9F2D55E1066EC490047BC81</string>
-											<string>D97D921B10673FE3006ECD39</string>
-											<string>D97D921C10673FE3006ECD39</string>
 										</array>
 									</dict>
 									<key>SplitCount</key>
@@ -448,9 +446,9 @@
 			</array>
 			<key>TableOfContents</key>
 			<array>
-				<string>D97D921E10673FE3006ECD39</string>
+				<string>D97D929E1069E018006ECD39</string>
 				<string>1CE0B1FE06471DED0097A5F4</string>
-				<string>D97D921F10673FE3006ECD39</string>
+				<string>D97D929F1069E018006ECD39</string>
 				<string>1CE0B20306471E060097A5F4</string>
 				<string>1CE0B20506471E060097A5F4</string>
 			</array>
@@ -586,7 +584,9 @@
 	<integer>5</integer>
 	<key>WindowOrderList</key>
 	<array>
+		<string>1C78EAAD065D492600B07095</string>
 		<string>1CD10A99069EF8BA00B06720</string>
+		<string>D9CCC4890DD942540002F404</string>
 		<string>/Users/thomaswillson/Code/Get iPlayer Automator/Get_iPlayer GUI.xcodeproj</string>
 	</array>
 	<key>WindowString</key>
@@ -631,7 +631,7 @@
 							<key>ContentConfiguration</key>
 							<dict>
 								<key>PBXBuildLogShowsTranscriptDefaultKey</key>
-								<string>{{0, 25}, {1280, 431}}</string>
+								<string>{{0, 5}, {1280, 451}}</string>
 								<key>PBXProjectModuleGUID</key>
 								<string>XCMainBuildResultsModuleGUID</string>
 								<key>PBXProjectModuleLabel</key>
@@ -669,7 +669,7 @@
 			<key>TableOfContents</key>
 			<array>
 				<string>D9CCC4890DD942540002F404</string>
-				<string>D9F2D5631066EC490047BC81</string>
+				<string>D97D92A01069E018006ECD39</string>
 				<string>1CD0528F0623707200166675</string>
 				<string>XCMainBuildResultsModuleGUID</string>
 			</array>
@@ -789,13 +789,13 @@
 			<key>TableOfContents</key>
 			<array>
 				<string>1CD10A99069EF8BA00B06720</string>
-				<string>D97D922010673FE3006ECD39</string>
+				<string>D97D92A11069E018006ECD39</string>
 				<string>1C162984064C10D400B95A72</string>
-				<string>D97D922110673FE3006ECD39</string>
-				<string>D97D922210673FE3006ECD39</string>
-				<string>D97D922310673FE3006ECD39</string>
-				<string>D97D922410673FE3006ECD39</string>
-				<string>D97D922510673FE3006ECD39</string>
+				<string>D97D92A21069E018006ECD39</string>
+				<string>D97D92A31069E018006ECD39</string>
+				<string>D97D92A41069E018006ECD39</string>
+				<string>D97D92A51069E018006ECD39</string>
+				<string>D97D92A61069E018006ECD39</string>
 			</array>
 			<key>ToolbarConfiguration</key>
 			<string>xcode.toolbar.config.debugV3</string>
@@ -949,7 +949,7 @@
 			<key>TableOfContents</key>
 			<array>
 				<string>1C78EAAD065D492600B07095</string>
-				<string>D9F2D56A1066EC490047BC81</string>
+				<string>D97D92A71069E018006ECD39</string>
 				<string>1C78EAAC065D492600B07095</string>
 			</array>
 			<key>ToolbarConfiguration</key>
