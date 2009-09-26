@@ -97,17 +97,6 @@
 #pragma mark Delegate Methods
 - (void)awakeFromNib
 {
-	/*
-	//Update Should Be Running:
-	[currentIndicator setIndeterminate:YES];
-	[currentIndicator startAnimation:nil];
-	[currentProgress setStringValue:@"Updating Program Indexes..."];
-	//Shouldn't search until update is done.
-	[searchField setEnabled:NO];
-	[stopButton setEnabled:NO];
-	[startButton setEnabled:NO];
-	 */
-
 	[self updateCache:nil];
 	
 	//Read Queue & Series-Link from File
@@ -130,6 +119,25 @@
 		NSArray *tempSeries = [rootObject valueForKey:@"serieslink"];
 		[queueController addObjects:tempQueue];
 		[pvrQueueController addObjects:tempSeries];
+		NSLog(@"Successfully loaded application data.");
+	}
+	@catch (NSException *e)
+	{
+		[fileManager removeItemAtPath:filePath error:nil];
+		NSLog(@"Unable to load saved application data. Deleted the data file.");
+		rootObject=nil;
+	}
+	
+	//Read Format Preferences
+	
+	filename = @"Formats.automatorqueue";
+	filePath = [folder stringByAppendingPathComponent:filename];
+	
+    @try
+	{
+		rootObject = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
+		[radioFormatController addObjects:[rootObject valueForKey:@"radioFormats"]];
+		[tvFormatController addObjects:[rootObject valueForKey:@"tvFormats"]];
 		NSLog(@"Successfully loaded application data.");
 	}
 	@catch (NSException *e)
@@ -219,6 +227,15 @@
 	[rootObject setValue:tempQueue forKey:@"queue"];
 	[rootObject setValue:tempSeries forKey:@"serieslink"];
 	[NSKeyedArchiver archiveRootObject: rootObject toFile: filePath];
+	
+	filename = @"Formats.automatorqueue";
+	filePath = [folder stringByAppendingPathComponent:filename];
+	
+	rootObject = [NSMutableDictionary dictionary];
+	
+	[rootObject setValue:[tvFormatController arrangedObjects] forKey:@"tvFormats"];
+	[rootObject setValue:[radioFormatController arrangedObjects] forKey:@"radioFormats"];
+	[NSKeyedArchiver archiveRootObject:rootObject toFile:filePath];
 }
 - (void)updater:(SUUpdater *)updater didFindValidUpdate:(SUAppcastItem *)update
 {
@@ -379,15 +396,14 @@
 				[pipeTask setStandardOutput:newPipe];
 				[pipeTask setStandardError:newPipe];
 				[pipeTask setLaunchPath:@"/usr/bin/perl"];
-				[pipeTask setArguments:[NSArray arrayWithObjects:getiPlayerPath,profileDirArg,noWarningArg,[self typeArgument:nil],[self cacheExpiryArgument:nil],listFormat,
+				[pipeTask setArguments:[NSArray arrayWithObjects:getiPlayerPath,profileDirArg,@"--nopurge",noWarningArg,[self typeArgument:nil],[self cacheExpiryArgument:nil],listFormat,
 										searchArgument,nil]];
 				NSMutableString *taskData = [[NSMutableString alloc] initWithString:@""];
+				NSLog(@"About to launch");
 				[pipeTask launch];
 				while ((someData = [readHandle2 availableData]) && [someData length]) {
-					NSLog(@"data1");
-					[taskData appendString:[[NSString alloc] initWithData:someData
-																 encoding:NSUTF8StringEncoding]];
-					NSLog(@"data");
+						[taskData appendString:[[NSString alloc] initWithData:someData
+																	 encoding:NSUTF8StringEncoding]];
 				}
 				NSLog(@"Task Data = %@", taskData);
 				NSString *string = [NSString stringWithString:taskData];
@@ -409,9 +425,9 @@
 						{
 							NSScanner *myScanner = [NSScanner scannerWithString:string];
 							Programme *p = [[Programme alloc] init];
-							NSString *temp_pid, *temp_showName, *temp_tvNetwork;
+							NSString *temp_pid, *temp_showName, *temp_tvNetwork, *temp_type;
 							[myScanner scanUpToString:@":" intoString:&temp_pid];
-							[myScanner scanUpToString:@"," intoString:NULL];
+							[myScanner scanUpToString:@"," intoString:&temp_type];
 							[myScanner scanString:@", ~" intoString:NULL];
 							[myScanner scanUpToString:@"~," intoString:&temp_showName];
 							[myScanner scanString:@"~," intoString:NULL];
@@ -419,6 +435,7 @@
 							[p setValue:temp_pid forKey:@"pid"];
 							[p setValue:temp_showName forKey:@"showName"];
 							[p setValue:temp_tvNetwork forKey:@"tvNetwork"];
+							if ([temp_type isEqualToString:@"radio"]) [p setValue:[NSNumber numberWithBool:YES] forKey:@"radio"];
 							NSLog(@"Original = %@, Result = %@", [show showName], [p showName]);
 							if ([[p showName] isEqualToString:[show showName]])
 							{
@@ -617,15 +634,20 @@
 		{
 			@try {
 				NSScanner *myScanner = [NSScanner scannerWithString:string];
-				NSString *temp_pid, *temp_showName, *temp_tvNetwork;
+				NSString *temp_pid, *temp_showName, *temp_tvNetwork, *temp_type;
 				[myScanner scanUpToString:@":" intoString:&temp_pid];
 				[myScanner scanUpToCharactersFromSet:[NSCharacterSet letterCharacterSet] intoString:NULL];
-				[myScanner scanUpToString:@", ~" intoString:NULL];
+				[myScanner scanUpToString:@", ~" intoString:&temp_type];
+				NSLog(temp_type);
 				[myScanner scanString:@", ~" intoString:NULL];
 				[myScanner scanUpToString:@"~," intoString:&temp_showName];
 				[myScanner scanUpToCharactersFromSet:[NSCharacterSet letterCharacterSet] intoString:NULL];
 				[myScanner scanUpToString:@"," intoString:&temp_tvNetwork];
 				Programme *p = [[Programme alloc] initWithInfo:nil pid:temp_pid programmeName:temp_showName network:temp_tvNetwork];
+				if ([temp_type isEqualToString:@"radio"])
+				{
+					[p setValue:[NSNumber numberWithBool:YES] forKey:@"radio"];
+				}
 				[resultsController addObject:p];
 				foundShow=YES;
 			}
@@ -702,7 +724,7 @@
 	NSPipe *getNamePipe = [[NSPipe alloc] init];
 	NSMutableString *getNameData = [[NSMutableString alloc] initWithString:@""];
 	
-	NSString *listArgument = [[NSString alloc] initWithFormat:@"--listformat=<index> <pid> <name> - <episode>", [pro valueForKey:@"pid"]];
+	NSString *listArgument = [[NSString alloc] initWithFormat:@"--listformat=<index> <pid> <type> <name> - <episode>", [pro valueForKey:@"pid"]];
 	NSString *cacheExpiryArg = [self cacheExpiryArgument:nil];
 	NSArray *args = [[NSArray alloc] initWithObjects:getiPlayerPath,noWarningArg,@"--nopurge",cacheExpiryArg,[self typeArgument:nil],listArgument,profileDirArg,nil];
 	[getNameTask setArguments:args];
@@ -741,15 +763,17 @@
 		i++;
 		if (i>1 && i<[array count]-1)
 		{
-			NSString *pid, *showName, *index;
+			NSString *pid, *showName, *index, *type;
 			@try{
-			NSScanner *scanner = [NSScanner scannerWithString:string];
-			[scanner scanUpToCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:&index];
-			[scanner scanUpToCharactersFromSet:[NSCharacterSet alphanumericCharacterSet] intoString:NULL];
-			[scanner scanUpToCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:&pid];
-			[scanner scanUpToCharactersFromSet:[NSCharacterSet alphanumericCharacterSet] intoString:NULL];
-			[scanner scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet]  intoString:&showName];
-			scanner = nil;
+				NSScanner *scanner = [NSScanner scannerWithString:string];
+				[scanner scanUpToCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:&index];
+				[scanner scanUpToCharactersFromSet:[NSCharacterSet alphanumericCharacterSet] intoString:NULL];
+				[scanner scanUpToCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:&pid];
+				[scanner scanUpToCharactersFromSet:[NSCharacterSet alphanumericCharacterSet] intoString:NULL];
+				[scanner scanUpToCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:&type];
+				[scanner scanUpToCharactersFromSet:[NSCharacterSet alphanumericCharacterSet] intoString:NULL];
+				[scanner scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet]  intoString:&showName];
+				scanner = nil;
 			}
 			@catch (NSException *e) {
 				NSAlert *getNameException = [[NSAlert alloc] init];
@@ -766,12 +790,14 @@
 				found=YES;
 				[p setValue:showName forKey:@"showName"];
 				[p setValue:index forKey:@"pid"];
+				if ([type isEqualToString:@"radio"]) [p setValue:[NSNumber numberWithBool:YES] forKey:@"radio"];
 			}
 			else if ([wantedID isEqualToString:index])
 			{
 				found=YES;
 				NSLog(@"Must be an index!");
 				[p setValue:showName forKey:@"showName"];
+				if ([type isEqualToString:@"radio"]) [p setValue:[NSNumber numberWithBool:YES] forKey:@"radio"];
 			}
 		}
 			
@@ -1097,7 +1123,9 @@
 			{
 				if ([[show complete] isEqualToNumber:[NSNumber numberWithBool:NO]])
 				{
-					currentDownload = [[Download alloc] initWithProgramme:show :self];
+					currentDownload = [[Download alloc] initWithProgramme:show 
+															 tvFormats:[tvFormatController arrangedObjects] 
+														  radioFormats:[radioFormatController arrangedObjects]];
 					break;
 				}
 			}
@@ -1230,7 +1258,9 @@
 							([tempQueue indexOfObject:nextShow]+1),
 							[tempQueue count]]
 						  :nil];
-			currentDownload = [[Download alloc] initWithProgramme:nextShow :self];
+			currentDownload = [[Download alloc] initWithProgramme:nextShow
+													 tvFormats:[tvFormatController arrangedObjects]
+												  radioFormats:[radioFormatController arrangedObjects]];
 		}
 		@catch (NSException *e)
 		{
@@ -1472,11 +1502,11 @@
 			@try {
 				NSScanner *myScanner = [NSScanner scannerWithString:string];
 				NSArray *currentQueue = [queueController arrangedObjects];
-				NSString *temp_pid, *temp_showName, *temp_tvNetwork;
+				NSString *temp_pid, *temp_showName, *temp_tvNetwork, *temp_type;
 				NSInteger timeadded;
 				[myScanner scanUpToString:@":" intoString:&temp_pid];
 				[myScanner scanUpToCharactersFromSet:[NSCharacterSet letterCharacterSet] intoString:NULL];
-				[myScanner scanUpToString:@", ~" intoString:NULL];
+				[myScanner scanUpToString:@", ~" intoString:&temp_type];
 				[myScanner scanString:@", ~" intoString:nil];
 				[myScanner scanUpToString:@"~," intoString:&temp_showName];
 				[myScanner scanUpToCharactersFromSet:[NSCharacterSet letterCharacterSet] intoString:NULL];
@@ -1488,6 +1518,7 @@
 				if (([[series2 added] integerValue] < timeadded) /*&& ([temp_tvNetwork isEqualToString:[series2 tvNetwork]])*/)
 				{
 					Programme *p = [[Programme alloc] initWithInfo:nil pid:temp_pid programmeName:temp_showName network:temp_tvNetwork];
+					if ([temp_type isEqualToString:@"radio"]) [p setValue:[NSNumber numberWithBool:YES] forKey:@"radio"];
 					[p setValue:@"Added by Series-Link" forKey:@"status"];
 					BOOL inQueue=NO;
 					for (Programme *show in currentQueue)
@@ -1720,7 +1751,7 @@
 {
 	//NSString *cacheExpiryArg = [[NSString alloc] initWithFormat:@"-e%d", ([[[NSUserDefaults standardUserDefaults] objectForKey:@"CacheExpiryTime"] intValue]*3600)];
 	//return cacheExpiryArg;
-	return @"-e604800";
+	return @"-e60480000000000000";
 }
 
 @synthesize log_value;

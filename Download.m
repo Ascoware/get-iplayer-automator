@@ -10,7 +10,7 @@
 
 @implementation Download
 #pragma mark Overridden Methods
-- (id)initWithProgramme:(Programme *)tempShow :(id)sender
+- (id)initWithProgramme:(Programme *)tempShow tvFormats:(NSArray *)tvFormatList radioFormats:(NSArray *)radioFormatList
 {
 	[super init];
 	runAgain = NO;
@@ -37,11 +37,38 @@
 #endif
 	NSString *downloadPath = [[NSString alloc] initWithString:[[NSUserDefaults standardUserDefaults] valueForKey:@"DownloadPath"]];
 		//Initialize Formats
-	NSArray *formatKeys = [NSArray arrayWithObjects:@"iPhone",@"Flash - High",@"Flash - Low",@"Flash - HD",@"Flash - Standard",@"Flash - Normal",@"Flash - Very High",nil];
-	NSArray *formatObjects = [NSArray arrayWithObjects:@"iphone",@"flashhigh",@"flashlow",@"flashhd",@"flashstd",@"flashstd",@"flashvhigh",nil];
-	NSDictionary *formats = [[NSDictionary alloc] initWithObjects:formatObjects forKeys:formatKeys];
-	NSString *defaultFormat = [formats objectForKey:[[NSUserDefaults standardUserDefaults] valueForKey:@"DefaultFormat"]];
-	NSString *alternateFormat = [formats objectForKey:[[NSUserDefaults standardUserDefaults] valueForKey:@"AlternateFormat"]];
+	NSArray *tvFormatKeys = [NSArray arrayWithObjects:@"iPhone",@"Flash - High",@"Flash - Low",@"Flash - HD",@"Flash - Standard",@"Flash - Normal",@"Flash - Very High",nil];
+	NSArray *tvFormatObjects = [NSArray arrayWithObjects:@"iphone",@"flashhigh",@"flashlow",@"flashhd",@"flashstd",@"flashnormal",@"flashvhigh",nil];
+	NSDictionary *tvFormats = [[NSDictionary alloc] initWithObjects:tvFormatObjects forKeys:tvFormatKeys];
+	NSArray *radioFormatKeys = [NSArray arrayWithObjects:@"iPhone",@"Flash",@"WMA",nil];
+	NSArray *radioFormatObjects = [NSArray arrayWithObjects:@"iphone", @"flashaudio",@"wma",nil];
+	NSDictionary *radioFormats = [[NSDictionary alloc] initWithObjects:radioFormatObjects forKeys:radioFormatKeys];
+	NSString *formatArg;
+	if ([[show radio] isEqualToNumber:[NSNumber numberWithBool:YES]])
+	{
+		NSLog(@"radio");
+		NSMutableString *temp_Format;
+		temp_Format = [[NSMutableString alloc] initWithString:@"--modes="];
+		for (RadioFormat *format in radioFormatList)
+		{
+			[temp_Format appendFormat:@"%@,", [radioFormats valueForKey:[format format]]];
+		}
+		[temp_Format deleteCharactersInRange:NSMakeRange([temp_Format length]-1, 1)];
+		formatArg = [NSString stringWithString:temp_Format];
+	} 
+	else
+	{
+		NSMutableString *temp_Format;
+		temp_Format = [[NSMutableString alloc] initWithString:@"--modes="];
+		for (TVFormat *format in tvFormatList)
+		{
+			[temp_Format appendFormat:@"%@,",[tvFormats valueForKey:[format format]]];
+		}
+		[temp_Format deleteCharactersInRange:NSMakeRange([temp_Format length]-1, 1)];
+		formatArg = [NSString stringWithString:temp_Format];
+	}
+	NSLog(formatArg);
+
 		//Set Proxy Argument
 	NSString *proxyArg;
 	NSString *partialProxyArg;
@@ -105,7 +132,6 @@
 	else ffmpegArg = nil;
 	NSString *downloadPathArg = [[NSString alloc] initWithFormat:@"--output=%@", downloadPath];
 	NSString *subDirArg = [[NSString alloc] initWithString:@"--subdir"];
-	NSString *formatArg = [[NSString alloc] initWithFormat:@"--modes=%@,%@", defaultFormat, alternateFormat];
 	NSString *getArg = [[NSString alloc] initWithFormat:@"--get"];
 	NSString *searchArg = [[NSString alloc] initWithFormat:@"%@", [show pid]];
 	NSString *versionArg = [[NSString alloc] initWithString:@"--versions=default"];

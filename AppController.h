@@ -72,6 +72,12 @@ bool runUpdate=NO;
 	Download *currentDownload;
 	IBOutlet NSToolbarItem *stopButton;
 	IBOutlet NSToolbarItem *startButton;
+	
+	//Preferences
+	NSMutableArray *tvFormatList;
+	NSMutableArray *radioFormatList;
+	IBOutlet NSArrayController *tvFormatController;
+	IBOutlet NSArrayController *radioFormatController;
 }
 //Update
 - (void)getiPlayerUpdateFinished;

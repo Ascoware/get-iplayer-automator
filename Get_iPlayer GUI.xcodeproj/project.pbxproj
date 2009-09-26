@@ -47,6 +47,8 @@
 		D941D9A01025DDCF0012A75F /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D941D99F1025DDCF0012A75F /* SystemConfiguration.framework */; };
 		D941DA131025ED3F0012A75F /* plugins in Resources */ = {isa = PBXBuildFile; fileRef = D941DA0F1025ED3E0012A75F /* plugins */; };
 		D948C40C103436DE000CF853 /* icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = D948C40B103436DE000CF853 /* icon.icns */; };
+		D97D9426106DBB68006ECD39 /* TVFormat.m in Sources */ = {isa = PBXBuildFile; fileRef = D97D9423106DBB68006ECD39 /* TVFormat.m */; };
+		D97D9427106DBB68006ECD39 /* RadioFormat.m in Sources */ = {isa = PBXBuildFile; fileRef = D97D9424106DBB68006ECD39 /* RadioFormat.m */; };
 		D9A4509D102FF8090011E175 /* Credits.html in Resources */ = {isa = PBXBuildFile; fileRef = D9A4509C102FF8090011E175 /* Credits.html */; };
 		D9A450A4102FFDC00011E175 /* LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = D9A450A3102FFDC00011E175 /* LICENSE.txt */; };
 		D9CC15680FF9071700D819E2 /* Play.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D9CC15670FF9071700D819E2 /* Play.tiff */; };
@@ -122,6 +124,10 @@
 		D941D99F1025DDCF0012A75F /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = /System/Library/Frameworks/SystemConfiguration.framework; sourceTree = "<absolute>"; };
 		D941DA0F1025ED3E0012A75F /* plugins */ = {isa = PBXFileReference; lastKnownFileType = folder; path = plugins; sourceTree = "<group>"; };
 		D948C40B103436DE000CF853 /* icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = icon.icns; sourceTree = "<group>"; };
+		D97D9422106DBB68006ECD39 /* TVFormat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TVFormat.h; sourceTree = "<group>"; };
+		D97D9423106DBB68006ECD39 /* TVFormat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TVFormat.m; sourceTree = "<group>"; };
+		D97D9424106DBB68006ECD39 /* RadioFormat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RadioFormat.m; sourceTree = "<group>"; };
+		D97D9425106DBB68006ECD39 /* RadioFormat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RadioFormat.h; sourceTree = "<group>"; };
 		D9A4509C102FF8090011E175 /* Credits.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = Credits.html; sourceTree = "<group>"; };
 		D9A450A3102FFDC00011E175 /* LICENSE.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 		D9BE0870103563530011CF40 /* Camino.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Camino.h; sourceTree = "<group>"; };
@@ -291,6 +297,10 @@
 				D904F423100B077600D60BBF /* Programme.m */,
 				D9178593101345D700B82736 /* Series.h */,
 				D9178594101345D700B82736 /* Series.m */,
+				D97D9422106DBB68006ECD39 /* TVFormat.h */,
+				D97D9423106DBB68006ECD39 /* TVFormat.m */,
+				D97D9424106DBB68006ECD39 /* RadioFormat.m */,
+				D97D9425106DBB68006ECD39 /* RadioFormat.h */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -364,6 +374,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D904F0731009F6B800D60BBF /* mplayer in Resources */,
 				D9F66963102C5DC500A9449B /* GetOperaURL.applescript in Resources */,
 				D9F668DB102C560500A9449B /* GetFireFoxURL.applescript in Resources */,
 				D9F66955102C5D1200A9449B /* GetCaminoURL.applescript in Resources */,
@@ -374,7 +385,6 @@
 				D9CC157B0FF9076F00D819E2 /* Stop.tiff in Resources */,
 				D904F04A1009F22E00D60BBF /* get_iplayer.pl in Resources */,
 				D904F06F1009F35100D60BBF /* flvstreamer_macosx in Resources */,
-				D904F0731009F6B800D60BBF /* mplayer in Resources */,
 				D91783F01013035B00B82736 /* camstudio_record_button.png in Resources */,
 				D9414D7C101C9636007E09A7 /* ffmpeg in Resources */,
 				D9CCF3CC1023485A009205BE /* dsa_pub.pem in Resources */,
@@ -420,6 +430,8 @@
 				D9178595101345D700B82736 /* Series.m in Sources */,
 				D941D95E1025DB580012A75F /* NSURLRequest+postForm.m in Sources */,
 				D941D95F1025DB580012A75F /* JRFeedbackController.m in Sources */,
+				D97D9426106DBB68006ECD39 /* TVFormat.m in Sources */,
+				D97D9427106DBB68006ECD39 /* RadioFormat.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

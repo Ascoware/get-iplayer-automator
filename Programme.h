@@ -23,6 +23,7 @@
 	NSInteger season;
 	NSInteger episode;
 	NSNumber *processedPID;
+	NSNumber *radio;
 }
 - (id)initWithInfo:(id)sender pid:(NSString *)PID programmeName:(NSString *)SHOWNAME network:(NSString *)TVNETWORK;
 - (id)initWithShow:(Programme *)show;
@@ -40,4 +41,5 @@
 @property (readwrite, assign) NSInteger season;
 @property (readwrite, assign) NSInteger episode;
 @property (readwrite, assign) NSNumber *processedPID;
+@property (readwrite, assign) NSNumber *radio;
 @end

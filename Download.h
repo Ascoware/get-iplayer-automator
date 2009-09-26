@@ -8,6 +8,8 @@
 
 #import <Cocoa/Cocoa.h>
 #import "Programme.h"
+#import "TVFormat.h"
+#import "RadioFormat.h"
 
 extern bool runDownloads;
 
@@ -37,7 +39,7 @@ extern bool runDownloads;
 	BOOL foundLastLine;
 	NSString *LastLine;
 }
-- (id)initWithProgramme:(Programme *)tempShow :(id)sender;
+- (id)initWithProgramme:(Programme *)tempShow tvFormats:(NSArray *)tvFormatList radioFormats:(NSArray *)radioFormatList;
 - (void)cancelDownload:(id)sender;
 - (void)addToLog:(NSString *)logMessage noTag:(BOOL)b;
 - (void)addToLog:(NSString *)logMessage;

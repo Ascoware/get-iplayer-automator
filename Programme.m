@@ -25,6 +25,7 @@ extern BOOL runDownloads;
 	episodeName = [[NSString alloc] init];
 	timeadded = [[NSNumber alloc] init];
 	processedPID = [[NSNumber alloc] initWithBool:YES];
+	radio = [[NSNumber alloc] initWithBool:NO];
 	return self;
 }
 - (id)initWithShow:(Programme *)show
@@ -40,6 +41,7 @@ extern BOOL runDownloads;
 	episodeName = [[NSString alloc] init];
 	timeadded = [[NSNumber alloc] init];
 	processedPID = [[NSNumber alloc] initWithBool:YES];
+	radio = [show radio];
 	return self;
 }
 - (id)init
@@ -62,6 +64,7 @@ extern BOOL runDownloads;
 	timeadded = [[NSNumber alloc] init];
 	path = [[NSString alloc] initWithString:@"Unknown"];
 	processedPID = [[NSNumber alloc] initWithBool:NO];
+	radio = [[NSNumber alloc] initWithBool:NO];
 	return self;
 }
 - (id)description
@@ -79,6 +82,7 @@ extern BOOL runDownloads;
 	[coder encodeObject:episodeName forKey:@"episodeName"];
 	[coder encodeObject:timeadded forKey:@"timeadded"];
 	[coder encodeObject:processedPID forKey:@"processedPID"];
+	[coder encodeObject:radio forKey:@"radio"];
 }
 - (id) initWithCoder: (NSCoder *)coder
 {
@@ -95,6 +99,7 @@ extern BOOL runDownloads;
 	timeadded = [[NSString alloc] init];
 	timeadded = [coder decodeObjectForKey:@"timeadded"];
 	processedPID = [coder decodeObjectForKey:@"processedPID"];
+	radio = [coder decodeObjectForKey:@"radio"];
 	return self;
 }
 @synthesize showName;
@@ -110,4 +115,5 @@ extern BOOL runDownloads;
 @synthesize episode;
 @synthesize timeadded;
 @synthesize processedPID;
+@synthesize radio;
 @end
