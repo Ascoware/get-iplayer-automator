@@ -503,6 +503,10 @@
 				GCC_WARN_SHADOW = NO;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/Binaries\"",
+				);
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "-licucore";
 				PRODUCT_NAME = "Get iPlayer Automator";
@@ -525,6 +529,10 @@
 				GCC_PREFIX_HEADER = "Get_iPlayer GUI_Prefix.pch";
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/Binaries\"",
+				);
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "-licucore";
 				PRODUCT_NAME = "Get iPlayer Automator";

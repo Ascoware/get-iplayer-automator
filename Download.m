@@ -40,8 +40,8 @@
 	NSArray *tvFormatKeys = [NSArray arrayWithObjects:@"iPhone",@"Flash - High",@"Flash - Low",@"Flash - HD",@"Flash - Standard",@"Flash - Normal",@"Flash - Very High",nil];
 	NSArray *tvFormatObjects = [NSArray arrayWithObjects:@"iphone",@"flashhigh",@"flashlow",@"flashhd",@"flashstd",@"flashnormal",@"flashvhigh",nil];
 	NSDictionary *tvFormats = [[NSDictionary alloc] initWithObjects:tvFormatObjects forKeys:tvFormatKeys];
-	NSArray *radioFormatKeys = [NSArray arrayWithObjects:@"iPhone",@"Flash",@"WMA",nil];
-	NSArray *radioFormatObjects = [NSArray arrayWithObjects:@"iphone", @"flashaudio",@"wma",nil];
+	NSArray *radioFormatKeys = [NSArray arrayWithObjects:@"iPhone",@"Flash",@"WMA",@"Real Audio",nil];
+	NSArray *radioFormatObjects = [NSArray arrayWithObjects:@"iphone", @"flashaudio",@"wma",@"realaudio",nil];
 	NSDictionary *radioFormats = [[NSDictionary alloc] initWithObjects:radioFormatObjects forKeys:radioFormatKeys];
 	NSString *formatArg;
 	if ([[show radio] isEqualToNumber:[NSNumber numberWithBool:YES]])
@@ -469,7 +469,26 @@
 			[self setPercentage:102];
 
 		}
-			
+		//If an MPlayer (Real Audio) status message...
+		else if ([s hasPrefix:@"A:"])
+		{
+			NSString *downloadedString, *totalString;
+			[scanner setScanLocation:0];
+			[scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:nil];
+			if (![scanner scanDouble:&downloaded]) downloaded=0.0;
+			[scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:nil];
+			[scanner scanUpToString:@")" intoString:&downloadedString];
+			[scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:nil];
+			if (![scanner scanDouble:&total]) total=0.0;
+			[scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:nil];
+			[scanner scanUpToString:@")" intoString:&totalString];
+			if (total>0) percent = (downloaded/total)*100; 
+			else percent = 0.0;
+			if ([downloadedString length] < 7) downloadedString = [@"00:" stringByAppendingString:downloadedString];
+			[self setCurrentProgress:[NSString stringWithFormat:@"%.1f%% - (%@/%@) -- %@",percent,downloadedString,totalString,[show valueForKey:@"showName"]]];
+			[self setPercentage:percent];
+			[show setValue:[NSString stringWithFormat:@"Downloading: %.1f%%", percent] forKey:@"status"];
+		}
 		else
 		{
 			//Process iPhone/Podcast/Radio Downloads Status Message

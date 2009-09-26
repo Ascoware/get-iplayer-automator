@@ -197,7 +197,48 @@
 	<key>Notifications</key>
 	<array/>
 	<key>OpenEditors</key>
-	<array/>
+	<array>
+		<dict>
+			<key>Content</key>
+			<dict>
+				<key>PBXProjectModuleGUID</key>
+				<string>D97D959F106E808B006ECD39</string>
+				<key>PBXProjectModuleLabel</key>
+				<string>04_Download.m.patch</string>
+				<key>PBXSplitModuleInNavigatorKey</key>
+				<dict>
+					<key>Split0</key>
+					<dict>
+						<key>PBXProjectModuleGUID</key>
+						<string>D97D95AD106E80BF006ECD39</string>
+						<key>PBXProjectModuleLabel</key>
+						<string>04_Download.m.patch</string>
+						<key>_historyCapacity</key>
+						<integer>0</integer>
+						<key>bookmark</key>
+						<string>D97D95B0106E80BF006ECD39</string>
+						<key>history</key>
+						<array>
+							<string>D97D95AE106E80BF006ECD39</string>
+						</array>
+					</dict>
+					<key>SplitCount</key>
+					<string>1</string>
+				</dict>
+				<key>StatusBarVisibility</key>
+				<true/>
+			</dict>
+			<key>Geometry</key>
+			<dict>
+				<key>Frame</key>
+				<string>{{0, 20}, {1280, 575}}</string>
+				<key>PBXModuleWindowStatusBarHidden2</key>
+				<false/>
+				<key>RubberWindowFrame</key>
+				<string>442 82 1280 616 0 0 1280 698 </string>
+			</dict>
+		</dict>
+	</array>
 	<key>PerspectiveWidths</key>
 	<array>
 		<integer>-1</integer>
@@ -231,8 +272,6 @@
 			<key>Layout</key>
 			<array>
 				<dict>
-					<key>BecomeActive</key>
-					<true/>
 					<key>ContentConfiguration</key>
 					<dict>
 						<key>PBXBottomSmartGroupGIDs</key>
@@ -281,13 +320,13 @@
 							<key>PBXSmartGroupTreeModuleOutlineStateSelectionKey</key>
 							<array>
 								<array>
-									<integer>37</integer>
-									<integer>24</integer>
+									<integer>6</integer>
+									<integer>2</integer>
 									<integer>0</integer>
 								</array>
 							</array>
 							<key>PBXSmartGroupTreeModuleOutlineStateVisibleRectKey</key>
-							<string>{{0, 136}, {312, 558}}</string>
+							<string>{{0, 71}, {312, 558}}</string>
 						</dict>
 						<key>PBXTopSmartGroupGIDs</key>
 						<array/>
@@ -319,12 +358,14 @@
 					<key>Dock</key>
 					<array>
 						<dict>
+							<key>BecomeActive</key>
+							<true/>
 							<key>ContentConfiguration</key>
 							<dict>
 								<key>PBXProjectModuleGUID</key>
 								<string>1CE0B20306471E060097A5F4</string>
 								<key>PBXProjectModuleLabel</key>
-								<string>Info.plist</string>
+								<string>Download.m</string>
 								<key>PBXSplitModuleInNavigatorKey</key>
 								<dict>
 									<key>Split0</key>
@@ -332,11 +373,11 @@
 										<key>PBXProjectModuleGUID</key>
 										<string>1CE0B20406471E060097A5F4</string>
 										<key>PBXProjectModuleLabel</key>
-										<string>Info.plist</string>
+										<string>Download.m</string>
 										<key>_historyCapacity</key>
 										<integer>0</integer>
 										<key>bookmark</key>
-										<string>D97D9572106DD3C1006ECD39</string>
+										<string>D97D95AC106E80BF006ECD39</string>
 										<key>history</key>
 										<array>
 											<string>D9CC156C0FF9075400D819E2</string>
@@ -373,7 +414,6 @@
 											<string>D9D0E0F61044DEDC0059F044</string>
 											<string>D9F2D4E21066D04E0047BC81</string>
 											<string>D9F2D5531066EC490047BC81</string>
-											<string>D97D942A106DBB7A006ECD39</string>
 											<string>D97D942B106DBB7A006ECD39</string>
 											<string>D97D9431106DBB7A006ECD39</string>
 											<string>D97D945C106DBC3D006ECD39</string>
@@ -383,10 +423,12 @@
 											<string>D97D94A4106DC7DB006ECD39</string>
 											<string>D97D94A5106DC7DB006ECD39</string>
 											<string>D97D94BF106DCB73006ECD39</string>
-											<string>D97D9563106DD37D006ECD39</string>
 											<string>D97D9565106DD37D006ECD39</string>
-											<string>D97D956F106DD3C1006ECD39</string>
-											<string>D97D9570106DD3C1006ECD39</string>
+											<string>D97D957D106DD9AD006ECD39</string>
+											<string>D97D95A1106E80BF006ECD39</string>
+											<string>D97D95A2106E80BF006ECD39</string>
+											<string>D97D95A3106E80BF006ECD39</string>
+											<string>D97D95A5106E80BF006ECD39</string>
 										</array>
 										<key>prevStack</key>
 										<array>
@@ -483,6 +525,12 @@
 											<string>D97D9567106DD37D006ECD39</string>
 											<string>D97D9568106DD37D006ECD39</string>
 											<string>D97D9571106DD3C1006ECD39</string>
+											<string>D97D957E106DD9AD006ECD39</string>
+											<string>D97D95A6106E80BF006ECD39</string>
+											<string>D97D95A7106E80BF006ECD39</string>
+											<string>D97D95A8106E80BF006ECD39</string>
+											<string>D97D95A9106E80BF006ECD39</string>
+											<string>D97D95AA106E80BF006ECD39</string>
 										</array>
 									</dict>
 									<key>SplitCount</key>
@@ -656,6 +704,8 @@
 	</array>
 	<key>PerspectivesBarVisible</key>
 	<false/>
+	<key>PinnedNavigatorIdentifier</key>
+	<string>D97D959F106E808B006ECD39</string>
 	<key>ShelfIsVisible</key>
 	<false/>
 	<key>SourceDescription</key>
@@ -683,6 +733,7 @@
 		<string>1C78EAAD065D492600B07095</string>
 		<string>1CD10A99069EF8BA00B06720</string>
 		<string>D9CCC4890DD942540002F404</string>
+		<string>D97D959F106E808B006ECD39</string>
 		<string>/Users/thomaswillson/Code/Get iPlayer Automator/Get_iPlayer GUI.xcodeproj</string>
 	</array>
 	<key>WindowString</key>
