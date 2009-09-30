@@ -146,7 +146,24 @@
 		NSLog(@"Unable to load saved application data. Deleted the data file.");
 		rootObject=nil;
 	}
-	
+	//Adds Defaults to Type Preferences
+	if ([[tvFormatController arrangedObjects] count] == 0)
+	{
+		TVFormat *format1 = [[TVFormat alloc] init];
+		[format1 setFormat:@"Flash - Standard"];
+		TVFormat *format2 = [[TVFormat alloc] init];
+		[format2 setFormat:@"iPhone"];
+		[tvFormatController addObjects:[NSArray arrayWithObjects:format2,format1,nil]];
+	}
+	if ([[radioFormatController arrangedObjects] count] == 0)
+	{
+		RadioFormat *format1 = [[RadioFormat alloc] init];
+		[format1 setFormat:@"Flash"];
+		RadioFormat *format2 = [[RadioFormat alloc] init];
+		[format2 setFormat:@"iPhone"];
+		[radioFormatController addObjects:[NSArray arrayWithObjects:format2,format1,nil]];
+	}
+		
 	//Growl Initialization
 	[GrowlApplicationBridge setGrowlDelegate:@""];
 }

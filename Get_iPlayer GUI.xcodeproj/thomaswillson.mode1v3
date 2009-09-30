@@ -335,7 +335,7 @@
 										<key>_historyCapacity</key>
 										<integer>0</integer>
 										<key>bookmark</key>
-										<string>D97D96671072E986006ECD39</string>
+										<string>D97D967F1072ECA3006ECD39</string>
 										<key>history</key>
 										<array>
 											<string>D9CC156C0FF9075400D819E2</string>
@@ -375,7 +375,6 @@
 											<string>D97D942B106DBB7A006ECD39</string>
 											<string>D97D9431106DBB7A006ECD39</string>
 											<string>D97D945E106DBC3D006ECD39</string>
-											<string>D97D945F106DBC3D006ECD39</string>
 											<string>D97D94A3106DC7DB006ECD39</string>
 											<string>D97D94A4106DC7DB006ECD39</string>
 											<string>D97D94BF106DCB73006ECD39</string>
@@ -384,9 +383,10 @@
 											<string>D97D95E9106FFF8F006ECD39</string>
 											<string>D97D95EA106FFF8F006ECD39</string>
 											<string>D97D960F1071B929006ECD39</string>
-											<string>D97D96261072DB3C006ECD39</string>
 											<string>D97D96581072E7B1006ECD39</string>
-											<string>D97D96591072E7B1006ECD39</string>
+											<string>D97D966B1072EBF6006ECD39</string>
+											<string>D97D966C1072EBF6006ECD39</string>
+											<string>D97D966D1072EBF6006ECD39</string>
 										</array>
 										<key>prevStack</key>
 										<array>
@@ -423,6 +423,10 @@
 											<string>D97D965B1072E7B1006ECD39</string>
 											<string>D97D965C1072E7B1006ECD39</string>
 											<string>D97D965D1072E7B1006ECD39</string>
+											<string>D97D966E1072EBF6006ECD39</string>
+											<string>D97D966F1072EBF6006ECD39</string>
+											<string>D97D96701072EBF6006ECD39</string>
+											<string>D97D96711072EBF6006ECD39</string>
 										</array>
 									</dict>
 									<key>SplitCount</key>
@@ -620,6 +624,8 @@
 	<integer>5</integer>
 	<key>WindowOrderList</key>
 	<array>
+		<string>D97D96781072EC5A006ECD39</string>
+		<string>D97D96791072EC5A006ECD39</string>
 		<string>1C78EAAD065D492600B07095</string>
 		<string>1CD10A99069EF8BA00B06720</string>
 		<string>D9CCC4890DD942540002F404</string>
