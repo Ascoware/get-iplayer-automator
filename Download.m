@@ -338,7 +338,8 @@
 					if ([s length] != 0)
 					{
 						//If not...
-						s2 = @"0.0% - (0.0 MB/~0.0 MB) -- Initializing...";
+						if ([s hasPrefix:@"frame="]) s2= @"Converting...";
+						else s2 = @"0.0% - (0.0 MB/~0.0 MB) -- Initializing...";
 						[self addToLog:s noTag:YES];
 						status=NO;
 						[scanner setScanLocation:0];
