@@ -78,6 +78,12 @@ bool runUpdate=NO;
 	NSMutableArray *radioFormatList;
 	IBOutlet NSArrayController *tvFormatController;
 	IBOutlet NSArrayController *radioFormatController;
+	
+	//Scheduling a Start
+	IBOutlet NSPanel *scheduleWindow;
+	IBOutlet NSDatePicker *datePicker;
+	NSTimer *interfaceTimer;
+	NSTimer *scheduleTimer;
 }
 //Update
 - (void)getiPlayerUpdateFinished;
@@ -124,6 +130,11 @@ bool runUpdate=NO;
 //PVR
 - (IBAction)addSeriesLinkToQueue:(id)sender;
 - (void)processAutoRecordData:(NSString *)autoRecordData2 forSeries:(Series *)series2;
+
+//Scheduling a Start
+- (IBAction)showScheduleWindow:(id)sender;
+- (IBAction)scheduleStart:(id)sender;
+- (IBAction)cancelSchedule:(id)sender;
 
 //Key-Value Coding
 @property (readwrite, assign) NSMutableAttributedString *log_value;

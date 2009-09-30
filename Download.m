@@ -136,7 +136,7 @@
 	NSString *searchArg = [[NSString alloc] initWithFormat:@"%@", [show pid]];
 	NSString *versionArg = [[NSString alloc] initWithString:@"--versions=default"];
 	//We don't want this to refresh now!
-	NSString *cacheExpiryArg = @"-e604800";
+	NSString *cacheExpiryArg = @"-e604800000000";
 	NSString *folder = @"~/Library/Application Support/Get iPlayer Automator/";
 		//Profile Override Argument
 	folder = [folder stringByExpandingTildeInPath];
@@ -149,7 +149,7 @@
 	
 		//Add Arguments that can't be NULL
 	NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:getiPlayerPath,profileDirArg,noWarningArg,noExpiryArg,mplayerArg,flvstreamerArg,cacheExpiryArg,downloadPathArg,
-					 subDirArg,formatArg,getArg,searchArg,@"--attempts=5",@"--whitespace",@"--file-prefix=<name> - <episode>",@"--nopurge",versionArg,proxyArg,partialProxyArg,nil];
+					 subDirArg,formatArg,getArg,searchArg,@"--attempts=5",@"--whitespace",@"--file-prefix=<name> - <episode> (<mode>)",@"--nopurge",versionArg,proxyArg,partialProxyArg,nil];
 		//Verbose?
 	if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"Verbose"] isEqualTo:[NSNumber numberWithBool:YES]])
 		[args addObject:[[NSString alloc] initWithString:@"--verbose"]];
@@ -469,7 +469,7 @@
 			[self setPercentage:102];
 
 		}
-		//If an MPlayer (Real Audio) status message...
+		/*//If an MPlayer (Real Audio) status message...
 		else if ([s hasPrefix:@"A:"])
 		{
 			NSString *downloadedString, *totalString;
@@ -488,7 +488,7 @@
 			[self setCurrentProgress:[NSString stringWithFormat:@"%.1f%% - (%@/%@) -- %@",percent,downloadedString,totalString,[show valueForKey:@"showName"]]];
 			[self setPercentage:percent];
 			[show setValue:[NSString stringWithFormat:@"Downloading: %.1f%%", percent] forKey:@"status"];
-		}
+		}*/
 		else
 		{
 			//Process iPhone/Podcast/Radio Downloads Status Message

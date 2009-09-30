@@ -1202,16 +1202,20 @@
 		if ([[finishedShow successful] boolValue])
 		{
 			NSLog(@"AppController: Success: Cleaning Up Path...");
-			[finishedShow setValue:@"Adding to iTunes..." forKey:@"status"];
+			[finishedShow setValue:@"Processing..." forKey:@"status"];
 			[self cleanUpPath:finishedShow];
 			NSLog(@"Path Clean, Parsing Season & Episode Info...");
 			[self seasonEpisodeInfo:finishedShow];
 			NSLog(@"Season & Episode Info Parsed");
-			if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"AddCompletedToiTunes"] boolValue])
+			if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"AddCompletedToiTunes"] isEqualTo:[NSNumber numberWithBool:YES]])
 			{
 				NSLog(@"Adding to iTunes...");
 				[self addToiTunes:finishedShow];
 				NSLog(@"Added to iTunes");
+			}
+			else
+			{
+				[finishedShow setValue:@"Download Complete" forKey:@"status"];
 			}
 			
 			[GrowlApplicationBridge notifyWithTitle:@"Download Finished" 
@@ -1754,6 +1758,74 @@
 	return @"-e60480000000000000";
 }
 
+#pragma mark Scheduler
+- (IBAction)showScheduleWindow:(id)sender
+{
+	[scheduleWindow makeKeyAndOrderFront:self];
+	[datePicker setDateValue:[NSDate date]];
+}
+- (IBAction)cancelSchedule:(id)sender
+{
+	[scheduleWindow close];
+}
+- (IBAction)scheduleStart:(id)sender
+{
+	NSDate *startTime = [datePicker dateValue];
+	scheduleTimer = [[NSTimer alloc] initWithFireDate:startTime 
+													  interval:1
+														target:self 
+													  selector:@selector(runScheduledDownloads:) 
+													  userInfo:nil 
+													   repeats:NO];
+	interfaceTimer = [NSTimer scheduledTimerWithTimeInterval:1 
+															   target:self 
+															 selector:@selector(updateScheduleStatus:) 
+															 userInfo:nil 
+															  repeats:YES];
+	[scheduleWindow close];
+	[startButton setEnabled:NO];
+	[stopButton setLabel:@"Cancel Timer"];
+	[stopButton setAction:@selector(stopTimer:)];
+	[stopButton setEnabled:YES];
+	NSRunLoop *runLoop = [NSRunLoop mainRunLoop];
+	[runLoop addTimer:scheduleTimer forMode:NSDefaultRunLoopMode];
+}
+- (void)runScheduledDownloads:(NSTimer *)theTimer
+{
+	[interfaceTimer invalidate];
+	[startButton setEnabled:YES];
+	[stopButton setEnabled:NO];
+	[stopButton setLabel:@"Stop"];
+	[stopButton setAction:@selector(stopDownloads:)];
+	[self startDownloads:self];
+}
+- (void)updateScheduleStatus:(NSTimer *)theTimer
+{
+	NSDate *startTime = [scheduleTimer fireDate];
+	NSDate *currentTime = [NSDate date];
+	
+	unsigned int unitFlags = NSHourCalendarUnit | NSMinuteCalendarUnit | NSDayCalendarUnit | NSSecondCalendarUnit;
+	NSDateComponents *conversionInfo = [[NSCalendar currentCalendar] components:unitFlags fromDate:currentTime toDate:startTime options:0];
+	
+	NSString *status = [NSString stringWithFormat:@"Time until Start (DD:HH:MM:SS): %d:%d:%d:%d", 
+						[conversionInfo day], [conversionInfo hour], 
+						[conversionInfo minute], [conversionInfo second]];
+	[currentProgress setStringValue:status];
+	[currentIndicator setIndeterminate:YES];
+	[currentIndicator startAnimation:self];
+}
+- (void)stopTimer:(id)sender
+{
+	[interfaceTimer invalidate];
+	[scheduleTimer invalidate];
+	[startButton setEnabled:YES];
+	[stopButton setEnabled:NO];
+	[stopButton setLabel:@"Stop"];
+	[stopButton setAction:@selector(stopDownloads:)];
+	[currentProgress setStringValue:@""];
+	[currentIndicator setIndeterminate:NO];
+	[currentIndicator stopAnimation:self];
+}
 @synthesize log_value;
 @synthesize getiPlayerPath;
 @end
