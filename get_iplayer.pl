@@ -24,7 +24,7 @@
 #
 #
 package main;
-my $version = 2.36;
+my $version = 2.40;
 #
 # Help:
 #	./get_iplayer --help | --longhelp
@@ -105,7 +105,6 @@ my %user_agent = (
 #	'categories'	=> <Comma separated list of categories>
 # 	'type'		=> <prog_type>
 #	'timeadded'	=> <timestamp when programme was added to cache>
-#	'longname'	=> <Long name (only parsed in stage 1)>,
 #	'version'	=> <selected version e.g default, signed, audiodescribed, etc - only set before recording>
 #	'filename'	=> <Path and Filename of saved file - set only while recording>
 #	'dir'		=> <Filename Directory of saved file - set only while recording>
@@ -1027,6 +1026,8 @@ sub list_progs {
 				main::display_stream_info( $this, $this->{verpids}->{$version}, $version );
 				$opt->{quiet} = 0;
 			}
+			# remove offending metadata
+			delete $this->{filename}, $this->{filepart}, $this->{ext};
 		}
 	}
 	logger "\nINFO: ".($#matches + 1)." Matching Programmes\n" if ( $opt->{pvr} && $#matches >= 0 ) || ! $opt->{pvr};
@@ -1270,7 +1271,7 @@ sub get_links {
 	}
 
 	# if a cache file doesn't exist/corrupted/empty, flush option is specified or original file is older than $cache_sec then download new data
-	my $cache_secs = main::progclass( $prog_type )->expiry() || 14400;
+	my $cache_secs = $opt->{expiry} || main::progclass( $prog_type )->expiry() || 14400;
 	main::logger "DEBUG: Cache expiry time for $prog_type is ${cache_secs} secs - refresh in ".( stat($cachefile)->mtime + $cache_secs - $now )." secs\n" if $opt->{debug} && ! $opt->{flush};
 	if ( (! $only_load_from_cache) && ( 
 			(! keys %prog_old) || 
@@ -3577,10 +3578,12 @@ sub mode_ver_download_retry_loop {
 				if ( ! $opt->{nowrite} ) {
 					$hist->add( $prog );
 					$prog->tag_file;
-					$prog->run_user_command( $opt->{command} ) if $opt->{command};
 				}
 				$prog->download_thumbnail if $opt->{thumb};
 				$prog->create_metadata_file if $opt->{metadata};
+				if ( ! $opt->{nowrite} ) {
+					$prog->run_user_command( $opt->{command} ) if $opt->{command};
+				}
 			}
 			$prog->report() if $opt->{pvr};
 			return 0;
@@ -3799,11 +3802,13 @@ sub generate_filenames {
 
 	$prog->{fileprefix} = $opt->{fileprefix} || $format;
 
-	# If we dont have longname defined just set it to name
-	$prog->{longname} = $prog->{name} if ! $prog->{longname};
+	# get $name, $episode from title
+	my ( $name, $episode ) = Programme::bbciplayer::split_title( $prog->{title} ) if $prog->{title};
+	$prog->{name} = $name if $name && ! $prog->{name};
+	$prog->{episode} = $episode if $episode && ! $prog->{episode};
+	# store the name extracted from the title metadata in <longname> else just use the <name> field
+	$prog->{longname} = $name || $prog->{name};
 
-	# If we dont have name defined just set it to longname
-	$prog->{name} = $prog->{longname} if ! $prog->{name};
 
 	# substitute fields and sanitize $prog->{fileprefix}
 	main::logger "DEBUG: Substituted '$prog->{fileprefix}' as " if $opt->{debug};
@@ -3844,7 +3849,7 @@ sub generate_filenames {
 	$prog->{ext} = 'EXT' if ! $prog->{ext};
 	
 	# Don't override the {filename} if it is already set (i.e. for history info)
-	$prog->{filename} = "$prog->{dir}/$prog->{fileprefix}.$prog->{ext}" if ! $prog->{filename};
+	$prog->{filename} = "$prog->{dir}/$prog->{fileprefix}.$prog->{ext}" if $prog->{filename} =~ /\.EXT$/ || ! $prog->{filename};
 	$prog->{filepart} = "$prog->{dir}/$prog->{fileprefix}.partial.$prog->{ext}";
 
 	# Create symlink filename if required
@@ -3884,8 +3889,8 @@ sub generate_filenames {
 
 
 # Run a user specified command
-# e.g. --command 'echo "<pid> <longname> recorded"'
-# run_user_command($pid, 'echo "<pid> <longname> recorded"');
+# e.g. --command 'echo "<pid> <name> recorded"'
+# run_user_command($pid, 'echo "<pid> <name> recorded"');
 sub run_user_command {
 	my $prog = shift;
 	my $command = shift;
@@ -4133,7 +4138,7 @@ sub get_verpids {
 
 		# Add to prog hash
 		$prog->{versions} = join ',', keys %{ $prog->{verpids} };
-		$prog->{longname} = decode_entities($title);
+		$prog->{title} = decode_entities($title);
 		return 0;
 	
 	# Determine if the is a standard pid, Live TV or EMP TV URL
@@ -4309,12 +4314,9 @@ sub get_verpids {
 		main::logger "INFO: Version: $version, VersionPid: $verpid\n" if $opt->{verbose};  
 	}
 
-	# Extract Long Name, e.g.: iplayer.episode.setTitle("DIY SOS: Series 16: Swansea"), Strip off the episode name
-	$title =~ s/^(.+):.*?$/$1/g;
-
 	# Add to prog hash
 	$prog->{versions} = join ',', keys %{ $prog->{verpids} };
-	$prog->{longname} = decode_entities($title);
+	$prog->{title} = decode_entities($title);
 	return 0;
 }
 
@@ -4609,6 +4611,26 @@ sub get_metadata {
 	$prog->{modes}		= $modes;
 	$prog->{modesizes}	= $mode_sizes;
 	return 0;
+}
+
+
+
+# Intelligently split name and episode from title string for BBC iPlayer metadata
+sub split_title {
+	my $title = shift;
+	my ( $name, $episode );
+	# <title type="text">The Sarah Jane Adventures: Series 1: Revenge of the Slitheen: Part 2</title>
+	# <title type="text">The Story of Tracy Beaker: Series 4 Compilation: Independence Day/Beaker Witch Project</title>
+	# <title type="text">The Sarah Jane Adventures: Series 1: The Lost Boy: Part 2</title>
+	if ( $title =~ m{^(.+?Series.*?):\s+(.+?)$} ) {
+		( $name, $episode ) = ( $1, $2 );
+	} elsif ( $title =~ m{^(.+?):\s+(.+)$} ) {
+		( $name, $episode ) = ( $1, $2 );
+	# Catch all - i.e. no ':' separators
+	} else {
+		( $name, $episode ) = ( $title, $title );
+	}			
+	return ( $name, $episode );
 }
 
 
@@ -5358,18 +5380,9 @@ sub get_links {
 			# <title type="text">Richard Hammond's Blast Lab: Series Two: Episode 11</title>
 			# <title type="text">Skate Nation: Pro-Skate Camp</title>
 			$title = $1 if $entry =~ m{<title\s*.*?>\s*(.*?)\s*</title>};
-			# <title type="text">The Sarah Jane Adventures: Series 1: Revenge of the Slitheen: Part 2</title>
-			# <title type="text">The Story of Tracy Beaker: Series 4 Compilation: Independence Day/Beaker Witch Project</title>
-			# <title type="text">The Sarah Jane Adventures: Series 1: The Lost Boy: Part 2</title>
-			if ( $title =~ m{^(.+?Series.*?):\s+(.+?)$} ) {
-				( $name, $episode ) = ( $1, $2 );
-			} elsif ( $title =~ m{^(.+?):\s+(.+)$} ) {
-				( $name, $episode ) = ( $1, $2 );
-			# Catch all - i.e. no ':' separators
-			} else {
-				( $name, $episode ) = ( $title, $title );
-			}			
 
+			# determine name and episode from title
+			( $name, $episode ) = Programme::bbciplayer::split_title( $title );
 			# This is not the availability!
 			# <updated>2008-06-22T05:01:49Z</updated>
 			#$available = Programme::get_time_string( $1, time() ) if $entry =~ m{<updated>(\d{4}\-\d\d\-\d\dT\d\d:\d\d:\d\d.).*?</updated>};
@@ -7095,7 +7108,7 @@ sub get {
 					main::tee($namedpipe, $prog->{filepart});
 					#system( "cat $namedpipe 2>/dev/null| $bin->{tee} $prog->{filepart}");
 				} else {
-					my $cmd = "$bin->{lame} $binopts->{lame} $namedpipe - 2>/dev/null| $bin->{tee} \"$prog->{filepart}\"";
+					my $cmd = "$bin->{lame} $binopts->{lame} \"$namedpipe\" - 2>/dev/null| $bin->{tee} \"$prog->{filepart}\"";
 					main::logger "DEGUG: Running $cmd\n" if $opt->{debug};
 					# Create symlink if required
 					$prog->create_symlink( $prog->{symlink}, $prog->{filepart} ) if $opt->{symlink};
@@ -7109,14 +7122,14 @@ sub get {
 					main::tee($namedpipe);
 					#system( "cat $namedpipe 2>/dev/null");
 				} else {
-					my $cmd = "$bin->{lame} $binopts->{lame} $namedpipe - 2>/dev/null";
+					my $cmd = "$bin->{lame} $binopts->{lame} \"$namedpipe\" - 2>/dev/null";
 					main::logger "DEGUG: Running $cmd\n" if $opt->{debug};
-					system( "$bin->{lame} $binopts->{lame} $namedpipe - 2>/dev/null");
+					system( "$bin->{lame} $binopts->{lame} \"$namedpipe\" - 2>/dev/null");
 				}
 
 			# Stream mp3 to file directly
 			} elsif ( ! $opt->{stdout} ) {
-				my $cmd = "$bin->{lame} $binopts->{lame} $namedpipe \"$prog->{filepart}\" >/dev/null 2>/dev/null";
+				my $cmd = "$bin->{lame} $binopts->{lame} \"$namedpipe\" \"$prog->{filepart}\" >/dev/null 2>/dev/null";
 				main::logger "DEGUG: Running $cmd\n" if $opt->{debug};
 				# Create symlink if required
 				$prog->create_symlink( $prog->{symlink}, $prog->{filepart} ) if $opt->{symlink};
