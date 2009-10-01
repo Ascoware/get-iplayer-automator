@@ -16,8 +16,10 @@
 	<key>DefaultNotifications</key>
 	<array>
 		<string>Downloads Finished</string>
+		<string>Download Finished</string>
 		<string>Download Failed</string>
 		<string>Feedback Sent</string>
+		<string>New Version Available</string>
 	</array>
 </dict>
 </plist>
