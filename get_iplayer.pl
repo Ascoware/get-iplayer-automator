@@ -25,6 +25,8 @@
 #
 package main;
 my $version = 2.40;
+# Custom version with patch. Hopefully this patch will be included in the next release of get_iplayer.
+#
 #
 # Help:
 #	./get_iplayer --help | --longhelp
@@ -7000,7 +7002,7 @@ sub get {
 
 	# Create ID3 tagging options for lame (escape " for shell)
 	my ( $id3_name, $id3_episode, $id3_desc, $id3_channel ) = ( $prog->{name}, $prog->{episode}, $prog->{desc}, $prog->{channel} );
-	$id3_name =~ s|"|\"|g for ($id3_name, $id3_episode, $id3_desc, $id3_channel);
+	s|"|\\"|g for ($id3_name, $id3_episode, $id3_desc, $id3_channel);
 	$binopts->{lame} .= " --ignore-tag-errors --ty ".( (localtime())[5] + 1900 )." --tl \"$id3_name\" --tt \"$id3_episode\" --ta \"$id3_channel\" --tc \"$id3_desc\" ";
 
 	# Use post-streaming transcoding using lame if namedpipes are not supported (i.e. ActivePerl/Windows)
