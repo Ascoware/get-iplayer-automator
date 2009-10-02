@@ -16,6 +16,7 @@
 	runAgain = NO;
 	running=YES;
 	foundLastLine=NO;
+	unResumableCount=0;
 	errorCache = [[NSMutableString alloc] init];
 	processErrorCache = [NSTimer scheduledTimerWithTimeInterval:.25 target:self selector:@selector(processError) userInfo:nil repeats:YES];
 	
@@ -348,17 +349,15 @@
 						if ([s hasPrefix:@"ERROR:"] || [s hasPrefix:@"\rERROR:"] || [s hasPrefix:@"\nERROR:"])
 						{
 							NSLog(@"here");
-							if ([scanner scanUpToString:@"corrupt file!" intoString:nil])
+							if ([scanner scanUpToString:@"corrupt file!" intoString:nil] && unResumableCount>3)
 							{
-								NSAlert *alert = [NSAlert alertWithMessageText:@"Unresumable File!" 
-																 defaultButton:nil 
-															   alternateButton:nil 
-																   otherButton:nil 
-													 informativeTextWithFormat:@"Try this download again. If it fails with the same message again, please move or rename the partial file for %@",[show showName]];
+								[show setValue:@"Unresumable File." forKey:@"status"];
+								[self addToLog:@"Unresumable file, please delete the partial file and try again." noTag:NO];
 								[task interrupt];
 								[alert runModal];
 							}
 						}
+						else unResumableCount++;
 					}
 					else
 					{

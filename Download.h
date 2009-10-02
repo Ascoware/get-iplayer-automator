@@ -38,6 +38,7 @@ extern bool runDownloads;
 	
 	BOOL foundLastLine;
 	NSString *LastLine;
+	int unResumableCount;
 }
 - (id)initWithProgramme:(Programme *)tempShow tvFormats:(NSArray *)tvFormatList radioFormats:(NSArray *)radioFormatList;
 - (void)cancelDownload:(id)sender;
