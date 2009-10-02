@@ -354,7 +354,6 @@
 								[show setValue:@"Unresumable File." forKey:@"status"];
 								[self addToLog:@"Unresumable file, please delete the partial file and try again." noTag:NO];
 								[task interrupt];
-								[alert runModal];
 							}
 						}
 						else unResumableCount++;
