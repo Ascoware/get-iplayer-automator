@@ -24,9 +24,7 @@
 #
 #
 package main;
-my $version = 2.40;
-# Custom version with patch. Hopefully this patch will be included in the next release of get_iplayer.
-#
+my $version = 2.41;
 #
 # Help:
 #	./get_iplayer --help | --longhelp
@@ -2303,9 +2301,9 @@ sub run_cmd {
 	my $rtn;
 	my $USE_SYSTEM = 0;
 	#my $system_suffix;
-	
+
 	main::logger "\n\nINFO: Command: ".(join ' ', @cmd)."\n\n" if $opt->{verbose};
-                
+
 	# Define what to do with STDOUT and STDERR of the child process
 	my $fh_child_out = ">&STDOUT";
 	my $fh_child_err = ">&STDERR";
@@ -2397,8 +2395,7 @@ sub run_cmd {
 # Escape chars in string for shell use
 sub StringUtils::esc_chars {
 	# will change, for example, a!!a to a\!\!a
-	s/([;<>\*\|&\$!#\(\)\[\]\{\}:'"])/\\$1/g;
-	return $_;
+	$_[0] =~ s/([;<>\*\|&\$!#\(\)\[\]\{\}:'"])/\\$1/g;
 }
 
 
@@ -3716,6 +3713,7 @@ sub create_metadata_file {
 # sanitize_mode == 1 then sanitize final string and also sanitize '/' in field values
 # sanitize_mode == 2 then just substitute only
 # sanitize_mode == 3 then substitute then use encode entities for fields only
+# sanitize_mode == 4 then substitute then escape characters in fields only for use in double-quoted shell text.
 #
 # Also if it find a HASH type then the $prog->{<version>} element is searched and used
 # Likewise, if a ARRAY type is found, elements are joined with commas
@@ -3750,8 +3748,13 @@ sub substitute {
 		# Remove/replace all non-nice-filename chars if required
 		if ($sanitize_mode == 0) {
 			$replace = StringUtils::sanitize_path( $value );
+		# html entity encode
 		} elsif ($sanitize_mode == 3) {
 			$replace = encode_entities( $value );
+		# escape these chars: ! ` \ "
+		} elsif ($sanitize_mode == 4) {
+			$replace = $value;
+			$replace =~ s/([\!"\\`])/\\$1/g;
 		} else {
 			$replace = $value;
 		}
@@ -3885,6 +3888,11 @@ sub generate_filenames {
 	main::logger "DEBUG: Final Filename:     $prog->{filename}\n" if $opt->{debug};
 	main::logger "DEBUG: Raw Mode: $opt->{raw}\n" if $opt->{debug};
 
+	# Check path length is < 256 chars
+	if ( length( $prog->{filepart} ) > 255 ) {
+		main::logger("ERROR: Generated filename is too long, please use --fileprefix option to shorten it to below 250 characters ('$prog->{filepart}')\n\n");
+		return 1;
+	}
 	return 0;
 }
 
@@ -3897,11 +3905,8 @@ sub run_user_command {
 	my $prog = shift;
 	my $command = shift;
 
-	# Substitute the fields for the pid (don't sanitize)
-	$command = $prog->substitute( $command, 2 );
-
-	# Escape chars in command for shell use
-	StringUtils::esc_chars(\$command);
+	# Substitute the fields for the pid (and sanitize for double-quoted shell use)
+	$command = $prog->substitute( $command, 4 );
 
 	# run command
 	main::logger "INFO: Running command '$command'\n" if $opt->{verbose};
@@ -4630,8 +4635,8 @@ sub split_title {
 		( $name, $episode ) = ( $1, $2 );
 	# Catch all - i.e. no ':' separators
 	} else {
-		( $name, $episode ) = ( $title, $title );
-	}			
+		( $name, $episode ) = ( $title, '-' );
+	}
 	return ( $name, $episode );
 }
 
@@ -7014,6 +7019,9 @@ sub get {
 			# Remove named pipe
 			unlink $namedpipe;
 			main::logger "INFO: Recording wav format (followed by transcoding)\n";
+			my $wavfile = "$prog->{filepart}.wav";
+			# Strip off any leading drivename in win32 - mplayer doesn't like this for pcm output files
+			$wavfile =~ s|^[a-zA-Z]:||g;
 			@cmd = (
 				$bin->{mplayer},
 				@{ $binopts->{mplayer} },
@@ -7021,7 +7029,7 @@ sub get {
 				'-bandwidth', $bandwidth,
 				'-vc', 'null',
 				'-vo', 'null',
-				'-ao', "pcm:waveheader:fast:file=\"$prog->{filepart}.wav\"",
+				'-ao', "pcm:waveheader:fast:file=\"$wavfile\"",
 				$url,
 			);
 			# Create symlink if required
@@ -7046,6 +7054,9 @@ sub get {
 		
 	} elsif ( $opt->{wav} && ! $opt->{stdout} ) {
 		main::logger "INFO: Writing wav format\n";
+		my $wavfile = $prog->{filepart};
+		# Strip off any leading drivename in win32 - mplayer doesn't like this for pcm output files
+		$wavfile =~ s|^[a-zA-Z]:||g;
 		# Start the mplayer process and write to wav file
 		my @cmd = (
 			$bin->{mplayer},
@@ -7054,7 +7065,7 @@ sub get {
 			'-bandwidth', $bandwidth,
 			'-vc', 'null',
 			'-vo', 'null',
-			'-ao', "pcm:waveheader:fast:file=\"$prog->{filepart}\"",
+			'-ao', "pcm:waveheader:fast:file=\"$wavfile\"",
 			$url,
 		);
 		# Create symlink if required
