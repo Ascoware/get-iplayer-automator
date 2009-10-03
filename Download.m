@@ -409,11 +409,16 @@
 				else
 				{	
 					//Otherwise, use the indeterminate display.
-					if (s2 != nil) 
+					if ([s2 isEqualToString:@"Converting..."])
+					{
+						[self setCurrentProgress:[NSString stringWithFormat:@"Converting... -- %@",[show valueForKey:@"showName"]]];
+						[self setPercentage:102];
+						[show setValue:@"Converting..." forKey:@"status"];
+					else if (s2 != nil) 
 					{
 						[self setCurrentProgress:s2];
 						[self setPercentage:102];
-						[show setValue:@"Downloading" forKey:@"status"];
+						[show setValue:@"Downloading..." forKey:@"status"];
 					}
 				}
 			}
