@@ -414,6 +414,7 @@
 						[self setCurrentProgress:[NSString stringWithFormat:@"Converting... -- %@",[show valueForKey:@"showName"]]];
 						[self setPercentage:102];
 						[show setValue:@"Converting..." forKey:@"status"];
+					}
 					else if (s2 != nil) 
 					{
 						[self setCurrentProgress:s2];
