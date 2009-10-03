@@ -1789,7 +1789,7 @@
 										 defaultButton:@"OK"
 									   alternateButton:nil 
 										   otherButton:nil 
-							 informativeTextWithFormat:@"You cannnt schedule downloads to start if they are already running."];
+							 informativeTextWithFormat:@"You cannot schedule downloads to start if they are already running."];
 		[alert runModal];
 	}
 }
