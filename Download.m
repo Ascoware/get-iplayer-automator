@@ -355,8 +355,8 @@
 								[self addToLog:@"Unresumable file, please delete the partial file and try again." noTag:NO];
 								[task interrupt];
 							}
+							else unResumableCount++;
 						}
-						else unResumableCount++;
 					}
 					else
 					{
