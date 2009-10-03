@@ -1778,8 +1778,20 @@
 #pragma mark Scheduler
 - (IBAction)showScheduleWindow:(id)sender
 {
-	[scheduleWindow makeKeyAndOrderFront:self];
-	[datePicker setDateValue:[NSDate date]];
+	if (!runDownloads)
+	{
+		[scheduleWindow makeKeyAndOrderFront:self];
+		[datePicker setDateValue:[NSDate date]];
+	}
+	else
+	{
+		NSAlert *alert = [NSAlert alertWithMessageText:@"Downloads are already running." 
+										 defaultButton:@"OK"
+									   alternateButton:nil 
+										   otherButton:nil 
+							 informativeTextWithFormat:@"You cannnt schedule downloads to start if they are already running."];
+		[alert runModal];
+	}
 }
 - (IBAction)cancelSchedule:(id)sender
 {
