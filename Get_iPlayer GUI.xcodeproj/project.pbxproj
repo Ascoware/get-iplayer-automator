@@ -50,6 +50,7 @@
 		D97D9426106DBB68006ECD39 /* TVFormat.m in Sources */ = {isa = PBXBuildFile; fileRef = D97D9423106DBB68006ECD39 /* TVFormat.m */; };
 		D97D9427106DBB68006ECD39 /* RadioFormat.m in Sources */ = {isa = PBXBuildFile; fileRef = D97D9424106DBB68006ECD39 /* RadioFormat.m */; };
 		D97D96A610743860006ECD39 /* lame in Resources */ = {isa = PBXBuildFile; fileRef = D97D96A510743860006ECD39 /* lame */; };
+		D97D97741077EFDF006ECD39 /* LiveTVChannel.m in Sources */ = {isa = PBXBuildFile; fileRef = D97D97731077EFDF006ECD39 /* LiveTVChannel.m */; };
 		D9A4509D102FF8090011E175 /* Credits.html in Resources */ = {isa = PBXBuildFile; fileRef = D9A4509C102FF8090011E175 /* Credits.html */; };
 		D9A450A4102FFDC00011E175 /* LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = D9A450A3102FFDC00011E175 /* LICENSE.txt */; };
 		D9CC15680FF9071700D819E2 /* Play.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D9CC15670FF9071700D819E2 /* Play.tiff */; };
@@ -57,7 +58,6 @@
 		D9CC157B0FF9076F00D819E2 /* Stop.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D9CC157A0FF9076F00D819E2 /* Stop.tiff */; };
 		D9CCF3CC1023485A009205BE /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = D9CCF3CB1023485A009205BE /* dsa_pub.pem */; };
 		D9CCF54C1025AAF9009205BE /* Growl Registration Ticket.growlRegDict in Resources */ = {isa = PBXBuildFile; fileRef = D9CCF54B1025AAF9009205BE /* Growl Registration Ticket.growlRegDict */; };
-		D9DA536D1039669900C260EC /* lib in Resources */ = {isa = PBXBuildFile; fileRef = D9DA53591039669900C260EC /* lib */; };
 		D9F668DB102C560500A9449B /* GetFireFoxURL.applescript in Resources */ = {isa = PBXBuildFile; fileRef = D9F668BF102C53D700A9449B /* GetFireFoxURL.applescript */; };
 		D9F66955102C5D1200A9449B /* GetCaminoURL.applescript in Resources */ = {isa = PBXBuildFile; fileRef = D9F66954102C5D0D00A9449B /* GetCaminoURL.applescript */; };
 		D9F66963102C5DC500A9449B /* GetOperaURL.applescript in Resources */ = {isa = PBXBuildFile; fileRef = D9F66962102C5DB800A9449B /* GetOperaURL.applescript */; };
@@ -130,6 +130,8 @@
 		D97D9424106DBB68006ECD39 /* RadioFormat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RadioFormat.m; sourceTree = "<group>"; };
 		D97D9425106DBB68006ECD39 /* RadioFormat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RadioFormat.h; sourceTree = "<group>"; };
 		D97D96A510743860006ECD39 /* lame */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = lame; sourceTree = "<group>"; };
+		D97D97721077EFDF006ECD39 /* LiveTVChannel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LiveTVChannel.h; sourceTree = "<group>"; };
+		D97D97731077EFDF006ECD39 /* LiveTVChannel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LiveTVChannel.m; sourceTree = "<group>"; };
 		D9A4509C102FF8090011E175 /* Credits.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = Credits.html; sourceTree = "<group>"; };
 		D9A450A3102FFDC00011E175 /* LICENSE.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 		D9BE0870103563530011CF40 /* Camino.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Camino.h; sourceTree = "<group>"; };
@@ -140,7 +142,6 @@
 		D9CCF4C310256E82009205BE /* iTunes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iTunes.h; sourceTree = "<group>"; };
 		D9CCF52E10259DED009205BE /* Features.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = Features.rtf; sourceTree = "<group>"; };
 		D9CCF54B1025AAF9009205BE /* Growl Registration Ticket.growlRegDict */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "Growl Registration Ticket.growlRegDict"; sourceTree = "<group>"; };
-		D9DA53591039669900C260EC /* lib */ = {isa = PBXFileReference; lastKnownFileType = folder; path = lib; sourceTree = "<group>"; };
 		D9F668BF102C53D700A9449B /* GetFireFoxURL.applescript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.applescript; path = GetFireFoxURL.applescript; sourceTree = "<group>"; };
 		D9F66954102C5D0D00A9449B /* GetCaminoURL.applescript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.applescript; path = GetCaminoURL.applescript; sourceTree = "<group>"; };
 		D9F66962102C5DB800A9449B /* GetOperaURL.applescript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.applescript; path = GetOperaURL.applescript; sourceTree = "<group>"; };
@@ -263,7 +264,6 @@
 		D904F04D1009F28400D60BBF /* Binaries */ = {
 			isa = PBXGroup;
 			children = (
-				D9DA53591039669900C260EC /* lib */,
 				D904F0721009F6B800D60BBF /* mplayer */,
 				D9414D7B101C9636007E09A7 /* ffmpeg */,
 				D97D96A510743860006ECD39 /* lame */,
@@ -304,6 +304,8 @@
 				D97D9423106DBB68006ECD39 /* TVFormat.m */,
 				D97D9425106DBB68006ECD39 /* RadioFormat.h */,
 				D97D9424106DBB68006ECD39 /* RadioFormat.m */,
+				D97D97721077EFDF006ECD39 /* LiveTVChannel.h */,
+				D97D97731077EFDF006ECD39 /* LiveTVChannel.m */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -398,7 +400,6 @@
 				D9A4509D102FF8090011E175 /* Credits.html in Resources */,
 				D9A450A4102FFDC00011E175 /* LICENSE.txt in Resources */,
 				D948C40C103436DE000CF853 /* icon.icns in Resources */,
-				D9DA536D1039669900C260EC /* lib in Resources */,
 				D97D96A610743860006ECD39 /* lame in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -436,6 +437,7 @@
 				D941D95F1025DB580012A75F /* JRFeedbackController.m in Sources */,
 				D97D9426106DBB68006ECD39 /* TVFormat.m in Sources */,
 				D97D9427106DBB68006ECD39 /* RadioFormat.m in Sources */,
+				D97D97741077EFDF006ECD39 /* LiveTVChannel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

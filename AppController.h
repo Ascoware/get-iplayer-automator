@@ -84,6 +84,17 @@ bool runUpdate=NO;
 	IBOutlet NSDatePicker *datePicker;
 	NSTimer *interfaceTimer;
 	NSTimer *scheduleTimer;
+	
+	//Live TV
+	IBOutlet NSWindow *liveTVWindow;
+	IBOutlet NSArrayController *liveTVChannelController;
+	IBOutlet NSTableView *liveTVTableView;
+	IBOutlet NSButton *liveStart;
+	IBOutlet NSButton *liveStop;
+	NSTask *getiPlayerStreamer;
+	NSTask *mplayerStreamer;
+	NSPipe *liveTVPipe;
+	NSPipe *liveTVError;
 }
 //Update
 - (void)getiPlayerUpdateFinished;
@@ -135,6 +146,11 @@ bool runUpdate=NO;
 - (IBAction)showScheduleWindow:(id)sender;
 - (IBAction)scheduleStart:(id)sender;
 - (IBAction)cancelSchedule:(id)sender;
+
+//Live TV
+- (IBAction)showLiveTVWindow:(id)sender;
+- (IBAction)startLiveTV:(id)sender;
+- (IBAction)stopLiveTV:(id)sender;
 
 //Key-Value Coding
 @property (readwrite, assign) NSMutableAttributedString *log_value;

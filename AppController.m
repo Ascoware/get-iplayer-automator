@@ -14,6 +14,7 @@
 #import "Growl-WithInstaller.framework/Headers/GrowlApplicationBridge.h"
 #import "Sparkle.framework/Headers/Sparkle.h"
 #import "JRFeedbackController.h"
+#import "LiveTVChannel.h"
 
 @implementation AppController
 #pragma mark Overriden Methods
@@ -166,6 +167,13 @@
 		
 	//Growl Initialization
 	[GrowlApplicationBridge setGrowlDelegate:@""];
+	
+	//Populate Live TV Channel List
+	LiveTVChannel *bbcOne = [[LiveTVChannel alloc] initWithChannelName:@"BBC One"];
+	LiveTVChannel *bbcTwo = [[LiveTVChannel alloc] initWithChannelName:@"BBC Two"];
+	LiveTVChannel *bbcNews24 = [[LiveTVChannel alloc] initWithChannelName:@"BBC News 24"];
+	[liveTVChannelController setContent:[NSArray arrayWithObjects:bbcOne,bbcTwo,bbcNews24,nil]];
+	[liveTVTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
 }
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)application
 {
@@ -1855,6 +1863,124 @@
 	[currentIndicator setIndeterminate:NO];
 	[currentIndicator stopAnimation:self];
 }
+
+#pragma mark Live TV
+- (IBAction)showLiveTVWindow:(id)sender
+{
+	if (!runDownloads)
+	{
+		[liveTVWindow makeKeyAndOrderFront:self];
+	}
+	else
+	{
+		NSAlert *downloadRunning = [NSAlert alertWithMessageText:@"Downloads are Running!" 
+												   defaultButton:@"Continue" 
+												 alternateButton:@"Cancel" 
+													 otherButton:nil 
+									   informativeTextWithFormat:@"You may experience choppy playback while downloads are running."];
+		NSInteger response = [downloadRunning runModal];
+		if (response == NSAlertDefaultReturn)
+		{
+			[liveTVWindow makeKeyAndOrderFront:self];
+		}
+	}
+}
+- (IBAction)startLiveTV:(id)sender
+{
+	getiPlayerStreamer = [[NSTask alloc] init];
+	mplayerStreamer = [[NSTask alloc] init];
+	liveTVPipe = [[NSPipe alloc] init];
+	liveTVError = [[NSPipe alloc] init];
+	
+	[getiPlayerStreamer setLaunchPath:@"/usr/bin/perl"];
+	[getiPlayerStreamer setStandardOutput:liveTVPipe];
+	[getiPlayerStreamer setStandardError:liveTVPipe];
+	[mplayerStreamer setStandardInput:liveTVPipe];
+	[mplayerStreamer setLaunchPath:[[NSBundle mainBundle] pathForResource:@"mplayer" ofType:nil]];
+	[mplayerStreamer setStandardError:liveTVError];
+	[mplayerStreamer setStandardOutput:liveTVError];
+	NSLog(@"get iplayer launch path set");
+	
+	//Get selected channel
+	LiveTVChannel *selectedChannel = [[liveTVChannelController arrangedObjects] objectAtIndex:[liveTVChannelController selectionIndex]];
+	
+	//Set Proxy Argument
+	NSString *proxyArg;
+	NSString *partialProxyArg = [NSString stringWithString:@"--partial-proxy"];
+	NSString *proxyOption = [[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"];
+	if ([proxyOption isEqualToString:@"None"])
+	{
+		//No Proxy
+		proxyArg = NULL;
+	}
+	else if ([proxyOption isEqualToString:@"Custom"])
+	{
+		//Get the Custom Proxy.
+		proxyArg = [[NSString alloc] initWithFormat:@"-p%@",[[NSUserDefaults standardUserDefaults] valueForKey:@"CustomProxy"]];
+	}
+	else
+	{
+		//Get provided proxy from my server.
+		NSURL *proxyURL = [[NSURL alloc] initWithString:@"http://tom-tech.com/get_iplayer/proxy.txt"];
+		NSURLRequest *proxyRequest = [NSURLRequest requestWithURL:proxyURL
+													  cachePolicy:NSURLRequestReturnCacheDataElseLoad
+												  timeoutInterval:30];
+		NSData *urlData;
+		NSURLResponse *response;
+		NSError *error;
+		urlData = [NSURLConnection sendSynchronousRequest:proxyRequest
+										returningResponse:&response
+													error:&error];
+		if (!urlData)
+		{
+			NSAlert *alert = [NSAlert alertWithMessageText:@"Provided Proxy could not be retrieved!" 
+											 defaultButton:nil 
+										   alternateButton:nil 
+											   otherButton:nil 
+								 informativeTextWithFormat:@"No proxy will be used.\r\rError: %@", [error localizedDescription]];
+			[alert runModal];
+			[self addToLog:@"Proxy could not be retrieved. No proxy will be used." :nil];
+			proxyArg=NULL;
+		}
+		else
+		{
+			NSString *providedProxy = [[NSString alloc] initWithData:urlData encoding:NSUTF8StringEncoding];
+			proxyArg = [[NSString alloc] initWithFormat:@"-phttp://%@", providedProxy];
+		}
+	}
+	
+	//Prepare Arguments	
+	NSArray *args = [NSArray arrayWithObjects:[[NSBundle mainBundle] pathForResource:@"get_iplayer" ofType:@"pl"],
+					 profileDirArg,
+					 @"--stream",
+					 @"--modes=flashnormal",
+					 @"--type=livetv",
+					 [selectedChannel channel],
+					 //@"--player=mplayer -cache 3072 -",
+					// [NSString stringWithFormat:@"--player=\"%@\" -cache 3072 -", [[NSBundle mainBundle] pathForResource:@"mplayer" ofType:nil]],
+					 proxyArg,
+					 partialProxyArg,
+					 nil];
+	[getiPlayerStreamer setArguments:args];
+	NSLog(@"Arguments set: %@",args);
+	
+	[mplayerStreamer setArguments:[NSArray arrayWithObjects:@"-cache",@"3072",@"-",nil]];
+	
+	
+	[getiPlayerStreamer launch];
+	[mplayerStreamer launch];
+	NSLog(@"get iplayer launched");
+	[liveStart setEnabled:NO];
+	[liveStop setEnabled:YES];
+}
+- (IBAction)stopLiveTV:(id)sender
+{
+	[getiPlayerStreamer interrupt];
+	[mplayerStreamer interrupt];
+	[liveStart setEnabled:YES];
+	[liveStop setEnabled:NO];
+}
+	
 @synthesize log_value;
 @synthesize getiPlayerPath;
 @end
