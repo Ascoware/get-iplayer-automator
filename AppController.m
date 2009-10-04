@@ -489,9 +489,9 @@
 				}
 				if (!foundMatch)
 				{
-					[show setValue:@"No Longer Available" forKey:@"status"];
+					[show setValue:@"Not Currently Available" forKey:@"status"];
 					[show setValue:[NSNumber numberWithBool:YES] forKey:@"complete"];
-					[show setValue:[NSNumber numberWithBool:YES] forKey:@"successful"];
+					[show setValue:[NSNumber numberWithBool:NO] forKey:@"successful"];
 					NSLog(@"%@ not found in cache", [show showName]);
 				}
 		}
