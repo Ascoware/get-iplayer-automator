@@ -1836,10 +1836,12 @@
 	NSRunLoop *runLoop = [NSRunLoop mainRunLoop];
 	[runLoop addTimer:scheduleTimer forMode:NSDefaultRunLoopMode];
 	runScheduled=YES;
+	[mainWindow setDocumentEdited:YES];
 }
 - (void)runScheduledDownloads:(NSTimer *)theTimer
 {
 	[interfaceTimer invalidate];
+	[mainWindow setDocumentEdited:NO];
 	[startButton setEnabled:YES];
 	[stopButton setEnabled:NO];
 	[stopButton setLabel:@"Stop"];
@@ -1872,6 +1874,7 @@
 	[currentProgress setStringValue:@""];
 	[currentIndicator setIndeterminate:NO];
 	[currentIndicator stopAnimation:self];
+	[mainWindow setDocumentEdited:NO];
 	runScheduled=NO;
 }
 
