@@ -92,7 +92,7 @@
 	
 	getiPlayerPath = [[NSString alloc] initWithString:[[NSBundle mainBundle] bundlePath]];
 	getiPlayerPath = [getiPlayerPath stringByAppendingString:@"/Contents/Resources/get_iplayer.pl"];
-	
+	runScheduled=NO;
 	return self;
 }
 #pragma mark Delegate Methods
@@ -507,6 +507,13 @@
 	//Check for Updates - Don't want to prompt the user when updates are running.
 	SUUpdater *updater = [SUUpdater sharedUpdater];
 	[updater checkForUpdatesInBackground];
+	
+	//If this is an update initiated by the scheduler, run the downloads.
+	if (runScheduled) 
+	{
+		[self startDownloads:self];
+		runScheduled=NO;
+	}
 }
 - (IBAction)forceUpdate:(id)sender
 {
@@ -1826,6 +1833,7 @@
 	[stopButton setEnabled:YES];
 	NSRunLoop *runLoop = [NSRunLoop mainRunLoop];
 	[runLoop addTimer:scheduleTimer forMode:NSDefaultRunLoopMode];
+	runScheduled=YES;
 }
 - (void)runScheduledDownloads:(NSTimer *)theTimer
 {
@@ -1834,7 +1842,7 @@
 	[stopButton setEnabled:NO];
 	[stopButton setLabel:@"Stop"];
 	[stopButton setAction:@selector(stopDownloads:)];
-	[self startDownloads:self];
+	[self forceUpdate:self];
 }
 - (void)updateScheduleStatus:(NSTimer *)theTimer
 {
@@ -1862,6 +1870,7 @@
 	[currentProgress setStringValue:@""];
 	[currentIndicator setIndeterminate:NO];
 	[currentIndicator stopAnimation:self];
+	runScheduled=NO;
 }
 
 #pragma mark Live TV

@@ -84,6 +84,7 @@ bool runUpdate=NO;
 	IBOutlet NSDatePicker *datePicker;
 	NSTimer *interfaceTimer;
 	NSTimer *scheduleTimer;
+	BOOL runScheduled;
 	
 	//Live TV
 	IBOutlet NSWindow *liveTVWindow;
