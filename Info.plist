@@ -30,8 +30,6 @@
 	<string>NO</string>
 	<key>SUFeedURL</key>
 	<string>http://tom-tech.com/get_iplayer/updates.xml</string>
-	<key>SUScheduledCheckInterval</key>
-	<string>4000</string>
 	<key>SUPublicDSAKeyFile</key>
 	<string>dsa_pub.pem</string>
 	<key>SUEnableAutomaticChecks</key>
