@@ -1175,12 +1175,14 @@
 		{
 			[whatAnIdiot runModal];
 			runDownloads=NO;
+			[mainWindow setDocumentEdited:NO];
 		}
 	}
 	else
 	{
 		[whatAnIdiot runModal];
 		runDownloads=NO;
+		[mainWindow setDocumentEdited:NO];
 	}
 }
 - (IBAction)stopDownloads:(id)sender
