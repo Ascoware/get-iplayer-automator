@@ -1052,7 +1052,7 @@
 		NSArray *selected = [queueController selectedObjects];
 		for (Programme *show in selected)
 		{
-			if (![[show status] isEqualToString:@"Waiting..."])
+			if (![[show status] isEqualToString:@"Waiting..."] && ![[show complete] isEqualToNumber:[NSNumber numberWithBool:YES]])
 			{
 				downloading = YES;
 			}
