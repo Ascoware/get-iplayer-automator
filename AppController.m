@@ -120,7 +120,6 @@
 		NSArray *tempSeries = [rootObject valueForKey:@"serieslink"];
 		[queueController addObjects:tempQueue];
 		[pvrQueueController addObjects:tempSeries];
-		NSLog(@"Successfully loaded application data.");
 	}
 	@catch (NSException *e)
 	{
@@ -139,7 +138,6 @@
 		rootObject = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
 		[radioFormatController addObjects:[rootObject valueForKey:@"radioFormats"]];
 		[tvFormatController addObjects:[rootObject valueForKey:@"tvFormats"]];
-		NSLog(@"Successfully loaded application data.");
 	}
 	@catch (NSException *e)
 	{
@@ -309,7 +307,6 @@
 		NSLog(@"NO UI");
 	}
 	getiPlayerUpdateArgs = [[NSArray alloc] initWithObjects:getiPlayerPath,cacheExpiryArg,typeArgument,@"--nopurge",profileDirArg,nil];
-	NSLog(@"%@", getiPlayerUpdateArgs);
 	getiPlayerUpdateTask = [[NSTask alloc] init];
 	[getiPlayerUpdateTask setLaunchPath:@"/usr/bin/perl"];
 	[getiPlayerUpdateTask setArguments:getiPlayerUpdateArgs];
@@ -403,10 +400,8 @@
 	for (Programme *show in tempQueue)
 	{
 		BOOL foundMatch=NO;
-		NSLog([show description]);
 		if ([[show showName] length] > 0)
 			{
-				NSLog(@"Should be initializing task");
 				NSTask *pipeTask = [[NSTask alloc] init];
 				NSPipe *newPipe = [[NSPipe alloc] init];
 				NSFileHandle *readHandle2 = [newPipe fileHandleForReading];
@@ -424,13 +419,11 @@
 				[pipeTask setArguments:[NSArray arrayWithObjects:getiPlayerPath,profileDirArg,@"--nopurge",noWarningArg,[self typeArgument:nil],[self cacheExpiryArgument:nil],listFormat,
 										searchArgument,nil]];
 				NSMutableString *taskData = [[NSMutableString alloc] initWithString:@""];
-				NSLog(@"About to launch");
 				[pipeTask launch];
 				while ((someData = [readHandle2 availableData]) && [someData length]) {
 						[taskData appendString:[[NSString alloc] initWithData:someData
 																	 encoding:NSUTF8StringEncoding]];
 				}
-				NSLog(@"Task Data = %@", taskData);
 				NSString *string = [NSString stringWithString:taskData];
 				NSUInteger length = [string length];
 				NSUInteger paraStart = 0, paraEnd = 0, contentsEnd = 0;
@@ -461,7 +454,6 @@
 							[p setValue:temp_showName forKey:@"showName"];
 							[p setValue:temp_tvNetwork forKey:@"tvNetwork"];
 							if ([temp_type isEqualToString:@"radio"]) [p setValue:[NSNumber numberWithBool:YES] forKey:@"radio"];
-							NSLog(@"Original = %@, Result = %@", [show showName], [p showName]);
 							if ([[p showName] isEqualToString:[show showName]])
 							{
 								[show setValue:[p pid] forKey:@"pid"];
@@ -492,7 +484,6 @@
 					[show setValue:@"Not Currently Available" forKey:@"status"];
 					[show setValue:[NSNumber numberWithBool:YES] forKey:@"complete"];
 					[show setValue:[NSNumber numberWithBool:NO] forKey:@"successful"];
-					NSLog(@"%@ not found in cache", [show showName]);
 				}
 		}
 		
@@ -626,7 +617,6 @@
 
 - (void)searchDataReady:(NSNotification *)n
 {
-	NSLog(@"data");
     NSData *d;
     d = [[n userInfo] valueForKey:NSFileHandleNotificationDataItem];
 	
@@ -634,7 +624,6 @@
 		NSString *s = [[NSString alloc] initWithData:d
 											encoding:NSUTF8StringEncoding];
 		[searchData appendString:s];
-		NSLog(s);
 	}
 	else
 	{
@@ -670,7 +659,6 @@
 				[myScanner scanUpToString:@":" intoString:&temp_pid];
 				[myScanner scanUpToCharactersFromSet:[NSCharacterSet letterCharacterSet] intoString:NULL];
 				[myScanner scanUpToString:@", ~" intoString:&temp_type];
-				NSLog(temp_type);
 				[myScanner scanString:@", ~" intoString:NULL];
 				[myScanner scanUpToString:@"~," intoString:&temp_showName];
 				[myScanner scanUpToCharactersFromSet:[NSCharacterSet letterCharacterSet] intoString:NULL];
@@ -818,7 +806,6 @@
 			}
 			if ([wantedID isEqualToString:pid])
 			{
-				NSLog(@"They match!");
 				found=YES;
 				[p setValue:showName forKey:@"showName"];
 				[p setValue:index forKey:@"pid"];
@@ -827,7 +814,6 @@
 			else if ([wantedID isEqualToString:index])
 			{
 				found=YES;
-				NSLog(@"Must be an index!");
 				[p setValue:showName forKey:@"showName"];
 				if ([type isEqualToString:@"radio"]) [p setValue:[NSNumber numberWithBool:YES] forKey:@"radio"];
 			}
@@ -835,13 +821,9 @@
 			
 	}
 	if (!found)
-	{
 		[p setValue:@"Not Found" forKey:@"showName"];
-	}
 	else
-	{
 		[p setProcessedPID:[NSNumber numberWithBool:YES]];
-	}
 	
 }
 - (IBAction)getCurrentWebpage:(id)sender
@@ -1231,26 +1213,15 @@
 	if (runDownloads)
 	{
 		Programme *finishedShow = [note object];
-		NSLog(@"finishedShow = %@", finishedShow);
-		NSLog(@"Path = %@", [finishedShow path]);
 		if ([[finishedShow successful] boolValue])
 		{
-			NSLog(@"AppController: Success: Cleaning Up Path...");
 			[finishedShow setValue:@"Processing..." forKey:@"status"];
 			[self cleanUpPath:finishedShow];
-			NSLog(@"Path Clean, Parsing Season & Episode Info...");
 			[self seasonEpisodeInfo:finishedShow];
-			NSLog(@"Season & Episode Info Parsed");
 			if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"AddCompletedToiTunes"] isEqualTo:[NSNumber numberWithBool:YES]])
-			{
-				NSLog(@"Adding to iTunes...");
 				[self addToiTunes:finishedShow];
-				NSLog(@"Added to iTunes");
-			}
 			else
-			{
 				[finishedShow setValue:@"Download Complete" forKey:@"status"];
-			}
 			
 			[GrowlApplicationBridge notifyWithTitle:@"Download Finished" 
 										description:[NSString stringWithFormat:@"%@ Completed Successfully",[finishedShow showName]] 
@@ -1262,7 +1233,6 @@
 		}
 		else
 		{
-			NSLog(@"AppController: Failure");
 			[GrowlApplicationBridge notifyWithTitle:@"Download Failed" 
 										description:[NSString stringWithFormat:@"%@ failed. See log for details.",[finishedShow showName]] 
 								   notificationName:@"Download Failed"
@@ -1282,13 +1252,11 @@
 				if (![[show complete] boolValue])
 				{
 					nextShow = show;
-					NSLog(@"Found show");
 					break;
 				}
 			}
 			if (nextShow==nil)
 			{
-				NSLog(@"No more shows");
 				NSException *noneLeft = [NSException exceptionWithName:@"EndOfDownloads" reason:@"Done" userInfo:nil];
 				[noneLeft raise];
 			}
@@ -1447,7 +1415,6 @@
 				[p setValue:temp_tvNetwork forKey:@"tvNetwork"];
 				NSNumber *added = [NSNumber numberWithInteger:timeadded];
 				[p setValue:added forKey:@"timeadded"];
-				NSLog(@"timeadded = %@", added);
 				[pvrResultsController addObject:p];
 			}
 			@catch (NSException *e) {
@@ -1485,7 +1452,6 @@
 		[show initWithShowname:tempName];
 		[show setValue:[programme timeadded] forKey:@"added"];
 		[show setValue:[programme tvNetwork] forKey:@"tvNetwork"];
-		NSLog(@"Added = %@", [show added]);
 		[pvrQueueController addObject:show];
 	}
 }
@@ -1549,10 +1515,8 @@
 				[myScanner scanUpToString:@"~," intoString:&temp_showName];
 				[myScanner scanUpToCharactersFromSet:[NSCharacterSet letterCharacterSet] intoString:NULL];
 				[myScanner scanUpToString:@"," intoString:&temp_tvNetwork];
-				NSLog(temp_tvNetwork);
 				[myScanner scanString:@"," intoString:nil];
 				[myScanner scanInteger:&timeadded];
-				NSLog([series2 tvNetwork]);
 				if (([[series2 added] integerValue] < timeadded) /*&& ([temp_tvNetwork isEqualToString:[series2 tvNetwork]])*/)
 				{
 					Programme *p = [[Programme alloc] initWithInfo:nil pid:temp_pid programmeName:temp_showName network:temp_tvNetwork];
@@ -1659,7 +1623,6 @@
 	
 	if (![[show path] isEqualToString:@"Unknown"])
 	{
-		NSLog(@"Original Path = %@", [show path]);
 		//Process Original Path into Parts
 		NSString *originalPath = [NSString stringWithString:[show path]];
 		NSString *originalFolder = [originalPath stringByDeletingLastPathComponent];
@@ -1669,7 +1632,6 @@
 		NSString *newFile;
 		if (![showName isEqualToString:originalShowName] || ![episodeName isEqualToString:originalEpisodeName])
 		{
-			NSLog(@"Generating New Paths");
 			//Generate New Paths
 			NSString *downloadDirectory = [[NSUserDefaults standardUserDefaults] objectForKey:@"DownloadPath"];
 			NSString *newFolder = [downloadDirectory stringByAppendingPathComponent:showName];
@@ -1677,7 +1639,6 @@
 			newFile = [newFolder stringByAppendingPathComponent:newFilename];
 			newFile = [newFile stringByAppendingPathExtension:extension];
 			
-			NSLog(@"New path generated: %@, %@",newFolder,newFile);
 			//Perform File Operations
 			NSFileManager *fileManager = [NSFileManager defaultManager];
 			[fileManager createDirectoryAtPath:newFolder attributes:nil];
@@ -1693,10 +1654,7 @@
 			else NSLog(@"Clean Up Path Error: %@", copyError);
 		}
 		else 
-		{
 			newFile = originalPath;
-			NSLog(@"No need to change.");
-		}
 	}
 	
 	//Save Data to Programme for Later Use
@@ -1779,11 +1737,7 @@
 - (IBAction)typeChanged:(id)sender
 {
 	if ([sender state] == NSOffState)
-	{
 		runSinceChange=NO;
-		NSLog(@"No");
-	}
-	else NSLog(@"Yes");
 }
 - (NSString *)cacheExpiryArgument:(id)sender
 {
