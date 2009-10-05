@@ -1063,7 +1063,8 @@
 												  defaultButton:@"OK" 
 												alternateButton:nil 
 													otherButton:nil 
-									  informativeTextWithFormat:@"You can not remove a show that is currently downloading"];
+									  informativeTextWithFormat:@"You can not remove a show that is currently downloading." 
+																@"Please stop the downloads then remove the download if you wish to cancel it."];
 			[cantRemove runModal];
 		}
 		else
