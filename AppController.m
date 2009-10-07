@@ -1583,7 +1583,6 @@
 			}
 			else if (track && [ext isEqualToString:@"mp3"])
 			{
-				[iTunes stop];
 				[track setBookmarkable:YES];
 				[track setName:[show showName]];
 				[track setAlbum:[show seriesName]];
@@ -1811,7 +1810,7 @@
 	unsigned int unitFlags = NSHourCalendarUnit | NSMinuteCalendarUnit | NSDayCalendarUnit | NSSecondCalendarUnit;
 	NSDateComponents *conversionInfo = [[NSCalendar currentCalendar] components:unitFlags fromDate:currentTime toDate:startTime options:0];
 	
-	NSString *status = [NSString stringWithFormat:@"Time until Start (DD:HH:MM:SS): %d:%d:%d:%d", 
+	NSString *status = [NSString stringWithFormat:@"Time until Start (DD:HH:MM:SS): %2d:%2d:%2d:%2d", 
 						[conversionInfo day], [conversionInfo hour], 
 						[conversionInfo minute], [conversionInfo second]];
 	[currentProgress setStringValue:status];

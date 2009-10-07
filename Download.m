@@ -433,7 +433,6 @@
 	[task interrupt];
 	[nc removeObserver:self name:NSFileHandleReadCompletionNotification object:fh];
 	[nc removeObserver:self name:NSFileHandleReadCompletionNotification object:errorFh];
-	task = nil;
 	[show setValue:@"Cancelled" forKey:@"status"];
 	[self addToLog:@"Download Cancelled"];
 }
