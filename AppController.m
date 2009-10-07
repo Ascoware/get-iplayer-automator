@@ -1584,9 +1584,13 @@
 			else if (track && [ext isEqualToString:@"mp3"])
 			{
 				[track setBookmarkable:YES];
+				[self addToLog:@"Bookmarkable set" :self];
 				[track setName:[show showName]];
+				[self addToLog:@"Name set" :self];
 				[track setAlbum:[show seriesName]];
+				[self addToLog:@"Album set" :self];
 				[track setUnplayed:YES];
+				[self addToLog:@"Everything set" :self];
 			}
 			[show setValue:@"Complete & in iTunes" forKey:@"status"];
 		}
