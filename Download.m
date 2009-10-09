@@ -349,7 +349,7 @@
 						if ([s hasPrefix:@"ERROR:"] || [s hasPrefix:@"\rERROR:"] || [s hasPrefix:@"\nERROR:"])
 						{
 							NSLog(@"here");
-							if ([scanner scanUpToString:@"corrupt file!" intoString:nil] && unResumableCount>3)
+							if ([scanner scanUpToString:@"corrupt file!" intoString:nil] && [scanner scanString:@"corrupt file!" intoString:nil] && unResumableCount>3)
 							{
 								[show setValue:@"Unresumable File." forKey:@"status"];
 								[self addToLog:@"Unresumable file, please delete the partial file and try again." noTag:NO];
