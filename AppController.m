@@ -1209,6 +1209,12 @@
 {
 	if (!runUpdate)
 		[currentProgress setStringValue:[[note userInfo] valueForKey:@"string"]];
+	if (runDownloads)
+	{
+		[startButton setEnabled:NO];
+		[stopButton setEnabled:YES];
+		[mainWindow setDocumentEdited:YES];
+	}
 }
 - (void)nextDownload:(NSNotification *)note
 {
