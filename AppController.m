@@ -1207,7 +1207,8 @@
 }
 - (void)setProgress:(NSNotification *)note
 {
-	[currentProgress setStringValue:[[note userInfo] valueForKey:@"string"]];
+	if (!runUpdate)
+		[currentProgress setStringValue:[[note userInfo] valueForKey:@"string"]];
 }
 - (void)nextDownload:(NSNotification *)note
 {
