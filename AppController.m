@@ -1171,15 +1171,19 @@
 - (IBAction)stopDownloads:(id)sender
 {
 	runDownloads=NO;
-	[mainWindow setDocumentEdited:NO];
 	[currentDownload cancelDownload:self];
 	[[currentDownload show] setStatus:@"Cancelled"];
-	[startButton setEnabled:YES];
+	if (!runUpdate)
+		[startButton setEnabled:YES];
 	[stopButton setEnabled:NO];
 	currentDownload = nil;
 	[currentIndicator stopAnimation:nil];
 	[currentIndicator setDoubleValue:0];
-	[currentProgress setStringValue:@""];
+	if (!runUpdate)
+	{
+		[currentProgress setStringValue:@""];
+		[mainWindow setDocumentEdited:NO];
+	}
 	
 	NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
 	[nc removeObserver:self name:@"setPercentage" object:nil]; 
