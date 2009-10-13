@@ -505,6 +505,11 @@
 		[self startDownloads:self];
 		runScheduled=NO;
 	}
+	
+	if (runDownloads)
+	{
+		[self addToLog:@"Download(s) are still running." :self];
+	}
 }
 - (IBAction)forceUpdate:(id)sender
 {
