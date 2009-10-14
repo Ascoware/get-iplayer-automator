@@ -1534,7 +1534,7 @@
 				[myScanner scanUpToString:@"," intoString:&temp_tvNetwork];
 				[myScanner scanString:@"," intoString:nil];
 				[myScanner scanInteger:&timeadded];
-				if (([[series2 added] integerValue] < timeadded) /*&& ([temp_tvNetwork isEqualToString:[series2 tvNetwork]])*/)
+				if (([[series2 added] integerValue] < timeadded) && ([temp_tvNetwork isEqualToString:[series2 tvNetwork]]))
 				{
 					Programme *p = [[Programme alloc] initWithInfo:nil pid:temp_pid programmeName:temp_showName network:temp_tvNetwork];
 					if ([temp_type isEqualToString:@"radio"]) [p setValue:[NSNumber numberWithBool:YES] forKey:@"radio"];
