@@ -75,7 +75,7 @@
 		NSMutableString *historyString = [[NSMutableString alloc] init];
 		for (DownloadHistoryEntry *entry in currentHistory)
 		{
-			[historyString appendFormat:@"%@\r", [entry entryString]];
+			[historyString appendFormat:@"%@\n", [entry entryString]];
 		}
 		NSString *historyPath = [NSString stringWithString:@"~/Library/Application Support/Get iPlayer Automator/download_history"];
 		historyPath = [historyPath stringByExpandingTildeInPath];
