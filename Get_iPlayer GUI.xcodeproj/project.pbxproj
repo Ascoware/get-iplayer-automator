@@ -34,6 +34,8 @@
 		D914BD29100CBFA900F7E68E /* Download.m in Sources */ = {isa = PBXBuildFile; fileRef = D914BD28100CBFA900F7E68E /* Download.m */; };
 		D91783F01013035B00B82736 /* camstudio_record_button.png in Resources */ = {isa = PBXBuildFile; fileRef = D91783EF1013035B00B82736 /* camstudio_record_button.png */; };
 		D9178595101345D700B82736 /* Series.m in Sources */ = {isa = PBXBuildFile; fileRef = D9178594101345D700B82736 /* Series.m */; };
+		D92687C51087F81F000E8132 /* DownloadHistoryController.m in Sources */ = {isa = PBXBuildFile; fileRef = D92687C41087F81F000E8132 /* DownloadHistoryController.m */; };
+		D92687CA1087F836000E8132 /* DownloadHistoryEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = D92687C91087F836000E8132 /* DownloadHistoryEntry.m */; };
 		D92BB40A1025B4D600B0BFEC /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D92BB4091025B4D600B0BFEC /* Sparkle.framework */; };
 		D92BB4131025B4DD00B0BFEC /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = D92BB4091025B4D600B0BFEC /* Sparkle.framework */; };
 		D9414D7C101C9636007E09A7 /* ffmpeg in Resources */ = {isa = PBXBuildFile; fileRef = D9414D7B101C9636007E09A7 /* ffmpeg */; };
@@ -112,6 +114,10 @@
 		D91783EF1013035B00B82736 /* camstudio_record_button.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = camstudio_record_button.png; sourceTree = "<group>"; };
 		D9178593101345D700B82736 /* Series.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Series.h; sourceTree = "<group>"; };
 		D9178594101345D700B82736 /* Series.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Series.m; sourceTree = "<group>"; };
+		D92687C31087F81F000E8132 /* DownloadHistoryController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DownloadHistoryController.h; sourceTree = "<group>"; };
+		D92687C41087F81F000E8132 /* DownloadHistoryController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DownloadHistoryController.m; sourceTree = "<group>"; };
+		D92687C81087F836000E8132 /* DownloadHistoryEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DownloadHistoryEntry.h; sourceTree = "<group>"; };
+		D92687C91087F836000E8132 /* DownloadHistoryEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DownloadHistoryEntry.m; sourceTree = "<group>"; };
 		D92BB4091025B4D600B0BFEC /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
 		D9414D7B101C9636007E09A7 /* ffmpeg */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = ffmpeg; sourceTree = "<group>"; };
 		D941D8F21025CD6B0012A75F /* Growl-WithInstaller.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = "Growl-WithInstaller.framework"; sourceTree = "<group>"; };
@@ -173,6 +179,8 @@
 				D9FEB87510077790003BADF8 /* AppController.m */,
 				D914BD27100CBFA900F7E68E /* Download.h */,
 				D914BD28100CBFA900F7E68E /* Download.m */,
+				D92687C31087F81F000E8132 /* DownloadHistoryController.h */,
+				D92687C41087F81F000E8132 /* DownloadHistoryController.m */,
 				D91787021013803000B82736 /* Models */,
 				D941D9551025DB440012A75F /* JRFeedback */,
 			);
@@ -306,6 +314,8 @@
 				D97D9424106DBB68006ECD39 /* RadioFormat.m */,
 				D97D97721077EFDF006ECD39 /* LiveTVChannel.h */,
 				D97D97731077EFDF006ECD39 /* LiveTVChannel.m */,
+				D92687C81087F836000E8132 /* DownloadHistoryEntry.h */,
+				D92687C91087F836000E8132 /* DownloadHistoryEntry.m */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -438,6 +448,8 @@
 				D97D9426106DBB68006ECD39 /* TVFormat.m in Sources */,
 				D97D9427106DBB68006ECD39 /* RadioFormat.m in Sources */,
 				D97D97741077EFDF006ECD39 /* LiveTVChannel.m in Sources */,
+				D92687C51087F81F000E8132 /* DownloadHistoryController.m in Sources */,
+				D92687CA1087F836000E8132 /* DownloadHistoryEntry.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
