@@ -48,7 +48,6 @@
 	NSString *formatArg;
 	if ([[show radio] isEqualToNumber:[NSNumber numberWithBool:YES]])
 	{
-		NSLog(@"radio");
 		NSMutableString *temp_Format;
 		temp_Format = [[NSMutableString alloc] initWithString:@"--modes="];
 		for (RadioFormat *format in radioFormatList)
@@ -69,7 +68,6 @@
 		[temp_Format deleteCharactersInRange:NSMakeRange([temp_Format length]-1, 1)];
 		formatArg = [NSString stringWithString:temp_Format];
 	}
-	NSLog(formatArg);
 
 		//Set Proxy Argument
 	NSString *proxyArg;
