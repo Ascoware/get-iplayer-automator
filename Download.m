@@ -80,8 +80,10 @@
 	}
 	else if ([proxyOption isEqualToString:@"Custom"])
 	{
-		//Get the Custom Proxy.
-		proxyArg = [[NSString alloc] initWithFormat:@"-p%@",[[NSUserDefaults standardUserDefaults] valueForKey:@"CustomProxy"]];
+		if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CustomProxy"] hasPrefix:@"http"])
+			proxyArg = [[NSString alloc] initWithFormat:@"-p%@",[[NSUserDefaults standardUserDefaults] valueForKey:@"CustomProxy"]];
+		else
+			proxyArg = [[NSString alloc] initWithFormat:@"-phttp://%@",[[NSUserDefaults standardUserDefaults] valueForKey:@"CustomProxy"]];
 	}
 	else
 	{
