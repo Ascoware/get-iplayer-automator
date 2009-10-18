@@ -135,7 +135,11 @@
 	else ffmpegArg = nil;
 	NSString *downloadPathArg = [[NSString alloc] initWithFormat:@"--output=%@", downloadPath];
 	NSString *subDirArg = [[NSString alloc] initWithString:@"--subdir"];
-	NSString *getArg = [[NSString alloc] initWithFormat:@"--get"];
+	NSString *getArg;
+	if ([[show processedPID] boolValue])
+		getArg = [[NSString alloc] initWithString:@"--get"];
+	else
+		getArg = [[NSString alloc] initWithString:@"--pid"];		
 	NSString *searchArg = [[NSString alloc] initWithFormat:@"%@", [show pid]];
 	NSString *versionArg = [[NSString alloc] initWithString:@"--versions=default"];
 	//We don't want this to refresh now!

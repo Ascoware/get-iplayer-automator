@@ -826,7 +826,7 @@
 			
 	}
 	if (!found)
-		[p setValue:@"Not Found" forKey:@"showName"];
+		[p setValue:@"Unknown: Not in Cache" forKey:@"showName"];
 	else
 		[p setProcessedPID:[NSNumber numberWithBool:YES]];
 	
@@ -1112,7 +1112,7 @@
 				else
 				{
 					[self getNameForProgramme:show];
-					if ([[show showName] isEqualToString:@"Not Found"])
+					if (/*[[show showName] isEqualToString:@"Not Found"]*/NO)
 					{
 						[show setComplete:[NSNumber numberWithBool:YES]];
 						[show setSuccessful:[NSNumber numberWithBool:NO]];
