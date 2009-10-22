@@ -1327,6 +1327,14 @@
 									   clickContext:nil];
 			[[SUUpdater sharedUpdater] checkForUpdatesInBackground];
 			
+			
+			if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"AutoRetryFailed"] boolValue] && downloadsFailed>0)
+			{
+				NSDate *scheduledDate = [NSDate dateWithTimeIntervalSinceNow:60*[[[NSUserDefaults standardUserDefaults] valueForKey:@"AutoRetryTime"] doubleValue]];
+				[datePicker setDateValue:scheduledDate];
+				[self scheduleStart:self];
+			}
+			
 			return;
 		}
 	}
@@ -1802,7 +1810,8 @@
 															 selector:@selector(updateScheduleStatus:) 
 															 userInfo:nil 
 															  repeats:YES];
-	[scheduleWindow close];
+	if ([scheduleWindow isVisible])
+		[scheduleWindow close];
 	[startButton setEnabled:NO];
 	[stopButton setLabel:@"Cancel Timer"];
 	[stopButton setAction:@selector(stopTimer:)];

@@ -19,9 +19,9 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>87</string>
+	<string>89</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.1.0 Beta 1</string>
+	<string>1.1.0</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
