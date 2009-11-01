@@ -831,7 +831,7 @@
 		}
 			
 	}
-	if (!found)
+	if (!found && [[show showName] isEqualToString:@""])
 		[p setValue:@"Unknown: Not in Cache" forKey:@"showName"];
 	else
 		[p setProcessedPID:[NSNumber numberWithBool:YES]];
@@ -1118,11 +1118,12 @@
 				else
 				{
 					[self getNameForProgramme:show];
-					if (/*[[show showName] isEqualToString:@"Not Found"]*/NO)
+					if ([[show showName] isEqualToString:@"Unknown - Not in Cache"])
 					{
 						[show setComplete:[NSNumber numberWithBool:YES]];
 						[show setSuccessful:[NSNumber numberWithBool:NO]];
-						[show setStatus:@"Failed: Not in Cache"];
+						[show setStatus:@"Failed: Please set the show name"];
+						[self addToLog:@"Could not download. Please set a show name first." :self];ß
 					}
 					else
 					{
@@ -1640,12 +1641,14 @@
 }
 - (void)cleanUpPath:(Programme *)show
 {
+
 	//Process Show Name into Parts
 	NSString *originalShowName, *originalEpisodeName;
 	NSScanner *nameScanner = [NSScanner scannerWithString:[show showName]];
 	[nameScanner scanUpToString:@" - " intoString:&originalShowName];
 	[nameScanner scanString:@"-" intoString:nil];
 	[nameScanner scanUpToString:@"Scan to End" intoString:&originalEpisodeName];
+		
 	
 	//Replace :'s with -'s
 	NSString *showName = [originalShowName stringByReplacingOccurrencesOfString:@":" withString:@" -"];
