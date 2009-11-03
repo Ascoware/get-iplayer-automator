@@ -8,6 +8,7 @@
 
 #import "DownloadHistoryController.h"
 #import "DownloadHistoryEntry.h"
+#import "Programme.h"
 
 
 @implementation DownloadHistoryController
@@ -15,6 +16,7 @@
 {
 	[super init];
 	[self readHistory:self];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(addToHistory:) name:@"AddProgToHistory" object:nil];
 	return self;
 }
 - (void)readHistory:(id)sender
@@ -133,5 +135,14 @@
 	[historyWindow setDocumentEdited:NO];
 	[saveButton setEnabled:NO];
 	[historyWindow close];
+}
+- (void)addToHistory:(NSNotification *)note
+{
+	[self readHistory:self];
+	NSDictionary *userInfo = [note userInfo];
+	Programme *prog = [userInfo valueForKey:@"Programme"];
+	DownloadHistoryEntry *entry = [[DownloadHistoryEntry alloc] initWithPID:[prog realPID] showName:[prog seriesName] episodeName:[prog episodeName] type:nil someNumber:@"251465" downloadFormat:@"flashhigh" downloadPath:@"/"];
+	[historyArrayController addObject:entry];
+	[self writeHistory:self];
 }
 @end

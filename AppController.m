@@ -831,7 +831,7 @@
 		}
 			
 	}
-	if (!found && [[show showName] isEqualToString:@""])
+	if (!found && [[p showName] isEqualToString:@""])
 		[p setValue:@"Unknown: Not in Cache" forKey:@"showName"];
 	else
 		[p setProcessedPID:[NSNumber numberWithBool:YES]];
@@ -1088,6 +1088,19 @@
 		[queueController remove:self];
 	}
 }
+- (IBAction)hidePvrShow:(id)sender
+{
+	NSArray *temp_queue = [queueController selectedObjects];
+	for (Programme *show in temp_queue)
+	{
+		if ([show realPID])
+		{
+			NSDictionary *info = [NSDictionary dictionaryWithObject:show forKey:@"Programme"];
+			[[NSNotificationCenter defaultCenter] postNotificationName:@"AddProgToHistory" object:self userInfo:info];
+			[queueController removeObject:show];
+		}
+	}
+}
 #pragma mark Download Controller
 - (IBAction)startDownloads:(id)sender
 {
@@ -1123,7 +1136,7 @@
 						[show setComplete:[NSNumber numberWithBool:YES]];
 						[show setSuccessful:[NSNumber numberWithBool:NO]];
 						[show setStatus:@"Failed: Please set the show name"];
-						[self addToLog:@"Could not download. Please set a show name first." :self];ß
+						[self addToLog:@"Could not download. Please set a show name first." :self];
 					}
 					else
 					{
@@ -1496,7 +1509,7 @@
 		NSString *typeArgument = [self typeArgument:nil];
 		
 		NSMutableArray *autoRecordArgs = [[NSMutableArray alloc] initWithObjects:getiPlayerPath, noWarningArg,@"--nopurge",
-										 @"--listformat=<index>: <type>, ~<name> - <episode>~, <channel>, <timeadded>", cacheExpiryArgument, 
+										 @"--listformat=<index>: <type>, ~<name> - <episode>~, <channel>, <timeadded>, <pid>,", cacheExpiryArgument, 
 										  typeArgument, profileDirArg,@"--hide",[series showName],nil];
 		
 		NSTask *autoRecordTask = [[NSTask alloc] init];
@@ -1538,7 +1551,7 @@
 			@try {
 				NSScanner *myScanner = [NSScanner scannerWithString:string];
 				NSArray *currentQueue = [queueController arrangedObjects];
-				NSString *temp_pid, *temp_showName, *temp_tvNetwork, *temp_type;
+				NSString *temp_pid, *temp_showName, *temp_tvNetwork, *temp_type, *temp_realPID;
 				NSInteger timeadded;
 				[myScanner scanUpToString:@":" intoString:&temp_pid];
 				[myScanner scanUpToCharactersFromSet:[NSCharacterSet letterCharacterSet] intoString:NULL];
@@ -1549,9 +1562,23 @@
 				[myScanner scanUpToString:@"," intoString:&temp_tvNetwork];
 				[myScanner scanString:@"," intoString:nil];
 				[myScanner scanInteger:&timeadded];
+				[myScanner scanUpToString:@", " intoString:nil];
+				[myScanner scanString:@", " intoString:nil];
+				[myScanner scanUpToString:@"," intoString:&temp_realPID];
+				
+				NSScanner *seriesEpisodeScanner = [NSScanner scannerWithString:temp_showName];
+				NSString *series_Name, *episode_Name;
+				[seriesEpisodeScanner scanUpToString:@" - " intoString:&series_Name];
+				[seriesEpisodeScanner scanString:@"-" intoString:nil];
+				[seriesEpisodeScanner scanUpToString:@"kjkljfdg" intoString:&episode_Name];
+				
 				if (([[series2 added] integerValue] < timeadded) && ([temp_tvNetwork isEqualToString:[series2 tvNetwork]]))
 				{
 					Programme *p = [[Programme alloc] initWithInfo:nil pid:temp_pid programmeName:temp_showName network:temp_tvNetwork];
+					[p setRealPID:temp_realPID];
+					[p setSeriesName:series_Name];
+					[p setEpisodeName:episode_Name];
+					NSLog(temp_realPID);
 					if ([temp_type isEqualToString:@"radio"]) [p setValue:[NSNumber numberWithBool:YES] forKey:@"radio"];
 					[p setValue:@"Added by Series-Link" forKey:@"status"];
 					BOOL inQueue=NO;

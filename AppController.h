@@ -142,6 +142,7 @@ bool runUpdate=NO;
 //PVR
 - (IBAction)addSeriesLinkToQueue:(id)sender;
 - (void)processAutoRecordData:(NSString *)autoRecordData2 forSeries:(Series *)series2;
+- (IBAction)hidePvrShow:(id)sender;
 
 //Scheduling a Start
 - (IBAction)showScheduleWindow:(id)sender;
