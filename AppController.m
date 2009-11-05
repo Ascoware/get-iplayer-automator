@@ -302,6 +302,7 @@
 		[searchField setEnabled:NO];
 		[stopButton setEnabled:NO];
 		[startButton setEnabled:NO];
+		[pvrSearchField setEnabled:NO];
 	}
 	@catch (NSException *e) {
 		NSLog(@"NO UI");
@@ -375,6 +376,7 @@
 	getiPlayerUpdatePipe = nil;
 	getiPlayerUpdateTask = nil;
 	[startButton setEnabled:YES];
+	[pvrSearchField setEnabled:YES];
 	
 	if (didUpdate)
 	{
