@@ -157,7 +157,7 @@
 	if ([[radioFormatController arrangedObjects] count] == 0)
 	{
 		RadioFormat *format1 = [[RadioFormat alloc] init];
-		[format1 setFormat:@"Flash"];
+		[format1 setFormat:@"Flash - MP3"];
 		RadioFormat *format2 = [[RadioFormat alloc] init];
 		[format2 setFormat:@"iPhone"];
 		[radioFormatController addObjects:[NSArray arrayWithObjects:format2,format1,nil]];
@@ -1641,16 +1641,18 @@
 				if ([show season]>0) [track setSeasonNumber:[show season]];
 				if ([show episode]>0) [track setEpisodeNumber:[show episode]];
 			}
-			else if (track && [ext isEqualToString:@"mp3"])
+			else if (track && ([ext isEqualToString:@"mp3"] || [ext isEqualToString:@"aac"]))
 			{
+				[self addToLog:@"Setting Podcast Metadata:" :self];
 				[track setBookmarkable:YES];
-				[self addToLog:@"Bookmarkable set" :self];
+				[self addToLog:@"	Bookmarkable set" :self];
 				[track setName:[show showName]];
-				[self addToLog:@"Name set" :self];
+				[self addToLog:@"	Name set" :self];
 				[track setAlbum:[show seriesName]];
-				[self addToLog:@"Album set" :self];
+				[self addToLog:@"	Album set" :self];
 				[track setUnplayed:YES];
-				[self addToLog:@"Everything set" :self];
+				[self addToLog:@"	Unplayed set" :self];
+				[self addToLog:@"All Metadata set." :self];
 			}
 			[show setValue:@"Complete & in iTunes" forKey:@"status"];
 		}
