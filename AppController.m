@@ -330,7 +330,7 @@
 {
     NSData *d;
     d = [[n userInfo] valueForKey:NSFileHandleNotificationDataItem];
-	
+	BOOL matches=NO;
     if ([d length] > 0) {
 		NSString *s = [[NSString alloc] initWithData:d
 											encoding:NSUTF8StringEncoding];
@@ -353,6 +353,12 @@
 			infomessage = nil;
 			didUpdate = YES;
 		}
+		else if ([s hasPrefix:@"Matches:"])
+		{
+			matches=YES;
+			getiPlayerUpdateTask=nil;
+			[self getiPlayerUpdateFinished];
+		}
     }
 	else
 	{
@@ -361,7 +367,7 @@
 	}
 	
     // If the task is running, start reading again
-    if (getiPlayerUpdateTask)
+    if (getiPlayerUpdateTask && !matches)
         [[getiPlayerUpdatePipe fileHandleForReading] readInBackgroundAndNotify];
 }
 - (void)getiPlayerUpdateFinished
@@ -399,6 +405,7 @@
 	//Long, Complicated Bit of Code that updates the index number.
 	//This is neccessary because if the cache is updated, the index number will almost certainly change.
 	NSArray *tempQueue = [queueController arrangedObjects];
+	NSLog(@"updating indexes");
 	for (Programme *show in tempQueue)
 	{
 		BOOL foundMatch=NO;
@@ -492,13 +499,14 @@
 	}
 	
 	//Don't want to add these until the cache is up-to-date!
-	if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"SeriesLinkStartup"] isEqualToNumber:[NSNumber numberWithBool:YES]])
+	if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"SeriesLinkStartup"] boolValue])
 	{
+		NSLog(@"Checking series link");
 		[self addSeriesLinkToQueue:self];
 	}
 	
 	//Update the search results
-	if ([[searchField stringValue] count] > 0)
+	if ([[searchField stringValue] length] > 0)
 	{
 		[self mainSearch:self];
 	}
