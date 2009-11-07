@@ -24,7 +24,7 @@
 #
 #
 package main;
-my $version = 2.42;
+my $version = 2.45;
 #
 # Help:
 #	./get_iplayer --help | --longhelp
@@ -123,7 +123,7 @@ my $opt_format = {
 	get		=> [ 2, "get|record|g", 'Recording', '--get, -g', "Start recording matching programmes"],
 	hash		=> [ 1, "hash", 'Recording', '--hash', "Show recording progress as hashes"],
 	itvnothread	=> [ 1, "itvnothread", 'Recording', '--itvnothread', "Disable parallel threaded recording for itv"],
-	modes		=> [ 0, "modes=s", 'Recording', '--modes <mode>,<mode>,...', "Recoding modes: iphone,flashhd,flashvhigh,flashhigh,flashstd,flashnormal,flashlow,n95_wifi,flashaac,flashaudio,realaudio,wma"],
+	modes		=> [ 0, "modes=s", 'Recording', '--modes <mode>,<mode>,...', "Recoding modes: iphone,flashhd,flashvhigh,flashhigh,flashstd,flashnormal,flashlow,n95_wifi,flashaac,flashaachigh,flashaacstd,flashaaclow,flashaudio,realaudio,wma"],
 	multimode	=> [ 1, "multimode", 'Recording', '--multimode', "Allow the recording of more than one mode for the same programme - WARNING: will record all specified/default modes!!"],
 	overwrite	=> [ 1, "overwrite|over-write", 'Recording', '--overwrite', "Overwrite recordings if they already exist"],
 	partialproxy	=> [ 1, "partial-proxy", 'Recording', '--partial-proxy', "Only uses web proxy where absolutely required (try this extra option if your proxy fails)"],
@@ -141,6 +141,7 @@ my $opt_format = {
 	thumbonly	=> [ 1, "thumbonly|thumbnailonly|thumbnail-only|thumb-only", 'Recording', '--thumbnail-only', "Only Download Thumbnail image if available, not the programme"],
 
 	# Search
+	before		=> [ 1, "before=n", 'Search', '--before', "Limit search to programmes added to the cache before N hours ago"],
 	category 	=> [ 2, "category=s", 'Search', '--category <string>', "Narrow search to matched categories (regex or comma separated values)"],
 	channel		=> [ 2, "channel=s", 'Search', '--channel <string>', "Narrow search to matched channel(s) (regex or comma separated values)"],
 	exclude		=> [ 1, "exclude=s", 'Search', '--exclude <string>', "Narrow search to exclude matched programme names (regex or comma separated values)"],
@@ -222,6 +223,7 @@ my $opt_format = {
 	warranty	=> [ 1, "Display", 'Display', '--warranty', 'Displays warranty section of GPLv3'],
 
 	# External Program
+	atomicparsley	=> [ 0, "atomicparsley|atomic-parsley=s", 'External Program', '--atomicparsley <path>', "Location of AtomicParsley tagger binary"],
 	id3v2		=> [ 0, "id3tag|id3v2=s", 'External Program', '--id3v2 <path>', "Location of id3v2 or id3tag binary"],
 	mplayer		=> [ 0, "mplayer=s", 'External Program', '--mplayer <path>', "Location of mplayer binary"],
 
@@ -262,7 +264,7 @@ sub logger(@) {
 	# Make sure quiet can be overridden by verbose and debug options
 	if ( $opt->{verbose} || $opt->{debug} || ! $opt->{quiet} ) {
 		# Only send messages to STDERR if pvr or stdout options are being used.
-		if ( $opt->{stdout} || $opt->{pvr} || $opt->{stderr} ) {
+		if ( $opt->{stdout} || $opt->{pvr} || $opt->{stderr} || $opt->{stream} ) {
 			print STDERR $msg;
 		} else {
 			print STDOUT $msg;
@@ -301,6 +303,11 @@ if ( defined $ENV{GETIPLAYERUSERPREFS} && $ENV{GETIPLAYERSYSPREFS} ) {
 	$profile_dir = $opt_pre->{profiledir} || $ENV{GETIPLAYERUSERPREFS};
 	$optfile_system = $ENV{GETIPLAYERSYSPREFS};
 
+# Otherwise look for windows style file locations
+} elsif ( defined $ENV{USERPROFILE} ) {
+	$profile_dir = $opt_pre->{profiledir} || $ENV{USERPROFILE}.'/.get_iplayer';
+	$optfile_system = $ENV{ALLUSERSPROFILE}.'/get_iplayer/options';
+
 # Options on unix-like systems
 } elsif ( defined $ENV{HOME} ) {
 	$profile_dir = $opt_pre->{profiledir} || $ENV{HOME}.'/.get_iplayer';
@@ -308,10 +315,6 @@ if ( defined $ENV{GETIPLAYERUSERPREFS} && $ENV{GETIPLAYERSYSPREFS} ) {
 	if ( -f '/etc/get_iplayer/options' ) {
 		logger "WARNING: System-wide options in /etc/get_iplayer/options are now ignored, please use /var/lib/get_iplayer/options instead\n";
 	}
-# Otherwise look for windows style file locations
-} elsif ( defined $ENV{USERPROFILE} ) {
-	$profile_dir = $opt_pre->{profiledir} || $ENV{USERPROFILE}.'/.get_iplayer';
-	$optfile_system = $ENV{ALLUSERSPROFILE}.'/get_iplayer/options';
 }
 # Make profile dir if it doesnt exist
 mkpath $profile_dir if ! -d $profile_dir;
@@ -636,6 +639,7 @@ sub find_matches {
 	push @{ $binopts->{vlc} }, '-vv' if $opt->{debug};
 
 	$bin->{id3v2}		= $opt->{id3v2} || 'id3v2';
+	$bin->{atomicparsley}	= $opt->{atomicparsley} || 'AtomicParsley';
 
 	$bin->{tee}		= 'tee';
 
@@ -1046,7 +1050,7 @@ sub get_regex_matches {
 	my $download_regex = shift;
 
 	my %download_hash;
-	my ( $channel_regex, $category_regex, $versions_regex, $channel_exclude_regex, $category_exclude_regex );
+	my ( $channel_regex, $category_regex, $versions_regex, $channel_exclude_regex, $category_exclude_regex, $exclude_regex );
 
 	if ( $opt->{channel} ) {
 		$channel_regex = '('.(join '|', ( split /,/, $opt->{channel} ) ).')';
@@ -1073,8 +1077,13 @@ sub get_regex_matches {
 	} else {
 		$category_exclude_regex = '^ROGUE$';
 	}
-	my $exclude_regex = $opt->{exclude} || '^ROGUE$';
-	my $since = $opt->{since} || 99999;
+	if ( $opt->{exclude} ) {
+		$exclude_regex = '('.(join '|', ( split /,/, $opt->{exclude} ) ).')';
+	} else {
+		$exclude_regex = '^ROGUE$';
+	}
+	my $since = $opt->{since} || 999999;
+	my $before = $opt->{before} || -999999;
 	my $now = time();
 
 	if ( $opt->{verbose} ) {
@@ -1085,6 +1094,8 @@ sub get_regex_matches {
 		main::logger "DEBUG: Search exclude_regex = $exclude_regex\n";
 		main::logger "DEBUG: Search channel_exclude_regex = $channel_exclude_regex\n";
 		main::logger "DEBUG: Search category_exclude_regex = $category_exclude_regex\n";
+		main::logger "DEBUG: Search since = $since\n";
+		main::logger "DEBUG: Search before = $before\n";
 	}
 	
 	# Determine search for fields
@@ -1101,6 +1112,7 @@ sub get_regex_matches {
 		  && $this->{name} !~ /$exclude_regex/i
 		  && $this->{categories} !~ /$category_exclude_regex/i
 		  && ( ( not defined $this->{timeadded} ) || $this->{timeadded} >= $now - ($since * 3600) )
+		  && ( ( not defined $this->{timeadded} ) || $this->{timeadded} < $now - ($before * 3600) )
 		) {
 			# Custom search fields
 			if ( @searchfields ) {
@@ -3617,9 +3629,10 @@ sub report {
 sub tag_file {
 	my $prog = shift;
 
+	# Return if file does not exist
+	return if ! -f $prog->{filename};
+
 	if ( $prog->{filename} =~ /\.(aac|mp3|m4a)$/i ) {
-		# Return if file does not exist
-		return if ! -f $prog->{filename};
 		# Create ID3 tagging options for external tagger program (escape " for shell)
 		my ( $id3_name, $id3_episode, $id3_desc, $id3_channel ) = ( $prog->{name}, $prog->{episode}, $prog->{desc}, $prog->{channel} );
 		s|"|\\"|g for ($id3_name, $id3_episode, $id3_desc, $id3_channel);
@@ -3641,6 +3654,65 @@ sub tag_file {
 			}
 		} else {
 			main::logger "WARNING: Cannot tag $prog->{ext} file\n" if $opt->{verbose};
+		}
+
+	} elsif ( $prog->{filename} =~ /\.(mp4|m4v)$/i ) {
+		# Create mp4 tagging options for external tagging program.
+		my $tags;
+		for my $tag ( keys %{ $prog } ) {
+			$tags->{ $tag } = $prog->{ $tag };
+			$tags->{ $tag } =~ s|"|\\"|g;
+		}
+
+		# Only tag if the required tool exists
+		if ( main::exists_in_path( 'atomicparsley' ) ) {
+			# Download Thubnail file as well for inclusion into MP4 stream.
+			# Apple TV/iTunes will use it.
+			main::logger "INFO: mp4 tagging $prog->{ext} file\n";
+
+			# extract year from firstbcast e.g. 2009-10-05T22:35:00+01:00
+			#$year =~ s/^.*(20\d\d|19\d\d).*$/$1/g;
+			# If year isn't set correctly in the information, then assume today.
+			$tags->{firstbcast} = (localtime())[5] + 1900 unless $tags->{firstbcast};
+
+			# Add guidance if set
+			$tags->{guidance} = 'clean';
+			$tags->{guidance} = 'explicit' if $prog->{guidance};
+
+			# Show type
+			my $stik = 'TV Show';
+			$stik = 'Movie' if $tags->{categories} =~ m{(film|movie)}i;
+
+			# Download the thumbnail if it doesn't already exist
+			$prog->download_thumbnail if ! -f $prog->{thumbfile};
+
+			# Build the command
+			my @cmd = (
+				$bin->{atomicparsley}, $prog->{filename},
+				'--TVNetwork',	$tags->{channel},
+				'--description',$tags->{desc},
+				'--comment',	$tags->{desc},
+				'--title',	$tags->{title},
+				'--TVShowName',	$tags->{longname},
+				'--TVEpisode',	$tags->{pid},
+				'--artist',	$tags->{name},
+				'--year',	$tags->{firstbcast},
+				'--advisory',	$tags->{guidance},
+				'--genre',	$tags->{categories},
+				'--stik',	$stik,
+				'--overWrite',	# Saves temp files being left around.
+			);
+
+			# Add the thumbnail if one was downloaded
+			push @cmd, "--artwork", $prog->{thumbfile} if -f $prog->{thumbfile};
+
+			# After running, clean up thumbnail file unless it is required using the thumbnail option.
+			if ( main::run_cmd( 'STDERR', @cmd ) ) {
+				main::logger "WARNING: Failed to tag $prog->{ext} file\n";
+				unlink $prog->{thumbfile} if ! $opt->{thumb};
+				return 2;
+			}
+			unlink $prog->{thumbfile} if ! $opt->{thumb};
 		}
 	}
 }
@@ -3885,11 +3957,20 @@ sub generate_filenames {
 		}
 	}
 
+	# Determine thumbnail filename
+	if ( $prog->{thumbnail} =~ /^http/i ) {
+		my $ext;
+		$ext = $1 if $prog->{thumbnail} =~ m{\.(\w+)$};
+		$ext = $opt->{thumbext} || $ext;
+		$prog->{thumbfile} = "$prog->{dir}/$prog->{fileprefix}.${ext}";
+	}
+
 	main::logger "DEBUG: File prefix:        $prog->{fileprefix}\n" if $opt->{debug};
 	main::logger "DEBUG: File ext:           $prog->{ext}\n" if $opt->{debug};
 	main::logger "DEBUG: Directory:          $prog->{dir}\n" if $opt->{debug};
 	main::logger "DEBUG: Partial Filename:   $prog->{filepart}\n" if $opt->{debug};
 	main::logger "DEBUG: Final Filename:     $prog->{filename}\n" if $opt->{debug};
+	main::logger "DEBUG: Thumnail Filename:  $prog->{thumbfile}\n" if $opt->{debug};
 	main::logger "DEBUG: Raw Mode: $opt->{raw}\n" if $opt->{debug};
 
 	# Check path length is < 256 chars
@@ -4072,11 +4153,9 @@ sub download_thumbnail {
 	my $ext;
 	my $image;
 		
-	if ( $prog->{thumbnail} =~ /^http/i ) {
+	if ( $prog->{thumbnail} =~ /^http/i && $prog->{thumbfile} ) {
 		main::logger "INFO: Getting thumbnail from $prog->{thumbnail}\n" if $opt->{verbose};
-		$ext = $1 if $prog->{thumbnail} =~ m{\.(\w+)$};
-		$ext = $opt->{thumbext} || $ext;
-		$file = "$prog->{dir}/$prog->{fileprefix}.${ext}";
+		$file = $prog->{thumbfile};
 
 		# Download thumb
 		$image = main::request_url_retry( main::create_ua('get_iplayer'), $prog->{thumbnail}, 1);
@@ -4275,22 +4354,16 @@ sub get_verpids {
 		# Treat live streams accordingly
 		# Live TV
 		if ( m{\s+simulcast="true"} ) {
-			$verpid = $1 if m{\s+live="true"\s+identifier="(.+?)"};
 			$version = 'default';
-			# Now we lookup the http://www.bbc.co.uk/emp/simulcast/<verpid>.xml to get the correct verpid params
-			# If we use the params in the playlist then they are sometimes wrong
-			# send request
-			my $xml = main::request_url_retry( $ua, "http://www.bbc.co.uk/emp/simulcast/${verpid}.xml", 3 );
-			if ( ! $xml ) {
-				main::logger "\rERROR: Failed to get version pid metadata from iplayer site\n\n";
-				return 0;
-			}
-			# Flatten
-			$xml =~ s/\n/ /g;
-			# <connection kind="akamai" application="live" identifier="bbc1_simcast@s3173" server="cp56493.live.edgefcs.net" tokenIssuer="akamaiUk" />
-			# <connection kind="akamai" application="live" identifier="news_channel_1@s2677" server="cp52113.live.edgefcs.net" tokenIssuer="akamaiUk" />
-			# verpid = ?server=cp56493.live.edgefcs.net&identifier=bbc1_simcast@s3173&kind=akamai&application=live
-			$verpid = "?server=$4&identifier=$3&kind=$1&application=$2" if $xml =~ m{<connection\s+kind="(.+?)"\s+application="(.+?)"\s+identifier="(.+?)"\s+server="(.+?)"\s+};
+			$verpid = "http://www.bbc.co.uk/emp/simulcast/".$1.".xml" if m{\s+live="true"\s+identifier="(.+?)"};
+			main::logger "INFO: Using Live TV: $verpid\n" if $opt->{verbose} && $verpid;
+
+		# Live/Non-live EMP tv/radio XML URL
+		} elsif ( $prog->{pid} =~ /^http/i && $url =~ /^http.+xml$/ ) {
+			$version = 'default';
+			$verpid = $url;
+			main::logger "INFO: Using Live/Non-live EMP tv/radio XML URL: $verpid\n" if $opt->{verbose} && $verpid;
+
 		# Live/Non-live EMP tv/radio
 		} elsif ( $prog->{pid} =~ /^http/i ) {
 			$version = 'default';
@@ -4305,19 +4378,23 @@ sub get_verpids {
 			if ( ! $verpid ) {
 				$verpid = "?server=$3&identifier=$2&kind=$1&application=ondemand" if $xml =~ m{<connection\s+kind="(.+?)"\s+identifier="(.+?)"\s+server="(.+?)"};
 			}
+			main::logger "INFO: Using Live/Non-live EMP tv/radio: $verpid\n" if $opt->{verbose} && $verpid;
+
 		# Live radio
 		} elsif ( m{\s+live="true"\s} ) {
 			# Try to get live stream version and verpid
 			# <item kind="radioProgramme" live="true" identifier="bbc_radio_one" group="bbc_radio_one">
 			$verpid = $1 if m{\s+live="true"\s+identifier="(.+?)"};
-			#$verpid = $prog->{pid};
 			$version = 'default';
+			main::logger "INFO: Using Live radio: $verpid\n" if $opt->{verbose} && $verpid;
+
 		# Not Live standard TV and Radio
 		} else {
 			#  duration="3600" identifier="b00dp4xn" group="b00dlrc8" publisher="pips">
 			$verpid = $1 if m{\s+duration=".*?"\s+identifier="(.+?)"};
 			# <alternate id="default" />
 			$version = lc($1) if m{<alternate\s+id="(.+?)"};
+			main::logger "INFO: Using Not Live standard TV and Radio: $verpid\n" if $opt->{verbose} && $verpid;
 		}
 		
 		next if ! ($verpid && $version);
@@ -4776,7 +4853,7 @@ sub get_stream_data_cdn {
 		# Common attributes
 		# swfurl = Default iPlayer swf version
 		my $conn = {
-			swfurl		=> "http://www.bbc.co.uk/emp/9player.swf?revision=10344_10753",
+			swfurl		=> "http://www.bbc.co.uk/emp/10player.swf?revision=14200_14320",
 			ext		=> $ext,
 			streamer	=> $streamer,
 			bitrate		=> $mattribs->{bitrate},
@@ -4792,6 +4869,19 @@ sub get_stream_data_cdn {
 			$conn->{live} = 1 if $cattribs->{application} =~ /^live/;
 			# Default appication is 'ondemand'
 			$cattribs->{application} = 'ondemand' if ! $cattribs->{application};
+
+			# if the authString is not set and this is a live (i.e. simulcast) then try to get an authstring
+			# Maybe should this be general for all CDNs?
+			if ( ! $cattribs->{authString} ) {
+				# Build URL
+				my $media_stream_live_prefix = 'http://www.bbc.co.uk/mediaselector/4/gtis/stream/';
+				my $url = ${media_stream_live_prefix}."?server=$cattribs->{server}&identifier=$cattribs->{identifier}&kind=$cattribs->{kind}&application=$cattribs->{application}";
+				my $xml = main::request_url_retry( main::create_ua(), $url, 3, undef, undef, 1 );
+				main::logger "\n$xml\n" if $opt->{debug};
+				$cattribs->{authString} = $1 if $xml =~ m{<token>(.+?)</token>};
+				$conn->{authstring} = $cattribs->{authString};
+			}
+
 			if ( $cattribs->{authString} ) {
 				### ??? live and Live TV, Live EMP Video or Non-public EMP video:
 				$conn->{playpath} = "$cattribs->{identifier}?auth=$cattribs->{authString}&aifp=v001";
@@ -4827,17 +4917,17 @@ sub get_stream_data_cdn {
 		# Level3 CDN	
 		} elsif ( $cattribs->{kind} eq 'level3' ) {
 			$conn->{playpath} = $cattribs->{identifier};
-			$conn->{application} = "$cattribs->{application}?$cattribs->{authstring}";
+			$conn->{application} = "$cattribs->{application}?$cattribs->{authString}";
 			$conn->{tcurl} = "rtmp://$cattribs->{server}:1935/$conn->{application}";
-			$conn->{streamurl} = "rtmp://$cattribs->{server}:1935/ondemand?_fcs_vhost=$cattribs->{server}&auth=$cattribs->{authstring}&aifp=v001&slist=$cattribs->{identifier}";
+			$conn->{streamurl} = "rtmp://$cattribs->{server}:1935/ondemand?_fcs_vhost=$cattribs->{server}&auth=$cattribs->{authString}&aifp=v001&slist=$cattribs->{identifier}";
 
 		# iplayertok CDN
 		} elsif ( $cattribs->{kind} eq 'iplayertok' ) {
 			$conn->{application} = $cattribs->{application};
-			decode_entities($cattribs->{authstring});
-			$conn->{playpath} = "$cattribs->{identifier}?$cattribs->{authstring}";
+			decode_entities($cattribs->{authString});
+			$conn->{playpath} = "$cattribs->{identifier}?$cattribs->{authString}";
 			$conn->{playpath} =~ s/^mp[34]://g;
-			$conn->{streamurl} = "rtmp://$cattribs->{server}:1935/ondemand?_fcs_vhost=$cattribs->{server}&auth=$cattribs->{authstring}&aifp=v001&slist=$cattribs->{identifier}";
+			$conn->{streamurl} = "rtmp://$cattribs->{server}:1935/ondemand?_fcs_vhost=$cattribs->{server}&auth=$cattribs->{authString}&aifp=v001&slist=$cattribs->{identifier}";
 			$conn->{tcurl} = "rtmp://$cattribs->{server}:1935/$conn->{application}";
 
 		# sis/edgesuite/sislive streams
@@ -4914,7 +5004,8 @@ sub get_stream_data {
 	# BBC streams
 	my $xml;
 	my @medias;
-	# If this is a Live TV or EMP stream verpid
+
+	# If this is an EMP stream verpid
 	if ( $verpid =~ /^\?/ ) {
 		$xml = main::request_url_retry( $ua, $media_stream_live_prefix.$verpid, 3, undef, undef, 1 );
 		main::logger "\n$xml\n" if $opt->{debug};
@@ -4949,9 +5040,17 @@ sub get_stream_data {
 		# Push into media data structure
 		push @{ $mattribs->{connections} }, $cattribs;
 		push @medias, $mattribs;
+
 	# Don't do this stream lookup if only iphone mode and neither info or subtitles options are specified - it is unneccesary
 	} elsif ( $prog->modelist() eq 'iphone' && (! $opt->{info}) && ! $opt->{subtitles} ) {
 		# skip mediaselector lookup
+
+	# Live simulcast verpid: http://www.bbc.co.uk/emp/simulcast/bbc_one_london.xml
+	} elsif ( $verpid =~ /http:/ ) {
+		$xml = main::request_url_retry( $ua, $verpid, 3, undef, undef, 1 );
+		main::logger "\n$xml\n" if $opt->{debug};
+		@medias = parse_metadata( $xml );
+
 	# Could also use Javascript based one: 'http://www.bbc.co.uk/iplayer/mediaselector/4/js/stream/$verpid
 	} else {
 		$xml = main::request_url_retry( $ua, $media_stream_data_prefix.$verpid, 3, undef, undef, 1 );
@@ -4968,20 +5067,26 @@ sub get_stream_data {
 				$mattribs->{type} eq 'video/mp4' &&
 				$mattribs->{encoding} eq 'h264'
 		) {
+			# Determine classifications of modes based mainly on bitrate
+
 			# flashhd modes
-			get_stream_data_cdn( \%data, $mattribs, 'flashhd', 'rtmp', 'mp4' ) if $mattribs->{bitrate} =~ /3200/;
+			if ( $mattribs->{bitrate} > 3000 ) {
+				get_stream_data_cdn( \%data, $mattribs, 'flashhd', 'rtmp', 'mp4' );
 
 			# flashvhigh modes
-			get_stream_data_cdn( \%data, $mattribs, 'flashvhigh', 'rtmp', 'mp4' ) if $mattribs->{width} =~ /[789]\d\d/;
+			} elsif ( $mattribs->{bitrate} > 1200 ) {
+				get_stream_data_cdn( \%data, $mattribs, 'flashvhigh', 'rtmp', 'mp4' );
 
 			# flashhigh modes
-			get_stream_data_cdn( \%data, $mattribs, 'flashhigh', 'rtmp', 'mp4' ) if $mattribs->{width} =~ /[6]\d\d/ && $mattribs->{bitrate} =~ /[78]\d\d/;
+			} elsif ( $mattribs->{bitrate} > 700 ) {
+				get_stream_data_cdn( \%data, $mattribs, 'flashhigh', 'rtmp', 'mp4' );
 
 			# flashstd modes
-			get_stream_data_cdn( \%data, $mattribs, 'flashstd', 'rtmp', 'mp4' ) if $mattribs->{width} =~ /[6]\d\d/ && $mattribs->{bitrate} =~ /[45]\d\d/;
+			} elsif ( $mattribs->{bitrate} > 400 && $mattribs->{width} >= 500 ) {
+				get_stream_data_cdn( \%data, $mattribs, 'flashstd', 'rtmp', 'mp4' );
 
 			# iPhone modes
-			if ( $mattribs->{width} =~ /4\d\d/ ) {
+			} elsif ( $mattribs->{width} < 500 ) {
 				# Fix/remove some audio stream attribs
 				if ( $prog->{type} eq 'radio' ) {
 					$mattribs->{bitrate} = 128;
@@ -4991,12 +5096,26 @@ sub get_stream_data {
 				get_stream_data_cdn( \%data, $mattribs, 'iphone', 'iphone', 'mov' );
 			}
 
+#	width => 512
+#	bitrate => 500
+#	kind => video
+#	connections => ARRAY(0xa108874)
+#	type => video/x-flv
+#	height => 288
+#	CONNECTION-ELEMENT:
+#		identifier => news_channel_1@s2677
+#		kind => akamai
+#		tokenIssuer => akamaiUk
+#		application => live
+#		server => cp52113.live.edgefcs.net
+
+
 		# flashnormal modes (also live and EMP modes)
 		} elsif (	$mattribs->{kind} eq 'video' &&
 				$mattribs->{type} eq 'video/x-flv' &&
 				$mattribs->{encoding} eq 'vp6'
 		) {
-			get_stream_data_cdn( \%data, $mattribs, 'flashnormal', 'rtmp', 'avi' ) if $mattribs->{width} =~ /[56]\d\d/;
+			get_stream_data_cdn( \%data, $mattribs, 'flashnormal', 'rtmp', 'avi' );
 
 		# flashlow modes
 		} elsif (	$mattribs->{kind} eq 'video' &&
@@ -5004,6 +5123,13 @@ sub get_stream_data {
 				$mattribs->{encoding} eq 'spark'
 		) {
 			get_stream_data_cdn( \%data, $mattribs, 'flashlow', 'rtmp', 'avi' );
+
+		# flashnormal modes without encoding specifed - assume vp6
+		} elsif (	$mattribs->{kind} eq 'video' &&
+				$mattribs->{type} eq 'video/x-flv'
+		) {
+			$mattribs->{encoding} = 'vp6';
+			get_stream_data_cdn( \%data, $mattribs, 'flashnormal', 'rtmp', 'avi' );
 
 		# n95 modes
 		} elsif (	$mattribs->{kind} eq 'video' &&
@@ -5042,7 +5168,18 @@ sub get_stream_data {
 				$mattribs->{type} eq 'audio/mp4' &&
 				$mattribs->{encoding} eq 'aac'
 		) {
-			get_stream_data_cdn( \%data, $mattribs, 'flashaac', 'rtmp', 'aac' );
+			# flashaachigh
+			if (  $mattribs->{bitrate} >= 192 ) {
+				get_stream_data_cdn( \%data, $mattribs, 'flashaachigh', 'rtmp', 'aac' );
+
+			# flashaacstd
+			} elsif ( $mattribs->{bitrate} >= 96 ) {
+				get_stream_data_cdn( \%data, $mattribs, 'flashaacstd', 'rtmp', 'aac' );
+
+			# flashaaclow
+			} else {
+				get_stream_data_cdn( \%data, $mattribs, 'flashaaclow', 'rtmp', 'aac' );
+			}
 
 		# flashaudio modes
 		} elsif (	$mattribs->{kind} eq 'audio' &&
@@ -5086,7 +5223,7 @@ sub get_stream_data {
 
 	# Do iphone redirect check regardless of an xml entry for iphone (except for EMP/Live) - sometimes the iphone streams exist regardless
 	# Skip check if the modelist selected excludes iphone
-	if ( $prog->{pid} !~ /^http/i && $verpid !~ /^\?/ && grep /^iphone/, split ',', $prog->modelist() ) {
+	if ( $prog->{pid} !~ /^http/i && $verpid !~ /^\?/ && $verpid !~ /^http:/ && grep /^iphone/, split ',', $prog->modelist() ) {
 		if ( my $streamurl = Streamer::iphone->get_url($ua, $verpid) ) {
 			my $mode = 'iphone1';
 			# Get iphone redirect
@@ -5771,7 +5908,7 @@ sub channels {
 # Class cmdline Options
 sub opt_format {
 	return {
-		radiomode	=> [ 1, "radiomode|amode=s", 'Recording', '--radiomode <mode>,<mode>,...', "Radio Recording mode(s): iphone,flashaac,flashaudio,realaudio,wma (default: iphone,flashaac,flashaudio,realaudio)"],
+		radiomode	=> [ 1, "radiomode|amode=s", 'Recording', '--radiomode <mode>,<mode>,...', "Radio Recording mode(s): iphone,flashaac,flashaachigh,flashaacstd,flashaaclow,flashaudio,realaudio,wma (default: iphone,flashaachigh,flashaacstd,flashaudio,realaudio,flashaaclow)"],
 		bandwidth 	=> [ 1, "bandwidth=n", 'Recording', '--bandwidth', "In radio realaudio mode specify the link bandwidth in bps for rtsp streaming (default 512000)"],
 		lame		=> [ 0, "lame=s", 'External Program', '--lame <path>', "Location of lame binary"],
 		outputradio	=> [ 1, "outputradio=s", 'Output', '--outputradio <dir>', "Output directory for radio recordings"],
@@ -5820,16 +5957,18 @@ sub modelist {
 			main::logger "WARNING: Not using flash modes since flvstreamer/rtmpdump is not found\n" if $opt->{verbose};
 			$mlist = 'iphone,realaudio,wma';
 		} else {
-			$mlist = 'iphone,flashaudio,flashaac,realaudio,wma';
+			$mlist = 'iphone,flashaachigh,flashaacstd,flashaudio,realaudio,flashaaclow,wma';
 		}
 	}
 	# Deal with BBC Radio fallback modes and expansions
 	# Valid modes are iphone,rtmp,flashaac,flashaudio,realaudio,wmv
 	# 'rtmp' or 'flash' => 'flashaudio,flashaac'
-	# flashaac => flashaac1,flashaac2
-	$mlist = main::expand_list($mlist, 'best', 'flashaac,iphone,flashaudio,realaudio,wma');
+	# flashaac => flashaachigh,flashaacstd,flashaaclow
+	# flashaachigh => flashaachigh1,flashaachigh2
+	$mlist = main::expand_list($mlist, 'best', 'flashaachigh,flashaacstd,iphone,flashaudio,realaudio,flashaaclow,wma');
 	$mlist = main::expand_list($mlist, 'flash', 'flashaudio,flashaac');
 	$mlist = main::expand_list($mlist, 'rtmp', 'flashaudio,flashaac');
+	$mlist = main::expand_list($mlist, 'flashaac', 'flashaachigh,flashaacstd,flashaaclow');
 
 	return $mlist;
 }
@@ -5944,13 +6083,6 @@ sub clean_pid {
 
 
 
-# get full episode metadata given pid and ua. Uses two different urls to get data
-sub get_metadata {
-	return 0;
-}
-
-
-
 # Usage: Programme::liveradio->get_links( \%prog, 'liveradio' );
 # Uses: %{ channels() }, \%prog
 sub get_links {
@@ -6042,6 +6174,7 @@ sub channels {
 # Class cmdline Options
 sub opt_format {
 	return {
+		livetvmode	=> [ 1, "livetvmode=s", 'Recording', '--livetvmode <mode>,<mode>,...', "Live TV Recoding modes: flashhd,flashvhigh,flashhigh,flashstd,flashnormal (default: flashhd,flashvhigh,flashhigh,flashstd,flashnormal)"],
 		outputlivetv	=> [ 1, "outputlivetv=s", 'Output', '--outputlivetv <dir>', "Output directory for live tv recordings"],
 		rtmplivetvopts	=> [ 1, "rtmp-livetv-opts|rtmplivetvopts=s", 'Recording', '--rtmp-livetv-opts <options>', "Add custom options to flvstreamer/rtmpdump for livetv"],
 	};
@@ -6062,7 +6195,28 @@ sub init {
 
 # Returns the modes to try for this prog type
 sub modelist {
-	return 'flashnormal';
+	my $prog = shift;
+	my $mlist = $opt->{livetvmode} || $opt->{modes};
+	
+	# Defaults
+	if ( ! $mlist ) {
+		$mlist = 'flashhd,flashvhigh,flashhigh,flashstd,flashnormal';
+	}
+	# Deal with BBC TV fallback modes and expansions
+	# Valid modes are rtmp,flashhigh,flashstd
+	# 'rtmp' or 'flash' => 'flashhigh,flashnormal'
+	$mlist = main::expand_list($mlist, 'best', 'flashhd,flashvhigh,flashhigh,flashstd,flashnormal,flashlow');
+	$mlist = main::expand_list($mlist, 'flash', 'flashhd,flashvhigh,flashhigh,flashstd,flashnormal,flashlow');
+	$mlist = main::expand_list($mlist, 'rtmp', 'flashhd,flashvhigh,flashhigh,flashstd,flashnormal,flashlow');
+
+	return $mlist;
+}
+
+
+
+# Default minimum expected download size for a programme type
+sub min_download_size {
+	return 102400;
 }
 
 
@@ -6195,15 +6349,18 @@ sub modelist {
 			main::logger "WARNING: Not using flash modes since flvstreamer/rtmpdump is not found\n" if $opt->{verbose};
 			$mlist = 'realaudio,wma';
 		} else {
-			$mlist = 'flashaac,realaudio,wma';
+			$mlist = 'flashaachigh,flashaacstd,realaudio,flashaaclow,wma';
 		}
 	}
 	# Deal with BBC Radio fallback modes and expansions
-	# Valid modes are iphone,rtmp,flashaac,flashaudio,realaudio,wmv
-	# 'rtmp' or 'flash' => 'flashaudio,flashaac'
-	$mlist = main::expand_list($mlist, 'best', 'flashaac,realaudio,wma');
+	# Valid modes are rtmp,flashaac,realaudio,wmv
+	# 'rtmp' or 'flash' => 'flashaac'
+	# flashaac => flashaachigh,flashaacstd,flashaaclow
+	# flashaachigh => flashaachigh1,flashaachigh2
+	$mlist = main::expand_list($mlist, 'best', 'flashaachigh,flashaacstd,realaudio,flashaaclow,wma');
 	$mlist = main::expand_list($mlist, 'flash', 'flashaac');
 	$mlist = main::expand_list($mlist, 'rtmp', 'flashaac');
+	$mlist = main::expand_list($mlist, 'flashaac', 'flashaachigh,flashaacstd,flashaaclow');
 
 	return $mlist;
 }
