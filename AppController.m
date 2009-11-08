@@ -1793,6 +1793,27 @@
 {
 	[JRFeedbackController showFeedback];
 }
+- (IBAction)restoreDefaults:(id)sender
+{	
+	NSUserDefaults *sharedDefaults = [NSUserDefaults standardUserDefaults];
+	[sharedDefaults removeObjectForKey:@"DownloadPath"];
+	[sharedDefaults removeObjectForKey:@"Proxy"];
+	[sharedDefaults removeObjectForKey:@"CustomProxy"];
+	[sharedDefaults removeObjectForKey:@"AutoRetryFailed"];
+	[sharedDefaults removeObjectForKey:@"AutoRetryTime"];
+	[sharedDefaults removeObjectForKey:@"AddCompletedToiTunes"];
+	[sharedDefaults removeObjectForKey:@"DefaultBrowser"];
+	[sharedDefaults removeObjectForKey:@"DefaultFormat"];
+	[sharedDefaults removeObjectForKey:@"AlternateFormat"];
+	[sharedDefaults removeObjectForKey:@"CacheBBC_TV"];
+	[sharedDefaults removeObjectForKey:@"CacheITV_TV"];
+	[sharedDefaults removeObjectForKey:@"CacheBBC_Radio"];
+	[sharedDefaults removeObjectForKey:@"CacheBBC_Podcasts"];
+	[sharedDefaults removeObjectForKey:@"CacheExpiryTime"];
+	[sharedDefaults removeObjectForKey:@"Verbose"];
+	[sharedDefaults removeObjectForKey:@"SeriesLinkStartup"];
+}
+	
 #pragma mark Argument Retrieval
 - (NSString *)typeArgument:(id)sender
 {

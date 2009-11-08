@@ -118,6 +118,7 @@ bool runUpdate=NO;
 - (void)cleanUpPath:(Programme *)show;
 - (void)seasonEpisodeInfo:(Programme *)show;
 - (IBAction)chooseDownloadPath:(id)sender;
+- (IBAction)restoreDefaults:(id)sender;
 - (IBAction)showFeedback:(id)sender;
 
 //Queue
