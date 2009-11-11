@@ -1660,6 +1660,8 @@
 				[self addToLog:@"	Album set" :self];
 				[track setUnplayed:YES];
 				[self addToLog:@"	Unplayed set" :self];
+				[track setArtist:[show tvNetwork]];
+				[self addToLog:@"	Artist set" :self];
 				[self addToLog:@"All Metadata set." :self];
 			}
 			[show setValue:@"Complete & in iTunes" forKey:@"status"];
