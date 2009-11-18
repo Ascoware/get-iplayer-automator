@@ -459,6 +459,14 @@
 							[myScanner scanUpToString:@"~," intoString:&temp_showName];
 							[myScanner scanString:@"~," intoString:NULL];
 							[myScanner scanUpToString:@"jkhjjhkjh" intoString:&temp_tvNetwork];
+							if ([temp_showName hasSuffix:@" - -"])
+							{
+								NSString *temp_showName2;
+								NSScanner *dashScanner = [NSScanner scannerWithString:temp_showName];
+								[dashScanner scanUpToString:@" - -" intoString:&temp_showName2];
+								temp_showName = temp_showName2;
+								temp_showName = [temp_showName stringByAppendingFormat:@" - %@", temp_showName2];
+							}
 							[p setValue:temp_pid forKey:@"pid"];
 							[p setValue:temp_showName forKey:@"showName"];
 							[p setValue:temp_tvNetwork forKey:@"tvNetwork"];
