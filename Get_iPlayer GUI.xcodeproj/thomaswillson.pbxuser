@@ -15,6 +15,7 @@
 		activeSDKPreference = macosx10.5;
 		activeTarget = 8D1107260486CEB800E47090 /* Get iPlayer Automator */;
 		addToTargets = (
+			8D1107260486CEB800E47090 /* Get iPlayer Automator */,
 		);
 		breakpoints = (
 		);
@@ -216,6 +217,14 @@
 			D9D8237C10B3B4A000556D1D /* PBXTextBookmark */ = D9D8237C10B3B4A000556D1D /* PBXTextBookmark */;
 			D9D8237D10B3B4A000556D1D /* PlistBookmark */ = D9D8237D10B3B4A000556D1D /* PlistBookmark */;
 			D9D8238210B3B61C00556D1D /* PlistBookmark */ = D9D8238210B3B61C00556D1D /* PlistBookmark */;
+			D9D823A410B3B6F200556D1D /* PlistBookmark */ = D9D823A410B3B6F200556D1D /* PlistBookmark */;
+			D9D823A510B3B6F200556D1D /* PBXTextBookmark */ = D9D823A510B3B6F200556D1D /* PBXTextBookmark */;
+			D9D823A610B3B6F200556D1D /* PBXTextBookmark */ = D9D823A610B3B6F200556D1D /* PBXTextBookmark */;
+			D9D823A710B3B6F200556D1D /* PBXTextBookmark */ = D9D823A710B3B6F200556D1D /* PBXTextBookmark */;
+			D9D823A810B3B6F200556D1D /* PBXTextBookmark */ = D9D823A810B3B6F200556D1D /* PBXTextBookmark */;
+			D9D823A910B3B6F200556D1D /* PBXTextBookmark */ = D9D823A910B3B6F200556D1D /* PBXTextBookmark */;
+			D9D823AA10B3B6F200556D1D /* PBXTextBookmark */ = D9D823AA10B3B6F200556D1D /* PBXTextBookmark */;
+			D9D823AB10B3B6F200556D1D /* PBXTextBookmark */ = D9D823AB10B3B6F200556D1D /* PBXTextBookmark */;
 			D9DA523A1037CA7F00C260EC = D9DA523A1037CA7F00C260EC /* PBXTextBookmark */;
 			D9F2D5531066EC490047BC81 = D9F2D5531066EC490047BC81 /* PBXTextBookmark */;
 			D9F66ABA102F095300A9449B = D9F66ABA102F095300A9449B /* PBXTextBookmark */;
@@ -301,16 +310,16 @@
 	};
 	D914BD27100CBFA900F7E68E /* Download.h */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {885, 798}}";
+			sepNavIntBoundsRect = "{{0, 0}, {885, 741}}";
 			sepNavSelRange = "{264, 0}";
-			sepNavVisRange = "{0, 688}";
+			sepNavVisRange = "{0, 803}";
 		};
 	};
 	D914BD28100CBFA900F7E68E /* Download.m */ = {
 		uiCtxt = {
 			sepNavIntBoundsRect = "{{0, 0}, {1223, 7787}}";
 			sepNavSelRange = "{479, 12}";
-			sepNavVisRange = "{38, 1591}";
+			sepNavVisRange = "{0, 1458}";
 			sepNavWindowFrame = "{{15, 26}, {1479, 672}}";
 		};
 	};
@@ -351,16 +360,16 @@
 	};
 	D92687C31087F81F000E8132 /* DownloadHistoryController.h */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {885, 447}}";
+			sepNavIntBoundsRect = "{{0, 0}, {885, 467}}";
 			sepNavSelRange = "{214, 0}";
 			sepNavVisRange = "{0, 652}";
 		};
 	};
 	D92687C41087F81F000E8132 /* DownloadHistoryController.m */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {1368, 2086}}";
+			sepNavIntBoundsRect = "{{0, 0}, {1594, 1937}}";
 			sepNavSelRange = "{5503, 0}";
-			sepNavVisRange = "{4796, 1046}";
+			sepNavVisRange = "{0, 1416}";
 		};
 	};
 	D92687C81087F836000E8132 /* DownloadHistoryEntry.h */ = {
@@ -582,7 +591,7 @@
 		fRef = D9FEB87510077790003BADF8 /* AppController.m */;
 		name = "AppController.m: 1598";
 		rLen = 0;
-		rLoc = 57263;
+		rLoc = 57249;
 		rType = 0;
 		vrLen = 1966;
 		vrLoc = 55607;
@@ -1026,7 +1035,7 @@
 		fRef = D9FEB87510077790003BADF8 /* AppController.m */;
 		name = "AppController.m: 469";
 		rLen = 0;
-		rLoc = 17790;
+		rLoc = 17776;
 		rType = 0;
 		vrLen = 1674;
 		vrLoc = 16641;
@@ -1052,6 +1061,87 @@
 		name = "/Users/thomaswillson/Code/Get iPlayer Automator/Info.plist";
 		rLen = 0;
 		rLoc = 9223372036854775807;
+	};
+	D9D823A410B3B6F200556D1D /* PlistBookmark */ = {
+		isa = PlistBookmark;
+		fRef = 8D1107310486CEB800E47090 /* Info.plist */;
+		fallbackIsa = PBXBookmark;
+		isK = 0;
+		kPath = (
+		);
+		name = "/Users/thomaswillson/Code/Get iPlayer Automator/Info.plist";
+		rLen = 0;
+		rLoc = 9223372036854775807;
+	};
+	D9D823A510B3B6F200556D1D /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = D9FEB87410077790003BADF8 /* AppController.h */;
+		name = "AppController.h: 121";
+		rLen = 0;
+		rLoc = 3157;
+		rType = 0;
+		vrLen = 796;
+		vrLoc = 0;
+	};
+	D9D823A610B3B6F200556D1D /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = D914BD28100CBFA900F7E68E /* Download.m */;
+		name = "Download.m: 21";
+		rLen = 12;
+		rLoc = 479;
+		rType = 0;
+		vrLen = 1458;
+		vrLoc = 0;
+	};
+	D9D823A710B3B6F200556D1D /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = D914BD27100CBFA900F7E68E /* Download.h */;
+		name = "Download.h: 15";
+		rLen = 0;
+		rLoc = 264;
+		rType = 0;
+		vrLen = 803;
+		vrLoc = 0;
+	};
+	D9D823A810B3B6F200556D1D /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = D92687C41087F81F000E8132 /* DownloadHistoryController.m */;
+		name = "DownloadHistoryController.m: 143";
+		rLen = 0;
+		rLoc = 5503;
+		rType = 0;
+		vrLen = 1416;
+		vrLoc = 0;
+	};
+	D9D823A910B3B6F200556D1D /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = D92687C31087F81F000E8132 /* DownloadHistoryController.h */;
+		name = "DownloadHistoryController.h: 11";
+		rLen = 0;
+		rLoc = 214;
+		rType = 0;
+		vrLen = 652;
+		vrLoc = 0;
+	};
+	D9D823AA10B3B6F200556D1D /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = D9FEB87510077790003BADF8 /* AppController.m */;
+		name = "AppController.m: 14";
+		rLen = 0;
+		rLoc = 270;
+		rType = 0;
+		vrLen = 863;
+		vrLoc = 0;
+	};
+	D9D823AB10B3B6F200556D1D /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = D9FEB87510077790003BADF8 /* AppController.m */;
+		name = "AppController.m: 16";
+		rLen = 0;
+		rLoc = 389;
+		rType = 0;
+		vrLen = 861;
+		vrLoc = 0;
 	};
 	D9DA523A1037CA7F00C260EC /* PBXTextBookmark */ = {
 		isa = PBXTextBookmark;
@@ -1113,16 +1203,16 @@
 	};
 	D9FEB87410077790003BADF8 /* AppController.h */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {1285, 2282}}";
+			sepNavIntBoundsRect = "{{0, 0}, {885, 2119}}";
 			sepNavSelRange = "{3157, 0}";
-			sepNavVisRange = "{2768, 1591}";
+			sepNavVisRange = "{0, 796}";
 		};
 	};
 	D9FEB87510077790003BADF8 /* AppController.m */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {1314, 26650}}";
-			sepNavSelRange = "{17790, 0}";
-			sepNavVisRange = "{16576, 1681}";
+			sepNavIntBoundsRect = "{{0, 0}, {885, 27027}}";
+			sepNavSelRange = "{389, 0}";
+			sepNavVisRange = "{0, 861}";
 			sepNavWindowFrame = "{{138, 155}, {910, 747}}";
 		};
 	};

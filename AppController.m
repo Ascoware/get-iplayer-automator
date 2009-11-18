@@ -11,7 +11,7 @@
 #import "Safari.h"
 #import "iTunes.h"
 #import "Camino.h"
-#import "Growl-WithInstaller.framework/Headers/GrowlApplicationBridge.h"
+#import "Growl.framework/Headers/GrowlApplicationBridge.h"
 #import "Sparkle.framework/Headers/Sparkle.h"
 #import "JRFeedbackController.h"
 #import "LiveTVChannel.h"
