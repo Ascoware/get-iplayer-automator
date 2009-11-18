@@ -684,6 +684,14 @@
 				[myScanner scanUpToString:@"~," intoString:&temp_showName];
 				[myScanner scanUpToCharactersFromSet:[NSCharacterSet letterCharacterSet] intoString:NULL];
 				[myScanner scanUpToString:@"," intoString:&temp_tvNetwork];
+				if ([temp_showName hasSuffix:@" - -"])
+				{
+					NSString *temp_showName2;
+					NSScanner *dashScanner = [NSScanner scannerWithString:temp_showName];
+					[dashScanner scanUpToString:@" - -" intoString:&temp_showName2];
+					temp_showName = temp_showName2;
+					temp_showName = [temp_showName stringByAppendingFormat:@" - %@", temp_showName2];
+				}
 				Programme *p = [[Programme alloc] initWithInfo:nil pid:temp_pid programmeName:temp_showName network:temp_tvNetwork];
 				if ([temp_type isEqualToString:@"radio"])
 				{
@@ -1581,6 +1589,14 @@
 				[seriesEpisodeScanner scanUpToString:@" - " intoString:&series_Name];
 				[seriesEpisodeScanner scanString:@"-" intoString:nil];
 				[seriesEpisodeScanner scanUpToString:@"kjkljfdg" intoString:&episode_Name];
+				if ([temp_showName hasSuffix:@" - -"])
+				{
+					NSString *temp_showName2;
+					NSScanner *dashScanner = [NSScanner scannerWithString:temp_showName];
+					[dashScanner scanUpToString:@" - -" intoString:&temp_showName2];
+					temp_showName = temp_showName2;
+					temp_showName = [temp_showName stringByAppendingFormat:@" - %@", temp_showName2];
+				}
 				
 				if (([[series2 added] integerValue] < timeadded) && ([temp_tvNetwork isEqualToString:[series2 tvNetwork]]))
 				{
