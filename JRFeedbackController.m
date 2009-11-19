@@ -11,7 +11,7 @@
 #import <SystemConfiguration/SCNetwork.h>
 
 #if USE_GROWL
-	#import "Growl-WithInstaller.framework/Headers/GrowlApplicationBridge.h"
+	#import "Growl.framework/Headers/GrowlApplicationBridge.h"
 #endif
 
 JRFeedbackController *gFeedbackController = nil;
