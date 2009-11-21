@@ -231,6 +231,8 @@
 			<key>Layout</key>
 			<array>
 				<dict>
+					<key>BecomeActive</key>
+					<true/>
 					<key>ContentConfiguration</key>
 					<dict>
 						<key>PBXBottomSmartGroupGIDs</key>
@@ -275,19 +277,23 @@
 								<string>29B97323FDCFA39411CA2CEA</string>
 								<string>1058C7A0FEA54F0111CA2CBB</string>
 								<string>1C37FBAC04509CD000000102</string>
-								<string>D9D9F44D10B6355E00972772</string>
-								<string>D9D9F44E10B6355E00972772</string>
 							</array>
 							<key>PBXSmartGroupTreeModuleOutlineStateSelectionKey</key>
 							<array>
 								<array>
-									<integer>6</integer>
-									<integer>2</integer>
+									<integer>45</integer>
+									<integer>39</integer>
+									<integer>30</integer>
+									<integer>0</integer>
+								</array>
+								<array>
+									<integer>47</integer>
+									<integer>30</integer>
 									<integer>0</integer>
 								</array>
 							</array>
 							<key>PBXSmartGroupTreeModuleOutlineStateVisibleRectKey</key>
-							<string>{{0, 0}, {312, 557}}</string>
+							<string>{{0, 497}, {312, 557}}</string>
 						</dict>
 						<key>PBXTopSmartGroupGIDs</key>
 						<array/>
@@ -319,14 +325,12 @@
 					<key>Dock</key>
 					<array>
 						<dict>
-							<key>BecomeActive</key>
-							<true/>
 							<key>ContentConfiguration</key>
 							<dict>
 								<key>PBXProjectModuleGUID</key>
 								<string>1CE0B20306471E060097A5F4</string>
 								<key>PBXProjectModuleLabel</key>
-								<string>Download.m</string>
+								<string>get_iplayer.pl</string>
 								<key>PBXSplitModuleInNavigatorKey</key>
 								<dict>
 									<key>Split0</key>
@@ -334,11 +338,11 @@
 										<key>PBXProjectModuleGUID</key>
 										<string>1CE0B20406471E060097A5F4</string>
 										<key>PBXProjectModuleLabel</key>
-										<string>Download.m</string>
+										<string>get_iplayer.pl</string>
 										<key>_historyCapacity</key>
 										<integer>0</integer>
 										<key>bookmark</key>
-										<string>D9D9F45810B6359800972772</string>
+										<string>D9D9F46310B6375A00972772</string>
 										<key>history</key>
 										<array>
 											<string>D9CC156C0FF9075400D819E2</string>
@@ -379,7 +383,6 @@
 											<string>D92B5C5C10A74BEC00B5A583</string>
 											<string>D92B5C6510A75AD500B5A583</string>
 											<string>D92B5C7410AA63CF00B5A583</string>
-											<string>D9A7853D10B395B900EAD9E4</string>
 											<string>D9D8237B10B3B4A000556D1D</string>
 											<string>D9D823A510B3B6F200556D1D</string>
 											<string>D9D823A710B3B6F200556D1D</string>
@@ -388,8 +391,9 @@
 											<string>D9D823E510B3B81C00556D1D</string>
 											<string>D9D9F44F10B6355E00972772</string>
 											<string>D9D9F45010B6355E00972772</string>
-											<string>D9D9F45710B6359800972772</string>
-											<string>D9D9F45110B6355E00972772</string>
+											<string>D9D9F46010B6375A00972772</string>
+											<string>D9D9F46110B6375A00972772</string>
+											<string>D9D9F46210B6375A00972772</string>
 										</array>
 									</dict>
 									<key>SplitCount</key>
