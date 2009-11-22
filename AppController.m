@@ -653,6 +653,7 @@
 		NSString *s = [[NSString alloc] initWithData:d
 											encoding:NSUTF8StringEncoding];
 		[searchData appendString:s];
+		NSLog(s);
 	}
 	else
 	{
@@ -680,7 +681,7 @@
 	}
 	for (NSString *string in array)
 	{
-		if (![string isEqualToString:@"Matches:"] && ![string hasPrefix:@"INFO:"] && ![string hasPrefix:@"WARNING:"] && [string length]>0)
+		if (![string isEqualToString:@"Matches:"] && ![string hasPrefix:@"INFO:"] && ![string hasPrefix:@"WARNING:"] && [string length]>0 && ![string hasPrefix:@"."])
 		{
 			@try {
 				NSScanner *myScanner = [NSScanner scannerWithString:string];
