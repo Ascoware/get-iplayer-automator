@@ -39,7 +39,7 @@
 #ifdef __i386__
 	NSString *ffmpegPath = [bundlePath stringByAppendingString:@"/Contents/Resources/ffmpeg"];
 #else
-	NSString *ffmpegPath = nil;
+	NSString *ffmpegPath = [bundlePath stringByAppendingString:@"/Contents/Resources/ffmpeg_universal"];
 #endif
 	NSString *downloadPath = [[NSString alloc] initWithString:[[NSUserDefaults standardUserDefaults] valueForKey:@"DownloadPath"]];
 		//Initialize Formats
