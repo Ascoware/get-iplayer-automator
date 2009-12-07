@@ -1731,6 +1731,15 @@
 		NSString *originalFolder = [originalPath stringByDeletingLastPathComponent];
 		NSString *extension = [originalPath pathExtension];
 		
+		//Retrieve Mode Used
+		NSString *originalFilename = [originalPath lastPathComponent];
+		NSScanner *originalFilenameScanner = [NSScanner scannerWithString:originalFilename];
+		[originalFilenameScanner scanUpToString:@"(" intoString:nil];
+		NSString *modeKey;
+		[originalFilenameScanner scanUpToString:@")" intoString:&modeKey];
+		NSDictionary *modeLookup = [NSDictionary dictionaryWithObjectsAndKeys:@"Very High",@"flashvhigh1",@"Very High",@"flashvhigh2",@"HD",@"flashhd1",@"HD",@"flashhd2",@"High",@"flashhigh1",@"High",@"flashhigh2",nil];
+		NSString *modeUsed = [modeLookup objectForKey:modeKey];
+		
 		//Rename File and Directory if Neccessary
 		NSString *newFile;
 		if (![showName isEqualToString:originalShowName] || ![episodeName isEqualToString:originalEpisodeName])
@@ -1745,6 +1754,13 @@
 			//Perform File Operations
 			NSFileManager *fileManager = [NSFileManager defaultManager];
 			[fileManager createDirectoryAtPath:newFolder attributes:nil];
+			if ([fileManager fileExistsAtPath:newFile])
+			{
+				newFilename = [newFilename stringByAppendingFormat:@" (%@)", modeUsed];
+				newFile = [newFolder stringByAppendingPathComponent:newFilename];
+				newFile = [newFile stringByAppendingPathExtension:extension];
+				[show setValue:[[show showName] stringByAppendingFormat:@" (%@)", modeUsed] forKey:@"showName"];
+			}
 			NSError *copyError;
 			if ([fileManager moveItemAtPath:[show path] toPath:newFile error:&copyError]) 
 			{
