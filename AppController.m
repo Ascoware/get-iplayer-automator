@@ -1734,9 +1734,9 @@
 		//Retrieve Mode Used
 		NSString *originalFilename = [originalPath lastPathComponent];
 		NSScanner *originalFilenameScanner = [NSScanner scannerWithString:originalFilename];
-		[originalFilenameScanner scanUpToString:@"(" intoString:nil];
+		[originalFilenameScanner scanUpToString:@"((" intoString:nil];
 		NSString *modeKey;
-		[originalFilenameScanner scanUpToString:@")" intoString:&modeKey];
+		[originalFilenameScanner scanUpToString:@"))" intoString:&modeKey];
 		NSDictionary *modeLookup = [NSDictionary dictionaryWithObjectsAndKeys:@"Very High",@"flashvhigh1",@"Very High",@"flashvhigh2",@"HD",@"flashhd1",@"HD",@"flashhd2",@"High",@"flashhigh1",@"High",@"flashhigh2",nil];
 		NSString *modeUsed = [modeLookup objectForKey:modeKey];
 		

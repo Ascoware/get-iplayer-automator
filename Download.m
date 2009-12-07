@@ -160,7 +160,7 @@
 	
 		//Add Arguments that can't be NULL
 	NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:getiPlayerPath,profileDirArg,noWarningArg,noExpiryArg,mplayerArg,flvstreamerArg,lameArg,cacheExpiryArg,downloadPathArg,
-					 subDirArg,formatArg,getArg,searchArg,@"--attempts=5",@"--whitespace",@"--file-prefix=<name> - <episode> (<mode>)",@"--nopurge",versionArg,proxyArg,partialProxyArg,nil];
+					 subDirArg,formatArg,getArg,searchArg,@"--attempts=5",@"--whitespace",@"--file-prefix=<name> - <episode> ((<mode>))",@"--nopurge",versionArg,proxyArg,partialProxyArg,nil];
 		//Verbose?
 	if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"Verbose"] isEqualTo:[NSNumber numberWithBool:YES]])
 		[args addObject:[[NSString alloc] initWithString:@"--verbose"]];
