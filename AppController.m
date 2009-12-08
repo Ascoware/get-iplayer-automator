@@ -1735,9 +1735,10 @@
 		NSString *originalFilename = [originalPath lastPathComponent];
 		NSScanner *originalFilenameScanner = [NSScanner scannerWithString:originalFilename];
 		[originalFilenameScanner scanUpToString:@"((" intoString:nil];
+		[originalFilenameScanner scanString:@"((" intoString:nil];
 		NSString *modeKey;
 		[originalFilenameScanner scanUpToString:@"))" intoString:&modeKey];
-		NSDictionary *modeLookup = [NSDictionary dictionaryWithObjectsAndKeys:@"Very High",@"flashvhigh1",@"Very High",@"flashvhigh2",@"HD",@"flashhd1",@"HD",@"flashhd2",@"High",@"flashhigh1",@"High",@"flashhigh2",nil];
+		NSDictionary *modeLookup = [NSDictionary dictionaryWithObjectsAndKeys:@"Very High",@"flashvhigh1",@"Very High",@"flashvhigh2",@"HD",@"flashhd1",@"HD",@"flashhd2",@"High",@"flashhigh1",@"High",@"flashhigh2",@"Standard",@"flashstd1",@"Standard",@"flashstd2",nil];
 		NSString *modeUsed = [modeLookup objectForKey:modeKey];
 		
 		//Rename File and Directory if Neccessary
