@@ -1538,8 +1538,19 @@
 - (IBAction)addSeriesLinkToQueue:(id)sender
 {
 	NSArray *seriesLink = [pvrQueueController arrangedObjects];
+	[currentIndicator setMaxValue:[seriesLink count]];
+	[currentIndicator setMinValue:0];
+	[currentIndicator setDoubleValue:0];
+	[currentIndicator setIndeterminate:NO];
+	[currentProgress setStringValue:@"Updating Series Link..."];
+	[currentIndicator setNeedsDisplay:YES];
+	[currentProgress setNeedsDisplay:YES];
 	for (Series *series in seriesLink)
 	{
+		[currentIndicator setDoubleValue:[seriesLink indexOfObject:series]];
+		[currentIndicator setNeedsDisplay:YES];
+		[currentProgress setStringValue:[NSString stringWithFormat:@"Updating Series Link - %d/%d - %@",[seriesLink indexOfObject:series],[seriesLink count],[series showName]]];
+		[currentProgress setNeedsDisplay:YES];
 		NSString *cacheExpiryArgument = [self cacheExpiryArgument:nil];
 		NSString *typeArgument = [self typeArgument:nil];
 		
@@ -1564,6 +1575,9 @@
 		}
 		[self processAutoRecordData:[autoRecordData copy] forSeries:series];
 	}
+	[currentIndicator setDoubleValue:0];
+	[currentProgress setStringValue:@""];
+	[currentIndicator setMaxValue:100];
 }
 
 - (void)processAutoRecordData:(NSString *)autoRecordData2 forSeries:(Series *)series2
