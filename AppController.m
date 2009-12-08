@@ -277,6 +277,14 @@
 	runUpdate=YES;
 	[mainWindow setDocumentEdited:YES];
 	
+	NSArray *tempQueue = [queueController arrangedObjects];
+	for (Programme *show in tempQueue)
+	{
+		if (![[show successful] isEqualToNumber:[NSNumber numberWithBool:NO]])
+		{
+			[queueController removeObject:show];
+		}
+	}
 	NSString *cacheExpiryArg;
 	if ([[sender class] isEqualTo:[[NSString stringWithString:@""] class]])
 	{
