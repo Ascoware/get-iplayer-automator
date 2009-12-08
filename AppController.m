@@ -1537,25 +1537,25 @@
 }
 - (IBAction)addSeriesLinkToQueue:(id)sender
 {
+	[NSTimer scheduledTimerWithTimeInterval:.1 target:self selector:@selector(seriesLinkToQueueTimerSelector:) userInfo:nil repeats:NO];
+}
+- (void)seriesLinkToQueueTimerSelector:(NSNotification *)note
+{
 	NSArray *seriesLink = [pvrQueueController arrangedObjects];
 	[currentIndicator setMaxValue:[seriesLink count]];
 	[currentIndicator setMinValue:0];
 	[currentIndicator setDoubleValue:0];
 	[currentIndicator setIndeterminate:NO];
 	[currentProgress setStringValue:@"Updating Series Link..."];
-	[currentIndicator setNeedsDisplay:YES];
-	[currentProgress setNeedsDisplay:YES];
 	for (Series *series in seriesLink)
 	{
 		[currentIndicator setDoubleValue:[seriesLink indexOfObject:series]];
-		[currentIndicator setNeedsDisplay:YES];
 		[currentProgress setStringValue:[NSString stringWithFormat:@"Updating Series Link - %d/%d - %@",[seriesLink indexOfObject:series],[seriesLink count],[series showName]]];
-		[currentProgress setNeedsDisplay:YES];
 		NSString *cacheExpiryArgument = [self cacheExpiryArgument:nil];
 		NSString *typeArgument = [self typeArgument:nil];
 		
 		NSMutableArray *autoRecordArgs = [[NSMutableArray alloc] initWithObjects:getiPlayerPath, noWarningArg,@"--nopurge",
-										 @"--listformat=<index>: <type>, ~<name> - <episode>~, <channel>, <timeadded>, <pid>,", cacheExpiryArgument, 
+										  @"--listformat=<index>: <type>, ~<name> - <episode>~, <channel>, <timeadded>, <pid>,", cacheExpiryArgument, 
 										  typeArgument, profileDirArg,@"--hide",[series showName],nil];
 		
 		NSTask *autoRecordTask = [[NSTask alloc] init];
@@ -1579,7 +1579,6 @@
 	[currentProgress setStringValue:@""];
 	[currentIndicator setMaxValue:100];
 }
-
 - (void)processAutoRecordData:(NSString *)autoRecordData2 forSeries:(Series *)series2
 {
 	NSString *string = [NSString stringWithString:autoRecordData2];
