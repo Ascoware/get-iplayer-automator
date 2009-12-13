@@ -1583,7 +1583,7 @@
 	[currentProgress setStringValue:@""];
 	[currentIndicator setIndeterminate:NO];
 	[currentIndicator stopAnimation:self];
-	[[NSNotificationCenter defaultCenter] removeObserver:self name:@"NSThreadWillExitNotification" object:self];
+	[[NSNotificationCenter defaultCenter] removeObserver:self name:@"NSThreadWillExitNotification" object:nil];
 }
 - (void)processAutoRecordData:(NSString *)autoRecordData2 forSeries:(Series *)series2
 {
