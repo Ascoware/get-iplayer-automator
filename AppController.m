@@ -1549,7 +1549,6 @@
 {
 	NSArray *seriesLink = [pvrQueueController arrangedObjects];
 	[currentProgress performSelectorOnMainThread:@selector(setStringValue:) withObject:@"Updating Series Link..." waitUntilDone:NO];
-	NSLog(@"Starting to update series link");
 	for (Series *series in seriesLink)
 	{
 		[currentProgress performSelectorOnMainThread:@selector(setStringValue:) withObject:[NSString stringWithFormat:@"Updating Series Link - %d/%d - %@",[seriesLink indexOfObject:series],[seriesLink count],[series showName]] waitUntilDone:NO];
@@ -1584,6 +1583,7 @@
 	[currentProgress setStringValue:@""];
 	[currentIndicator setIndeterminate:NO];
 	[currentIndicator stopAnimation:self];
+	[[NSNotificationCenter defaultCenter] removeObserver:self name:@"NSThreadWillExitNotification" object:self];
 }
 - (void)processAutoRecordData:(NSString *)autoRecordData2 forSeries:(Series *)series2
 {
@@ -1640,7 +1640,6 @@
 					[p setRealPID:temp_realPID];
 					[p setSeriesName:series_Name];
 					[p setEpisodeName:episode_Name];
-					NSLog(temp_realPID);
 					if ([temp_type isEqualToString:@"radio"]) [p setValue:[NSNumber numberWithBool:YES] forKey:@"radio"];
 					[p setValue:@"Added by Series-Link" forKey:@"status"];
 					BOOL inQueue=NO;
