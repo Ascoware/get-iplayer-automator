@@ -1537,20 +1537,22 @@
 }
 - (IBAction)addSeriesLinkToQueue:(id)sender
 {
-	[NSTimer scheduledTimerWithTimeInterval:.1 target:self selector:@selector(seriesLinkToQueueTimerSelector:) userInfo:nil repeats:NO];
+	//[NSTimer scheduledTimerWithTimeInterval:.1 target:self selector:@selector(seriesLinkToQueueTimerSelector:) userInfo:nil repeats:NO];
+	//NSThreadWillExitNotification
+	[currentIndicator setIndeterminate:YES];
+	[currentIndicator startAnimation:self];
+	[NSThread detachNewThreadSelector:@selector(seriesLinkToQueueTimerSelector) toTarget:self withObject:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(seriesLinkFinished:) name:@"NSThreadWillExitNotification" object:nil];
+	
 }
-- (void)seriesLinkToQueueTimerSelector:(NSNotification *)note
+- (void)seriesLinkToQueueTimerSelector
 {
 	NSArray *seriesLink = [pvrQueueController arrangedObjects];
-	[currentIndicator setMaxValue:[seriesLink count]];
-	[currentIndicator setMinValue:0];
-	[currentIndicator setDoubleValue:0];
-	[currentIndicator setIndeterminate:NO];
-	[currentProgress setStringValue:@"Updating Series Link..."];
+	[currentProgress performSelectorOnMainThread:@selector(setStringValue:) withObject:@"Updating Series Link..." waitUntilDone:NO];
+	NSLog(@"Starting to update series link");
 	for (Series *series in seriesLink)
 	{
-		[currentIndicator setDoubleValue:[seriesLink indexOfObject:series]];
-		[currentProgress setStringValue:[NSString stringWithFormat:@"Updating Series Link - %d/%d - %@",[seriesLink indexOfObject:series],[seriesLink count],[series showName]]];
+		[currentProgress performSelectorOnMainThread:@selector(setStringValue:) withObject:[NSString stringWithFormat:@"Updating Series Link - %d/%d - %@",[seriesLink indexOfObject:series],[seriesLink count],[series showName]] waitUntilDone:NO];
 		NSString *cacheExpiryArgument = [self cacheExpiryArgument:nil];
 		NSString *typeArgument = [self typeArgument:nil];
 		
@@ -1575,9 +1577,13 @@
 		}
 		[self processAutoRecordData:[autoRecordData copy] forSeries:series];
 	}
-	[currentIndicator setDoubleValue:0];
+}
+- (void)seriesLinkFinished:(NSNotification *)note
+{
+	NSLog(@"finished");
 	[currentProgress setStringValue:@""];
-	[currentIndicator setMaxValue:100];
+	[currentIndicator setIndeterminate:NO];
+	[currentIndicator stopAnimation:self];
 }
 - (void)processAutoRecordData:(NSString *)autoRecordData2 forSeries:(Series *)series2
 {
