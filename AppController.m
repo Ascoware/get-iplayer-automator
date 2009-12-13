@@ -1698,6 +1698,7 @@
 				[track setUnplayed:YES];
 				[track setEpisodeID:[show episodeName]];
 				[track setShow:[show seriesName]];
+				[track setArtist:[show tvNetwork]];
 				if ([show season]>0) [track setSeasonNumber:[show season]];
 				if ([show episode]>0) [track setEpisodeNumber:[show episode]];
 			}
