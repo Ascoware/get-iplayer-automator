@@ -1539,11 +1539,13 @@
 {
 	//[NSTimer scheduledTimerWithTimeInterval:.1 target:self selector:@selector(seriesLinkToQueueTimerSelector:) userInfo:nil repeats:NO];
 	//NSThreadWillExitNotification
-	[currentIndicator setIndeterminate:YES];
-	[currentIndicator startAnimation:self];
-	[NSThread detachNewThreadSelector:@selector(seriesLinkToQueueTimerSelector) toTarget:self withObject:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(seriesLinkFinished:) name:@"NSThreadWillExitNotification" object:nil];
-	
+	if ([[pvrQueueController arrangedObjects] count] > 0)
+	{
+		[currentIndicator setIndeterminate:YES];
+		[currentIndicator startAnimation:self];
+		[NSThread detachNewThreadSelector:@selector(seriesLinkToQueueTimerSelector) toTarget:self withObject:nil];
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(seriesLinkFinished:) name:@"NSThreadWillExitNotification" object:nil];
+	}	
 }
 - (void)seriesLinkToQueueTimerSelector
 {
