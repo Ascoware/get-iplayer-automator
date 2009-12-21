@@ -531,13 +531,6 @@
 	SUUpdater *updater = [SUUpdater sharedUpdater];
 	[updater checkForUpdatesInBackground];
 	
-	//If this is an update initiated by the scheduler, run the downloads.
-	if (runScheduled) 
-	{
-		[self startDownloads:self];
-		runScheduled=NO;
-	}
-	
 	if (runDownloads)
 	{
 		[self addToLog:@"Download(s) are still running." :self];
@@ -1581,11 +1574,17 @@
 }
 - (void)seriesLinkFinished:(NSNotification *)note
 {
-	NSLog(@"finished");
 	[currentProgress setStringValue:@""];
 	[currentIndicator setIndeterminate:NO];
 	[currentIndicator stopAnimation:self];
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:@"NSThreadWillExitNotification" object:nil];
+	
+	//If this is an update initiated by the scheduler, run the downloads.
+	if (runScheduled) 
+	{
+		[self startDownloads:self];
+		runScheduled=NO;
+	}
 }
 - (void)processAutoRecordData:(NSString *)autoRecordData2 forSeries:(Series *)series2
 {
