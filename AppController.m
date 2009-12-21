@@ -1582,7 +1582,7 @@
 	//If this is an update initiated by the scheduler, run the downloads.
 	if (runScheduled) 
 	{
-		[self startDownloads:self];
+		[self performSelectorOnMainThread:@selector(startDownloads:) withObject:self waitUntilDone:NO];
 		runScheduled=NO;
 	}
 }
