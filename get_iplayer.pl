@@ -24,7 +24,7 @@
 #
 #
 package main;
-my $version = 2.49;
+my $version = 2.51;
 #
 # Help:
 #	./get_iplayer --help | --longhelp
@@ -122,7 +122,7 @@ my $opt_format = {
 	force		=> [ 1, "force|force-download", 'Recording', '--force', "Ignore programme history (unsets --hide option also). Forces a script update if used wth -u"],
 	get		=> [ 2, "get|record|g", 'Recording', '--get, -g', "Start recording matching programmes"],
 	hash		=> [ 1, "hash", 'Recording', '--hash', "Show recording progress as hashes"],
-	itvnothread	=> [ 1, "itvnothread", 'Recording', '--itvnothread', "Disable parallel threaded recording for itv"],
+	mmsnothread	=> [ 1, "mmsnothread|itvnothread", 'Recording', '--mmsnothread', "Disable parallel threaded recording for mms"],
 	modes		=> [ 0, "modes=s", 'Recording', '--modes <mode>,<mode>,...', "Recoding modes: iphone,flashhd,flashvhigh,flashhigh,flashstd,flashnormal,flashlow,n95_wifi,flashaac,flashaachigh,flashaacstd,flashaaclow,flashaudio,realaudio,wma"],
 	multimode	=> [ 1, "multimode", 'Recording', '--multimode', "Allow the recording of more than one mode for the same programme - WARNING: will record all specified/default modes!!"],
 	overwrite	=> [ 1, "overwrite|over-write", 'Recording', '--overwrite', "Overwrite recordings if they already exist"],
@@ -1454,7 +1454,7 @@ sub download_block {
 
 	# Use url prepend if required
 	if ( $opt->{proxy} =~ /^prepend:/ ) {
-		$url = $opt->{proxy}.$url;
+		$url = $opt->{proxy}.main::url_encode( $url );
 		$url =~ s/^prepend://g;
 	}
 
@@ -2159,7 +2159,7 @@ sub request_url_retry {
 
 	# Use url prepend if required
 	if ( $opt->{proxy} =~ /^prepend:/ ) {
-		$url = $opt->{proxy}.$url;
+		$url = $opt->{proxy}.main::url_encode( $url );
 		$url =~ s/^prepend://g;
 	}
 
@@ -2508,6 +2508,87 @@ sub expand_list {
 		$_ = $replace if $_ eq $search;
 	}
 	return join ',', @elements;	
+}
+
+
+
+sub get_playlist_url {
+	my $ua = shift;
+	my $url = shift;
+	my $filter = shift;
+	# Don't recurse more than 5 times
+	my $depth = 5;
+
+	# Resolve the MMS url if it is an http ref
+	while ( $url =~ /^http/i && $depth ) {
+		my $content = main::request_url_retry($ua, $url, 2, '', '');
+		# Reference list
+		if ( $content =~ m{\[reference\]}i ) {
+			my @urls;
+			# [Reference]
+			# Ref1=http://wm.bbc.co.uk/wms/england/radioberkshire/aod/andrewpeach_thu.wma?MSWMExt=.asf
+			# Ref2=http://wm.bbc.co.uk/wms/england/radioberkshire/aod/andrewpeach_thu.wma?MSWMExt=.asf
+			for ( split /ref\d*=/i, $content ) {
+				#main::logger "DEBUG: LINE: $_\n" if $opt->{debug};
+				s/[\s]//g;
+				# Rename http:// to mms:// - don't really know why but this seems to be necessary with such playlists
+				s|http://|mms://|g;
+				push @urls, $_ if m{^(http|mms|rtsp)://};
+				main::logger "DEBUG: Got Reference URL: $_\n" if $opt->{debug};
+			}
+			# use first URL for now??
+			$url = $urls[0];
+
+		# ASX XML based playlist
+		} elsif ( $content =~ m{<asx}i ) {
+			my @urls;
+			# <ASX version="3.0">
+			#  <ABSTRACT>http://www.bbc.co.uk/</ABSTRACT>
+			#  <TITLE>BBC support</TITLE>
+			#  <AUTHOR>BBC</AUTHOR>
+			#  <COPYRIGHT>(c) British Broadcasting Corporation</COPYRIGHT>
+			#  <MoreInfo href="http://www.bbc.co.uk/" />
+			#  <Entry>
+			#    <ref href="rtsp://wm.bbc.co.uk/wms/england/radioberkshire/aod/andrewpeach_thu.wma" />
+			#    <ref href="http://wm.bbc.co.uk/wms/england/radioberkshire/aod/andrewpeach_thu.wma" />
+			#    <ref href="rtsp://wm.bbc.co.uk/wms2/england/radioberkshire/aod/andrewpeach_thu.wma" />
+			#    <ref href="http://wm.bbc.co.uk/wms2/england/radioberkshire/aod/andrewpeach_thu.wma" />
+			#    <MoreInfo href="http://www.bbc.co.uk/" />
+			#    <Abstract>BBC</Abstract>
+			#  </Entry>
+			# </ASX>
+			for ( split /</i, $content ) {
+				#main::logger "DEBUG: LINE: $_\n" if $opt->{debug};
+				# Ignore anything except mms or http from this playlist
+				push @urls, $1 if m{ref\s+href=\"((http|$filter)://.+?)\"}i;
+			}
+			for ( @urls ) {
+				main::logger "DEBUG: Got ASX URL: $_\n" if $opt->{debug};
+			}
+			# use first URL for now??
+			$url = $urls[0];
+
+		# RAM format urls
+		} elsif ( $content =~ m{rtsp://}i ) {
+			my @urls;
+			for ( split /[\n\r\s]/i, $content ) {
+				main::logger "DEBUG: LINE: $_\n" if $opt->{debug};
+				# Ignore anything except $filter or http from this playlist
+				push @urls, $1 if m{((http|$filter)://.+?)[\n\r\s]?$}i;
+			}
+			for ( @urls ) {
+				main::logger "DEBUG: Got RAM URL: $_\n" if $opt->{debug};
+			}
+			# use first URL for now??
+			$url = $urls[0];			
+
+		} else {	
+			chomp( $url = $content );
+		}
+		$depth--;
+	}
+
+	return $url;
 }
 
 
@@ -4971,6 +5052,10 @@ sub get_stream_data_cdn {
 		# drm license - ignore
 		} elsif ( $cattribs->{kind} eq 'licence' ) {
 
+		# iphone new
+		} elsif ( $cattribs->{kind} eq 'securesis' ) {
+			$conn->{streamurl} = $cattribs->{href};
+
 		# Unknown CDN
 		} else {
 			new_stream_report($mattribs, $cattribs) if $opt->{verbose};
@@ -5071,10 +5156,6 @@ sub get_stream_data {
 		push @{ $mattribs->{connections} }, $cattribs;
 		push @medias, $mattribs;
 
-	# Don't do this stream lookup if only iphone mode and neither info or subtitles options are specified - it is unneccesary
-	} elsif ( $prog->modelist() eq 'iphone' && (! $opt->{info}) && ! $opt->{subtitles} ) {
-		# skip mediaselector lookup
-
 	# Live simulcast verpid: http://www.bbc.co.uk/emp/simulcast/bbc_one_london.xml
 	} elsif ( $verpid =~ /http:/ ) {
 		$xml = main::request_url_retry( $ua, $verpid, 3, undef, undef, 1 );
@@ -5092,8 +5173,19 @@ sub get_stream_data {
 	my $mode;
 	for my $mattribs ( @medias ) {
 		
+		# New iphone stream
+		if ( $mattribs->{service} eq 'iplayer_streaming_http_mp4' ) {
+			# Fix/remove some audio stream attribs
+			if ( $prog->{type} eq 'radio' ) {
+				$mattribs->{bitrate} = 128;
+				delete $mattribs->{width};
+				delete $mattribs->{height};
+			}
+			get_stream_data_cdn( \%data, $mattribs, 'iphone', 'iphone', 'mov' );
+		
+		
 		# flashhd modes
-		if (		$mattribs->{kind} eq 'video' &&
+		} elsif (	$mattribs->{kind} eq 'video' &&
 				$mattribs->{type} eq 'video/mp4' &&
 				$mattribs->{encoding} eq 'h264'
 		) {
@@ -5115,31 +5207,8 @@ sub get_stream_data {
 			} elsif ( $mattribs->{bitrate} > 400 && $mattribs->{width} >= 500 ) {
 				get_stream_data_cdn( \%data, $mattribs, 'flashstd', 'rtmp', 'mp4' );
 
-			# iPhone modes
-			} elsif ( $mattribs->{width} < 500 ) {
-				# Fix/remove some audio stream attribs
-				if ( $prog->{type} eq 'radio' ) {
-					$mattribs->{bitrate} = 128;
-					delete $mattribs->{width};
-					delete $mattribs->{height};
-				}
-				get_stream_data_cdn( \%data, $mattribs, 'iphone', 'iphone', 'mov' );
 			}
-
-#	width => 512
-#	bitrate => 500
-#	kind => video
-#	connections => ARRAY(0xa108874)
-#	type => video/x-flv
-#	height => 288
-#	CONNECTION-ELEMENT:
-#		identifier => news_channel_1@s2677
-#		kind => akamai
-#		tokenIssuer => akamaiUk
-#		application => live
-#		server => cp52113.live.edgefcs.net
-
-
+			
 		# flashnormal modes (also live and EMP modes)
 		} elsif (	$mattribs->{kind} eq 'video' &&
 				$mattribs->{type} eq 'video/x-flv' &&
@@ -5195,8 +5264,9 @@ sub get_stream_data {
 
 		# flashaac modes
 		} elsif (	$mattribs->{kind} eq 'audio' &&
-				$mattribs->{type} eq 'audio/mp4' &&
-				$mattribs->{encoding} eq 'aac'
+				$mattribs->{type} eq 'audio/mp4'
+				# This also catches worldservice who happen not to set the encoding type
+				# && $mattribs->{encoding} eq 'aac'
 		) {
 			# flashaachigh
 			if (  $mattribs->{bitrate} >= 192 ) {
@@ -5249,21 +5319,6 @@ sub get_stream_data {
 		} else {
 			new_stream_report($mattribs, undef) if $opt->{verbose};
 		}	
-	}
-
-	# Do iphone redirect check regardless of an xml entry for iphone (except for EMP/Live) - sometimes the iphone streams exist regardless
-	# Skip check if the modelist selected excludes iphone
-	if ( $prog->{pid} !~ /^http/i && $verpid !~ /^\?/ && $verpid !~ /^http:/ && grep /^iphone/, split ',', $prog->modelist() ) {
-		if ( my $streamurl = Streamer::iphone->get_url($ua, $verpid) ) {
-			my $mode = 'iphone1';
-			# Get iphone redirect
-			$data{$mode}{streamurl} = $streamurl;
-			$data{$mode}{streamer} = 'iphone';
-			$data{$mode}{ext} = 'mov';
-			get_stream_set_type( $data{$mode} ) if ! $data{$mode}{type};
-		} else {
-			main::logger "DEBUG: No iphone redirect stream\n" if $opt->{verbose};
-		}
 	}
 
 	# Report modes found
@@ -6487,7 +6542,7 @@ sub get_url {
 	# This doesn't work through url-prepend proxies
 	## Use url prepend if required
 	#if ( $opt->{proxy} =~ /^prepend:/ ) {
-	#	$url_1 = $opt->{proxy}.$url_1;
+	#	$url_1 = $opt->{proxy}.main::url_encode( $url_1 );
 	#	$url_1 =~ s/^prepend://g;
 	#}
 
@@ -6541,7 +6596,7 @@ sub get {
 		
 	# Use url prepend if required
 	if ( $opt->{proxy} =~ /^prepend:/ ) {
-		$url_2 = $opt->{proxy}.$url_2;
+		$url_2 = $opt->{proxy}.main::url_encode( $url_2 );
 		$url_2 =~ s/^prepend://g;
 	}
 
@@ -7155,22 +7210,8 @@ sub get {
 	# Download bandwidth bps used for rtsp streams
 	my $bandwidth = $opt->{bandwidth} || 512000;
 
-	# Resolve URL if required
-	if ( $url =~ /^http/ ) {
-		my $url1 = main::request_url_retry($ua, $url, 2, '', '');
-		chomp($url1);
-		$url1 =~ s/[\s\n]//g;
-		# Yet another recursion if required!
-		if ( $url1 =~ /^http/ ) {
-			# "http://www.bbc.co.uk/worldservice/meta/tx/nb/live/www15.asx"
-			$url1 = main::request_url_retry($ua, $url1, 2, '', '');
-			chomp($url1);
-			$url1 =~ s/[\s\n]/ /g;
-			# Only get the first rtsp url
-			$url1 =~ s!^.+?(rtsp://.+?)(\s|\s.*|)$!$1!g;
-		}
-		$url = $url1;
-	}
+	# Parse/recurse playlist if required to get mms url
+	$url = main::get_playlist_url( $ua, $url, 'rtsp' );
 
 	# Add stop and start if defined
 	# append: ?start=5400&end=7400 or &start=5400&end=7400
@@ -7452,25 +7493,9 @@ sub get {
 	# Download each mms url (multi-threaded to stream in parallel)
 	my $file_part_prefix = "$prog->{dir}/$prog->{fileprefix}_part";
 	for ( my $count = 0; $count <= $#url_list; $count++ ) {
-
-		# Resolve the MMS url if it is an http ref
-		if ( $url_list[$count] =~ /^http/ ) {
-			my $url = main::request_url_retry($ua, $url_list[$count], 2, '', '');
-			chomp($url);
-			$url =~ s/[\s\n]//g;
-			# HREF="mms://a1899.v394403.c39440.g.vm.akamaistream.net/7/1899/39440/1/bbcworldservice.download.akamai.com/39440//worldservice/css/nb/410060838.wma"
-			# HREF = "http://www.bbc.co.uk/worldservice/meta/tx/nb/live/www15.asx"
-			$url =~ s/^.*href\s*=\s*\"(.+?)\".*$/$1/gi;
-			# Yet another recursion if required!
-			if ( $url =~ /^http/ ) {
-				# "http://www.bbc.co.uk/worldservice/meta/tx/nb/live/www15.asx"
-				$url = main::request_url_retry($ua, $url, 2, '', '');
-				chomp($url);
-				$url =~ s/[\s\n]//g;
-				$url =~ s/^.*href\s*=\s*\"(.+?)\".*$/$1/gi;			
-			}
-			$url_list[$count] = $url;
-		}
+		
+		# Parse/recurse playlist if required to get mms url
+		$url_list[$count] = main::get_playlist_url( $ua, $url_list[$count], 'mms' );
 
 		# Create temp recording filename
 		$file_tmp = sprintf( "%s%02d.".$prog->{ext}, $file_part_prefix, $count+1);
@@ -7493,7 +7518,7 @@ sub get {
 		main::logger "INFO: Command: $cmd\n" if $opt->{verbose};
 
 		# fork streaming threads
-		if ( not $opt->{itvnothread} ) {
+		if ( not $opt->{mmsnothread} ) {
 			my $childpid = fork();
 			if (! $childpid) {
 				# Child starts here
@@ -7560,7 +7585,7 @@ sub get {
 	}
 
 	# If doing a threaded streaming, monitor the progress and thread completion
-	if ( not $opt->{itvnothread} ) {
+	if ( not $opt->{mmsnothread} ) {
 		# Wait for all threads to complete
 		$| = 1;
 		# Autoreap zombies
