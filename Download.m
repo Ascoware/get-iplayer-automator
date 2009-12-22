@@ -49,7 +49,7 @@
 	NSString *downloadPath = [[NSString alloc] initWithString:[[NSUserDefaults standardUserDefaults] valueForKey:@"DownloadPath"]];
 		//Initialize Formats
 	NSArray *tvFormatKeys = [NSArray arrayWithObjects:@"iPhone",@"Flash - High",@"Flash - Low",@"Flash - HD",@"Flash - Standard",@"Flash - Normal",@"Flash - Very High",nil];
-	NSArray *tvFormatObjects = [NSArray arrayWithObjects:@"iphone",@"flashhigh",@"flashlow",@"flashhd",@"flashstd",@"flashnormal",@"flashvhigh",nil];
+	NSArray *tvFormatObjects = [NSArray arrayWithObjects:@"iphone",@"flashhigh",@"flashlow",@"flashhd",@"flashstd",@"flashstd",@"flashvhigh",nil];
 	NSDictionary *tvFormats = [[NSDictionary alloc] initWithObjects:tvFormatObjects forKeys:tvFormatKeys];
 	NSArray *radioFormatKeys = [NSArray arrayWithObjects:@"iPhone",@"Flash - MP3",@"Flash - AAC",@"WMA",@"Real Audio",@"Flash",nil];
 	NSArray *radioFormatObjects = [NSArray arrayWithObjects:@"iphone", @"flashaudio",@"flashaac",@"wma",@"realaudio",@"flashaudio",nil];
