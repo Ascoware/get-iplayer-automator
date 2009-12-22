@@ -1787,7 +1787,6 @@
 			{
 				NSString *newSubtitleFilename = [NSString stringWithFormat:@"%@ (Subtitles).srt", newFilename];
 				newSubtitlePath = [newFolder stringByAppendingPathComponent:newSubtitleFilename];
-				NSLog(newSubtitlePath);
 			}
 			
 			//Perform File Operations
@@ -1804,7 +1803,9 @@
 			NSError *copyError;
 			if ([fileManager moveItemAtPath:[show path] toPath:newFile error:&copyError]) 
 			{
-				[fileManager moveItemAtPath:originalSubtitlePath toPath:newSubtitlePath error:nil];
+				NSLog(@"Original: %@ \rNew: %@", originalSubtitlePath, newSubtitlePath);
+				if (originalSubtitlePath && newSubtitlePath)
+					[fileManager moveItemAtPath:originalSubtitlePath toPath:newSubtitlePath error:nil];
 				if (![newFolder isEqualToString:originalFolder])
 				{
 					[fileManager removeItemAtPath:originalFolder error:NULL];
