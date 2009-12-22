@@ -1539,6 +1539,7 @@
 		[currentIndicator startAnimation:self];
 		[NSThread detachNewThreadSelector:@selector(seriesLinkToQueueTimerSelector) toTarget:self withObject:nil];
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(seriesLinkFinished:) name:@"NSThreadWillExitNotification" object:nil];
+		[startButton setEnabled:NO];
 	}	
 }
 - (void)seriesLinkToQueueTimerSelector
@@ -1578,6 +1579,7 @@
 	[currentProgress setStringValue:@""];
 	[currentIndicator setIndeterminate:NO];
 	[currentIndicator stopAnimation:self];
+	[startButton setEnabled:YES];
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:@"NSThreadWillExitNotification" object:nil];
 	
 	//If this is an update initiated by the scheduler, run the downloads.
