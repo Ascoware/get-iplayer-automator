@@ -394,12 +394,19 @@
 					[scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:nil];
 					if (![scanner scanDouble:&elapsed]) elapsed=0.0;
 					[scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:nil];
-					if (![scanner scanDouble:&percent]) percent=0.0;
-					if (downloaded>0 && percent>0) total = ((downloaded/1024)/(percent/100));
+					if (![scanner scanDouble:&percent]) percent=102.0;
+					if (downloaded>0 && percent>0 && percent!=102) total = ((downloaded/1024)/(percent/100));
 					else total=0;
-					[self setCurrentProgress:[NSString stringWithFormat:@"%.1f%% - (%.2f MB/~%.0f MB) -- %@",percent,(downloaded/1024),total,[show valueForKey:@"showName"]]];
+					if (percent != 102)
+						[self setCurrentProgress:[NSString stringWithFormat:@"%.1f%% - (%.2f MB/~%.0f MB) -- %@",percent,(downloaded/1024),total,[show valueForKey:@"showName"]]];
+					else
+						[self setCurrentProgress:[NSString stringWithFormat:@"%.2f MB Downloaded -- %@",(downloaded/1024),[show showName]]];
 					[self setPercentage:percent];
-					[show setValue:[NSString stringWithFormat:@"Downloading: %.1f%%", percent] forKey:@"status"];
+					if (percent != 102)
+						[show setValue:[NSString stringWithFormat:@"Downloading: %.1f%%", percent] forKey:@"status"];
+					else 
+						[show setValue:@"Downloading..." forKey:@"status"];
+
 				}
 				//If an MPlayer (Real Audio) status message...
 				else if ([s hasPrefix:@"A:"])
