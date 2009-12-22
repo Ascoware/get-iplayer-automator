@@ -1695,7 +1695,7 @@
 			if (track && ([ext isEqualToString:@"mov"] || [ext isEqualToString:@"mp4"]))
 			{
 				[track setVideoKind:iTunesEVdKTVShow];
-				[track setName:[show showName]];
+				[track setName:[show episodeName]];
 				[track setUnplayed:YES];
 				[track setEpisodeID:[show episodeName]];
 				[track setShow:[show seriesName]];
