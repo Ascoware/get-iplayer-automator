@@ -481,7 +481,8 @@
 			NSScanner *scanner = [NSScanner scannerWithString:output];
 			NSString *subtitlePath;
 			[scanner scanString:@"INFO: Downloading Subtitles to \'" intoString:nil];
-			[scanner scanUpToString:@"\'" intoString:&subtitlePath];
+			[scanner scanUpToString:@".srt\'" intoString:&subtitlePath];
+			subtitlePath = [subtitlePath stringByAppendingPathExtension:@"srt"];
 			NSLog(subtitlePath);
 			[show setSubtitlePath:subtitlePath];
 		}
