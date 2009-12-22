@@ -170,6 +170,8 @@
 	if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"Verbose"] isEqualTo:[NSNumber numberWithBool:YES]])
 		[args addObject:[[NSString alloc] initWithString:@"--verbose"]];
 	if (ffmpegArg) [args addObject:ffmpegArg];
+	if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"DownloadSubtitles"] isEqualTo:[NSNumber numberWithBool:YES]])
+		[args addObject:@"--subtitles"];
 	task = [[NSTask alloc] init];
 	pipe = [[NSPipe alloc] init];
 	errorPipe = [[NSPipe alloc] init];
@@ -467,6 +469,15 @@
 	//Parse each line individually.
 	for (NSString *output in array)
 	{
+		if ([output hasPrefix:@"INFO: Downloading Subtitles"])
+		{
+			NSScanner *scanner = [NSScanner scannerWithString:output];
+			NSString *subtitlePath;
+			[scanner scanString:@"INFO: Downloading Subtitles to \'" intoString:nil];
+			[scanner scanUpToString:@"\'" intoString:&subtitlePath];
+			NSLog(subtitlePath);
+			[show setSubtitlePath:subtitlePath];
+		}
 		if ([output hasPrefix:@"INFO: Recorded"])
 		{
 			LastLine = [NSString stringWithString:output];

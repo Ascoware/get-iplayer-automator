@@ -60,6 +60,7 @@
 	[defaultValues setObject:@"4" forKey:@"CacheExpiryTime"];
 	[defaultValues setObject:[NSNumber numberWithBool:NO] forKey:@"Verbose"];
 	[defaultValues setObject:[NSNumber numberWithBool:YES] forKey:@"SeriesLinkStartup"];
+	[defaultValues setObject:[NSNumber numberWithBool:NO] forKey:@"DownloadSubtitles"];
 	
 	[[NSUserDefaults standardUserDefaults] registerDefaults:defaultValues];
 	defaultValues = nil;
@@ -1759,6 +1760,8 @@
 		NSString *originalFolder = [originalPath stringByDeletingLastPathComponent];
 		NSString *extension = [originalPath pathExtension];
 		
+		NSString *originalSubtitlePath = [show subtitlePath];
+		
 		//Retrieve Mode Used
 		NSString *originalFilename = [originalPath lastPathComponent];
 		NSScanner *originalFilenameScanner = [NSScanner scannerWithString:originalFilename];
@@ -1779,6 +1782,13 @@
 			NSString *newFilename = [NSString stringWithFormat:@"%@ - %@", showName, episodeName];
 			newFile = [newFolder stringByAppendingPathComponent:newFilename];
 			newFile = [newFile stringByAppendingPathExtension:extension];
+			NSString *newSubtitlePath;
+			if (originalSubtitlePath)
+			{
+				NSString *newSubtitleFilename = [NSString stringWithFormat:@"%@ (Subtitles).srt", newFilename];
+				newSubtitlePath = [newFolder stringByAppendingPathComponent:newSubtitleFilename];
+				NSLog(newSubtitlePath);
+			}
 			
 			//Perform File Operations
 			NSFileManager *fileManager = [NSFileManager defaultManager];
@@ -1789,10 +1799,12 @@
 				newFile = [newFolder stringByAppendingPathComponent:newFilename];
 				newFile = [newFile stringByAppendingPathExtension:extension];
 				[show setValue:[[show showName] stringByAppendingFormat:@" (%@)", modeUsed] forKey:@"showName"];
+				
 			}
 			NSError *copyError;
 			if ([fileManager moveItemAtPath:[show path] toPath:newFile error:&copyError]) 
 			{
+				[fileManager moveItemAtPath:originalSubtitlePath toPath:newSubtitlePath error:nil];
 				if (![newFolder isEqualToString:originalFolder])
 				{
 					[fileManager removeItemAtPath:originalFolder error:NULL];

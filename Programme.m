@@ -26,6 +26,7 @@ extern BOOL runDownloads;
 	timeadded = [[NSNumber alloc] init];
 	processedPID = [[NSNumber alloc] initWithBool:YES];
 	radio = [[NSNumber alloc] initWithBool:NO];
+	subtitlePath=nil;
 	realPID=nil;
 	return self;
 }
@@ -44,6 +45,7 @@ extern BOOL runDownloads;
 	processedPID = [[NSNumber alloc] initWithBool:YES];
 	radio = [show radio];
 	realPID = [show realPID];
+	subtitlePath = [show subtitlePath];
 	return self;
 }
 - (id)init
@@ -68,6 +70,7 @@ extern BOOL runDownloads;
 	processedPID = [[NSNumber alloc] initWithBool:NO];
 	radio = [[NSNumber alloc] initWithBool:NO];
 	realPID=nil;
+	subtitlePath=nil;
 	return self;
 }
 - (id)description
@@ -104,6 +107,7 @@ extern BOOL runDownloads;
 	processedPID = [coder decodeObjectForKey:@"processedPID"];
 	radio = [coder decodeObjectForKey:@"radio"];
 	realPID = nil;
+	subtitlePath=nil;
 	return self;
 }
 @synthesize showName;
@@ -121,4 +125,5 @@ extern BOOL runDownloads;
 @synthesize processedPID;
 @synthesize radio;
 @synthesize realPID;
+@synthesize subtitlePath;
 @end

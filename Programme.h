@@ -25,6 +25,7 @@
 	NSNumber *processedPID;
 	NSNumber *radio;
 	NSString *realPID;
+	NSString *subtitlePath;
 }
 - (id)initWithInfo:(id)sender pid:(NSString *)PID programmeName:(NSString *)SHOWNAME network:(NSString *)TVNETWORK;
 - (id)initWithShow:(Programme *)show;
@@ -44,4 +45,5 @@
 @property (readwrite, assign) NSNumber *processedPID;
 @property (readwrite, assign) NSNumber *radio;
 @property (readwrite, assign) NSString *realPID;
+@property (readwrite, assign) NSString *subtitlePath;
 @end
