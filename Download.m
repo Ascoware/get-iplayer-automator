@@ -32,7 +32,6 @@
 	NSString *mplayerPath = [bundlePath stringByAppendingString:@"/Contents/Resources/mplayer"];
 #ifdef __i386__
 	NSString *flvstreamerPath;
-	NSLog(@"NSAppKitVersionNumber = %d", floor(NSAppKitVersionNumber));
 	if (floor(NSAppKitVersionNumber) > 949)
 		flvstreamerPath = [bundlePath stringByAppendingString:@"/Contents/Resources/flvstreamer-1.9"];
 	else
@@ -245,7 +244,6 @@
 						[array addObject:[log substringWithRange:currentRange]];
 					}
 					lastLine = [array objectAtIndex:([array count]-1)];
-					NSLog(@"Last Line = %@", lastLine);
 				}
 				else 
 				{
@@ -255,7 +253,6 @@
 				NSScanner *scn = [NSScanner scannerWithString:lastLine];
 				if ([lastLine hasPrefix:@"INFO: Recorded"])
 				{
-					NSLog(@"Download: Success");
 					[show setValue:[NSNumber numberWithBool:YES] forKey:@"complete"];
 					[show setValue:[NSNumber numberWithBool:YES] forKey:@"successful"];
 					[show setValue:@"Download Complete" forKey:@"status"];
@@ -277,7 +274,6 @@
 				}
 				else if ([lastLine hasPrefix:@"INFO: All streaming threads completed"])
 				{
-					NSLog(@"Download: Success");
 					[show setValue:[NSNumber numberWithBool:YES] forKey:@"complete"];
 					[show setValue:[NSNumber numberWithBool:YES] forKey:@"successful"];
 					[show setValue:@"Download Complete" forKey:@"status"];
@@ -286,7 +282,6 @@
 				else if ([scn scanUpToString:@"Already in download history" intoString:nil] && 
 						 [scn scanString:@"Already in" intoString:nil])
 				{
-					NSLog(@"In History");
 					[show setValue:[NSNumber numberWithBool:YES] forKey:@"complete"];
 					[show setValue:[NSNumber numberWithBool:NO] forKey:@"successful"];
 					[show setValue:@"Failed: Download in History" forKey:@"status"];
@@ -294,14 +289,12 @@
 				}
 				else
 				{
-					NSLog(@"Download: Failure");
 					[show setValue:[NSNumber numberWithBool:YES] forKey:@"complete"];
 					[show setValue:[NSNumber numberWithBool:NO] forKey:@"successful"];
 					[show setValue:@"Download Failed" forKey:@"status"];
 					[self addToLog:[NSString stringWithFormat:@"%@ Failed",[show showName]]];
 				}
 			}
-			NSLog(@"Posting notification");
 			[nc postNotificationName:@"DownloadFinished" object:show];
 		}
 	}
@@ -363,7 +356,6 @@
 						[scanner setScanLocation:0];
 						if ([s hasPrefix:@"ERROR:"] || [s hasPrefix:@"\rERROR:"] || [s hasPrefix:@"\nERROR:"])
 						{
-							NSLog(@"here");
 							if ([scanner scanUpToString:@"corrupt file!" intoString:nil] && [scanner scanString:@"corrupt file!" intoString:nil] && unResumableCount>3)
 							{
 								[show setValue:@"Unresumable File." forKey:@"status"];
@@ -483,7 +475,6 @@
 			[scanner scanString:@"INFO: Downloading Subtitles to \'" intoString:nil];
 			[scanner scanUpToString:@".srt\'" intoString:&subtitlePath];
 			subtitlePath = [subtitlePath stringByAppendingPathExtension:@"srt"];
-			NSLog(subtitlePath);
 			[show setSubtitlePath:subtitlePath];
 		}
 		if ([output hasPrefix:@"INFO: Recorded"])

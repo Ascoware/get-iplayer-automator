@@ -414,7 +414,6 @@
 	//Long, Complicated Bit of Code that updates the index number.
 	//This is neccessary because if the cache is updated, the index number will almost certainly change.
 	NSArray *tempQueue = [queueController arrangedObjects];
-	NSLog(@"updating indexes");
 	for (Programme *show in tempQueue)
 	{
 		BOOL foundMatch=NO;
@@ -429,7 +428,6 @@
 				NSScanner *scanner = [NSScanner scannerWithString:name];
 				NSString *searchArgument;
 				[scanner scanUpToString:@" - " intoString:&searchArgument];
-				NSLog(searchArgument);
 				// write handle is closed to this process
 				[pipeTask setStandardOutput:newPipe];
 				[pipeTask setStandardError:newPipe];
@@ -1541,7 +1539,9 @@
 			[currentIndicator startAnimation:self];
 			[startButton setEnabled:NO];
 		}
+		NSLog(@"About to launch Series-Link Thread");
 		[NSThread detachNewThreadSelector:@selector(seriesLinkToQueueTimerSelector) toTarget:self withObject:nil];
+		NSLog(@"Series-Link Thread Launched");
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(seriesLinkFinished:) name:@"NSThreadWillExitNotification" object:nil];
 	}	
 }
@@ -1596,7 +1596,7 @@
 		[self performSelectorOnMainThread:@selector(startDownloads:) withObject:self waitUntilDone:NO];
 		runScheduled=NO;
 	}
-	NSLog(@"seriesLinkFinished");
+	NSLog(@"Series-Link Thread Finished");
 }
 - (void)processAutoRecordData:(NSString *)autoRecordData2 forSeries:(Series *)series2
 {
@@ -1679,7 +1679,6 @@
 		{
 			if ([string hasPrefix:@"Unknown option:"] || [string hasPrefix:@"Option"] || [string hasPrefix:@"Usage"])
 			{
-				NSLog(@"Unknown Option");
 				return;
 			}
 		}
@@ -2061,7 +2060,6 @@
 	[mplayerStreamer setLaunchPath:[[NSBundle mainBundle] pathForResource:@"mplayer" ofType:nil]];
 	[mplayerStreamer setStandardError:liveTVError];
 	[mplayerStreamer setStandardOutput:liveTVError];
-	NSLog(@"get iplayer launch path set");
 	
 	//Get selected channel
 	LiveTVChannel *selectedChannel = [[liveTVChannelController arrangedObjects] objectAtIndex:[liveTVChannelController selectionIndex]];
@@ -2124,14 +2122,12 @@
 					 partialProxyArg,
 					 nil];
 	[getiPlayerStreamer setArguments:args];
-	NSLog(@"Arguments set: %@",args);
 	
 	[mplayerStreamer setArguments:[NSArray arrayWithObjects:@"-cache",@"3072",@"-",nil]];
 	
 	
 	[getiPlayerStreamer launch];
 	[mplayerStreamer launch];
-	NSLog(@"get iplayer launched");
 	[liveStart setEnabled:NO];
 	[liveStop setEnabled:YES];
 }
