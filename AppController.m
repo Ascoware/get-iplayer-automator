@@ -1533,7 +1533,7 @@
 {
 	//[NSTimer scheduledTimerWithTimeInterval:.1 target:self selector:@selector(seriesLinkToQueueTimerSelector:) userInfo:nil repeats:NO];
 	//NSThreadWillExitNotification
-	if ([[pvrQueueController arrangedObjects] count] > 0)
+	if ([[pvrQueueController arrangedObjects] count] > 0 && !runUpdate)
 	{
 		if (!runDownloads)
 		{
