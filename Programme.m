@@ -89,6 +89,7 @@ extern BOOL runDownloads;
 	[coder encodeObject:timeadded forKey:@"timeadded"];
 	[coder encodeObject:processedPID forKey:@"processedPID"];
 	[coder encodeObject:radio forKey:@"radio"];
+	[coder encodeObject:realPID forKey:@"realPID"];
 }
 - (id) initWithCoder: (NSCoder *)coder
 {
@@ -106,7 +107,7 @@ extern BOOL runDownloads;
 	timeadded = [coder decodeObjectForKey:@"timeadded"];
 	processedPID = [coder decodeObjectForKey:@"processedPID"];
 	radio = [coder decodeObjectForKey:@"radio"];
-	realPID = nil;
+	realPID = [coder decodeObjectForKey:@"realPID"];
 	subtitlePath=nil;
 	return self;
 }
