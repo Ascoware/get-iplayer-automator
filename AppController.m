@@ -1535,20 +1535,25 @@
 	//NSThreadWillExitNotification
 	if ([[pvrQueueController arrangedObjects] count] > 0)
 	{
-		[currentIndicator setIndeterminate:YES];
-		[currentIndicator startAnimation:self];
+		if (!runDownloads)
+		{
+			[currentIndicator setIndeterminate:YES];
+			[currentIndicator startAnimation:self];
+			[startButton setEnabled:NO];
+		}
 		[NSThread detachNewThreadSelector:@selector(seriesLinkToQueueTimerSelector) toTarget:self withObject:nil];
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(seriesLinkFinished:) name:@"NSThreadWillExitNotification" object:nil];
-		[startButton setEnabled:NO];
 	}	
 }
 - (void)seriesLinkToQueueTimerSelector
 {
 	NSArray *seriesLink = [pvrQueueController arrangedObjects];
-	[currentProgress performSelectorOnMainThread:@selector(setStringValue:) withObject:@"Updating Series Link..." waitUntilDone:NO];
+	if (!runDownloads)
+		[currentProgress performSelectorOnMainThread:@selector(setStringValue:) withObject:@"Updating Series Link..." waitUntilDone:NO];
 	for (Series *series in seriesLink)
 	{
-		[currentProgress performSelectorOnMainThread:@selector(setStringValue:) withObject:[NSString stringWithFormat:@"Updating Series Link - %d/%d - %@",[seriesLink indexOfObject:series],[seriesLink count],[series showName]] waitUntilDone:NO];
+		if (!runDownloads)
+			[currentProgress performSelectorOnMainThread:@selector(setStringValue:) withObject:[NSString stringWithFormat:@"Updating Series Link - %d/%d - %@",[seriesLink indexOfObject:series],[seriesLink count],[series showName]] waitUntilDone:NO];
 		NSString *cacheExpiryArgument = [self cacheExpiryArgument:nil];
 		NSString *typeArgument = [self typeArgument:nil];
 		
@@ -1576,10 +1581,13 @@
 }
 - (void)seriesLinkFinished:(NSNotification *)note
 {
-	[currentProgress setStringValue:@""];
-	[currentIndicator setIndeterminate:NO];
-	[currentIndicator stopAnimation:self];
-	[startButton setEnabled:YES];
+	if (!runDownloads)
+	{
+		[currentProgress setStringValue:@""];
+		[currentIndicator setIndeterminate:NO];
+		[currentIndicator stopAnimation:self];
+		[startButton setEnabled:YES];
+	}
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:@"NSThreadWillExitNotification" object:nil];
 	
 	//If this is an update initiated by the scheduler, run the downloads.
@@ -1588,6 +1596,7 @@
 		[self performSelectorOnMainThread:@selector(startDownloads:) withObject:self waitUntilDone:NO];
 		runScheduled=NO;
 	}
+	NSLog(@"seriesLinkFinished");
 }
 - (void)processAutoRecordData:(NSString *)autoRecordData2 forSeries:(Series *)series2
 {
