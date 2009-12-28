@@ -1228,7 +1228,6 @@
 	if (!runUpdate)
 		[startButton setEnabled:YES];
 	[stopButton setEnabled:NO];
-	currentDownload = nil;
 	[currentIndicator stopAnimation:nil];
 	[currentIndicator setDoubleValue:0];
 	if (!runUpdate)
@@ -1245,7 +1244,15 @@
 	NSArray *tempQueue = [queueController arrangedObjects];
 	for (Programme *show in tempQueue)
 		if ([[show status] isEqualToString:@"Waiting..."]) [show setStatus:@""];
-	}
+	
+	[NSTimer scheduledTimerWithTimeInterval:2.0 target:self selector:@selector(fixDownloadStatus:) userInfo:currentDownload repeats:NO];	
+}
+- (void)fixDownloadStatus:(NSNotification *)note
+{
+	[[[note userInfo] show] setValue:@"Cancelled" forKey:@"status"];
+	currentDownload=nil;
+	NSLog(@"Download should read cancelled");
+}
 - (void)setPercentage:(NSNotification *)note
 {	
 	if ([note userInfo])
