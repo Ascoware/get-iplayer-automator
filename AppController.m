@@ -1581,6 +1581,7 @@
 }
 - (void)seriesLinkFinished:(NSNotification *)note
 {
+	NSLog(@"Thread Finished Notification Received");
 	if (!runDownloads)
 	{
 		[currentProgress setStringValue:@""];
