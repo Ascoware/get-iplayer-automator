@@ -1249,9 +1249,14 @@
 }
 - (void)fixDownloadStatus:(NSNotification *)note
 {
-	[[[note userInfo] show] setValue:@"Cancelled" forKey:@"status"];
-	currentDownload=nil;
-	NSLog(@"Download should read cancelled");
+	if (!runDownloads)
+	{
+		[[[note userInfo] show] setValue:@"Cancelled" forKey:@"status"];
+		currentDownload=nil;
+		NSLog(@"Download should read cancelled");
+	}
+	else
+		NSLog(@"fixDownloadStatus handler did not run because downloads appear to be running again");
 }
 - (void)setPercentage:(NSNotification *)note
 {	
