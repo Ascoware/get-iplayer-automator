@@ -1609,7 +1609,20 @@
 		[self performSelectorOnMainThread:@selector(startDownloads:) withObject:self waitUntilDone:NO];
 		runScheduled=NO;
 	}
+	[NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(seriesLinkFinished2:) userInfo:nil repeats:NO];
 	NSLog(@"Series-Link Thread Finished");
+}
+- (void)seriesLinkFinished2:(NSNotification *)note
+{
+	NSLog(@"Second Check");
+	if (!runDownloads)
+	{
+		[currentProgress setStringValue:@""];
+		[currentIndicator setIndeterminate:NO];
+		[currentIndicator stopAnimation:self];
+		[startButton setEnabled:YES];
+	}
+	NSLog(@"Definitely shouldn't show an updating series-link thing!");
 }
 - (void)processAutoRecordData:(NSString *)autoRecordData2 forSeries:(Series *)series2
 {
