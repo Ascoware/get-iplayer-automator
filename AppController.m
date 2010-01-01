@@ -1609,8 +1609,13 @@
 		[self performSelectorOnMainThread:@selector(startDownloads:) withObject:self waitUntilDone:NO];
 		runScheduled=NO;
 	}
-	[NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(seriesLinkFinished2:) userInfo:nil repeats:NO];
+	[self performSelectorOnMainThread:@selector(scheduleTimerForFinished:) withObject:nil waitUntilDone:NO];
 	NSLog(@"Series-Link Thread Finished");
+}
+	 
+- (void)scheduleTimerForFinished:(id)sender
+{
+	[NSTimer scheduledTimerWithTimeInterval:2.0 target:self selector:@selector(seriesLinkFinished2:) userInfo:currentProgress repeats:NO];
 }
 - (void)seriesLinkFinished2:(NSNotification *)note
 {
