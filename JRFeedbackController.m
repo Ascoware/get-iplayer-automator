@@ -144,24 +144,41 @@ NSString *JRFeedbackType[JRFeedbackController_SectionCount] = {
     }
 }
 
-- (IBAction)submitAction:(id)sender {
-    [sendButton setEnabled:NO];
-    [cancelButton setEnabled:NO];
-    
-    [sectionStrings[currentSection] release];
-    sectionStrings[currentSection] = [[textView textStorage] copy];
-    [textView setEditable:NO];
-    
-    [progress startAnimation:self];
-    
-    // if they checked not to include hardware, don't scan. Post right away.
-    if ([includeHardwareDetailsCheckbox intValue] == 1) {
-        [NSThread detachNewThreadSelector:@selector(system_profilerThread:)
-                                 toTarget:self
-                               withObject:nil];
-    } else {
-        [self postFeedback:@"<systemProfile suppressed>"];
-    }
+- (IBAction)submitAction:(id)sender 
+{
+    if (!([[emailAddressComboBox stringValue] isEqualToString:@""] && includeContactInfo))
+	{
+		[sendButton setEnabled:NO];
+		[cancelButton setEnabled:NO];
+		
+		[sectionStrings[currentSection] release];
+		sectionStrings[currentSection] = [[textView textStorage] copy];
+		[textView setEditable:NO];
+		
+		[progress startAnimation:self];
+		
+		// if they checked not to include hardware, don't scan. Post right away.
+		if ([includeHardwareDetailsCheckbox intValue] == 1) 
+		{
+			[NSThread detachNewThreadSelector:@selector(system_profilerThread:)
+									 toTarget:self
+								   withObject:nil];
+		} 
+		else 
+		{
+			[self postFeedback:@"<systemProfile suppressed>"];
+		}
+	}
+	else 
+	{
+		NSAlert *noEmailAddress = [NSAlert alertWithMessageText:@"No Email Address" 
+												  defaultButton:@"OK" 
+												alternateButton:nil 
+													otherButton:nil 
+									  informativeTextWithFormat:@"Please specify an email address so that I can follow up with you regarding your request."];
+		[noEmailAddress runModal];
+	}
+
 }
 
 - (void)system_profilerThread:(id)ignored {
