@@ -1938,6 +1938,7 @@
 	[sharedDefaults removeObjectForKey:@"CacheExpiryTime"];
 	[sharedDefaults removeObjectForKey:@"Verbose"];
 	[sharedDefaults removeObjectForKey:@"SeriesLinkStartup"];
+	[sharedDefaults removeObjectForKey:@"DownloadSubtitles"];
 }
 	
 #pragma mark Argument Retrieval
