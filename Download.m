@@ -30,6 +30,7 @@
 	NSString *bundlePath = [[NSString alloc] initWithString:[[NSBundle mainBundle] bundlePath]];
 	NSString *getiPlayerPath = [bundlePath stringByAppendingString:@"/Contents/Resources/get_iplayer.pl"];
 	NSString *mplayerPath = [bundlePath stringByAppendingString:@"/Contents/Resources/mplayer"];
+	NSString *atomicParsleyPath = [bundlePath stringByAppendingString:@"/Contents/Resources/AtomicParsley"];
 #ifdef __i386__
 	NSString *flvstreamerPath;
 	if (floor(NSAppKitVersionNumber) > 949)
@@ -138,6 +139,7 @@
 	NSString *mplayerArg = [[NSString alloc] initWithFormat:@"--mplayer=%@", mplayerPath];
 	NSString *flvstreamerArg = [[NSString alloc] initWithFormat:@"--flvstreamer=%@", flvstreamerPath];
 	NSString *lameArg = [[NSString alloc] initWithFormat:@"--lame=%@", lamePath];
+	NSString *atomicParsleyArg = [[NSString alloc] initWithFormat:@"--atomicparsley=%@", atomicParsleyPath];
 	NSString *ffmpegArg;
 	if (ffmpegPath) ffmpegArg = [[NSString alloc] initWithFormat:@"--ffmpeg=%@", ffmpegPath];
 	else ffmpegArg = nil;
@@ -163,7 +165,7 @@
 	profileDirArg = [[NSString alloc] initWithFormat:@"--profile-dir=%@", folder];
 	
 		//Add Arguments that can't be NULL
-	NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:getiPlayerPath,profileDirArg,noWarningArg,noExpiryArg,mplayerArg,flvstreamerArg,lameArg,cacheExpiryArg,downloadPathArg,
+	NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:getiPlayerPath,profileDirArg,noWarningArg,noExpiryArg,mplayerArg,flvstreamerArg,lameArg,atomicParsleyArg,cacheExpiryArg,downloadPathArg,
 					 subDirArg,formatArg,getArg,searchArg,@"--attempts=5",@"--whitespace",@"--file-prefix=<name> - <episode> ((<mode>))",@"--nopurge",versionArg,proxyArg,partialProxyArg,nil];
 		//Verbose?
 	if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"Verbose"] isEqualTo:[NSNumber numberWithBool:YES]])
