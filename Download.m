@@ -637,18 +637,18 @@
 										  [[NSDecimalNumber decimalNumberWithDecimal:percentage] doubleValue],
 										  [[NSDecimalNumber decimalNumberWithDecimal:recieved] doubleValue],
 										  [[NSDecimalNumber decimalNumberWithDecimal:total] doubleValue],
-										  adjustedSpeed,[show showName]]];
+										  adjustedSpeed,timeRemaining]];
 				[show setValue:[NSString stringWithFormat:@"Initializing: %3.1f%%",
 								[[NSDecimalNumber decimalNumberWithDecimal:percentage] doubleValue]]
 						forKey:@"status"];		
 			}
 			else
 			{
-				[self setCurrentProgress:[NSString stringWithFormat:@"%3.1f%% (%3.2fMB/%3.2fMB) - %.1fKB/s -- %@",
+				[self setCurrentProgress:[NSString stringWithFormat:@"%3.1f%% (%3.2fMB/%3.2fMB) - %.1fKB/s - %@ Remaining -- %@",
 				 [[NSDecimalNumber decimalNumberWithDecimal:percentage] doubleValue],
 				 [[NSDecimalNumber decimalNumberWithDecimal:recieved] doubleValue],
 				 [[NSDecimalNumber decimalNumberWithDecimal:total] doubleValue],
-										  adjustedSpeed,[show showName]]];
+										  adjustedSpeed,timeRemaining]];
 				[show setValue:[NSString stringWithFormat:@"Downloading: %3.1f%%",
 								[[NSDecimalNumber decimalNumberWithDecimal:percentage] doubleValue]]
 						forKey:@"status"];
