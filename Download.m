@@ -439,7 +439,12 @@
 							double rateAverage = oldRateAverage = rateSum/100;
 							lastDownloaded=downloaded;
 							lastDate = [NSDate date];
-							[self setCurrentProgress:[NSString stringWithFormat:@"%.1f%% - (%.2f MB/~%.0f MB) - %.0f Min Remaining -- %@",percent,downloaded,total,((total-downloaded)/rateAverage)/60,[show valueForKey:@"showName"]]];
+							NSDate *predictedFinished = [NSDate dateWithTimeIntervalSinceNow:(total-downloaded)/rateAverage];
+							
+							unsigned int unitFlags = NSHourCalendarUnit | NSMinuteCalendarUnit;
+							NSDateComponents *conversionInfo = [[NSCalendar currentCalendar] components:unitFlags fromDate:lastDate toDate:predictedFinished options:0];
+							
+							[self setCurrentProgress:[NSString stringWithFormat:@"%.1f%% - (%.2f MB/~%.0f MB) - %2d:%2d Remaining -- %@",percent,downloaded,total,[conversionInfo hour],[conversionInfo minute],[show valueForKey:@"showName"]]];
 						}
 						else 
 						{
