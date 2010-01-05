@@ -616,8 +616,8 @@
 			if(![scanner scanDecimal:&percentage]) percentage = [[NSNumber numberWithInt:0]decimalValue];
 			[scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] 
 									intoString:nil];
-			[scanner scanUpToCharactersFromSet:[NSCharacterSet characterSetWithCharactersInString:@"a"] 
-									intoString:&timeRemaining];
+			[scanner scanUpToString:@" rem"
+						 intoString:&timeRemaining];
 			double adjustedSpeed = [[NSNumber numberWithInteger:speed] doubleValue]/8;
 			[self setPercentage:[[NSDecimalNumber decimalNumberWithDecimal:percentage] doubleValue]];
 			if ([[NSDecimalNumber decimalNumberWithDecimal:total] doubleValue] < 5.00 && [[NSDecimalNumber decimalNumberWithDecimal:recieved] doubleValue] > 0)
@@ -648,7 +648,7 @@
 				 [[NSDecimalNumber decimalNumberWithDecimal:percentage] doubleValue],
 				 [[NSDecimalNumber decimalNumberWithDecimal:recieved] doubleValue],
 				 [[NSDecimalNumber decimalNumberWithDecimal:total] doubleValue],
-										  adjustedSpeed,timeRemaining]];
+										  adjustedSpeed,timeRemaining,[show showName]]];
 				[show setValue:[NSString stringWithFormat:@"Downloading: %3.1f%%",
 								[[NSDecimalNumber decimalNumberWithDecimal:percentage] doubleValue]]
 						forKey:@"status"];
