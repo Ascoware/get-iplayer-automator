@@ -39,6 +39,12 @@ extern bool runDownloads;
 	BOOL foundLastLine;
 	NSString *LastLine;
 	int unResumableCount;
+	
+	double lastDownloaded;
+	NSDate *lastDate;
+	NSMutableArray *rateEntries;
+	double oldRateAverage;
+	int outOfRange;
 }
 - (id)initWithProgramme:(Programme *)tempShow tvFormats:(NSArray *)tvFormatList radioFormats:(NSArray *)radioFormatList;
 - (void)cancelDownload:(id)sender;

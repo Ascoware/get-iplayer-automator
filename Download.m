@@ -20,6 +20,11 @@
 	errorCache = [[NSMutableString alloc] init];
 	processErrorCache = [NSTimer scheduledTimerWithTimeInterval:.25 target:self selector:@selector(processError) userInfo:nil repeats:YES];
 	
+	//Prepare Time Remaining
+	rateEntries = [[NSMutableArray alloc] init];
+	lastDownloaded=0;
+	outOfRange=0;
+	
 	log = [[NSMutableString alloc] initWithString:@""];
 	nc = [NSNotificationCenter defaultCenter];
 	show = tempShow;
@@ -392,14 +397,81 @@
 					if (downloaded>0 && percent>0 && percent!=102) total = ((downloaded/1024)/(percent/100));
 					else total=0;
 					if (percent != 102)
-						[self setCurrentProgress:[NSString stringWithFormat:@"%.1f%% - (%.2f MB/~%.0f MB) -- %@",percent,(downloaded/1024),total,[show valueForKey:@"showName"]]];
+						[self setCurrentProgress:[NSString stringWithFormat:@"%.1f%% - (%.2f MB/~%.0f MB) -- %@",percent,downloaded,total,[show valueForKey:@"showName"]]];
 					else
-						[self setCurrentProgress:[NSString stringWithFormat:@"%.2f MB Downloaded -- %@",(downloaded/1024),[show showName]]];
+						[self setCurrentProgress:[NSString stringWithFormat:@"%.2f MB Downloaded -- %@",downloaded,[show showName]]];
 					[self setPercentage:percent];
 					if (percent != 102)
 						[show setValue:[NSString stringWithFormat:@"Downloading: %.1f%%", percent] forKey:@"status"];
 					else 
 						[show setValue:@"Downloading..." forKey:@"status"];
+#pragma mark Calculate Time Remaining
+					//Calculate Time Remaining
+					downloaded=downloaded/1024;
+					if (total>0 && downloaded>0 && percent>0)
+					{
+						if ([rateEntries count] == 100)
+						{
+
+							double rate = ((downloaded-lastDownloaded)/(-[lastDate timeIntervalSinceNow]));
+							if (rate < (oldRateAverage*5) && rate > (oldRateAverage/5) && rate < 50)
+							{
+								[rateEntries removeObjectAtIndex:0];
+								[rateEntries addObject:[NSNumber numberWithDouble:rate]];
+								outOfRange=0;
+							}
+							else 
+							{
+								outOfRange++;
+								if (outOfRange>10)
+								{
+									rateEntries = [[NSMutableArray alloc] init];
+									outOfRange=0;
+								}
+							}
+
+
+							double rateSum=0;
+							for (NSNumber *tempRate in rateEntries)
+							{
+								rateSum=rateSum+[tempRate doubleValue];
+							}
+							double rateAverage = oldRateAverage = rateSum/100;
+							lastDownloaded=downloaded;
+							lastDate = [NSDate date];
+							[self setCurrentProgress:[NSString stringWithFormat:@"%.1f%% - (%.2f MB/~%.0f MB) - %.0f Min Remaining -- %@",percent,downloaded,total,((total-downloaded)/rateAverage)/60,[show valueForKey:@"showName"]]];
+						}
+						else 
+						{
+							if (lastDownloaded>0 && lastDate)
+							{
+								double rate = ((downloaded-lastDownloaded)/(-[lastDate timeIntervalSinceNow]));
+								if (rate<50)
+									[rateEntries addObject:[NSNumber numberWithDouble:rate]];
+								lastDownloaded=downloaded;
+								lastDate = [NSDate date];
+								if ([rateEntries count]>98)
+								{
+									double rateSum=0;
+									for (NSNumber *entry in rateEntries)
+									{
+										rateSum = rateSum+[entry doubleValue];
+									}
+									oldRateAverage = rateSum/[rateEntries count];
+								}
+							}
+							else 
+							{
+								lastDownloaded=downloaded;
+								lastDate = [NSDate date];
+							}
+							if (percent != 102)
+								[self setCurrentProgress:[NSString stringWithFormat:@"%.1f%% - (%.2f MB/~%.0f MB) -- %@",percent,downloaded,total,[show valueForKey:@"showName"]]];
+							else
+								[self setCurrentProgress:[NSString stringWithFormat:@"%.2f MB Downloaded -- %@",downloaded,[show showName]]];
+						}
+					}
+
 
 				}
 				//If an MPlayer (Real Audio) status message...
