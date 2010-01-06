@@ -616,7 +616,7 @@
 			if(![scanner scanDecimal:&percentage]) percentage = [[NSNumber numberWithInt:0]decimalValue];
 			[scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] 
 									intoString:nil];
-			[scanner scanUpToString:@" rem"
+			[scanner scanUpToString:@"rem"
 						 intoString:&timeRemaining];
 			double adjustedSpeed = [[NSNumber numberWithInteger:speed] doubleValue]/8;
 			[self setPercentage:[[NSDecimalNumber decimalNumberWithDecimal:percentage] doubleValue]];
