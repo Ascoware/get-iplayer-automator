@@ -397,7 +397,7 @@
 					if (downloaded>0 && percent>0 && percent!=102) total = ((downloaded/1024)/(percent/100));
 					else total=0;
 					if (percent != 102)
-						[self setCurrentProgress:[NSString stringWithFormat:@"%.1f%% - (%.2f MB/~%.0f MB) -- %@",percent,downloaded,total,[show valueForKey:@"showName"]]];
+						[self setCurrentProgress:[NSString stringWithFormat:@"%.1f%% - (%.2f MB/~%.0f MB) -- %@",percent,downloaded/1024,total,[show valueForKey:@"showName"]]];
 					else
 						[self setCurrentProgress:[NSString stringWithFormat:@"%.2f MB Downloaded -- %@",downloaded,[show showName]]];
 					[self setPercentage:percent];
