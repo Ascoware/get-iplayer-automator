@@ -406,7 +406,7 @@
 					else 
 						[show setValue:@"Downloading..." forKey:@"status"];
 #pragma mark Calculate Time Remaining
-					/*//Calculate Time Remaining
+					//Calculate Time Remaining
 					downloaded=downloaded/1024;
 					if (total>0 && downloaded>0 && percent>0)
 					{
@@ -475,7 +475,7 @@
 							else
 								[self setCurrentProgress:[NSString stringWithFormat:@"%.2f MB Downloaded -- %@",downloaded,[show showName]]];
 						}
-					}*/
+					}
 
 
 				}
