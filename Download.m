@@ -358,7 +358,7 @@
 						//If not...
 						if ([s hasPrefix:@"frame="]) s2= @"Converting...";
 						else s2 = @"0.0% - (0.0 MB/~0.0 MB) -- Initializing...";
-						[self addToLog:s noTag:YES];
+							[self addToLog:s noTag:YES];
 						status=NO;
 						[scanner setScanLocation:0];
 						if ([s hasPrefix:@"ERROR:"] || [s hasPrefix:@"\rERROR:"] || [s hasPrefix:@"\nERROR:"])
@@ -399,7 +399,7 @@
 					if (percent != 102)
 						[self setCurrentProgress:[NSString stringWithFormat:@"%.1f%% - (%.2f MB/~%.0f MB) -- %@",percent,downloaded/1024,total,[show valueForKey:@"showName"]]];
 					else
-						[self setCurrentProgress:[NSString stringWithFormat:@"%.2f MB Downloaded -- %@",downloaded,[show showName]]];
+						[self setCurrentProgress:[NSString stringWithFormat:@"%.2f MB Downloaded -- %@",downloaded/1024,[show showName]]];
 					[self setPercentage:percent];
 					if (percent != 102)
 						[show setValue:[NSString stringWithFormat:@"Downloading: %.1f%%", percent] forKey:@"status"];
@@ -473,7 +473,7 @@
 							if (percent != 102)
 								[self setCurrentProgress:[NSString stringWithFormat:@"%.1f%% - (%.2f MB/~%.0f MB) -- %@",percent,downloaded,total,[show valueForKey:@"showName"]]];
 							else
-								[self setCurrentProgress:[NSString stringWithFormat:@"%.2f MB Downloaded -- %@",downloaded,[show showName]]];
+								[self setCurrentProgress:[NSString stringWithFormat:@"%.2f MB Downloaded -- %@",downloaded/1024,[show showName]]];
 						}
 					}
 
