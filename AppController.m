@@ -61,6 +61,7 @@
 	[defaultValues setObject:[NSNumber numberWithBool:NO] forKey:@"Verbose"];
 	[defaultValues setObject:[NSNumber numberWithBool:YES] forKey:@"SeriesLinkStartup"];
 	[defaultValues setObject:[NSNumber numberWithBool:NO] forKey:@"DownloadSubtitles"];
+	[defaultValues setObject:[NSNumber numberWithBool:NO] forKey:@"AlwaysUseProxy"];
 	
 	[[NSUserDefaults standardUserDefaults] registerDefaults:defaultValues];
 	defaultValues = nil;
@@ -316,7 +317,54 @@
 	@catch (NSException *e) {
 		NSLog(@"NO UI");
 	}
-	getiPlayerUpdateArgs = [[NSArray alloc] initWithObjects:getiPlayerPath,cacheExpiryArg,typeArgument,@"--nopurge",profileDirArg,nil];
+	NSString *proxyArg;
+	if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])
+	{
+		NSString *proxyOption = [[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"];
+		if ([proxyOption isEqualToString:@"None"])
+		{
+			//No Proxy
+			proxyArg = NULL;
+		}
+		else if ([proxyOption isEqualToString:@"Custom"])
+		{
+			if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CustomProxy"] hasPrefix:@"http"])
+				proxyArg = [[NSString alloc] initWithFormat:@"-p%@",[[NSUserDefaults standardUserDefaults] valueForKey:@"CustomProxy"]];
+			else
+				proxyArg = [[NSString alloc] initWithFormat:@"-phttp://%@",[[NSUserDefaults standardUserDefaults] valueForKey:@"CustomProxy"]];
+		}
+		else
+		{
+			//Get provided proxy from my server.
+			NSURL *proxyURL = [[NSURL alloc] initWithString:@"http://tom-tech.com/get_iplayer/proxy.txt"];
+			NSURLRequest *proxyRequest = [NSURLRequest requestWithURL:proxyURL
+														  cachePolicy:NSURLRequestReturnCacheDataElseLoad
+													  timeoutInterval:30];
+			NSData *urlData;
+			NSURLResponse *response;
+			NSError *error;
+			urlData = [NSURLConnection sendSynchronousRequest:proxyRequest
+											returningResponse:&response
+														error:&error];
+			if (!urlData)
+			{
+				NSAlert *alert = [NSAlert alertWithMessageText:@"Provided Proxy could not be retrieved!" 
+												 defaultButton:nil 
+											   alternateButton:nil 
+												   otherButton:nil 
+									 informativeTextWithFormat:@"No proxy will be used.\r\rError: %@", [error localizedDescription]];
+				[alert runModal];
+				[self addToLog:@"Proxy could not be retrieved. No proxy will be used."];
+				proxyArg=NULL;
+			}
+			else
+			{
+				NSString *providedProxy = [[NSString alloc] initWithData:urlData encoding:NSUTF8StringEncoding];
+				proxyArg = [[NSString alloc] initWithFormat:@"-phttp://%@", providedProxy];
+			}
+		}
+	}
+	getiPlayerUpdateArgs = [[NSArray alloc] initWithObjects:getiPlayerPath,cacheExpiryArg,typeArgument,@"--nopurge",profileDirArg,proxyArg,nil];
 	getiPlayerUpdateTask = [[NSTask alloc] init];
 	[getiPlayerUpdateTask setLaunchPath:@"/usr/bin/perl"];
 	[getiPlayerUpdateTask setArguments:getiPlayerUpdateArgs];

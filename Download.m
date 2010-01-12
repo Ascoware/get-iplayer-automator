@@ -130,7 +130,7 @@
 		}
 	}
 		//Partial Proxy?
-	if (/*[[[NSUserDefaults standardUserDefaults] valueForKey:@"PartialProxy"] isEqualTo:[NSNumber numberWithBool:YES]]*/YES)
+	if (![[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])
 	{
 		partialProxyArg = [[NSString alloc] initWithString:@"--partial-proxy"];
 	}
@@ -596,6 +596,12 @@
 			[show setValue:@"Downloading..." forKey:@"status"];
 			[self setPercentage:102];
 
+		}
+		else if ([output hasPrefix:@" Progress"])
+		{
+			[show setValue:@"Downloading Artwork..." forKey:@"status"];
+			[self setPercentage:102];
+			[self setCurrentProgress:[NSString stringWithFormat:@"Downloading Artwork... -- %@", [show showName]]];
 		}
 		else
 		{
