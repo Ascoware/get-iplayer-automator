@@ -21,51 +21,59 @@
 }
 - (void)readHistory:(id)sender
 {
+	NSLog(@"Read History");
 	if ([[historyArrayController arrangedObjects] count] > 0)
 		[historyArrayController removeObjectsAtArrangedObjectIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, [[historyArrayController arrangedObjects] count])]];
 	
 	NSString *historyFilePath = [NSString stringWithString:@"~/Library/Application Support/Get iPlayer Automator/download_history"];
 	NSFileHandle *historyFile = [NSFileHandle fileHandleForReadingAtPath:[historyFilePath stringByExpandingTildeInPath]];
 	NSData *historyFileData = [historyFile readDataToEndOfFile];
-	NSString *historyFileInfo = [[NSString alloc] initWithData:historyFileData encoding:NSUTF8StringEncoding];
+	NSString *historyFileInfo = [[NSString alloc] initWithData:historyFileData encoding:NSASCIIStringEncoding];
 	
-	NSString *string = [NSString stringWithString:historyFileInfo];
-	NSUInteger length = [string length];
-	NSUInteger paraStart = 0, paraEnd = 0, contentsEnd = 0;
-	NSMutableArray *array = [NSMutableArray array];
-	NSRange currentRange;
-	while (paraEnd < length) {
-		[string getParagraphStart:&paraStart end:&paraEnd
-					  contentsEnd:&contentsEnd forRange:NSMakeRange(paraEnd, 0)];
-		currentRange = NSMakeRange(paraStart, contentsEnd - paraStart);
-		[array addObject:[string substringWithRange:currentRange]];
-	}
-	for (NSString *entry in array)
+	if ([historyFileInfo length] > 0)
 	{
-		NSScanner *scanner = [NSScanner scannerWithString:entry];
-		NSString *pidtwo, *showNametwo, *episodeNametwo, *typetwo, *someNumbertwo, *downloadFormattwo, *downloadPathtwo;
-		[scanner scanUpToString:@"|" intoString:&pidtwo];
-		[scanner scanString:@"|" intoString:nil];
-		[scanner scanUpToString:@"|" intoString:&showNametwo];
-		[scanner scanString:@"|" intoString:nil];
-		[scanner scanUpToString:@"|" intoString:&episodeNametwo];
-		[scanner scanString:@"|" intoString:nil];
-		[scanner scanUpToString:@"|" intoString:&typetwo];
-		[scanner scanString:@"|" intoString:nil];
-		[scanner scanUpToString:@"|" intoString:&someNumbertwo];
-		[scanner scanString:@"|" intoString:nil];
-		[scanner scanUpToString:@"|" intoString:&downloadFormattwo];
-		[scanner scanString:@"|" intoString:nil];
-		[scanner scanUpToString:@"|" intoString:&downloadPathtwo];
-		DownloadHistoryEntry *historyEntry = [[DownloadHistoryEntry alloc] initWithPID:pidtwo 
-																			  showName:showNametwo 
-																		   episodeName:episodeNametwo 
-																				  type:typetwo 
-																			someNumber:someNumbertwo 
-																		downloadFormat:downloadFormattwo 
-																		  downloadPath:downloadPathtwo];
-		[historyArrayController addObject:historyEntry];
+		NSString *string = [NSString stringWithString:historyFileInfo];
+		NSUInteger length = [string length];
+		NSUInteger paraStart = 0, paraEnd = 0, contentsEnd = 0;
+		NSMutableArray *array = [NSMutableArray array];
+		NSRange currentRange;
+		while (paraEnd < length) {
+			[string getParagraphStart:&paraStart end:&paraEnd
+						  contentsEnd:&contentsEnd forRange:NSMakeRange(paraEnd, 0)];
+			currentRange = NSMakeRange(paraStart, contentsEnd - paraStart);
+			[array addObject:[string substringWithRange:currentRange]];
+		}
+		for (NSString *entry in array)
+		{
+			if ([entry length] >0)
+			{
+				NSScanner *scanner = [NSScanner scannerWithString:entry];
+				NSString *pidtwo, *showNametwo, *episodeNametwo, *typetwo, *someNumbertwo, *downloadFormattwo, *downloadPathtwo;
+				[scanner scanUpToString:@"|" intoString:&pidtwo];
+				[scanner scanString:@"|" intoString:nil];
+				[scanner scanUpToString:@"|" intoString:&showNametwo];
+				[scanner scanString:@"|" intoString:nil];
+				[scanner scanUpToString:@"|" intoString:&episodeNametwo];
+				[scanner scanString:@"|" intoString:nil];
+				[scanner scanUpToString:@"|" intoString:&typetwo];
+				[scanner scanString:@"|" intoString:nil];
+				[scanner scanUpToString:@"|" intoString:&someNumbertwo];
+				[scanner scanString:@"|" intoString:nil];
+				[scanner scanUpToString:@"|" intoString:&downloadFormattwo];
+				[scanner scanString:@"|" intoString:nil];
+				[scanner scanUpToString:@"|" intoString:&downloadPathtwo];
+				DownloadHistoryEntry *historyEntry = [[DownloadHistoryEntry alloc] initWithPID:pidtwo 
+																					  showName:showNametwo 
+																				   episodeName:episodeNametwo 
+																						  type:typetwo 
+																					someNumber:someNumbertwo 
+																				downloadFormat:downloadFormattwo 
+																				  downloadPath:downloadPathtwo];
+				[historyArrayController addObject:historyEntry];
+			}
+		}
 	}
+	NSLog(@"end read history");
 }
 
 - (IBAction)writeHistory:(id)sender
@@ -81,7 +89,7 @@
 		}
 		NSString *historyPath = [NSString stringWithString:@"~/Library/Application Support/Get iPlayer Automator/download_history"];
 		historyPath = [historyPath stringByExpandingTildeInPath];
-		NSData *historyData = [historyString dataUsingEncoding:NSUTF8StringEncoding];
+		NSData *historyData = [historyString dataUsingEncoding:NSASCIIStringEncoding];
 		NSFileManager *fileManager = [NSFileManager defaultManager];
 		if (![fileManager fileExistsAtPath:historyPath])
 			[fileManager createFileAtPath:historyPath contents:historyData attributes:nil];
