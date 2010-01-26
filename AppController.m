@@ -567,6 +567,15 @@
 		NSLog(@"Checking series link");
 		[self addSeriesLinkToQueue:self];
 	}
+	else
+	{
+		if (runScheduled) 
+		{
+			[self performSelectorOnMainThread:@selector(startDownloads:) withObject:self waitUntilDone:NO];
+			runScheduled=NO;
+		}
+	}
+
 	
 	//Update the search results
 	if ([[searchField stringValue] length] > 0)
