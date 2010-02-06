@@ -1618,11 +1618,11 @@
 {
 	NSArray *seriesLink = [pvrQueueController arrangedObjects];
 	if (!runDownloads)
-		[currentProgress performSelectorOnMainThread:@selector(setStringValue:) withObject:@"Updating Series Link..." waitUntilDone:NO];
+		[currentProgress performSelectorOnMainThread:@selector(setStringValue:) withObject:@"Updating Series Link..." waitUntilDone:YES];
 	for (Series *series in seriesLink)
 	{
 		if (!runDownloads)
-			[currentProgress performSelectorOnMainThread:@selector(setStringValue:) withObject:[NSString stringWithFormat:@"Updating Series Link - %d/%d - %@",[seriesLink indexOfObject:series],[seriesLink count],[series showName]] waitUntilDone:NO];
+			[currentProgress performSelectorOnMainThread:@selector(setStringValue:) withObject:[NSString stringWithFormat:@"Updating Series Link - %d/%d - %@",[seriesLink indexOfObject:series],[seriesLink count],[series showName]] waitUntilDone:YES];
 		NSString *cacheExpiryArgument = [self cacheExpiryArgument:nil];
 		NSString *typeArgument = [self typeArgument:nil];
 		
@@ -1661,7 +1661,7 @@
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:@"NSThreadWillExitNotification" object:nil];
 	
 	//If this is an update initiated by the scheduler, run the downloads.
-	if (runScheduled) 
+	if (runScheduled && !scheduleTimer) 
 	{
 		[self performSelectorOnMainThread:@selector(startDownloads:) withObject:self waitUntilDone:NO];
 		runScheduled=NO;
@@ -1672,7 +1672,7 @@
 	 
 - (void)scheduleTimerForFinished:(id)sender
 {
-	[NSTimer scheduledTimerWithTimeInterval:2.0 target:self selector:@selector(seriesLinkFinished2:) userInfo:currentProgress repeats:NO];
+	[NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(seriesLinkFinished2:) userInfo:currentProgress repeats:NO];
 }
 - (void)seriesLinkFinished2:(NSNotification *)note
 {
@@ -2082,6 +2082,7 @@
 	[stopButton setEnabled:NO];
 	[stopButton setLabel:@"Stop"];
 	[stopButton setAction:@selector(stopDownloads:)];
+	scheduleTimer=nil;
 	[self forceUpdate:self];
 }
 - (void)updateScheduleStatus:(NSTimer *)theTimer
@@ -2095,7 +2096,8 @@
 	NSString *status = [NSString stringWithFormat:@"Time until Start (DD:HH:MM:SS): %2d:%2d:%2d:%2d", 
 						[conversionInfo day], [conversionInfo hour], 
 						[conversionInfo minute], [conversionInfo second]];
-	[currentProgress setStringValue:status];
+	if (!runUpdate)
+		[currentProgress setStringValue:status];
 	[currentIndicator setIndeterminate:YES];
 	[currentIndicator startAnimation:self];
 }
