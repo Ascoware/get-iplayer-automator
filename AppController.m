@@ -575,13 +575,6 @@
 			runScheduled=NO;
 		}
 	}
-
-	
-	//Update the search results
-	if ([[searchField stringValue] length] > 0)
-	{
-		[self mainSearch:self];
-	}
 	
 	//Check for Updates - Don't want to prompt the user when updates are running.
 	SUUpdater *updater = [SUUpdater sharedUpdater];
