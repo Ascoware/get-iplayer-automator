@@ -13,6 +13,7 @@
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
 			<integer value="1071"/>
+			<integer value="466"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -39,10 +40,6 @@
 				<string key="NSClassName">NSApplication</string>
 			</object>
 			<object class="NSUserDefaultsController" id="687834588">
-				<object class="NSMutableArray" key="NSDeclaredKeys">
-					<bool key="EncodedWithXMLCoder">YES</bool>
-					<string>AlwaysUseProxy</string>
-				</object>
 				<bool key="NSSharedInstance">YES</bool>
 			</object>
 			<object class="NSCustomObject" id="755631768">
@@ -1206,7 +1203,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA</b
 				<string key="NSWindowContentMaxSize">{1.79769e+308, 1.79769e+308}</string>
 				<string key="NSWindowContentMinSize">{502, 538}</string>
 				<object class="NSView" key="NSWindowView" id="439893737">
-					<nil key="NSNextResponder"/>
+					<reference key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
 					<object class="NSMutableArray" key="NSSubviews">
 						<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1827,6 +1824,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA</b
 						</object>
 					</object>
 					<string key="NSFrameSize">{807, 556}</string>
+					<reference key="NSSuperview"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1280, 778}}</string>
 				<string key="NSMinSize">{502, 615}</string>
@@ -6467,6 +6465,22 @@ IHdpbGwgc2hvdyB1cCBoZXJlLg</string>
 					</object>
 					<int key="connectionID">1298</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">dataSource</string>
+						<reference key="source" ref="411012033"/>
+						<reference key="destination" ref="1023620516"/>
+					</object>
+					<int key="connectionID">1299</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">queueTableView</string>
+						<reference key="source" ref="1023620516"/>
+						<reference key="destination" ref="411012033"/>
+					</object>
+					<int key="connectionID">1300</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -6854,7 +6868,6 @@ IHdpbGwgc2hvdyB1cCBoZXJlLg</string>
 							<reference ref="6734462"/>
 							<reference ref="389843271"/>
 							<reference ref="990043186"/>
-							<reference ref="974999293"/>
 							<reference ref="1069450876"/>
 							<reference ref="721489289"/>
 							<reference ref="132798493"/>
@@ -6866,6 +6879,7 @@ IHdpbGwgc2hvdyB1cCBoZXJlLg</string>
 							<reference ref="600980876"/>
 							<reference ref="307574110"/>
 							<reference ref="613897096"/>
+							<reference ref="974999293"/>
 						</object>
 						<reference key="parent" ref="972006081"/>
 					</object>
@@ -9690,9 +9704,9 @@ IHdpbGwgc2hvdyB1cCBoZXJlLg</string>
 					<string>{{475, 832}, {234, 43}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{20, 50}, {807, 556}}</string>
+					<string>{{-1246, 157}, {807, 556}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{20, 50}, {807, 556}}</string>
+					<string>{{-1246, 157}, {807, 556}}</string>
 					<integer value="1"/>
 					<string>{{33, 99}, {480, 360}}</string>
 					<integer value="1"/>
@@ -9960,7 +9974,7 @@ IHdpbGwgc2hvdyB1cCBoZXJlLg</string>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">1298</int>
+			<int key="maxID">1300</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -10053,6 +10067,7 @@ IHdpbGwgc2hvdyB1cCBoZXJlLg</string>
 							<string>pvrSearchField</string>
 							<string>pvrSearchIndicator</string>
 							<string>queueController</string>
+							<string>queueTableView</string>
 							<string>radioFormatController</string>
 							<string>resultsController</string>
 							<string>scheduleWindow</string>
@@ -10086,6 +10101,7 @@ IHdpbGwgc2hvdyB1cCBoZXJlLg</string>
 							<string>NSTextField</string>
 							<string>NSProgressIndicator</string>
 							<string>NSArrayController</string>
+							<string>NSTableView</string>
 							<string>NSArrayController</string>
 							<string>NSArrayController</string>
 							<string>NSPanel</string>

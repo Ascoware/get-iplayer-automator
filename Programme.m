@@ -111,6 +111,19 @@ extern BOOL runDownloads;
 	subtitlePath=nil;
 	return self;
 }
+/*
+- (id)pasteboardPropertyListForType:(NSString *)type
+{
+	if ([type isEqualToString:@"com.thomaswillson.programme"])
+	{
+		return [NSKeyedArchiver archivedDataWithRootObject:self];
+	}
+}
+- (NSArray *)writableTypesForPasteboard:(NSPasteboard *)pasteboard
+{
+	return [NSArray arrayWithObject:@"com.thomaswillson.programme"];
+}
+ */
 @synthesize showName;
 @synthesize pid;
 @synthesize tvNetwork;

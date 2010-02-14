@@ -61,6 +61,7 @@ bool runUpdate=NO;
 	IBOutlet NSArrayController *queueController;
 	IBOutlet NSButton *getNamesButton;
 	NSMutableArray *queueArray;
+	IBOutlet NSTableView *queueTableView;
 	
 	//Main Window: Status
 	IBOutlet NSProgressIndicator *overallIndicator;
