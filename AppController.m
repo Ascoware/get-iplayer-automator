@@ -62,6 +62,7 @@
 	[defaultValues setObject:[NSNumber numberWithBool:YES] forKey:@"SeriesLinkStartup"];
 	[defaultValues setObject:[NSNumber numberWithBool:NO] forKey:@"DownloadSubtitles"];
 	[defaultValues setObject:[NSNumber numberWithBool:NO] forKey:@"AlwaysUseProxy"];
+	[defaultValues setObject:[NSNumber numberWithBool:NO] forKey:@"XBMC_naming"];
 	
 	[[NSUserDefaults standardUserDefaults] registerDefaults:defaultValues];
 	defaultValues = nil;
@@ -2014,6 +2015,8 @@
 	[sharedDefaults removeObjectForKey:@"Verbose"];
 	[sharedDefaults removeObjectForKey:@"SeriesLinkStartup"];
 	[sharedDefaults removeObjectForKey:@"DownloadSubtitles"];
+	[sharedDefaults removeObjectForKey:@"AlwaysUseProxy"];
+	[sharedDefaults removeObjectForKey:@"XBMC_naming"];
 }
 	
 #pragma mark Argument Retrieval

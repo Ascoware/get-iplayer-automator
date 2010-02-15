@@ -171,13 +171,25 @@
 	
 		//Add Arguments that can't be NULL
 	NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:getiPlayerPath,profileDirArg,noWarningArg,noExpiryArg,mplayerArg,flvstreamerArg,lameArg,atomicParsleyArg,cacheExpiryArg,downloadPathArg,
-					 subDirArg,formatArg,getArg,searchArg,@"--attempts=5",@"--file-prefix=<name> - <episode> ((<mode>))",@"--nopurge",@"--fatfilename",@"-w",versionArg,proxyArg,partialProxyArg,nil];
+					 subDirArg,formatArg,getArg,searchArg,@"--attempts=5",@"--nopurge",@"--fatfilename",@"-w",versionArg,proxyArg,partialProxyArg,nil];
 		//Verbose?
 	if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"Verbose"] isEqualTo:[NSNumber numberWithBool:YES]])
 		[args addObject:[[NSString alloc] initWithString:@"--verbose"]];
 	if (ffmpegArg) [args addObject:ffmpegArg];
 	if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"DownloadSubtitles"] isEqualTo:[NSNumber numberWithBool:YES]])
 		[args addObject:@"--subtitles"];
+	
+		//Naming Convention
+	if (![[[NSUserDefaults standardUserDefaults] valueForKey:@"XBMC_naming"] boolValue])
+	{
+		[args addObject:@"--file-prefix=<name> - <episode> ((mode))"];
+	}
+	else 
+	{
+		[args addObject:@"--file-prefix=<nameshort>.<senum>"];
+		[args addObject:@"--subdir-format=<nameshort>"];
+	}
+
 	task = [[NSTask alloc] init];
 	pipe = [[NSPipe alloc] init];
 	errorPipe = [[NSPipe alloc] init];
