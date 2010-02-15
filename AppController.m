@@ -1367,8 +1367,8 @@
 		if ([[finishedShow successful] boolValue])
 		{
 			[finishedShow setValue:@"Processing..." forKey:@"status"];
-			[self cleanUpPath:finishedShow];
-			[self seasonEpisodeInfo:finishedShow];
+			//[self cleanUpPath:finishedShow];
+			//[self seasonEpisodeInfo:finishedShow];
 			if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"AddCompletedToiTunes"] isEqualTo:[NSNumber numberWithBool:YES]])
 				[self addToiTunes:finishedShow];
 			else
@@ -1810,18 +1810,18 @@
 			iTunesTrack *track = [iTunes add:fileToAdd to:nil];
 			if (track && ([ext isEqualToString:@"mov"] || [ext isEqualToString:@"mp4"]))
 			{
-				[track setVideoKind:iTunesEVdKTVShow];
-				[track setName:[show episodeName]];
+				//[track setVideoKind:iTunesEVdKTVShow];
+				//[track setName:[show episodeName]];
 				[track setUnplayed:YES];
-				[track setEpisodeID:[show episodeName]];
-				[track setShow:[show seriesName]];
-				[track setArtist:[show tvNetwork]];
-				if ([show season]>0) [track setSeasonNumber:[show season]];
-				if ([show episode]>0) [track setEpisodeNumber:[show episode]];
+				//[track setEpisodeID:[show episodeName]];
+				//[track setShow:[show seriesName]];
+				//[track setArtist:[show tvNetwork]];
+				//if ([show season]>0) [track setSeasonNumber:[show season]];
+				//if ([show episode]>0) [track setEpisodeNumber:[show episode]];
 			}
 			else if (track && ([ext isEqualToString:@"mp3"] || [ext isEqualToString:@"aac"]))
 			{
-				[self addToLog:@"Setting Podcast Metadata:" :self];
+				/*[self addToLog:@"Setting Podcast Metadata:" :self];
 				[track setBookmarkable:YES];
 				[self addToLog:@"	Bookmarkable set" :self];
 				[track setName:[show showName]];
@@ -1832,7 +1832,7 @@
 				[self addToLog:@"	Unplayed set" :self];
 				[track setArtist:[show tvNetwork]];
 				[self addToLog:@"	Artist set" :self];
-				[self addToLog:@"All Metadata set." :self];
+				[self addToLog:@"All Metadata set." :self];*/
 			}
 			[show setValue:@"Complete & in iTunes" forKey:@"status"];
 		}
