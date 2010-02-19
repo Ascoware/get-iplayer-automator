@@ -1705,8 +1705,9 @@
 	}
 	NSLog(@"Definitely shouldn't show an updating series-link thing!");
 }
-- (void)processAutoRecordData:(NSString *)autoRecordData2 forSeries:(Series *)series2
+- (BOOL)processAutoRecordData:(NSString *)autoRecordData2 forSeries:(Series *)series2
 {
+	BOOL oneFound=NO;
 	NSString *string = [NSString stringWithString:autoRecordData2];
 	NSUInteger length = [string length];
 	NSUInteger paraStart = 0, paraEnd = 0, contentsEnd = 0;
@@ -1756,6 +1757,7 @@
 				
 				if (([[series2 added] integerValue] < timeadded) && ([temp_tvNetwork isEqualToString:[series2 tvNetwork]]))
 				{
+					oneFound=YES;
 					Programme *p = [[Programme alloc] initWithInfo:nil pid:temp_pid programmeName:temp_showName network:temp_tvNetwork];
 					[p setRealPID:temp_realPID];
 					[p setSeriesName:series_Name];
@@ -1786,10 +1788,16 @@
 		{
 			if ([string hasPrefix:@"Unknown option:"] || [string hasPrefix:@"Option"] || [string hasPrefix:@"Usage"])
 			{
-				return;
+				return NO;
 			}
 		}
 	}
+	if (oneFound)
+	{
+		[series2 setLastFound:[NSDate date]];
+		return YES;
+	}
+	else return NO;
 }
 
 #pragma mark Misc.

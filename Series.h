@@ -13,9 +13,11 @@
 	NSString *showName;
 	NSString *tvNetwork;
 	NSNumber *added;
+	NSDate *lastFound;
 }
 - (id)initWithShowname:(NSString *)SHOWNAME;
 @property (readwrite, assign) NSString *showName;
 @property (readwrite, assign) NSNumber *added;
 @property (readwrite, assign) NSString *tvNetwork;
+@property (readwrite, assign) NSDate *lastFound;
 @end
