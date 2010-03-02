@@ -104,7 +104,7 @@
 		//Get provided proxy from my server.
 		NSURL *proxyURL = [[NSURL alloc] initWithString:@"http://tom-tech.com/get_iplayer/proxy.txt"];
 		NSURLRequest *proxyRequest = [NSURLRequest requestWithURL:proxyURL
-													  cachePolicy:NSURLRequestReturnCacheDataElseLoad
+													  cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
 												  timeoutInterval:30];
 		NSData *urlData;
 		NSURLResponse *response;
