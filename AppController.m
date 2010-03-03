@@ -834,10 +834,11 @@
 	NSTask *getNameTask = [[NSTask alloc] init];
 	NSPipe *getNamePipe = [[NSPipe alloc] init];
 	NSMutableString *getNameData = [[NSMutableString alloc] initWithString:@""];
-	
-	NSString *listArgument = [[NSString alloc] initWithFormat:@"--listformat=<index> <pid> <type> <name> - <episode>", [pro valueForKey:@"pid"]];
+	NSString *listArgument = @"--listformat=<index> <pid> <type> <name> - <episode>";
+	NSString *fieldsArgument = @"--fields=index,pid";
+	NSString *wantedID = [pro valueForKey:@"pid"];
 	NSString *cacheExpiryArg = [self cacheExpiryArgument:nil];
-	NSArray *args = [[NSArray alloc] initWithObjects:getiPlayerPath,noWarningArg,@"--nopurge",cacheExpiryArg,[self typeArgument:nil],listArgument,profileDirArg,nil];
+	NSArray *args = [[NSArray alloc] initWithObjects:getiPlayerPath,noWarningArg,@"--nopurge",cacheExpiryArg,[self typeArgument:nil],listArgument,profileDirArg,fieldsArgument,wantedID,nil];
 	[getNameTask setArguments:args];
 	[getNameTask setLaunchPath:@"/usr/bin/perl"];
 	
