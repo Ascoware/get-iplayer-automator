@@ -320,7 +320,7 @@
 	@catch (NSException *e) {
 		NSLog(@"NO UI");
 	}
-	NSString *proxyArg;
+	NSString *proxyArg=nil;
 	if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])
 	{
 		NSString *proxyOption = [[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"];
