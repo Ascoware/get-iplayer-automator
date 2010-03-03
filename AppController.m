@@ -945,8 +945,8 @@
 				if ([[NSNumber numberWithUnsignedInteger:[documents count]] intValue])
 				{
 					for (SafariDocument *document in documents)
-					{
-						if ([[document URL] hasPrefix:@"http://www.bbc.co.uk/iplayer/episode/"] || [[document URL] hasPrefix:@"http://www.itv.com/ITVPlayer/Video/default.html?ViewType"])
+ 					{
+						if ([[document URL] hasPrefix:@"http://www.bbc.co.uk/iplayer/episode/"] || [[document URL] hasPrefix:@"http://bbc.co.uk/iplayer/console/"] || [[document URL] hasPrefix:@"http://www.itv.com/ITVPlayer/Video/default.html?ViewType"])
 						{
 							url = [NSString stringWithString:[document URL]];
 							foundURL=YES;
@@ -1049,7 +1049,7 @@
 			{
 				for (CaminoTab *tab in tabsArray)
 				{
-					if ([[tab URL] hasPrefix:@"http://bbc.co.uk/iplayer/episode"] || [[tab URL] hasPrefix:@"http://www.itv.com/ITVPlayer/Video/default.html?ViewType"])
+					if ([[tab URL] hasPrefix:@"http://bbc.co.uk/iplayer/episode/"] || [[tab URL] hasPrefix:@"http://bbc.co.uk/iplayer/console/"] || [[tab URL] hasPrefix:@"http://www.itv.com/ITVPlayer/Video/default.html?ViewType"])
 					{
 						url = [[NSString alloc] initWithString:[tab URL]];
 						foundURL=YES;
@@ -1103,8 +1103,14 @@
 	{
 		NSString *pid;
 		NSScanner *urlScanner = [[NSScanner alloc] initWithString:url];
-		[urlScanner scanUpToString:@"pisode" intoString:nil];
-		[urlScanner scanUpToString:@"b" intoString:nil];
+		[urlScanner scanUpToString:@"/episode/" intoString:nil];
+		if ([urlScanner isAtEnd]) {
+			[urlScanner setScanLocation:0];
+			[urlScanner scanUpToString:@"/console/" intoString:nil];
+		}
+		[urlScanner scanString:@"/" intoString:nil];
+		[urlScanner scanUpToString:@"/" intoString:nil];
+		[urlScanner scanString:@"/" intoString:nil];
 		[urlScanner scanUpToString:@"/" intoString:&pid];
 		Programme *newProg = [[Programme alloc] init];
 		[newProg setValue:pid forKey:@"pid"];
