@@ -1837,17 +1837,17 @@
 			}
 			else if (track && ([ext isEqualToString:@"mp3"] || [ext isEqualToString:@"aac"]))
 			{
-				/*[self addToLog:@"Setting Podcast Metadata:" :self];
+				//[self addToLog:@"Setting Podcast Metadata:" :self];
 				[track setBookmarkable:YES];
 				[self addToLog:@"	Bookmarkable set" :self];
-				[track setName:[show showName]];
-				[self addToLog:@"	Name set" :self];
-				[track setAlbum:[show seriesName]];
-				[self addToLog:@"	Album set" :self];
+				//[track setName:[show showName]];
+				//[self addToLog:@"	Name set" :self];
+				//[track setAlbum:[show seriesName]];
+				//[self addToLog:@"	Album set" :self];
 				[track setUnplayed:YES];
 				[self addToLog:@"	Unplayed set" :self];
-				[track setArtist:[show tvNetwork]];
-				[self addToLog:@"	Artist set" :self];
+				//[track setArtist:[show tvNetwork]];
+				//[self addToLog:@"	Artist set" :self];
 				[self addToLog:@"All Metadata set." :self];*/
 			}
 			[show setValue:@"Complete & in iTunes" forKey:@"status"];
