@@ -42,6 +42,10 @@
 	lastFound = [coder decodeObjectForKey:@"lastFound"];
 	return self;
 }
+- (id)description
+{
+	return [NSString stringWithFormat:@"%@ (%@)", showName,tvNetwork];
+}
 @synthesize showName;
 @synthesize added;
 @synthesize tvNetwork;

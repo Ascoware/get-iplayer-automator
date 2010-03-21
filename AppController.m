@@ -63,6 +63,8 @@
 	[defaultValues setObject:[NSNumber numberWithBool:NO] forKey:@"DownloadSubtitles"];
 	[defaultValues setObject:[NSNumber numberWithBool:NO] forKey:@"AlwaysUseProxy"];
 	[defaultValues setObject:[NSNumber numberWithBool:NO] forKey:@"XBMC_naming"];
+	[defaultValues setObject:@"30" forKey:@"KeepSeriesFor"];
+	[defaultValues setObject:[NSNumber numberWithBool:NO] forKey:@"RemoveOldSeries"];
 	
 	[[NSUserDefaults standardUserDefaults] registerDefaults:defaultValues];
 	defaultValues = nil;
@@ -1645,6 +1647,7 @@
 	NSArray *seriesLink = [pvrQueueController arrangedObjects];
 	if (!runDownloads)
 		[currentProgress performSelectorOnMainThread:@selector(setStringValue:) withObject:@"Updating Series Link..." waitUntilDone:YES];
+	NSMutableArray *seriesToBeRemoved = [[NSMutableArray alloc] init];
 	for (Series *series in seriesLink)
 	{
 		if (!runDownloads)
@@ -1671,8 +1674,10 @@
 			NSString *tempData = [[NSString alloc] initWithData:inData encoding:NSUTF8StringEncoding];
 			[autoRecordData appendString:tempData];
 		}
-		[self processAutoRecordData:[autoRecordData copy] forSeries:series];
+		if (![self processAutoRecordData:[autoRecordData copy] forSeries:series])
+			[seriesToBeRemoved addObject:series];
 	}
+	[pvrQueueController removeObjects:seriesToBeRemoved];
 }
 - (void)seriesLinkFinished:(NSNotification *)note
 {
@@ -1804,7 +1809,14 @@
 		[series2 setLastFound:[NSDate date]];
 		return YES;
 	}
-	else return NO;
+	else
+	{
+		if (!([[NSDate date] timeIntervalSinceDate:[series2 lastFound]] < ([[[NSUserDefaults standardUserDefaults] valueForKey:@"KeepSeriesFor"] intValue]*86400)) && [[[NSUserDefaults standardUserDefaults] valueForKey:@"RemoveOldSeries"] boolValue])
+		{
+			return NO;
+		}
+		return YES;
+	}
 }
 
 #pragma mark Misc.
