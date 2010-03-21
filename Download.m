@@ -39,7 +39,7 @@
 #ifdef __i386__
 	NSString *flvstreamerPath;
 	if (floor(NSAppKitVersionNumber) > 949)
-		flvstreamerPath = [bundlePath stringByAppendingString:@"/Contents/Resources/flvstreamer-1.9"];
+		flvstreamerPath = [bundlePath stringByAppendingString:@"/Contents/Resources/flvstreamer-2.1c1"];
 	else
 		flvstreamerPath = [bundlePath stringByAppendingString:@"/Contents/Resources/flvstreamer_macosx"];
 #else
