@@ -182,7 +182,7 @@
 		//Naming Convention
 	if (![[[NSUserDefaults standardUserDefaults] valueForKey:@"XBMC_naming"] boolValue])
 	{
-		[args addObject:@"--file-prefix=<name> - <episode> ((mode))"];
+		[args addObject:@"--file-prefix=<name> - <episode> ((<modeshort>))"];
 	}
 	else 
 	{
