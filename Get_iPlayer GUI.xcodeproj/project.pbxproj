@@ -61,10 +61,10 @@
 		D9CCF54C1025AAF9009205BE /* Growl Registration Ticket.growlRegDict in Resources */ = {isa = PBXBuildFile; fileRef = D9CCF54B1025AAF9009205BE /* Growl Registration Ticket.growlRegDict */; };
 		D9D8239010B3B6D600556D1D /* Growl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9D8238F10B3B6D600556D1D /* Growl.framework */; };
 		D9D8239A10B3B6EA00556D1D /* Growl.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = D9D8238F10B3B6D600556D1D /* Growl.framework */; };
-		D9D9F44610B6347500972772 /* flvstreamer-1.9 in Resources */ = {isa = PBXBuildFile; fileRef = D9D9F44510B6347500972772 /* flvstreamer-1.9 */; };
 		D9F668DB102C560500A9449B /* GetFireFoxURL.applescript in Resources */ = {isa = PBXBuildFile; fileRef = D9F668BF102C53D700A9449B /* GetFireFoxURL.applescript */; };
 		D9F66955102C5D1200A9449B /* GetCaminoURL.applescript in Resources */ = {isa = PBXBuildFile; fileRef = D9F66954102C5D0D00A9449B /* GetCaminoURL.applescript */; };
 		D9F66963102C5DC500A9449B /* GetOperaURL.applescript in Resources */ = {isa = PBXBuildFile; fileRef = D9F66962102C5DB800A9449B /* GetOperaURL.applescript */; };
+		D9FAFBEA1156AD2A005ACE1C /* rtmpdump in Resources */ = {isa = PBXBuildFile; fileRef = D9FAFBE91156AD2A005ACE1C /* rtmpdump */; };
 		D9FEB87610077790003BADF8 /* AppController.m in Sources */ = {isa = PBXBuildFile; fileRef = D9FEB87510077790003BADF8 /* AppController.m */; };
 /* End PBXBuildFile section */
 
@@ -151,10 +151,10 @@
 		D9CCF52E10259DED009205BE /* Features.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = Features.rtf; sourceTree = "<group>"; };
 		D9CCF54B1025AAF9009205BE /* Growl Registration Ticket.growlRegDict */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "Growl Registration Ticket.growlRegDict"; sourceTree = "<group>"; };
 		D9D8238F10B3B6D600556D1D /* Growl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Growl.framework; sourceTree = "<group>"; };
-		D9D9F44510B6347500972772 /* flvstreamer-1.9 */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = "flvstreamer-1.9"; sourceTree = "<group>"; };
 		D9F668BF102C53D700A9449B /* GetFireFoxURL.applescript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.applescript; path = GetFireFoxURL.applescript; sourceTree = "<group>"; };
 		D9F66954102C5D0D00A9449B /* GetCaminoURL.applescript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.applescript; path = GetCaminoURL.applescript; sourceTree = "<group>"; };
 		D9F66962102C5DB800A9449B /* GetOperaURL.applescript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.applescript; path = GetOperaURL.applescript; sourceTree = "<group>"; };
+		D9FAFBE91156AD2A005ACE1C /* rtmpdump */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = rtmpdump; sourceTree = "<group>"; };
 		D9FEB87410077790003BADF8 /* AppController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppController.h; sourceTree = "<group>"; };
 		D9FEB87510077790003BADF8 /* AppController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -276,11 +276,11 @@
 		D904F04D1009F28400D60BBF /* Binaries */ = {
 			isa = PBXGroup;
 			children = (
+				D9FAFBE91156AD2A005ACE1C /* rtmpdump */,
 				D904F0721009F6B800D60BBF /* mplayer */,
 				D9013BAA10BB7715004B01BE /* ffmpeg_universal */,
 				D97D96A510743860006ECD39 /* lame */,
 				D904F06E1009F35100D60BBF /* flvstreamer_macosx */,
-				D9D9F44510B6347500972772 /* flvstreamer-1.9 */,
 				D961247E10F12C9200046D31 /* AtomicParsley */,
 				D904F0491009F22E00D60BBF /* get_iplayer.pl */,
 			);
@@ -416,9 +416,9 @@
 				D9A450A4102FFDC00011E175 /* LICENSE.txt in Resources */,
 				D948C40C103436DE000CF853 /* icon.icns in Resources */,
 				D97D96A610743860006ECD39 /* lame in Resources */,
-				D9D9F44610B6347500972772 /* flvstreamer-1.9 in Resources */,
 				D9013BAB10BB7715004B01BE /* ffmpeg_universal in Resources */,
 				D961247F10F12C9200046D31 /* AtomicParsley in Resources */,
+				D9FAFBEA1156AD2A005ACE1C /* rtmpdump in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
