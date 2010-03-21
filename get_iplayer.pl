@@ -2,7 +2,7 @@
 #
 # get_iplayer - Lists, Records and Streams BBC iPlayer TV and Radio programmes + other Programmes via 3rd-party plugins
 #
-#    Copyright (C) 2008-2010 Phil Lewis
+#    Thanks to Phil Lewis for his original work towards this script.
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -17,14 +17,12 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-# Author: Phil Lewis
-# Email: iplayer2 (at sign) linuxcentre.net
-# Web: http://linuxcentre.net/iplayer
+# Web: http://get-iplayer.googlecode.com
 # License: GPLv3 (see LICENSE.txt)
 #
 #
 package main;
-my $version = 2.76;
+my $version = 2.77; #r4
 #
 # Help:
 #	./get_iplayer --help | --longhelp
@@ -663,7 +661,7 @@ sub init_search {
 
 	$bin->{tee}		= 'tee';
 
-	$bin->{flvstreamer}	= $opt->{flvstreamer} || 'flvstreamer';
+	$bin->{flvstreamer}	= $opt->{flvstreamer} || $opt->{rtmpdump} || 'flvstreamer';
 	delete $binopts->{flvstreamer};
 	push @{ $binopts->{flvstreamer} }, ( '--timeout', 10 );
 	push @{ $binopts->{flvstreamer}	}, '--quiet' if $opt->{quiet};
@@ -3073,7 +3071,7 @@ sub usage {
 		'If given no arguments, \fBget_iplayer\fR updates and displays the list of currently available programmes.',
 		'Each available programme has a numerical identifier, \fBpid\fR.',
 		'\fBget_iplayer\fR records BBC iPlayer programmes by pretending to be an iPhone, which means that some programmes in the list are unavailable for recording.',
-		'It can also utilise the \fBflvstreamer\fR tool to record programmes from RTMP flash streams at various qualities.',
+		'It can also utilise the \fBrtmpdump\fR or \fBflvstreamer\fR tools to record programmes from RTMP flash streams at various qualities.',
 		'.PP',
 		'In PVR mode, \fBget_iplayer\fR can be called from cron to record programmes to a schedule.',
 		'.SH "OPTIONS"' if $manpage;
@@ -6279,7 +6277,7 @@ sub opt_format {
 		tvmode		=> [ 1, "tvmode|vmode=s", 'Recording', '--tvmode <mode>,<mode>,...', "TV Recoding modes: iphone,rtmp,flashhd,flashvhigh,flashhigh,flashstd,flashnormal,flashlow,n95_wifi (default: iphone,flashhigh,flashstd,flashnormal)"],
 		outputtv	=> [ 1, "outputtv=s", 'Output', '--outputtv <dir>', "Output directory for tv recordings"],
 		vlc		=> [ 1, "vlc=s", 'External Program', '--vlc <path>', "Location of vlc or cvlc binary"],
-		rtmptvopts	=> [ 1, "rtmp-tv-opts|rtmptvopts=s", 'Recording', '--rtmp-tv-opts <options>', "Add custom options to flvstreamer for tv"],
+		rtmptvopts	=> [ 1, "rtmp-tv-opts|rtmptvopts=s", 'Recording', '--rtmp-tv-opts <options>', "Add custom options to flvstreamer/rtmpdump for tv"],
 	};
 }
 
@@ -6305,7 +6303,7 @@ sub modelist {
 	# Defaults
 	if ( ! $mlist ) {
 		if ( ! main::exists_in_path('flvstreamer') ) {
-			main::logger "WARNING: Not using flash modes since flvstreamer is not found\n" if $opt->{verbose};
+			main::logger "WARNING: Not using flash modes since flvstreamer/rtmpdump is not found\n" if $opt->{verbose};
 			$mlist = 'iphone';
 		} else {
 			$mlist = 'iphone,flashhigh,flashstd,flashnormal';
@@ -6789,9 +6787,9 @@ sub download {
 		main::logger "\nWARNING: Required vlc does not exist\n";
 		return 'next';
 	}
-	# if flvstreamer does not exist
+	# if flvstreamer/rtmpdump does not exist
 	if ( $mode =~ /^flash/ && ! main::exists_in_path('flvstreamer')) {
-		main::logger "WARNING: Required program flvstreamer does not exist (see http://linuxcentre.net/getiplayer/installation and http://linuxcentre.net/getiplayer/download)\n";
+		main::logger "WARNING: Required program flvstreamer/rtmpdump does not exist.\n";
 		return 'next';
 	}
 	# Force raw mode if ffmpeg is not installed
@@ -7142,7 +7140,7 @@ sub opt_format {
 		lame		=> [ 0, "lame=s", 'External Program', '--lame <path>', "Location of lame binary"],
 		outputradio	=> [ 1, "outputradio=s", 'Output', '--outputradio <dir>', "Output directory for radio recordings"],
 		wav		=> [ 1, "wav!", 'Recording', '--wav', "In radio realaudio mode output as wav and don't transcode to mp3"],
-		rtmpradioopts	=> [ 1, "rtmp-radio-opts|rtmpradioopts=s", 'Recording', '--rtmp-radio-opts <options>', "Add custom options to flvstreamer for radio"],
+		rtmpradioopts	=> [ 1, "rtmp-radio-opts|rtmpradioopts=s", 'Recording', '--rtmp-radio-opts <options>', "Add custom options to flvstreamer/rtmpdump for radio"],
 	};
 }
 
@@ -7186,7 +7184,7 @@ sub modelist {
 	# Defaults
 	if ( ! $mlist ) {
 		if ( ! main::exists_in_path('flvstreamer') ) {
-			main::logger "WARNING: Not using flash modes since flvstreamer is not found\n" if $opt->{verbose};
+			main::logger "WARNING: Not using flash modes since flvstreamer/rtmpdump is not found\n" if $opt->{verbose};
 			$mlist = 'iphone,realaudio,wma';
 		} else {
 			$mlist = 'iphone,flashaachigh,flashaacstd,flashaudio,realaudio,flashaaclow,wma';
@@ -7549,7 +7547,7 @@ sub opt_format {
 	return {
 		liveradiomode	=> [ 1, "liveradiomode=s", 'Recording', '--liveradiomode <mode>,<mode>,..', "Live Radio Recording modes: flashaac,realaudio,wma"],
 		outputliveradio	=> [ 1, "outputliveradio=s", 'Output', '--outputliveradio <dir>', "Output directory for live radio recordings"],
-		rtmpliveradioopts => [ 1, "rtmp-liveradio-opts|rtmpliveradioopts=s", 'Recording', '--rtmp-liveradio-opts <options>', "Add custom options to flvstreamer for liveradio"],
+		rtmpliveradioopts => [ 1, "rtmp-liveradio-opts|rtmpliveradioopts=s", 'Recording', '--rtmp-liveradio-opts <options>', "Add custom options to flvstreamer/rtmpdump for liveradio"],
 	};
 }
 
@@ -7578,7 +7576,7 @@ sub modelist {
 	# Defaults
 	if ( ! $mlist ) {
 		if ( ! main::exists_in_path('flvstreamer') ) {
-			main::logger "WARNING: Not using flash modes since flvstreamer is not found\n" if $opt->{verbose};
+			main::logger "WARNING: Not using flash modes since flvstreamer/rtmpdump is not found\n" if $opt->{verbose};
 			$mlist = 'realaudio,wma';
 		} else {
 			$mlist = 'flashaachigh,flashaacstd,realaudio,flashaaclow,wma';
@@ -8110,7 +8108,7 @@ sub opt_format {
 	return {
 		ffmpeg		=> [ 0, "ffmpeg=s", 'External Program', '--ffmpeg <path>', "Location of ffmpeg binary"],
 		rtmpport	=> [ 1, "rtmpport=n", 'Recording', '--rtmpport <port>', "Override the RTMP port (e.g. 443)"],
-		flvstreamer	=> [ 0, "flvstreamer=s", 'External Program', '--flvstreamer <path>', "Location of flvstreamer binary"],
+		flvstreamer	=> [ 0, "flvstreamer|rtmpdump=s", 'External Program', '--flvstreamer <path>', "Location of flvstreamer/rtmpdump binary"],
 	};
 }
 
@@ -8142,26 +8140,26 @@ sub get {
 		$file_tmp = $prog->{filepart}.'.flv'
 	}
 
-	# Remove failed file recording (below a certain size) - hack to get around flvstreamer not returning correct exit code
+	# Remove failed file recording (below a certain size) - hack to get around flvstreamer/rtmpdump not returning correct exit code
 	if ( -f $file_tmp && stat($file_tmp)->size < $prog->min_download_size() ) {
 		unlink( $file_tmp );
 	}
 		
-	# Add custom options to flvstreamer for this type if specified with --rtmp-<type>-opts
+	# Add custom options to flvstreamer/rtmpdump for this type if specified with --rtmp-<type>-opts
 	if ( defined $opt->{'rtmp'.$prog->{type}.'opts'} ) {
 		push @cmdopts, ( split /\s+/, $opt->{'rtmp'.$prog->{type}.'opts'} );
 	}
 
-	# flvstreamer version detection e.g. 'FLVStreamer v1.8a'
+	# rtmpdump/flvstreamer version detection e.g. 'RTMPDump v1.5', 'FLVStreamer v1.8a', 'RTMPDump 2.1b'
 	my $rtmpver;
-	chomp( $rtmpver = (grep /^\w+\s+v?[\.\d]+.*$/i, `"$bin->{flvstreamer}" 2>&1`)[0] );
+	chomp( $rtmpver = (grep /^(RTMPDump|FLVStreamer)/, `"$bin->{flvstreamer}" 2>&1`)[0] );
 	$rtmpver =~ s/^\w+\s+v?([\.\d]+).*$/$1/g;
 	main::logger "INFO: $bin->{flvstreamer} version $rtmpver\n" if $opt->{verbose};
 	main::logger "INFO: RTMP_URL: $url_2, tcUrl: $tcurl, application: $application, authString: $authstring, swfUrl: $swfurl, file: $prog->{filepart}, file_done: $prog->{filename}\n" if $opt->{verbose};
 
 	# Save the effort and don't support < v1.8
 	if ( $rtmpver < 1.8 ) {
-		main::logger "WARNING: flvstreamer 1.8 or later is required - please upgrade\n";
+		main::logger "WARNING: flvstreamer/rtmpdump 1.8 or later is required - please upgrade\n";
 		return 'next';
 	}
 
