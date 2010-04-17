@@ -1377,8 +1377,11 @@
 		if ([[finishedShow successful] boolValue])
 		{
 			[finishedShow setValue:@"Processing..." forKey:@"status"];
-			//[self cleanUpPath:finishedShow];
-			//[self seasonEpisodeInfo:finishedShow];
+			if ([[[finishedShow path] pathExtension] isEqualToString:@"mov"])
+			{
+				[self cleanUpPath:finishedShow];
+				[self seasonEpisodeInfo:finishedShow];
+			}
 			if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"AddCompletedToiTunes"] isEqualTo:[NSNumber numberWithBool:YES]])
 				[self addToiTunes:finishedShow];
 			else
@@ -1838,14 +1841,17 @@
 			iTunesTrack *track = [iTunes add:fileToAdd to:nil];
 			if (track && ([ext isEqualToString:@"mov"] || [ext isEqualToString:@"mp4"]))
 			{
-				//[track setVideoKind:iTunesEVdKTVShow];
-				//[track setName:[show episodeName]];
+				if ([ext isEqualToString:@"mov"])
+				{
+					[track setVideoKind:iTunesEVdKTVShow];
+					[track setName:[show episodeName]];
+					[track setEpisodeID:[show episodeName]];
+					[track setShow:[show seriesName]];
+					[track setArtist:[show tvNetwork]];
+					if ([show season]>0) [track setSeasonNumber:[show season]];
+					if ([show episode]>0) [track setEpisodeNumber:[show episode]];
+				}
 				[track setUnplayed:YES];
-				//[track setEpisodeID:[show episodeName]];
-				//[track setShow:[show seriesName]];
-				//[track setArtist:[show tvNetwork]];
-				//if ([show season]>0) [track setSeasonNumber:[show season]];
-				//if ([show episode]>0) [track setEpisodeNumber:[show episode]];
 			}
 			else if (track && ([ext isEqualToString:@"mp3"] || [ext isEqualToString:@"aac"]))
 			{
@@ -1897,7 +1903,7 @@
 	showName = [showName stringByReplacingOccurrencesOfString:@"/" withString:@"-"];
 	episodeName = [episodeName stringByReplacingOccurrencesOfString:@"/" withString:@"-"];
 	
-	if (![[show path] isEqualToString:@"Unknown"])
+	/*if (![[show path] isEqualToString:@"Unknown"])
 	{
 		//Process Original Path into Parts
 		NSString *originalPath = [NSString stringWithString:[show path]];
@@ -1961,7 +1967,7 @@
 		else 
 			newFile = originalPath;
 	}
-	
+	*/
 	//Save Data to Programme for Later Use
 	[show setValue:showName forKey:@"seriesName"];
 	[show setValue:episodeName forKey:@"episodeName"];
