@@ -1843,7 +1843,7 @@
 			{
 				if ([ext isEqualToString:@"mov"])
 				{
-					[track setVideoKind:iTunesEVdKTVShow];
+					//[track setVideoKind:iTunesEVdKTVShow];
 					[track setName:[show episodeName]];
 					[track setEpisodeID:[show episodeName]];
 					[track setShow:[show seriesName]];
