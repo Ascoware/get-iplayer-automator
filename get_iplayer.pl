@@ -22,7 +22,7 @@
 #
 #
 package main;
-my $version = 2.77;
+my $version = 2.77; #r6
 #
 # Help:
 #	./get_iplayer --help | --longhelp
@@ -5851,12 +5851,12 @@ sub get_stream_data_cdn {
 		# Limelight CDN
 		} elsif ( $cattribs->{kind} eq 'limelight' ) {
 			decode_entities( $cattribs->{authString} );
-			$conn->{playpath} = "$cattribs->{identifier}?$cattribs->{authString}";
+			$conn->{playpath} = "$cattribs->{identifier}";
 			# Remove offending mp3/mp4: at the start of the identifier (don't remove in stream url)
 			### Not entirely sure if this is even required for video modes either??? - not reqd for aac and low
 			# $conn->{playpath} =~ s/^mp[34]://g;
 			$conn->{streamurl} = "rtmp://$cattribs->{server}:1935/ondemand?_fcs_vhost=$cattribs->{server}&auth=$cattribs->{authString}&aifp=v001&slist=$cattribs->{identifier}";
-			$conn->{application} = $cattribs->{application};
+			$conn->{application} = "$cattribs->{application}?$cattribs->{authString}";
 			$conn->{tcurl} = "rtmp://$cattribs->{server}:1935/$conn->{application}";
 			
 		# Level3 CDN	
