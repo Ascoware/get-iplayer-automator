@@ -2,7 +2,7 @@
 #
 # get_iplayer - Lists, Records and Streams BBC iPlayer TV and Radio programmes + other Programmes via 3rd-party plugins
 #
-#    Thanks to Phil Lewis for his original work towards this script.
+#    Copyright (C) 2008-2010 Phil Lewis
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 #
 #
 package main;
-my $version = 2.77; #r6
+my $version = 2.78;
 #
 # Help:
 #	./get_iplayer --help | --longhelp
@@ -126,7 +126,7 @@ my $opt_format = {
 	pid		=> [ 2, "pid|url=s", 'Recording', '--pid <pid>', "Record an arbitrary pid that does not necessarily appear in the index."],
 	pidrecursive	=> [ 1, "pidrecursive|pid-recursive!", 'Recording', '--pid-recursive', "When used with --pid record all the embedded pids if the pid is a series or brand pid."],
 	proxy		=> [ 0, "proxy|p=s", 'Recording', '--proxy, -p <url>', "Web proxy URL e.g. 'http://USERNAME:PASSWORD\@SERVER:PORT' or 'http://SERVER:PORT'"],
-	raw		=> [ 0, "raw!", 'Recording', '--raw', "Don't transcode or change the recording/stream in any way (i.e. radio/realaudio, rtmp/flv, iphone/mov)"],
+	raw		=> [ 0, "raw!", 'Recording', '--raw', "Don't transcode or change the recording/stream in any way (i.e. radio/realaudio, rtmp/flv)"],
 	start		=> [ 1, "start=s", 'Recording', '--start <secs>', "Recording/streaming start offset (rtmp and realaudio only)"],
 	stop		=> [ 1, "stop=s", 'Recording', '--stop <secs>', "Recording/streaming stop offset (can be used to limit live rtmp recording length) rtmp and realaudio only"],
 	suboffset	=> [ 1, "suboffset=n", 'Recording', '--suboffset <offset>', "Offset the subtitle timestamps by the specified number of milliseconds"],
@@ -661,7 +661,11 @@ sub init_search {
 
 	$bin->{tee}		= 'tee';
 
-	$bin->{flvstreamer}	= $opt->{flvstreamer} || $opt->{rtmpdump} || 'flvstreamer';
+	$bin->{flvstreamer}	= $opt->{flvstreamer} || 'rtmpdump';
+	if (! main::exists_in_path('flvstreamer') ) {
+		$bin->{flvstreamer} = 'flvstreamer';
+	}
+
 	delete $binopts->{flvstreamer};
 	push @{ $binopts->{flvstreamer} }, ( '--timeout', 10 );
 	push @{ $binopts->{flvstreamer}	}, '--quiet' if $opt->{quiet};
@@ -1953,9 +1957,9 @@ sub open_file_append {
 #		update matching plugins in $plugin_dir_user
 #		warn of any plugins that are not in $plugin_dir_system or $plugin_dir_user and not available
 sub update_script {
-	my $version_url	= 'http://linuxcentre.net/get_iplayer/VERSION-get_iplayer';
-	my $update_url	= 'http://linuxcentre.net/get_iplayer/get_iplayer';
-	my $changelog_url = 'http://linuxcentre.net/get_iplayer/CHANGELOG.txt';
+	my $version_url	= 'http://www.infradead.org/get_iplayer/VERSION-get_iplayer';
+	my $update_url	= 'http://www.infradead.org/get_iplayer/';
+	my $changelog_url = 'http://www.infradead.org/get_iplayer/CHANGELOG-get_iplayer';
 	my $latest_ver;
 	# Get version URL
 	my $script_file = $0;
@@ -2002,7 +2006,7 @@ sub update_script {
 	}
 
 	logger "INFO: Current version is ".(sprintf '%.2f', $version)."\n";
-	logger "INFO: Checking for latest version from linuxcentre.net\n";
+	logger "INFO: Checking for latest version from www.infradead.org\n";
 	if ( $latest_ver = request_url_retry($ua, $version_url, 3 ) ) {
 		chomp($latest_ver);
 		# Compare version numbers
@@ -2012,9 +2016,9 @@ sub update_script {
 			logger "INFO: Newer version $latest_ver available\n" if $latest_ver > $version;
 			
 			# Get the manifest of files to be updated
-			my $base_url = "${update_url}-${latest_ver}";
+			my $base_url = "${update_url}/${latest_ver}";
 			my $res;
-			if ( not $res = request_url_retry($ua, "$base_url/MANIFEST.txt", 3 ) ) {
+			if ( not $res = request_url_retry($ua, "${update_url}/MANIFEST.v${latest_ver}", 3 ) ) {
 				logger "ERROR: Failed to obtain update file manifest - Update aborted\n";
 				exit 3;
 			}
@@ -2090,7 +2094,7 @@ sub update_script {
 
 			# Show changelog since last version if this is an upgrade
 			if ( $version < $latest_ver ) {
-				logger "INFO: Change Log: http://linuxcentre.net/get_iplayer/CHANGELOG.txt\n";
+				logger "INFO: Change Log: ${changelog_url}\n";
 				my $changelog = request_url_retry($ua, $changelog_url, 3 );
 				my $current_ver = sprintf('%.2f', $version);
 				$changelog =~ s|^(.*)Version\s+$current_ver.+$|$1|s;
@@ -3060,7 +3064,7 @@ sub usage {
 		'.PP',
 		'\fBget_iplayer\fR \fB--stream\fR [<options>] \fB--type\fR=livetv,liveradio <regex|index> \fB--player\fR="mplayer -cache 128 -"',
 		'.PP',
-		'\fBget_iplayer\fR \fB--update\fR',
+		'\fBget_iplayer\fR \fB--refresh\fR',
 		'.SH DESCRIPTION',
 		'\fBget_iplayer\fR lists, searches and records BBC iPlayer TV/Radio, BBC Podcast programmes. Other 3rd-Party plugins may be available.',
 		'.PP',
@@ -3071,7 +3075,7 @@ sub usage {
 		'If given no arguments, \fBget_iplayer\fR updates and displays the list of currently available programmes.',
 		'Each available programme has a numerical identifier, \fBpid\fR.',
 		'\fBget_iplayer\fR records BBC iPlayer programmes by pretending to be an iPhone, which means that some programmes in the list are unavailable for recording.',
-		'It can also utilise the \fBrtmpdump\fR or \fBflvstreamer\fR tools to record programmes from RTMP flash streams at various qualities.',
+		'It can also utilise the \fBflvstreamer\fR tool to record programmes from RTMP flash streams at various qualities.',
 		'.PP',
 		'In PVR mode, \fBget_iplayer\fR can be called from cron to record programmes to a schedule.',
 		'.SH "OPTIONS"' if $manpage;
@@ -3086,7 +3090,7 @@ sub usage {
 	push @usage, ' Stream BBC Embedded Media URL:  get_iplayer --stream --type=<TYPE> "<URL>" | mplayer -cache 128 -' if $helplevel != 2;
 	push @usage, ' Stream Live iPlayer Programme:  get_iplayer --stream --type=livetv,liveradio <REGEX|INDEX> --player="mplayer -cache 128 -"' if $helplevel != 2;
 	push @usage, '';
-	push @usage, ' Update get_iplayer:             get_iplayer --update [--force]';
+	push @usage, ' Update get_iplayer cache:       get_iplayer --refresh [--force]';
 	push @usage, '';
 	push @usage, ' Basic Help:                     get_iplayer --basic-help' if $helplevel != 2;
 	push @usage, ' Intermediate Help:              get_iplayer --help' if $helplevel == 2;
@@ -3147,6 +3151,7 @@ sub usage {
 		print MAN join "\n", @man, "\n";
 		close MAN;
 		main::logger "INFO: Wrote manpage file '$manpage'\n";
+		exit 0;
 
 	# Print options dump and quit
 	} elsif ( $dumpopts ) {
@@ -5795,10 +5800,28 @@ sub get_stream_data_cdn {
 
 	my $count = 1;
 	for my $cattribs ( @{ $mattribs->{connections} } ) {
+
+		# Get authstring from more specific mediaselector if this mode is specified - fails sometimes otherwise
+		if ( $cattribs->{authString} && $cattribs->{kind} =~ /^(limelight|akamai|level3|sis|iplayertok)$/ && (grep /^$mode$/, (split /,/, $mattribs->{modelist})) ) {
+			# Build URL
+			my $media_stream_data_prefix = 'http://www.bbc.co.uk/mediaselector/4/mtis/stream/';
+			my $url = $media_stream_data_prefix."$mattribs->{verpid}/$mattribs->{service}/$cattribs->{kind}?cb=".( sprintf "%05.0f", 99999*rand(0) );
+			my $xml = main::request_url_retry( main::create_ua( 'desktop' ), $url, 3, undef, undef, 1 );
+			main::logger "\n$xml\n" if $opt->{debug};
+			# get new set of connection attributes from the new xml data
+			my $new_mattribs = (parse_metadata( $xml ))[0];
+			my $new_cattribs = $new_mattribs->{connections}[0];
+			# Override elemnts from more specific connection attribs if present
+			for my $element ( keys %{ $new_cattribs } ) {
+				$cattribs->{$element} = $new_cattribs->{$element} if $new_cattribs->{$element};
+			}
+		}
+		decode_entities($cattribs->{authString});
+
 		# Common attributes
 		# swfurl = Default iPlayer swf version
 		my $conn = {
-			swfurl		=> "http://www.bbc.co.uk/emp/10player.swf?revision=15501_15796",
+			swfurl		=> "http://www.bbc.co.uk/emp/10player.swf?revision=18269_19216",
 			ext		=> $ext,
 			streamer	=> $streamer,
 			bitrate		=> $mattribs->{bitrate},
@@ -5823,35 +5846,40 @@ sub get_stream_data_cdn {
 				my $url = ${media_stream_live_prefix}."?server=$cattribs->{server}&identifier=$cattribs->{identifier}&kind=$cattribs->{kind}&application=$cattribs->{application}";
 				my $xml = main::request_url_retry( main::create_ua( 'desktop' ), $url, 3, undef, undef, 1 );
 				main::logger "\n$xml\n" if $opt->{debug};
-				$cattribs->{authString} = $1 if $xml =~ m{<token>(.+?)</token>};
+				$cattribs->{authString} = 'auth='.$1 if $xml =~ m{<token>(.+?)</token>};
 				$conn->{authstring} = $cattribs->{authString};
 			}
 
+			$conn->{playpath} = $cattribs->{identifier};
+			$conn->{streamurl} = "rtmp://$cattribs->{server}:1935/$cattribs->{application}?_fcs_vhost=$cattribs->{server}&undefined";
+			$conn->{application} = "$cattribs->{application}?_fcs_vhost=$cattribs->{server}&undefined";
+
 			if ( $cattribs->{authString} ) {
+				if ( $cattribs->{authString} !~ /&aifp=/ ) {
+					$cattribs->{authString} .= '&aifp=v001';
+				}
+
+				if ( $cattribs->{authString} !~ /&slist=/ ) {
+					$cattribs->{identifier} =~ s/^mp[34]://;
+					$cattribs->{authString} .= "&slist=$cattribs->{identifier}";
+				}
+
 				### ??? live and Live TV, Live EMP Video or Non-public EMP video:
-				$conn->{playpath} = "$cattribs->{identifier}?auth=$cattribs->{authString}&aifp=v001";
+				$conn->{playpath} .= "?$cattribs->{authString}";
+				$conn->{streamurl} .= "&$cattribs->{authString}";
+				$conn->{application} .= "&$cattribs->{authString}";
 			} else {
-				$conn->{playpath} = $cattribs->{identifier};
+				$conn->{streamurl} .= "&undefined";
+				$conn->{application} .= "&undefined";
 			}
-			if ( $cattribs->{authString} ) {
-				$conn->{streamurl} = "rtmp://$cattribs->{server}:1935/$cattribs->{application}?_fcs_vhost=$cattribs->{server}&auth=$cattribs->{authString}&aifp=v001&slist=$cattribs->{identifier}";
-			} else {
-				$conn->{streamurl} = "rtmp://$cattribs->{server}:1935/$cattribs->{application}?_fcs_vhost=$cattribs->{server}&undefined";
-			}
-			# Remove offending mp3/mp4: at the start of the identifier (don't remove in stream url)
-			$cattribs->{identifier} =~ s/^mp[34]://;
-			if ( $cattribs->{authString} ) {
-				$conn->{application} = "$cattribs->{application}?_fcs_vhost=$cattribs->{server}&auth=$cattribs->{authString}&aifp=v001&slist=$cattribs->{identifier}";
-			} else {
-				$conn->{application} = "$cattribs->{application}?_fcs_vhost=$cattribs->{server}&undefined";
-			}
+
 			# Port 1935? for live?
 			$conn->{tcurl} = "rtmp://$cattribs->{server}:80/$conn->{application}";
 
 		# Limelight CDN
 		} elsif ( $cattribs->{kind} eq 'limelight' ) {
 			decode_entities( $cattribs->{authString} );
-			$conn->{playpath} = "$cattribs->{identifier}";
+			$conn->{playpath} = $cattribs->{identifier};
 			# Remove offending mp3/mp4: at the start of the identifier (don't remove in stream url)
 			### Not entirely sure if this is even required for video modes either??? - not reqd for aac and low
 			# $conn->{playpath} =~ s/^mp[34]://g;
@@ -6012,6 +6040,10 @@ sub get_stream_data {
 	my $mode;
 	for my $mattribs ( @medias ) {
 		
+		# Put verpid into mattribs
+		$mattribs->{verpid} = $verpid;
+		$mattribs->{modelist} = $prog->modelist;
+
 		# New iphone stream
 		if ( $mattribs->{service} eq 'iplayer_streaming_http_mp4' ) {
 			# Fix/remove some audio stream attribs
@@ -6046,6 +6078,9 @@ sub get_stream_data {
 			} elsif ( $mattribs->{bitrate} > 400 && $mattribs->{width} >= 500 ) {
 				get_stream_data_cdn( $data, $mattribs, 'flashstd', 'rtmp', 'mp4' );
 
+			# flashlow modes
+			} elsif ( $mattribs->{bitrate} > 300 && $mattribs->{width} >= 380 ) {
+				get_stream_data_cdn( $data, $mattribs, 'flashlow', 'rtmp', 'mp4' );
 			}
 			
 		# flashnormal modes (also live and EMP modes)
@@ -6158,6 +6193,48 @@ sub get_stream_data {
 		} else {
 			new_stream_report($mattribs, undef) if $opt->{verbose};
 		}	
+	}
+
+	# if flashaaclow exists then rtspaaclow one usually does also.
+	if ( $data->{'flashaaclow1'} && $prog->{type} eq 'radio' ) {
+		my $mode = 'rtspaaclow1';
+		$data->{$mode}->{bitrate} = $data->{'flashaaclow1'}->{bitrate};
+		$data->{$mode}->{encoding} = $data->{'flashaaclow1'}->{encoding};
+		$data->{$mode}->{type} = "(iplayer_stream_aac_rtsp_lo) rtsp aac ".( $data->{$mode}->{bitrate} || '48' )."kbps stream";
+		$data->{$mode}->{identifier} =  $data->{'flashaaclow1'}->{identifier};
+		$data->{$mode}->{identifier} =~ s/^mp[34]://;
+		$data->{$mode}->{streamurl} = "rtsp://3gp-acl.bbc.net.uk:554/".$data->{$mode}->{identifier}.".mp4";
+		$data->{$mode}->{streamer} = 'rtsp';
+		$data->{$mode}->{ext} = 'aac';
+		get_stream_set_type( $data->{$mode} ) if ! $data->{$mode}->{type};
+	}
+
+	# if flashaacstd exists then rtspaacstd one usually does also.
+	if ( $data->{'flashaacstd1'} && $prog->{type} eq 'radio' ) {
+		my $mode = 'rtspaacstd1';
+		$data->{$mode}->{bitrate} = $data->{'flashaacstd1'}->{bitrate};
+		$data->{$mode}->{encoding} = $data->{'flashaacstd1'}->{encoding};
+		$data->{$mode}->{type} = "(iplayer_stream_aac_rtsp_med) rtsp aac ".( $data->{$mode}->{bitrate} || '128' )."kbps stream";
+		$data->{$mode}->{identifier} =  $data->{'flashaacstd1'}->{identifier};
+		$data->{$mode}->{identifier} =~ s/^mp[34]://;
+		$data->{$mode}->{streamurl} = "rtsp://3gp-acl.bbc.net.uk:554/".$data->{$mode}->{identifier}.".mp4";
+		$data->{$mode}->{streamer} = 'rtsp';
+		$data->{$mode}->{ext} = 'aac';
+		get_stream_set_type( $data->{$mode} ) if ! $data->{$mode}->{type};
+	}
+
+	# if flashaudio exists then rtspaudio one usually does also.
+	if ( $data->{'flashaudio1'} && $prog->{type} eq 'radio' ) {
+		my $mode = 'rtspaudio1';
+		$data->{$mode}->{bitrate} = $data->{'flashaudio1'}->{bitrate};
+		$data->{$mode}->{encoding} = $data->{'flashaudio1'}->{encoding};
+		$data->{$mode}->{type} = "(iplayer_stream_mp3_rtsp_med) rtsp mp3 ".( $data->{$mode}->{bitrate} || '128' )."kbps stream";
+		$data->{$mode}->{identifier} =  $data->{'flashaudio1'}->{identifier};
+		$data->{$mode}->{identifier} =~ s|^mp[34]:secure/(\w+?)/(.+$)|$1/secure_auth/$2|;
+		$data->{$mode}->{streamurl} = "rtsp://3gp-acl.bbc.net.uk:554/".$data->{$mode}->{identifier}.".mp3";
+		$data->{$mode}->{streamer} = 'rtsp';
+		$data->{$mode}->{ext} = 'mp3';
+		get_stream_set_type( $data->{$mode} ) if ! $data->{$mode}->{type};
 	}
 
 	# Do iphone redirect check regardless of an xml entry for iphone (except for EMP/Live) - sometimes the iphone streams exist regardless
@@ -6277,7 +6354,7 @@ sub opt_format {
 		tvmode		=> [ 1, "tvmode|vmode=s", 'Recording', '--tvmode <mode>,<mode>,...', "TV Recoding modes: iphone,rtmp,flashhd,flashvhigh,flashhigh,flashstd,flashnormal,flashlow,n95_wifi (default: iphone,flashhigh,flashstd,flashnormal)"],
 		outputtv	=> [ 1, "outputtv=s", 'Output', '--outputtv <dir>', "Output directory for tv recordings"],
 		vlc		=> [ 1, "vlc=s", 'External Program', '--vlc <path>', "Location of vlc or cvlc binary"],
-		rtmptvopts	=> [ 1, "rtmp-tv-opts|rtmptvopts=s", 'Recording', '--rtmp-tv-opts <options>', "Add custom options to flvstreamer/rtmpdump for tv"],
+		rtmptvopts	=> [ 1, "rtmp-tv-opts|rtmptvopts=s", 'Recording', '--rtmp-tv-opts <options>', "Add custom options to flvstreamer for tv"],
 	};
 }
 
@@ -7185,9 +7262,9 @@ sub modelist {
 	if ( ! $mlist ) {
 		if ( ! main::exists_in_path('flvstreamer') ) {
 			main::logger "WARNING: Not using flash modes since flvstreamer/rtmpdump is not found\n" if $opt->{verbose};
-			$mlist = 'iphone,realaudio,wma';
+			$mlist = 'iphone,rtspaudio,realaudio,wma';
 		} else {
-			$mlist = 'iphone,flashaachigh,flashaacstd,flashaudio,realaudio,flashaaclow,wma';
+			$mlist = 'iphone,flashaachigh,flashaacstd,flashaudio,rtspaudio,realaudio,flashaaclow,wma';
 		}
 	}
 	# Deal with BBC Radio fallback modes and expansions
@@ -7547,7 +7624,7 @@ sub opt_format {
 	return {
 		liveradiomode	=> [ 1, "liveradiomode=s", 'Recording', '--liveradiomode <mode>,<mode>,..', "Live Radio Recording modes: flashaac,realaudio,wma"],
 		outputliveradio	=> [ 1, "outputliveradio=s", 'Output', '--outputliveradio <dir>', "Output directory for live radio recordings"],
-		rtmpliveradioopts => [ 1, "rtmp-liveradio-opts|rtmpliveradioopts=s", 'Recording', '--rtmp-liveradio-opts <options>', "Add custom options to flvstreamer/rtmpdump for liveradio"],
+		rtmpliveradioopts => [ 1, "rtmp-liveradio-opts|rtmpliveradioopts=s", 'Recording', '--rtmp-liveradio-opts <options>', "Add custom options to flvstreamer for liveradio"],
 	};
 }
 
@@ -7718,20 +7795,15 @@ sub get_url {
 
 # %prog (only for %prog for mode and tagging)
 # Get the h.264/mp3 stream
-# ( $ua, $url_2, $prog '0|1 == rearrange moov' )
+# ( $stream, $ua, $url_2, $prog )
 sub get {
 	my ( $stream, $ua, $url_2, $prog ) = @_;
 	my $childpid;
-	my $rearrange = 0;
 	my $iphone_block_size	= 0x2000000; # 32MB
 
 	# Stage 3a: Download 1st byte to get exact file length
 	main::logger "INFO: Stage 3 URL = $url_2\n" if $opt->{verbose};
 
-	# Override the $rearrange value is --raw option is specified
-	#$rearrange = 1 if $prog->{type} eq 'tv' && not $opt->{raw};
-	main::logger "DEBUG: Rearrang mov file mode = $rearrange (type: $prog->{type}, raw: $opt->{raw})\n" if $opt->{debug};
-		
 	# Use url prepend if required
 	if ( defined $opt->{proxy} && $opt->{proxy} =~ /^prepend:/ ) {
 		$url_2 = $opt->{proxy}.main::url_encode( $url_2 );
@@ -7762,25 +7834,9 @@ sub get {
 
 	# Only do this if we're rearranging QT streams
 	my $mdat_start = 0;
-	# default to this if we are not rearranging (tells the download chunk loop where to stop - i.e. EOF instead of end of mdat atom)
+	# default (tells the download chunk loop where to stop - i.e. EOF instead of end of mdat atom)
 	my $moov_start = $download_len + 1;
 	my $header;
-	if ($rearrange) {
-		# Get ftyp+wide header etc
-		$mdat_start = 0x1c;
-		my $buffer = main::download_block(undef, $url_2, $ua, 0, $mdat_start + 4);
-		# Get bytes upto (but not including) mdat atom start -> $header
-		$header = substr($buffer, 0, $mdat_start);
-		
-		# Detemine moov start
-		# Get mdat_length_chars from downloaded block
-		my $mdat_length_chars = substr($buffer, $mdat_start, 4);
-		my $mdat_length = bytestring_to_int($mdat_length_chars);
-		main::logger "DEBUG: mdat_length = ".main::get_hex($mdat_length_chars)." = $mdat_length\n" if $opt->{debug};
-		main::logger "DEBUG: mdat_length (decimal) = $mdat_length\n" if $opt->{debug};
-		# The MOOV box starts one byte after MDAT box ends
-		$moov_start = $mdat_start + $mdat_length;
-	}
 
 	# If we have partial content and wish to stream, resume the recording & spawn off STDOUT from existing file start 
 	# Sanity check - we cannot support resuming of partial content if we're streaming also. 
@@ -7818,82 +7874,6 @@ sub get {
 	my $restart_offset = 0;
 	my $moovdata;
 	my $moov_length = 0;
-
-	if ($rearrange) {
-		# if cookie fails then trigger a retry after deleting cookiejar
-		# Determine orginal moov atom length so we can work out if the partially recorded file has the moov atom in it already
-		$moov_length = bytestring_to_int( main::download_block( undef, $url_2, $ua, $moov_start, $moov_start+3 ) );
-		main::logger "INFO: original moov atom length = $moov_length                          \n" if $opt->{verbose};
-		# Sanity check this moov length - chances are that were being served up a duff file if this is > 10% of the file size or < 64k
-		if ( $moov_length > (${moov_start}/9.0) || $moov_length < 65536 ) {
-			main::logger "WARNING: Bad file recording, deleting cookie                 \n";
-			$ua->cookie_jar( HTTP::Cookies->new( file => $cookiejar.'coremedia', autosave => 0, ignore_discard => 0 ) );
-			unlink $cookiejar.'coremedia';
-			unlink $prog->{filepart};
-			return 'retry';
-		}
-
-		# we still need an accurate moovlength for the already downloaded moov atom for resume restart_offset.....
-		# If we have no existing file, a file which doesn't yet even have the moov atom, or using stdout (or no-write option)
-		# (allow extra 1k on moov_length for metadata when testing)
-		if ( $opt->{stdout} || $opt->{nowrite} || stat($prog->{filepart})->size < ($moov_length+$mdat_start+1024) ) {
-			# get moov chunk into memory
-			$moovdata = main::download_block( undef, $url_2, $ua, $moov_start, (${download_len}-1) );
-			main::logger "                                                                                                         \r" if $opt->{hash};
-			# Create new udta atom with child atoms for metadata
-			# Ref: http://atomicparsley.sourceforge.net/mpeg-4files.html
-			my $udta_new = create_qt_atom('udta',
-				create_qt_atom( chr(0xa9).'nam', $prog->{name}.' - '.$prog->{episode}, 'string' ).
-				create_qt_atom( chr(0xa9).'alb', $prog->{name}, 'string' ).
-				create_qt_atom( chr(0xa9).'trk', $prog->{episode}, 'string' ).
-				create_qt_atom( chr(0xa9).'aut', $prog->{channel}, 'string' ).
-				create_qt_atom( chr(0xa9).'ART', $prog->{channel}, 'string' ).
-				create_qt_atom( chr(0xa9).'cpy', $prog->{channel}, 'string' ).
-				create_qt_atom( chr(0xa9).'des', $prog->{descshort}, 'string' ).
-				create_qt_atom( chr(0xa9).'gen', $prog->{categories}, 'string' ).
-				create_qt_atom( chr(0xa9).'cmt', 'Recorded using get_iplayer', 'string' ).
-				create_qt_atom( chr(0xa9).'req', 'QuickTime 6.0 or greater', 'string' ).
-				create_qt_atom( chr(0xa9).'day', substr( $prog->{firstbcast}->{$prog->{version}}, 0, 4 ) || ((localtime())[5] + 1900), 'string' )
-			, '' );
-			# Insert new udta atom over the old one and get the new $moov_length (and update moov atom size field)
-			replace_moov_udta_atom ( $udta_new, $moovdata );
-
-			# Process the moov data so that we can relocate it (change the chunk offsets that are absolute)
-			# Also update moov+_length to be accurate after metadata is added etc
-			$moov_length = relocate_moov_chunk_offsets( $moovdata );
-			main::logger "INFO: New moov atom length = $moov_length                          \n" if $opt->{verbose};
-			# write moov atom to file next (yes - were rearranging the file - header+moov+mdat - not header+mdat+moov)
-			main::logger "INFO: Appending ftype+wide+moov atoms to $prog->{filepart}\n" if $opt->{verbose};
-			# Write header atoms (ftyp, wide)
-			print $fh $header if ! $opt->{nowrite};
-			print STDOUT $header if $opt->{stdout};
-			# Write moov atom
-			print $fh $moovdata if ! $opt->{nowrite};
-			print STDOUT $moovdata if $opt->{stdout};
-			# If were not resuming we want to only start the download chunk loop from mdat_start 
-			$restart_offset = $mdat_start;
-		}
-
-		# Get accurate moov_length from file (unless stdout or nowrite options are specified)
-		# Assume header+moov+mdat atom layout
-		if ( (! $opt->{stdout}) && (! $opt->{nowrite}) && stat($prog->{filepart})->size > ($moov_length+$mdat_start) ) {
-				main::logger "INFO: Getting moov atom length from partially recorded file $prog->{filepart}\n" if $opt->{verbose};
-				if ( ! open( MOOVDATA, "< $prog->{filepart}" ) ) {
-					main::logger "ERROR: Cannot Read partially recorded file\n";
-					return 'next';
-				}
-				my $data;
-				seek(MOOVDATA, $mdat_start, 0);
-				if ( read(MOOVDATA, $data, 4, 0) != 4 ) {
-					main::logger "ERROR: Cannot Read moov atom length from partially recorded file\n";
-					return 'next';
-				}
-				close MOOVDATA;
-				# Get moov atom size from file
-				$moov_length = bytestring_to_int( substr($data, 0, 4) );
-				main::logger "INFO: moov atom length (from partially recorded file) = $moov_length                          \n" if $opt->{verbose};
-		}
-	}
 
 	# If we have a too-small-sized file (greater than moov_length+mdat_start) and not stdout and not no-write then this is a partial recording
 	if (-f $prog->{filepart} && (! $opt->{stdout}) && (! $opt->{nowrite}) && stat($prog->{filepart})->size > ($moov_length+$mdat_start) ) {
@@ -7952,134 +7932,6 @@ sub get {
 
 
 
-# Usage: moov_length = relocate_moov_chunk_offsets(<binary string>)
-sub relocate_moov_chunk_offsets {
-	my $moovdata = $_[0];
-	# Change all the chunk offsets in moov->stco atoms and add moov_length to them all
-	# get moov atom length - same as length($moovdata)
-	my $moov_length = bytestring_to_int( substr($moovdata, 0, 4) );
-	# Use index() to search for a string within a string
-	my $i = -1;
-	while (($i = index($moovdata, 'stco', $i)) > -1) {
-
-		# determine length of atom (4 bytes preceding stco)
-		my $stco_len = bytestring_to_int( substr($moovdata, $i-4, 4) );
-		main::logger "INFO: Found stco atom at moov atom offset: $i length $stco_len\n" if $opt->{verbose};
-
-		# loop through all chunk offsets in this atom and add offset (== moov atom length)
-		for (my $j = $i+12; $j < $stco_len+$i-4; $j+=4) {
-			my $chunk_offset = bytestring_to_int( substr($moovdata, $j, 4) );
-			$chunk_offset += $moov_length;
-			# write back bytes into $moovdata
-			write_msb_value_at_offset( $moovdata, $j, $chunk_offset );
-		}
-		# skip over this whole atom now it is processed
-		$i += $stco_len;
-	}
-	# Write $moovdata back to calling string
-	$_[0] = $moovdata;
-	return $moov_length;
-}
-
-
-
-# Replace the moov->udta atom with a new user-supplied one and update the moov atom size
-# Usage: replace_moov_udta_atom ( $udta_new, $moovdata )
-sub replace_moov_udta_atom {
-	my $udta_new = $_[0];
-	my $moovdata = $_[1];
-
-	# get moov atom length
-	my $moov_length = bytestring_to_int( substr($moovdata, 0, 4) );
-
-	# Find the original udta atom start 
-	# Use index() to search for a string within a string ($i will point at the beginning of the atom)
-	my $i = index($moovdata, 'udta', -1) - 4;
-
-	# determine length of old atom (4 bytes preceding the name)
-	my $udta_old_len = bytestring_to_int( substr($moovdata, $i, 4) );
-	main::logger "INFO: Found udta atom at moov atom offset: $i length $udta_old_len\n" if $opt->{verbose};
-
-	# Save the data before the udta atom
-	my $moovdata_before_udta = substr($moovdata, 0, $i);
-
-	# Save the remainder portion of data after the udta atom for later
-	my $udta_new_len = length( $udta_new );
-	my $moovdata_after_udta = substr($moovdata, $i, $moov_length - ( $i + $udta_new_len ) );
-
-	# Old udta atom should we need it
-	### my $udta_old = substr($moovdata, $i, $udta_len);
-
-	# Create new moov atom
-	$moovdata = $moovdata_before_udta.$udta_new.$moovdata_after_udta;
-	main::logger "INFO: Inserted new udta atom at moov atom offset: $i length $udta_new_len\n" if $opt->{verbose};
-
-	# Recalculate the moov size and insert into moovdata
-	write_msb_value_at_offset( $moovdata, 0, length($moovdata) );
-	
-	# Write $moovdata back to calling string
-	$_[1] = $moovdata;
-
-	return 0;
-}
-
-
-
-# Converts a string of chars to it's MSB decimal value
-sub bytestring_to_int {
-	# Reverse to LSB order
-        my $buf = reverse shift;
-        my $dec = 0;
-        for (my $i=0; $i<length($buf); $i++) {
-		# Multiply byte value by 256^$i then accumulate
-                $dec += (ord substr($buf, $i, 1)) * 256 ** $i;
-        }
-        #main::logger "DEBUG: Decimal value = $dec\n" if $opt->{verbose};
-        return $dec;
-}
-
-
-
-# Write the msb 4 byte $value starting at $offset into the passed string
-# Usage: write_msb_value($string, $offset, $value)
-sub write_msb_value_at_offset {
-	my $offset = $_[1];
-	my $value = $_[2];
-	substr($_[0], $offset+0, 1) = chr( ($value >> 24) & 0xFF );
-	substr($_[0], $offset+1, 1) = chr( ($value >> 16) & 0xFF );
-	substr($_[0], $offset+2, 1) = chr( ($value >>  8) & 0xFF );
-	substr($_[0], $offset+3, 1) = chr( ($value >>  0) & 0xFF );
-	return 0;
-}
-
-
-
-# Returns a string containing an QT atom
-# Usage: create_qt_atom(<atome name>, <atom data>, ['string'])
-sub create_qt_atom {
-	my ($name, $data, $prog_type) = (@_);
-	if (length($name) != 4) {
-		main::logger "ERROR: Inavlid QT atom name length '$name'\n";
-		exit 1;
-	}
-	# prepend string length if this is a string type
-	if ( defined $prog_type && $prog_type eq 'string' ) {
-		my $value = length($data);
-		$data = '1111'.$data;
-		# overwrite '1111' with total atom length in 2-byte MSB + 0x0 0x0
-		substr($data, 0, 1) = chr( ($value >> 8) & 0xFF );
-		substr($data, 1, 1) = chr( ($value >> 0) & 0xFF );
-		substr($data, 2, 1) = chr(0);
-		substr($data, 3, 1) = chr(0);
-	}
-	my $atom = '0000'.$name.$data;
-	# overwrite '0000' with total atom length in MSB
-	write_msb_value_at_offset( $atom, 0, length($name.$data) + 4 );
-	return $atom;
-}
-
-
-
 ################### Streamer::rtmp class #################
 package Streamer::rtmp;
 
@@ -8128,12 +7980,14 @@ sub get {
 	my $playpath 	= $streamdata{playpath};
 	my $port 	= $streamdata{port} || $opt->{rtmpport} || 1935;
 	my $protocol	= $streamdata{protocol} || 0;
+	my $pageurl	= $prog->{player};
 	my $mode	= $prog->{mode};
 	push @cmdopts, ( split /\s+/, $streamdata{extraopts} ) if $streamdata{extraopts};
 
 	my $file_tmp;
 	my @cmd;
-	
+	my $swfarg = "--swfUrl";
+
 	if ( $opt->{raw} ) {
 		$file_tmp = $prog->{filepart};
 	} else {
@@ -8150,16 +8004,20 @@ sub get {
 		push @cmdopts, ( split /\s+/, $opt->{'rtmp'.$prog->{type}.'opts'} );
 	}
 
-	# rtmpdump/flvstreamer version detection e.g. 'RTMPDump v1.5', 'FLVStreamer v1.8a', 'RTMPDump 2.1b'
-	my $rtmpver;
-	chomp( $rtmpver = (grep /^(RTMPDump|FLVStreamer)/, `"$bin->{flvstreamer}" 2>&1`)[0] );
-	$rtmpver =~ s/^\w+\s+v?([\.\d]+).*$/$1/g;
+	# flvstreamer version detection e.g. 'FLVStreamer v1.8a'
+	my $rtmpver = `"$bin->{flvstreamer}" --help 2>&1`;
+	if ( $rtmpver =~ /swfVfy/ ) {
+		$swfarg = "--swfVfy";
+	} else {
+		main::logger "WARNING: Your version of flvstreamer/rtmpdump does not support SWF Verification\n";
+	}
+	$rtmpver =~ s/^\w+\s+v?([\.\d]+)(.*\n)*$/$1/g;
 	main::logger "INFO: $bin->{flvstreamer} version $rtmpver\n" if $opt->{verbose};
 	main::logger "INFO: RTMP_URL: $url_2, tcUrl: $tcurl, application: $application, authString: $authstring, swfUrl: $swfurl, file: $prog->{filepart}, file_done: $prog->{filename}\n" if $opt->{verbose};
 
 	# Save the effort and don't support < v1.8
 	if ( $rtmpver < 1.8 ) {
-		main::logger "WARNING: flvstreamer/rtmpdump 1.8 or later is required - please upgrade\n";
+		main::logger "WARNING: rtmpdump/flvstreamer 1.8 or later is required - please upgrade\n";
 		return 'next';
 	}
 
@@ -8196,9 +8054,10 @@ sub get {
 			'--protocol', $protocol,
 			'--playpath', $playpath,
 			'--host', $server,
-			'--swfUrl', $swfurl,
+			$swfarg, $swfurl,
 			'--tcUrl', $tcurl,
 			'--app', $application,
+			'--pageUrl', $pageurl,
 			@cmdopts,
 		);
 	# Using just streamurl (i.e. no playpath defined)
@@ -9238,7 +9097,7 @@ sub add {
 		return 1;
 	}
 	# Parse valid options and create array (ignore options from the options files that have not been overriden on the cmdline)
-	for ( grep !/(webrequest|future|nocopyright|^test|metadataonly|subsonly|thumbonly|stdout|^get|update|^save|^prefs|help|expiry|nowrite|tree|terse|streaminfo|listformat|^list|showoptions|hide|info|pvr.*)$/, sort {lc $a cmp lc $b} keys %{$opt_cmdline} ) {
+	for ( grep !/(webrequest|future|nocopyright|^test|metadataonly|subsonly|thumbonly|stdout|^get|refresh|^save|^prefs|help|expiry|nowrite|tree|terse|streaminfo|listformat|^list|showoptions|hide|info|pvr.*)$/, sort {lc $a cmp lc $b} keys %{$opt_cmdline} ) {
 		if ( defined $opt_cmdline->{$_} ) {
 				push @options, "$_ $opt_cmdline->{$_}";
 				main::logger "DEBUG: Adding option $_ = $opt_cmdline->{$_}\n" if $opt->{debug};
