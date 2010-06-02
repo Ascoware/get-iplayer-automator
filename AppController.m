@@ -1102,7 +1102,7 @@
 	}
 	
 	//Process URL
-	if([url hasPrefix:@"http://www.bbc.co.uk/iplayer/episode/"])
+	if([url hasPrefix:@"http://www.bbc.co.uk/iplayer/episode/"] || [url hasPrefix:@"http://beta.bbc.co.uk/iplayer/episode"])
 	{
 		NSString *pid;
 		NSScanner *urlScanner = [[NSScanner alloc] initWithString:url];
