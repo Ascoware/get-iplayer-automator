@@ -372,6 +372,7 @@
 					{
 						//If not...
 						if ([s hasPrefix:@"frame="]) s2= @"Converting...";
+						else if ([s hasPrefix:@" Progress"]) s2= @"Processing Download...";
 						else s2 = @"0.0% - (0.0 MB/~0.0 MB) -- Initializing...";
 							[self addToLog:s noTag:YES];
 						status=NO;
@@ -420,7 +421,7 @@
 						[show setValue:[NSString stringWithFormat:@"Downloading: %.1f%%", percent] forKey:@"status"];
 					else 
 						[show setValue:@"Downloading..." forKey:@"status"];
-#pragma mark Calculate Time Remaining
+					
 					//Calculate Time Remaining
 					downloaded=downloaded/1024;
 					if (total>0 && downloaded>0 && percent>0)
@@ -522,6 +523,12 @@
 						[self setCurrentProgress:[NSString stringWithFormat:@"Converting... -- %@",[show valueForKey:@"showName"]]];
 						[self setPercentage:102];
 						[show setValue:@"Converting..." forKey:@"status"];
+					}
+					else if ([s2 isEqualToString:@"Processing Download..."])
+					{
+						[self setCurrentProgress:[NSString stringWithFormat:@"Processing Download -- %@", [show valueForKey:@"showName"]]];
+						[self setPercentage:102];
+						[show setValue:@"Processing Download..." forKey:@"status"];
 					}
 					else if (s2 != nil) 
 					{
