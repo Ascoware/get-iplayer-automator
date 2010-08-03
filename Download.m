@@ -589,6 +589,12 @@
 			//Add Status Message to Log
 			[self addToLog:output noTag:YES];
 		}
+		else if ([output hasPrefix:@" Progress"])
+		{
+			[self setPercentage:102];
+			[self setCurrentProgress:[NSString stringWithFormat:@"Processing Download... - %@", [show valueForKey:@"showName"]]];
+			[self setValue:@"Processing Download..." forKey:@"status"];
+		}
 		else if ([output hasPrefix:@"Threads:"])
 		{
 			//If it is an MPlayer (ITV) status message:
