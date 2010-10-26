@@ -191,7 +191,7 @@
 	}
 	
 	if (floor(NSAppKitVersionNumber) > 949)
-		[args addObject:@"--rtmp-tv-opts=-W http://www.bbc.co.uk/emp/10player.swf?revision=15501_15796"];
+		[args addObject:@"--rtmp-tv-opts=-W http://www.bbc.co.uk/emp/10player.swf?revision=18269_21576"];
 
 	task = [[NSTask alloc] init];
 	pipe = [[NSPipe alloc] init];
