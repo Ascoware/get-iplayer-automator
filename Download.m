@@ -373,8 +373,11 @@
 						//If not...
 						if ([s hasPrefix:@"frame="]) s2= @"Converting...";
 						else if ([s hasPrefix:@" Progress"]) s2= @"Processing Download...";
-						else s2 = @"0.0% - (0.0 MB/~0.0 MB) -- Initializing...";
+						else 
+						{
+							s2 = @"0.0% - (0.0 MB/~0.0 MB) -- Initializing...";
 							[self addToLog:s noTag:YES];
+						}
 						status=NO;
 						[scanner setScanLocation:0];
 						if ([s hasPrefix:@"ERROR:"] || [s hasPrefix:@"\rERROR:"] || [s hasPrefix:@"\nERROR:"])
