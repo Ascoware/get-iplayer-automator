@@ -179,6 +179,11 @@
 	LiveTVChannel *bbcNews24 = [[LiveTVChannel alloc] initWithChannelName:@"BBC News 24"];
 	[liveTVChannelController setContent:[NSArray arrayWithObjects:bbcOne,bbcTwo,bbcNews24,nil]];
 	[liveTVTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
+	
+	//Remove SWFinfo
+	NSString *infoPath = @"~/.swfinfo";
+	infoPath = [infoPath stringByExpandingTildeInPath];
+	if ([fileManager fileExistsAtPath:infoPath]) [fileManager removeItemAtPath:infoPath error:nil];
 }
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)application
 {
