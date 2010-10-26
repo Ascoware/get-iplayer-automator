@@ -375,7 +375,7 @@
 						else if ([s hasPrefix:@" Progress"]) s2= @"Processing Download...";
 						else 
 						{
-							s2 = @"0.0% - (0.0 MB/~0.0 MB) -- Initializing...";
+							s2 = [NSString stringWithFormat:@"Initialising... -- %@", [show valueForKey:@"showName"]];
 							[self addToLog:s noTag:YES];
 						}
 						status=NO;
@@ -529,7 +529,7 @@
 					}
 					else if ([s2 isEqualToString:@"Processing Download..."])
 					{
-						[self setCurrentProgress:[NSString stringWithFormat:@"Processing Download -- %@", [show valueForKey:@"showName"]]];
+						[self setCurrentProgress:[NSString stringWithFormat:@"Processing Download... -- %@", [show valueForKey:@"showName"]]];
 						[self setPercentage:102];
 						[show setValue:@"Processing Download..." forKey:@"status"];
 					}
