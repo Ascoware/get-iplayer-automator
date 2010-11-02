@@ -1629,6 +1629,7 @@
 		[show initWithShowname:tempName];
 		[show setValue:[programme timeadded] forKey:@"added"];
 		[show setValue:[programme tvNetwork] forKey:@"tvNetwork"];
+		[show setValue:[NSDate date] forKey:@"lastFound"];
 		[pvrQueueController addObject:show];
 	}
 }
