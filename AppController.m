@@ -156,18 +156,16 @@
 	if ([[tvFormatController arrangedObjects] count] == 0)
 	{
 		TVFormat *format1 = [[TVFormat alloc] init];
-		[format1 setFormat:@"Flash - Standard"];
+		[format1 setFormat:@"Flash - High"];
 		TVFormat *format2 = [[TVFormat alloc] init];
-		[format2 setFormat:@"iPhone"];
+		[format2 setFormat:@"Flash - Standard"];
 		[tvFormatController addObjects:[NSArray arrayWithObjects:format2,format1,nil]];
 	}
 	if ([[radioFormatController arrangedObjects] count] == 0)
 	{
 		RadioFormat *format1 = [[RadioFormat alloc] init];
 		[format1 setFormat:@"Flash - MP3"];
-		RadioFormat *format2 = [[RadioFormat alloc] init];
-		[format2 setFormat:@"iPhone"];
-		[radioFormatController addObjects:[NSArray arrayWithObjects:format2,format1,nil]];
+		[radioFormatController addObjects:[NSArray arrayWithObjects:format1,nil]];
 	}
 		
 	//Growl Initialization
