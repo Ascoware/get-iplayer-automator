@@ -38,7 +38,7 @@
 	NSString *atomicParsleyPath = [bundlePath stringByAppendingString:@"/Contents/Resources/AtomicParsley"];
 #ifdef __i386__
 	NSString *flvstreamerPath;
-	if (floor(NSAppKitVersionNumber) > 949)
+	if (floor(NSAppKitVersionNumber) > 949) //Newer than 10.5
 		flvstreamerPath = [bundlePath stringByAppendingString:@"/Contents/Resources/rtmpdump"];
 	else
 		flvstreamerPath = [bundlePath stringByAppendingString:@"/Contents/Resources/flvstreamer_macosx"];
@@ -190,8 +190,8 @@
 		[args addObject:@"--subdir-format=<nameshort>"];
 	}
 	
-	if (floor(NSAppKitVersionNumber) > 949)
-		[args addObject:@"--rtmp-tv-opts=-W http://www.bbc.co.uk/emp/10player.swf?revision=18269_21576"];
+	//if (floor(NSAppKitVersionNumber) > 949)
+		//[args addObject:@"--rtmp-tv-opts=-W http://www.bbc.co.uk/emp/10player.swf?revision=18269_21576"];
 
 	task = [[NSTask alloc] init];
 	pipe = [[NSPipe alloc] init];
