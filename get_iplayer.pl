@@ -25,6 +25,7 @@
 #
 package main;
 my $version = 2.78;
+$0 = 'get_iplayer';
 #
 # Help:
 #	./get_iplayer --help | --longhelp
@@ -5881,6 +5882,8 @@ sub get_stream_data_cdn {
 
 		# Limelight CDN
 		} elsif ( $cattribs->{kind} eq 'limelight' ) {
+			# Set the live flag if this has 'live' in the service name
+			$conn->{live} = 1 if defined $mattribs->{service} && $mattribs->{service} =~ /live/;
 			decode_entities( $cattribs->{authString} );
 			$conn->{playpath} = $cattribs->{identifier};
 			# Remove offending mp3/mp4: at the start of the identifier (don't remove in stream url)
@@ -6472,10 +6475,11 @@ sub get_links {
 	# Download index feed
 	# Sort feeds so that category based feeds are done last - this makes sure that the channels get defined correctly if there are dups
 	my @channel_list;
-	push @channel_list, grep !/(categor|popular|highlights)/, keys %channels;
+	push @channel_list, grep !/(categor|popular|highlights|bbchd)/, keys %channels;
 	push @channel_list, grep  /categor/, keys %channels;
 	push @channel_list, grep  /popular/, keys %channels;
 	push @channel_list, grep  /highlights/, keys %channels;
+	push @channel_list, grep  /bbchd/, keys %channels;
 	for ( @channel_list ) {
 
 		my $url = "${channel_feed_url}/$_/list/limit/400";
@@ -6636,6 +6640,7 @@ sub get_links {
 				$cats{$_} = 1 for ( @category, split /,/, $prog->{$pid}->{categories} );
 				$cats{Popular} = 1 if $channel eq 'Popular';
 				$cats{Highlights} = 1 if $channel eq 'Highlights';
+				$cats{HD} = 1 if $channel eq 'BBC HD';
 				$prog->{$pid}->{categories} = join(',', sort keys %cats);
 
 				# If this is a dupicate pid and the channel is now Signed then both versions are available
