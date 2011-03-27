@@ -47,7 +47,7 @@
 #endif
 	NSString *lamePath = [bundlePath stringByAppendingString:@"/Contents/Resources/lame"];
 #ifdef __i386__
-	NSString *ffmpegPath = [bundlePath stringByAppendingString:@"/Contents/Resources/ffmpeg_universal"];
+	NSString *ffmpegPath = [bundlePath stringByAppendingString:@"/Contents/Resources/ffmpeg"];
 #else
 	NSString *ffmpegPath = [bundlePath stringByAppendingString:@"/Contents/Resources/ffmpeg_universal"];
 #endif
