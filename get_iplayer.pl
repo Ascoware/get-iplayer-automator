@@ -4249,7 +4249,7 @@ sub tag_file {
 	# Return if file does not exist
 	return if ! -f $prog->{filename};
 
-	if ( $prog->{filename} =~ /\.(aac|mp3|m4a)$/i ) {
+	if ( $prog->{filename} =~ /\.(aac|mp3)$/i ) {
 		# Create ID3 tagging options for external tagger program (escape " for shell)
 		my ( $id3_name, $id3_episode, $id3_desc, $id3_channel ) = ( $prog->{name}, $prog->{episode}, $prog->{desc}, $prog->{channel} );
 		s|"|\\"|g for ($id3_name, $id3_episode, $id3_desc, $id3_channel);
@@ -4273,7 +4273,7 @@ sub tag_file {
 			main::logger "WARNING: Cannot tag $prog->{ext} file\n" if $opt->{verbose};
 		}
 
-	} elsif ( $prog->{filename} =~ /\.(mp4|m4v)$/i ) {
+	} elsif ( $prog->{filename} =~ /\.(mp4|m4v|m4a)$/i ) {
 		# Create mp4 tagging options for external tagging program.
 		my $tags;
 		for my $tag ( keys %{$prog} ) {
@@ -4320,28 +4320,51 @@ sub tag_file {
 			$title =~ s/[\s\-]*$//g;
 
 			# Build the command
-			my @cmd = (
-				$bin->{atomicparsley}, $prog->{filename},
-				'--TVNetwork',	$tags->{channel},
-				'--description',$tags->{descshort},
-				'--comment',	$tags->{descshort},
-				'--title',	$title,
-				'--TVShowName',	$tags->{longname},
-				'--TVEpisode',	$tags->{pid},
-				'--artist',	$tags->{name},
-				'--year',	$tags->{firstbcast},
-				'--advisory',	$tags->{guidance},
-				'--genre',	$tags->{categories},
-				'--stik',	$stik,
-				'--overWrite',	# Saves temp files being left around.
-			);
+			if ( $prog->{filename} =~ /\.(mp4|m4v)$/i ) {
+				@cmd = (
+					$bin->{atomicparsley}, $prog->{filename},
+					'--TVNetwork',	$tags->{channel},
+					'--description',$tags->{descshort},
+					'--comment',	$tags->{descshort},
+					'--title',	$title,
+					'--TVShowName',	$tags->{longname},
+					'--TVEpisode',	$tags->{pid},
+					'--artist',	$tags->{name},
+					'--year',	$tags->{firstbcast},
+					'--advisory',	$tags->{guidance},
+					'--genre',	$tags->{categories},
+					'--stik',	$stik,
+					'--overWrite',	# Saves temp files being left around.
+				);
+				
+				# Add the series and episode numbers if they are defined
+				push @cmd, "--TVSeasonNum", $prog->{seriesnum} if $prog->{seriesnum};
+				push @cmd, "--TVEpisodeNum", $prog->{episodenum} if $prog->{episodenum};
+				
+			} elsif ( $prog->{filename} =~ /\.(m4a)$/i ) {
+				@cmd = (
+					$bin->{atomicparsley}, $prog->{filename},
+					'--description',$tags->{descshort},
+					'--comment',	$tags->{descshort},
+					'--title',	$tags->{title},
+					'--TVShowName',	$tags->{longname},
+					'--TVEpisode',	$tags->{pid},
+					'--artist',	$tags->{channel},
+					'--albumArtist',	$tags->{channel},
+					'--album',	$tags->{longname},
+					'--year',	$tags->{firstbcast},
+					'--advisory',	$tags->{guidance},
+					'--genre',	$tags->{categories},
+					'--overWrite',	# Saves temp files being left around.
+				);
+				
+				# Add the series and episode numbers if they are defined as disk / track numbers
+				push @cmd, "--disk", $prog->{seriesnum} if $prog->{seriesnum};
+				push @cmd, "--tracknum", $prog->{episodenum} if $prog->{episodenum};
+			}
 
 			# Add the thumbnail if one was downloaded
 			push @cmd, "--artwork", $prog->{thumbfile} if -f $prog->{thumbfile};
-
-			# Add the series and episode numbers if they are defined
-			push @cmd, "--TVSeasonNum", $prog->{seriesnum} if $prog->{seriesnum};
-			push @cmd, "--TVEpisodeNum", $prog->{episodenum} if $prog->{episodenum};
 
 			# time of recording - this messes up iTunes somewhat
 			#push @cmd, "--purchaseDate", "$prog->{dldate}T$prog->{dltime}Z" if $prog->{dldate} && $prog->{dltime};
@@ -8146,6 +8169,39 @@ sub get {
 	my $return = main::run_cmd( 'STDERR', @cmd );
 	if ( (! $return) && -f $prog->{filepart} && stat($prog->{filepart})->size > $prog->min_download_size() ) {
 			unlink( $file_tmp );
+	
+			# If we have an aac file use ffmpeg to pack in m4a container and remove adts headers
+			# Have to do a second ffmpeg call because remuxing flv to m4a with -absf aac_adtstoasc gives corrupt m4a
+			# flv -> aac -> m4a works
+			if ( $mode =~ /flashaac/ ) {
+				
+					$prog->{itunesfilename} = "$prog->{dir}/$prog->{fileprefix}.m4a";
+					$prog->{itunesfilepart} = "$prog->{dir}/$prog->{fileprefix}.partial.m4a";
+				
+					@cmd = (
+						$bin->{ffmpeg},
+						'-i', $prog->{filepart},
+						'-vn',
+						'-acodec', 'copy',
+						'-absf', 'aac_adtstoasc',
+						'-y', $prog->{itunesfilepart},
+					);
+					
+					# Run aac to m4a conversion and delete aac file on success
+					# set paths to itunes paths
+					my $return = main::run_cmd( 'STDERR', @cmd );
+					if ( (! $return) && -f $prog->{itunesfilepart} ) {
+							unlink( $prog->{filepart} );
+							$prog->{filepart} = $prog->{itunesfilepart};
+							$prog->{filename} = $prog->{itunesfilename};
+		
+						# If the ffmpeg conversion failed, remove the failed-converted m4a file
+						# original flv -> aac conversion was a success so filepart / filename left alone
+						} else {
+							main::logger "WARNING: aac to m4a conversion failed - retaining aac file\n";
+							unlink $prog->{itunesfilepart};
+						}
+				}
 
 	# If the ffmpeg conversion failed, remove the failed-converted file attempt - move the file as done anyway
 	} else {
