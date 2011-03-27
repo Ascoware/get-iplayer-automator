@@ -186,7 +186,7 @@
 	}
 	else 
 	{
-		[args addObject:@"--file-prefix=<nameshort>.<senum>"];
+		[args addObject:@"--file-prefix=<nameshort>.<senum>.<episode>"];
 		[args addObject:@"--subdir-format=<nameshort>"];
 	}
 	
