@@ -24,8 +24,7 @@
 #
 #
 package main;
-my $version = 2.78;
-$0 = 'get_iplayer';
+my $version = 2.79;
 #
 # Help:
 #	./get_iplayer --help | --longhelp
@@ -3165,7 +3164,7 @@ sub usage {
 		main::logger join "\n", @usage, "\n";
 	}
 
-	exit 1;
+	exit 0;
 }
 
 
@@ -4978,6 +4977,8 @@ sub get_verpids {
 	# iPlayer LiveTV or PID
 	} else {
 		$url = 'http://www.bbc.co.uk/iplayer/playlist/'.$prog->{pid};
+		# use the audiodescribed playlist url if non-default versions are specified
+		$url .= '/ad' if defined $opt->{versionlist} && $opt->{versionlist} ne 'default';
 	}
 	
 	main::logger "INFO: iPlayer metadata URL = $url\n" if $opt->{verbose};
@@ -5099,7 +5100,11 @@ sub get_verpids {
 			# <alternate id="default" />
 			if ( m{<alternate\s+id="(.+?)"} ) {
 				my $curr_version = lc($1);
-				$version = lc($1);
+				# Remap version name from 'default' => 'audiodescribed' if we are using the /ad playlist URL:
+				if ( defined $opt->{versionlist} && $opt->{versionlist} ne 'default' ) {
+					$curr_version = 'audiodescribed' if $curr_version eq 'default';
+				}
+				$version = $curr_version;
 				# if current version is already defined, add a numeric suffix
 				if ( $prog->{verpids}->{$curr_version} ) {
 					my $vercount = 1;
@@ -5110,20 +5115,14 @@ sub get_verpids {
 					}
 					$version = $curr_version;
 				}
-			# If this item has no version name then append $count to previous version found (a hack but I think it works)
+			# If this item has no version name then this is assumed to be the 'default' version
 			} else {
-				# determine version name and trailing count (if any)
-				$prev_version =~ m{^(.+)(\d*)$};
-				my $prev_count = $2 || 1;
-				$prev_version = $1 || 'default';
-				$prev_count++;
-				$version = $prev_version.$prev_count;
+				$version = 'default';
 			}
 			main::logger "INFO: Using Not Live standard TV and Radio: $verpid\n" if $opt->{verbose} && $verpid;
 		}
 
 		next if ! ($verpid && $version);
-		$prev_version = $version;
 		$prog->{verpids}->{$version} = $verpid;
 		$prog->{durations}->{$version} = $1 if m{duration="(\d+?)"};
 		main::logger "INFO: Version: $version, VersionPid: $verpid, Duration: $prog->{durations}->{$version}\n" if $opt->{verbose};  
@@ -6354,7 +6353,7 @@ sub channels_schedule {
 # Class cmdline Options
 sub opt_format {
 	return {
-		tvmode		=> [ 1, "tvmode|vmode=s", 'Recording', '--tvmode <mode>,<mode>,...', "TV Recoding modes: iphone,rtmp,flashhd,flashvhigh,flashhigh,flashstd,flashnormal,flashlow,n95_wifi (default: iphone,flashhigh,flashstd,flashnormal)"],
+		tvmode		=> [ 1, "tvmode|vmode=s", 'Recording', '--tvmode <mode>,<mode>,...', "TV Recoding modes: iphone,rtmp,flashhd,flashvhigh,flashhigh,flashstd,flashnormal,flashlow,n95_wifi (default: flashhigh,flashstd,flashnormal)"],
 		outputtv	=> [ 1, "outputtv=s", 'Output', '--outputtv <dir>', "Output directory for tv recordings"],
 		vlc		=> [ 1, "vlc=s", 'External Program', '--vlc <path>', "Location of vlc or cvlc binary"],
 		rtmptvopts	=> [ 1, "rtmp-tv-opts|rtmptvopts=s", 'Recording', '--rtmp-tv-opts <options>', "Add custom options to flvstreamer for tv"],
@@ -6386,7 +6385,7 @@ sub modelist {
 			main::logger "WARNING: Not using flash modes since flvstreamer/rtmpdump is not found\n" if $opt->{verbose};
 			$mlist = 'iphone';
 		} else {
-			$mlist = 'iphone,flashhigh,flashstd,flashnormal';
+			$mlist = 'flashhigh,flashstd,flashnormal';
 		}
 	}
 	# Deal with BBC TV fallback modes and expansions
@@ -6621,6 +6620,8 @@ sub get_links {
 
 			# Extract channel
 			$channel = $channels{$_};
+			# Add HD as category
+			push @category, 'HD' if $channel eq 'BBC HD';
 
 			main::logger "DEBUG: '$pid, $name - $episode, $channel'\n" if $opt->{debug};
 
@@ -6640,7 +6641,6 @@ sub get_links {
 				$cats{$_} = 1 for ( @category, split /,/, $prog->{$pid}->{categories} );
 				$cats{Popular} = 1 if $channel eq 'Popular';
 				$cats{Highlights} = 1 if $channel eq 'Highlights';
-				$cats{HD} = 1 if $channel eq 'BBC HD';
 				$prog->{$pid}->{categories} = join(',', sort keys %cats);
 
 				# If this is a dupicate pid and the channel is now Signed then both versions are available
@@ -7217,7 +7217,7 @@ sub channels_schedule {
 # Class cmdline Options
 sub opt_format {
 	return {
-		radiomode	=> [ 1, "radiomode|amode=s", 'Recording', '--radiomode <mode>,<mode>,...', "Radio Recording mode(s): iphone,flashaac,flashaachigh,flashaacstd,flashaaclow,flashaudio,realaudio,wma (default: iphone,flashaachigh,flashaacstd,flashaudio,realaudio,flashaaclow)"],
+		radiomode	=> [ 1, "radiomode|amode=s", 'Recording', '--radiomode <mode>,<mode>,...', "Radio Recording mode(s): iphone,flashaac,flashaachigh,flashaacstd,flashaaclow,flashaudio,realaudio,wma (default: flashaachigh,flashaacstd,flashaudio,realaudio,flashaaclow)"],
 		bandwidth 	=> [ 1, "bandwidth=n", 'Recording', '--bandwidth', "In radio realaudio mode specify the link bandwidth in bps for rtsp streaming (default 512000)"],
 		lame		=> [ 0, "lame=s", 'External Program', '--lame <path>', "Location of lame binary"],
 		outputradio	=> [ 1, "outputradio=s", 'Output', '--outputradio <dir>', "Output directory for radio recordings"],
@@ -7267,9 +7267,9 @@ sub modelist {
 	if ( ! $mlist ) {
 		if ( ! main::exists_in_path('flvstreamer') ) {
 			main::logger "WARNING: Not using flash modes since flvstreamer/rtmpdump is not found\n" if $opt->{verbose};
-			$mlist = 'iphone,rtspaudio,realaudio,wma';
+			$mlist = 'rtspaudio,realaudio,wma';
 		} else {
-			$mlist = 'iphone,flashaachigh,flashaacstd,flashaudio,rtspaudio,realaudio,flashaaclow,wma';
+			$mlist = 'flashaachigh,flashaacstd,flashaudio,rtspaudio,realaudio,flashaaclow,wma';
 		}
 	}
 	# Deal with BBC Radio fallback modes and expansions
