@@ -4320,6 +4320,7 @@ sub tag_file {
 			$title =~ s/[\s\-]*$//g;
 
 			# Build the command
+			my @cmd;
 			if ( $prog->{filename} =~ /\.(mp4|m4v)$/i ) {
 				@cmd = (
 					$bin->{atomicparsley}, $prog->{filename},
