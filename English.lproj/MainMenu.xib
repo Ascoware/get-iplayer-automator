@@ -2,17 +2,17 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">10F569</string>
+		<string key="IBDocument.SystemVersion">10J567</string>
 		<string key="IBDocument.InterfaceBuilderVersion">732</string>
-		<string key="IBDocument.AppKitVersion">1038.29</string>
-		<string key="IBDocument.HIToolboxVersion">461.00</string>
+		<string key="IBDocument.AppKitVersion">1038.35</string>
+		<string key="IBDocument.HIToolboxVersion">462.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
 			<string key="NS.object.0">732</string>
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="548"/>
+			<integer value="1090"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1973,6 +1973,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA</b
 									</object>
 									<string key="NSFrame">{{1, 17}, {566, 131}}</string>
 									<reference key="NSSuperview" ref="632119056"/>
+									<reference key="NSNextKeyView" ref="415811496"/>
 									<reference key="NSDocView" ref="415811496"/>
 									<reference key="NSBGColor" ref="596185587"/>
 									<int key="NScvFlags">4</int>
@@ -2006,6 +2007,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA</b
 									</object>
 									<string key="NSFrame">{{1, 0}, {566, 17}}</string>
 									<reference key="NSSuperview" ref="632119056"/>
+									<reference key="NSNextKeyView" ref="953731068"/>
 									<reference key="NSDocView" ref="953731068"/>
 									<reference key="NSBGColor" ref="596185587"/>
 									<int key="NScvFlags">4</int>
@@ -2014,6 +2016,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA</b
 							</object>
 							<string key="NSFrame">{{20, 226}, {583, 164}}</string>
 							<reference key="NSSuperview" ref="442319543"/>
+							<reference key="NSNextKeyView" ref="826140608"/>
 							<int key="NSsFlags">50</int>
 							<reference key="NSVScroller" ref="704954213"/>
 							<reference key="NSHScroller" ref="97022619"/>
@@ -2124,6 +2127,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA</b
 									</object>
 									<string key="NSFrame">{{1, 17}, {566, 113}}</string>
 									<reference key="NSSuperview" ref="23822857"/>
+									<reference key="NSNextKeyView" ref="4104102"/>
 									<reference key="NSDocView" ref="4104102"/>
 									<reference key="NSBGColor" ref="596185587"/>
 									<int key="NScvFlags">4</int>
@@ -2157,6 +2161,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA</b
 									</object>
 									<string key="NSFrame">{{1, 0}, {566, 17}}</string>
 									<reference key="NSSuperview" ref="23822857"/>
+									<reference key="NSNextKeyView" ref="712453682"/>
 									<reference key="NSDocView" ref="712453682"/>
 									<reference key="NSBGColor" ref="596185587"/>
 									<int key="NScvFlags">4</int>
@@ -2165,6 +2170,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA</b
 							</object>
 							<string key="NSFrame">{{20, 18}, {583, 146}}</string>
 							<reference key="NSSuperview" ref="442319543"/>
+							<reference key="NSNextKeyView" ref="557979714"/>
 							<int key="NSsFlags">50</int>
 							<reference key="NSVScroller" ref="258460123"/>
 							<reference key="NSHScroller" ref="646104309"/>
@@ -3703,7 +3709,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 																			<object class="NSComboTableView" key="NSTableView" id="104092765">
 																				<reference key="NSNextResponder"/>
 																				<int key="NSvFlags">274</int>
-																				<string key="NSFrameSize">{13, 126}</string>
+																				<string key="NSFrameSize">{13, 108}</string>
 																				<reference key="NSSuperview"/>
 																				<reference key="NSWindow"/>
 																				<bool key="NSEnabled">YES</bool>
@@ -3894,13 +3900,12 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 																				<string>Flash AAC - Low</string>
 																				<string>Flash AAC - Standard</string>
 																				<string>Flash AAC - High</string>
-																				<string>Flash - MP3</string>
 																				<string>Real Audio</string>
 																			</object>
 																			<object class="NSComboTableView" key="NSTableView" id="657660857">
 																				<reference key="NSNextResponder"/>
 																				<int key="NSvFlags">274</int>
-																				<string key="NSFrameSize">{13, 126}</string>
+																				<string key="NSFrameSize">{13, 108}</string>
 																				<reference key="NSSuperview"/>
 																				<reference key="NSWindow"/>
 																				<bool key="NSEnabled">YES</bool>

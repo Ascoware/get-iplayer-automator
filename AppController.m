@@ -164,7 +164,7 @@
 	if ([[radioFormatController arrangedObjects] count] == 0)
 	{
 		RadioFormat *format1 = [[RadioFormat alloc] init];
-		[format1 setFormat:@"Flash - MP3"];
+		[format1 setFormat:@"Flash AAC - Standard"];
 		[radioFormatController addObjects:[NSArray arrayWithObjects:format1,nil]];
 	}
 		
