@@ -5485,7 +5485,7 @@ sub get_metadata {
 	$prog->{nameshort} =~ s/:?\s*Series\s+.+?(:\s*|$)//i;
 
 	# Conditionally set the senum
-	$seriesnum = 1 $seriesnum == 0;
+	$seriesnum = 1 if $seriesnum == 0;
 	$prog->{senum} = sprintf "s%02se%02s", $seriesnum, $episodenum if $seriesnum != 0 || $episodenum != 0;
 
 	# Default to 150px width thumbnail;
