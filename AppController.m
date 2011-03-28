@@ -1840,7 +1840,7 @@
 	if (![iTunes isRunning]) [iTunes activate];
 	@try
 	{
-		if ([ext isEqualToString:@"mov"] || [ext isEqualToString:@"mp4"] || [ext isEqualToString:@"mp3"])
+		if ([ext isEqualToString:@"mov"] || [ext isEqualToString:@"mp4"] || [ext isEqualToString:@"mp3"] || [ext isEqualToString:@"m4a"])
 		{
 			iTunesTrack *track = [iTunes add:fileToAdd to:nil];
 			if (track && ([ext isEqualToString:@"mov"] || [ext isEqualToString:@"mp4"]))
@@ -1857,7 +1857,7 @@
 				}
 				[track setUnplayed:YES];
 			}
-			else if (track && ([ext isEqualToString:@"mp3"] || [ext isEqualToString:@"aac"]))
+			else if (track && ([ext isEqualToString:@"mp3"] || [ext isEqualToString:@"m4a"]))
 			{
 				//[self addToLog:@"Setting Podcast Metadata:" :self];
 				[track setBookmarkable:YES];
