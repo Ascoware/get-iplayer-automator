@@ -47,7 +47,11 @@
 #endif
 	NSString *lamePath = [bundlePath stringByAppendingString:@"/Contents/Resources/lame"];
 #ifdef __i386__
-	NSString *ffmpegPath = [bundlePath stringByAppendingString:@"/Contents/Resources/ffmpeg"];
+	NSString *ffmpegPath;
+	if (floor(NSAppKitVersionNumber) > 949)
+		ffmpegPath = [bundlePath stringByAppendingString:@"/Contents/Resources/ffmpeg"];
+	else
+		ffmpegPath = [bundlePath stringByAppendingString:@"/Contents/Resources/ffmpeg_leopard"];
 #else
 	NSString *ffmpegPath = [bundlePath stringByAppendingString:@"/Contents/Resources/ffmpeg_universal"];
 #endif
