@@ -13,7 +13,7 @@
 		activeBuildConfigurationName = Release;
 		activeExecutable = D9CC15540FF9000A00D819E2 /* Get iPlayer Automator */;
 		activeSDKPreference = macosx10.5;
-		activeTarget = D9D0E01310449DE70059F044 /* Distribution */;
+		activeTarget = 8D1107260486CEB800E47090 /* Get iPlayer Automator */;
 		addToTargets = (
 			8D1107260486CEB800E47090 /* Get iPlayer Automator */,
 		);
@@ -162,14 +162,11 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 322957780;
-			PBXWorkspaceStateSaveDate = 322957780;
+			PBXPerProjectTemplateStateSaveDate = 323058223;
+			PBXWorkspaceStateSaveDate = 323058223;
 		};
 		perUserProjectItems = {
 			D903A8D410E1CEC200F4F9CC = D903A8D410E1CEC200F4F9CC /* PBXTextBookmark */;
-			D91EE93812C56DE7004D1B89 = D91EE93812C56DE7004D1B89 /* PBXTextBookmark */;
-			D91EE98512CA9082004D1B89 = D91EE98512CA9082004D1B89 /* PlistBookmark */;
-			D91EE99812CA9290004D1B89 = D91EE99812CA9290004D1B89 /* PBXTextBookmark */;
 			D9268848108A67F8000E8132 = D9268848108A67F8000E8132 /* PBXTextBookmark */;
 			D9356FCC109FD9840066DEC0 = D9356FCC109FD9840066DEC0 /* PBXTextBookmark */;
 			D935700B10A279BF0066DEC0 = D935700B10A279BF0066DEC0 /* PBXTextBookmark */;
@@ -201,28 +198,21 @@
 			D96CE45C1156D2C800744507 = D96CE45C1156D2C800744507 /* PBXTextBookmark */;
 			D96CE45D1156D2C800744507 = D96CE45D1156D2C800744507 /* PBXTextBookmark */;
 			D96CE45F1156D2C800744507 = D96CE45F1156D2C800744507 /* PBXTextBookmark */;
-			D971EC5A12E2892700D8F4AB = D971EC5A12E2892700D8F4AB /* PBXTextBookmark */;
-			D971EC5B12E2892700D8F4AB = D971EC5B12E2892700D8F4AB /* PBXTextBookmark */;
-			D971EC5C12E2892700D8F4AB = D971EC5C12E2892700D8F4AB /* PBXTextBookmark */;
-			D971EC5D12E2892700D8F4AB = D971EC5D12E2892700D8F4AB /* PBXTextBookmark */;
-			D971EC5E12E2892700D8F4AB = D971EC5E12E2892700D8F4AB /* PBXTextBookmark */;
 			D97D945E106DBC3D006ECD39 = D97D945E106DBC3D006ECD39 /* PBXTextBookmark */;
 			D97D95A3106E80BF006ECD39 = D97D95A3106E80BF006ECD39 /* PBXTextBookmark */;
-			D999D01E133AF08200DB5E83 = D999D01E133AF08200DB5E83 /* PBXTextBookmark */;
-			D9CAE56E134016B4003471DA /* PBXTextBookmark */ = D9CAE56E134016B4003471DA /* PBXTextBookmark */;
-			D9CAE56F134016B4003471DA /* PBXTextBookmark */ = D9CAE56F134016B4003471DA /* PBXTextBookmark */;
-			D9CAE570134016B4003471DA /* PBXTextBookmark */ = D9CAE570134016B4003471DA /* PBXTextBookmark */;
-			D9CAE571134016B4003471DA /* PBXTextBookmark */ = D9CAE571134016B4003471DA /* PBXTextBookmark */;
-			D9CAE572134016B4003471DA /* PBXTextBookmark */ = D9CAE572134016B4003471DA /* PBXTextBookmark */;
-			D9CAE573134016B4003471DA /* PBXTextBookmark */ = D9CAE573134016B4003471DA /* PBXTextBookmark */;
-			D9CAE574134016B4003471DA /* PlistBookmark */ = D9CAE574134016B4003471DA /* PlistBookmark */;
-			D9CAE575134016B4003471DA /* PlistBookmark */ = D9CAE575134016B4003471DA /* PlistBookmark */;
-			D9CAE57E1340222C003471DA /* PlistBookmark */ = D9CAE57E1340222C003471DA /* PlistBookmark */;
-			D9CAE57F1340222C003471DA /* PBXTextBookmark */ = D9CAE57F1340222C003471DA /* PBXTextBookmark */;
-			D9CAE58313402299003471DA /* PBXTextBookmark */ = D9CAE58313402299003471DA /* PBXTextBookmark */;
-			D9CAE58413402299003471DA /* PlistBookmark */ = D9CAE58413402299003471DA /* PlistBookmark */;
-			D9CAE58513402299003471DA /* PlistBookmark */ = D9CAE58513402299003471DA /* PlistBookmark */;
-			D9CAE5A013402BFE003471DA /* PlistBookmark */ = D9CAE5A013402BFE003471DA /* PlistBookmark */;
+			D9CAE56E134016B4003471DA = D9CAE56E134016B4003471DA /* PBXTextBookmark */;
+			D9CAE56F134016B4003471DA = D9CAE56F134016B4003471DA /* PBXTextBookmark */;
+			D9CAE570134016B4003471DA = D9CAE570134016B4003471DA /* PBXTextBookmark */;
+			D9CAE571134016B4003471DA = D9CAE571134016B4003471DA /* PBXTextBookmark */;
+			D9CAE573134016B4003471DA = D9CAE573134016B4003471DA /* PBXTextBookmark */;
+			D9CAE58313402299003471DA = D9CAE58313402299003471DA /* PBXTextBookmark */;
+			D9CAE5A71340CFFB003471DA = D9CAE5A71340CFFB003471DA /* PlistBookmark */;
+			D9CAE5AA134179AB003471DA = D9CAE5AA134179AB003471DA /* PBXTextBookmark */;
+			D9CAE5B313417A36003471DA /* PBXTextBookmark */ = D9CAE5B313417A36003471DA /* PBXTextBookmark */;
+			D9CAE5B413417A36003471DA /* PBXTextBookmark */ = D9CAE5B413417A36003471DA /* PBXTextBookmark */;
+			D9CAE5BB13417AE2003471DA /* PBXTextBookmark */ = D9CAE5BB13417AE2003471DA /* PBXTextBookmark */;
+			D9CAE5BC13417AE2003471DA /* PlistBookmark */ = D9CAE5BC13417AE2003471DA /* PlistBookmark */;
+			D9CAE5BD13417AE2003471DA /* PlistBookmark */ = D9CAE5BD13417AE2003471DA /* PlistBookmark */;
 			D9CC156C0FF9075400D819E2 = D9CC156C0FF9075400D819E2 /* PBXBookmark */;
 			D9CC15D00FF9F02000D819E2 = D9CC15D00FF9F02000D819E2 /* PBXBookmark */;
 			D9CC15D10FF9F02000D819E2 = D9CC15D10FF9F02000D819E2 /* PBXBookmark */;
@@ -309,9 +299,9 @@
 	};
 	D914BD28100CBFA900F7E68E /* Download.m */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {1377, 9334}}";
-			sepNavSelRange = "{1980, 0}";
-			sepNavVisRange = "{840, 2938}";
+			sepNavIntBoundsRect = "{{0, 0}, {1433, 9217}}";
+			sepNavSelRange = "{2135, 0}";
+			sepNavVisRange = "{0, 1892}";
 			sepNavWindowFrame = "{{15, 26}, {1479, 672}}";
 		};
 	};
@@ -329,37 +319,6 @@
 			sepNavVisRange = "{0, 1325}";
 			sepNavWindowFrame = "{{1240, -5}, {910, 747}}";
 		};
-	};
-	D91EE93812C56DE7004D1B89 /* PBXTextBookmark */ = {
-		isa = PBXTextBookmark;
-		fRef = D914BD27100CBFA900F7E68E /* Download.h */;
-		name = "Download.h: 47";
-		rLen = 0;
-		rLoc = 993;
-		rType = 0;
-		vrLen = 1421;
-		vrLoc = 0;
-	};
-	D91EE98512CA9082004D1B89 /* PlistBookmark */ = {
-		isa = PlistBookmark;
-		fRef = 8D1107310486CEB800E47090 /* Info.plist */;
-		fallbackIsa = PBXBookmark;
-		isK = 0;
-		kPath = (
-		);
-		name = "/Users/thomaswillson/Code/Get iPlayer Automator/Info.plist";
-		rLen = 0;
-		rLoc = 9223372036854775808;
-	};
-	D91EE99812CA9290004D1B89 /* PBXTextBookmark */ = {
-		isa = PBXTextBookmark;
-		fRef = D904F0491009F22E00D60BBF /* get_iplayer.pl */;
-		name = "get_iplayer.pl: 8135";
-		rLen = 0;
-		rLoc = 293827;
-		rType = 0;
-		vrLen = 6656;
-		vrLoc = 8002;
 	};
 	D92687C31087F81F000E8132 /* DownloadHistoryController.h */ = {
 		uiCtxt = {
@@ -729,56 +688,6 @@
 		vrLen = 732;
 		vrLoc = 0;
 	};
-	D971EC5A12E2892700D8F4AB /* PBXTextBookmark */ = {
-		isa = PBXTextBookmark;
-		fRef = D9FEB87510077790003BADF8 /* AppController.m */;
-		name = "AppController.m: 2269";
-		rLen = 0;
-		rLoc = 83494;
-		rType = 0;
-		vrLen = 1570;
-		vrLoc = 82465;
-	};
-	D971EC5B12E2892700D8F4AB /* PBXTextBookmark */ = {
-		isa = PBXTextBookmark;
-		fRef = D914BD28100CBFA900F7E68E /* Download.m */;
-		name = "Download.m: 191";
-		rLen = 0;
-		rLoc = 8820;
-		rType = 0;
-		vrLen = 1994;
-		vrLoc = 0;
-	};
-	D971EC5C12E2892700D8F4AB /* PBXTextBookmark */ = {
-		isa = PBXTextBookmark;
-		fRef = D904F422100B077600D60BBF /* Programme.h */;
-		name = "Programme.h: 50";
-		rLen = 0;
-		rLoc = 1583;
-		rType = 0;
-		vrLen = 1586;
-		vrLoc = 3;
-	};
-	D971EC5D12E2892700D8F4AB /* PBXTextBookmark */ = {
-		isa = PBXTextBookmark;
-		fRef = D904F423100B077600D60BBF /* Programme.m */;
-		name = "Programme.m: 76";
-		rLen = 81;
-		rLoc = 2305;
-		rType = 0;
-		vrLen = 1542;
-		vrLoc = 1186;
-	};
-	D971EC5E12E2892700D8F4AB /* PBXTextBookmark */ = {
-		isa = PBXTextBookmark;
-		fRef = D904F423100B077600D60BBF /* Programme.m */;
-		name = "Programme.m: 78";
-		rLen = 0;
-		rLoc = 2382;
-		rType = 0;
-		vrLen = 1671;
-		vrLoc = 0;
-	};
 	D97D9422106DBB68006ECD39 /* TVFormat.h */ = {
 		uiCtxt = {
 			sepNavIntBoundsRect = "{{0, 0}, {885, 403}}";
@@ -848,16 +757,6 @@
 			sepNavVisRange = "{0, 429}";
 		};
 	};
-	D999D01E133AF08200DB5E83 /* PBXTextBookmark */ = {
-		isa = PBXTextBookmark;
-		fRef = D904F423100B077600D60BBF /* Programme.m */;
-		name = "Programme.m: 78";
-		rLen = 0;
-		rLoc = 2382;
-		rType = 0;
-		vrLen = 1668;
-		vrLoc = 3;
-	};
 	D9A4509C102FF8090011E175 /* Credits.html */ = {
 		uiCtxt = {
 			sepNavIntBoundsRect = "{{0, 0}, {1285, 765}}";
@@ -904,7 +803,7 @@
 		fRef = D914BD28100CBFA900F7E68E /* Download.m */;
 		name = "Download.m: 50";
 		rLen = 0;
-		rLoc = 1980;
+		rLoc = 2035;
 		rType = 0;
 		vrLen = 2938;
 		vrLoc = 840;
@@ -919,16 +818,6 @@
 		vrLen = 1184;
 		vrLoc = 237;
 	};
-	D9CAE572134016B4003471DA /* PBXTextBookmark */ = {
-		isa = PBXTextBookmark;
-		fRef = D904F0491009F22E00D60BBF /* get_iplayer.pl */;
-		name = "get_iplayer.pl: 5471";
-		rLen = 0;
-		rLoc = 199213;
-		rType = 0;
-		vrLen = 2011;
-		vrLoc = 198230;
-	};
 	D9CAE573134016B4003471DA /* PBXTextBookmark */ = {
 		isa = PBXTextBookmark;
 		fRef = D9FEB87510077790003BADF8 /* AppController.m */;
@@ -938,49 +827,6 @@
 		rType = 0;
 		vrLen = 1900;
 		vrLoc = 5351;
-	};
-	D9CAE574134016B4003471DA /* PlistBookmark */ = {
-		isa = PlistBookmark;
-		fRef = 8D1107310486CEB800E47090 /* Info.plist */;
-		fallbackIsa = PBXBookmark;
-		isK = 0;
-		kPath = (
-		);
-		name = "/Users/thomaswillson/Code/Get iPlayer Automator/Info.plist";
-		rLen = 0;
-		rLoc = 9223372036854775807;
-	};
-	D9CAE575134016B4003471DA /* PlistBookmark */ = {
-		isa = PlistBookmark;
-		fRef = 8D1107310486CEB800E47090 /* Info.plist */;
-		fallbackIsa = PBXBookmark;
-		isK = 0;
-		kPath = (
-		);
-		name = "/Users/thomaswillson/Code/Get iPlayer Automator/Info.plist";
-		rLen = 0;
-		rLoc = 9223372036854775807;
-	};
-	D9CAE57E1340222C003471DA /* PlistBookmark */ = {
-		isa = PlistBookmark;
-		fRef = 8D1107310486CEB800E47090 /* Info.plist */;
-		fallbackIsa = PBXBookmark;
-		isK = 0;
-		kPath = (
-		);
-		name = "/Users/thomaswillson/Code/Get iPlayer Automator/Info.plist";
-		rLen = 0;
-		rLoc = 9223372036854775807;
-	};
-	D9CAE57F1340222C003471DA /* PBXTextBookmark */ = {
-		isa = PBXTextBookmark;
-		fRef = D904F0491009F22E00D60BBF /* get_iplayer.pl */;
-		name = "get_iplayer.pl: 5488";
-		rLen = 0;
-		rLoc = 199964;
-		rType = 0;
-		vrLen = 2039;
-		vrLoc = 198204;
 	};
 	D9CAE58313402299003471DA /* PBXTextBookmark */ = {
 		isa = PBXTextBookmark;
@@ -992,7 +838,58 @@
 		vrLen = 2097;
 		vrLoc = 198204;
 	};
-	D9CAE58413402299003471DA /* PlistBookmark */ = {
+	D9CAE5A71340CFFB003471DA /* PlistBookmark */ = {
+		isa = PlistBookmark;
+		fRef = 8D1107310486CEB800E47090 /* Info.plist */;
+		fallbackIsa = PBXBookmark;
+		isK = 0;
+		kPath = (
+		);
+		name = "/Users/thomaswillson/Code/Get iPlayer Automator/Info.plist";
+		rLen = 0;
+		rLoc = 9223372036854775808;
+	};
+	D9CAE5AA134179AB003471DA /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = D914BD28100CBFA900F7E68E /* Download.m */;
+		name = "Download.m: 50";
+		rLen = 0;
+		rLoc = 2035;
+		rType = 0;
+		vrLen = 2960;
+		vrLoc = 822;
+	};
+	D9CAE5B313417A36003471DA /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = D914BD28100CBFA900F7E68E /* Download.m */;
+		name = "Download.m: 50";
+		rLen = 0;
+		rLoc = 2035;
+		rType = 0;
+		vrLen = 2942;
+		vrLoc = 840;
+	};
+	D9CAE5B413417A36003471DA /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = D914BD28100CBFA900F7E68E /* Download.m */;
+		name = "Download.m: 50";
+		rLen = 0;
+		rLoc = 2035;
+		rType = 0;
+		vrLen = 2942;
+		vrLoc = 840;
+	};
+	D9CAE5BB13417AE2003471DA /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = D914BD28100CBFA900F7E68E /* Download.m */;
+		name = "Download.m: 54";
+		rLen = 0;
+		rLoc = 2135;
+		rType = 0;
+		vrLen = 1892;
+		vrLoc = 0;
+	};
+	D9CAE5BC13417AE2003471DA /* PlistBookmark */ = {
 		isa = PlistBookmark;
 		fRef = 8D1107310486CEB800E47090 /* Info.plist */;
 		fallbackIsa = PBXBookmark;
@@ -1003,18 +900,7 @@
 		rLen = 0;
 		rLoc = 9223372036854775807;
 	};
-	D9CAE58513402299003471DA /* PlistBookmark */ = {
-		isa = PlistBookmark;
-		fRef = 8D1107310486CEB800E47090 /* Info.plist */;
-		fallbackIsa = PBXBookmark;
-		isK = 0;
-		kPath = (
-		);
-		name = "/Users/thomaswillson/Code/Get iPlayer Automator/Info.plist";
-		rLen = 0;
-		rLoc = 9223372036854775807;
-	};
-	D9CAE5A013402BFE003471DA /* PlistBookmark */ = {
+	D9CAE5BD13417AE2003471DA /* PlistBookmark */ = {
 		isa = PlistBookmark;
 		fRef = 8D1107310486CEB800E47090 /* Info.plist */;
 		fallbackIsa = PBXBookmark;
