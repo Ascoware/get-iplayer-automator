@@ -81,10 +81,11 @@
 	
 	//Install Plugins If Needed
 	NSString *pluginPath = [folder stringByAppendingPathComponent:@"plugins"];
-	if (![fileManager fileExistsAtPath:pluginPath])
+	if (/*![fileManager fileExistsAtPath:pluginPath]*/TRUE)
 	{
 		[self addToLog:@"Installing Get_iPlayer Plugins..." :self];
 		NSString *providedPath = [[NSBundle mainBundle] bundlePath];
+		if ([fileManager fileExistsAtPath:pluginPath]) [fileManager removeItemAtPath:pluginPath error:NULL];
 		providedPath = [providedPath stringByAppendingPathComponent:@"/Contents/Resources/plugins"];
 		[fileManager copyPath:providedPath toPath:pluginPath handler:nil];
 	}
