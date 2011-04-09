@@ -164,8 +164,12 @@
 	if ([[radioFormatController arrangedObjects] count] == 0)
 	{
 		RadioFormat *format1 = [[RadioFormat alloc] init];
-		[format1 setFormat:@"Flash AAC - Standard"];
-		[radioFormatController addObjects:[NSArray arrayWithObjects:format1,nil]];
+		[format1 setFormat:@"Flash AAC - High"];
+		RadioFormat *format2 = [[RadioFormat alloc] init];
+		[format2 setFormat:@"Flash AAC - Standard"];
+		RadioFormat *format3 = [[RadioFormat alloc] init];
+		[format3 setFormat:@"Flash - MP3"];
+		[radioFormatController addObjects:[NSArray arrayWithObjects:format1,format2,format3,nil]];
 	}
 		
 	//Growl Initialization
