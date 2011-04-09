@@ -96,7 +96,7 @@
 		//No Proxy
 		proxyArg = NULL;
 	}
-	else if ([proxyOption isEqualToString:@"Custom"])
+	else if ([proxyOption isEqualToString:@"Custom"] && (![[show radio] isEqualToNumber:[NSNumber numberWithBool:YES]] || [[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"]))
 	{
 		if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CustomProxy"] hasPrefix:@"http"])
 			proxyArg = [[NSString alloc] initWithFormat:@"-p%@",[[NSUserDefaults standardUserDefaults] valueForKey:@"CustomProxy"]];
@@ -129,8 +129,12 @@
 		}
 		else
 		{
-			NSString *providedProxy = [[NSString alloc] initWithData:urlData encoding:NSUTF8StringEncoding];
-			proxyArg = [[NSString alloc] initWithFormat:@"-phttp://%@", providedProxy];
+			if (![[show radio] isEqualToNumber:[NSNumber numberWithBool:YES]] || [[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"])
+			{	
+				NSString *providedProxy = [[NSString alloc] initWithData:urlData encoding:NSUTF8StringEncoding];
+				proxyArg = [[NSString alloc] initWithFormat:@"-phttp://%@", providedProxy];
+			}
+			else proxyArg=NULL;
 		}
 	}
 		//Partial Proxy?
