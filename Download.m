@@ -96,7 +96,7 @@
 		//No Proxy
 		proxyArg = NULL;
 	}
-	else if ([proxyOption isEqualToString:@"Custom"] && (![[show radio] isEqualToNumber:[NSNumber numberWithBool:YES]] || [[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"]))
+	else if ([proxyOption isEqualToString:@"Custom"] && (![[show radio] isEqualToNumber:[NSNumber numberWithBool:YES]] || [[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue]))
 	{
 		if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CustomProxy"] hasPrefix:@"http"])
 			proxyArg = [[NSString alloc] initWithFormat:@"-p%@",[[NSUserDefaults standardUserDefaults] valueForKey:@"CustomProxy"]];
@@ -129,7 +129,7 @@
 		}
 		else
 		{
-			if (![[show radio] isEqualToNumber:[NSNumber numberWithBool:YES]] || [[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"])
+			if (![[show radio] isEqualToNumber:[NSNumber numberWithBool:YES]] || [[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])
 			{	
 				NSString *providedProxy = [[NSString alloc] initWithData:urlData encoding:NSUTF8StringEncoding];
 				proxyArg = [[NSString alloc] initWithFormat:@"-phttp://%@", providedProxy];
