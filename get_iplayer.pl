@@ -54,6 +54,7 @@ use Fcntl;
 use File::Copy;
 use File::Path;
 use File::stat;
+use File::Spec;
 use Getopt::Long;
 use HTML::Entities;
 use HTTP::Cookies;
@@ -138,6 +139,7 @@ my $opt_format = {
 	test		=> [ 1, "test|t!", 'Recording', '--test, -t', "Test only - no recording (will show programme type)"],
 	thumb		=> [ 1, "thumb|thumbnail!", 'Recording', '--thumb', "Download Thumbnail image if available"],
 	thumbonly	=> [ 1, "thumbonly|thumbnailonly|thumbnail-only|thumb-only!", 'Recording', '--thumbnail-only', "Only Download Thumbnail image if available, not the programme"],
+	aactomp3 => [ 1, "aactomp3", 'Recording', '--aactomp3', "Transcode aac audio to mp3 with ffmpeg"],
 
 	# Search
 	before		=> [ 1, "before=n", 'Search', '--before', "Limit search to programmes added to the cache before N hours ago"],
@@ -2392,7 +2394,7 @@ sub create_html_email {
 
 	my $smtp = Net::SMTP->new($smtphost);
 	if ( ! $smtp ) {
-		main::logger "ERROR: Could not find or connect to specficied SMTP server\n";
+		main::logger "ERROR: Could not find or connect to specified SMTP server\n";
 		return 1;
 	};
 
@@ -4261,7 +4263,7 @@ sub tag_file {
 				'--artist', $id3_channel,
 				'--album', $id3_name,
 				'--song', $id3_episode,
-				'--comment', 'Description:'.$id3_desc,
+				'--comment', $id3_desc,
 				'--year', substr( $prog->{firstbcast}->{$prog->{version}}, 0, 4 ) || ((localtime())[5] + 1900),
 				$prog->{filename},
 			);
@@ -4337,11 +4339,11 @@ sub tag_file {
 					'--stik',	$stik,
 					'--overWrite',	# Saves temp files being left around.
 				);
-				
+
 				# Add the series and episode numbers if they are defined
 				push @cmd, "--TVSeasonNum", $prog->{seriesnum} if $prog->{seriesnum};
 				push @cmd, "--TVEpisodeNum", $prog->{episodenum} if $prog->{episodenum};
-				
+
 			} elsif ( $prog->{filename} =~ /\.(m4a)$/i ) {
 				@cmd = (
 					$bin->{atomicparsley}, $prog->{filename},
@@ -4358,7 +4360,7 @@ sub tag_file {
 					'--genre',	$tags->{categories},
 					'--overWrite',	# Saves temp files being left around.
 				);
-				
+
 				# Add the series and episode numbers if they are defined as disk / track numbers
 				push @cmd, "--disk", $prog->{seriesnum} if $prog->{seriesnum};
 				push @cmd, "--tracknum", $prog->{episodenum} if $prog->{episodenum};
@@ -4585,11 +4587,7 @@ sub generate_filenames {
 	}
 
 	# Determine direcotry and find it's absolute path
-	if ( $^O !~ /^MSWin32$/ ) {
-		$prog->{dir} = abs_path( $opt->{ 'output'.$prog->{type} } || $opt->{output} || $ENV{IPLAYER_OUTDIR} || '.' );
-	} else {
-		$prog->{dir} = $opt->{ 'output'.$prog->{type} } || $opt->{output} || $ENV{IPLAYER_OUTDIR} || '.';
-	}
+	$prog->{dir} = File::Spec->rel2abs( $opt->{ 'output'.$prog->{type} } || $opt->{output} || $ENV{IPLAYER_OUTDIR} || '.' );
 	
 	# Add modename to default format string if multimode option is used
 	$format .= ' <mode>' if $opt->{multimode};
@@ -4651,8 +4649,16 @@ sub generate_filenames {
 	# Use a dummy file ext if one isn't set - helps with readability of metadata
 	$prog->{ext} = 'EXT' if ! $prog->{ext};
 	
+	# check if file extension has changed as a result of failed attempt with different mode
+	my $ext_changed = 0;
+	if ( ! $opt->{history} && ! $opt->{multimode} && defined $prog->{filename} && $prog->{filename} ne '' ) {
+		my ($dir, $fileprefix, $ext) = ( $1, $3, $4 ) if $prog->{filename} =~ m{^((.*)[\//]+)?([^\//]+?)\.(\w+)$};
+		$ext_changed = ( defined $ext && $ext ne '' && $ext ne $prog->{ext} );
+		main::logger "DEBUG: File ext changed:   $ext -> $prog->{ext}\n" if $ext_changed && $opt->{debug};
+	}
+
 	# Don't override the {filename} if it is already set (i.e. for history info) or unless multimode option is specified
-	$prog->{filename} = "$prog->{dir}/$prog->{fileprefix}.$prog->{ext}" if ( defined $prog->{filename} && $prog->{filename} =~ /\.EXT$/ ) || $opt->{multimode} || ! $prog->{filename};
+	$prog->{filename} = "$prog->{dir}/$prog->{fileprefix}.$prog->{ext}" if ( defined $prog->{filename} && $prog->{filename} =~ /\.EXT$/ ) || $opt->{multimode} || ! $prog->{filename} || $ext_changed;
 	$prog->{filepart} = "$prog->{dir}/$prog->{fileprefix}.partial.$prog->{ext}";
 
 	# Create symlink filename if required
@@ -4695,7 +4701,7 @@ sub generate_filenames {
 	main::logger "DEBUG: Directory:          $prog->{dir}\n" if $opt->{debug};
 	main::logger "DEBUG: Partial Filename:   $prog->{filepart}\n" if $opt->{debug};
 	main::logger "DEBUG: Final Filename:     $prog->{filename}\n" if $opt->{debug};
-	main::logger "DEBUG: Thumnail Filename:  $prog->{thumbfile}\n" if $opt->{debug};
+	main::logger "DEBUG: Thumbnail Filename: $prog->{thumbfile}\n" if $opt->{debug};
 	main::logger "DEBUG: Raw Mode: $opt->{raw}\n" if $opt->{debug};
 
 	# Check path length is < 256 chars
@@ -4843,15 +4849,16 @@ sub get_time_string {
 	main::logger "DEBUG: $_ = $year, $mon, $mday, $hour, $min, $sec, $tzhour, $tzmin\n" if $opt->{debug};
 	# Sanity check date data
 	return '' if $year < 1970 || $mon < 1 || $mon > 12 || $mday < 1 || $mday > 31 || $hour < 0 || $hour > 24 || $min < 0 || $min > 59 || $sec < 0 || $sec > 59 || $tzhour < -13 || $tzhour > 13 || $tzmin < -59 || $tzmin > 59;
-	# Year cannot be > 2032 so limit accordingly :-/
-	$year = 2038 if $year > 2038;
 	# Calculate the seconds difference between epoch_now and epoch_datestring and convert back into array_time
-	my $epoch = timegm($sec, $min, $hour, $mday, ($mon-1), ($year-1900), undef, undef, 0) - $tzhour*60*60 - $tzmin*60;
+	my $epoch = eval { timegm($sec, $min, $hour, $mday, ($mon-1), ($year-1900), undef, undef, 0) - $tzhour*60*60 - $tzmin*60; };
+	# ensure safe 32-bit date	my $epoch = eval { timegm($sec, $min, $hour, $mday, ($mon-1), ($year-1900), undef, undef, 0) - $tzhour*60*60 - $tzmin*60; };
+	# ensure safe 32-bit date if timegm croaks
+	if ( $@ ) { $epoch = timegm(0, 0, 0, 1, 0, 138, undef, undef, 0) - $tzhour*60*60 - $tzmin*60; };
 	my $rtn;
 	if ( $diff ) {
 		# Return time ago
 		if ( $epoch < $diff ) {
-			my @time = gmtime( $diff - ( timegm($sec, $min, $hour, $mday, ($mon-1), ($year-1900), undef, undef, 0) - $tzhour*60*60 - $tzmin*60 ) );
+			my @time = gmtime( $diff - $epoch );
 			# The time() func gives secs since 1970, gmtime is since 1900
 			my $years = $time[5] - 70;
 			$rtn = "$years years " if $years;
@@ -4859,7 +4866,7 @@ sub get_time_string {
 			return $rtn;
 		# Return time to go
 		} elsif ( $epoch > $diff ) {
-			my @time = gmtime( ( timegm($sec, $min, $hour, $mday, ($mon-1), ($year-1900), undef, undef, 0) - $tzhour*60*60 - $tzmin*60 ) - $diff );
+			my @time = gmtime( $epoch - $diff );
 			my $years = $time[5] - 70;
 			$rtn = 'in ';
 			$rtn .= "$years years " if $years;
@@ -4872,7 +4879,7 @@ sub get_time_string {
 	# Return time in epoch
 	} else {
 		# Calculate the seconds difference between epoch_now and epoch_datestring and convert back into array_time
-		return timegm($sec, $min, $hour, $mday, ($mon-1), ($year-1900), undef, undef, 0) - $tzhour*60*60 - $tzmin*60;
+		return $epoch;
 	}
 }
 
@@ -6916,6 +6923,8 @@ sub download {
 	$prog->{ext} = 'wav' if $opt->{wav} &&  $mode =~ /^real/;
 	# Override flash ext based on raw
 	$prog->{ext} = 'flv' if $opt->{raw} && $mode =~ /^flash/;
+	# Override flashaac ext based on aactomp3
+	$prog->{ext} = 'mp3' if ! $opt->{raw} && $opt->{aactomp3} && $mode =~ /^flashaac/;
 
 	# Determine the correct filenames for this recording
 	if ( $prog->generate_filenames( $ua, $prog->file_prefix_format() ) ) {
@@ -6943,7 +6952,6 @@ sub download {
 		main::logger "\n";
 		$prog->download_subtitles( $ua, $subfile );
 	}
-
 
 	my $return = 0;
 	# Only get the stream if we are writing a file or streaming
@@ -7112,6 +7120,7 @@ sub channels {
 		'bbc_radio_two'				=> 'BBC Radio 2',
 		'bbc_radio_three'			=> 'BBC Radio 3',
 		'bbc_radio_four'			=> 'BBC Radio 4',
+		'bbc_radio_four_extra'			=> 'BBC Radio 4 Extra',
 		'bbc_radio_five_live'			=> 'BBC Radio 5 live',
 		'bbc_radio_five_live_sports_extra'	=> 'BBC 5 live Sports Extra',
 		'bbc_6music'				=> 'BBC 6 Music',
@@ -7182,6 +7191,7 @@ sub channels_schedule {
 		'radio3/programmes/schedules'		=> 'BBC Radio 3',
 		'radio4/programmes/schedules/fm'	=> 'BBC Radio 4 FM',
 		'radio4/programmes/schedules/lw'	=> 'BBC Radio 4 LW',
+		'radio4extra/programmes/schedules'	=> 'BBC Radio 4 Extra',
 		'5live/programmes/schedules'		=> 'BBC Radio 5 live',
 		'5livesportsextra/programmes/schedules'	=> 'BBC 5 live Sports Extra',
 		'6music/programmes/schedules'		=> 'BBC 6 Music',
@@ -7591,6 +7601,7 @@ sub channels {
 		'bbc_radio_three'			=> 'BBC Radio 3',
 		'bbc_radio_fourfm'			=> 'BBC Radio 4 FM',
 		'bbc_radio_fourlw'			=> 'BBC Radio 4 LW',
+		'bbc_radio_four_extra'			=> 'BBC Radio 4 Extra',
 		'bbc_radio_five_live'			=> 'BBC Radio 5 live',
 		'bbc_radio_five_live_sports_extra'	=> 'BBC 5 live Sports Extra',
 		'bbc_6music'				=> 'BBC 6 Music',
@@ -8144,16 +8155,26 @@ sub get {
 			$file_tmp,
 			'-dumpfile', $prog->{filepart},
 		);
-	# Convert flv to aac/mp4a
+	# Convert flv to aac/mp4a/mp3
 	} elsif ( $mode =~ /flashaac/ ) {
-		# This works as long as we specify aac and not mp4a
-		@cmd = (
-			$bin->{ffmpeg},
-			'-i', $file_tmp,
-			'-vn',
-			'-acodec', 'copy',
-			'-y', $prog->{filepart},
-		);
+		# transcode to MP3 if directed
+		if ( $opt->{aactomp3} ) {
+			@cmd = (
+				$bin->{ffmpeg},
+				'-i', $file_tmp,
+				'-vn',
+				'-acodec', 'libmp3lame', '-ac', '2', '-ab', '128k',
+				'-y', $prog->{filepart},
+			);
+		} else {
+			@cmd = (
+				$bin->{ffmpeg},
+				'-i', $file_tmp,
+				'-vn',
+				'-acodec', 'copy',
+				'-y', $prog->{filepart},
+			);
+		}
 	# Convert video flv to mp4/avi if required
 	} else {
 		@cmd = (
@@ -8166,44 +8187,49 @@ sub get {
 		);
 	}
 
-
 	# Run flv conversion and delete source file on success
 	my $return = main::run_cmd( 'STDERR', @cmd );
 	if ( (! $return) && -f $prog->{filepart} && stat($prog->{filepart})->size > $prog->min_download_size() ) {
 			unlink( $file_tmp );
-	
+
 			# If we have an aac file use ffmpeg to pack in m4a container and remove adts headers
 			# Have to do a second ffmpeg call because remuxing flv to m4a with -absf aac_adtstoasc gives corrupt m4a
 			# flv -> aac -> m4a works
-			if ( $mode =~ /flashaac/ ) {
-				
-					$prog->{itunesfilename} = "$prog->{dir}/$prog->{fileprefix}.m4a";
-					$prog->{itunesfilepart} = "$prog->{dir}/$prog->{fileprefix}.partial.m4a";
-				
-					@cmd = (
-						$bin->{ffmpeg},
-						'-i', $prog->{filepart},
-						'-vn',
-						'-acodec', 'copy',
-						'-absf', 'aac_adtstoasc',
-						'-y', $prog->{itunesfilepart},
-					);
-					
-					# Run aac to m4a conversion and delete aac file on success
-					# set paths to itunes paths
-					my $return = main::run_cmd( 'STDERR', @cmd );
-					if ( (! $return) && -f $prog->{itunesfilepart} ) {
-							unlink( $prog->{filepart} );
-							$prog->{filepart} = $prog->{itunesfilepart};
-							$prog->{filename} = $prog->{itunesfilename};
-		
-						# If the ffmpeg conversion failed, remove the failed-converted m4a file
-						# original flv -> aac conversion was a success so filepart / filename left alone
-						} else {
-							main::logger "WARNING: aac to m4a conversion failed - retaining aac file\n";
-							unlink $prog->{itunesfilepart};
-						}
+			if ( $mode =~ /flashaac/ && $prog->{ext} eq 'aac' && ! $opt->{aactomp3} ) {
+
+				# Temp file is now partial file from flv->aac conversion
+				# Change the extension to m4a for later info / debug messages
+				# final and parital filenames use new extension
+				$file_tmp = $prog->{filepart};
+				$prog->{ext} = 'm4a';
+				$prog->{filename} = "$prog->{dir}/$prog->{fileprefix}.$prog->{ext}";
+				$prog->{filepart} = "$prog->{dir}/$prog->{fileprefix}.partial.$prog->{ext}";
+
+				@cmd = (
+					$bin->{ffmpeg},
+					'-i', $file_tmp,
+					'-vn',
+					'-acodec', 'copy',
+					'-absf', 'aac_adtstoasc',
+					'-y', $prog->{filepart},
+				);
+
+				# Run aac conversion and delete source file on success
+				my $return = main::run_cmd( 'STDERR', @cmd );
+				if ( (! $return) && -f $prog->{filepart} && stat($prog->{filepart})->size > $prog->min_download_size() ) {
+					unlink( $file_tmp );
+
+				# If the ffmpeg conversion failed, remove the failed-converted file attempt - move the file as done anyway
+				} else {
+					main::logger "WARNING: aac conversion failed - retaining aac file\n";
+					unlink $prog->{filepart};
+					$prog->{filepart} = $file_tmp;
+					$prog->{filename} = $file_tmp;
+
+					# reset the extension to aac for later info / debug messages
+					$prog->{ext} = 'aac';
 				}
+			}
 
 	# If the ffmpeg conversion failed, remove the failed-converted file attempt - move the file as done anyway
 	} else {
