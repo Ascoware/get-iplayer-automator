@@ -4851,7 +4851,6 @@ sub get_time_string {
 	return '' if $year < 1970 || $mon < 1 || $mon > 12 || $mday < 1 || $mday > 31 || $hour < 0 || $hour > 24 || $min < 0 || $min > 59 || $sec < 0 || $sec > 59 || $tzhour < -13 || $tzhour > 13 || $tzmin < -59 || $tzmin > 59;
 	# Calculate the seconds difference between epoch_now and epoch_datestring and convert back into array_time
 	my $epoch = eval { timegm($sec, $min, $hour, $mday, ($mon-1), ($year-1900), undef, undef, 0) - $tzhour*60*60 - $tzmin*60; };
-	# ensure safe 32-bit date	my $epoch = eval { timegm($sec, $min, $hour, $mday, ($mon-1), ($year-1900), undef, undef, 0) - $tzhour*60*60 - $tzmin*60; };
 	# ensure safe 32-bit date if timegm croaks
 	if ( $@ ) { $epoch = timegm(0, 0, 0, 1, 0, 138, undef, undef, 0) - $tzhour*60*60 - $tzmin*60; };
 	my $rtn;
@@ -5856,7 +5855,7 @@ sub get_stream_data_cdn {
 		# Common attributes
 		# swfurl = Default iPlayer swf version
 		my $conn = {
-			swfurl		=> "http://www.bbc.co.uk/emp/10player.swf?revision=18269_21576",
+			swfurl		=> "http://www.bbc.co.uk/emp/revisions/18269_21576_10player.swf?revision=18269_21576",
 			ext		=> $ext,
 			streamer	=> $streamer,
 			bitrate		=> $mattribs->{bitrate},
