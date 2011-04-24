@@ -36,25 +36,9 @@
 	NSString *getiPlayerPath = [bundlePath stringByAppendingString:@"/Contents/Resources/get_iplayer.pl"];
 	NSString *mplayerPath = [bundlePath stringByAppendingString:@"/Contents/Resources/mplayer"];
 	NSString *atomicParsleyPath = [bundlePath stringByAppendingString:@"/Contents/Resources/AtomicParsley"];
-#ifdef __i386__
-	NSString *flvstreamerPath;
-	if (floor(NSAppKitVersionNumber) > 949) //Newer than 10.5
-		flvstreamerPath = [bundlePath stringByAppendingString:@"/Contents/Resources/rtmpdump"];
-	else
-		flvstreamerPath = [bundlePath stringByAppendingString:@"/Contents/Resources/flvstreamer_macosx"];
-#else
-	NSString *flvstreamerPath = [bundlePath stringByAppendingString:@"/Contents/Resources/flvstreamer_macosx"];
-#endif
+	NSString *flvstreamerPath = [bundlePath stringByAppendingString:@"/Contents/Resources/rtmpdump"];
 	NSString *lamePath = [bundlePath stringByAppendingString:@"/Contents/Resources/lame"];
-#ifdef __i386__
-	NSString *ffmpegPath;
-	if (floor(NSAppKitVersionNumber) > 949)
-		ffmpegPath = [bundlePath stringByAppendingString:@"/Contents/Resources/ffmpeg"];
-	else
-		ffmpegPath = [bundlePath stringByAppendingString:@"/Contents/Resources/ffmpeg_leopard"];
-#else
-	NSString *ffmpegPath = [bundlePath stringByAppendingString:@"/Contents/Resources/ffmpeg_universal"];
-#endif
+	NSString *ffmpegPath = [bundlePath stringByAppendingString:@"/Contents/Resources/ffmpeg"];
 	NSString *downloadPath = [[NSString alloc] initWithString:[[NSUserDefaults standardUserDefaults] valueForKey:@"DownloadPath"]];
 		//Initialize Formats
 	NSArray *tvFormatKeys = [NSArray arrayWithObjects:@"iPhone",@"Flash - High",@"Flash - Low",@"Flash - HD",@"Flash - Standard",@"Flash - Normal",@"Flash - Very High",nil];

@@ -26,9 +26,7 @@
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
-		D9013BAB10BB7715004B01BE /* ffmpeg_universal in Resources */ = {isa = PBXBuildFile; fileRef = D9013BAA10BB7715004B01BE /* ffmpeg_universal */; };
 		D904F04A1009F22E00D60BBF /* get_iplayer.pl in Resources */ = {isa = PBXBuildFile; fileRef = D904F0491009F22E00D60BBF /* get_iplayer.pl */; };
-		D904F06F1009F35100D60BBF /* flvstreamer_macosx in Resources */ = {isa = PBXBuildFile; fileRef = D904F06E1009F35100D60BBF /* flvstreamer_macosx */; };
 		D904F0731009F6B800D60BBF /* mplayer in Resources */ = {isa = PBXBuildFile; fileRef = D904F0721009F6B800D60BBF /* mplayer */; };
 		D904F424100B077600D60BBF /* Programme.m in Sources */ = {isa = PBXBuildFile; fileRef = D904F423100B077600D60BBF /* Programme.m */; };
 		D914BC59100C9F0100F7E68E /* ScriptingBridge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D914BC58100C9F0100F7E68E /* ScriptingBridge.framework */; };
@@ -55,7 +53,6 @@
 		D9A4509D102FF8090011E175 /* Credits.html in Resources */ = {isa = PBXBuildFile; fileRef = D9A4509C102FF8090011E175 /* Credits.html */; };
 		D9A450A4102FFDC00011E175 /* LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = D9A450A3102FFDC00011E175 /* LICENSE.txt */; };
 		D9CAE546133FF9BE003471DA /* ffmpeg in Resources */ = {isa = PBXBuildFile; fileRef = D9CAE545133FF9BE003471DA /* ffmpeg */; };
-		D9CAE5BA13417A5F003471DA /* ffmpeg_leopard in Resources */ = {isa = PBXBuildFile; fileRef = D9CAE5B913417A5F003471DA /* ffmpeg_leopard */; };
 		D9CC15680FF9071700D819E2 /* Play.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D9CC15670FF9071700D819E2 /* Play.tiff */; };
 		D9CC156A0FF9072F00D819E2 /* ActivityWindow.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D9CC15690FF9072F00D819E2 /* ActivityWindow.tiff */; };
 		D9CC157B0FF9076F00D819E2 /* Stop.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D9CC157A0FF9076F00D819E2 /* Stop.tiff */; };
@@ -75,7 +72,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 8D1107260486CEB800E47090 /* Get iPlayer Automator */;
+			remoteGlobalIDString = 8D1107260486CEB800E47090;
 			remoteInfo = "Get iPlayer Automator";
 		};
 /* End PBXContainerItemProxy section */
@@ -106,9 +103,7 @@
 		32CA4F630368D1EE00C91783 /* Get_iPlayer GUI_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Get_iPlayer GUI_Prefix.pch"; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* Get iPlayer Automator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Get iPlayer Automator.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		D9013BAA10BB7715004B01BE /* ffmpeg_universal */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = ffmpeg_universal; sourceTree = "<group>"; };
 		D904F0491009F22E00D60BBF /* get_iplayer.pl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.perl; name = get_iplayer.pl; path = ../get_iplayer.pl; sourceTree = "<group>"; };
-		D904F06E1009F35100D60BBF /* flvstreamer_macosx */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = flvstreamer_macosx; sourceTree = "<group>"; };
 		D904F0721009F6B800D60BBF /* mplayer */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = mplayer; sourceTree = "<group>"; };
 		D904F422100B077600D60BBF /* Programme.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Programme.h; sourceTree = "<group>"; };
 		D904F423100B077600D60BBF /* Programme.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Programme.m; sourceTree = "<group>"; };
@@ -146,7 +141,6 @@
 		D9A450A3102FFDC00011E175 /* LICENSE.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 		D9BE0870103563530011CF40 /* Camino.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Camino.h; sourceTree = "<group>"; };
 		D9CAE545133FF9BE003471DA /* ffmpeg */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = ffmpeg; sourceTree = "<group>"; };
-		D9CAE5B913417A5F003471DA /* ffmpeg_leopard */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = ffmpeg_leopard; sourceTree = "<group>"; };
 		D9CC15670FF9071700D819E2 /* Play.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = Play.tiff; sourceTree = "<group>"; };
 		D9CC15690FF9072F00D819E2 /* ActivityWindow.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = ActivityWindow.tiff; sourceTree = "<group>"; };
 		D9CC157A0FF9076F00D819E2 /* Stop.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = Stop.tiff; sourceTree = "<group>"; };
@@ -280,13 +274,10 @@
 		D904F04D1009F28400D60BBF /* Binaries */ = {
 			isa = PBXGroup;
 			children = (
-				D9CAE5B913417A5F003471DA /* ffmpeg_leopard */,
 				D9CAE545133FF9BE003471DA /* ffmpeg */,
 				D9FAFBE91156AD2A005ACE1C /* rtmpdump */,
 				D904F0721009F6B800D60BBF /* mplayer */,
-				D9013BAA10BB7715004B01BE /* ffmpeg_universal */,
 				D97D96A510743860006ECD39 /* lame */,
-				D904F06E1009F35100D60BBF /* flvstreamer_macosx */,
 				D961247E10F12C9200046D31 /* AtomicParsley */,
 				D904F0491009F22E00D60BBF /* get_iplayer.pl */,
 			);
@@ -414,7 +405,6 @@
 				D9CC156A0FF9072F00D819E2 /* ActivityWindow.tiff in Resources */,
 				D9CC157B0FF9076F00D819E2 /* Stop.tiff in Resources */,
 				D904F04A1009F22E00D60BBF /* get_iplayer.pl in Resources */,
-				D904F06F1009F35100D60BBF /* flvstreamer_macosx in Resources */,
 				D91783F01013035B00B82736 /* camstudio_record_button.png in Resources */,
 				D9CCF3CC1023485A009205BE /* dsa_pub.pem in Resources */,
 				D9CCF54C1025AAF9009205BE /* Growl Registration Ticket.growlRegDict in Resources */,
@@ -425,11 +415,9 @@
 				D9A450A4102FFDC00011E175 /* LICENSE.txt in Resources */,
 				D948C40C103436DE000CF853 /* icon.icns in Resources */,
 				D97D96A610743860006ECD39 /* lame in Resources */,
-				D9013BAB10BB7715004B01BE /* ffmpeg_universal in Resources */,
 				D961247F10F12C9200046D31 /* AtomicParsley in Resources */,
 				D9FAFBEA1156AD2A005ACE1C /* rtmpdump in Resources */,
 				D9CAE546133FF9BE003471DA /* ffmpeg in Resources */,
-				D9CAE5BA13417A5F003471DA /* ffmpeg_leopard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
