@@ -293,7 +293,7 @@
 					[show setValue:@"Download Complete" forKey:@"status"];
 					[show setPath:@"Unknown"];
 				}
-				else if ([scn scanUpToString:@"Already in download history" intoString:nil] && 
+				else if ([scn scanUpToString:@"Already in history" intoString:nil] && 
 						 [scn scanString:@"Already in" intoString:nil])
 				{
 					[show setValue:[NSNumber numberWithBool:YES] forKey:@"complete"];
