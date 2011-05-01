@@ -16,7 +16,7 @@
 	runAgain = NO;
 	running=YES;
 	foundLastLine=NO;
-	unResumableCount=0;
+	unResumableFile=FALSE;
 	errorCache = [[NSMutableString alloc] init];
 	processErrorCache = [NSTimer scheduledTimerWithTimeInterval:.25 target:self selector:@selector(processError) userInfo:nil repeats:YES];
 	
@@ -265,7 +265,12 @@
 				}
 
 				NSScanner *scn = [NSScanner scannerWithString:lastLine];
-				if ([lastLine hasPrefix:@"INFO: Recorded"])
+				if (unResumableFile)
+				{
+					[show setValue:[NSNumber numberWithBool:YES] forKey:@"complete"];
+					[show setValue:[NSNumber numberWithBool:NO] forKey:@"successful"];
+				}					
+				else if ([lastLine hasPrefix:@"INFO: Recorded"])
 				{
 					[show setValue:[NSNumber numberWithBool:YES] forKey:@"complete"];
 					[show setValue:[NSNumber numberWithBool:YES] forKey:@"successful"];
@@ -374,13 +379,13 @@
 						[scanner setScanLocation:0];
 						if ([s hasPrefix:@"ERROR:"] || [s hasPrefix:@"\rERROR:"] || [s hasPrefix:@"\nERROR:"])
 						{
-							if ([scanner scanUpToString:@"corrupt file!" intoString:nil] && [scanner scanString:@"corrupt file!" intoString:nil] && unResumableCount>3)
+							if ([scanner scanUpToString:@"corrupt file!" intoString:nil] && [scanner scanString:@"corrupt file!" intoString:nil])
 							{
 								[show setValue:@"Unresumable File." forKey:@"status"];
 								[self addToLog:@"Unresumable file, please delete the partial file and try again." noTag:NO];
 								[task interrupt];
+								unResumableFile=TRUE;
 							}
-							else unResumableCount++;
 						}
 					}
 					else

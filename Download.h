@@ -38,7 +38,7 @@ extern bool runDownloads;
 	
 	BOOL foundLastLine;
 	NSString *LastLine;
-	int unResumableCount;
+	BOOL unResumableFile;
 	
 	double lastDownloaded;
 	NSDate *lastDate;
