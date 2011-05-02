@@ -269,6 +269,7 @@
 				{
 					[show setValue:[NSNumber numberWithBool:YES] forKey:@"complete"];
 					[show setValue:[NSNumber numberWithBool:NO] forKey:@"successful"];
+					[show setValue:@"Failed: Unresumable File" forKey:@"status"];
 				}					
 				else if ([lastLine hasPrefix:@"INFO: Recorded"])
 				{
@@ -363,7 +364,7 @@
 				NSString *s2;
 				NSScanner *scanner = [NSScanner scannerWithString:s];
 				//Check if BBC Flash status Message
-				if (![scanner scanFloat:nil])
+				if (![scanner scanFloat:nil] && !unResumableFile)
 				{
 					if ([s length] != 0)
 					{
@@ -381,7 +382,7 @@
 						{
 							if ([scanner scanUpToString:@"corrupt file!" intoString:nil] && [scanner scanString:@"corrupt file!" intoString:nil])
 							{
-								[show setValue:@"Unresumable File." forKey:@"status"];
+								[show setValue:@"Failed: Unresumable File" forKey:@"status"];
 								[self addToLog:@"Unresumable file, please delete the partial file and try again." noTag:NO];
 								[task interrupt];
 								unResumableFile=TRUE;
