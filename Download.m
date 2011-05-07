@@ -38,11 +38,7 @@
 	NSString *atomicParsleyPath = [bundlePath stringByAppendingString:@"/Contents/Resources/AtomicParsley"];
 	NSString *flvstreamerPath = [bundlePath stringByAppendingString:@"/Contents/Resources/rtmpdump"];
 	NSString *lamePath = [bundlePath stringByAppendingString:@"/Contents/Resources/lame"];
-#ifdef __LP64__
-	NSString *ffmpegPath = [bundlePath stringByAppendingString:@"/Contents/Resources/ffmpeg64"];
-#else
 	NSString *ffmpegPath = [bundlePath stringByAppendingString:@"/Contents/Resources/ffmpeg"];
-#endif
 	NSString *downloadPath = [[NSString alloc] initWithString:[[NSUserDefaults standardUserDefaults] valueForKey:@"DownloadPath"]];
 		//Initialize Formats
 	NSArray *tvFormatKeys = [NSArray arrayWithObjects:@"iPhone",@"Flash - High",@"Flash - Low",@"Flash - HD",@"Flash - Standard",@"Flash - Normal",@"Flash - Very High",nil];
