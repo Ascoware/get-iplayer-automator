@@ -16,9 +16,9 @@
 	runAgain = NO;
 	running=YES;
 	foundLastLine=NO;
-	unResumableFile=FALSE;
 	errorCache = [[NSMutableString alloc] init];
 	processErrorCache = [NSTimer scheduledTimerWithTimeInterval:.25 target:self selector:@selector(processError) userInfo:nil repeats:YES];
+	reasonForFailure = [[NSString alloc] initWithString:@"None"];
 	
 	//Prepare Time Remaining
 	rateEntries = [[NSMutableArray alloc] init];
@@ -265,12 +265,37 @@
 				}
 
 				NSScanner *scn = [NSScanner scannerWithString:lastLine];
-				if (unResumableFile)
+				if ([reasonForFailure isEqualToString:@"unresumable"])
 				{
 					[show setValue:[NSNumber numberWithBool:YES] forKey:@"complete"];
 					[show setValue:[NSNumber numberWithBool:NO] forKey:@"successful"];
 					[show setValue:@"Failed: Unresumable File" forKey:@"status"];
-				}					
+				}
+				else if ([reasonForFailure isEqualToString:@"proxy"])
+				{
+					[show setValue:[NSNumber numberWithBool:YES] forKey:@"complete"];
+					[show setValue:[NSNumber numberWithBool:NO] forKey:@"successful"];
+					NSString *proxyOption = [[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"];
+					if ([proxyOption isEqualToString:@"None"])
+					{
+						[show setValue:@"Failed: See Log" forKey:@"status"];
+						[self addToLog:@"REASON FOR FAILURE: Proxy failed. If in the UK, please submit a bug report." noTag:TRUE];
+						[self addToLog:@"If outside the UK, please enable the provided proxy." noTag:TRUE];
+					}
+					else if ([proxyOption isEqualToString:@"Provided"])
+					{
+						[show setValue:@"Failed: Bad Proxy" forKey:@"status"];
+						[self addToLog:@"REASON FOR FAILURE: Proxy failed. If in the UK, please disable the proxy in the preferences." noTag:TRUE];
+						[self addToLog:@"If outside the UK, please submit a bug report so that the proxy can be updated." noTag:TRUE];
+					}
+					else if ([proxyOption isEqualToString:@"Custom"])
+					{
+						[show setValue:@"Failed: Bad Proxy" forKey:@"status"];
+						[self addToLog:@"REASON FOR FAILURE: Proxy failed. If in the UK, please disable the proxy in the preferences." noTag:TRUE];
+						[self addToLog:@"If outside the UK, please use a different proxy." noTag:TRUE];
+					}
+					[self addToLog:[NSString stringWithFormat:@"%@ Failed",[show showName]]];
+				}
 				else if ([lastLine hasPrefix:@"INFO: Recorded"])
 				{
 					[show setValue:[NSNumber numberWithBool:YES] forKey:@"complete"];
@@ -364,7 +389,7 @@
 				NSString *s2;
 				NSScanner *scanner = [NSScanner scannerWithString:s];
 				//Check if BBC Flash status Message
-				if (![scanner scanFloat:nil] && !unResumableFile)
+				if (![scanner scanFloat:nil])
 				{
 					if ([s length] != 0)
 					{
@@ -382,10 +407,9 @@
 						{
 							if ([scanner scanUpToString:@"corrupt file!" intoString:nil] && [scanner scanString:@"corrupt file!" intoString:nil])
 							{
-								[show setValue:@"Failed: Unresumable File" forKey:@"status"];
 								[self addToLog:@"Unresumable file, please delete the partial file and try again." noTag:NO];
 								[task interrupt];
-								unResumableFile=TRUE;
+								reasonForFailure=@"unresumable";
 							}
 						}
 					}
@@ -583,6 +607,11 @@
 		{
 			LastLine = [NSString stringWithString:output];
 			foundLastLine=YES;
+		}
+		if ([output hasPrefix:@"INFO: No specified modes"])
+		{
+			reasonForFailure=@"proxy";
+			[self addToLog:output noTag:YES];
 		}
 		else if ([output hasPrefix:@"INFO:"] || [output hasPrefix:@"WARNING:"] || [output hasPrefix:@"ERROR:"] || 
 			[output hasSuffix:@"default"] || [output hasPrefix:[show pid]])
