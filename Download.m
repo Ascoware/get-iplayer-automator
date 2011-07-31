@@ -37,6 +37,7 @@
 	NSString *mplayerPath = [bundlePath stringByAppendingString:@"/Contents/Resources/mplayer"];
 	NSString *atomicParsleyPath = [bundlePath stringByAppendingString:@"/Contents/Resources/AtomicParsley"];
 	NSString *flvstreamerPath = [bundlePath stringByAppendingString:@"/Contents/Resources/rtmpdump"];
+    NSString *rtmpdumpPath = [bundlePath stringByAppendingString:@"/Contents/Resources/rtmpdump-2.4"];
 	NSString *lamePath = [bundlePath stringByAppendingString:@"/Contents/Resources/lame"];
 	NSString *ffmpegPath = [bundlePath stringByAppendingString:@"/Contents/Resources/ffmpeg"];
 	NSString *downloadPath = [[NSString alloc] initWithString:[[NSUserDefaults standardUserDefaults] valueForKey:@"DownloadPath"]];
@@ -134,7 +135,11 @@
 	NSString *noWarningArg = [[NSString alloc] initWithString:@"--nocopyright"];
 	NSString *noExpiryArg = [[NSString alloc] initWithString:@"--nopurge"];
 	NSString *mplayerArg = [[NSString alloc] initWithFormat:@"--mplayer=%@", mplayerPath];
-	NSString *flvstreamerArg = [[NSString alloc] initWithFormat:@"--flvstreamer=%@", flvstreamerPath];
+    NSString *flvstreamerArg;
+    if (NSAppKitVersionNumber > 1038)
+        flvstreamerArg = [[NSString alloc] initWithFormat:@"--flvstreamer=%@", rtmpdumpPath];
+    else
+        flvstreamerArg = [[NSString alloc] initWithFormat:@"--flvstreamer=%@", flvstreamerPath];
 	NSString *lameArg = [[NSString alloc] initWithFormat:@"--lame=%@", lamePath];
 	NSString *atomicParsleyArg = [[NSString alloc] initWithFormat:@"--atomicparsley=%@", atomicParsleyPath];
 	NSString *ffmpegArg;
