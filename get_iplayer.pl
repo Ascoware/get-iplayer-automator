@@ -139,7 +139,8 @@ my $opt_format = {
 	test		=> [ 1, "test|t!", 'Recording', '--test, -t', "Test only - no recording (will show programme type)"],
 	thumb		=> [ 1, "thumb|thumbnail!", 'Recording', '--thumb', "Download Thumbnail image if available"],
 	thumbonly	=> [ 1, "thumbonly|thumbnailonly|thumbnail-only|thumb-only!", 'Recording', '--thumbnail-only', "Only Download Thumbnail image if available, not the programme"],
-	aactomp3 => [ 1, "aactomp3", 'Recording', '--aactomp3', "Transcode aac audio to mp3 with ffmpeg"],
+	aactomp3	=> [ 1, "aactomp3", 'Recording', '--aactomp3', "Transcode AAC audio to MP3 with ffmpeg (CBR 128k unless --mp3vbr is specified)"],
+	mp3vbr		=> [ 1, "mp3vbr=n", 'Recording', '--mp3vbr', "Set LAME VBR mode to N (0 to 9) for AAC transcoding. 0 = target bitrate 245 Kbit/s, 9 = target bitrate 65 Kbit/s (requires --aactomp3)"],
 
 	# Search
 	before		=> [ 1, "before=n", 'Search', '--before', "Limit search to programmes added to the cache before N hours ago"],
@@ -168,6 +169,7 @@ my $opt_format = {
 	html		=> [ 1, "html=s", 'Output', '--html <file>', "Create basic HTML index of matching programmes in specified file"],
 	isodate		=> [ 1, "isodate!",  'Output', '--isodate', "Use ISO8601 dates (YYYY-MM-DD) in filenames"],
 	metadata	=> [ 1, "metadata=s", 'Output', '--metadata <type>', "Create metadata info file after recording. Valid types are: xbmc, xbmc_movie, freevo, generic"],
+	mkv			=> [ 1, "mkv", 'Output', '--mkv', "Output video in MKV container instead of MP4. Currently no tagging supported from get_iplayer for MKV output"],
 	mythtv		=> [ 1, "mythtv=s", 'Output', '--mythtv <file>', "Create Mythtv streams XML of matching programmes in specified file"],
 	nowrite		=> [ 1, "no-write|nowrite|n!", 'Output', '--nowrite, -n', "No writing of file to disk (use with -x to prevent a copy being stored on disk)"],
 	output		=> [ 2, "output|o=s", 'Output', '--output, -o <dir>', "Recording output directory"],
@@ -240,6 +242,16 @@ my $opt_format = {
 	atomicparsley	=> [ 1, "atomicparsley|atomic-parsley=s", 'External Program', '--atomicparsley <path>', "Location of AtomicParsley tagger binary"],
 	id3v2		=> [ 1, "id3tag|id3v2=s", 'External Program', '--id3v2 <path>', "Location of id3v2 or id3tag binary"],
 	mplayer		=> [ 1, "mplayer=s", 'External Program', '--mplayer <path>', "Location of mplayer binary"],
+
+	# Tagging
+	tag_fulltitle => [ 1, "tagfulltitle|tag-fulltitle!", 'Tagging', '--tag-fulltitle', "Use complete title (including series) instead of shorter episode title"],
+	tag_hdvideo => [ 1, "taghdvideo|tag-hdvideo!", 'Tagging', '--tag-hdvideo', "AtomicParsley supports --hdvideo argument for HD video flag"],
+	tag_longdesc => [ 1, "taglongdesc|tag-longdesc!", 'Tagging', '--tag-longdesc', "AtomicParsley supports --longdesc argument for long description text"],
+	tag_longdescription => [ 1, "taglongdescription|tag-longdescription!", 'Tagging', '--tag-longdescription', "AtomicParsley supports --longDescription argument for long description text"],
+	tag_podcast => [ 1, "tagpodcast|tag-podcast!", 'Tagging', '--tag-podcast', "Tag downloaded radio and tv programmes as iTunes podcasts (requires MP3::Tag module for AAC/MP3 files)"],
+	tag_podcast_radio => [ 1, "tagpodcastradio|tag-podcast-radio!", 'Tagging', '--tag-podcast-radio', "Tag only downloaded radio programmes as iTunes podcasts (requires MP3::Tag module for AAC/MP3 files)"],
+	tag_podcast_tv => [ 1, "tagpodcasttv|tag-podcast-tv!", 'Tagging', '--tag-podcast-tv', "Tag only downloaded tv programmes as iTunes podcasts"],
+	tag_utf8 => [ 1, "tagutf8|tag-utf8!", 'Tagging', '--tag-utf8', "AtomicParsley expects UTF-8 input"],
 
 	# Deprecated
 
@@ -486,7 +498,6 @@ my $binopts;
 my @search_args = @ARGV;
 my $memcache = {};
 
-
 ########### Main processing ###########
 
 # Use --webrequest to specify options in urlencoded format
@@ -612,35 +623,96 @@ exit 0;
 
 
 sub init_search {
-	# Show options
-	$opt->display('Current options') if $opt->{verbose};
-	# $prog->{pid}->object hash
-	my $prog = {};
-	# obtain prog object given index. e.g. $index_prog->{$index_no}->{element};
-	my $index_prog = {};
-	# hash of prog types specified
-	my $type = {};
-	logger "INFO: Search args: '".(join "','", @search_args)."'\n" if $opt->{verbose};
+	# Set --subtitles if --subsonly is used
+	if ( $opt->{subsonly} ) {
+		$opt->{subtitles} = 1;
+	}
+
+	# Set --thumbnail if --thumbonly is used
+	if ( $opt->{thumbonly} ) {
+		$opt->{thumb} = 1;
+	}
 
 	# Ensure lowercase types
 	$opt->{type} = lc( $opt->{type} );
 	# Expand 'all' type to comma separated list all prog types
 	$opt->{type} = join( ',', progclass() ) if $opt->{type} =~ /(all|any)/i;
-	$type->{$_} = 1 for split /,/, $opt->{type};
+
 	# --stream is the same as --stdout --nowrite
 	if ( $opt->{stream} ) {
 		$opt->{nowrite} = 1;
 		$opt->{stdout} = 1;
 		delete $opt->{stream};
 	}
-	# Redirect STDOUT to player command if one is specified
-	if ( $opt->{player} && $opt->{nowrite} && $opt->{stdout} ) {
-		open (STDOUT, "| $opt->{player}") || die "ERROR: Cannot open player command\n";
-		STDOUT->autoflush(1);
-		binmode STDOUT;
+
+	# Force nowrite if metadata/subs/thumb-only
+	if ( $opt->{metadataonly} || $opt->{subsonly} || $opt->{thumbonly} ) {
+		$opt->{nowrite} = 1;
 	}
+
+	# List all options and where they are set from then exit
+	if ( $opt_cmdline->{showoptions} ) {
+		# Show all options andf where set from
+		$opt_file->display('Options from Files');
+		$opt_cmdline->display('Options from Command Line');
+		$opt->display('Options Used');
+		logger "Search Args: ".join(' ', @search_args)."\n\n";
+	}
+
+	# Web proxy
+	$opt->{proxy} = $ENV{HTTP_PROXY} || $ENV{http_proxy} if not $opt->{proxy};
+	logger "INFO: Using Proxy $opt->{proxy}\n" if $opt->{proxy};
+
+	# Set --get && --nowrite if --metadataonly is used
+	if ( $opt->{metadataonly} ) {
+		if ( ! $opt->{metadata} ) {
+			main::logger "ERROR: Please specify metadata type using --metadata=<type>\n";
+			exit 2;
+		}
+	}
+
+	# Sanity check some conflicting options
+	if ( $opt->{nowrite} && ! $opt->{stdout} ) {
+		if ( ! ( $opt->{metadataonly} || $opt->{subsonly} || $opt->{thumbonly} ) ) {
+			logger "ERROR: Cannot record to nowhere\n";
+			exit 1;
+		}
+	}
+
+	# hash of prog types specified
+	my $type = {};
+	$type->{$_} = 1 for split /,/, $opt->{type};
+
 	# Default to type=tv if no type option is set
 	$type->{tv}		= 1 if keys %{ $type } == 0;
+
+	# Sanity check valid --type specified
+	for (keys %{ $type }) {
+		if ( not progclass($_) ) {
+			logger "ERROR: Invalid type '$_' specified. Valid types are: ".( join ',', progclass() )."\n";
+			exit 3;
+		}
+	}
+
+	# exit if only showing options
+	exit 0 if ( $opt_cmdline->{showoptions} );
+
+	# Display the ages of the selected caches in seconds
+	if ( $opt->{showcacheage} ) {
+		for ( keys %{ $type } ) {
+			my $cachefile = "${profile_dir}/${_}.cache";
+			main::logger "INFO: $_ cache age: ".( time() - stat($cachefile)->mtime )." secs\n" if -f $cachefile;
+		}
+		exit 0;
+	}
+
+	# Show options
+	$opt->display('Current options') if $opt->{verbose};
+	# $prog->{pid}->object hash
+	my $prog = {};
+	# obtain prog object given index. e.g. $index_prog->{$index_no}->{element};
+	my $index_prog = {};
+	logger "INFO: Search args: '".(join "','", @search_args)."'\n" if $opt->{verbose};
 
 	# External Binaries
 	$bin->{mplayer}		= $opt->{mplayer} || 'mplayer';
@@ -681,59 +753,13 @@ sub init_search {
 		s!^(.+)$!"$1"!g;
 	}
 	
-	# Set --subtitles if --subsonly is used
-	if ( $opt->{subsonly} ) {
-		$opt->{subtitles} = 1;
+	# Redirect STDOUT to player command if one is specified
+	if ( $opt->{player} && $opt->{nowrite} && $opt->{stdout} ) {
+		open (STDOUT, "| $opt->{player}") || die "ERROR: Cannot open player command\n";
+		STDOUT->autoflush(1);
+		binmode STDOUT;
 	}
 
-	# Set --thumbnail if --thumbonly is used
-	if ( $opt->{thumbonly} ) {
-		$opt->{thumb} = 1;
-	}
-
-	# Set --get && --nowrite if --metadataonly is used
-	if ( $opt->{metadataonly} ) {
-		if ( ! $opt->{metadata} ) {
-			main::logger "ERROR: Please specify metadata type using --metadata=<type>\n";
-			exit 2;
-		}
-	}
-
-	# List all options and where they are set from then exit
-	if ( $opt_cmdline->{showoptions} ) {
-		# Show all options andf where set from
-		$opt_file->display('Options from Files');
-		$opt_cmdline->display('Options from Command Line');
-		$opt->display('Options Used');
-		logger "Search Args: ".join(' ', @search_args)."\n\n";
-	}
-
-	# Sanity check some conflicting options
-	if ( $opt->{nowrite} && ! $opt->{stdout} ) {
-		logger "ERROR: Cannot record to nowhere\n";
-		exit 1;
-	}
-
-	# Sanity check valid --type specified
-	for (keys %{ $type }) {
-		if ( not progclass($_) ) {
-			logger "ERROR: Invalid type '$_' specified. Valid types are: ".( join ',', progclass() )."\n";
-			exit 3;
-		}
-	}
-	
-	# Web proxy
-	$opt->{proxy} = $ENV{HTTP_PROXY} || $ENV{http_proxy} if not $opt->{proxy};
-	logger "INFO: Using Proxy $opt->{proxy}\n" if $opt->{proxy};
-
-	# Display the ages of the selected caches in seconds
-	if ( $opt->{showcacheage} ) {
-		for ( keys %{ $type } ) {
-			my $cachefile = "${profile_dir}/${_}.cache";
-			main::logger "INFO: $_ cache age: ".( time() - stat($cachefile)->mtime )." secs\n" if -f $cachefile;
-		}
-		exit 0;
-	}
 	return ( $type, $prog, $index_prog );
 }
 
@@ -3114,7 +3140,7 @@ sub usage {
 
 	# Build the help usage text
 	# Each section
-	for my $section ( 'Search', 'Display', 'Recording', 'Download', 'Output', 'PVR', 'Config', 'External Program', 'Misc' ) {
+	for my $section ( 'Search', 'Display', 'Recording', 'Download', 'Output', 'PVR', 'Config', 'External Program', 'Tagging', 'Misc' ) {
 		next if not defined $section_name{$section};
 		my @lines;
 		my @manlines;
@@ -3751,10 +3777,13 @@ sub check {
 
 package Programme;
 
+use Encode;
 use Env qw[@PATH];
 use Fcntl;
+use File::Basename;
 use File::Copy;
 use File::Path;
+use File::Spec;
 use File::stat;
 use HTML::Entities;
 use HTTP::Cookies;
@@ -4204,10 +4233,6 @@ sub mode_ver_download_retry_loop {
 			} else {
 				# Add to history, tag file, and run post-record command if a stream was written
 				main::logger "\n";
-				if ( ! $opt->{nowrite} ) {
-					$hist->add( $prog );
-					$prog->tag_file;
-				}
 				if ( $opt->{thumb} ) {
 					$prog->create_dir();
 					$prog->download_thumbnail();
@@ -4215,6 +4240,10 @@ sub mode_ver_download_retry_loop {
 				if ( $opt->{metadata} ) {
 					$prog->create_dir();
 					$prog->create_metadata_file();
+				}
+				if ( ! $opt->{nowrite} ) {
+					$hist->add( $prog );
+					$prog->tag_file;
 				}
 				if ( $opt->{command} && ! $opt->{nowrite} ) {
 					$prog->run_user_command( $opt->{command} );
@@ -4244,143 +4273,38 @@ sub report {
 
 
 
-# Add id3 tag to MP3/AAC files if required
-sub tag_file {
+# create metadata for tagging
+sub tag_metadata {
 	my $prog = shift;
-
-	# Return if file does not exist
-	return if ! -f $prog->{filename};
-
-	if ( $prog->{filename} =~ /\.(aac|mp3)$/i ) {
-		# Create ID3 tagging options for external tagger program (escape " for shell)
-		my ( $id3_name, $id3_episode, $id3_desc, $id3_channel ) = ( $prog->{name}, $prog->{episode}, $prog->{desc}, $prog->{channel} );
-		s|"|\\"|g for ($id3_name, $id3_episode, $id3_desc, $id3_channel);
-		# Only tag if the required tool exists
-		if ( main::exists_in_path('id3v2') ) {
-			main::logger "INFO: id3 tagging $prog->{ext} file\n";
-			my @cmd = (
-				$bin->{id3v2}, 
-				'--artist', $id3_channel,
-				'--album', $id3_name,
-				'--song', $id3_episode,
-				'--comment', $id3_desc,
-				'--year', substr( $prog->{firstbcast}->{$prog->{version}}, 0, 4 ) || ((localtime())[5] + 1900),
-				$prog->{filename},
-			);
-			if ( main::run_cmd( 'STDERR', @cmd ) ) {
-				main::logger "WARNING: Failed to tag $prog->{ext} file\n";
-				return 2;
-			}
+	my $meta;
+	while ( my ($key, $val) = each %{$prog} ) {
+		if ( ref($val) eq 'HASH' ) {
+			$meta->{$key} = $prog->{$key}->{$prog->{version}};
 		} else {
-			main::logger "WARNING: Cannot tag $prog->{ext} file\n" if $opt->{verbose};
-		}
-
-	} elsif ( $prog->{filename} =~ /\.(mp4|m4v|m4a)$/i ) {
-		# Create mp4 tagging options for external tagging program.
-		my $tags;
-		for my $tag ( keys %{$prog} ) {
-			# Used for firstbcast etc which are a version based HASH
-			if ( ref$prog->{$tag} eq 'HASH' ) {
-				$tags->{$tag} = $prog->{$tag}->{$prog->{version}};
-			} else {
-				$tags->{$tag} = $prog->{$tag};
-			}
-			$tags->{$tag} =~ s|"|\\"|g;
-		}
-
-		# Make 'duration' == 'length' for the selected version
-		$tags->{duration} = $prog->{durations}->{$prog->{version}} if $prog->{durations}->{$prog->{version}};
-
-		# Only tag if the required tool exists
-		if ( main::exists_in_path( 'atomicparsley' ) ) {
-			# Download the thumbnail if it doesn't already exist
-			$prog->download_thumbnail if ! -f $prog->{thumbfile};
-
-			# Download Thubnail file as well for inclusion into MP4 stream.
-			# Apple TV/iTunes will use it.
-			main::logger "INFO: mp4 tagging $prog->{ext} file\n";
-
-			# extract year from firstbcast e.g. 2009-10-05T22:35:00+01:00
-			#$year =~ s/^.*(20\d\d|19\d\d).*$/$1/g;
-			# If year isn't set correctly in the information, then assume today.
-			$tags->{firstbcast} = (localtime())[5] + 1900 if ! $tags->{firstbcast};
-
-			# Add guidance if set
-			$tags->{guidance} = 'clean';
-			$tags->{guidance} = 'explicit' if $prog->{guidance};
-
-			# Show type
-			my $stik = 'TV Show';
-			$stik = 'Movie' if $tags->{categories} =~ m{(film|movie)}i;
-
-			# Strip series and episode text from name, longname, episode
-			for my $tag ( qw/name longname episode/ ) {
-				$tags->{$tag} =~ s/(:\s*)?(Series|Episode)\s*\d+(:\s*)?//gi;
-			}
-			my $title = "$tags->{longname} - $tags->{episode}";
-			# strip any trailing '-' and whitespace
-			$title =~ s/[\s\-]*$//g;
-
-			# Build the command
-			my @cmd;
-			if ( $prog->{filename} =~ /\.(mp4|m4v)$/i ) {
-				@cmd = (
-					$bin->{atomicparsley}, $prog->{filename},
-					'--TVNetwork',	$tags->{channel},
-					'--description',$tags->{descshort},
-					'--comment',	$tags->{descshort},
-					'--title',	$title,
-					'--TVShowName',	$tags->{longname},
-					'--TVEpisode',	$tags->{pid},
-					'--artist',	$tags->{name},
-					'--year',	$tags->{firstbcast},
-					'--advisory',	$tags->{guidance},
-					'--genre',	$tags->{categories},
-					'--stik',	$stik,
-					'--overWrite',	# Saves temp files being left around.
-				);
-
-				# Add the series and episode numbers if they are defined
-				push @cmd, "--TVSeasonNum", $prog->{seriesnum} if $prog->{seriesnum};
-				push @cmd, "--TVEpisodeNum", $prog->{episodenum} if $prog->{episodenum};
-
-			} elsif ( $prog->{filename} =~ /\.(m4a)$/i ) {
-				@cmd = (
-					$bin->{atomicparsley}, $prog->{filename},
-					'--description',$tags->{descshort},
-					'--comment',	$tags->{descshort},
-					'--title',	$tags->{title},
-					'--TVShowName',	$tags->{longname},
-					'--TVEpisode',	$tags->{pid},
-					'--artist',	$tags->{channel},
-					'--albumArtist',	$tags->{channel},
-					'--album',	$tags->{longname},
-					'--year',	$tags->{firstbcast},
-					'--advisory',	$tags->{guidance},
-					'--genre',	$tags->{categories},
-					'--overWrite',	# Saves temp files being left around.
-				);
-
-				# Add the series and episode numbers if they are defined as disk / track numbers
-				push @cmd, "--disk", $prog->{seriesnum} if $prog->{seriesnum};
-				push @cmd, "--tracknum", $prog->{episodenum} if $prog->{episodenum};
-			}
-
-			# Add the thumbnail if one was downloaded
-			push @cmd, "--artwork", $prog->{thumbfile} if -f $prog->{thumbfile};
-
-			# time of recording - this messes up iTunes somewhat
-			#push @cmd, "--purchaseDate", "$prog->{dldate}T$prog->{dltime}Z" if $prog->{dldate} && $prog->{dltime};
-
-			# After running, clean up thumbnail file unless it is required using the thumbnail option.
-			if ( main::run_cmd( 'STDERR', @cmd ) ) {
-				main::logger "WARNING: Failed to tag $prog->{ext} file\n";
-				unlink $prog->{thumbfile} if ! $opt->{thumb};
-				return 2;
-			}
-			unlink $prog->{thumbfile} if ! $opt->{thumb};
+			$meta->{$key} = $val;
 		}
 	}
+	# expect input in UTF-8
+	while ( my ($key, $val) = each %{$meta} ) {
+		$meta->{$key} = decode("utf8", $val);
+	}
+	return $meta;
+}
+
+# add metadata tags to file
+sub tag_file {
+	my $prog = shift;
+	# return if file does not exist
+	return if ! -f $prog->{filename};
+	# download thumbnail if necessary
+	$prog->download_thumbnail if ( ! -f $prog->{thumbfile} );
+	# create metadata
+	my $meta = $prog->tag_metadata;
+	# tag file
+	my $tagger = Tagger->new();
+	$tagger->tag_file($meta);
+	# clean up thumbnail if necessary
+	unlink $prog->{thumbfile} if ! $opt->{thumb};
 }
 
 
@@ -4533,7 +4457,10 @@ sub substitute {
 		# escape these chars: ! ` \ "
 		} elsif ($sanitize_mode == 4) {
 			$replace = $value;
-			$replace =~ s/([\!"\\`])/\\$1/g;
+			# Don't escape file paths
+			if ( $key !~ /(filename|filepart|thumbfile)/ ) {
+				$replace =~ s/([\!"\\`])/\\$1/g;
+			}
 		} else {
 			$replace = $value;
 		}
@@ -4586,7 +4513,7 @@ sub generate_filenames {
 		$prog->get_metadata_general();
 	}
 
-	# Determine direcotry and find it's absolute path
+	# Determine directory and find its absolute path
 	$prog->{dir} = File::Spec->rel2abs( $opt->{ 'output'.$prog->{type} } || $opt->{output} || $ENV{IPLAYER_OUTDIR} || '.' );
 	
 	# Add modename to default format string if multimode option is used
@@ -4625,22 +4552,24 @@ sub generate_filenames {
 
 	# Special case for history mode, parse the fileprefix and dir from filename if it is already defined
 	if ( $opt->{history} && defined $prog->{filename} && $prog->{filename} ne '' ) {
-		( $prog->{dir}, $prog->{fileprefix}, $prog->{ext} ) = ( $1, $3, $4 ) if $prog->{filename} =~ m{^((.*)[\//]+)?([^\//]+?)\.(\w+)$};
+		( $prog->{fileprefix}, $prog->{dir}, $prog->{ext} ) = fileparse($prog->{filename}, qr/\.[^.]*/);
+		# Fix up file path components
+		$prog->{ext} =~ s/\.//;
+		$prog->{dir} = File::Spec->canonpath($prog->{dir});
+		$prog->{filename} = File::Spec->catfile($prog->{dir}, "$prog->{fileprefix}.$prog->{ext}");
 	}
 
 	# Don't create subdir if we are only testing recordings
 	# Create a subdir for programme sorting option
 	if ( $opt->{subdir} ) {
 		my $subdir = $prog->substitute( $opt->{subdirformat} || '<longname>' );
-		$prog->{dir} .= "/${subdir}";
-		$prog->{dir} =~ s|\/\/|\/|g;
+		$prog->{dir} = File::Spec->catdir($prog->{dir}, $subdir);
 		main::logger("INFO: Creating subdirectory $prog->{dir} for programme\n") if $opt->{verbose};
 	}
 
 	# Create a subdir if there are multiple parts
 	if ( $multipart ) {
-		$prog->{dir} .= "/$prog->{fileprefix}";
-		$prog->{dir} .= s|\/\/|\/|g;
+		$prog->{dir} = File::Spec->catdir($prog->{dir}, $prog->{fileprefix});
 		main::logger("INFO: Creating multi-part subdirectory $prog->{dir} for programme\n") if $opt->{verbose};
 	}
 
@@ -4652,14 +4581,15 @@ sub generate_filenames {
 	# check if file extension has changed as a result of failed attempt with different mode
 	my $ext_changed = 0;
 	if ( ! $opt->{history} && ! $opt->{multimode} && defined $prog->{filename} && $prog->{filename} ne '' ) {
-		my ($dir, $fileprefix, $ext) = ( $1, $3, $4 ) if $prog->{filename} =~ m{^((.*)[\//]+)?([^\//]+?)\.(\w+)$};
+		( my $fileprefix, my $dir, my $ext ) = fileparse($prog->{filename}, qr/\.[^.]*/);
+		$ext =~ s/\.//;
 		$ext_changed = ( defined $ext && $ext ne '' && $ext ne $prog->{ext} );
 		main::logger "DEBUG: File ext changed:   $ext -> $prog->{ext}\n" if $ext_changed && $opt->{debug};
 	}
 
 	# Don't override the {filename} if it is already set (i.e. for history info) or unless multimode option is specified
-	$prog->{filename} = "$prog->{dir}/$prog->{fileprefix}.$prog->{ext}" if ( defined $prog->{filename} && $prog->{filename} =~ /\.EXT$/ ) || $opt->{multimode} || ! $prog->{filename} || $ext_changed;
-	$prog->{filepart} = "$prog->{dir}/$prog->{fileprefix}.partial.$prog->{ext}";
+	$prog->{filename} = File::Spec->catfile($prog->{dir}, "$prog->{fileprefix}.$prog->{ext}") if ( defined $prog->{filename} && $prog->{filename} =~ /\.EXT$/ ) || $opt->{multimode} || ! $prog->{filename} || $ext_changed;
+	$prog->{filepart} = File::Spec->catfile($prog->{dir}, "$prog->{fileprefix}.partial.$prog->{ext}");
 
 	# Create symlink filename if required
 	if ( $opt->{symlink} ) {
@@ -4693,7 +4623,7 @@ sub generate_filenames {
 		my $ext;
 		$ext = $1 if $prog->{thumbnail} =~ m{\.(\w+)$};
 		$ext = $opt->{thumbext} || $ext;
-		$prog->{thumbfile} = "$prog->{dir}/$prog->{fileprefix}.${ext}";
+		$prog->{thumbfile} = File::Spec->catfile($prog->{dir}, "$prog->{fileprefix}.${ext}");
 	}
 
 	main::logger "DEBUG: File prefix:        $prog->{fileprefix}\n" if $opt->{debug};
@@ -5491,7 +5421,6 @@ sub get_metadata {
 	$prog->{nameshort} =~ s/:?\s*Series\s+.+?(:\s*|$)//i;
 
 	# Conditionally set the senum
-	$seriesnum = 1 if $seriesnum == 0;
 	$prog->{senum} = sprintf "s%02se%02s", $seriesnum, $episodenum if $seriesnum != 0 || $episodenum != 0;
 
 	# Default to 150px width thumbnail;
@@ -5575,7 +5504,10 @@ sub get_pids_recursive {
 	return @pids;
 }
 
-
+sub ensure_array {
+	my ($in) = @_;
+	return ref $in eq 'ARRAY' ? @$in : $in;
+}
 
 # Gets the episode data from a given episode pid
 sub parse_rdf_episode {
@@ -5614,7 +5546,7 @@ sub parse_rdf_series {
 	my $spid = extract_pid( $rdf->{'po:Series'}->{'rdf:about'} );
 	main::logger "INFO:    Series: '".$rdf->{'po:Series'}->{'dc:title'}."' ($spid)\n";
 	main::logger "INFO:      From Brand PID '".$rdf->{'po:Brand'}->{'rdf:about'}."'\n" if $opt->{debug};
-	for my $episode_element ( @{ $rdf->{'po:Series'}->{'po:episode'} } ) {
+	for my $episode_element (ensure_array($rdf->{'po:Series'}->{'po:episode'})) {
 		my $pid = extract_pid( $episode_element->{'po:Episode'}->{'rdf:about'} );
 		main::logger "INFO:      Episode '".$episode_element->{'po:Episode'}->{'dc:title'}."' ($pid)\n";
 		push @pids, $pid;
@@ -5640,8 +5572,9 @@ sub parse_rdf_brand {
 		main::logger "INFO: With Series pid '".$series_element->{'rdf:resource'}."'\n" if $opt->{debug};
 		push @pids, parse_rdf_series( $ua, $series_element->{'rdf:resource'} );
 	}
-	main::logger "INFO:    Series: <None>\n" if $#{ $rdf->{'po:Brand'}->{'po:episode'} };
-	for my $episode_element ( @{ $rdf->{'po:Brand'}->{'po:episode'} } ) {
+	my @episodes = ensure_array($rdf->{'po:Brand'}->{'po:episode'});
+	main::logger "INFO:    Series: <None>\n" if @episodes;
+	for my $episode_element ( @episodes ) {
 		main::logger "INFO:      Episode pid: ".$episode_element->{'rdf:resource'}."\n" if $opt->{debug};
 		push @pids, extract_pid( $episode_element->{'rdf:resource'} );
 		parse_rdf_episode( $ua, $episode_element->{'rdf:resource'} );
@@ -5880,7 +5813,10 @@ sub get_stream_data_cdn {
 				my $url = ${media_stream_live_prefix}."?server=$cattribs->{server}&identifier=$cattribs->{identifier}&kind=$cattribs->{kind}&application=$cattribs->{application}";
 				my $xml = main::request_url_retry( main::create_ua( 'desktop' ), $url, 3, undef, undef, 1 );
 				main::logger "\n$xml\n" if $opt->{debug};
-				$cattribs->{authString} = 'auth='.$1 if $xml =~ m{<token>(.+?)</token>};
+				$cattribs->{authString} = 'auth='.$1 if $xml =~ m{<token>auth=(.+?)</token>};
+				if ( ! $cattribs->{authString} ) {
+					$cattribs->{authString} = 'auth='.$1 if $xml =~ m{<token>(.+?)</token>};
+				}
 				$conn->{authstring} = $cattribs->{authString};
 			}
 
@@ -6413,7 +6349,7 @@ sub modelist {
 	# Defaults
 	if ( ! $mlist ) {
 		if ( ! main::exists_in_path('flvstreamer') ) {
-			main::logger "WARNING: Not using flash modes since flvstreamer/rtmpdump is not found\n" if $opt->{verbose};
+			main::logger "WARNING: Not using flash modes since flvstreamer is not found\n" if $opt->{verbose};
 			$mlist = 'iphone';
 		} else {
 			$mlist = 'flashhigh,flashstd,flashnormal';
@@ -6900,9 +6836,9 @@ sub download {
 		main::logger "\nWARNING: Required vlc does not exist\n";
 		return 'next';
 	}
-	# if flvstreamer/rtmpdump does not exist
+	# if flvstreamer does not exist
 	if ( $mode =~ /^flash/ && ! main::exists_in_path('flvstreamer')) {
-		main::logger "WARNING: Required program flvstreamer/rtmpdump does not exist.\n";
+		main::logger "WARNING: Required program flvstreamer does not exist (see http://linuxcentre.net/getiplayer/installation and http://linuxcentre.net/getiplayer/download)\n";
 		return 'next';
 	}
 	# Force raw mode if ffmpeg is not installed
@@ -6924,6 +6860,8 @@ sub download {
 	$prog->{ext} = 'flv' if $opt->{raw} && $mode =~ /^flash/;
 	# Override flashaac ext based on aactomp3
 	$prog->{ext} = 'mp3' if ! $opt->{raw} && $opt->{aactomp3} && $mode =~ /^flashaac/;
+	# Override ext based on mkv option
+	$prog->{ext} = 'mkv' if ! $opt->{raw} && $opt->{mkv} && $prog->{type} eq 'tv';
 
 	# Determine the correct filenames for this recording
 	if ( $prog->generate_filenames( $ua, $prog->file_prefix_format() ) ) {
@@ -7256,7 +7194,7 @@ sub opt_format {
 		lame		=> [ 0, "lame=s", 'External Program', '--lame <path>', "Location of lame binary"],
 		outputradio	=> [ 1, "outputradio=s", 'Output', '--outputradio <dir>', "Output directory for radio recordings"],
 		wav		=> [ 1, "wav!", 'Recording', '--wav', "In radio realaudio mode output as wav and don't transcode to mp3"],
-		rtmpradioopts	=> [ 1, "rtmp-radio-opts|rtmpradioopts=s", 'Recording', '--rtmp-radio-opts <options>', "Add custom options to flvstreamer/rtmpdump for radio"],
+		rtmpradioopts	=> [ 1, "rtmp-radio-opts|rtmpradioopts=s", 'Recording', '--rtmp-radio-opts <options>', "Add custom options to flvstreamer for radio"],
 	};
 }
 
@@ -7300,7 +7238,7 @@ sub modelist {
 	# Defaults
 	if ( ! $mlist ) {
 		if ( ! main::exists_in_path('flvstreamer') ) {
-			main::logger "WARNING: Not using flash modes since flvstreamer/rtmpdump is not found\n" if $opt->{verbose};
+			main::logger "WARNING: Not using flash modes since flvstreamer is not found\n" if $opt->{verbose};
 			$mlist = 'rtspaudio,realaudio,wma';
 		} else {
 			$mlist = 'flashaachigh,flashaacstd,flashaudio,rtspaudio,realaudio,flashaaclow,wma';
@@ -7693,7 +7631,7 @@ sub modelist {
 	# Defaults
 	if ( ! $mlist ) {
 		if ( ! main::exists_in_path('flvstreamer') ) {
-			main::logger "WARNING: Not using flash modes since flvstreamer/rtmpdump is not found\n" if $opt->{verbose};
+			main::logger "WARNING: Not using flash modes since flvstreamer is not found\n" if $opt->{verbose};
 			$mlist = 'realaudio,wma';
 		} else {
 			$mlist = 'flashaachigh,flashaacstd,realaudio,flashaaclow,wma';
@@ -7982,6 +7920,7 @@ use Env qw[@PATH];
 use Fcntl;
 use File::Copy;
 use File::Path;
+use File::Spec;
 use File::stat;
 use HTML::Entities;
 use HTTP::Cookies;
@@ -8000,7 +7939,7 @@ sub opt_format {
 	return {
 		ffmpeg		=> [ 0, "ffmpeg=s", 'External Program', '--ffmpeg <path>', "Location of ffmpeg binary"],
 		rtmpport	=> [ 1, "rtmpport=n", 'Recording', '--rtmpport <port>', "Override the RTMP port (e.g. 443)"],
-		flvstreamer	=> [ 0, "flvstreamer|rtmpdump=s", 'External Program', '--flvstreamer <path>', "Location of flvstreamer/rtmpdump binary"],
+		flvstreamer	=> [ 0, "flvstreamer=s", 'External Program', '--flvstreamer <path>', "Location of flvstreamer binary"],
 	};
 }
 
@@ -8034,12 +7973,12 @@ sub get {
 		$file_tmp = $prog->{filepart}.'.flv'
 	}
 
-	# Remove failed file recording (below a certain size) - hack to get around flvstreamer/rtmpdump not returning correct exit code
+	# Remove failed file recording (below a certain size) - hack to get around flvstreamer not returning correct exit code
 	if ( -f $file_tmp && stat($file_tmp)->size < $prog->min_download_size() ) {
 		unlink( $file_tmp );
 	}
 		
-	# Add custom options to flvstreamer/rtmpdump for this type if specified with --rtmp-<type>-opts
+	# Add custom options to flvstreamer for this type if specified with --rtmp-<type>-opts
 	if ( defined $opt->{'rtmp'.$prog->{type}.'opts'} ) {
 		push @cmdopts, ( split /\s+/, $opt->{'rtmp'.$prog->{type}.'opts'} );
 	}
@@ -8156,13 +8095,17 @@ sub get {
 		);
 	# Convert flv to aac/mp4a/mp3
 	} elsif ( $mode =~ /flashaac/ ) {
-		# transcode to MP3 if directed
+		# transcode to MP3 if directed. If mp3vbr is not set then perform CBR.
 		if ( $opt->{aactomp3} ) {
+			my @br_opts = ('-ab', '128k');
+			if ( $opt->{mp3vbr} =~ /^\d$/ ) {
+				@br_opts = ('-aq', $opt->{mp3vbr});
+			}
 			@cmd = (
 				$bin->{ffmpeg},
 				'-i', $file_tmp,
 				'-vn',
-				'-acodec', 'libmp3lame', '-ac', '2', '-ab', '128k',
+				'-acodec', 'libmp3lame', '-ac', '2', @br_opts,
 				'-y', $prog->{filepart},
 			);
 		} else {
@@ -8174,6 +8117,15 @@ sub get {
 				'-y', $prog->{filepart},
 			);
 		}
+	# Convert video flv to mkv if required
+	} elsif ( $opt->{mkv} ) {
+		@cmd = (
+			$bin->{ffmpeg},
+			'-i', $file_tmp,
+			'-vcodec', 'copy',
+			'-acodec', 'copy',
+			'-y', $prog->{filepart},
+		);
 	# Convert video flv to mp4/avi if required
 	} else {
 		@cmd = (
@@ -8198,11 +8150,11 @@ sub get {
 
 				# Temp file is now partial file from flv->aac conversion
 				# Change the extension to m4a for later info / debug messages
-				# final and parital filenames use new extension
+				# final and partial filenames use new extension
 				$file_tmp = $prog->{filepart};
 				$prog->{ext} = 'm4a';
-				$prog->{filename} = "$prog->{dir}/$prog->{fileprefix}.$prog->{ext}";
-				$prog->{filepart} = "$prog->{dir}/$prog->{fileprefix}.partial.$prog->{ext}";
+				$prog->{filename} = File::Spec->catfile($prog->{dir}, "$prog->{fileprefix}.$prog->{ext}");
+				$prog->{filepart} = File::Spec->catfile($prog->{dir}, "$prog->{fileprefix}.partial.$prog->{ext}");
 
 				@cmd = (
 					$bin->{ffmpeg},
@@ -9410,5 +9362,314 @@ sub enable {
 }
 
 
+package Tagger;
+use Encode;
+use File::stat;
+
+# already in scope
+# my ($opt, $bin);
+
+# constructor
+sub new {
+	my $class = shift;
+	my $self = {};
+	bless($self, $class);
+}
+
+# map metadata values to tags
+sub tags_from_metadata {
+	my ($self, $meta) = @_;
+	my $tags;
+	# iTunes media kind
+	$tags->{stik} = 'Normal';
+	if ( $meta->{ext} =~ /(mp4|m4v)/i) {
+		$tags->{stik} = $meta->{categories} =~ /(film|movie)/i ? 'Movie' : 'TV Show';
+	}
+	$tags->{advisory} = $meta->{guidance} ? 'explicit' : 'remove';
+	# copyright message from download date
+	$tags->{copyright} = substr($meta->{dldate}, 0, 4)." British Broadcasting Corporation, all rights reserved";
+	# select version of of episode title to use
+	if ( $opt->{tag_fulltitle} ) {
+		$tags->{title} = $meta->{title};
+	} else {
+		# fix up episode if necessary
+		(my $title = $meta->{episode}) =~ s/[\s\-]+$//;
+		$tags->{title} = $title ? $title : $meta->{name};
+	}
+	$tags->{artist} = $meta->{channel};
+	# album artist from programme type
+	($tags->{albumArtist} = "BBC " . ucfirst($meta->{type})) =~ s/tv/TV/i;
+	$tags->{album} = $meta->{name};
+	$tags->{grouping} = $meta->{categories};
+	# composer references iPlayer
+	$tags->{composer} = "BBC iPlayer";
+	# extract genre as first category, use second if first too generic
+	my @ignore = ("Films", "Sign Zone", "Audio Described", "Northern Ireland", "Scotland", "Wales", "England");
+	my ($genre, $genre2) = split(/\s*,\s*/, $meta->{categories}, 3);
+	if ( $genre && $genre2 && grep(/$genre/i, @ignore) ) { $genre = $genre2; }
+	# fallback genre
+	$genre ||= "get_iplayer";
+	$tags->{genre} = $genre;
+	$tags->{comment} = $meta->{descshort};
+	# fix up firstbcast if necessary
+	$tags->{year} = $meta->{firstbcast};
+	if ( $tags->{year} !~ /\d{4}-\d{2}-\d{2}\D\d{2}:\d{2}:\d{2}/ ) {
+		my @utc = gmtime();
+		$utc[4] += 1;
+		$utc[5] += 1900;
+		$tags->{year} = sprintf("%4d-%02d-%02dT%02d:%02d:%02dZ", reverse @utc[0..5]);
+	}
+	# extract date components for ID3v2.3
+	my @date = split(//, $tags->{year});
+	$tags->{tyer} = join('', @date[0..3]);
+	$tags->{tdat} = join('', @date[8,9,5,6]);
+	$tags->{time} = join('', @date[11,12,14,15]);
+	$tags->{tracknum} = $meta->{episodenum};
+	$tags->{disk} = $meta->{seriesnum};
+	# generate lyrics text with links if available
+	$tags->{lyrics} = $meta->{desc};
+	$tags->{lyrics} .= "\n\nEPISODE\n  $meta->{player}" if $meta->{player};
+	$tags->{lyrics} .= "\n\nSERIES\n  $meta->{web}" if $meta->{web};
+	$tags->{description} = $meta->{descshort};
+	$tags->{longDescription} = $meta->{desc};
+	$tags->{hdvideo} = $meta->{mode} =~ /hd/i ? 'true' : 'false';
+	$tags->{TVShowName} = $meta->{name};
+	$tags->{TVEpisode} = $meta->{senum} ? $meta->{senum} : $meta->{pid};
+	$tags->{TVSeasonNum} = $tags->{disk};
+	$tags->{TVEpisodeNum} = $tags->{tracknum};
+	$tags->{TVNetwork} = $meta->{channel};
+	$tags->{podcastFlag} = 'true';
+	$tags->{category} = $tags->{genre};
+	$tags->{keyword} = $meta->{categories};
+	$tags->{podcastGUID} = $meta->{player};
+	$tags->{artwork} = $meta->{thumbfile};
+	# video flag
+	$tags->{is_video} = $meta->{ext} =~ /(mp4|m4v)/i;
+	# tvshow flag
+	$tags->{is_tvshow} = $tags->{stik} eq 'TV Show';
+	# podcast flag
+	$tags->{is_podcast} = $meta->{type} =~ /podcast/i || $opt->{tag_podcast}
+		|| ( $opt->{tag_podcast_radio} && ! $tags->{is_video} )
+		|| ( $opt->{tag_podcast_tv} && $tags->{is_video} );
+	return $tags;
+}
+
+# add metadata tag to file
+sub tag_file {
+	my ($self, $meta) = @_;
+	my $tags = $self->tags_from_metadata($meta);
+	# dispatch to appropriate tagging function
+	if ( $meta->{filename} =~ /\.(aac|mp3)$/i ) {
+		return $self->tag_file_id3($meta, $tags);
+	} elsif ( $meta->{filename} =~ /\.(mp4|m4v|m4a)$/i ) {
+		return $self->tag_file_mp4($meta, $tags);
+	} else {
+		main::logger "WARNING: Don't know how to tag \U$meta->{ext}\E file\n" if $opt->{verbose};
+	}
+}
+
+# add full ID3 tag with MP3::Tag
+sub tag_file_id3 {
+	my ($self, $meta, $tags) = @_;
+	# look for required module
+	eval 'use MP3::Tag';
+	if ( $@ ) {
+		if ( $opt->{verbose} ) {
+			main::logger "INFO: Install the MP3::Tag module for full taggging of \U$meta->{ext}\E files\n";
+			main::logger "INFO: Falling back to ID3 BASIC taggging of \U$meta->{ext}\E files\n";
+		}
+		return $self->tag_file_id3_basic($meta, $tags);
+	}
+	eval {
+		main::logger "INFO: ID3 tagging \U$meta->{ext}\E file\n";
+		# translate podcast flag
+		$tags->{podcastFlag} = "\x01";
+		# remove existing tag(s) to avoid decoding errors
+		my $mp3 = MP3::Tag->new($meta->{filename});
+		$mp3->get_tags();
+		$mp3->{ID3v1}->remove_tag() if exists $mp3->{ID3v1};
+		$mp3->{ID3v2}->remove_tag() if exists $mp3->{ID3v2};
+		$mp3->close();
+		# add metadata
+		$mp3 = MP3::Tag->new($meta->{filename});
+		$mp3->select_id3v2_frame_by_descr('TCOP', $tags->{copyright});
+		$mp3->select_id3v2_frame_by_descr('TIT2', $tags->{title});
+		$mp3->select_id3v2_frame_by_descr('TPE1', $tags->{artist});
+		$mp3->select_id3v2_frame_by_descr('TPE2', $tags->{albumArtist});
+		$mp3->select_id3v2_frame_by_descr('TALB', $tags->{album});
+		$mp3->select_id3v2_frame_by_descr('TIT1', $tags->{grouping});
+		$mp3->select_id3v2_frame_by_descr('TCOM', $tags->{composer});
+		$mp3->select_id3v2_frame_by_descr('TCON', $tags->{genre});
+		$mp3->select_id3v2_frame_by_descr('COMM(eng,#0)[]', $tags->{comment});
+		$mp3->select_id3v2_frame_by_descr('TYER', $tags->{tyer});
+		$mp3->select_id3v2_frame_by_descr('TDAT', $tags->{tdat});
+		$mp3->select_id3v2_frame_by_descr('TIME', $tags->{time});
+		$mp3->select_id3v2_frame_by_descr('TRCK', $tags->{tracknum});
+		$mp3->select_id3v2_frame_by_descr('TPOS', $tags->{disk});
+		$mp3->select_id3v2_frame_by_descr('USLT', $tags->{lyrics});
+		# tag iTunes podcast
+		if ( $tags->{is_podcast} ) {
+			# ID3v2.4 only, but works in iTunes
+			$mp3->select_id3v2_frame_by_descr('TDRL', $tags->{year});
+			# ID3v2.3 and ID3v2.4
+			$mp3->select_id3v2_frame_by_descr('TIT3', $tags->{description});
+			# Neither ID3v2.3 nor ID3v2.4, but work in iTunes
+			$mp3->select_id3v2_frame_by_descr('TDES', $tags->{longDescription});
+			$mp3->{ID3v2}->add_raw_frame('PCST', $tags->{podcastFlag});
+			$mp3->select_id3v2_frame_by_descr('TCAT', $tags->{category});
+			$mp3->select_id3v2_frame_by_descr('TKWD', $tags->{keyword});
+			$mp3->select_id3v2_frame_by_descr('TGID', $tags->{podcastGUID});
+		}
+		# add artwork if available
+		if ( -f $meta->{thumbfile} ) {
+			my $data;
+			open(THUMB, $meta->{thumbfile});
+			binmode(THUMB);
+			read(THUMB, $data, stat($meta->{thumbfile})->size());
+			close(THUMB);
+			$mp3->select_id3v2_frame_by_descr('APIC', $data);
+		}
+		# write metadata to file
+		$mp3->update_tags();
+		$mp3->close();
+	};
+	if ( $@ ) {
+		main::logger "ERROR: Failed to tag \U$meta->{ext}\E file\n";
+		main::logger "ERROR: $@" if $opt->{verbose};
+		# clean up thumbnail if necessary
+		unlink $meta->{thumbfile} if ! $opt->{thumb};
+		return 4;
+	}
+}
+
+# add basic ID3 tag with id3v2
+sub tag_file_id3_basic {
+	my ($self, $meta, $tags) = @_;
+	if ( main::exists_in_path('id3v2') ) {
+		main::logger "INFO: ID3 BASIC tagging \U$meta->{ext}\E file\n";
+		# notify about limitations of basic tagging
+		if ( $opt->{verbose} ) {
+			main::logger "INFO: ID3 BASIC tagging cannot add artwork to \U$meta->{ext}\E files\n";
+			main::logger "INFO: ID3 BASIC tagging cannot add podcast metadata to \U$meta->{ext}\E files\n" if $tags->{is_podcast};
+		}
+		# colons are parsed as frame field separators by id3v2
+		# so replace them to make safe comment text
+		$tags->{comment} =~ s/:/_/g;
+		# make safe lyrics text as well
+		# can't use $tags->{lyrics} because of colons in links
+		$tags->{longDescription} =~ s/:/_/g;
+		# encode for id3v2
+		while ( my ($key, $val) = each %{$tags} ) {
+			$tags->{$key} = encode("iso-8859-1", $val);
+		}
+		# build id3v2 command
+		my @cmd = (
+			$bin->{id3v2},
+			'--TCOP', $tags->{copyright},
+			'--TIT2', $tags->{title},
+			'--TPE1', $tags->{artist},
+			'--TPE2', $tags->{albumArtist},
+			'--TALB', $tags->{album},
+			'--TIT1', $tags->{grouping},
+			'--TCOM', $tags->{composer},
+			'--TCON', $tags->{genre},
+			'--COMM', $tags->{comment},
+			'--TYER', $tags->{tyer},
+			'--TDAT', $tags->{tdat},
+			'--TIME', $tags->{time},
+			'--TRCK', $tags->{tracknum},
+			'--TPOS', $tags->{disk},
+			'--USLT', $tags->{longDescription},
+			$meta->{filename},
+		);
+		# run id3v2 command
+		if ( main::run_cmd( 'STDERR', @cmd ) ) {
+			main::logger "WARNING: Failed to tag \U$meta->{ext}\E file\n";
+			return 2;
+		}
+	} else {
+		main::logger "WARNING: Cannot tag \U$meta->{ext}\E file\n" if $opt->{verbose};
+	}
+}
+
+# add MP4 tag with atomicparsley
+sub tag_file_mp4 {
+	my ($self, $meta, $tags) = @_;
+	# Only tag if the required tool exists
+	if ( main::exists_in_path( 'atomicparsley' ) ) {
+		main::logger "INFO: MP4 tagging \U$meta->{ext}\E file\n";
+		# pretty copyright for MP4
+		$tags->{copyright} = "\xA9 $tags->{copyright}" if $tags->{copyright};
+		# encode metadata for atomicparsley
+		my $encoding = $opt->{tag_utf8} ? "utf8" : "iso-8859-1";
+		while ( my ($key, $val) = each %$tags ) {
+			$tags->{$key} = encode($encoding, $val);
+		}
+		# build atomicparsley command
+		my @cmd = (
+			$bin->{atomicparsley},
+			$meta->{filename},
+			'--freefree',
+			'--overWrite',
+			'--stik', $tags->{stik},
+			'--advisory', $tags->{advisory},
+			'--copyright', $tags->{copyright},
+			'--title', $tags->{title},
+			'--artist', $tags->{artist},
+			'--albumArtist', $tags->{albumArtist},
+			'--album', $tags->{album},
+			'--grouping', $tags->{grouping},
+			'--composer', $tags->{composer},
+			'--genre', $tags->{genre},
+			'--comment', $tags->{comment},
+			'--year', $tags->{year},
+			'--tracknum', $tags->{tracknum},
+			'--disk', $tags->{disk},
+			'--lyrics', $tags->{lyrics},
+		);
+		# add descriptions to audio podcasts and video
+		if ( $tags->{is_video} || $tags->{is_podcast}) {
+			push @cmd, ('--description', $tags->{description} );
+			if ( $opt->{tag_longdescription} ) {
+				push @cmd, ( '--longDescription', $tags->{longDescription} );
+			} elsif ( $opt->{tag_longdesc} ) {
+				push @cmd, ( '--longdesc', $tags->{longDescription} );
+			}
+		}
+		# video only
+		if ( $tags->{is_video} ) {
+			# all video
+			push @cmd, ( '--hdvideo', $tags->{hdvideo} ) if $opt->{tag_hdvideo};
+			# tv only
+			if ( $tags->{is_tvshow} ) {
+				push @cmd, (
+					'--TVShowName', $tags->{TVShowName},
+					'--TVEpisode', $tags->{TVEpisode},
+					'--TVSeasonNum', $tags->{TVSeasonNum},
+					'--TVEpisodeNum', $tags->{TVEpisodeNum},
+					'--TVNetwork', $tags->{TVNetwork},
+				);
+			}
+		}
+		# tag iTunes podcast
+		if ( $tags->{is_podcast} ) {
+			push @cmd, (
+				'--podcastFlag', $tags->{podcastFlag},
+				'--category', $tags->{category},
+				'--keyword', $tags->{keyword},
+				'--podcastGUID', $tags->{podcastGUID},
+			);
+		}
+		# add artwork if available
+		push @cmd, ( '--artwork', $meta->{thumbfile} ) if -f $meta->{thumbfile};
+		# run atomicparsley command
+		if ( main::run_cmd( 'STDERR', @cmd ) ) {
+			main::logger "WARNING: Failed to tag \U$meta->{ext}\E file\n";
+			return 2;
+		}
+	} else {
+		main::logger "WARNING: Cannot tag \U$meta->{ext}\E file\n" if $opt->{verbose};
+	}
+}
 
 ############## End OO ##############
