@@ -136,10 +136,17 @@
 	NSString *noExpiryArg = [[NSString alloc] initWithString:@"--nopurge"];
 	NSString *mplayerArg = [[NSString alloc] initWithFormat:@"--mplayer=%@", mplayerPath];
     NSString *flvstreamerArg;
-    if (NSAppKitVersionNumber > 1038)
+    NSLog(@"%f", NSAppKitVersionNumber);
+    if (NSAppKitVersionNumber >= 1138)
+    {
         flvstreamerArg = [[NSString alloc] initWithFormat:@"--flvstreamer=%@", rtmpdumpPath];
+        NSLog(@"Lion rtmpdump");
+    }
     else
+    {
         flvstreamerArg = [[NSString alloc] initWithFormat:@"--flvstreamer=%@", flvstreamerPath];
+        NSLog(@"Snow Leopard rtmpdump");
+    }
 	NSString *lameArg = [[NSString alloc] initWithFormat:@"--lame=%@", lamePath];
 	NSString *atomicParsleyArg = [[NSString alloc] initWithFormat:@"--atomicparsley=%@", atomicParsleyPath];
 	NSString *ffmpegArg;
