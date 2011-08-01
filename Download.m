@@ -303,6 +303,8 @@
 				}
                 else if ([reasonForFailure isEqualToString:@"modes"])
                 {
+                    [show setValue:[NSNumber numberWithBool:YES] forKey:@"complete"];
+					[show setValue:[NSNumber numberWithBool:NO] forKey:@"successful"];
                     [show setValue:@"Failed: No Specified Modes" forKey:@"status"];
                     [self addToLog:@"REASON FOR FAILURE: None of the modes in your download format list are available for this show." noTag:YES];
                     [self addToLog:@"Try adding more modes." noTag:YES];
