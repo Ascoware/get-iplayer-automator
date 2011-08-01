@@ -33,6 +33,7 @@
 	//Prepare Arguments
 		//Initialize Paths
 	NSString *bundlePath = [[NSString alloc] initWithString:[[NSBundle mainBundle] bundlePath]];
+    NSString *resourcesPath = [bundlePath stringByAppendingString:@"/Contents/Resources/"];
 	NSString *getiPlayerPath = [bundlePath stringByAppendingString:@"/Contents/Resources/get_iplayer.pl"];
 	NSString *mplayerPath = [bundlePath stringByAppendingString:@"/Contents/Resources/mplayer"];
 	NSString *atomicParsleyPath = [bundlePath stringByAppendingString:@"/Contents/Resources/AtomicParsley"];
@@ -205,6 +206,11 @@
 	[task setLaunchPath:@"/usr/bin/perl"];
 	[task setStandardOutput:pipe];
 	[task setStandardError:errorPipe];
+    NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:[task environment]];
+    [envVariableDictionary setObject:resourcesPath forKey:@"DYLD_LIBRARY_PATH"];
+    [envVariableDictionary setObject:[@"~" stringByExpandingTildeInPath] forKey:@"HOME"];
+    NSLog(@"%@",envVariableDictionary);
+    [task setEnvironment:envVariableDictionary];
 	
 	fh = [pipe fileHandleForReading];
 	errorFh = [errorPipe fileHandleForReading];
