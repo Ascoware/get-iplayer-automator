@@ -301,6 +301,13 @@
 					}
 					[self addToLog:[NSString stringWithFormat:@"%@ Failed",[show showName]]];
 				}
+                else if ([reasonForFailure isEqualToString:@"modes"])
+                {
+                    [show setValue:@"Failed: No Specified Modes" forKey:@"status"];
+                    [self addToLog:@"REASON FOR FAILURE: None of the modes in your download format list are available for this show." noTag:YES];
+                    [self addToLog:@"Try adding more modes." noTag:YES];
+                    [self addToLog:[NSString stringWithFormat:@"%@ Failed",[show showName]]];
+                }
 				else if ([lastLine hasPrefix:@"INFO: Recorded"])
 				{
 					[show setValue:[NSNumber numberWithBool:YES] forKey:@"complete"];
@@ -613,11 +620,16 @@
 			LastLine = [NSString stringWithString:output];
 			foundLastLine=YES;
 		}
-		if ([output hasPrefix:@"INFO: No specified modes"])
+		if ([output hasPrefix:@"INFO: No specified modes"] && [output hasSuffix:@"--modes=)"])
 		{
 			reasonForFailure=@"proxy";
 			[self addToLog:output noTag:YES];
 		}
+        else if ([output hasPrefix:@"INFO: No specified modes"])
+        {
+            reasonForFailure=@"modes";
+            [self addToLog:output noTag:YES];
+        }
 		else if ([output hasPrefix:@"INFO:"] || [output hasPrefix:@"WARNING:"] || [output hasPrefix:@"ERROR:"] || 
 			[output hasSuffix:@"default"] || [output hasPrefix:[show pid]])
 		{
