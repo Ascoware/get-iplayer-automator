@@ -15,6 +15,7 @@
 #import "Sparkle.framework/Headers/Sparkle.h"
 #import "JRFeedbackController.h"
 #import "LiveTVChannel.h"
+#import "ReasonForFailure.h"
 
 @implementation AppController
 #pragma mark Overriden Methods
@@ -115,7 +116,7 @@
 	folder = [folder stringByExpandingTildeInPath];
 	if ([fileManager fileExistsAtPath: folder] == NO)
 	{
-		[fileManager createDirectoryAtPath: folder attributes: nil];
+		[fileManager createDirectoryAtPath:folder attributes: nil];
 	}
 	NSString *filename = @"Queue.automatorqueue";
 	NSString *filePath = [folder stringByAppendingPathComponent:filename];
@@ -1232,6 +1233,11 @@
 							@"Get iPlayer Automator needs to know what to download."];
 	if ([[queueController arrangedObjects] count] > 0)
 	{
+        NSLog(@"Initialising Failure Dictionary");
+        if (!solutionsDictionary)
+            solutionsDictionary = [NSDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"ReasonsForFailure" ofType:@"plist"]];
+        NSLog(@"Failure Dictionary Ready");
+        
 		BOOL foundOne=NO;
 		runDownloads=YES;
 		[mainWindow setDocumentEdited:YES];
@@ -1412,6 +1418,17 @@
 										   priority:0
 										   isSticky:NO
 									   clickContext:nil];
+            
+            ReasonForFailure *showSolution = [[ReasonForFailure alloc] init];
+            [showSolution setShowName:[finishedShow showName]];
+            [showSolution setSolution:[solutionsDictionary valueForKey:[finishedShow reasonForFailure]]];
+            if (![showSolution solution])
+                [showSolution setSolution:@"Problem Unknown. Please submit a bug report from the application menu."];
+            NSLog(@"Reason for Failure: %@", [finishedShow reasonForFailure]);
+            NSLog(@"Dictionary Lookup: %@", [solutionsDictionary valueForKey:[finishedShow reasonForFailure]]);
+            NSLog(@"Solution: %@", [showSolution solution]);
+            [solutionsArrayController addObject:showSolution];
+            NSLog(@"Added Solution");
 		}
 		NSArray *tempQueue = [queueController arrangedObjects];
 		Programme *nextShow=nil;
@@ -1482,7 +1499,8 @@
 									   clickContext:nil];
 			[[SUUpdater sharedUpdater] checkForUpdatesInBackground];
 			
-			
+			if (downloadsFailed>0)
+                [solutionsWindow makeKeyAndOrderFront:self];
 			if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"AutoRetryFailed"] boolValue] && downloadsFailed>0)
 			{
 				NSDate *scheduledDate = [NSDate dateWithTimeIntervalSinceNow:60*[[[NSUserDefaults standardUserDefaults] valueForKey:@"AutoRetryTime"] doubleValue]];

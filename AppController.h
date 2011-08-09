@@ -97,6 +97,12 @@ bool runUpdate=NO;
 	NSTask *mplayerStreamer;
 	NSPipe *liveTVPipe;
 	NSPipe *liveTVError;
+    
+    //Download Solutions
+    IBOutlet NSWindow *solutionsWindow;
+    IBOutlet NSArrayController *solutionsArrayController;
+    IBOutlet NSTableView *solutionsTableView;
+    NSDictionary *solutionsDictionary;
 }
 //Update
 - (void)getiPlayerUpdateFinished;
@@ -155,6 +161,9 @@ bool runUpdate=NO;
 - (IBAction)showLiveTVWindow:(id)sender;
 - (IBAction)startLiveTV:(id)sender;
 - (IBAction)stopLiveTV:(id)sender;
+
+//Download Solutions
+- (IBAction)saveSolutionsAsText:(id)sender;
 
 //Key-Value Coding
 @property (readwrite, assign) NSMutableAttributedString *log_value;

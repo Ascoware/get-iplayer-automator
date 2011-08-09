@@ -28,6 +28,8 @@ extern BOOL runDownloads;
 	radio = [[NSNumber alloc] initWithBool:NO];
 	subtitlePath=nil;
 	realPID=nil;
+    reasonForFailure=nil;
+    availableModes=nil;
 	return self;
 }
 - (id)initWithShow:(Programme *)show
@@ -46,6 +48,8 @@ extern BOOL runDownloads;
 	radio = [show radio];
 	realPID = [show realPID];
 	subtitlePath = [show subtitlePath];
+    reasonForFailure=[show reasonForFailure];
+    availableModes=nil;
 	return self;
 }
 - (id)init
@@ -71,6 +75,8 @@ extern BOOL runDownloads;
 	radio = [[NSNumber alloc] initWithBool:NO];
 	realPID=nil;
 	subtitlePath=nil;
+    reasonForFailure=nil;
+    availableModes=nil;
 	return self;
 }
 - (id)description
@@ -109,6 +115,8 @@ extern BOOL runDownloads;
 	radio = [coder decodeObjectForKey:@"radio"];
 	realPID = [coder decodeObjectForKey:@"realPID"];
 	subtitlePath=nil;
+    reasonForFailure=nil;
+    availableModes=nil;
 	return self;
 }
 /*
@@ -140,4 +148,6 @@ extern BOOL runDownloads;
 @synthesize radio;
 @synthesize realPID;
 @synthesize subtitlePath;
+@synthesize reasonForFailure;
+@synthesize availableModes;
 @end

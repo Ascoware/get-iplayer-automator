@@ -288,6 +288,7 @@
 					[show setValue:[NSNumber numberWithBool:YES] forKey:@"complete"];
 					[show setValue:[NSNumber numberWithBool:NO] forKey:@"successful"];
 					[show setValue:@"Failed: Unresumable File" forKey:@"status"];
+                    [show setReasonForFailure:@"Unresumable_File"];
 				}
 				else if ([reasonForFailure isEqualToString:@"proxy"])
 				{
@@ -305,12 +306,14 @@
 						[show setValue:@"Failed: Bad Proxy" forKey:@"status"];
 						[self addToLog:@"REASON FOR FAILURE: Proxy failed. If in the UK, please disable the proxy in the preferences." noTag:TRUE];
 						[self addToLog:@"If outside the UK, please submit a bug report so that the proxy can be updated." noTag:TRUE];
+                        [show setReasonForFailure:@"Provided_Proxy"];
 					}
 					else if ([proxyOption isEqualToString:@"Custom"])
 					{
 						[show setValue:@"Failed: Bad Proxy" forKey:@"status"];
 						[self addToLog:@"REASON FOR FAILURE: Proxy failed. If in the UK, please disable the proxy in the preferences." noTag:TRUE];
 						[self addToLog:@"If outside the UK, please use a different proxy." noTag:TRUE];
+                        [show setReasonForFailure:@"Custom_Proxy"];
 					}
 					[self addToLog:[NSString stringWithFormat:@"%@ Failed",[show showName]]];
 				}
@@ -322,6 +325,7 @@
                     [self addToLog:@"REASON FOR FAILURE: None of the modes in your download format list are available for this show." noTag:YES];
                     [self addToLog:@"Try adding more modes." noTag:YES];
                     [self addToLog:[NSString stringWithFormat:@"%@ Failed",[show showName]]];
+                    [show setReasonForFailure:@"Specified_Modes"];
                 }
 				else if ([lastLine hasPrefix:@"INFO: Recorded"])
 				{
@@ -643,6 +647,17 @@
         else if ([output hasPrefix:@"INFO: No specified modes"])
         {
             reasonForFailure=@"modes";
+            [self addToLog:output noTag:YES];
+            NSScanner *modeScanner = [NSScanner scannerWithString:output];
+            [modeScanner scanUpToString:@"--modes=" intoString:nil];
+            [modeScanner scanString:@"--modes=" intoString:nil];
+            NSString *availableModes;
+            [modeScanner scanUpToString:@")" intoString:&availableModes];
+            [show setAvailableModes:availableModes];
+        }
+        else if ([output hasPrefix:@"ERROR: Failed to get version pid"])
+        {
+            [show setReasonForFailure:@"ShowNotFound"];
             [self addToLog:output noTag:YES];
         }
 		else if ([output hasPrefix:@"INFO:"] || [output hasPrefix:@"WARNING:"] || [output hasPrefix:@"ERROR:"] || 

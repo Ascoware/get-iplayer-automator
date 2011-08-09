@@ -43,7 +43,6 @@
 		D941D95F1025DB580012A75F /* JRFeedbackController.m in Sources */ = {isa = PBXBuildFile; fileRef = D941D95C1025DB580012A75F /* JRFeedbackController.m */; };
 		D941D99C1025DDA90012A75F /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D941D99B1025DDA90012A75F /* AddressBook.framework */; };
 		D941D9A01025DDCF0012A75F /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D941D99F1025DDCF0012A75F /* SystemConfiguration.framework */; };
-		D941DA131025ED3F0012A75F /* plugins in Resources */ = {isa = PBXBuildFile; fileRef = D941DA0F1025ED3E0012A75F /* plugins */; };
 		D948C40C103436DE000CF853 /* icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = D948C40B103436DE000CF853 /* icon.icns */; };
 		D961247F10F12C9200046D31 /* AtomicParsley in Resources */ = {isa = PBXBuildFile; fileRef = D961247E10F12C9200046D31 /* AtomicParsley */; };
 		D97D9426106DBB68006ECD39 /* TVFormat.m in Sources */ = {isa = PBXBuildFile; fileRef = D97D9423106DBB68006ECD39 /* TVFormat.m */; };
@@ -66,6 +65,10 @@
 		D9FAFBEA1156AD2A005ACE1C /* rtmpdump in Resources */ = {isa = PBXBuildFile; fileRef = D9FAFBE91156AD2A005ACE1C /* rtmpdump */; };
 		D9FEB87610077790003BADF8 /* AppController.m in Sources */ = {isa = PBXBuildFile; fileRef = D9FEB87510077790003BADF8 /* AppController.m */; };
 		DF3A234B13E5F59900B82C2E /* rtmpdump-2.4 in Resources */ = {isa = PBXBuildFile; fileRef = DF3A234A13E5F59900B82C2E /* rtmpdump-2.4 */; };
+		DFC865E213E96BE200606599 /* ReasonForFailure.m in Sources */ = {isa = PBXBuildFile; fileRef = DFC865E113E96BE200606599 /* ReasonForFailure.m */; };
+		DFE5B67013E7062C0008571B /* librtmp.dylib in Resources */ = {isa = PBXBuildFile; fileRef = DF592B5313E70084000D0D11 /* librtmp.dylib */; };
+		DFE5B67413E70AC20008571B /* plugins in Resources */ = {isa = PBXBuildFile; fileRef = DFE5B67313E70AC20008571B /* plugins */; };
+		DFFF196713E96288007B52AC /* ReasonsForFailure.plist in Resources */ = {isa = PBXBuildFile; fileRef = DFFF196613E96288007B52AC /* ReasonsForFailure.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -128,7 +131,6 @@
 		D941D95D1025DB580012A75F /* JRFeedbackController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JRFeedbackController.h; sourceTree = "<group>"; };
 		D941D99B1025DDA90012A75F /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = /System/Library/Frameworks/AddressBook.framework; sourceTree = "<absolute>"; };
 		D941D99F1025DDCF0012A75F /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = /System/Library/Frameworks/SystemConfiguration.framework; sourceTree = "<absolute>"; };
-		D941DA0F1025ED3E0012A75F /* plugins */ = {isa = PBXFileReference; lastKnownFileType = folder; path = plugins; sourceTree = "<group>"; };
 		D948C40B103436DE000CF853 /* icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = icon.icns; sourceTree = "<group>"; };
 		D961247E10F12C9200046D31 /* AtomicParsley */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = AtomicParsley; sourceTree = "<group>"; };
 		D97D9422106DBB68006ECD39 /* TVFormat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TVFormat.h; sourceTree = "<group>"; };
@@ -157,6 +159,11 @@
 		D9FEB87410077790003BADF8 /* AppController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppController.h; sourceTree = "<group>"; };
 		D9FEB87510077790003BADF8 /* AppController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppController.m; sourceTree = "<group>"; };
 		DF3A234A13E5F59900B82C2E /* rtmpdump-2.4 */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = "rtmpdump-2.4"; sourceTree = "<group>"; };
+		DF592B5313E70084000D0D11 /* librtmp.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = librtmp.dylib; sourceTree = "<group>"; };
+		DFC865E013E96BE200606599 /* ReasonForFailure.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReasonForFailure.h; sourceTree = "<group>"; };
+		DFC865E113E96BE200606599 /* ReasonForFailure.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReasonForFailure.m; sourceTree = "<group>"; };
+		DFE5B67313E70AC20008571B /* plugins */ = {isa = PBXFileReference; lastKnownFileType = folder; path = plugins; sourceTree = "<group>"; };
+		DFFF196613E96288007B52AC /* ReasonsForFailure.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = ReasonsForFailure.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -248,11 +255,11 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				DFE5B67313E70AC20008571B /* plugins */,
 				D948C40B103436DE000CF853 /* icon.icns */,
 				D9A450A3102FFDC00011E175 /* LICENSE.txt */,
 				D9A4509C102FF8090011E175 /* Credits.html */,
 				D90EF2A7102B5D6300290A67 /* Scripts */,
-				D941DA0F1025ED3E0012A75F /* plugins */,
 				D904F04D1009F28400D60BBF /* Binaries */,
 				D9CC156B0FF9073D00D819E2 /* Buttons */,
 				8D1107310486CEB800E47090 /* Info.plist */,
@@ -260,6 +267,7 @@
 				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
 				1DDD58140DA1D0A300B32029 /* MainMenu.xib */,
 				D9CCF54B1025AAF9009205BE /* Growl Registration Ticket.growlRegDict */,
+				DFFF196613E96288007B52AC /* ReasonsForFailure.plist */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -276,9 +284,10 @@
 		D904F04D1009F28400D60BBF /* Binaries */ = {
 			isa = PBXGroup;
 			children = (
-				DF3A234A13E5F59900B82C2E /* rtmpdump-2.4 */,
+				DF592B5313E70084000D0D11 /* librtmp.dylib */,
 				D9CAE545133FF9BE003471DA /* ffmpeg */,
 				D9FAFBE91156AD2A005ACE1C /* rtmpdump */,
+				DF3A234A13E5F59900B82C2E /* rtmpdump-2.4 */,
 				D904F0721009F6B800D60BBF /* mplayer */,
 				D97D96A510743860006ECD39 /* lame */,
 				D961247E10F12C9200046D31 /* AtomicParsley */,
@@ -322,6 +331,8 @@
 				D97D97731077EFDF006ECD39 /* LiveTVChannel.m */,
 				D92687C81087F836000E8132 /* DownloadHistoryEntry.h */,
 				D92687C91087F836000E8132 /* DownloadHistoryEntry.m */,
+				DFC865E013E96BE200606599 /* ReasonForFailure.h */,
+				DFC865E113E96BE200606599 /* ReasonForFailure.m */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -417,15 +428,17 @@
 				D9CCF54C1025AAF9009205BE /* Growl Registration Ticket.growlRegDict in Resources */,
 				D941D9511025DB2B0012A75F /* JRFeedbackProvider.strings in Resources */,
 				D941D9521025DB2B0012A75F /* JRFeedbackProvider.xib in Resources */,
-				D941DA131025ED3F0012A75F /* plugins in Resources */,
 				D9A4509D102FF8090011E175 /* Credits.html in Resources */,
 				D9A450A4102FFDC00011E175 /* LICENSE.txt in Resources */,
+				DFE5B67013E7062C0008571B /* librtmp.dylib in Resources */,
 				D948C40C103436DE000CF853 /* icon.icns in Resources */,
 				D97D96A610743860006ECD39 /* lame in Resources */,
 				D961247F10F12C9200046D31 /* AtomicParsley in Resources */,
 				D9FAFBEA1156AD2A005ACE1C /* rtmpdump in Resources */,
 				D9CAE546133FF9BE003471DA /* ffmpeg in Resources */,
 				DF3A234B13E5F59900B82C2E /* rtmpdump-2.4 in Resources */,
+				DFE5B67413E70AC20008571B /* plugins in Resources */,
+				DFFF196713E96288007B52AC /* ReasonsForFailure.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -443,7 +456,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "set -o errexit\n\n[ $BUILD_STYLE = Release ] || { echo Distribution target requires \"'Release'\" build style; false; }\n\nVERSION=$(defaults read \"$BUILT_PRODUCTS_DIR/Get iPlayer Automator.app/Contents/Info\" CFBundleVersion)\nSHORTVERSION=$(defaults read \"$BUILT_PRODUCTS_DIR/Get iPlayer Automator.app/Contents/Info\" CFBundleShortVersionString)\nDOWNLOAD_BASE_URL=\"http://get-iplayer-automator.googlecode.com/files\"\nRELEASENOTES_URL=\"http://tom-tech.com/get_iplayer/releasenotes/$VERSION.html\"\n\nARCHIVE_FILENAME=\"GetiPlayerAutomator_$SHORTVERSION.zip\"\nDOWNLOAD_URL=\"$DOWNLOAD_BASE_URL/$ARCHIVE_FILENAME\"\nKEYCHAIN_PRIVKEY_NAME=\"Sparkle Private Key\"\n\nWD=$PWD\ncd \"$BUILT_PRODUCTS_DIR\"\nrm -f \"GetiPlayerAutomator\"*.zip\nditto -ck --keepParent \"Get iPlayer Automator.app\" \"$ARCHIVE_FILENAME\"\n\nSIZE=$(stat -f %z \"$ARCHIVE_FILENAME\")\nPUBDATE=$(date +\"%a, %d %b %G %T %z\")\nSIGNATURE=$(\n\topenssl dgst -sha1 -binary < \"$ARCHIVE_FILENAME\" \\\n\t| openssl dgst -dss1 -sign <(security find-generic-password -g -s \"$KEYCHAIN_PRIVKEY_NAME\" 2>&1 1>/dev/null | perl -pe '($_) = /\"(.+)\"/; s/\\\\012/\\n/g') \\\n\t| openssl enc -base64\n)\n\n[ $SIGNATURE ] || { echo Unable to load signing private key with name \"'$KEYCHAIN_PRIVKEY_NAME'\" from keychain; false; }\n\ncat <<EOF\n\t\t<item>\n\t\t\t<title>Version $SHORTVERSION</title>\n\t\t\t<sparkle:releaseNotesLink>$RELEASENOTES_URL</sparkle:releaseNotesLink>\n\t\t\t<sparkle:minimumSystemVersion>10.6.0</sparkle:minimumSystemVersion>\n\t\t\t<pubDate>$PUBDATE</pubDate>\n\t\t\t<enclosure\n\t\t\t\turl=\"$DOWNLOAD_URL\"\n\t\t\t\tsparkle:version=\"$VERSION\"\n\t\t\t\tsparkle:shortVersionString=\"$SHORTVERSION\"\n\t\t\t\ttype=\"application/octet-stream\"\n\t\t\t\tlength=\"$SIZE\"\n\t\t\t\tsparkle:dsaSignature=\"$SIGNATURE\"\n\t\t\t/>\n\t\t</item>\nEOF";
+			shellScript = "set -o errexit\n\n#security find-generic-password -g -s \"$KEYCHAIN_PRIVKEY_NAME\" 2>&1 1>/dev/null\n\nVERSION=$(defaults read \"$BUILT_PRODUCTS_DIR/Get iPlayer Automator.app/Contents/Info\" CFBundleVersion)\nSHORTVERSION=$(defaults read \"$BUILT_PRODUCTS_DIR/Get iPlayer Automator.app/Contents/Info\" CFBundleShortVersionString)\nDOWNLOAD_BASE_URL=\"http://get-iplayer-automator.googlecode.com/files\"\nRELEASENOTES_URL=\"http://tom-tech.com/get_iplayer/releasenotes/$VERSION.html\"\n\nARCHIVE_FILENAME=\"GetiPlayerAutomator_$SHORTVERSION.zip\"\nDOWNLOAD_URL=\"$DOWNLOAD_BASE_URL/$ARCHIVE_FILENAME\"\nKEYCHAIN_PRIVKEY_NAME=\"Sparkle Private Key\"\n\nWD=$PWD\ncd \"$BUILT_PRODUCTS_DIR\"\nrm -f \"GetiPlayerAutomator\"*.zip\nditto -ck --keepParent \"Get iPlayer Automator.app\" \"$ARCHIVE_FILENAME\"\n\nSIZE=$(stat -f %z \"$ARCHIVE_FILENAME\")\nPUBDATE=$(date +\"%a, %d %b %G %T %z\")\nSIGNATURE=$(openssl dgst -sha1 -binary < \"$ARCHIVE_FILENAME\" | openssl dgst -dss1 -sign \"/Users/iphonedev/Code/Keys/Sparkle_Key.pem\" | openssl enc -base64)\n\n\n[ $SIGNATURE ] || { echo Unable to load signing private key with name \"'$KEYCHAIN_PRIVKEY_NAME'\" from keychain; false; }\n\ncat <<EOF\n\t\t<item>\n\t\t\t<title>Version $SHORTVERSION</title>\n\t\t\t<sparkle:releaseNotesLink>$RELEASENOTES_URL</sparkle:releaseNotesLink>\n\t\t\t<sparkle:minimumSystemVersion>10.6.0</sparkle:minimumSystemVersion>\n\t\t\t<pubDate>$PUBDATE</pubDate>\n\t\t\t<enclosure\n\t\t\t\turl=\"$DOWNLOAD_URL\"\n\t\t\t\tsparkle:version=\"$VERSION\"\n\t\t\t\tsparkle:shortVersionString=\"$SHORTVERSION\"\n\t\t\t\ttype=\"application/octet-stream\"\n\t\t\t\tlength=\"$SIZE\"\n\t\t\t\tsparkle:dsaSignature=\"$SIGNATURE\"\n\t\t\t/>\n\t\t</item>\nEOF";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -464,6 +477,7 @@
 				D97D97741077EFDF006ECD39 /* LiveTVChannel.m in Sources */,
 				D92687C51087F81F000E8132 /* DownloadHistoryController.m in Sources */,
 				D92687CA1087F836000E8132 /* DownloadHistoryEntry.m in Sources */,
+				DFC865E213E96BE200606599 /* ReasonForFailure.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
