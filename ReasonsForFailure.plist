@@ -3,14 +3,25 @@
 <plist version="1.0">
 <dict>
 	<key>Provided_Proxy</key>
-	<string>The provided proxy could not be contacted. If you are in the UK the proxy in preferences should be set to none. If you are in fact outside the country, please report the failed proxy using the menu item located in the application menu.</string>
+	<string>The provided proxy could not be contacted. If you are in the UK the proxy in 
+preferences should be set to none. 
+If you are in fact outside the country, please report the failed proxy 
+using the menu item located in the application menu.</string>
 	<key>Custom_Proxy</key>
-	<string>The proxy you specified could not be contacted. If you are in the UK the proxy in preferences should be set to none. If you are outside the UK, please either specify a new proxy of your own or use the one that is provided.</string>
+	<string>The proxy you specified could not be contacted.
+If you are in the UK the proxy in preferences should be set to none.
+If you are outside the UK, please either specify a new proxy of your own or use the one that is 
+provided.</string>
 	<key>Specified_Modes</key>
-	<string>None of the download formats you specified were available for this show. Please add more download formats to your list in preferences.</string>
+	<string>None of the download formats you specified were available for this show.
+Please add more download formats to your list in preferences.</string>
 	<key>Unresumable_File</key>
-	<string>The download of the show could not be resumed. Please either delete or rename the partial file left behind in your download folder. The downloaded portion will be playable with Adobe Media Player or similar.</string>
+	<string>The download of the show could not be resumed. Please either delete or rename the 
+partial file left behind in your download folder. The downloaded portion will be playable 
+with Adobe Media Player or similar.</string>
 	<key>ShowNotFound</key>
-	<string>The show could not be located on iPlayer or iPlayer could not be contacted. Please check your internet connection.</string>
+	<string>The show could not be located on iPlayer or iPlayer could not be contacted. Please 
+check your internet connection.
+If outside the UK, use a proxy.</string>
 </dict>
 </plist>

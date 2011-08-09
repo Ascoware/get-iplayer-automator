@@ -1423,12 +1423,13 @@
             [showSolution setShowName:[finishedShow showName]];
             [showSolution setSolution:[solutionsDictionary valueForKey:[finishedShow reasonForFailure]]];
             if (![showSolution solution])
-                [showSolution setSolution:@"Problem Unknown. Please submit a bug report from the application menu."];
+                [showSolution setSolution:@"Problem Unknown.\nPlease submit a bug report from the application menu."];
             NSLog(@"Reason for Failure: %@", [finishedShow reasonForFailure]);
             NSLog(@"Dictionary Lookup: %@", [solutionsDictionary valueForKey:[finishedShow reasonForFailure]]);
             NSLog(@"Solution: %@", [showSolution solution]);
             [solutionsArrayController addObject:showSolution];
             NSLog(@"Added Solution");
+            [solutionsTableView setRowHeight:68];
 		}
 		NSArray *tempQueue = [queueController arrangedObjects];
 		Programme *nextShow=nil;

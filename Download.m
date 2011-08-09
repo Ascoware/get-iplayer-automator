@@ -300,6 +300,7 @@
 						[show setValue:@"Failed: See Log" forKey:@"status"];
 						[self addToLog:@"REASON FOR FAILURE: Proxy failed. If in the UK, please submit a bug report." noTag:TRUE];
 						[self addToLog:@"If outside the UK, please enable the provided proxy." noTag:TRUE];
+                        [show setReasonForFailure:@"ShowNotFound"];
 					}
 					else if ([proxyOption isEqualToString:@"Provided"])
 					{
@@ -326,6 +327,7 @@
                     [self addToLog:@"Try adding more modes." noTag:YES];
                     [self addToLog:[NSString stringWithFormat:@"%@ Failed",[show showName]]];
                     [show setReasonForFailure:@"Specified_Modes"];
+                    NSLog(@"Set Modes");
                 }
 				else if ([lastLine hasPrefix:@"INFO: Recorded"])
 				{
@@ -441,6 +443,7 @@
 								[self addToLog:@"Unresumable file, please delete the partial file and try again." noTag:NO];
 								[task interrupt];
 								reasonForFailure=@"unresumable";
+                                [show setReasonForFailure:@"Unresumable_File"];
 							}
 						}
 					}
