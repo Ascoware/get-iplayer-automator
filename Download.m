@@ -647,6 +647,7 @@
         else if ([output hasPrefix:@"INFO: No specified modes"])
         {
             reasonForFailure=@"modes";
+            [show setReasonForFailure:@"Specified_Modes"];
             [self addToLog:output noTag:YES];
             NSScanner *modeScanner = [NSScanner scannerWithString:output];
             [modeScanner scanUpToString:@"--modes=" intoString:nil];
