@@ -23,5 +23,9 @@ with Adobe Media Player or similar.</string>
 	<string>The show could not be located on iPlayer or iPlayer could not be contacted. Please 
 check your internet connection.
 If outside the UK, use a proxy.</string>
+    <key>InHistory</key>
+    <string>This programme has already been downloaded and is in the history.
+To re-download it, go to File->Edit Download History,
+remove it, and try again.
 </dict>
 </plist>

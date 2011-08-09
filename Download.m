@@ -362,6 +362,7 @@
 					[show setValue:[NSNumber numberWithBool:NO] forKey:@"successful"];
 					[show setValue:@"Failed: Download in History" forKey:@"status"];
 					[self addToLog:[NSString stringWithFormat:@"%@ Failed",[show showName]]];
+                    [show setReasonForFailure:@"InHistory"];
 				}
 				else
 				{
