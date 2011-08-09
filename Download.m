@@ -38,7 +38,7 @@
 	NSString *mplayerPath = [bundlePath stringByAppendingString:@"/Contents/Resources/mplayer"];
 	NSString *atomicParsleyPath = [bundlePath stringByAppendingString:@"/Contents/Resources/AtomicParsley"];
 	NSString *flvstreamerPath = [bundlePath stringByAppendingString:@"/Contents/Resources/rtmpdump"];
-    NSString *rtmpdumpPath = [bundlePath stringByAppendingString:@"/Contents/Resources/rtmpdump-2.4"];
+    NSString *rtmpdumpPath = [bundlePath stringByAppendingString:@"/Contents/Resources/flvstreamer"];
 	NSString *lamePath = [bundlePath stringByAppendingString:@"/Contents/Resources/lame"];
 	NSString *ffmpegPath = [bundlePath stringByAppendingString:@"/Contents/Resources/ffmpeg"];
 	NSString *downloadPath = [[NSString alloc] initWithString:[[NSUserDefaults standardUserDefaults] valueForKey:@"DownloadPath"]];
@@ -138,16 +138,14 @@
 	NSString *mplayerArg = [[NSString alloc] initWithFormat:@"--mplayer=%@", mplayerPath];
     NSString *flvstreamerArg;
     NSLog(@"%f", NSAppKitVersionNumber);
-    if (NSAppKitVersionNumber >= 1138)
-    {
+#ifdef __x86_64
         flvstreamerArg = [[NSString alloc] initWithFormat:@"--flvstreamer=%@", rtmpdumpPath];
         NSLog(@"Lion rtmpdump");
-    }
-    else
-    {
+#else
         flvstreamerArg = [[NSString alloc] initWithFormat:@"--flvstreamer=%@", flvstreamerPath];
         NSLog(@"Snow Leopard rtmpdump");
-    }
+#endif
+
 	NSString *lameArg = [[NSString alloc] initWithFormat:@"--lame=%@", lamePath];
 	NSString *atomicParsleyArg = [[NSString alloc] initWithFormat:@"--atomicparsley=%@", atomicParsleyPath];
 	NSString *ffmpegArg;
