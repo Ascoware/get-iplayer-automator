@@ -37,8 +37,8 @@
 	NSString *getiPlayerPath = [bundlePath stringByAppendingString:@"/Contents/Resources/get_iplayer.pl"];
 	NSString *mplayerPath = [bundlePath stringByAppendingString:@"/Contents/Resources/mplayer"];
 	NSString *atomicParsleyPath = [bundlePath stringByAppendingString:@"/Contents/Resources/AtomicParsley"];
-	NSString *flvstreamerPath = [bundlePath stringByAppendingString:@"/Contents/Resources/rtmpdump"];
-    NSString *rtmpdumpPath = [bundlePath stringByAppendingString:@"/Contents/Resources/flvstreamer"];
+	NSString *flvstreamerPath = [bundlePath stringByAppendingString:@"/Contents/Resources/flvstreamer"];
+    NSString *rtmpdumpPath = [bundlePath stringByAppendingString:@"/Contents/Resources/rtmpdump-2.4"];
 	NSString *lamePath = [bundlePath stringByAppendingString:@"/Contents/Resources/lame"];
 	NSString *ffmpegPath = [bundlePath stringByAppendingString:@"/Contents/Resources/ffmpeg"];
 	NSString *downloadPath = [[NSString alloc] initWithString:[[NSUserDefaults standardUserDefaults] valueForKey:@"DownloadPath"]];
@@ -138,7 +138,7 @@
 	NSString *mplayerArg = [[NSString alloc] initWithFormat:@"--mplayer=%@", mplayerPath];
     NSString *flvstreamerArg;
     NSLog(@"%f", NSAppKitVersionNumber);
-#ifdef __x86_64
+#ifdef __x86_64__
         flvstreamerArg = [[NSString alloc] initWithFormat:@"--flvstreamer=%@", rtmpdumpPath];
         NSLog(@"Lion rtmpdump");
 #else
@@ -657,6 +657,14 @@
             NSString *availableModes;
             [modeScanner scanUpToString:@")" intoString:&availableModes];
             [show setAvailableModes:availableModes];
+        }
+        else if ([output hasSuffix:@"use --force to override"])
+        {
+            [show setValue:[NSNumber numberWithBool:YES] forKey:@"complete"];
+            [show setValue:[NSNumber numberWithBool:NO] forKey:@"successful"];
+            [show setValue:@"Failed: Download in History" forKey:@"status"];
+            [self addToLog:[NSString stringWithFormat:@"%@ Failed",[show showName]]];
+            [show setReasonForFailure:@"InHistory"];
         }
         else if ([output hasPrefix:@"ERROR: Failed to get version pid"])
         {

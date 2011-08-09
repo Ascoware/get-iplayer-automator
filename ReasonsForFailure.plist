@@ -26,6 +26,6 @@ If outside the UK, use a proxy.</string>
     <key>InHistory</key>
     <string>This programme has already been downloaded and is in the history.
 To re-download it, go to File->Edit Download History,
-remove it, and try again.
+remove it, and try again.</string>
 </dict>
 </plist>
