@@ -37,8 +37,6 @@
 	NSString *getiPlayerPath = [bundlePath stringByAppendingString:@"/Contents/Resources/get_iplayer.pl"];
 	NSString *mplayerPath = [bundlePath stringByAppendingString:@"/Contents/Resources/mplayer"];
 	NSString *atomicParsleyPath = [bundlePath stringByAppendingString:@"/Contents/Resources/AtomicParsley"];
-	NSString *flvstreamerPath = [bundlePath stringByAppendingString:@"/Contents/Resources/flvstreamer"];
-    NSString *rtmpdumpPath = [bundlePath stringByAppendingString:@"/Contents/Resources/rtmpdump-2.4"];
 	NSString *lamePath = [bundlePath stringByAppendingString:@"/Contents/Resources/lame"];
 	NSString *ffmpegPath = [bundlePath stringByAppendingString:@"/Contents/Resources/ffmpeg"];
 	NSString *downloadPath = [[NSString alloc] initWithString:[[NSUserDefaults standardUserDefaults] valueForKey:@"DownloadPath"]];
@@ -137,13 +135,13 @@
 	NSString *noExpiryArg = [[NSString alloc] initWithString:@"--nopurge"];
 	NSString *mplayerArg = [[NSString alloc] initWithFormat:@"--mplayer=%@", mplayerPath];
     NSString *flvstreamerArg;
-    NSLog(@"%f", NSAppKitVersionNumber);
+   
 #ifdef __x86_64__
-        flvstreamerArg = [[NSString alloc] initWithFormat:@"--flvstreamer=%@", rtmpdumpPath];
-        NSLog(@"Lion rtmpdump");
+    NSString *rtmpdumpPath = [bundlePath stringByAppendingString:@"/Contents/Resources/rtmpdump-2.4"];
+    flvstreamerArg = [[NSString alloc] initWithFormat:@"--flvstreamer=%@", rtmpdumpPath];
 #else
-        flvstreamerArg = [[NSString alloc] initWithFormat:@"--flvstreamer=%@", flvstreamerPath];
-        NSLog(@"Snow Leopard rtmpdump");
+    NSString *flvstreamerPath = [bundlePath stringByAppendingString:@"/Contents/Resources/flvstreamer"];
+    flvstreamerArg = [[NSString alloc] initWithFormat:@"--flvstreamer=%@", flvstreamerPath];
 #endif
 
 	NSString *lameArg = [[NSString alloc] initWithFormat:@"--lame=%@", lamePath];
@@ -168,7 +166,7 @@
 	NSFileManager *fileManager = [NSFileManager defaultManager];
 	if ([fileManager fileExistsAtPath: folder] == NO)
 	{
-		[fileManager createDirectoryAtPath: folder attributes: nil];
+		[fileManager createDirectoryAtPath:folder withIntermediateDirectories:NO attributes:nil error:nil];
 	}
 	profileDirArg = [[NSString alloc] initWithFormat:@"--profile-dir=%@", folder];
 	
@@ -263,8 +261,8 @@
 				NSString *lastLine;
 				if (!foundLastLine)
 				{
-					unsigned length = [log length];
-					unsigned paraStart = 0, paraEnd = 0, contentsEnd = 0;
+					NSUInteger length = [log length];
+					NSUInteger paraStart = 0, paraEnd = 0, contentsEnd = 0;
 					NSMutableArray *array = [NSMutableArray array];
 					NSRange currentRange;
 					while (paraEnd < length) {

@@ -163,7 +163,7 @@ bool runUpdate=NO;
 - (IBAction)stopLiveTV:(id)sender;
 
 //Download Solutions
-- (IBAction)saveSolutionsAsText:(id)sender;
+//- (IBAction)saveSolutionsAsText:(id)sender;
 
 //Key-Value Coding
 @property (readwrite, assign) NSMutableAttributedString *log_value;

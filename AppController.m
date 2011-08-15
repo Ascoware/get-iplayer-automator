@@ -77,7 +77,7 @@
 	NSFileManager *fileManager = [NSFileManager defaultManager];
 	if (![fileManager fileExistsAtPath:folder])
 	{
-		[fileManager createDirectoryAtPath:folder attributes:nil];
+		[fileManager createDirectoryAtPath:folder withIntermediateDirectories:NO attributes:nil error:nil];
 	}
 	[fileManager changeCurrentDirectoryPath:folder];
 	
@@ -89,7 +89,7 @@
 		NSString *providedPath = [[NSBundle mainBundle] bundlePath];
 		if ([fileManager fileExistsAtPath:pluginPath]) [fileManager removeItemAtPath:pluginPath error:NULL];
 		providedPath = [providedPath stringByAppendingPathComponent:@"/Contents/Resources/plugins"];
-		[fileManager copyPath:providedPath toPath:pluginPath handler:nil];
+		[fileManager copyItemAtPath:providedPath toPath:pluginPath error:nil];
 	}
 	
 	
@@ -117,7 +117,7 @@
 	folder = [folder stringByExpandingTildeInPath];
 	if ([fileManager fileExistsAtPath: folder] == NO)
 	{
-		[fileManager createDirectoryAtPath:folder attributes: nil];
+		[fileManager createDirectoryAtPath:folder withIntermediateDirectories:NO attributes:nil error:nil];
 	}
 	NSString *filename = @"Queue.automatorqueue";
 	NSString *filePath = [folder stringByAppendingPathComponent:filename];
@@ -256,7 +256,7 @@
 	folder = [folder stringByExpandingTildeInPath];
 	if ([fileManager fileExistsAtPath: folder] == NO)
 	{
-		[fileManager createDirectoryAtPath: folder attributes: nil];
+		[fileManager createDirectoryAtPath:folder withIntermediateDirectories:NO attributes:nil error:nil];
 	}
 	NSString *filename = @"Queue.automatorqueue";
 	NSString *filePath = [folder stringByAppendingPathComponent:filename];
@@ -369,7 +369,7 @@
 												   otherButton:nil 
 									 informativeTextWithFormat:@"No proxy will be used.\r\rError: %@", [error localizedDescription]];
 				[alert runModal];
-				[self addToLog:@"Proxy could not be retrieved. No proxy will be used."];
+				[self addToLog:@"Proxy could not be retrieved. No proxy will be used." :self];
 				proxyArg=NULL;
 			}
 			else
@@ -718,7 +718,6 @@
 		NSString *s = [[NSString alloc] initWithData:d
 											encoding:NSUTF8StringEncoding];
 		[searchData appendString:s];
-		NSLog(s);
 	}
 	else
 	{
@@ -967,7 +966,8 @@
 					}
 					if (foundURL==NO)
 					{
-						url = [NSString stringWithString:[[documents objectAtIndex:0] URL]];
+						url = [NSString stringWithString:[[[documents objectAtIndex:0] URL] path]];
+                        //Might be incorrect
 					}
 				}
 				else
@@ -1071,7 +1071,7 @@
 				}
 				if (foundURL==NO)
 				{
-					url = [[NSString alloc] initWithString:[[tabsArray objectAtIndex:0] URL]];
+					url = [[NSString alloc] initWithString:[[[tabsArray objectAtIndex:0] URL] path]];
 				}
 			}
 			else
