@@ -923,8 +923,11 @@
 		}
 			
 	}
-	if (!found && [[p showName] isEqualToString:@""])
+	if (!found && ([[p showName] isEqualToString:@""] || [[p showName] isEqualToString:@"Unknown: Not in Cache"]))
+    {
 		[p setValue:@"Unknown: Not in Cache" forKey:@"showName"];
+        [p setProcessedPID:[[NSNumber alloc] initWithBool:NO]];
+    }
 	else
 		[p setProcessedPID:[NSNumber numberWithBool:YES]];
 	
