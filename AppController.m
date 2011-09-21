@@ -2049,6 +2049,7 @@
 	[openPanel setCanChooseFiles:NO];
 	[openPanel setCanChooseDirectories:YES];
 	[openPanel setAllowsMultipleSelection:NO];
+    [openPanel setCanCreateDirectories:YES];
 	[openPanel runModalForTypes:nil];
 	NSArray *urls = [openPanel URLs];
 	[[NSUserDefaults standardUserDefaults] setValue:[[urls objectAtIndex:0] path] forKey:@"DownloadPath"];
