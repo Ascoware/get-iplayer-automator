@@ -16,6 +16,7 @@
 #import "JRFeedbackController.h"
 #import "LiveTVChannel.h"
 #import "ReasonForFailure.h"
+#import "Chrome.h"
 
 @implementation AppController
 #pragma mark Overriden Methods
@@ -1117,6 +1118,52 @@
 				}
 			}
 		}
+        else if ([browser isEqualToString:@"Chrome"])
+        {
+            BOOL foundURL=NO;
+            ChromeApplication *Chrome = [SBApplication applicationWithBundleIdentifier:@"com.google.Chrome"];
+            if ([Chrome isRunning])
+            {
+                @try
+                {
+                    SBElementArray *tabs = [Chrome 
+                    if ([[NSNumber numberWithUnsignedInteger:[documents count]] intValue])
+                    {
+                        for (SafariDocument *document in documents)
+                        {
+                            if ([[document URL] hasPrefix:@"http://www.bbc.co.uk/iplayer/episode/"] || [[document URL] hasPrefix:@"http://bbc.co.uk/iplayer/console/"] || [[document URL] hasPrefix:@"http://www.itv.com/ITVPlayer/Video/default.html?ViewType"])
+                            {
+                                url = [NSString stringWithString:[document URL]];
+                                NSScanner *nameScanner = [NSScanner scannerWithString:[document name]];
+                                [nameScanner scanString:@"BBC iPlayer - " intoString:nil];
+                                [nameScanner scanUpToString:@"kjklgfdjfgkdlj" intoString:&newShowName];
+                                foundURL=YES;
+                            }
+                        }
+                        if (foundURL==NO)
+                        {
+                            url = [NSString stringWithString:[[[documents objectAtIndex:0] URL] path]];
+                            //Might be incorrect
+                        }
+                    }
+                    else
+                    {
+                        [browserNotOpen runModal];
+                        return;
+                    }
+                }
+                @catch (NSException *e)
+                {
+                    [browserNotOpen runModal];
+                    return;
+                }
+            }
+            else
+            {
+                [browserNotOpen runModal];
+                return;
+            }            
+        }
 	}
 	
 	//Process URL
