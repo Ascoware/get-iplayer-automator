@@ -22,4 +22,5 @@ extern bool runDownloads;
 - (void)readHistory:(id)sender;
 - (IBAction)writeHistory:(id)sender;
 - (IBAction)cancelChanges:(id)sender;
+- (void)addToLog:(NSString *)logMessage;
 @end

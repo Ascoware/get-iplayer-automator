@@ -92,9 +92,21 @@
 		NSData *historyData = [historyString dataUsingEncoding:NSASCIIStringEncoding];
 		NSFileManager *fileManager = [NSFileManager defaultManager];
 		if (![fileManager fileExistsAtPath:historyPath])
-			[fileManager createFileAtPath:historyPath contents:historyData attributes:nil];
+        {
+			if (![fileManager createFileAtPath:historyPath contents:historyData attributes:nil])
+            {
+                [[NSAlert alertWithMessageText:@"Could not create history file!" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Please submit a bug report saying that the history file could not be created."] runModal];
+                [self addToLog:@"Could not create history file!"];
+            }
+        }
 		else
-			[historyData writeToFile:historyPath atomically:YES];
+        {
+			if (![historyData writeToFile:historyPath atomically:YES])
+            {
+                [[NSAlert alertWithMessageText:@"Could not write to history file!" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Please submit a bug report saying that the history file could not be written to."] runModal];
+                [self addToLog:@"Could not write to history file!"];
+            }
+        }
 	}
 	else
 	{
@@ -152,5 +164,9 @@
 	DownloadHistoryEntry *entry = [[DownloadHistoryEntry alloc] initWithPID:[prog realPID] showName:[prog seriesName] episodeName:[prog episodeName] type:nil someNumber:@"251465" downloadFormat:@"flashhigh" downloadPath:@"/"];
 	[historyArrayController addObject:entry];
 	[self writeHistory:self];
+}
+- (void)addToLog:(NSString *)logMessage
+{
+	[[NSNotificationCenter defaultCenter] postNotificationName:@"AddToLog" object:self userInfo:[NSDictionary dictionaryWithObject:logMessage forKey:@"message"]];
 }
 @end
