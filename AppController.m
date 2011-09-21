@@ -923,9 +923,10 @@
 		}
 			
 	}
-	if (!found && ([[p showName] isEqualToString:@""] || [[p showName] isEqualToString:@"Unknown: Not in Cache"]))
+	if (!found)
     {
-		[p setValue:@"Unknown: Not in Cache" forKey:@"showName"];
+        if ([[p showName] isEqualToString:@""] || [[p showName] isEqualToString:@"Unknown: Not in Cache"])
+            [p setValue:@"Unknown: Not in Cache" forKey:@"showName"];
         [p setProcessedPID:[[NSNumber alloc] initWithBool:NO]];
     }
 	else
@@ -934,6 +935,7 @@
 }
 - (IBAction)getCurrentWebpage:(id)sender
 {
+    NSString *newShowName=nil;
 	//Get Default Browser
 	NSString *browser = [[NSUserDefaults standardUserDefaults] objectForKey:@"DefaultBrowser"];
 	
@@ -964,6 +966,9 @@
 						if ([[document URL] hasPrefix:@"http://www.bbc.co.uk/iplayer/episode/"] || [[document URL] hasPrefix:@"http://bbc.co.uk/iplayer/console/"] || [[document URL] hasPrefix:@"http://www.itv.com/ITVPlayer/Video/default.html?ViewType"])
 						{
 							url = [NSString stringWithString:[document URL]];
+                            NSScanner *nameScanner = [NSScanner scannerWithString:[document name]];
+                            [nameScanner scanString:@"BBC iPlayer - " intoString:nil];
+                            [nameScanner scanUpToString:@"kjklgfdjfgkdlj" intoString:&newShowName];
 							foundURL=YES;
 						}
 					}
@@ -1130,6 +1135,7 @@
 		[urlScanner scanUpToString:@"/" intoString:&pid];
 		Programme *newProg = [[Programme alloc] init];
 		[newProg setValue:pid forKey:@"pid"];
+        if (newShowName) [newProg setShowName:newShowName];
 		[queueController addObject:newProg];
 		[self getNameForProgramme:newProg];
 	}
