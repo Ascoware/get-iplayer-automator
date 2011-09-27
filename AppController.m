@@ -975,7 +975,7 @@
 					}
 					if (foundURL==NO)
 					{
-						url = [NSString stringWithString:[[[documents objectAtIndex:0] URL] path]];
+						url = [NSString stringWithString:[[documents objectAtIndex:0] URL]];
                         //Might be incorrect
 					}
 				}
@@ -998,7 +998,12 @@
 		}
 		
 	}
-	else if ([browser isEqualToString:@"Firefox"])
+    else
+    {
+        [[NSAlert alertWithMessageText:@"Get iPlayer Automator currently only supports Safari." defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Please change your preferred browser in the preferences and try again."] runModal];
+        return;
+    }
+	/*else if ([browser isEqualToString:@"Firefox"])
 	{
 		NSString *scriptPath = [[NSBundle mainBundle] pathForResource:@"GetFireFoxURL" ofType:@"applescript"];
 		NSURL *scriptLocation = [[NSURL alloc] initFileURLWithPath:scriptPath];
@@ -1024,30 +1029,6 @@
 	}
 	else if ([browser isEqualToString:@"Camino"])
 	{
-		/* AppleScript Version
-		NSString *scriptPath = [[NSBundle mainBundle] pathForResource:@"GetCaminoURL" ofType:@"applescript"];
-		NSURL *scriptLocation = [[NSURL alloc] initFileURLWithPath:scriptPath];
-		if (scriptLocation)
-		{
-			NSDictionary *errorDic;
-			NSAppleScript *getCaminoURL = [[NSAppleScript alloc] initWithContentsOfURL:scriptLocation error:&errorDic];
-			if (getCaminoURL)
-			{
-				NSDictionary *executionError;
-				NSAppleEventDescriptor *result = [getCaminoURL executeAndReturnError:&executionError];
-				if (result)
-				{
-					url = [[NSString alloc] initWithString:[result stringValue]];
-					if ([url isEqualToString:@"Error"]) 
-					{
-						[browserNotOpen runModal];
-						return;
-					}
-				}
-			}
-		}
-		 */
-		
 		//Scripting Bridge Version
 		CaminoApplication *camino = [SBApplication applicationWithBundleIdentifier:@"org.mozilla.camino"];
 		if ([camino isRunning])
@@ -1095,86 +1076,75 @@
 			return;
 		}
 	}
-	else if ([browser isEqualToString:@"Opera"])
-	{
-		NSString *scriptPath = [[NSBundle mainBundle] pathForResource:@"GetOperaURL" ofType:@"applescript"];
-		NSURL *scriptLocation = [[NSURL alloc] initFileURLWithPath:scriptPath];
-		if (scriptLocation)
-		{
-			NSDictionary *errorDic;
-			NSAppleScript *getOperaURL = [[NSAppleScript alloc] initWithContentsOfURL:scriptLocation error:&errorDic];
-			if (getOperaURL)
-			{
-				NSDictionary *executionError;
-				NSAppleEventDescriptor *result = [getOperaURL executeAndReturnError:&executionError];
-				if (result)
-				{
-					url = [[NSString alloc] initWithString:[result stringValue]];
-					if ([url isEqualToString:@"Error"]) 
-					{
-						[browserNotOpen runModal];
-						return;
-					}
-				}
-			}
-		}
-        else if ([browser isEqualToString:@"Chrome"])
+    else if ([browser isEqualToString:@"Chrome"])
+    {
+        NSLog(@"Beginning Chrome");
+        BOOL foundURL=NO;
+        ChromeApplication *Chrome = [SBApplication applicationWithBundleIdentifier:@"com.google.Chrome"];
+        if ([Chrome isRunning])
         {
-            BOOL foundURL=NO;
-            ChromeApplication *Chrome = [SBApplication applicationWithBundleIdentifier:@"com.google.Chrome"];
-            if ([Chrome isRunning])
+            NSLog(@"Chrome is running.");
+            @try
             {
-                @try
+                SBElementArray *windows = [Chrome windows];
+                SBElementArray *tabs;
+                for (ChromeWindow *chromeWindow1 in windows)
                 {
-                    SBElementArray *windows = [Chrome windows];
-                    SBElementArray *tabs;
-                    for (ChromeWindow *chromeWindow in windows)
+                    [tabs addObject:[chromeWindow1 activeTab]];
+                    NSLog(@"Adding tab.");
+                }
+                if ([tabs count]>0)
+                {
+                    NSLog(@"Have tabs");
+                    for (ChromeTab *document in tabs)
                     {
-                        [tabs addObject:[chromeWindow activeTab]];
+                        NSLog(@"Looking at tab");
+                        if ([[document URL] hasPrefix:@"http://www.bbc.co.uk/iplayer/episode/"] || [[document URL] hasPrefix:@"http://bbc.co.uk/iplayer/console/"] || [[document URL] hasPrefix:@"http://www.itv.com/ITVPlayer/Video/default.html?ViewType"])
+                        {
+                            url = [NSString stringWithString:[document URL]];
+                            NSScanner *nameScanner = [NSScanner scannerWithString:[document title]];
+                            [nameScanner scanString:@"BBC iPlayer - " intoString:nil];
+                            [nameScanner scanUpToString:@"kjklgfdjfgkdlj" intoString:&newShowName];
+                            foundURL=YES;
+                        }
                     }
-                    if ([[NSNumber numberWithUnsignedInteger:[tabs count]] intValue])
+                    if (foundURL==NO)
                     {
-                        for (ChromeTab *document in tabs)
-                        {
-                            if ([[document URL] hasPrefix:@"http://www.bbc.co.uk/iplayer/episode/"] || [[document URL] hasPrefix:@"http://bbc.co.uk/iplayer/console/"] || [[document URL] hasPrefix:@"http://www.itv.com/ITVPlayer/Video/default.html?ViewType"])
-                            {
-                                url = [NSString stringWithString:[document URL]];
-                                NSScanner *nameScanner = [NSScanner scannerWithString:[document title]];
-                                [nameScanner scanString:@"BBC iPlayer - " intoString:nil];
-                                [nameScanner scanUpToString:@"kjklgfdjfgkdlj" intoString:&newShowName];
-                                foundURL=YES;
-                            }
-                        }
-                        if (foundURL==NO)
-                        {
-                            NSLog(@"here");
-                            url = [NSString stringWithString:[[tabs objectAtIndex:0] URL]];
-                            //Might be incorrect
-                            NSLog(@"%@", url);
-                        }
+                        NSLog(@"Didn't Find URL");
+                        url = [NSString stringWithString:[[tabs objectAtIndex:0] URL]];
+                        //Might be incorrect
+                        NSLog(@"%@", url);
                     }
                     else
                     {
-                        [browserNotOpen runModal];
-                        return;
+                        NSLog(@"%@", url);
                     }
                 }
-                @catch (NSException *e)
+                else
                 {
+                    NSLog(@"Tab count is 0");
+                    for (ChromeWindow *chromeWindow in windows)
+                    {
+                        url=[[chromeWindow activeTab] URL];
+                    }
                     [browserNotOpen runModal];
                     return;
                 }
             }
-            else
+            @catch (NSException *e)
             {
                 [browserNotOpen runModal];
                 return;
-            }         
-            NSLog(@"%d", foundURL);
+            }
         }
-	}
+        else
+        {
+            [browserNotOpen runModal];
+            return;
+        }         
+        NSLog(@"%d", foundURL);
+    }*/
 	//Process URL
-    NSLog(@"%@", url);
 	if([url hasPrefix:@"http://www.bbc.co.uk/iplayer/episode/"] || [url hasPrefix:@"http://beta.bbc.co.uk/iplayer/episode"])
 	{
 		NSString *pid;

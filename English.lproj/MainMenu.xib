@@ -313,7 +313,6 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA</b
 							<string key="NSFrame">{{282, 12}, {130, 32}}</string>
 							<reference key="NSSuperview" ref="655669"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="665648133">
 								<int key="NSCellFlags">67239424</int>
@@ -2375,7 +2374,6 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA</b
 							<string key="NSFrame">{{13, 10}, {474, 478}}</string>
 							<reference key="NSSuperview" ref="1051541567"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="802348472"/>
 							<object class="NSMutableArray" key="NSTabViewItems">
 								<bool key="EncodedWithXMLCoder">YES</bool>
 								<object class="NSTabViewItem" id="257925979">
@@ -2578,12 +2576,12 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA</b
 													<string key="NSKeyEquivalent"/>
 													<int key="NSPeriodicDelay">400</int>
 													<int key="NSPeriodicInterval">75</int>
-													<object class="NSMenuItem" key="NSMenuItem" id="523749420">
+													<object class="NSMenuItem" key="NSMenuItem" id="45895171">
 														<reference key="NSMenu" ref="1061773299"/>
-														<string key="NSTitle">Chrome</string>
+														<string key="NSTitle">Safari</string>
 														<string key="NSKeyEquiv"/>
+														<int key="NSKeyEquivModMask">1048576</int>
 														<int key="NSMnemonicLoc">2147483647</int>
-														<int key="NSState">1</int>
 														<reference key="NSOnImage" ref="35465992"/>
 														<reference key="NSMixedImage" ref="502551668"/>
 														<string key="NSAction">_popUpItemAction:</string>
@@ -2594,21 +2592,9 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA</b
 														<string key="NSTitle">OtherViews</string>
 														<object class="NSMutableArray" key="NSMenuItems">
 															<bool key="EncodedWithXMLCoder">YES</bool>
-															<object class="NSMenuItem" id="45895171">
-																<reference key="NSMenu" ref="1061773299"/>
-																<string key="NSTitle">Safari</string>
-																<string key="NSKeyEquiv"/>
-																<int key="NSKeyEquivModMask">1048576</int>
-																<int key="NSMnemonicLoc">2147483647</int>
-																<reference key="NSOnImage" ref="35465992"/>
-																<reference key="NSMixedImage" ref="502551668"/>
-																<string key="NSAction">_popUpItemAction:</string>
-																<reference key="NSTarget" ref="681645979"/>
-															</object>
-															<reference ref="523749420"/>
+															<reference ref="45895171"/>
 														</object>
 													</object>
-													<int key="NSSelectedIndex">1</int>
 													<int key="NSPreferredEdge">1</int>
 													<bool key="NSUsesItemFromMenu">YES</bool>
 													<bool key="NSAltersState">YES</bool>
@@ -3313,7 +3299,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 												<string key="NSFrame">{{256, 9}, {193, 32}}</string>
 												<reference key="NSSuperview" ref="802348472"/>
 												<reference key="NSWindow"/>
-												<reference key="NSNextKeyView"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="927644620">
 													<int key="NSCellFlags">67239424</int>
@@ -8615,15 +8600,9 @@ IHdpbGwgc2hvdyB1cCBoZXJlLg</string>
 						<reference key="object" ref="1061773299"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="523749420"/>
 							<reference ref="45895171"/>
 						</object>
 						<reference key="parent" ref="681645979"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">1018</int>
-						<reference key="object" ref="523749420"/>
-						<reference key="parent" ref="1061773299"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">586</int>
@@ -9917,7 +9896,6 @@ IHdpbGwgc2hvdyB1cCBoZXJlLg</string>
 					<string>1002.IBPluginDependency</string>
 					<string>1003.IBPluginDependency</string>
 					<string>1010.IBPluginDependency</string>
-					<string>1018.IBPluginDependency</string>
 					<string>1023.IBPluginDependency</string>
 					<string>1026.IBPluginDependency</string>
 					<string>1028.IBPluginDependency</string>
@@ -10317,7 +10295,6 @@ IHdpbGwgc2hvdyB1cCBoZXJlLg</string>
 				</object>
 				<object class="NSMutableArray" key="dict.values">
 					<bool key="EncodedWithXMLCoder">YES</bool>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
