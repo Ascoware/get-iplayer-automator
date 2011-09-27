@@ -1126,15 +1126,20 @@
             {
                 @try
                 {
-                    SBElementArray *tabs = [Chrome 
-                    if ([[NSNumber numberWithUnsignedInteger:[documents count]] intValue])
+                    SBElementArray *windows = [Chrome windows];
+                    SBElementArray *tabs;
+                    for (ChromeWindow *chromeWindow in windows)
                     {
-                        for (SafariDocument *document in documents)
+                        [tabs addObject:[chromeWindow activeTab]];
+                    }
+                    if ([[NSNumber numberWithUnsignedInteger:[tabs count]] intValue])
+                    {
+                        for (ChromeTab *document in tabs)
                         {
                             if ([[document URL] hasPrefix:@"http://www.bbc.co.uk/iplayer/episode/"] || [[document URL] hasPrefix:@"http://bbc.co.uk/iplayer/console/"] || [[document URL] hasPrefix:@"http://www.itv.com/ITVPlayer/Video/default.html?ViewType"])
                             {
                                 url = [NSString stringWithString:[document URL]];
-                                NSScanner *nameScanner = [NSScanner scannerWithString:[document name]];
+                                NSScanner *nameScanner = [NSScanner scannerWithString:[document title]];
                                 [nameScanner scanString:@"BBC iPlayer - " intoString:nil];
                                 [nameScanner scanUpToString:@"kjklgfdjfgkdlj" intoString:&newShowName];
                                 foundURL=YES;
@@ -1142,8 +1147,10 @@
                         }
                         if (foundURL==NO)
                         {
-                            url = [NSString stringWithString:[[[documents objectAtIndex:0] URL] path]];
+                            NSLog(@"here");
+                            url = [NSString stringWithString:[[tabs objectAtIndex:0] URL]];
                             //Might be incorrect
+                            NSLog(@"%@", url);
                         }
                     }
                     else
@@ -1162,11 +1169,12 @@
             {
                 [browserNotOpen runModal];
                 return;
-            }            
+            }         
+            NSLog(@"%d", foundURL);
         }
 	}
-	
 	//Process URL
+    NSLog(@"%@", url);
 	if([url hasPrefix:@"http://www.bbc.co.uk/iplayer/episode/"] || [url hasPrefix:@"http://beta.bbc.co.uk/iplayer/episode"])
 	{
 		NSString *pid;
