@@ -142,6 +142,7 @@
 		D97D97731077EFDF006ECD39 /* LiveTVChannel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LiveTVChannel.m; sourceTree = "<group>"; };
 		D9A4509C102FF8090011E175 /* Credits.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = Credits.html; sourceTree = "<group>"; };
 		D9A450A3102FFDC00011E175 /* LICENSE.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
+		D9A7F8E1142A953C00082626 /* Chrome.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Chrome.h; sourceTree = "<group>"; };
 		D9BE0870103563530011CF40 /* Camino.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Camino.h; sourceTree = "<group>"; };
 		D9CAE545133FF9BE003471DA /* ffmpeg */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = ffmpeg; sourceTree = "<group>"; };
 		D9CC15670FF9071700D819E2 /* Play.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = Play.tiff; sourceTree = "<group>"; };
@@ -299,6 +300,7 @@
 		D90EF1361029CB3100290A67 /* Scripting Headers */ = {
 			isa = PBXGroup;
 			children = (
+				D9A7F8E1142A953C00082626 /* Chrome.h */,
 				D9BE0870103563530011CF40 /* Camino.h */,
 				D9CCF4C310256E82009205BE /* iTunes.h */,
 				D914BC2E100C9DEF00F7E68E /* Safari.h */,
