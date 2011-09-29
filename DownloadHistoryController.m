@@ -101,9 +101,11 @@
         }
 		else
         {
-			if (![historyData writeToFile:historyPath atomically:YES])
+            NSError *writeToFileError;
+			if (![historyData writeToFile:historyPath options:nil error:&writeToFileError])
             {
                 [[NSAlert alertWithMessageText:@"Could not write to history file!" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Please submit a bug report saying that the history file could not be written to."] runModal];
+                [[NSAlert alertWithError:writeToFileError] runModal];
                 [self addToLog:@"Could not write to history file!"];
             }
         }
