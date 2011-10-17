@@ -964,7 +964,11 @@
 				{
 					for (SafariDocument *document in documents)
  					{
-						if ([[document URL] hasPrefix:@"http://www.bbc.co.uk/iplayer/episode/"] || [[document URL] hasPrefix:@"http://bbc.co.uk/iplayer/console/"] || [[document URL] hasPrefix:@"http://www.itv.com/ITVPlayer/Video/default.html?ViewType"])
+						if ([[document URL] hasPrefix:@"http://www.bbc.co.uk/iplayer/episode/"] ||
+                            [[document URL] hasPrefix:@"http://bbc.co.uk/iplayer/episode/"] ||
+                            [[document URL] hasPrefix:@"http://bbc.co.uk/iplayer/console/"] || 
+                            [[document URL] hasPrefix:@"http://www.bbc.co.uk/iplayer/console/"] ||
+                            [[document URL] hasPrefix:@"http://www.itv.com/ITVPlayer/Video/default.html?ViewType"])
 						{
 							url = [NSString stringWithString:[document URL]];
                             NSScanner *nameScanner = [NSScanner scannerWithString:[document name]];
