@@ -48,28 +48,13 @@
 	NSArray *radioFormatObjects = [NSArray arrayWithObjects:@"iphone", @"flashaudio",@"flashaac",@"wma",@"realaudio",@"flashaudio",@"flashaachigh",@"flashaacstd",@"flashaaclow",nil];
 	NSDictionary *radioFormats = [[NSDictionary alloc] initWithObjects:radioFormatObjects forKeys:radioFormatKeys];
 	NSString *formatArg;
-	if ([[show radio] isEqualToNumber:[NSNumber numberWithBool:YES]])
-	{
-		NSMutableString *temp_Format;
-		temp_Format = [[NSMutableString alloc] initWithString:@"--modes="];
-		for (RadioFormat *format in radioFormatList)
-		{
-			[temp_Format appendFormat:@"%@,", [radioFormats valueForKey:[format format]]];
-		}
-		[temp_Format deleteCharactersInRange:NSMakeRange([temp_Format length]-1, 1)];
-		formatArg = [NSString stringWithString:temp_Format];
-	} 
-	else
-	{
-		NSMutableString *temp_Format;
-		temp_Format = [[NSMutableString alloc] initWithString:@"--modes="];
-		for (TVFormat *format in tvFormatList)
-		{
-			[temp_Format appendFormat:@"%@,",[tvFormats valueForKey:[format format]]];
-		}
-		[temp_Format deleteCharactersInRange:NSMakeRange([temp_Format length]-1, 1)];
-		formatArg = [NSString stringWithString:temp_Format];
-	}
+    NSMutableString *temp_Format;
+    temp_Format = [[NSMutableString alloc] initWithString:@"--modes="];
+    for (RadioFormat *format in radioFormatList)
+        [temp_Format appendFormat:@"%@,", [radioFormats valueForKey:[format format]]];
+    for (TVFormat *format in tvFormatList)
+        [temp_Format appendFormat:@"%@,",[tvFormats valueForKey:[format format]]];
+    formatArg = [NSString stringWithString:temp_Format];
 
 		//Set Proxy Argument
 	NSString *proxyArg;
