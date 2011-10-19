@@ -24,7 +24,7 @@
 #
 #
 package main;
-my $version = 2.79;
+my $version = 2.80;
 #
 # Help:
 #	./get_iplayer --help | --longhelp
@@ -251,7 +251,7 @@ my $opt_format = {
 	tag_podcast => [ 1, "tagpodcast|tag-podcast!", 'Tagging', '--tag-podcast', "Tag downloaded radio and tv programmes as iTunes podcasts (requires MP3::Tag module for AAC/MP3 files)"],
 	tag_podcast_radio => [ 1, "tagpodcastradio|tag-podcast-radio!", 'Tagging', '--tag-podcast-radio', "Tag only downloaded radio programmes as iTunes podcasts (requires MP3::Tag module for AAC/MP3 files)"],
 	tag_podcast_tv => [ 1, "tagpodcasttv|tag-podcast-tv!", 'Tagging', '--tag-podcast-tv', "Tag only downloaded tv programmes as iTunes podcasts"],
-	tag_utf8 => [ 1, "tagutf8|tag-utf8!", 'Tagging', '--tag-utf8', "AtomicParsley expects UTF-8 input"],
+	tag_utf8 => [ 1, "tagutf8|tag-utf8!", 'Tagging', '--tag-utf8', "AtomicParsley accepts UTF-8 input"],
 
 	# Deprecated
 
@@ -461,7 +461,7 @@ if ( $opt_cmdline->{warranty} || $opt_cmdline->{conditions}) {
 }
 
 # Force plugins update if no plugins found
-if ( ! keys %plugin_files ) {
+if ( ! keys %plugin_files && ! $opt->{packagemanager}) {
 	logger "WARNING: Running the updater again to obtain plugins.\n";
 	$opt->{pluginsupdate} = 1;
 }
@@ -3077,7 +3077,7 @@ sub usage {
 	my @man;
 	my @dump;
 	push @man, 
-		'.TH GET_IPLAYER "1" "January 2010" "Phil Lewis" "get_iplayer Manual"',
+		'.TH GET_IPLAYER "1" "August 2011" "Phil Lewis" "get_iplayer Manual"',
 		'.SH NAME', 'get_iplayer - Stream Recording tool and PVR for BBC iPlayer, BBC Podcasts and more',
 		'.SH SYNOPSIS',
 		'\fBget_iplayer\fR [<options>] [<regex|index> ...]',
@@ -3166,9 +3166,9 @@ sub usage {
 	if ( $manpage ) {
 		push @man,
 			'.SH AUTHOR',
-			'get_iplayer is written and maintained by Phil Lewis <iplayer2 (at sign) linuxcentre.net>.',
+			'get_iplayer was written by Phil Lewis <iplayer2 (at sign) linuxcentre.net> and is now maintained by the contributors at http://www.infradead.org/get_iplayer/html/get_iplayer.html',
 			'.PP',
-			'This manual page was originally written by Jonathan Wiltshire <debian@jwiltshire.org.uk> for the Debian project (but may be used by others).',
+			'This manual page was originally written by Jonathan Wiltshire <jmw@debian.org> for the Debian project (but may be used by others).',
 			'.SH COPYRIGHT NOTICE';
 		push @man, Options->copyright_notice;
 		# Escape '-'
@@ -3522,7 +3522,7 @@ sub add {
 	return 0 if $opt->{nowrite};
 
 	# Add to history
-	if ( ! open(HIST, ">> $historyfile") ) {
+	if ( ! open(HIST, ">>:utf8", $historyfile) ) {
 		main::logger "ERROR: Cannot write or append to $historyfile\n";
 		exit 11;
 	}
@@ -4283,10 +4283,6 @@ sub tag_metadata {
 		} else {
 			$meta->{$key} = $val;
 		}
-	}
-	# expect input in UTF-8
-	while ( my ($key, $val) = each %{$meta} ) {
-		$meta->{$key} = decode("utf8", $val);
 	}
 	return $meta;
 }
@@ -5481,6 +5477,10 @@ sub get_pids_recursive {
 			main::logger "INFO: Episode-only pid detected\n";
 			# No need to lookup - we already are an episode pid
 			push @pids, $prog->{pid};
+		} elsif ( $rdf->{'po:Clip'} ) {
+			main::logger "INFO: Clip-only pid detected\n";
+			# No need to lookup - we already are a clip pid
+			push @pids, $prog->{pid};
 		# a series pid page
 		} elsif ( $rdf->{'po:Series'} ) {
 			main::logger "INFO: Series pid detected\n";
@@ -5534,6 +5534,31 @@ sub parse_rdf_episode {
 
 
 
+# Gets the clip data from a given clip pid
+sub parse_rdf_clip {
+	my $ua = shift;
+	my $uri = shift;
+	my $rdf = get_rdf_data( $ua, $uri );
+	if ( ! $rdf ) {
+		main::logger "WARNING: Clip PID rdf URL contained no RDF data.\n";
+		return '';
+	}
+	my $pid = extract_pid( $uri );
+	main::logger "INFO:      Clip '".$rdf->{'po:Clip'}->{'dc:title'}."' ($pid)\n";
+	# We don't really need the ver pids from here
+	if ( ref$rdf->{'po:Clip'}->{'po:version'} eq 'ARRAY' ) {
+		for my $verpid_element ( @{ $rdf->{'po:Clip'}->{'po:version'} } ) {
+			main::logger "INFO:        With Version PID '".extract_pid( $verpid_element->{'rdf:resource'} )."'\n" if $opt->{debug};
+		}
+	} else {
+		main::logger "INFO:        With Version PID '".extract_pid( $rdf->{'po:Clip'}->{'po:version'}->{'rdf:resource'} )."'\n" if $opt->{debug};
+	}
+	#main::logger "INFO:        From Series PID '".extract_pid( $rdf->{'po:Series'}->{'rdf:about'} )."'\n" if $opt->{debug};
+	main::logger "INFO:        From Brand PID '".extract_pid( $rdf->{'po:Brand'}->{'rdf:about'} )."'\n" if $opt->{debug};
+}
+
+
+
 sub parse_rdf_series {
 	my $ua = shift;
 	my $uri = shift;
@@ -5578,6 +5603,12 @@ sub parse_rdf_brand {
 		main::logger "INFO:      Episode pid: ".$episode_element->{'rdf:resource'}."\n" if $opt->{debug};
 		push @pids, extract_pid( $episode_element->{'rdf:resource'} );
 		parse_rdf_episode( $ua, $episode_element->{'rdf:resource'} );
+	}
+	my @clips = ensure_array($rdf->{'po:Brand'}->{'po:clip'});
+	for my $clip_element ( @clips ) {
+		main::logger "INFO:      Clip pid: ".$clip_element->{'rdf:resource'}."\n" if $opt->{debug};
+		push @pids, extract_pid( $clip_element->{'rdf:resource'} );
+		parse_rdf_clip( $ua, $clip_element->{'rdf:resource'} );
 	}
 	return @pids;
 }
@@ -8938,16 +8969,16 @@ my $opt_cmdline;
 # Class cmdline Options
 sub opt_format {
 	return {
-		pvr		=> [ 0, "pvr|pvrrun|pvr-run!", 'PVR', '--pvr [pvr search name]', "Runs the PVR using all saved PVR searches (intended to be run every hour from cron etc). The list can be limited by adding a regex to the command."],
-		pvrexclude	=> [ 0, "pvrexclude|pvr-exclude=s", 'PVR', '--pvr-exclude <string>', "Exclude the PVR searches to run by seacrh name (regex or comma separated values)"],
-		pvrsingle	=> [ 0, "pvrsingle|pvr-single=s", 'PVR', '--pvr-single <search name>', "Runs a named PVR search"],
-		pvradd		=> [ 0, "pvradd|pvr-add=s", 'PVR', '--pvradd <search name>', "Save the named PVR search with the specified search terms"],
-		pvrdel		=> [ 0, "pvrdel|pvr-del=s", 'PVR', '--pvrdel <search name>', "Remove the named search from the PVR searches"],
-		pvrdisable	=> [ 1, "pvrdisable|pvr-disable=s", 'PVR', '--pvr-disable <search name>', "Disable (not delete) a named PVR search"],
-		pvrenable	=> [ 1, "pvrenable|pvr-enable=s", 'PVR', '--pvr-enable <search name>', "Enable a previously disabled named PVR search"],
-		pvrlist		=> [ 0, "pvrlist|pvr-list!", 'PVR', '--pvrlist', "Show the PVR search list"],
-		pvrqueue	=> [ 0, "pvrqueue|pvr-queue!", 'PVR', '--pvrqueue', "Add currently matched programmes to queue for later one-off recording using the --pvr option"],
-		pvrscheduler	=> [ 0, "pvrscheduler|pvr-scheduler=n", 'PVR', '--pvrscheduler <seconds>', "Runs the PVR using all saved PVR searches every <seconds>"],
+		pvr		=> [ 0, "pvr|pvrrun|pvr-run!", 'PVR', '--pvr [pvr search name]', "Runs the PVR using all saved PVR searches (intended to be run every hour from cron etc). The list can be limited by adding a regex to the command. Synonyms: --pvrrun, --pvr-run"],
+		pvrexclude	=> [ 0, "pvrexclude|pvr-exclude=s", 'PVR', '--pvr-exclude <string>', "Exclude the PVR searches to run by search name (regex or comma separated values). Synonyms: --pvrexclude"],
+		pvrsingle	=> [ 0, "pvrsingle|pvr-single=s", 'PVR', '--pvr-single <search name>', "Runs a named PVR search. Synonyms: --pvrsingle"],
+		pvradd		=> [ 0, "pvradd|pvr-add=s", 'PVR', '--pvr-add <search name>', "Save the named PVR search with the specified search terms. Synonyms: --pvradd"],
+		pvrdel		=> [ 0, "pvrdel|pvr-del=s", 'PVR', '--pvr-del <search name>', "Remove the named search from the PVR searches. Synonyms: --pvrdel"],
+		pvrdisable	=> [ 1, "pvrdisable|pvr-disable=s", 'PVR', '--pvr-disable <search name>', "Disable (not delete) a named PVR search. Synonyms: --pvrdisable"],
+		pvrenable	=> [ 1, "pvrenable|pvr-enable=s", 'PVR', '--pvr-enable <search name>', "Enable a previously disabled named PVR search. Synonyms: --pvrenable"],
+		pvrlist		=> [ 0, "pvrlist|pvr-list!", 'PVR', '--pvr-list', "Show the PVR search list. Synonyms: --pvrlist"],
+		pvrqueue	=> [ 0, "pvrqueue|pvr-queue!", 'PVR', '--pvr-queue', "Add currently matched programmes to queue for later one-off recording using the --pvr option. Synonyms: --pvrqueue"],
+		pvrscheduler	=> [ 0, "pvrscheduler|pvr-scheduler=n", 'PVR', '--pvr-scheduler <seconds>', "Runs the PVR using all saved PVR searches every <seconds>. Synonyms: --pvrscheduler"],
 		comment		=> [ 1, "comment=s", 'PVR', '--comment <string>', "Adds a comment to a PVR search"],
 	};
 }
@@ -9454,12 +9485,26 @@ sub tags_from_metadata {
 	return $tags;
 }
 
+# escape/enclose embedded quotes in command line parameters
+sub tags_escape_quotes {
+	my ($tags) = @_;
+	# only necessary for Windows
+	if ( $^O =~ /^MSWin32$/ ) {
+		while ( my ($key, $val) = each %$tags ) {
+			if ($val =~ /"/) {
+				$val =~ s/"/\\"/g;
+				$tags->{$key} = '"'.$val.'"';
+			}
+		}
+	}
+}
+
 # add metadata tag to file
 sub tag_file {
 	my ($self, $meta) = @_;
 	my $tags = $self->tags_from_metadata($meta);
 	# dispatch to appropriate tagging function
-	if ( $meta->{filename} =~ /\.(aac|mp3)$/i ) {
+	if ( $meta->{filename} =~ /\.(mp3)$/i ) {
 		return $self->tag_file_id3($meta, $tags);
 	} elsif ( $meta->{filename} =~ /\.(mp4|m4v|m4a)$/i ) {
 		return $self->tag_file_mp4($meta, $tags);
@@ -9558,6 +9603,8 @@ sub tag_file_id3_basic {
 		# make safe lyrics text as well
 		# can't use $tags->{lyrics} because of colons in links
 		$tags->{longDescription} =~ s/:/_/g;
+		# handle embedded quotes
+		tags_escape_quotes($tags);
 		# encode for id3v2
 		while ( my ($key, $val) = each %{$tags} ) {
 			$tags->{$key} = encode("iso-8859-1", $val);
@@ -9600,6 +9647,8 @@ sub tag_file_mp4 {
 		main::logger "INFO: MP4 tagging \U$meta->{ext}\E file\n";
 		# pretty copyright for MP4
 		$tags->{copyright} = "\xA9 $tags->{copyright}" if $tags->{copyright};
+		# handle embedded quotes
+		tags_escape_quotes($tags);
 		# encode metadata for atomicparsley
 		my $encoding = $opt->{tag_utf8} ? "utf8" : "iso-8859-1";
 		while ( my ($key, $val) = each %$tags ) {
