@@ -6,9 +6,9 @@
 //  Copyright 2009 __MyCompanyName__. All rights reserved.
 //
 
-#import "Download.h"
+#import "BBCDownload.h"
 
-@implementation Download
+@implementation BBCDownload
 #pragma mark Overridden Methods
 - (id)initWithProgramme:(Programme *)tempShow tvFormats:(NSArray *)tvFormatList radioFormats:(NSArray *)radioFormatList
 {
@@ -210,10 +210,7 @@
 	[show setValue:@"Starting..." forKey:@"status"];
 	
 	//Prepare UI
-	[currentProgress setStringValue:@"Beginning..."];
-	[currentIndicator setMaxValue:100];
-	[currentIndicator setMinValue:0];
-	[currentIndicator setIndeterminate:NO];
+	[self setCurrentProgress:@"Beginning..."];
 	return self;
 }
 - (id)description

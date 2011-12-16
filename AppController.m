@@ -1328,7 +1328,7 @@
 			{
 				if ([[show complete] isEqualToNumber:[NSNumber numberWithBool:NO]])
 				{
-					currentDownload = [[Download alloc] initWithProgramme:show 
+					currentDownload = [[BBCDownload alloc] initWithProgramme:show 
 															 tvFormats:[tvFormatController arrangedObjects] 
 														  radioFormats:[radioFormatController arrangedObjects]];
 					break;
@@ -1403,6 +1403,8 @@
 		NSDictionary *userInfo = [note userInfo];
 		[currentIndicator setIndeterminate:NO];
 		[currentIndicator startAnimation:nil];
+        [currentIndicator setMinValue:0];
+        [currentIndicator setMaxValue:100];
 		[currentIndicator setDoubleValue:[[userInfo valueForKey:@"nsDouble"] doubleValue]];
 	}
 	else
@@ -1493,7 +1495,7 @@
 							([tempQueue indexOfObject:nextShow]+1),
 							[tempQueue count]]
 						  :nil];
-			currentDownload = [[Download alloc] initWithProgramme:nextShow
+			currentDownload = [[BBCDownload alloc] initWithProgramme:nextShow
 													 tvFormats:[tvFormatController arrangedObjects]
 												  radioFormats:[radioFormatController arrangedObjects]];
 		}
@@ -2127,7 +2129,7 @@
 	{
 		NSMutableString *typeArgument = [[NSMutableString alloc] initWithString:@"--type="];
 		if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheBBC_TV"] isEqualTo:[NSNumber numberWithBool:YES]]) [typeArgument appendString:@"tv,"];
-		if (/*[[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheITV_TV"] isEqualTo:[NSNumber numberWithBool:YES]]*/NO) [typeArgument appendString:@"itv,"];
+		if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheITV_TV"] isEqualTo:[NSNumber numberWithBool:YES]]) [typeArgument appendString:@"itv,"];
 		if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheBBC_Radio"] isEqualTo:[NSNumber numberWithBool:YES]]) [typeArgument appendString:@"radio,"];
 		if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheBBC_Podcasts"] isEqualTo:[NSNumber numberWithBool:YES]]) [typeArgument appendString:@"podcast,"];
 		[typeArgument deleteCharactersInRange:NSMakeRange([typeArgument length]-1,1)];

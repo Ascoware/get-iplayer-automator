@@ -7,7 +7,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "Download.h"
+#import "BBCDownload.h"
 #import "Series.h"
 
 bool runDownloads=NO;
@@ -70,7 +70,7 @@ bool runUpdate=NO;
 	IBOutlet NSTextField *currentProgress;
 	
 	//Download Controller
-	Download *currentDownload;
+	BBCDownload *currentDownload;
 	IBOutlet NSToolbarItem *stopButton;
 	IBOutlet NSToolbarItem *startButton;
 	

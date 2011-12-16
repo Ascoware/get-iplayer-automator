@@ -13,13 +13,9 @@
 
 extern bool runDownloads;
 
-@interface Download : NSObject {
+@interface BBCDownload : NSObject {
 	NSNotificationCenter *nc;
-	IBOutlet NSTextField *currentProgress;
-	IBOutlet NSProgressIndicator *currentIndicator;
-	IBOutlet NSTextField *overallProgress;
-	IBOutlet NSProgressIndicator *overallIndicator;
-	IBOutlet NSArrayController *queueController;
+
 	Programme *show;
 	NSString *profileDirArg;
 	

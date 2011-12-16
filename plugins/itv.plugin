@@ -1,10 +1,3 @@
-### This template is just a quick example of how to write you own plug-in for get_iplayer
-### Once written it can be tested by copying to <profile dir>/plugins/ (e.g. ~/.get_iplayer/plugins/)
-### The file must be named as <PROGTYPE>.plugin so that get_iplayer will recognise it (use 'get_iplayer --listplugins' to test it)
-### <PROGTYPE> must start with a letter and be lowercase
-### All the plugin help text in this file starts with '###'
-### This template is just a bunch of example methods stolen from different plugins - it wont work as-is
-
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
@@ -18,9 +11,8 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-################### Podcast class #################
-### Substitute PROGTYPE in the rest of this file to be the type of your plugin (e.g. podcast or hulu etc)
-package Programme::PROGTYPE;
+################### ITV class #################
+package Programme::itv;
 
 use Env qw[@PATH];
 use Fcntl;
@@ -56,288 +48,579 @@ sub new {
 	for (keys %params) {
 		$self->{$_} = $params{$_};
 	}
-	## Ensure that all instances reference the same class global $optref var
-	# $self->{optref} = $Programme::optref;
 	# Ensure the subclass $opt var is pointing to the Superclass global optref
 	$opt = $Programme::optref;
 	bless $self, $type;
 }
 
-### Choose a min-max range of programme index numbers currently not used by other plugins
-### Required
-sub index_min { return 60001 }
-sub index_max { return 69999 }
 
-### Keep all you channel listings here if any... (see other plugins for examples)
-sub channels { return {}; }
+sub index_min { return 100001 }
+sub index_max { return 199999 }
+sub channels {
+	return {
+		'crime'					=> 'ITV Classics Crime Drama',
+		'perioddrama'				=> 'ITV Classics Period Drama',
+		'familydrama'				=> 'ITV Classics Family Drama',
+		'documentary'				=> 'ITV Classics Documentaries',
+		'comedy'				=> 'ITV Classics Comedy',
+		'kids'					=> 'ITV Classics Children\'s TV',
+		'soaps'					=> 'ITV Classics Soaps',
+		'/'					=> 'ITV Classics',
+	};
+}
 
 
-### Add any plugin specific options that you want get_iplayer to display in the help pages in the following format:
-### <option name> => [ <1=advance help | 0=normal help>, '<getopt format>', '<Help section>', 'Usage', 'help text'],
-### You then refer to the option as $opt->{<option name>}
-### The example line below will automatically allow users to specify the output dir for recordings for your PROGTYPE
-### Optional
 # Class cmdline Options
 sub opt_format {
 	return {
-		outputPROGTYPE	=> [ 1, "outputPROGTYPE=s", 'Output', '--outputPROGTYPE <dir>', "Output directory for PROGTYPE recordings"],
+		outputitv	=> [ 1, "outputitv=s", 'Output', '--outputitv <dir>', "Output directory for itv recordings"],
+		itvnothread	=> [ 1, "itvnothread", 'Recording', '--itvnothread', "Disable parallel threaded recording for itv"],
 	};
 }
 
 
 # Method to return optional list_entry format
-### This defines which programme fields should be displayed AFTER 
-### '${prefix}$prog->{index}:\t${prog_type}${name}$prog->{episode}' when 'get_iplayer --type=PROGTYPE' is used
-### Optional
 sub optional_list_entry_format {
 	my $prog = shift;
-	return ", $prog->{available}, $prog->{channel}, $prog->{categories}";
+	return ", $prog->{channel}, $prog->{categories}, $prog->{guidance}";
 }
+
 
 
 # Returns the modes to try for this prog type
-### Set this to the mode to be used for download - this can be the same as the PROGTYPE if only one type exists
 sub modelist {
-	return 'podcast';
+	return 'itvlow,itvnormal,itvhigh';
 }
 
 
-### This method simply (!) gets an XML feed which lists all programme or scrapes a web page that gived overview info for each available programme.
-### Once you have the requisite information (you don't need all the fields) then you can create an object which will add it to the cache automatically for you. 
-### The example below does 'five' web page scraping but this code will very much depend on how you need to get the info
-### Just make sure you use '$progref->{$pid} = Programme::PROGTYPE->new()' to add a new prog object for each programme
-### The pid is a unique numeric or alphanumeric identifier used on the website or feed to identify that programme
-### The main::request_url_retry method should be used whenever downloading web pages or 
-### feeds (search for 'sub request_url_retry ' in the get_iplayer script for usage)
-# Usage: Programme::tv->get_links( \%prog, 'five' );
+
+# Cleans up a pid and removes url parts that might be specified
+sub clean_pid {
+	my $prog = shift;
+	# extract numerical format - remove surrounding url
+	$prog->{pid} = $1 if $prog->{pid} =~ m{(\d{2,8})};
+}
+
+
+
+# get full episode metadata given pid and ua. Uses two different urls to get data
+sub get_metadata {
+	my $prog = shift;
+	my $ua = shift;
+	my $metadata;
+	my $entry;
+	my ($name, $episode, $duration, $available, $channel, $expiry, $longdesc, $versions, $guidance, $prog_type, $categories, $player, $thumbnail);
+
+	main::logger "DEBUG: Getting Metadata for $prog->{pid}:\n" if $opt->{debug};
+
+	# ITV Catch-Up metadata
+	my $prog_metadata_url_itv = 'http://www.itv.com/_app/Dynamic/CatchUpData.ashx?ViewType=5&Filter='; # +<pid>
+	$entry = main::request_url_retry($ua, "${prog_metadata_url_itv}$prog->{pid}", 3, '', '');
+	decode_entities($entry);
+	main::logger "DEBUG: ${prog_metadata_url_itv}$prog->{pid}:\n$entry\n\n" if $opt->{debug};
+	# Flatten
+	$entry =~ s|[\r\n]||g;
+
+	#div class="itvCatchUpPlayerPanel" xmlns:ms="urn:schemas-microsoft-com:xslt">
+	#  <div class="cu-sponsor"><a href="http://sam.itv.com/accipiter/adclick/CID=000040d70000000000000000/acc_random=1/SITE=CLICKTRACK/AREAITVCATCHUP.VIDEO=CLICKTRACK..FREEVIEW.SPONSORBUTTON.OCT08/AAMSZ=120X60/pageid=1" title="ITV Player in assocation with Freeview"><img src="/_app/img/catchup/catchup_video_freeview2.jpg" alt="ITV Player is sponsored by Freeview"></a></div>
+	#  <h2>Doctor Zhivago</h2>
+	#  <p>Part 1 of 3. Dramatisation of the epic novel by Boris Pasternak. Growing up in Moscow with his uncle, aunt and cousin Tonya, Yury is captivated by a stunning young girl called ...</p>
+	#  <p class="timings"><span class="date">Mon 29 Dec 2008</span><br /><br /><span>
+	#
+	#        Duration: 1hr 30 min |
+	#                                Expires in
+	#                                <strong>22</strong>
+	#                                                days
+	#                                        </span></p>
+	#  <p><a href="http://www.itv.com/CatchUp/Programmes/default.html?ViewType=1&amp;Filter=2352">3 Episodes Available
+	#        </a><br></br></p>
+	#  <p class="channelLogo"><img src="/_app/img/logos/itv3-black.gif" alt="ITV 4"></p>
+	#  <div id="cu-2-0-VideoID">33105</div>
+	#  <div id="cu-2-0-DentonId">17</div>
+	#  <div id="cu-2-0-ItemMediaUrl">http://www.itv.com//img/480x272/Doctor-Zhivago-c47828f8-a1af-4cd2-b5a2-40c18eb7e63c.jpg</div>
+	#</div><script language="javascript" type="text/javascript" xmlns:ms="urn:schemas-microsoft-com:xslt">
+	#                        SetCatchUpModuleID(0);
+	#                </script>
+	#
+
+	#<div class="itvCatchUpPlayerPanel" xmlns:ms="urn:schemas-microsoft-com:xslt">
+	#  <div class="cu-sponsor"><a href="http://sam.itv.com/accipiter/adclick/CID=000040d70000000000000000/acc_random=1/SITE=CLICKTRACK/AREAITVCATCHUP.VIDEO=CLICKTRACK..FREEVIEW.SPONSORBUTTON.OCT08/AAMSZ=120X60/pageid=1" title="ITV Player in assocation with Freeview"><img src="/_app/img/catchup/catchup_video_freeview2.jpg" alt="ITV Player is sponsored by Freeview"></a></div>
+	#  <h2>Affinity</h2>
+	#  <p>Victorian period drama with a murderous, pyschological twist.</p>
+	#  <p class="timings"><span class="date">Sun 28 Dec 2008</span><br /><br /><span>
+	#
+	#        Duration: 2hr 00 min |
+	#                                Expires in
+	#                                <strong>21</strong>
+	#                                                days
+	#                                        </span></p>
+	#  <p class="channelLogo"><img src="/_app/img/logos/itv1-black.gif" alt="ITV 2"></p>
+	#  <div class="guidance">
+	#    <div><strong>ITV Video Guidance</strong><p>This programme contains strong language and scenes of a sexual nature                                                                                                                           </p>
+	#    </div>
+	#  </div>
+	#  <div id="cu-2-0-VideoID">33076</div>
+	#  <div id="cu-2-0-DentonId">11</div>
+	#  <div id="cu-2-0-ItemMediaUrl">http://www.itv.com//img/480x272/Affinity-9624033b-6e05-4784-85f7-114be0559b24.jpg</div>
+	#</div><script language="javascript" type="text/javascript" xmlns:ms="urn:schemas-microsoft-com:xslt">
+	#                        SetCatchUpModuleID(0);
+	#                </script>
+	#
+
+	#$expiry = $1 if $entry =~ m{<dcterms:valid>\s*start=.+?;\s*end=(.*?);};
+	$available = $1 if $entry =~ m{<p\s+class="timings">\s*<span\s+class="date">(.+?)<\/span>};
+	$duration = $1 if $entry =~ m{Duration:\s*(.+?)\s+\|};
+	#$prog_type = $1 if $entry =~ m{medium=\"(\w+?)\"};
+	$longdesc = $1 if $entry =~ m{<p>(.+?)<\/p>}i;
+	$guidance = $1 if $entry =~ m{ITV Video Guidance<\/strong><p>\s*(.+?)[\W\s]*<\/p>};
+	#$player = $1 if $entry =~ m{<media:player\s*url=\"(.*?)\"\s*\/>};
+	$thumbnail = $1 if $entry =~ m{<div id="cu-2-0-ItemMediaUrl">(.+?)</div>};
+	$name = $1 if $entry =~ m{<h2>(.+?)</h2>};
+
+	# Fill in from cache if not got from metadata
+	$prog->{name} 		= $name || $prog->{name};
+	$prog->{episode} 	= $episode || $prog->{episode};
+	$prog->{type}		= $prog_type || $prog->{type};
+	$prog->{duration}	= $duration || $prog->{duration};
+	$prog->{channel}	= $channel || $prog->{channel};
+	$prog->{available}	= $available || $prog->{available};
+	$prog->{expiry}		= $expiry || $prog->{expiry};
+	$prog->{versions}	= $versions || $prog->{versions};
+	$prog->{guidance}	= $guidance || $prog->{guidance};
+	$prog->{categories}	= $categories || $prog->{categories};
+	$prog->{desc}		= $longdesc || $prog->{desc};
+	$prog->{player}		= $player;
+	$prog->{thumbnail}	= $thumbnail || $prog->{thumbnail};
+	# just use the default modelist
+	$prog->{modes}		= 'default: '.$prog->modelist();
+	return 0;
+}
+
+
+
+# Usage: Programme::itv->get_links( \%prog, 'itv' );
 # Uses: %{ channels() }, \%prog
 sub get_links {
 	shift; # ignore obj ref
 	my $progref = shift;
 	my $prog_type = shift;
 	my %channels = %{ channels() };
-
-	# page scraping here
+	my $itv_catchup_page_prefix = 'http://www.itv.com/CatchUp/Video/default.html?ViewType=5&amp;Filter='; # $pid
 
 	my $xml;
-	my $feed_data;
 	my $res;
-	main::logger "INFO: Getting $prog_type Programmes List\n";
+	my %series_pid;
+	my %episode_pid;
+	main::logger "INFO: Getting itv Index Feeds\n";
+	# Setup User agent
+	my $ua = main::create_ua();
 
-	# Setup user agent with redirection enabled and cookie-jar disabled
-	# Disable cookie jar (otherwise it saves cookies that prevent further XML downloads for a prog)
-	my $ua = main::create_ua( undef, 1 );
+	# Method
+	# http://www.itv.com/_data/xml/CatchUpData/CatchUp360/CatchUpMenu.xml (gets list of urls for each prog series) =>
+	#  =>
+	
+	# Download index feed
+	my $itv_index_shows_url = 'http://www.itv.com/ClassicTVshows/'; # $channel/default.html
+	my $itv_index_feed_url = 'http://www.itv.com/_data/xml/CatchUpData/CatchUp360/CatchUpMenu.xml';
 
-	my $baseurl = 'http://demand.five.tv';
+	# Sort feeds so that pages are done last - this makes sure that the channels get defined correctly if there are dups
+	my @channel_list;
+	push @channel_list, grep !/\//, keys %channels;
+	push @channel_list, grep  /\//, keys %channels;
+	# ITV ClassicShows parsing
+	for my $channel ( @channel_list ) {
+		# <li class="first-child"><a href="http://www.itv.com/ClassicTVshows/comedy/ABitofaDo/default.html">A Bit of a Do</a><br></li>
+		# <li><a href="http://www.itv.com/ClassicTVshows/familydrama/achristmascarol/default.html">A Christmas Carol</a><br></li>
+		# Get page, search for relevent lines which contain series links and loop through each matching line
+		for my $s_line ( grep /(<li><a\s+href=".+?"><img\s+src=".+?"\s+alt=".+?"><\/a><h4>|<li.*?><a href=".+?">.+?<\/a><br><\/li>)/, ( split /\n/, main::request_url_retry($ua, $itv_index_shows_url.${channel}.'/default.html', 3, '.', "WARNING: Failed to get itv ${channel} index from site\n") ) ) {
+			# Remove non utf8
+			$s_line =~ s/[^\x{21}-\x{7E}\s\t\n\r]//g;
+			my ($url, $name);
+			# Extract series url + series description
+			($url, $name) = ($1, $2) if $s_line =~ m{<li><a\s+href="\s*(.+?)\s*"><img\s+src=".+?"\s+alt="\s*(.+?)\s*"><\/a><h4>};
+			($url, $name) = ($1, $2) if $s_line =~ m{<li.*?><a href="\s*(.+?)\s*">\s*(.+?)\s*<\/a><br><\/li>};
+			chomp($url);
+			chomp($name);
+			next if ! ($url && $name);
+			# decode
+			decode_entities($name);
+			StringUtils::clean_utf8_and_whitespace($name);
+			main::logger "DEBUG: Channel: '$channel' Series: '$name' URL: '$url'\n" if $opt->{verbose};
 
-	my $url = $baseurl.'/SeriesAZ.aspx';
-	$xml = main::request_url_retry($ua, $url, 3, '.', "WARNING: Failed to get series list from from Demand Five site\n");
+			# Get list of episodes for this series
+			# e.g. <li class="first-child"><a title="Play" href="?vodcrid=crid://itv.com/993&amp;DF=0">Episode one</a><br>The Sun in a Bottle</li>
+			#      <li><a title="Play" href="?vodcrid=crid://itv.com/994&amp;DF=0">Episode two</a><br>Castle Saburac</li>
+			#      <li class="first-child"><a class="nsat" title="This programme contains strong language and violence       " href="?vodcrid=crid://itv.com/588&amp;G=10&amp;DF=0">Episode one</a><br>The Dead of Jericho</li>
+			#
+			# e.g. <li><a class="playVideo" title="Play" href="?vodcrid=crid://itv.com/1232&amp;DF=0"><img src="img/60x45/Crossroads-Rosemary-shoots-David-efeef7cd-8d41-416c-9e30-26ce1b3d625c.jpg" alt="Crossroads: Rosemary shoots David"><span>Play</span></a><h4>
+			#      vodcrid=crid://itv.com/971&amp;DF=0"><img src="img/60x45/9d20fd47-5d4b-44f5-9188-856505de0d0f.jpg" alt="Emmerdale  2002 Louise kills Ray"
+			#
+			# e.g. <a class="playVideo" title="Play" href="?vodcrid=crid://itv.com/1854&amp;DF=1"><img src="img/157x104/140c456c-d8bd-49d5-90f8-f7cc6d86f132.jpg" alt="Soldier Soldier "><span>Play</span></a><h2>Soldier Soldier</h2>
+			#
+			for my $e_line ( grep /vodcrid=crid/, ( split /\n/, main::request_url_retry($ua, $url, 3, '.', "WARNING: Failed to get ${name} index from site\n") ) ) {
+				my ($guidance, $pid, $episode, $thumbnail);
+				main::logger "DEBUG: Match Line: $e_line\n" if $opt->{debug};
+				# Extract episode data
+				($guidance, $pid, $episode)  = ($2, $3, $4) if $e_line =~ m{<li.*?><a\s+(class="nsat"\s+)?title="\s*(.+?)\s*"\s+href="\?vodcrid=crid://itv.com/(\d+?)&.+?>\s*(.+?)\s*<};
+				($pid, $thumbnail, $episode) = ($1, $2, $3) if $e_line =~ m{vodcrid=crid://itv.com/(\d+?)&.+?><img\s+src="(.+?)"\s+alt="\s*(.+?)\s*"};
+				next if ! ($pid && $episode);
+				# Remove 'Play'
+				$guidance =~ s/^Play$//ig;
+				# decode
+				decode_entities($episode);
+				decode_entities($guidance);
+				StringUtils::clean_utf8_and_whitespace($guidance);
+				StringUtils::clean_utf8_and_whitespace($episode);
+				main::logger "DEBUG: PID: '$pid' Episode: '$episode' Guidance: '$guidance'\n" if $opt->{debug};
 
-	# Hash of <name> => <uri>;
-	my %names;
-	# class="episodeLink" href="Series.aspx?seriesBaseName=HiddenLives">Hidden Lives</a>
-	while ( $xml =~ m{class="episodeLink"\s+href="(.+?)">\s*(.+?)</a>}sg ) {
-		$names{$2} = "/$1";
-		main::logger "DEBUG: Series '$2', URI: /$1\n" if $opt->{debug};
+				# Skip if this pid is a duplicate
+				if ( defined $progref->{$pid} ) {
+					main::logger "WARNING: '$pid, $progref->{$pid}->{name} - $progref->{$pid}->{episode}, $progref->{$pid}->{channel}' already exists (this channel = $channel)\n" if $opt->{verbose};
+					# Merge data (hack)
+					#$progref->{$pid}->{episode} .= ','.$episode;
+					my $oldname = $progref->{$pid}->{name};
+					$progref->{$pid}->{episode} = $episode if (! $progref->{$pid}->{episode}) || $progref->{$pid}->{episode} =~ /$oldname/i;
+					$progref->{$pid}->{thumbnail} = $thumbnail if ! $progref->{$pid}->{thumbnail};
+					$progref->{$pid}->{guidance} = $guidance if ! $progref->{$pid}->{guidance};
+					next;
+				}
+
+				# build data structure
+				$progref->{$pid} = Programme::itv->new(
+					'pid'		=> $pid,
+					'name'		=> $name,
+					'versions'	=> 'default',
+					'episode'	=> $episode,
+					'channel'	=> $channels{$channel},
+					'guidance'	=> $guidance,
+					'categories'	=> $channels{$channel},
+					'type'		=> $prog_type,
+					'web'		=> $url,
+				);
+			}
+		}
 	}
 
-	# Download index feed
-	# Sort feeds so that category based feeds are done last - this makes sure that the channels get defined correctly if there are dups
-	for my $name ( keys %names ) {
+	my $xmlindex = main::request_url_retry($ua, $itv_index_feed_url, 3, '.', "WARNING: Failed to get itv index from site\n");
+	$xmlindex =~ s/[\n\r]//g;
 
-		my $url = $baseurl.$names{$name};
-		main::logger "DEBUG: Getting Episodes for $name\n" if $opt->{verbose};
-		$xml = main::request_url_retry($ua, $url, 3, '.', "WARNING: Failed to get programme index feed for $_ from Demand Five site\n");
-		decode_entities($xml);
-		StringUtils::clean_utf8_and_whitespace($xml);
+	# This gives a list of programme series (sometimes episodes)
+	#    <ITVCatchUpProgramme>
+	#      <ProgrammeId>50</ProgrammeId>
+	#      <ProgrammeTitle>A CHRISTMAS CAROL</ProgrammeTitle>
+	#      <ProgrammeMediaId>615915</ProgrammeMediaId>
+	#      <ProgrammeMediaUrl>
+	#      http://www.itv.com//img/150x113/A-Christmas-Carol-2f16d25a-de1d-4a3a-90cb-d47489eee98e.jpg</ProgrammeMediaUrl>
+	#      <LastUpdated>2009-01-06T12:24:22.7419643+00:00</LastUpdated>
+	#      <Url>
+	#      http://www.itv.com/CatchUp/Video/default.html?ViewType=5&amp;Filter=32910</Url>
+	#      <EpisodeCount>1</EpisodeCount>
+	#      <VideoID>32910</VideoID>
+	#      <DentonID>-1</DentonID>
+	#      <DentonRating></DentonRating>
+	#      <AdditionalContentUrl />
+	#      <AdditionalContentUrlText />
+	#    </ITVCatchUpProgramme>
 
-		# <div id="episode4" class="episodesOff">
-		# 	<div class="serepisodesdtls">
-		# 		<div class="fltlt">
-		# 			<a href="javascript:void(0);" class="episodeClose" onclick="toggleEpisode('episode4');">
-		# 				<img src="/images/ico_episode_close.gif" alt="View Details" vspace="2" border="0"  title="View Details" />
-		# 			</a>
-		# 			<a href="javascript:void(0);" class="episodeOpen" onclick="toggleEpisode('episode4');">
-		# 				<img src="/images/ico_episode_open.gif" alt="View Details" vspace="2" border="0"  title="View Details" />
-		# 			</a>
-		# 		</div>
-		#		<div class="serepiinfo">
-		#			<a href="javascript:void(0);" onclick="toggleEpisode('episode4');">episode 24 :</a> 
-		#			<a href="javascript:void(0);" onclick="toggleEpisode('episode4');" class="epititle"> I Want To Cook</a> 
-		#			<!-- Parental Guidance REMEMBER TO SET THE ALT AND TITLE FROM DATA -->
-		#			<!-- Subtitles image -->
-		#			<!-- Schedule -->
-		#			<br />
-		#			<!-- Ratings image -->
-		#			<br />Avg Rating:
-		#			<div id="ctl00_MainContent_EpisodeList_EpisodeList_ctl03_AvgRatingStars" class="userRating" itemid="C5116040024">
-		#		<img id="ctl00_MainContent_EpisodeList_EpisodeList_ctl03_AvgRatingStars_AvgStars" src="images/avg_star_5.png" style="border-width:0px;" /><span id="ctl00_MainContent_EpisodeList_EpisodeList_ctl03_AvgRatingStars_Count" class="countLabel">(1 vote)</span>
-		#	</div>
-		#	<!-- FileSize -->
-		#	<br />
-		#	<div style="float:left;">
-		#		11 mins - 60.5 MB
-		#	</div>
-		#	<!-- Expires image -->
-		#	<div id="ctl00_MainContent_EpisodeList_EpisodeList_ctl03_ExpiresVisible" style="float:left;">
-		#		<img src="/images/ico_epi_expires.gif" alt="expires" width="14" height="12" hspace="5" />
-		#		<span class="expires">Available for another <strong>6</strong> days</span>
-		#	</div>
-		#</div>
-		#</div>
-		#<div id="ctl00_MainContent_EpisodeList_EpisodeList_ctl03_divPlayItem">
-		#	<div class="serepirent" >
-		#	<a href="Episode.aspx?episodeBaseName=C5116040024" class="PlayEpisodeItem" >
-		#		<img src="/images/btn_play.gif" alt="rent" border="0" align="top" title="play" />
-		#	</a> 
-		#</div>
-		#</div>
-		#<div class="seperator"><img src="/images/seperator.gif" alt="" title="" /></div>
-		#<div class="epimoreinfo">
-		#	<div class="moreinfort">
-		#		<img src="http://content.download.five.tv/bthttp/five/downloadstore/images/LittlePrincess_ESmall.png" alt="episode image"/>	
-		#	</div>
-		#	<div class="findmore">Little Princess is baking a cake.
-		#	<div>
-		#		<img src="/images/find_more.gif" alt="find more" width="12" height="12" align="top" title="find more" /> 
-		#		<a href="Episode.aspx?episodeBaseName=C5116040024"> find out more</a></div>
-		#	</div>
-		#</div>
-		#</div>
+	for my $feedxml ( split /<ITVCatchUpProgramme>/, $xmlindex ) {
+		# Extract feed data
+		my ($episodecount, $viewtype, $videoid, $url);
+		my @entries;
 
-		# Parse XML
+		main::logger "\n\nDEBUG: XML: $feedxml\n"  if $opt->{debug}; 
 
-		# get list of entries within <entry> </entry> tags
-		my @entries = split /<div id="episode\d+"/, $xml;
-		# Discard first element == header
-		shift @entries;
+		decode_entities($feedxml);
+		# Remove non utf8
+		StringUtils::clean_utf8_and_whitespace($feedxml);
 
-		main::logger "INFO: Got ".($#entries + 1)." episodes\n" if $opt->{verbose};
+		# <EpisodeCount>1</EpisodeCount>
+		$episodecount = $1 if $feedxml =~ m{<EpisodeCount>\s*(\d+)\s*<\/EpisodeCount>};
 
-		foreach my $entry (@entries) {
-			my ( $episode, $desc, $pid, $available, $expiry, $channel, $duration, $thumbnail, $versions, $guidance );
+		# <Url>http://www.itv.com/CatchUp/Video/default.html?ViewType=5&amp;Filter=32910</Url>
+		($viewtype, $videoid) = ($1, $2) if $feedxml =~ m{<Url>\s*.+?ViewType=(\d+).+?Filter=(\d+)\s*<\/Url>}i;
 
-			$entry =~ s/[\r\n]/ /g;
-			$entry =~ s/\s+/ /g;
+		## <VideoID>32910</VideoID>
+		#$videoid = $1 if $feedxml =~ m{<VideoID>\s*(\d+)\s*<\/VideoID>};
 
-			# main::logger "DEBUG: Entry = $entry\n" if $opt->{debug};
+		# Skip if there is no feed data for channel
+		next if ($viewtype =~ /^0*$/ || $videoid =~ /^0*$/ );
 
-			# PID
-			# <a href="Episode.aspx?episodeBaseName=C5116040024">
-			$pid = $1 if $entry =~ m{Episode.aspx\?episodeBaseName=(C\d+)"}i;
+		main::logger "DEBUG: Got ViewType=$viewtype VideoId=$videoid EpisodeCount=$episodecount\n" if $opt->{debug};
 
-			# Episode
-			## <a href="javascript:void(0);" onclick="toggleEpisode('episode4');">episode 24 :</a>
-			# <a href="javascript:void(0);" onclick="toggleEpisode('episode4');" class="epititle"> I Want To Cook</a>
-			$episode = $1 if $entry =~ m{class="epititle">\s*(.+?)\s*</a>}i;
+		my $url = "http://www.itv.com/_app/Dynamic/CatchUpData.ashx?ViewType=${viewtype}&Filter=${videoid}";
 
-			# Available
-			# <span class="expires">Available for another <strong>6</strong> days</span>
-			$available = $1 if $entry =~ m{<span class="expires">Available for another (.+?)</span>}i;
-			$available =~ s|<\/?.+?>||g;
+		# Add response from episode metadata url to list to be parsed if this is an episode link
+		if ( $viewtype == 5 ) {
+			next if $episode_pid{$videoid};
+			$episode_pid{$videoid} = 1;
+			# Get metadata pages for episode
 
-			# Duration
-			# <!-- FileSize -->
-			# <br />
-			# <div style="float:left;">
-			#	11 mins - 60.5 MB
-			# </div>
-			$duration = $1 if $entry =~ m{FileSize\s*-->\s*<b.+?>\s*<div.+?>\s*(.+?)\s*</div>}i;
+			my ( $name, $guidance, $channel, $episode, $desc, $pid, $available, $duration, $thumbnail );
 
-			# Desc
-			# <div class="findmore">Little Princess is baking a cake.
-			# <div>
-			$desc = $1 if $entry =~ m{<div class="findmore">\s*(.+?)\s*<div>};
-			# Remove unwanted html tags and extra whitespace
-			$desc =~ s!</?(br|b|i|p|strong)\s*/?>!!gi;
-			$desc =~ s/\s+/ /g;
+			$pid = $videoid;
+			$channel = 'ITV Catch-Up';
 
-			# <span class="channel">Channel 4</span>
-			#$channel =  $1 if $entry =~ m{<span\s+class="channel">\s*(.+?)\s*</span>}i;
-
-			# Merge and Skip if this pid is a duplicate
+			# Skip if this pid is a duplicate
 			if ( defined $progref->{$pid} ) {
 				main::logger "WARNING: '$pid, $progref->{$pid}->{name} - $progref->{$pid}->{episode}, $progref->{$pid}->{channel}' already exists (this channel = $channel)\n" if $opt->{verbose};
 				next;
 			}
 
-			# Thumbnail
-			#	<div class="moreinfort">
-			#		<img src="http://content.download.five.tv/bthttp/five/downloadstore/images/LittlePrincess_ESmall.png" alt="episode image"/>	
-			#	</div>
-			$thumbnail = $1 if $entry =~ m{<div class="moreinfort">\s*<img src="(.+?)"};
-			main::logger "DEBUG: pid='$pid',name='$name', episode='$episode', duration='$duration', available='${available}'\n" if $opt->{debug};
+			$name = $1 if $feedxml =~ m{<ProgrammeTitle>\s*(.+?)\s*<\/ProgrammeTitle>};
+			$guidance = $1 if $feedxml =~ m{<DentonRating>\s*(.*?)\s*<\/DentonRating>};
+			$thumbnail = $1 if $feedxml =~ m{<ProgrammeMediaUrl>\s*(.+?)\s*<\/ProgrammeMediaUrl>};
+			$episode = $pid;
+			# Strip end/extra whitespace
+			StringUtils::clean_utf8_and_whitespace($guidance);
 
 			# build data structure
-			$progref->{$pid} = main::progclass($prog_type)->new(
+			$progref->{$pid} = Programme::itv->new(
 				'pid'		=> $pid,
 				'name'		=> $name,
 				'versions'	=> 'default',
 				'episode'	=> $episode,
-				'desc'		=> $desc,
 				'guidance'	=> $guidance,
+				'desc'		=> $desc,
 				'available'	=> $available,
 				'duration'	=> $duration,
 				'thumbnail'	=> $thumbnail,
-				'channel'	=> 'five',
-				'categories'	=> 'tv',
-				'type'		=> $prog_type,
-				'web'		=> "http://demand.five.tv/Episode.aspx?episodeBaseName=${pid}",
+				'channel'	=> $channel,
+				'categories'	=> 'TV',
+				'type'		=> 'itv',
+				'web'		=> ${itv_catchup_page_prefix}.${pid},
 			);
-		}
+
+
+		# Get next episode list and parse
+		#     <div class="listItem highlight contain">
+		#      <div class="floatLeft"><a href="http://www.itv.com/CatchUp/Video/default.html?ViewType=5&amp;Filter=33383"><img src="http://www.itv.com//img/157x88/P7-67e0b86f-b335-4f6b-8db
+		#      <div class="content">
+		#        <h3><a href="http://www.itv.com/CatchUp/Video/default.html?ViewType=5&amp;Filter=33383">Emmerdale</a></h3>
+		#        <p class="date">Mon 05 Jan 2009</p>
+		#        <p class="progDesc">Donna is stunned to learn Marlon has pointed the finger at Ross. Aaron defaces Tom King's grave.</p>
+		#        <ul class="progDetails">
+		#          <li>
+		#                          Duration: 30 min
+		#          </li>
+		#          <li class="days">
+		#            Expires in
+		#                        <strong>29</strong>
+		#                                        days
+		#                                </li>
+		#        </ul>
+		#      </div>
+		#    </div>
+		#    <div class="listItem contain">
+		#      <div class="floatLeft"><a href="http://www.itv.com/CatchUp/Video/default.html?ViewType=5&amp;Filter=33245"><img src="http://www.itv.com//img/157x88/Marlon-Dingle-742c50b3-3b
+		#      <div class="content">
+		#        <h3><a href="http://www.itv.com/CatchUp/Video/default.html?ViewType=5&amp;Filter=33245">Emmerdale</a></h3>
+		#        <p class="date">Fri 02 Jan 2009</p>
+		#        <p class="progDesc">Marlon gets his revenge on Ross. The King brothers struggle to restart their business without Matthew. Scarlett is fed up with Victoria getting all Daz
+		#        <ul class="progDetails">
+		#          <li>
+		#                          Duration: 30 min
+		#          </li>
+		#          <li class="days">
+		#            Expires in
+		#                        <strong>26</strong>
+		#                                        days
+		#                                </li>
+		#        </ul>
+		#      </div>
+		#    </div>
+		# 
+		} elsif ( $viewtype == 1 ) {
+			# Make sure we don't duplicate parsing a series
+			next if $series_pid{$videoid};
+			$series_pid{$videoid} = 1;
+
+			# Get metadata pages for each series
+			main::logger "DEBUG: Getting series metadata $url\n" if $opt->{debug};
+			$xml = main::main::request_url_retry($ua, $url, 2, '.', "WARNING: Failed to get itv series data for ${videoid} from itv site\n") if $opt->{verbose};
+			$xml = main::request_url_retry($ua, $url, 2, '.', '') if ! $opt->{verbose};
+
+			# skip if no data
+			next if ! $xml;
+			decode_entities($xml);
+			# Flatten entry
+			$xml =~ s/[\n\r]//g;
+			StringUtils::clean_utf8_and_whitespace($xml);
+
+			# Extract Filter (pids) from this list
+			# e.g. <h3><a href="http://www.itv.com/CatchUp/Video/default.html?ViewType=5&amp;Filter=32042">Emmerdale</a></h3>
+			my @videoids = (split /<h3><a href=.+?Filter=/, $xml);
+
+			# Get episode data for each videoid
+			$viewtype = 5;
+
+			my @episode_data = split/<h3><a href=.+?Filter=/, $xml;
+			# Ignore first entry
+			shift @episode_data;
+			main::logger "INFO: Got ".($#episode_data+1)." programmes\n" if $opt->{verbose};
+
+			for my $xml (@episode_data) {
+				$videoid = $1 if $xml =~ m{^(\d+?)".+$}i;
+
+				# Make sure we don't duplicate parsing an episode
+				next if $episode_pid{$videoid};
+				$episode_pid{$videoid} = 1;
+
+				my ( $name, $guidance, $channel, $episode, $desc, $pid, $available, $duration, $thumbnail );
+	
+				$pid = $videoid;
+				$channel = 'ITV Catch-Up';
+	
+				# Skip if this pid is a duplicate
+				if ( defined $progref->{$pid} ) {
+					main::logger "WARNING: '$pid, $progref->{$pid}->{name} - $progref->{$pid}->{episode}, $progref->{$pid}->{channel}' already exists (this channel = $channel)\n" if $opt->{verbose};
+					next;
+				}
+				$name = $1 if $feedxml =~ m{<ProgrammeTitle>\s*(.+?)\s*<\/ProgrammeTitle>};
+				$available = $1 if $xml =~ m{<p\s+class="date">(.+?)<\/p>}i;
+				$episode = $available;
+				$duration = $1 if $xml =~ m{<li>Duration:\s*(.+?)\s*<\/li>}i;
+				$desc = $1 if $xml =~ m{<p\s+class="progDesc">(.+?)\s*<\/p>};
+				$guidance = $1 if $feedxml =~ m{<DentonRating>\s*(.*?)\s*<\/DentonRating>};
+				$thumbnail = $1 if $feedxml =~ m{<ProgrammeMediaUrl>\s*(.+?)\s*<\/ProgrammeMediaUrl>};
+				$guidance =~ s/[\s\x00\xc2\xa0]+$//ig;
+
+				main::logger "DEBUG: name='$name' episode='$episode' pid=$pid available='$available' \n" if $opt->{debug};	
+	
+				# build data structure
+				$progref->{$pid} = Programme::itv->new(
+					'pid'		=> $pid,
+					'name'		=> $name,
+					'versions'	=> 'default',
+					'episode'	=> $episode,
+					'guidance'	=> $guidance,
+					'desc'		=> $desc,
+					'available'	=> $available,
+					'duration'	=> $duration,
+					'thumbnail'	=> $thumbnail,
+					'channel'	=> $channel,
+					'categories'	=> 'TV',
+					'type'		=> 'itv',
+					'web'           => ${itv_catchup_page_prefix}.${pid},
+				);
+			}
+		}	
+
 	}
 	main::logger "\n";
 	return 0;
 }
 
 
+sub download {
+	my ( $prog, $ua, $mode, $version, $version_pid ) = ( @_ );
+	my %streamdata;
 
-### This method is called to get the URL or stream URI to enable get_iplayer to download it. (example from old 'five' plugin)
-### The $data{MODE}{streamer} value must refer to one of the Streamer::XXXXX classes in get_iplayer.
-### If you need to add a new one best contact the get_iplayer author.
-### The stream URL should be in $data{MODE}{streamurl}, other $data{MODE} parameters might need to be set depending on the Stremer class used
-### The $data{MODE}{ext} should reflect the filename extension of the finally recorded or streamed file. e.g. 'mp4' or 'mov'
+	# if subsonly required then skip
+	return 'skip' if $opt->{subsonly};
+
+	%streamdata = %{ $prog->get_stream_data( undef, 'itv') };
+
+	# Get extension from streamdata if defined and raw not specified
+	$prog->{ext} = $prog->{streams}->{$version}->{$mode}->{ext};
+	$prog->{ext} = 'asf' if $opt->{raw};
+	
+	my @url_list = split /\|/, $prog->{streams}->{$version}->{$mode}->{streamurl};
+
+	if ( $#url_list < 0 ) {
+		main::logger "WARNING: No programme stream URLs were found, skipping\n";
+		return 'skip';
+	}
+	
+	# Determine the correct filenames for this recording
+	return 'skip' if $prog->generate_filenames( $ua, "<name> <episode> <pid>", $#url_list );
+
+	# Skip from here if we are only testing recordings
+	return 'skip' if $opt->{test};
+
+	# Instantiate new streamer from streamdata
+	my $class = "Streamer::$prog->{streams}->{$version}->{$mode}->{streamer}";
+	my $stream = $class->new;
+
+	# Do the recording
+	return $stream->get( $ua, $prog->{streams}->{$version}->{$mode}->{streamurl}, $prog );
+}
+
+
+
+# get ITV prog info
+sub get_url {
+	my ( undef, $ua, $pid ) = ( @_ );
+
+	my ( $response, $url_1, $url_2, $url_3, $url_4 );
+	my $part;
+	my $duration;
+	my $filename;
+	my @url_list;
+
+	# construct stage 1 request url
+	$url_1 = 'http://www.itv.com/_app/video/GetMediaItem.ashx?vodcrid=crid://itv.com/'.$pid.'&bitrate=384&adparams=SITE=ITV/AREA=CATCHUP.VIDEO/SEG=CATCHUP.VIDEO%20HTTP/1.1';
+
+	# Extract '<LicencePlaylist>(.+?) HTTP/1.1</LicencePlaylist>'
+	main::logger "INFO: ITV Video Stage 1 URL: $url_1\n" if $opt->{verbose};
+	$response = main::request_url_retry($ua, $url_1, 2, '', '');
+	main::logger "DEBUG: Response data: $response\n" if $opt->{debug};
+	$url_2 = $1 if $response =~ m{<LicencePlaylist>(.+?) HTTP/1.1</LicencePlaylist>};
+	# replace '&amp;' with '&' and append '%20HTTP/1.1'
+	$url_2 =~ s/&amp;/&/g;
+	$url_2 .= '%20HTTP/1.1';
+	return '' if $url_2 !~ m{http\:\/\/}i;
+	main::logger "INFO: ITV Video Stage 2 URL: $url_2\n" if $opt->{verbose};
+	$response = main::request_url_retry($ua, $url_2, 2, '', '');
+	main::logger "DEBUG: Response data: $response\n" if $opt->{debug};
+
+	# Extract hrefs and names. There are multiple entries for parts of prog (due to ads):
+	# e.g. <asx><Title>Doctor Zhivago</Title><EntryRef href="HTTP://SAM.ITV.COM/XTSERVER/ACC_RANDOM=1231194223/SITE=ITV/AREA=CATCHUP.VIDEO/SEG=CATCHUP.VIDEO HTTP/1.1/SOURCE=CATCH.UP/GENRE=DRAMA/PROGNAME=DOCTOR.ZHIVAGO/PROGID=33105/SERIES=DOCTOR.ZHIVAGO/EPNUM=/EPTITLE=/BREAKNUM=0/ADPOS=1/PAGEID=01231194223/DENTON=0/CUSTOMRATING=/TOTDUR=90/PREDUR=0/POSDUR=905/GENERIC=6e0536bf-7883-4aaa-9230-94ecc4aea403/AAMSZ=VIDEO" /><EntryRef href="HTTP://SAM.ITV.COM/XTSERVER/ACC_RANDOM=1231194223/SITE=ITV/AREA=CATCHUP.VIDEO/SEG=CATCHUP.VIDEOHTTP/1.1/SOURCE=CATCH.UP/GENRE=DRAMA/PROGNAME=DOCTOR.ZHIVAGO/PROGID=33105/SERIES=DOCTOR.ZHIVAGO/EPNUM=/EPTITLE=/BREAKNUM=0/ADPOS=LAST/PAGEID=01231194223/DENTON=0/CUSTOMRATING=/TOTDUR=90/PREDUR=0/POSDUR=905/GENERIC=6e0536bf-7883-4aaa-9230-94ecc4aea403/AAMSZ=VIDEO" />
+	#$prog->{name} = $1 if $response =~ m{<Title>(.+?)<\/Title>};
+	for my $entry (split /<Entry><ref\s+href=/, $response) {
+		main::logger "DEBUG: Entry data: $entry\n" if $opt->{debug};
+		$entry .= '<Entry><ref href='.$entry;
+
+		( $url_3, $part, $filename, $duration ) = ( $1, $2, $3, $4 ) if $entry =~ m{<Entry><ref\s+href="(.+?)"\s+\/><param\s+value="true"\s+name="Prebuffer"\s+\/>\s*<PARAM\s+NAME="PrgPartNumber"\s+VALUE="(.+?)"\s*\/><PARAM\s+NAME="FileName"\s+VALUE="(.+?)"\s*\/><PARAM\s+NAME="PrgLength"\s+VALUE="(.+?)"\s*\/>};
+		next if not $url_3;
+		# Replace '&amp;' with '&' in url
+		$url_3 =~ s/&amp;/&/g;
+		main::logger "INFO: ITV Video Name: $part\n";
+
+		main::logger "INFO: ITV Video Stage 3 URL: $url_3\n" if $opt->{verbose};
+		$entry = main::request_url_retry($ua, $url_3, 2, '', '');
+		main::logger "DEBUG: Response data: $entry\n" if $opt->{debug};
+
+		# Extract mms (replace 'http' with 'mms') url: e.g.: Ref1=http://itvbrdbnd.wmod.llnwd.net/a1379/o21/ucontent/2007/6/22/1549_384_1_2.wmv?MSWMExt=.asf
+		chomp( $url_4 = 'mms'.$1 ) if $entry =~ m{Ref1=http(.+?)[\r\n]+};
+		main::logger "INFO: ITV Video URL: $url_4\n" if $opt->{verbose};
+		push @url_list, $url_4;
+	}
+	return @url_list;
+}
+
+
+
+# Generic
 # Gets media streams data for this version pid
+# $media = undef|itv
 sub get_stream_data {
-	my ( $prog, undef, $media ) = @_;
+	my ( $prog, $verpid, $media ) = @_;
 	my %data;
-	my $entry;
 
-	# Setup user agent with redirection enabled and cookie-jar disabled
-	# Disable cookie jar by setting '1' (otherwise it saves cookies that prevent further XML downloads for a prog)
-	my $ua = main::create_ua( undef, 1 );
+	# Setup user agent with redirection enabled
+	my $ua = main::create_ua();
 	$opt->{quiet} = 0 if $opt->{streaminfo};
 
-	# Need to add temporary cookie with request of "handlerReferer=<pid>"
-	# e.g. Set-Cookie: handlerReferer=C5144920007; path=/; domain=.demand.five.tv;
-	$ua->default_header('Cookie' => "handlerReferer=$prog->{pid}; path=/;");
-	main::logger "DEBUG: Sending Cookie: Cookie: handlerReferer=$prog->{pid}; path=/;\n" if $opt->{debug};
-	# Get XML
-	my $prog_metadata_url = 'http://demand.five.tv/Handlers/FlashEpisode.ashx?baseName='; # + <pid>
-	$entry = main::request_url_retry($ua, "${prog_metadata_url}$prog->{pid}", 3 );
-
-	decode_entities($entry);
-	main::logger "DEBUG: ${prog_metadata_url}$prog->{pid}:\n$entry\n\n" if $opt->{debug};
-	# Flatten
-	$entry =~ s|[\r\n]||g;
-
-	my $stremuri;
-
-	#   <video>
-	#     <![CDATA[rtmpe://streamflv.download.five.tv/a800/o10/mp4:bthttp/five/downloadstore/secure/thegadgetshow/movies/The-Gadget-Show_S11_E7_Episode-7_FLVSTREAM.mp4?e=1241001311&h=62a13cc33a4f88fccbdef4baccc80c41]]>
-	# </video>
-
-	$stremuri = $1 if $entry =~ m{\[(rtmpe://.+?)\]};
-
-	# streams
-	my $mode = 'flashhigh';
-	$data{$mode}{ext} = 'mp4';
-	$data{$mode}{streamer} = 'rtmp';
-
-	$data{$mode}{type} = 'Flash RTMPE h264 stream';
-	$data{$mode}{streamurl} = $stremuri;
-	$data{$mode}{protocol} = 3;
-	main::logger "DEBUG: Found $mode: $data{$mode}{type}\n" if $opt->{debug};
+	# ITV streams
+	my $prog_type = 'itv';
+	$data{$prog_type}{type} = 'ITV ASF Video stream';
+	# Use asf until we can create mp4 from it
+	#$data{$prog_type}{ext} = 'mp4';
+	$data{$prog_type}{ext} = 'asf';
+	$data{$prog_type}{streamer} = 'mms';
+	$opt->{quiet} = 1 if $opt->{streaminfo};
+	$data{$prog_type}{streamurl} = join('|', $prog->get_url( $ua, $prog->{pid} ) );
+	$opt->{quiet} = 0 if $opt->{streaminfo};
 
 	# Return a hash with media => url if '' is specified - otherwise just the specified url
 	if ( ! $media ) {
@@ -347,61 +630,6 @@ sub get_stream_data {
 		$data{$media}{exists} = 0 if not defined $data{$media};
 		return $data{$media};
 	}
-}
-
-
-
-### Finally, this method is called by get_iplayer when a --get is used (this example is from the old ch4 plugin)
-### This is where we check that the required download external progs exist (and fallback to a raw mode if required)
-### Get the detailed streamdata using %streamdata = %{ $prog->get_stream_data( undef, '<MODE>') };
-### You will need to set the correct $prog->{ext} from $prog->{streams}->{$version}->{$mode}->{ext} (taken from above method)
-### The filename generation can be tweaked using the usual <fields> when calling $prog->generate_filenames
-### Best keep the test step in there
-### Create the streamer instance
-### The final return $stream->get( $ua, $prog->{pid}, $prog ) calls the streamer/recorder with all your data
-sub download {
-	my ( $prog, $ua, $mode, $version, $version_pid ) = ( @_ );
-	my %streamdata;
-
-	# if subsonly required then skip
-	return 'skip' if $opt->{subsonly};
-
-	# if rtmpdump does not exist
-	if ( $mode =~ /^(rtmp|flash)/ && ! main::exists_in_path('rtmpdump')) {
-		main::logger "WARNING: Required program rtmpdump does not exist (see http://linuxcentre.net/getiplayer/installation and http://linuxcentre.net/getiplayer/download)\n";
-		return 'next';
-	}
-	# Force raw mode if ffmpeg is not installed
-	if ( $mode =~ /^(flash|rtmp)/ && ! main::exists_in_path('ffmpeg')) {
-		main::logger "\nWARNING: ffmpeg does not exist - not converting flv file\n";
-		$opt->{raw} = 1;
-	}
-
-	%streamdata = %{ $prog->get_stream_data( undef, 'flashnormal') };
-
-	# Get extension from streamdata if defined and raw not specified
-	$prog->{ext} = $prog->{streams}->{$version}->{$mode}->{ext};
-	$prog->{ext} = 'flv' if $opt->{raw};
-	
-	my $url = $prog->{streams}->{$version}->{$mode}->{streamurl};
-
-	if ( not $url ) {
-		main::logger "WARNING: No programme stream URL was found, skipping\n";
-		return 'skip';
-	}
-	
-	# Determine the correct filenames for this recording
-	return 'skip' if $prog->generate_filenames( $ua, "<name> <episode> <pid>" );
-
-	# Skip from here if we are only testing recording
-	return 'skip' if $opt->{test};
-
-	# Instantiate new streamer from streamdata
-	my $class = "Streamer::$prog->{streams}->{$version}->{$mode}->{streamer}";
-	my $stream = $class->new;
-
-	# Do the recording
-	return $stream->get( $ua, $prog->{streams}->{$version}->{$mode}->{streamurl}, $prog, %{ $prog->{streams}->{$version}->{$mode} } );
 }
 
 1;
