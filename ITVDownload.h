@@ -7,7 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "Download.h"
 
-@interface ITVDownload : NSObject
+@interface ITVDownload : Download
 
 @end
