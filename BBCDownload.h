@@ -13,7 +13,9 @@
 
 extern bool runDownloads;
 
-@interface BBCDownload : NSObject {
+#import "Download.h"
+
+@interface BBCDownload : Download {
 	NSNotificationCenter *nc;
 
 	Programme *show;
