@@ -9,6 +9,8 @@
 #import <Cocoa/Cocoa.h>
 #import "BBCDownload.h"
 #import "Series.h"
+#import "ITVDownload.h"
+#import "Download.h"
 
 bool runDownloads=NO;
 bool runUpdate=NO;
@@ -70,15 +72,17 @@ bool runUpdate=NO;
 	IBOutlet NSTextField *currentProgress;
 	
 	//Download Controller
-	BBCDownload *currentDownload;
+	Download *currentDownload;
 	IBOutlet NSToolbarItem *stopButton;
 	IBOutlet NSToolbarItem *startButton;
 	
 	//Preferences
 	NSMutableArray *tvFormatList;
 	NSMutableArray *radioFormatList;
+    NSMutableArray *itvFormatList;
 	IBOutlet NSArrayController *tvFormatController;
 	IBOutlet NSArrayController *radioFormatController;
+    IBOutlet NSArrayController *itvFormatController;
 	
 	//Scheduling a Start
 	IBOutlet NSPanel *scheduleWindow;

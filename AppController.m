@@ -96,7 +96,7 @@
 	
 	//Initialize Arguments
 	noWarningArg = [[NSString alloc] initWithString:@"--nocopyright"];
-	listFormat = [[NSString alloc] initWithString:@"--listformat=<index>: <type>, ~<name> - <episode>~, <channel>"];
+	listFormat = [[NSString alloc] initWithString:@"--listformat=<index>: <type>, ~<name> - <episode>~, <channel>, <web>"];
 	profileDirArg = [[NSString alloc] initWithFormat:@"--profile-dir=%@", folder];
 	
 	getiPlayerPath = [[NSString alloc] initWithString:[[NSBundle mainBundle] bundlePath]];
@@ -156,6 +156,17 @@
 		NSLog(@"Unable to load saved application data. Deleted the data file.");
 		rootObject=nil;
 	}
+    
+    filename = @"ITVFormats.automator";
+    filePath = [folder stringByAppendingPathComponent:filename];
+    @try {
+        rootObject = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
+        [itvFormatController addObjects:[rootObject valueForKey:@"itvFormats"]];
+    }
+    @catch (NSException *exception) {
+        [fileManager removeItemAtPath:filePath error:nil];
+        rootObject=nil;
+    }
 	//Adds Defaults to Type Preferences
 	if ([[tvFormatController arrangedObjects] count] == 0)
 	{
@@ -175,6 +186,14 @@
 		[format3 setFormat:@"Flash - MP3"];
 		[radioFormatController addObjects:[NSArray arrayWithObjects:format1,format2,format3,nil]];
 	}
+    if ([[itvFormatController arrangedObjects] count] == 0)
+    {
+        TVFormat *format1 = [[TVFormat alloc] init];
+        [format1 setFormat:@"Flash - High"];
+        TVFormat *format2 = [[TVFormat alloc] init];
+        [format2 setFormat:@"Flash - Standard"];
+        [itvFormatController addObjects:[NSArray arrayWithObjects:format1,format2,nil]];
+    }
 		
 	//Growl Initialization
 	[GrowlApplicationBridge setGrowlDelegate:@""];
@@ -277,6 +296,12 @@
 	[rootObject setValue:[tvFormatController arrangedObjects] forKey:@"tvFormats"];
 	[rootObject setValue:[radioFormatController arrangedObjects] forKey:@"radioFormats"];
 	[NSKeyedArchiver archiveRootObject:rootObject toFile:filePath];
+    
+    filename = @"ITVFormats.automator";
+    filePath = [folder stringByAppendingPathComponent:filename];
+    rootObject = [NSMutableDictionary dictionary];
+    [rootObject setValue:[itvFormatController arrangedObjects] forKey:@"itvFormats"];
+    [NSKeyedArchiver archiveRootObject:rootObject toFile:filePath];
 }
 - (void)updater:(SUUpdater *)updater didFindValidUpdate:(SUAppcastItem *)update
 {
@@ -750,7 +775,7 @@
 		{
 			@try {
 				NSScanner *myScanner = [NSScanner scannerWithString:string];
-				NSString *temp_pid, *temp_showName, *temp_tvNetwork, *temp_type;
+				NSString *temp_pid, *temp_showName, *temp_tvNetwork, *temp_type, *url;
 				[myScanner scanUpToString:@":" intoString:&temp_pid];
 				[myScanner scanUpToCharactersFromSet:[NSCharacterSet letterCharacterSet] intoString:NULL];
 				[myScanner scanUpToString:@", ~" intoString:&temp_type];
@@ -758,6 +783,8 @@
 				[myScanner scanUpToString:@"~," intoString:&temp_showName];
 				[myScanner scanUpToCharactersFromSet:[NSCharacterSet letterCharacterSet] intoString:NULL];
 				[myScanner scanUpToString:@"," intoString:&temp_tvNetwork];
+                [myScanner scanUpToCharactersFromSet:[NSCharacterSet letterCharacterSet] intoString:NULL];
+                [myScanner scanUpToString:@"kjkjkj" intoString:&url];
 				if ([temp_showName hasSuffix:@" - -"])
 				{
 					NSString *temp_showName2;
@@ -767,6 +794,7 @@
 					temp_showName = [temp_showName stringByAppendingFormat:@" - %@", temp_showName2];
 				}
 				Programme *p = [[Programme alloc] initWithInfo:nil pid:temp_pid programmeName:temp_showName network:temp_tvNetwork];
+                [p setUrl:url];
 				if ([temp_type isEqualToString:@"radio"])
 				{
 					[p setValue:[NSNumber numberWithBool:YES] forKey:@"radio"];
@@ -1319,6 +1347,11 @@
 		if (foundOne)
 		{
 			//Start First Download
+            NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+			[nc addObserver:self selector:@selector(setPercentage:) name:@"setPercentage" object:nil];
+			[nc addObserver:self selector:@selector(setProgress:) name:@"setCurrentProgress" object:nil];
+			[nc addObserver:self selector:@selector(nextDownload:) name:@"DownloadFinished" object:nil];
+            
 			tempQueue = [queueController arrangedObjects];
 			[self addToLog:[NSString stringWithFormat:@"\rDownloading Show %d/%d:\r",
 							(1),
@@ -1328,9 +1361,12 @@
 			{
 				if ([[show complete] isEqualToNumber:[NSNumber numberWithBool:NO]])
 				{
-					currentDownload = [[BBCDownload alloc] initWithProgramme:show 
-															 tvFormats:[tvFormatController arrangedObjects] 
-														  radioFormats:[radioFormatController arrangedObjects]];
+                    if ([[show tvNetwork] hasPrefix:@"ITV"])
+                        currentDownload = [[ITVDownload alloc] initWithProgramme:show itvFormats:[itvFormatController arrangedObjects]];
+                    else
+                        currentDownload = [[BBCDownload alloc] initWithProgramme:show 
+                                                                       tvFormats:[tvFormatController arrangedObjects] 
+                                                                    radioFormats:[radioFormatController arrangedObjects]];
 					break;
 				}
 			}
@@ -1339,10 +1375,6 @@
 			[currentIndicator setIndeterminate:NO];
 			[currentIndicator setDoubleValue:0.0];
 			
-			NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-			[nc addObserver:self selector:@selector(setPercentage:) name:@"setPercentage" object:nil];
-			[nc addObserver:self selector:@selector(setProgress:) name:@"setCurrentProgress" object:nil];
-			[nc addObserver:self selector:@selector(nextDownload:) name:@"DownloadFinished" object:nil];
 		}
 		else
 		{
@@ -1728,7 +1760,7 @@
 		NSString *typeArgument = [self typeArgument:nil];
 		
 		NSMutableArray *autoRecordArgs = [[NSMutableArray alloc] initWithObjects:getiPlayerPath, noWarningArg,@"--nopurge",
-										  @"--listformat=<index>: <type>, ~<name> - <episode>~, <channel>, <timeadded>, <pid>,", cacheExpiryArgument, 
+										  @"--listformat=<index>: <type>, ~<name> - <episode>~, <channel>, <timeadded>, <pid>,<url>", cacheExpiryArgument, 
 										  typeArgument, profileDirArg,@"--hide",[series showName],nil];
 		
 		NSTask *autoRecordTask = [[NSTask alloc] init];
@@ -1810,7 +1842,7 @@
 			@try {
 				NSScanner *myScanner = [NSScanner scannerWithString:string];
 				NSArray *currentQueue = [queueController arrangedObjects];
-				NSString *temp_pid, *temp_showName, *temp_tvNetwork, *temp_type, *temp_realPID;
+				NSString *temp_pid, *temp_showName, *temp_tvNetwork, *temp_type, *temp_realPID, *url;
 				NSInteger timeadded;
 				[myScanner scanUpToString:@":" intoString:&temp_pid];
 				[myScanner scanUpToCharactersFromSet:[NSCharacterSet letterCharacterSet] intoString:NULL];
@@ -1824,6 +1856,8 @@
 				[myScanner scanUpToString:@", " intoString:nil];
 				[myScanner scanString:@", " intoString:nil];
 				[myScanner scanUpToString:@"," intoString:&temp_realPID];
+                [myScanner scanString:@"," intoString:nil];
+                [myScanner scanUpToString:@"kjkjkj" intoString:&url];
 				
 				NSScanner *seriesEpisodeScanner = [NSScanner scannerWithString:temp_showName];
 				NSString *series_Name, *episode_Name;
@@ -1846,6 +1880,7 @@
 					[p setRealPID:temp_realPID];
 					[p setSeriesName:series_Name];
 					[p setEpisodeName:episode_Name];
+                    [p setUrl:url];
 					if ([temp_type isEqualToString:@"radio"]) [p setValue:[NSNumber numberWithBool:YES] forKey:@"radio"];
 					[p setValue:@"Added by Series-Link" forKey:@"status"];
 					BOOL inQueue=NO;

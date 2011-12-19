@@ -23,9 +23,12 @@ with Adobe Media Player or similar.</string>
 	<string>The show could not be located on iPlayer or iPlayer could not be contacted. Please 
 check your internet connection.
 If outside the UK, use a proxy.</string>
-    <key>InHistory</key>
-    <string>This programme has already been downloaded and is in the history.
-To re-download it, go to File->Edit Download History,
+	<key>InHistory</key>
+	<string>This programme has already been downloaded and is in the history.
+To re-download it, go to File-&gt;Edit Download History,
 remove it, and try again.</string>
+	<key>FileExists</key>
+	<string>This show already exists in the download directory. If you would
+like to download it again, delete the file first.</string>
 </dict>
 </plist>

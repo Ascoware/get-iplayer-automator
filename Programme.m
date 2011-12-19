@@ -73,6 +73,7 @@ extern BOOL runDownloads;
 	path = [[NSString alloc] initWithString:@"Unknown"];
 	processedPID = [[NSNumber alloc] initWithBool:NO];
 	radio = [[NSNumber alloc] initWithBool:NO];
+    url = [[NSString alloc] init];
 	realPID=nil;
 	subtitlePath=nil;
     reasonForFailure=nil;
@@ -96,6 +97,7 @@ extern BOOL runDownloads;
 	[coder encodeObject:processedPID forKey:@"processedPID"];
 	[coder encodeObject:radio forKey:@"radio"];
 	[coder encodeObject:realPID forKey:@"realPID"];
+    [coder encodeObject:url forKey:@"url"];
 }
 - (id) initWithCoder: (NSCoder *)coder
 {
@@ -114,6 +116,7 @@ extern BOOL runDownloads;
 	processedPID = [coder decodeObjectForKey:@"processedPID"];
 	radio = [coder decodeObjectForKey:@"radio"];
 	realPID = [coder decodeObjectForKey:@"realPID"];
+    url = [coder decodeObjectForKey:@"url"];
 	subtitlePath=nil;
     reasonForFailure=nil;
     availableModes=nil;
@@ -150,4 +153,6 @@ extern BOOL runDownloads;
 @synthesize subtitlePath;
 @synthesize reasonForFailure;
 @synthesize availableModes;
+@synthesize url;
+@synthesize dateAired;
 @end

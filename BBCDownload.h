@@ -16,9 +16,6 @@ extern bool runDownloads;
 #import "Download.h"
 
 @interface BBCDownload : Download {
-	NSNotificationCenter *nc;
-
-	Programme *show;
 	NSString *profileDirArg;
 	
 	NSTask *task;
@@ -27,7 +24,6 @@ extern bool runDownloads;
 	NSFileHandle *fh;
 	NSFileHandle *errorFh;
 	
-	NSMutableString *log;
 	NSMutableString *errorCache;
 	NSTimer *processErrorCache;
 	BOOL runAgain;
@@ -37,19 +33,8 @@ extern bool runDownloads;
 	BOOL foundLastLine;
 	NSString *LastLine;
 	NSString *reasonForFailure;
-	
-	double lastDownloaded;
-	NSDate *lastDate;
-	NSMutableArray *rateEntries;
-	double oldRateAverage;
-	int outOfRange;
 }
 - (id)initWithProgramme:(Programme *)tempShow tvFormats:(NSArray *)tvFormatList radioFormats:(NSArray *)radioFormatList;
-- (void)cancelDownload:(id)sender;
-- (void)addToLog:(NSString *)logMessage noTag:(BOOL)b;
-- (void)addToLog:(NSString *)logMessage;
 - (void)processGetiPlayerOutput:(NSString *)outp;
-- (void)setCurrentProgress:(NSString *)string;
-- (void)setPercentage:(double)d;
-@property (readonly) Programme *show;
+
 @end

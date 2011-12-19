@@ -78,7 +78,7 @@
 
 - (IBAction)writeHistory:(id)sender
 {
-	if (!runDownloads)
+	if (!runDownloads || [sender isEqualTo:self])
 	{
 		NSLog(@"Write History to File");
 		NSArray *currentHistory = [historyArrayController arrangedObjects];

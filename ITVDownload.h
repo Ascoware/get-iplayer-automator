@@ -8,7 +8,38 @@
 
 #import <Foundation/Foundation.h>
 #import "Download.h"
+#import "TVFormat.h"
 
-@interface ITVDownload : Download
-
+@interface ITVDownload : Download {
+    NSTask *task;
+    
+    NSPipe *pipe;
+    NSPipe *errorPipe;
+    
+    NSFileHandle *fh;
+    NSFileHandle *errorFh;
+    
+    NSMutableString *errorCache;
+    NSTimer *errorTimer;
+    
+    NSString *subtitleURL;
+    NSString *thumbnailURL;
+    NSString *downloadPath;
+    
+    //ffmpeg Conversion
+    NSTask *ffTask;
+    NSPipe *ffPipe;
+    NSPipe *ffErrorPipe;
+    NSFileHandle *ffFh;
+    NSFileHandle *ffErrorFh;
+    
+    //AtomicParsley Tagging
+    NSTask *apTask;
+    NSPipe *apPipe;
+    NSFileHandle *apFh;
+    
+    NSArray *formatList;
+}
+- (id)initWithProgramme:(Programme *)tempShow itvFormats:(NSArray *)itvFormatList;
+- (void)processGetiPlayerOutput:(NSString *)outp;
 @end

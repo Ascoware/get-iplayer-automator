@@ -28,6 +28,8 @@
 	NSString *subtitlePath;
     NSString *reasonForFailure;
     NSString *availableModes;
+    NSString *url;
+    NSDate *dateAired;
 }
 - (id)initWithInfo:(id)sender pid:(NSString *)PID programmeName:(NSString *)SHOWNAME network:(NSString *)TVNETWORK;
 - (id)initWithShow:(Programme *)show;
@@ -50,4 +52,6 @@
 @property (readwrite, assign) NSString *subtitlePath;
 @property (readwrite, assign) NSString *reasonForFailure;
 @property (readwrite, assign) NSString *availableModes;
+@property (readwrite, assign) NSString *url;
+@property (readwrite, assign) NSDate *dateAired;
 @end
