@@ -83,6 +83,7 @@ bool runUpdate=NO;
 	IBOutlet NSArrayController *tvFormatController;
 	IBOutlet NSArrayController *radioFormatController;
     IBOutlet NSArrayController *itvFormatController;
+    IBOutlet NSButton *itvTVCheckbox;
 	
 	//Scheduling a Start
 	IBOutlet NSPanel *scheduleWindow;

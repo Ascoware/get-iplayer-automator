@@ -107,6 +107,14 @@
 #pragma mark Delegate Methods
 - (void)awakeFromNib
 {
+#ifdef __x86_64__
+    [itvTVCheckbox setEnabled:YES];
+#else
+    [itvTVCheckbox setEnabled:NO];
+    [itvTVCheckbox setState:NSOffState];
+    [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithBool:NO] forKey:@"CacheITV_TV"];
+#endif
+    
 	[self updateCache:nil];
 	
 	[queueTableView registerForDraggedTypes:[NSArray arrayWithObject:@"com.thomaswillson.programme"]];
