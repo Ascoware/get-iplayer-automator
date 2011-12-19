@@ -996,7 +996,7 @@
                             [[document URL] hasPrefix:@"http://bbc.co.uk/iplayer/episode/"] ||
                             [[document URL] hasPrefix:@"http://bbc.co.uk/iplayer/console/"] || 
                             [[document URL] hasPrefix:@"http://www.bbc.co.uk/iplayer/console/"] ||
-                            [[document URL] hasPrefix:@"http://www.itv.com/ITVPlayer/Video/default.html?ViewType"])
+                            [[document URL] hasPrefix:@"http://www.itv.com/itvplayer/video/?Filter"])
 						{
 							url = [NSString stringWithString:[document URL]];
                             NSScanner *nameScanner = [NSScanner scannerWithString:[document name]];
@@ -1196,7 +1196,7 @@
 		[queueController addObject:newProg];
 		[self getNameForProgramme:newProg];
 	}
-	else if ([url hasPrefix:@"http://www.itv.com/ITVPlayer/Video/default.html?ViewType"])
+	else if ([url hasPrefix:@"http://www.itv.com/itvplayer/video/?Filter"])
 	{
 		NSString *pid;
 		NSScanner *urlScanner = [NSScanner scannerWithString:url];
