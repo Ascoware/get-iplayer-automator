@@ -244,7 +244,7 @@
     NSArray *formatObjects = [NSArray arrayWithObjects:@"400000",@"600000",@"800000",@"1200000",nil];
     NSDictionary *formatDic = [NSDictionary dictionaryWithObjects:formatObjects forKeys:formatKeys];
     [scanner scanUpToString:@"MediaFile delivery" intoString:nil];
-    [scanner scanString:@"MediaFile derlivery" intoString:nil];
+    [scanner scanString:@"MediaFile delivery" intoString:nil];
     [scanner scanUpToString:@"MediaFile delivery" intoString:nil];
     NSUInteger location = [scanner scanLocation];
     NSMutableArray *bitrates = [[NSMutableArray alloc] init];
@@ -589,9 +589,12 @@
             
             //Retrieve Subtitle URL
             [scanner scanUpToString:@"<ClosedCaptioning" intoString:nil];
-            [scanner scanUpToString:@"CDATA[" intoString:nil];
-            [scanner scanString:@"CDATA[" intoString:nil];
-            [scanner scanUpToString:@"]]" intoString:&subtitleURL];
+            if(![scanner scanString:@"<ClosedCaptioningURIs/>" intoString:nil])
+            {
+                [scanner scanUpToString:@"CDATA[" intoString:nil];
+                [scanner scanString:@"CDATA[" intoString:nil];
+                [scanner scanUpToString:@"]]" intoString:&subtitleURL];
+            }
             
             //Retrieve Auth URL
             NSString *authURL;
