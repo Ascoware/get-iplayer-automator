@@ -26,6 +26,8 @@
 }
 - (id)initWithProgramme:(Programme *)tempShow itvFormats:(NSArray *)itvFormatList
 {
+    nc = [NSNotificationCenter defaultCenter];
+    
     [self setCurrentProgress:@"Retrieving Programme Metadata..."];
     [self setPercentage:102];
     [tempShow setValue:@"Initialising..." forKey:@"status"];
@@ -34,7 +36,6 @@
     [self addToLog:[NSString stringWithFormat:@"Downloading %@",[show showName]] noTag:NO];
     [self addToLog:@"INFO: Preparing Request for Auth Info" noTag:YES];
     
-    nc = [NSNotificationCenter defaultCenter];
     
     errorCache = [[NSMutableString alloc] initWithString:@""];
     errorTimer = [NSTimer scheduledTimerWithTimeInterval:.25 target:self selector:@selector(processError) userInfo:nil repeats:YES];
