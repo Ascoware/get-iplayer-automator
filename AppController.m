@@ -556,13 +556,16 @@
 						{
 							NSScanner *myScanner = [NSScanner scannerWithString:string];
 							Programme *p = [[Programme alloc] init];
-							NSString *temp_pid, *temp_showName, *temp_tvNetwork, *temp_type;
+							NSString *temp_pid, *temp_showName, *temp_tvNetwork, *temp_type, *url;
 							[myScanner scanUpToString:@":" intoString:&temp_pid];
 							[myScanner scanUpToString:@"," intoString:&temp_type];
 							[myScanner scanString:@", ~" intoString:NULL];
 							[myScanner scanUpToString:@"~," intoString:&temp_showName];
 							[myScanner scanString:@"~," intoString:NULL];
-							[myScanner scanUpToString:@"jkhjjhkjh" intoString:&temp_tvNetwork];
+							[myScanner scanUpToString:@"," intoString:&temp_tvNetwork];
+                            [myScanner scanString:@"," intoString:nil];
+                            [myScanner scanUpToString:@"kljkjkj" intoString:&url];
+                            
 							if ([temp_showName hasSuffix:@" - -"])
 							{
 								NSString *temp_showName2;
@@ -574,8 +577,9 @@
 							[p setValue:temp_pid forKey:@"pid"];
 							[p setValue:temp_showName forKey:@"showName"];
 							[p setValue:temp_tvNetwork forKey:@"tvNetwork"];
+                            [p setUrl:url];
 							if ([temp_type isEqualToString:@"radio"]) [p setValue:[NSNumber numberWithBool:YES] forKey:@"radio"];
-							if ([[p showName] isEqualToString:[show showName]])
+							if ([[p showName] isEqualToString:[show showName]] || ([[p url] isEqualToString:[show url]] && [[show url] length] > 0))
 							{
 								[show setValue:[p pid] forKey:@"pid"];
 								foundMatch=YES;
