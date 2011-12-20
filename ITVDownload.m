@@ -210,6 +210,9 @@
     [scanner scanUpToString:@"</EpisodeTitle>" intoString:&episodeName];
     [show setEpisodeName:episodeName];
     
+    //Fix Show Name - Episode Name
+    [show setShowName:[NSString stringWithFormat:@"%@ - %@",seriesName,episodeName]];
+    
     //Retrieve Episode Number
     NSInteger episodeNumber;
     [scanner scanUpToString:@"<EpisodeNumber>" intoString:nil];
