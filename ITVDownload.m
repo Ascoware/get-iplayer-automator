@@ -69,7 +69,7 @@
         [request setProxyHost:proxyHost];
         [self addToLog:[NSString stringWithFormat:@"INFO: Using proxy %@",[[NSUserDefaults standardUserDefaults] valueForKey:@"CustomProxy"]] noTag:YES];
 	}
-	else
+	else if ([proxyOption isEqualToString:@"Provided"])
 	{
 		//Get provided proxy from my server.
 		NSURL *proxyURL = [[NSURL alloc] initWithString:@"http://tom-tech.com/get_iplayer/proxy.txt"];
