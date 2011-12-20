@@ -26,6 +26,10 @@
 }
 - (id)initWithProgramme:(Programme *)tempShow itvFormats:(NSArray *)itvFormatList
 {
+    [self setCurrentProgress:@"Retrieving Programme Metadata..."];
+    [self setPercentage:102];
+    [tempShow setValue:@"Initialising..." forKey:@"status"];
+    
     formatList = [itvFormatList copy];
     [self addToLog:[NSString stringWithFormat:@"Downloading %@",[show showName]] noTag:NO];
     [self addToLog:@"INFO: Preparing Request for Auth Info" noTag:YES];
@@ -55,6 +59,8 @@
     [request addRequestHeader:@"SOAPAction" value:@"\"http://tempuri.org/PlaylistService/GetPlaylist\""];
     [request setRequestMethod:@"POST"];
     [request setPostBody:[NSMutableData dataWithData:[body dataUsingEncoding:NSUTF8StringEncoding]]];
+    [request setDidFinishSelector:@selector(metaRequestFinished:)];
+    [request setDelegate:self];
     
     NSString *proxyOption = [[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"];
 	if ([proxyOption isEqualToString:@"Custom"])
@@ -109,7 +115,11 @@
 
     [request setProxyType:@"HTTP"];
     [self addToLog:@"INFO: Requesting Auth." noTag:YES];
-    [request startSynchronous];
+    [request startAsynchronous];
+    return self;
+}
+-(void)metaRequestFinished:(ASIHTTPRequest *)request
+{
     NSLog(@"Response Status Code: %ld",(long)[request responseStatusCode]);
     if ([request responseStatusCode] == 0)
     {
@@ -125,7 +135,7 @@
         [show setValue:@"Failed: Bad Proxy" forKey:@"status"];
         [nc postNotificationName:@"DownloadFinished" object:show];
         [self addToLog:@"Download Failed" noTag:NO];
-        return self;
+        return;
     }
     else if ([request responseStatusCode] == 500)
     {
@@ -141,7 +151,7 @@
         [show setValue:@"Failed: Outside UK" forKey:@"status"];
         [nc postNotificationName:@"DownloadFinished" object:show];
         [self addToLog:@"Download Failed" noTag:NO];
-        return self;
+        return;
     }
     else if ([request responseStatusCode] != 200)
     {
@@ -151,7 +161,7 @@
         [show setValue:@"Download Failed" forKey:@"status"];
         [nc postNotificationName:@"DownloadFinished" object:show];
         [self addToLog:@"Download Failed" noTag:NO];
-        return self;
+        return;
     }
     NSData *urlData = [request responseData];
     
@@ -170,12 +180,12 @@
         [self addToLog:[NSString stringWithFormat:@"%@ Failed",[show showName]]];
         [show setReasonForFailure:@"ITVUnknown"];
         [nc postNotificationName:@"DownloadFinished" object:show];
-        return self;
+        return;
     }
         
     
     output = [output stringByReplacingOccurrencesOfString:@"&amp;" withString:@"&"];
-    scanner = [NSScanner scannerWithString:output];
+    NSScanner *scanner = [NSScanner scannerWithString:output];
     //Retrieve Series Name
     NSString *seriesName;
     [scanner scanUpToString:@"<ProgrammeTitle>" intoString:nil];
@@ -233,8 +243,8 @@
     [scanner scanUpToString:@"MediaFile delivery" intoString:nil];
     NSUInteger location = [scanner scanLocation];
     NSMutableArray *bitrates = [[NSMutableArray alloc] init];
-    NSLog(@"ITVFormatList = %@",itvFormatList);
-    for (TVFormat *format in itvFormatList)
+    NSLog(@"ITVFormatList = %@",formatList);
+    for (TVFormat *format in formatList)
         [bitrates addObject:[formatDic objectForKey:[format format]]];
     NSLog(@"Birates=%@",bitrates);
     for (NSString *bitrate in bitrates)
@@ -275,7 +285,7 @@
         [show setValue:@"Download Failed" forKey:@"status"];
         [show setReasonForFailure:@"FileExists"];
         [nc postNotificationName:@"DownloadFinished" object:show];
-        return self;
+        return;
     }
     else if ([[NSFileManager defaultManager] fileExistsAtPath:downloadPath])
     {
@@ -328,7 +338,7 @@
 	[self setCurrentProgress:@"Initialising RTMPDump..."];
     [self setPercentage:102];
     
-    return self;
+    return;
 }
 - (void)DownloadDataReady:(NSNotification *)note
 {
