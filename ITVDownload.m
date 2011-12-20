@@ -211,7 +211,7 @@
     [show setEpisodeName:episodeName];
     
     //Fix Show Name - Episode Name
-    [show setShowName:[NSString stringWithFormat:@"%@ - %@",seriesName,episodeName]];
+    [show setShowName:[[show showName] stringByAppendingFormat:@" - %@",episodeName]];
     
     //Retrieve Episode Number
     NSInteger episodeNumber;
