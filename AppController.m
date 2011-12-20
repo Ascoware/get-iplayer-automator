@@ -1535,9 +1535,15 @@
 							([tempQueue indexOfObject:nextShow]+1),
 							[tempQueue count]]
 						  :nil];
-			currentDownload = [[BBCDownload alloc] initWithProgramme:nextShow
-													 tvFormats:[tvFormatController arrangedObjects]
-												  radioFormats:[radioFormatController arrangedObjects]];
+			if ([[nextShow complete] isEqualToNumber:[NSNumber numberWithBool:NO]])
+            {
+                if ([[nextShow tvNetwork] hasPrefix:@"ITV"])
+                    currentDownload = [[ITVDownload alloc] initWithProgramme:nextShow itvFormats:[itvFormatController arrangedObjects]];
+                else
+                    currentDownload = [[BBCDownload alloc] initWithProgramme:nextShow 
+                                                                   tvFormats:[tvFormatController arrangedObjects] 
+                                                                radioFormats:[radioFormatController arrangedObjects]];
+            }
 		}
 		@catch (NSException *e)
 		{
