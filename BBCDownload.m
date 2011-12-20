@@ -18,13 +18,8 @@
 	foundLastLine=NO;
 	errorCache = [[NSMutableString alloc] init];
 	processErrorCache = [NSTimer scheduledTimerWithTimeInterval:.25 target:self selector:@selector(processError) userInfo:nil repeats:YES];
-	reasonForFailure = [[NSString alloc] initWithString:@"None"];
-	
-	//Prepare Time Remaining
-	rateEntries = [[NSMutableArray alloc] init];
-	lastDownloaded=0;
-	outOfRange=0;
-	
+    reasonForFailure = [[NSString alloc] initWithString:@"None"];
+    
 	log = [[NSMutableString alloc] initWithString:@""];
 	nc = [NSNotificationCenter defaultCenter];
 	show = tempShow;

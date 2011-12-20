@@ -13,6 +13,17 @@
 {
     NSLog(@"Cancel Download");
 }
+- (id)init
+{
+    [super init];
+    
+    //Prepare Time Remaining
+	rateEntries = [[NSMutableArray alloc] init];
+	lastDownloaded=0;
+	outOfRange=0;
+    
+    return self;
+}
 @synthesize show;
 #pragma mark Notification Posters
 - (void)addToLog:(NSString *)logMessage noTag:(BOOL)b
