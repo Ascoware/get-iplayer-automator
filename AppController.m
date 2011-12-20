@@ -882,7 +882,7 @@
 	NSTask *getNameTask = [[NSTask alloc] init];
 	NSPipe *getNamePipe = [[NSPipe alloc] init];
 	NSMutableString *getNameData = [[NSMutableString alloc] initWithString:@""];
-	NSString *listArgument = @"--listformat=<index> <pid> <type> <name> - <episode>";
+	NSString *listArgument = @"--listformat=<index> <pid> <type> <name> - <episode>,<channel>|";
 	NSString *fieldsArgument = @"--fields=index,pid";
 	NSString *wantedID = [pro valueForKey:@"pid"];
 	NSString *cacheExpiryArg = [self cacheExpiryArgument:nil];
@@ -923,7 +923,7 @@
 		i++;
 		if (i>1 && i<[array count]-1)
 		{
-			NSString *pid, *showName, *index, *type;
+			NSString *pid, *showName, *index, *type, *tvNetwork;
 			@try{
 				NSScanner *scanner = [NSScanner scannerWithString:string];
 				[scanner scanUpToCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:&index];
@@ -932,7 +932,9 @@
 				[scanner scanUpToCharactersFromSet:[NSCharacterSet alphanumericCharacterSet] intoString:NULL];
 				[scanner scanUpToCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:&type];
 				[scanner scanUpToCharactersFromSet:[NSCharacterSet alphanumericCharacterSet] intoString:NULL];
-				[scanner scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet]  intoString:&showName];
+				[scanner scanUpToString:@","  intoString:&showName];
+                [scanner scanString:@"," intoString:nil];
+                [scanner scanUpToString:@"|" intoString:&tvNetwork];
 				scanner = nil;
 			}
 			@catch (NSException *e) {
@@ -949,12 +951,14 @@
 				found=YES;
 				[p setValue:showName forKey:@"showName"];
 				[p setValue:index forKey:@"pid"];
+                [p setValue:tvNetwork forKey:@"tvNetwork"];
 				if ([type isEqualToString:@"radio"]) [p setValue:[NSNumber numberWithBool:YES] forKey:@"radio"];
 			}
 			else if ([wantedID isEqualToString:index])
 			{
 				found=YES;
 				[p setValue:showName forKey:@"showName"];
+                [p setValue:tvNetwork forKey:@"tvNetwork"];
 				if ([type isEqualToString:@"radio"]) [p setValue:[NSNumber numberWithBool:YES] forKey:@"radio"];
 			}
 		}
