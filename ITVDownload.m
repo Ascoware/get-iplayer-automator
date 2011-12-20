@@ -169,6 +169,7 @@
     if (urlData != nil)
     {
         output = [[NSString alloc] initWithData:urlData encoding:NSUTF8StringEncoding];
+        NSLog(@"Auth Request: %@",output);
         [self addToLog:@"INFO: Response recieved" noTag:YES];
     }
     else
@@ -223,9 +224,12 @@
         
     //Retrieve Subtitle URL
     [scanner scanUpToString:@"<ClosedCaptioning" intoString:nil];
-    [scanner scanUpToString:@"CDATA[" intoString:nil];
-    [scanner scanString:@"CDATA[" intoString:nil];
-    [scanner scanUpToString:@"]]" intoString:&subtitleURL];
+    if(![scanner scanString:@"<ClosedCaptioningURIs/>" intoString:nil])
+    {
+        [scanner scanUpToString:@"CDATA[" intoString:nil];
+        [scanner scanString:@"CDATA[" intoString:nil];
+        [scanner scanUpToString:@"]]" intoString:&subtitleURL];
+    }
     
     //Retrieve Auth URL
     NSString *authURL;
