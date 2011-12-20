@@ -211,7 +211,9 @@
     [show setEpisodeName:episodeName];
     
     //Fix Show Name - Episode Name
-    [show setShowName:[[show showName] stringByAppendingFormat:@" - %@",episodeName]];
+    NSScanner *scanner2 = [NSScanner scannerWithString:episodeName];
+    if ([scanner2 scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:nil] && ![[show showName] hasSuffix:episodeName])
+        [show setShowName:[[show showName] stringByAppendingFormat:@" - %@",episodeName]];
     
     //Retrieve Episode Number
     NSInteger episodeNumber;
