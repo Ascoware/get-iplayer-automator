@@ -110,6 +110,22 @@
     [request setProxyType:@"HTTP"];
     [self addToLog:@"INFO: Requesting Auth." noTag:YES];
     [request startSynchronous];
+    if (!([request responseStatusCode] == 200))
+    {
+        [self addToLog:@"INFO: No response received. Probably a proxy issue." noTag:YES];
+        [show setSuccessful:[NSNumber numberWithBool:NO]];
+        [show setComplete:[NSNumber numberWithBool:YES]];
+        if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"] isEqualTo:@"Provided"])
+            [show setReasonForFailure:@"Provided_Proxy"];
+        else if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"] isEqualTo:@"Custom"])
+            [show setReasonForFailure:@"Custom_Proxy"];
+        else
+            [show setReasonForFailure:@"Internet_Connection"];
+        [show setValue:@"Failed: Bad Proxy" forKey:@"status"];
+        [nc postNotificationName:@"DownloadFinished" object:show];
+        [self addToLog:@"Download Failed" noTag:NO];
+        return self;
+    }
     NSData *urlData = [request responseData];
     
     NSString *output;
