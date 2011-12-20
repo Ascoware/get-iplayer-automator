@@ -935,7 +935,8 @@
 				[scanner scanUpToString:@","  intoString:&showName];
                 [scanner scanString:@"," intoString:nil];
                 [scanner scanUpToString:@"|" intoString:&tvNetwork];
-                [scanner scanString:@"|" intoString:&url];
+                [scanner scanString:@"|" intoString:nil];
+                [scanner scanUpToString:@"|" intoString:&url];
 				scanner = nil;
 			}
 			@catch (NSException *e) {
