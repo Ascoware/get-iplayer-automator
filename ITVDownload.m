@@ -110,9 +110,10 @@
     [request setProxyType:@"HTTP"];
     [self addToLog:@"INFO: Requesting Auth." noTag:YES];
     [request startSynchronous];
-    if (!([request responseStatusCode] == 200))
+    NSLog(@"Response Status Code: %ld",(long)[request responseStatusCode]);
+    if ([request responseStatusCode] == 0)
     {
-        [self addToLog:@"INFO: No response received. Probably a proxy issue." noTag:YES];
+        [self addToLog:@"ERROR: No response received. Probably a proxy issue." noTag:YES];
         [show setSuccessful:[NSNumber numberWithBool:NO]];
         [show setComplete:[NSNumber numberWithBool:YES]];
         if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"] isEqualTo:@"Provided"])
@@ -122,6 +123,32 @@
         else
             [show setReasonForFailure:@"Internet_Connection"];
         [show setValue:@"Failed: Bad Proxy" forKey:@"status"];
+        [nc postNotificationName:@"DownloadFinished" object:show];
+        [self addToLog:@"Download Failed" noTag:NO];
+        return self;
+    }
+    else if ([request responseStatusCode] == 500)
+    {
+        [self addToLog:@"ERROR: ITV thinks you are outside the UK."  noTag:YES];
+        [show setSuccessful:[NSNumber numberWithBool:NO]];
+        [show setComplete:[NSNumber numberWithBool:YES]];
+        if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"] isEqualTo:@"Provided"])
+            [show setReasonForFailure:@"Provided_Proxy"];
+        else if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"] isEqualTo:@"Custom"])
+            [show setReasonForFailure:@"Custom_Proxy"];
+        else
+            [show setReasonForFailure:@"Outside_UK"];
+        [show setValue:@"Failed: Outside UK" forKey:@"status"];
+        [nc postNotificationName:@"DownloadFinished" object:show];
+        [self addToLog:@"Download Failed" noTag:NO];
+        return self;
+    }
+    else if ([request responseStatusCode] != 200)
+    {
+        [self addToLog:@"ERROR: Could not retrieve program metadata." noTag:YES];
+        [show setSuccessful:[NSNumber numberWithBool:NO]];
+        [show setComplete:[NSNumber numberWithBool:YES]];
+        [show setValue:@"Download Failed" forKey:@"status"];
         [nc postNotificationName:@"DownloadFinished" object:show];
         [self addToLog:@"Download Failed" noTag:NO];
         return self;
