@@ -882,7 +882,7 @@
 	NSTask *getNameTask = [[NSTask alloc] init];
 	NSPipe *getNamePipe = [[NSPipe alloc] init];
 	NSMutableString *getNameData = [[NSMutableString alloc] initWithString:@""];
-	NSString *listArgument = @"--listformat=<index> <pid> <type> <name> - <episode>,<channel>|";
+	NSString *listArgument = @"--listformat=<index> <pid> <type> <name> - <episode>,<channel>|<web>|";
 	NSString *fieldsArgument = @"--fields=index,pid";
 	NSString *wantedID = [pro valueForKey:@"pid"];
 	NSString *cacheExpiryArg = [self cacheExpiryArgument:nil];
@@ -923,7 +923,7 @@
 		i++;
 		if (i>1 && i<[array count]-1)
 		{
-			NSString *pid, *showName, *index, *type, *tvNetwork;
+			NSString *pid, *showName, *index, *type, *tvNetwork, *url;
 			@try{
 				NSScanner *scanner = [NSScanner scannerWithString:string];
 				[scanner scanUpToCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:&index];
@@ -935,6 +935,7 @@
 				[scanner scanUpToString:@","  intoString:&showName];
                 [scanner scanString:@"," intoString:nil];
                 [scanner scanUpToString:@"|" intoString:&tvNetwork];
+                [scanner scanString:@"|" intoString:&url];
 				scanner = nil;
 			}
 			@catch (NSException *e) {
@@ -952,6 +953,7 @@
 				[p setValue:showName forKey:@"showName"];
 				[p setValue:index forKey:@"pid"];
                 [p setValue:tvNetwork forKey:@"tvNetwork"];
+                [p setUrl:url];
 				if ([type isEqualToString:@"radio"]) [p setValue:[NSNumber numberWithBool:YES] forKey:@"radio"];
 			}
 			else if ([wantedID isEqualToString:index])
@@ -959,6 +961,7 @@
 				found=YES;
 				[p setValue:showName forKey:@"showName"];
                 [p setValue:tvNetwork forKey:@"tvNetwork"];
+                [p setUrl:url];
 				if ([type isEqualToString:@"radio"]) [p setValue:[NSNumber numberWithBool:YES] forKey:@"radio"];
 			}
 		}
