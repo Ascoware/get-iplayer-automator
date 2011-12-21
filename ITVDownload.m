@@ -28,7 +28,7 @@
 {
     nc = [NSNotificationCenter defaultCenter];
     
-    [self setCurrentProgress:@"Retrieving Programme Metadata..."];
+    [self setCurrentProgress:[NSString stringWithFormat:@"Retrieving Programme Metadata... -- %@",[show showName]]];
     [self setPercentage:102];
     [tempShow setValue:@"Initialising..." forKey:@"status"];
     
@@ -345,7 +345,7 @@
 	[show setValue:@"Initiliasing..." forKey:@"status"];
 	
 	//Prepare UI
-	[self setCurrentProgress:@"Initialising RTMPDump..."];
+	[self setCurrentProgress:[NSString stringWithFormat:@"Initialising RTMPDump... -- %@",[show showName]]];
     [self setPercentage:102];
     
     return;
@@ -694,7 +694,7 @@
             [show setValue:@"Initiliasing..." forKey:@"status"];
             
             //Prepare UI
-            [self setCurrentProgress:@"Initialising RTMPDump..."];
+            [self setCurrentProgress:[NSString stringWithFormat:@"Initialising RTMPDump... -- %@",[show showName]]];
             [self setPercentage:102];
 
             return;
@@ -747,7 +747,7 @@
         [ffFh readInBackgroundAndNotify];
         [ffErrorFh readInBackgroundAndNotify];
         
-        [self setCurrentProgress:@"Converting..."];
+        [self setCurrentProgress:[NSString stringWithFormat:@"Converting... -- %@",[show showName]]];
         [show setStatus:@"Converting..."];
         [self setPercentage:102];
     }
@@ -760,7 +760,7 @@
         [[NSFileManager defaultManager] removeItemAtPath:downloadPath error:nil];
         [show setValue:@"Tagging..." forKey:@"status"];
         [self setPercentage:102];
-        [self setCurrentProgress:@"Tagging..."];
+        [self setCurrentProgress:[NSString stringWithFormat:@"Downloading Thumbnail... -- %@",[show showName]]];
         [self addToLog:@"INFO: Tagging the Show" noTag:YES];
         [self addToLog:@"INFO: Downloading thumbnail" noTag:YES];
         
@@ -771,7 +771,8 @@
     }
     else
     {
-       [nc postNotificationName:@"DownloadFinished" object:show]; 
+        [show setValue:@"Download Complete" forKey:@"status"];
+        [nc postNotificationName:@"DownloadFinished" object:show]; 
     }
 }
 - (void)requestFinished:(ASIHTTPRequest *)request
@@ -812,6 +813,8 @@
     [apTask launch];
     [apFh readInBackgroundAndNotify];
     
+    [self setCurrentProgress:[NSString stringWithFormat:@"Tagging the Programme... -- %@",[show showName]]];
+    
 }
 - (void)requestFailed:(ASIHTTPRequest *)request
 {
@@ -824,6 +827,8 @@
     else
         [self addToLog:@"INFO: Tagging failed." noTag:YES];
     
-    [nc postNotificationName:@"DownloadFinished" object:show];    
+    [show setValue:@"Download Complete" forKey:@"status"];
+    
+    [nc postNotificationName:@"DownloadFinished" object:show];
 }
 @end
