@@ -23,8 +23,7 @@ Please add more download formats to your list in preferences.</string>
 partial file left behind in your download folder. The downloaded portion will be playable 
 with Adobe Media Player or similar.</string>
 	<key>ShowNotFound</key>
-	<string>The show could not be located on iPlayer or iPlayer could not be contacted. Please 
-check your internet connection.
+	<string>The show could not be located on iPlayer/ITV Player.
 If outside the UK, use a proxy.</string>
 	<key>InHistory</key>
 	<string>This programme has already been downloaded and is in the history.
