@@ -749,12 +749,14 @@
         
         [self setCurrentProgress:[NSString stringWithFormat:@"Converting... -- %@",[show showName]]];
         [show setStatus:@"Converting..."];
+        [self addToLog:@"INFO: Converting FLV File to MP4" noTag:YES];
         [self setPercentage:102];
     }
 }
 - (void)ffmpegFinished:(NSNotification *)finishedNote
 {
     NSLog(@"Conversion Finished");
+    [self addToLog:@"INFO: Finished Converting." noTag:YES];
     if ([[finishedNote object] terminationStatus] == 0)
     {
         [[NSFileManager defaultManager] removeItemAtPath:downloadPath error:nil];
