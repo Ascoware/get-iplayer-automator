@@ -26,6 +26,7 @@
 }
 - (id)initWithProgramme:(Programme *)tempShow itvFormats:(NSArray *)itvFormatList
 {
+    show = tempShow;
     nc = [NSNotificationCenter defaultCenter];
     
     [self setCurrentProgress:[NSString stringWithFormat:@"Retrieving Programme Metadata... -- %@",[show showName]]];
@@ -40,7 +41,6 @@
     errorCache = [[NSMutableString alloc] initWithString:@""];
     errorTimer = [NSTimer scheduledTimerWithTimeInterval:.25 target:self selector:@selector(processError) userInfo:nil repeats:YES];
     
-    show = tempShow;
     NSString *body = [[NSString alloc] initWithData:[NSData dataWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"Body" ofType:nil]] 
                                            encoding:NSUTF8StringEncoding];
     NSString *temp_id;
@@ -140,16 +140,16 @@
     }
     else if ([request responseStatusCode] == 500)
     {
-        [self addToLog:@"ERROR: ITV thinks you are outside the UK."  noTag:YES];
+        [self addToLog:@"ERROR: Show not Available."  noTag:YES];
         [show setSuccessful:[NSNumber numberWithBool:NO]];
         [show setComplete:[NSNumber numberWithBool:YES]];
         if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"] isEqualTo:@"Provided"])
-            [show setReasonForFailure:@"Provided_Proxy"];
+            [show setReasonForFailure:@"ShowNotFound"];
         else if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"] isEqualTo:@"Custom"])
-            [show setReasonForFailure:@"Custom_Proxy"];
+            [show setReasonForFailure:@"ShowNotFound"];
         else
-            [show setReasonForFailure:@"Outside_UK"];
-        [show setValue:@"Failed: Outside UK" forKey:@"status"];
+            [show setReasonForFailure:@"ShowNotFound"];
+        [show setValue:@"Failed: Not Available" forKey:@"status"];
         [nc postNotificationName:@"DownloadFinished" object:show];
         [self addToLog:@"Download Failed" noTag:NO];
         return;
