@@ -29,6 +29,8 @@
     show = tempShow;
     nc = [NSNotificationCenter defaultCenter];
     
+    running=TRUE;
+    
     [self setCurrentProgress:[NSString stringWithFormat:@"Retrieving Programme Metadata... -- %@",[show showName]]];
     [self setPercentage:102];
     [tempShow setValue:@"Initialising..." forKey:@"status"];
@@ -212,7 +214,7 @@
     
     //Fix Show Name - Episode Name
     NSScanner *scanner2 = [NSScanner scannerWithString:episodeName];
-    if ([scanner2 scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:nil] && ![[show showName] hasSuffix:episodeName])
+    if ([scanner2 scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:nil] && ![[show showName] hasSuffix:episodeName] && ![[show showName] hasPrefix:episodeName])
         [show setShowName:[[show showName] stringByAppendingFormat:@" - %@",episodeName]];
     
     //Retrieve Episode Number
@@ -431,6 +433,7 @@
     [show setSuccessful:[NSNumber numberWithBool:NO]];
 	[self addToLog:@"Download Cancelled"];
     [errorTimer invalidate];
+    running=FALSE;
 }
 - (void)rtmpdumpFinished:(NSNotification *)finishedNote
 {
@@ -448,7 +451,7 @@
         NSDictionary *info = [NSDictionary dictionaryWithObject:show forKey:@"Programme"];
         [[NSNotificationCenter defaultCenter] postNotificationName:@"AddProgToHistory" object:self userInfo:info];
     }
-    else if (exitCode==1)
+    else if (exitCode==1 && running)
     {
         if ([[[task arguments] lastObject] isEqualTo:@"--resume"])
         {
@@ -479,6 +482,8 @@
             [request addRequestHeader:@"SOAPAction" value:@"\"http://tempuri.org/PlaylistService/GetPlaylist\""];
             [request setRequestMethod:@"POST"];
             [request setPostBody:[NSMutableData dataWithData:[body dataUsingEncoding:NSUTF8StringEncoding]]];
+            [request setDidFinishSelector:@selector(metaRequestFinished:)];
+            [request setDelegate:self];
             
             NSString *proxyOption = [[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"];
             if ([proxyOption isEqualToString:@"Custom"])
@@ -533,170 +538,7 @@
             
             [request setProxyType:@"HTTP"];
             [self addToLog:@"INFO: Requesting Auth." noTag:YES];
-            [request startSynchronous];
-            NSData *urlData = [request responseData];
-            
-            NSString *output;
-            if (urlData != nil)
-            {
-                output = [[NSString alloc] initWithData:urlData encoding:NSUTF8StringEncoding];
-                [self addToLog:@"INFO: Response recieved" noTag:YES];
-            }
-            else
-            {
-                NSLog(@"Could not retrieve program metadata");
-                [show setValue:[NSNumber numberWithBool:YES] forKey:@"complete"];
-                [show setValue:[NSNumber numberWithBool:NO] forKey:@"successful"];
-                [show setValue:@"Download Failed" forKey:@"status"];
-                [self addToLog:[NSString stringWithFormat:@"%@ Failed",[show showName]]];
-                [show setReasonForFailure:@"ITVUnknown"];
-                [nc postNotificationName:@"DownloadFinished" object:show];
-                return;
-            }
-            
-            
-            output = [output stringByReplacingOccurrencesOfString:@"&amp;" withString:@"&"];
-            scanner = [NSScanner scannerWithString:output];
-            //Retrieve Series Name
-            NSString *seriesName;
-            [scanner scanUpToString:@"<ProgrammeTitle>" intoString:nil];
-            [scanner scanString:@"<ProgrammeTitle>" intoString:nil];
-            [scanner scanUpToString:@"</ProgrammeTitle>" intoString:&seriesName];
-            [show setSeriesName:seriesName];
-            
-            //Retrieve Transmission Date
-            NSString *dateString;
-            [scanner scanUpToString:@"<TransmissionDate>" intoString:nil];
-            [scanner scanString:@"<TransmissionDate>" intoString:nil];
-            [scanner scanUpToString:@"</TransmissionDate>" intoString:&dateString];
-            NSDateFormatter *dateFormat = [[NSDateFormatter alloc] initWithDateFormat:@"dd LLLL yyyy" allowNaturalLanguage:NO];
-            [show setDateAired:[dateFormat dateFromString:dateString]];
-            
-            //Retrieve Episode Name
-            NSString *episodeName;
-            [scanner scanUpToString:@"<EpisodeTitle>" intoString:nil];
-            [scanner scanString:@"<EpisodeTitle>" intoString:nil];
-            [scanner scanUpToString:@"</EpisodeTitle>" intoString:&episodeName];
-            [show setEpisodeName:episodeName];
-            
-            //Retrieve Episode Number
-            NSInteger episodeNumber;
-            [scanner scanUpToString:@"<EpisodeNumber>" intoString:nil];
-            [scanner scanString:@"<EpisodeNumber>" intoString:nil];
-            [scanner scanInteger:&episodeNumber];
-            [show setEpisode:episodeNumber];
-            
-            //Retrieve Thumbnail URL
-            [scanner scanUpToString:@"<PosterFrame>" intoString:nil];
-            [scanner scanUpToString:@"CDATA" intoString:nil];
-            [scanner scanString:@"CDATA[" intoString:nil];
-            [scanner scanUpToString:@"]]" intoString:&thumbnailURL];
-            
-            //Retrieve Subtitle URL
-            [scanner scanUpToString:@"<ClosedCaptioning" intoString:nil];
-            if(![scanner scanString:@"<ClosedCaptioningURIs/>" intoString:nil])
-            {
-                [scanner scanUpToString:@"CDATA[" intoString:nil];
-                [scanner scanString:@"CDATA[" intoString:nil];
-                [scanner scanUpToString:@"]]" intoString:&subtitleURL];
-            }
-            
-            //Retrieve Auth URL
-            NSString *authURL;
-            [scanner scanUpToString:@"rtmpe://" intoString:nil];
-            [scanner scanUpToString:@"\"" intoString:&authURL];
-            
-            NSLog(@"Retrieving Playpath");
-            //Retrieve PlayPath
-            NSString *playPath;
-            NSArray *formatKeys = [NSArray arrayWithObjects:@"Flash - Very Low",@"Flash - Low",@"Flash - Standard",@"Flash - High",nil];
-            NSArray *formatObjects = [NSArray arrayWithObjects:@"400000",@"600000",@"800000",@"1200000",nil];
-            NSDictionary *formatDic = [NSDictionary dictionaryWithObjects:formatObjects forKeys:formatKeys];
-            [scanner scanUpToString:@"MediaFile delivery" intoString:nil];
-            [scanner scanString:@"MediaFile derlivery" intoString:nil];
-            [scanner scanUpToString:@"MediaFile delivery" intoString:nil];
-            NSUInteger location = [scanner scanLocation];
-            NSMutableArray *bitrates = [[NSMutableArray alloc] init];
-            NSLog(@"ITVFormatList = %@",formatList);
-            for (TVFormat *format in formatList)
-                [bitrates addObject:[formatDic objectForKey:[format format]]];
-            NSLog(@"Birates=%@",bitrates);
-            for (NSString *bitrate in bitrates)
-            {
-                NSLog(@"Bitrate = %@",bitrate);
-                [scanner scanUpToString:[NSString stringWithFormat:@"bitrate=\"%@",bitrate] intoString:nil];
-                if ([scanner scanString:[NSString stringWithFormat:@"bitrate=\"%@",bitrate] intoString:nil])
-                {
-                    NSLog(@"Found it");
-                    [scanner scanUpToString:@"CDATA" intoString:nil];
-                    [scanner scanString:@"CDATA[" intoString:nil];
-                    [scanner scanUpToString:@"]]" intoString:&playPath];
-                    break;
-                }
-                [scanner setScanLocation:location];
-            }
-            
-            [self addToLog:@"INFO: Program data processed." noTag:YES];
-            
-            //Create Download Path
-            downloadPath = [[NSUserDefaults standardUserDefaults] valueForKey:@"DownloadPath"];
-            downloadPath = [downloadPath stringByAppendingPathComponent:[show seriesName]];
-            [[NSFileManager defaultManager] createDirectoryAtPath:downloadPath withIntermediateDirectories:YES attributes:nil error:nil];
-            downloadPath = [downloadPath stringByAppendingPathComponent:[[NSString stringWithFormat:@"%@ - %@.partial.flv",[show seriesName],[show episodeName]] stringByReplacingOccurrencesOfString:@"/" withString:@"-"]];
-            
-            NSMutableArray *args = [NSMutableArray arrayWithObjects:
-                                    [NSString stringWithFormat:@"-r%@",authURL],
-                                    @"-Whttp://www.itv.com/mediaplayer/ITVMediaPlayer.swf?v=11.20.654",
-                                    [NSString stringWithFormat:@"-y%@",playPath],
-                                    [NSString stringWithFormat:@"-o%@",downloadPath],
-                                    nil];
-            
-            
-            task = [[NSTask alloc] init];
-            pipe = [[NSPipe alloc] init];
-            errorPipe = [[NSPipe alloc] init];
-            [task setLaunchPath:[[NSBundle mainBundle] pathForResource:@"rtmpdump-2.4" ofType:nil]];
-            [self addToLog:[NSString stringWithFormat:@"LaunchPath: %@",[task launchPath]] noTag:YES];
-            
-            /* rtmpdump -r "rtmpe://cp72511.edgefcs.net/ondemand?auth=eaEc.b4aodIcdbraJczd.aKchaza9cbdTc0cyaUc2aoblaLc3dsdkd5d9cBduczdLdn-bo64cN-eS-6ys1GDrlysDp&aifp=v002&slist=production/" -W http://www.itv.com/mediaplayer/ITVMediaPlayer.swf?v=11.20.654 -y "mp4:production/priority/CATCHUP/e48ab1e2/1a73/4620/adea/dda6f21f45ee/1-6178-0002-001_THE-ROYAL-VARIETY-PERFORMANCE-2011_TX141211_ITV1200_16X9.mp4" -o test2 */
-            
-            [task setArguments:[NSArray arrayWithArray:args]];
-            
-            
-            [task setStandardOutput:pipe];
-            [task setStandardError:errorPipe];
-            fh = [pipe fileHandleForReading];
-            errorFh = [errorPipe fileHandleForReading];
-            
-            NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:[task environment]];
-            [envVariableDictionary setObject:[[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"Contents/Resources"] forKey:@"DYLD_LIBRARY_PATH"];
-            [envVariableDictionary setObject:[@"~" stringByExpandingTildeInPath] forKey:@"HOME"];
-            [task setEnvironment:envVariableDictionary];
-            
-            
-            [nc addObserver:self
-                   selector:@selector(DownloadDataReady:)
-                       name:NSFileHandleReadCompletionNotification
-                     object:fh];
-            [nc addObserver:self
-                   selector:@selector(ErrorDataReady:)
-                       name:NSFileHandleReadCompletionNotification
-                     object:errorFh];
-            [nc addObserver:self 
-                   selector:@selector(rtmpdumpFinished:) 
-                       name:NSTaskDidTerminateNotification 
-                     object:task];
-            
-            [self addToLog:@"INFO: Launching RTMPDUMP..." noTag:YES];
-            [task launch];
-            [fh readInBackgroundAndNotify];
-            [errorFh readInBackgroundAndNotify];
-            [show setValue:@"Initiliasing..." forKey:@"status"];
-            
-            //Prepare UI
-            [self setCurrentProgress:[NSString stringWithFormat:@"Initialising RTMPDump... -- %@",[show showName]]];
-            [self setPercentage:102];
-
+            [request startAsynchronous];
             return;
         }
     }

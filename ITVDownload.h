@@ -39,6 +39,7 @@
     NSFileHandle *apFh;
     
     NSArray *formatList;
+    BOOL running;
 }
 - (id)initWithProgramme:(Programme *)tempShow itvFormats:(NSArray *)itvFormatList;
 - (void)processGetiPlayerOutput:(NSString *)outp;
