@@ -579,7 +579,7 @@
 							[p setValue:temp_tvNetwork forKey:@"tvNetwork"];
                             [p setUrl:url];
 							if ([temp_type isEqualToString:@"radio"]) [p setValue:[NSNumber numberWithBool:YES] forKey:@"radio"];
-							if ([[p showName] isEqualToString:[show showName]] || ([[p url] isEqualToString:[show url]] && [[show url] length] > 0))
+							if ([[p showName] isEqualToString:[show showName]] || ([[p url] isEqualToString:[show url]] && [show url]))
 							{
 								[show setValue:[p pid] forKey:@"pid"];
 								foundMatch=YES;
