@@ -212,10 +212,20 @@
     [scanner scanUpToString:@"</EpisodeTitle>" intoString:&episodeName];
     [show setEpisodeName:episodeName];
     
-    //Fix Show Name - Episode Name
-    NSScanner *scanner2 = [NSScanner scannerWithString:episodeName];
-    if ([scanner2 scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:nil] && ![[show showName] hasSuffix:episodeName] && ![[show showName] hasPrefix:episodeName])
-        [show setShowName:[[show showName] stringByAppendingFormat:@" - %@",episodeName]];
+    //Fix Showname
+    NSURLRequest *metaDataRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://www.itv.com/_app/Dynamic/CatchUpData.ashx?ViewType=5&Filter=%@",[show realPID]]]];
+    NSString *response = [[NSString alloc] initWithData:[NSURLConnection sendSynchronousRequest:metaDataRequest returningResponse:nil error:nil] encoding:NSUTF8StringEncoding];
+    NSScanner *metadataScanner = [NSScanner scannerWithString:response];
+    [metadataScanner scanUpToString:@"<h2>" intoString:nil];
+    [metadataScanner scanString:@"<h2>" intoString:nil];
+    NSString *description, *showname;
+    [metadataScanner scanUpToString:@"</h2>" intoString:&showname];
+    [metadataScanner scanUpToString:@"<p>" intoString:nil];
+    [metadataScanner scanString:@"<p>" intoString:nil];
+    [metadataScanner scanUpToString:@"</p>" intoString:&description];
+    [show setShowName:showname];
+    [show setDescription:description];
+    
     
     //Retrieve Episode Number
     NSInteger episodeNumber;
@@ -642,6 +652,8 @@
                           @"--TVEpisode",[show episodeName],
                           @"--title",[NSString stringWithFormat:@"%@ - %@",[show seriesName],[show episodeName]],
                           @"--artwork",[request downloadDestinationPath],
+                          @"--comment",[show description],
+                          @"--description",[show description],
                           @"--overWrite",
                           nil]];
     [nc addObserver:self

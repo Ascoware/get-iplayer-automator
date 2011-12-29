@@ -30,6 +30,7 @@
     NSString *availableModes;
     NSString *url;
     NSDate *dateAired;
+    NSString *description;
 }
 - (id)initWithInfo:(id)sender pid:(NSString *)PID programmeName:(NSString *)SHOWNAME network:(NSString *)TVNETWORK;
 - (id)initWithShow:(Programme *)show;
@@ -54,4 +55,5 @@
 @property (readwrite, assign) NSString *availableModes;
 @property (readwrite, assign) NSString *url;
 @property (readwrite, assign) NSDate *dateAired;
+@property (readwrite, assign) NSString *description;
 @end

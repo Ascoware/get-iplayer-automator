@@ -26,10 +26,11 @@ extern BOOL runDownloads;
 	timeadded = [[NSNumber alloc] init];
 	processedPID = [[NSNumber alloc] initWithBool:YES];
 	radio = [[NSNumber alloc] initWithBool:NO];
-	subtitlePath=nil;
-	realPID=nil;
-    reasonForFailure=nil;
-    availableModes=nil;
+	subtitlePath=[[NSString alloc] init];
+	realPID=[[NSString alloc] init];
+    reasonForFailure=[[NSString alloc] init];
+    availableModes=[[NSString alloc] init];
+    description=[[NSString alloc] init];
 	return self;
 }
 - (id)initWithShow:(Programme *)show
@@ -49,7 +50,8 @@ extern BOOL runDownloads;
 	realPID = [show realPID];
 	subtitlePath = [show subtitlePath];
     reasonForFailure=[show reasonForFailure];
-    availableModes=nil;
+    availableModes=[[NSString alloc] init];
+    description=[[NSString alloc] init];
 	return self;
 }
 - (id)init
@@ -74,10 +76,11 @@ extern BOOL runDownloads;
 	processedPID = [[NSNumber alloc] initWithBool:NO];
 	radio = [[NSNumber alloc] initWithBool:NO];
     url = [[NSString alloc] init];
-	realPID=nil;
-	subtitlePath=nil;
-    reasonForFailure=nil;
-    availableModes=nil;
+	realPID=[[NSString alloc] init];
+	subtitlePath=[[NSString alloc] init];
+    reasonForFailure=[[NSString alloc] init];
+    availableModes=[[NSString alloc] init];
+    description=[[NSString alloc] init];
 	return self;
 }
 - (id)description
@@ -116,9 +119,10 @@ extern BOOL runDownloads;
 	radio = [[coder decodeObjectForKey:@"radio"] retain];
 	realPID = [[coder decodeObjectForKey:@"realPID"] retain];
     url = [[coder decodeObjectForKey:@"url"] retain];
-	subtitlePath=nil;
-    reasonForFailure=nil;
-    availableModes=nil;
+	subtitlePath=[[NSString alloc] init];
+    reasonForFailure=[[NSString alloc] init];
+    availableModes=[[NSString alloc] init];
+    description=[[NSString alloc] init];
 	return self;
 }
 /*
@@ -154,4 +158,5 @@ extern BOOL runDownloads;
 @synthesize availableModes;
 @synthesize url;
 @synthesize dateAired;
+@synthesize description;
 @end
