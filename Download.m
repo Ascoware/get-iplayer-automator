@@ -31,12 +31,10 @@
 	if (b)
 	{
 		[nc postNotificationName:@"AddToLog" object:nil userInfo:[NSDictionary dictionaryWithObject:logMessage forKey:@"message"]];
-        NSLog(@"%@",logMessage);
 	}
 	else
 	{
 		[nc postNotificationName:@"AddToLog" object:self userInfo:[NSDictionary dictionaryWithObject:logMessage forKey:@"message"]];
-        NSLog(@"%@",logMessage);
 	}
 }
 - (void)addToLog:(NSString *)logMessage
