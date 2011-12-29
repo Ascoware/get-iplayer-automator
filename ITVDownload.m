@@ -659,6 +659,7 @@
                           @"--artwork",[request downloadDestinationPath],
                           @"--comment",[show desc],
                           @"--description",[show desc],
+                          @"--artist",[show tvNetwork],
                           @"--overWrite",
                           nil]];
     [nc addObserver:self
