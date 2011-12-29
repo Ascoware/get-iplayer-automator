@@ -113,7 +113,7 @@ sub get_metadata {
 
 	main::logger "DEBUG: Getting Metadata for $prog->{pid}:\n" if $opt->{debug};
 
-	# ITV Catch-Up metadata
+	# ITV Player metadata
 	my $prog_metadata_url_itv = 'http://www.itv.com/_app/Dynamic/CatchUpData.ashx?ViewType=5&Filter='; # +<pid>
 	$entry = main::request_url_retry($ua, "${prog_metadata_url_itv}$prog->{pid}", 3, '', '');
 	decode_entities($entry);
@@ -358,7 +358,7 @@ sub get_links {
 			my ( $name, $guidance, $channel, $episode, $desc, $pid, $available, $duration, $thumbnail );
 
 			$pid = $videoid;
-			$channel = 'ITV Catch-Up';
+			$channel = 'ITV Player';
 
 			# Skip if this pid is a duplicate
 			if ( defined $progref->{$pid} ) {
@@ -468,7 +468,7 @@ sub get_links {
 				my ( $name, $guidance, $channel, $episode, $desc, $pid, $available, $duration, $thumbnail );
 	
 				$pid = $videoid;
-				$channel = 'ITV Catch-Up';
+				$channel = 'ITV Player';
 	
 				# Skip if this pid is a duplicate
 				if ( defined $progref->{$pid} ) {
