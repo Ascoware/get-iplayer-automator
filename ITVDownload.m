@@ -402,7 +402,8 @@
 	//Parse each line individually.
 	for (NSString *output in array)
 	{
-        [self addToLog:output noTag:YES];
+        if (![output hasPrefix:@"frame="])
+            [self addToLog:output noTag:YES];
     }
 }
 - (void)processError
@@ -590,6 +591,10 @@
                selector:@selector(DownloadDataReady:)
                    name:NSFileHandleReadCompletionNotification
                  object:ffFh];
+        [nc addObserver:self 
+               selector:@selector(DownloadDataReady:) 
+                   name:NSFileHandleReadCompletionNotification 
+                 object:ffErrorFh];
         [nc addObserver:self 
                selector:@selector(ffmpegFinished:) 
                    name:NSTaskDidTerminateNotification 
