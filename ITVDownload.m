@@ -655,7 +655,7 @@
                           @"--TVSeasonNum",[NSString stringWithFormat:@"%ld",(long)[show season]],
                           @"--TVEpisodeNum",[NSString stringWithFormat:@"%ld",(long)[show episode]],
                           @"--TVEpisode",[show episodeName],
-                          @"--title",[NSString stringWithFormat:@"%@ - %@",[show seriesName],[show episodeName]],
+                          @"--title",[show showName],
                           @"--artwork",[request downloadDestinationPath],
                           @"--comment",[show desc],
                           @"--description",[show desc],
