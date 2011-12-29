@@ -440,7 +440,7 @@
     if ([d length] > 0) {
 		NSString *s = [[NSString alloc] initWithData:d
 											encoding:NSUTF8StringEncoding];
-		if ([s hasPrefix:@"INFO:"])
+		if ([s hasPrefix:@"INFO:"] || [s hasPrefix:@"WARNING:"] || [s hasPrefix:@"ERROR:"])
 		{
 			[self addToLog:[NSString stringWithString:s] :nil];
 			NSScanner *scanner = [NSScanner scannerWithString:s];
