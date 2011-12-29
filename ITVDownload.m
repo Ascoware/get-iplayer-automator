@@ -625,7 +625,7 @@
         [self addToLog:@"INFO: Downloading thumbnail" noTag:YES];
         
         ASIHTTPRequest *downloadThumb = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:thumbnailURL]];
-        [downloadThumb setDownloadDestinationPath:[[show path] stringByAppendingPathExtension:@".jpg"]];
+        [downloadThumb setDownloadDestinationPath:[[show path] stringByAppendingPathExtension:@"jpg"]];
         [downloadThumb setDelegate:self];
         [downloadThumb startAsynchronous];        
     }
@@ -687,7 +687,10 @@
 - (void)atomicParsleyFinished:(NSNotification *)finishedNote
 {
     if ([[finishedNote object] terminationStatus] == 0)
+    {
+        [[NSFileManager defaultManager] removeItemAtPath:[[show path] stringByAppendingPathExtension:@"jpg"] error:nil];
         [self addToLog:@"INFO: AtomicParsley Tagging finished." noTag:YES];
+    }
     else
         [self addToLog:@"INFO: Tagging failed." noTag:YES];
     
