@@ -280,7 +280,7 @@
     downloadPath = [[NSUserDefaults standardUserDefaults] valueForKey:@"DownloadPath"];
     downloadPath = [downloadPath stringByAppendingPathComponent:[show seriesName]];
     [[NSFileManager defaultManager] createDirectoryAtPath:downloadPath withIntermediateDirectories:YES attributes:nil error:nil];
-    downloadPath = [downloadPath stringByAppendingPathComponent:[[NSString stringWithFormat:@"%@ - %@.partial.flv",[show seriesName],[show episodeName]] stringByReplacingOccurrencesOfString:@"/" withString:@"-"]];
+    downloadPath = [downloadPath stringByAppendingPathComponent:[[[NSString stringWithFormat:@"%@.partial.flv",[show showName]] stringByReplacingOccurrencesOfString:@"/" withString:@"-"] stringByReplacingOccurrencesOfString:@":" withString:@" -"]];
     
     NSMutableArray *args = [NSMutableArray arrayWithObjects:
                             [NSString stringWithFormat:@"-r%@",authURL],
@@ -438,8 +438,8 @@
 - (void)rtmpdumpFinished:(NSNotification *)finishedNote
 {
     [self addToLog:@"RTMPDUMP finished"];
-    [nc removeObserver:self name:NSFileHandleReadCompletionNotification object:fh];
-	[nc removeObserver:self name:NSFileHandleReadCompletionNotification object:errorFh];
+    //[nc removeObserver:self name:NSFileHandleReadCompletionNotification object:fh];
+	//[nc removeObserver:self name:NSFileHandleReadCompletionNotification object:errorFh];
     [errorTimer invalidate];
     
     NSInteger exitCode=[[finishedNote object] terminationStatus];
@@ -455,7 +455,7 @@
     {
         if ([[[task arguments] lastObject] isEqualTo:@"--resume"])
         {
-            
+            [[NSFileManager defaultManager] removeItemAtPath:downloadPath error:nil];
             [self addToLog:@"WARNING: Download couldn't be resumed. Overwriting partial file." noTag:YES];
             [self addToLog:@"INFO: Preparing Request for Auth Info" noTag:YES];
             
@@ -615,6 +615,7 @@
     }
     else
     {
+        [self addToLog:[NSString stringWithFormat:@"INFO: Exit Code = %ld",(long)[[finishedNote object]terminationStatus]] noTag:YES];
         [show setValue:@"Download Complete" forKey:@"status"];
         [nc postNotificationName:@"DownloadFinished" object:show]; 
     }
