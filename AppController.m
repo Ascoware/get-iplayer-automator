@@ -1392,8 +1392,6 @@
 			}
 			[startButton setEnabled:NO];
 			[stopButton setEnabled:YES];
-			[currentIndicator setIndeterminate:NO];
-			[currentIndicator setDoubleValue:0.0];
 			
 		}
 		else
