@@ -223,6 +223,7 @@
     [metadataScanner scanUpToString:@"<p>" intoString:nil];
     [metadataScanner scanString:@"<p>" intoString:nil];
     [metadataScanner scanUpToString:@"</p>" intoString:&description];
+    showname = [NSString stringWithFormat:@"%@ - %@",showname,[show episodeName]];
     [show setShowName:showname];
     [show setDesc:description];
     
