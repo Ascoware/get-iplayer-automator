@@ -224,7 +224,7 @@
     [metadataScanner scanString:@"<p>" intoString:nil];
     [metadataScanner scanUpToString:@"</p>" intoString:&description];
     [show setShowName:showname];
-    [show setDescription:description];
+    [show setDesc:description];
     
     
     //Retrieve Episode Number
@@ -657,8 +657,8 @@
                           @"--TVEpisode",[show episodeName],
                           @"--title",[NSString stringWithFormat:@"%@ - %@",[show seriesName],[show episodeName]],
                           @"--artwork",[request downloadDestinationPath],
-                          @"--comment",[show description],
-                          @"--description",[show description],
+                          @"--comment",[show desc],
+                          @"--description",[show desc],
                           @"--overWrite",
                           nil]];
     [nc addObserver:self

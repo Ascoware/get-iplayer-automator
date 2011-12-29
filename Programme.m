@@ -30,7 +30,7 @@ extern BOOL runDownloads;
 	realPID=[[NSString alloc] init];
     reasonForFailure=[[NSString alloc] init];
     availableModes=[[NSString alloc] init];
-    description=[[NSString alloc] init];
+    desc=[[NSString alloc] init];
 	return self;
 }
 - (id)initWithShow:(Programme *)show
@@ -51,7 +51,7 @@ extern BOOL runDownloads;
 	subtitlePath = [show subtitlePath];
     reasonForFailure=[show reasonForFailure];
     availableModes=[[NSString alloc] init];
-    description=[[NSString alloc] init];
+    desc=[[NSString alloc] init];
 	return self;
 }
 - (id)init
@@ -80,7 +80,7 @@ extern BOOL runDownloads;
 	subtitlePath=[[NSString alloc] init];
     reasonForFailure=[[NSString alloc] init];
     availableModes=[[NSString alloc] init];
-    description=[[NSString alloc] init];
+    desc=[[NSString alloc] init];
 	return self;
 }
 - (id)description
@@ -122,7 +122,7 @@ extern BOOL runDownloads;
 	subtitlePath=[[NSString alloc] init];
     reasonForFailure=[[NSString alloc] init];
     availableModes=[[NSString alloc] init];
-    description=[[NSString alloc] init];
+    desc=[[NSString alloc] init];
 	return self;
 }
 /*
@@ -158,5 +158,5 @@ extern BOOL runDownloads;
 @synthesize availableModes;
 @synthesize url;
 @synthesize dateAired;
-@synthesize description;
+@synthesize desc;
 @end
