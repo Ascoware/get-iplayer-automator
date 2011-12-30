@@ -440,7 +440,7 @@
     if ([d length] > 0) {
 		NSString *s = [[NSString alloc] initWithData:d
 											encoding:NSUTF8StringEncoding];
-		if ([s hasPrefix:@"INFO:"] || [s hasPrefix:@"WARNING:"] || [s hasPrefix:@"ERROR:"])
+		if ([s hasPrefix:@"INFO:"])
 		{
 			[self addToLog:[NSString stringWithString:s] :nil];
 			NSScanner *scanner = [NSScanner scannerWithString:s];
@@ -451,6 +451,10 @@
 			infoMessage = nil;
 			scanner = nil;
 		}
+        else if ([s hasPrefix:@"WARNING:"] || [s hasPrefix:@"ERROR:"])
+        {
+            [self addToLog:s :nil];
+        }
 		else if ([s isEqualToString:@"."])
 		{
 			NSMutableString *infomessage = [[NSMutableString alloc] initWithFormat:@"%@.", [currentProgress stringValue]];
