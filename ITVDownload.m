@@ -27,7 +27,7 @@
 - (id)initWithProgramme:(Programme *)tempShow itvFormats:(NSArray *)itvFormatList
 {
     show = tempShow;
-    attemptNumber=0;
+    attemptNumber=1;
     nc = [NSNotificationCenter defaultCenter];
     
     running=TRUE;
@@ -395,6 +395,12 @@
             [self launchMetaRequest];
             return;
         }
+    }
+    else if (exitCode==2 && attemptNumber<4)
+    {
+        attemptNumber++;
+        [self addToLog:[NSString stringWithFormat:@"WARNING: Trying download again. Attempt %ld/4",(long)attemptNumber] noTag:YES];
+        [self launchMetaRequest];
     }
     else
     {
