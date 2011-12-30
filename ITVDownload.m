@@ -63,6 +63,8 @@
     [request setRequestMethod:@"POST"];
     [request setPostBody:[NSMutableData dataWithData:[body dataUsingEncoding:NSUTF8StringEncoding]]];
     [request setDidFinishSelector:@selector(metaRequestFinished:)];
+    [request setTimeOutSeconds:10];
+    [request setNumberOfTimesToRetryOnTimeout:3];
     [request setDelegate:self];
     
     NSString *proxyOption = [[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"];
@@ -495,6 +497,8 @@
             [request setPostBody:[NSMutableData dataWithData:[body dataUsingEncoding:NSUTF8StringEncoding]]];
             [request setDidFinishSelector:@selector(metaRequestFinished:)];
             [request setDelegate:self];
+            [request setTimeOutSeconds:10];
+            [request setNumberOfTimesToRetryOnTimeout:3];
             
             NSString *proxyOption = [[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"];
             if ([proxyOption isEqualToString:@"Custom"])
