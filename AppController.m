@@ -2005,6 +2005,7 @@
                 [self addToLog:@"Try setting iTunes to open in 32-bit mode." :nil];
                 if ([[NSAlert alertWithMessageText:@"File could not be added to iTunes," defaultButton:@"Help Me!" alternateButton:@"Do nothing" otherButton:nil informativeTextWithFormat:@"This is usually fixed by running iTunes in 32-bit mode. Would you like instructions to do this?"] runModal] == NSAlertDefaultReturn)
                     [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"http://support.apple.com/kb/TS3771"]];
+                [show setValue:@"Complete: Not in iTunes" forKey:@"status"];
             }
 		}
 		else
