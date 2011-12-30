@@ -399,41 +399,13 @@
     
     NSInteger exitCode=[[finishedNote object] terminationStatus];
     NSLog(@"Exit Code = %ld",(long)exitCode);
-    if (exitCode==0)
+    if (exitCode==0) //RTMPDump is successful
     {
         [show setComplete:[NSNumber numberWithBool:YES]];
         [show setSuccessful:[NSNumber numberWithBool:YES]];
         NSDictionary *info = [NSDictionary dictionaryWithObject:show forKey:@"Programme"];
         [[NSNotificationCenter defaultCenter] postNotificationName:@"AddProgToHistory" object:self userInfo:info];
-    }
-    else if (exitCode==1 && running)
-    {
-        if ([[[task arguments] lastObject] isEqualTo:@"--resume"])
-        {
-            [[NSFileManager defaultManager] removeItemAtPath:downloadPath error:nil];
-            [self addToLog:@"WARNING: Download couldn't be resumed. Overwriting partial file." noTag:YES];
-            [self addToLog:@"INFO: Preparing Request for Auth Info" noTag:YES];
-            [self launchMetaRequest];
-            return;
-        }
-    }
-    else if (exitCode==2 && attemptNumber<4)
-    {
-        attemptNumber++;
-        [self addToLog:[NSString stringWithFormat:@"WARNING: Trying download again. Attempt %ld/4",(long)attemptNumber] noTag:YES];
-        [self launchMetaRequest];
-    }
-    else
-    {
-        [show setSuccessful:[NSNumber numberWithBool:NO]];
-        [show setComplete:[NSNumber numberWithBool:YES]];
-        [show setReasonForFailure:@"Unknown"];
-        [nc postNotificationName:@"DownloadFinished" object:show];
-        [show setValue:@"Download Failed" forKey:@"status"];
-    }
-    
-    if ([[show successful] boolValue])
-    {
+        
         ffTask = [[NSTask alloc] init];
         ffPipe = [[NSPipe alloc] init];
         ffErrorPipe = [[NSPipe alloc] init];
@@ -456,7 +428,7 @@
                               @"-acodec",@"copy",
                               [NSString stringWithFormat:@"%@",completeDownloadPath],
                               nil]];
-
+        
         [nc addObserver:self
                selector:@selector(DownloadDataReady:)
                    name:NSFileHandleReadCompletionNotification
@@ -469,7 +441,7 @@
                selector:@selector(ffmpegFinished:) 
                    name:NSTaskDidTerminateNotification 
                  object:ffTask];
-
+        
         [ffTask launch];
         [ffFh readInBackgroundAndNotify];
         [ffErrorFh readInBackgroundAndNotify];
@@ -478,6 +450,31 @@
         [show setStatus:@"Converting..."];
         [self addToLog:@"INFO: Converting FLV File to MP4" noTag:YES];
         [self setPercentage:102];
+    }
+    else if (exitCode==1 && running) //RTMPDump could not resume
+    {
+        if ([[[task arguments] lastObject] isEqualTo:@"--resume"])
+        {
+            [[NSFileManager defaultManager] removeItemAtPath:downloadPath error:nil];
+            [self addToLog:@"WARNING: Download couldn't be resumed. Overwriting partial file." noTag:YES];
+            [self addToLog:@"INFO: Preparing Request for Auth Info" noTag:YES];
+            [self launchMetaRequest];
+            return;
+        }
+    }
+    else if (exitCode==2 && attemptNumber<4 && running) //RTMPDump lost connection but should be able to resume.
+    {
+        attemptNumber++;
+        [self addToLog:[NSString stringWithFormat:@"WARNING: Trying download again. Attempt %ld/4",(long)attemptNumber] noTag:YES];
+        [self launchMetaRequest];
+    }
+    else //Some undocumented exit code or too many attempts
+    {
+        [show setSuccessful:[NSNumber numberWithBool:NO]];
+        [show setComplete:[NSNumber numberWithBool:YES]];
+        [show setReasonForFailure:@"Unknown"];
+        [nc postNotificationName:@"DownloadFinished" object:show];
+        [show setValue:@"Download Failed" forKey:@"status"];
     }
     [errorTimer invalidate];
 }
