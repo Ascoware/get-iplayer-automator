@@ -12,8 +12,8 @@ using the menu item located in the application menu.</string>
 If you are in the UK the proxy in preferences should be set to none.
 If you are outside the UK, please either specify a new proxy of your own or use the one that is 
 provided.</string>
-<key>Internet_Connection</key>
-<string>The ITV site could not be contacted. Please check
+	<key>Internet_Connection</key>
+	<string>The ITV site could not be contacted. Please check
 your internet connection.</string>
 	<key>Specified_Modes</key>
 	<string>None of the download formats you specified were available for this show.
@@ -32,8 +32,10 @@ remove it, and try again.</string>
 	<key>FileExists</key>
 	<string>This show already exists in the download directory. If you would
 like to download it again, delete the file first.</string>
-    <key>Outside_UK</key>
-    <string>ITV thinks you are outside the UK. Please enable the provided
+	<key>Outside_UK</key>
+	<string>ITV thinks you are outside the UK. Please enable the provided
 proxy option in preferences.</string>
+	<key>MetadataProcessing</key>
+	<string>GiA could not process this programme. Please submit a bug report.</string>
 </dict>
 </plist>

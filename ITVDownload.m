@@ -225,13 +225,24 @@
     downloadPath = [downloadPath stringByAppendingPathComponent:[show seriesName]];
     [[NSFileManager defaultManager] createDirectoryAtPath:downloadPath withIntermediateDirectories:YES attributes:nil error:nil];
     downloadPath = [downloadPath stringByAppendingPathComponent:[[[NSString stringWithFormat:@"%@.partial.flv",[show showName]] stringByReplacingOccurrencesOfString:@"/" withString:@"-"] stringByReplacingOccurrencesOfString:@":" withString:@" -"]];
-    
-    NSMutableArray *args = [NSMutableArray arrayWithObjects:
-                            [NSString stringWithFormat:@"-r%@",authURL],
-                            @"-Whttp://www.itv.com/mediaplayer/ITVMediaPlayer.swf?v=11.20.654",
-                            [NSString stringWithFormat:@"-y%@",playPath],
-                            [NSString stringWithFormat:@"-o%@",downloadPath],
-                            nil];
+    NSMutableArray *args;
+    @try {
+        args = [NSMutableArray arrayWithObjects:
+                                [NSString stringWithFormat:@"-r%@",authURL],
+                                @"-Whttp://www.itv.com/mediaplayer/ITVMediaPlayer.swf?v=11.20.654",
+                                [NSString stringWithFormat:@"-y%@",playPath],
+                                [NSString stringWithFormat:@"-o%@",downloadPath],
+                                nil];
+    }
+    @catch (NSException *exception) {
+        [self addToLog:@"ERROR: Could not process ITV metadata." noTag:YES];
+        [show setComplete:[NSNumber numberWithBool:YES]];
+        [show setSuccessful:[NSNumber numberWithBool:NO]];
+        [show setValue:@"Download Failed" forKey:@"status"];
+        [show setReasonForFailure:@"MetadataProcessing"];
+        [nc postNotificationName:@"DownloadFinished" object:show];
+        return;
+    }
     
     if ([[NSFileManager defaultManager] fileExistsAtPath:[[[downloadPath stringByDeletingPathExtension] stringByDeletingPathExtension] stringByAppendingPathExtension:@"mp4"]])
     {
