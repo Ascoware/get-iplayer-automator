@@ -1967,7 +1967,8 @@
 		if ([ext isEqualToString:@"mov"] || [ext isEqualToString:@"mp4"] || [ext isEqualToString:@"mp3"] || [ext isEqualToString:@"m4a"])
 		{
 			iTunesTrack *track = [iTunes add:fileToAdd to:nil];
-			if (track && ([ext isEqualToString:@"mov"] || [ext isEqualToString:@"mp4"]))
+            NSLog(@"Track exists = %@", ([track exists] ? @"YES" : @"NO"));
+			if ([track exists] && ([ext isEqualToString:@"mov"] || [ext isEqualToString:@"mp4"]))
 			{
 				if ([ext isEqualToString:@"mov"])
 				{
@@ -1980,8 +1981,9 @@
 					if ([show episode]>0) [track setEpisodeNumber:[show episode]];
 				}
 				[track setUnplayed:YES];
+                [show setValue:@"Complete & in iTunes" forKey:@"status"];
 			}
-			else if (track && ([ext isEqualToString:@"mp3"] || [ext isEqualToString:@"m4a"]))
+			else if ([track exists] && ([ext isEqualToString:@"mp3"] || [ext isEqualToString:@"m4a"]))
 			{
 				//[self addToLog:@"Setting Podcast Metadata:" :self];
 				[track setBookmarkable:YES];
@@ -1995,8 +1997,15 @@
 				//[track setArtist:[show tvNetwork]];
 				//[self addToLog:@"	Artist set" :self];
 				[self addToLog:@"All Metadata set." :self];
+                [show setValue:@"Complete & in iTunes" forKey:@"status"];
 			}
-			[show setValue:@"Complete & in iTunes" forKey:@"status"];
+			else
+            {
+                [self addToLog:@"iTunes did not accept file." :nil];
+                [self addToLog:@"Try setting iTunes to open in 32-bit mode." :nil];
+                if ([[NSAlert alertWithMessageText:@"File could not be added to iTunes," defaultButton:@"Help Me!" alternateButton:@"Do nothing" otherButton:nil informativeTextWithFormat:@"This is usually fixed by running iTunes in 32-bit mode. Would you like instructions to do this?"] runModal] == NSAlertDefaultReturn)
+                    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"http://support.apple.com/kb/TS3771"]];
+            }
 		}
 		else
 		{
