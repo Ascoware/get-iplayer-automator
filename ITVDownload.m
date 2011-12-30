@@ -130,10 +130,15 @@
     
     //Retrieve Episode Name
     NSString *episodeName;
-    [scanner scanUpToString:@"<EpisodeTitle>" intoString:nil];
-    [scanner scanString:@"<EpisodeTitle>" intoString:nil];
-    [scanner scanUpToString:@"</EpisodeTitle>" intoString:&episodeName];
-    [show setEpisodeName:episodeName];
+    [scanner scanUpToString:@"<EpisodeTitle" intoString:nil];
+    if (![scanner scanString:@"<EpisodeTitle/>" intoString:nil])
+    {
+        [scanner scanString:@"<EpisodeTitle>" intoString:nil];
+        [scanner scanUpToString:@"</EpisodeTitle>" intoString:&episodeName];
+        [show setEpisodeName:episodeName];
+    }
+    else
+        [show setEpisodeName:@"(No Episode Name)"];
     
     //Fix Showname
     NSURLRequest *metaDataRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://www.itv.com/_app/Dynamic/CatchUpData.ashx?ViewType=5&Filter=%@",[show realPID]]]];
@@ -153,10 +158,15 @@
     
     //Retrieve Episode Number
     NSInteger episodeNumber;
-    [scanner scanUpToString:@"<EpisodeNumber>" intoString:nil];
-    [scanner scanString:@"<EpisodeNumber>" intoString:nil];
-    [scanner scanInteger:&episodeNumber];
-    [show setEpisode:episodeNumber];
+    [scanner scanUpToString:@"<EpisodeNumber" intoString:nil];
+    if (![scanner scanString:@"<EpisodeNumber/>" intoString:nil])
+    {
+        [scanner scanString:@"<EpisodeNumber>" intoString:nil];
+        [scanner scanInteger:&episodeNumber];
+        [show setEpisode:episodeNumber];
+    }
+    else
+        [show setEpisode:0];
     
     //Retrieve Thumbnail URL
     [scanner scanUpToString:@"<PosterFrame>" intoString:nil];
