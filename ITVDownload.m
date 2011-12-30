@@ -27,6 +27,7 @@
 - (id)initWithProgramme:(Programme *)tempShow itvFormats:(NSArray *)itvFormatList
 {
     show = tempShow;
+    attemptNumber=0;
     nc = [NSNotificationCenter defaultCenter];
     
     running=TRUE;
@@ -39,88 +40,8 @@
     [self addToLog:[NSString stringWithFormat:@"Downloading %@",[show showName]] noTag:NO];
     [self addToLog:@"INFO: Preparing Request for Auth Info" noTag:YES];
     
+    [self launchMetaRequest];
     
-    errorCache = [[NSMutableString alloc] initWithString:@""];
-    errorTimer = [NSTimer scheduledTimerWithTimeInterval:.25 target:self selector:@selector(processError) userInfo:nil repeats:YES];
-    
-    NSString *body = [[NSString alloc] initWithData:[NSData dataWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"Body" ofType:nil]] 
-                                           encoding:NSUTF8StringEncoding];
-    NSString *temp_id;
-    NSScanner *scanner = [NSScanner scannerWithString:[show url]];
-    [scanner scanUpToString:@"Filter=" intoString:nil];
-    [scanner scanString:@"Filter=" intoString:nil];
-    [scanner scanUpToString:@"kljkjj" intoString:&temp_id];
-    [show setRealPID:temp_id];
-    body = [body stringByReplacingOccurrencesOfString:@"!!!ID!!!" withString:temp_id];
-        
-    
-    NSURL *requestURL = [[NSURL alloc] initWithString:@"http://mercury.itv.com/PlaylistService.svc"];
-    
-    ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:requestURL];
-    [request addRequestHeader:@"Referer" value:@"http://www.itv.com/mercury/Mercury_VideoPlayer.swf?v=1.5.309/[[DYNAMIC]]/2"];
-    [request addRequestHeader:@"Content-Type" value:@"text/xml; charset=utf-8"];
-    [request addRequestHeader:@"SOAPAction" value:@"\"http://tempuri.org/PlaylistService/GetPlaylist\""];
-    [request setRequestMethod:@"POST"];
-    [request setPostBody:[NSMutableData dataWithData:[body dataUsingEncoding:NSUTF8StringEncoding]]];
-    [request setDidFinishSelector:@selector(metaRequestFinished:)];
-    [request setTimeOutSeconds:10];
-    [request setNumberOfTimesToRetryOnTimeout:3];
-    [request setDelegate:self];
-    
-    NSString *proxyOption = [[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"];
-	if ([proxyOption isEqualToString:@"Custom"])
-	{
-        NSString *proxyHost;
-        NSInteger proxyPort;
-		scanner = [NSScanner scannerWithString:[[NSUserDefaults standardUserDefaults] valueForKey:@"CustomProxy"]];
-        [scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:nil];
-        [scanner scanUpToString:@":" intoString:&proxyHost];
-        [scanner scanString:@":" intoString:nil];
-        if ([scanner scanInteger:&proxyPort]) [request setProxyPort:proxyPort];
-        [request setProxyHost:proxyHost];
-        [self addToLog:[NSString stringWithFormat:@"INFO: Using proxy %@",[[NSUserDefaults standardUserDefaults] valueForKey:@"CustomProxy"]] noTag:YES];
-	}
-	else if ([proxyOption isEqualToString:@"Provided"])
-	{
-		//Get provided proxy from my server.
-		NSURL *proxyURL = [[NSURL alloc] initWithString:@"http://tom-tech.com/get_iplayer/proxy.txt"];
-		NSURLRequest *proxyRequest = [NSURLRequest requestWithURL:proxyURL
-													  cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
-												  timeoutInterval:30];
-		NSData *urlData;
-		NSURLResponse *response;
-		NSError *error;
-		urlData = [NSURLConnection sendSynchronousRequest:proxyRequest
-										returningResponse:&response
-													error:&error];
-		if (!urlData)
-		{
-			NSAlert *alert = [NSAlert alertWithMessageText:@"Provided Proxy could not be retrieved!" 
-											 defaultButton:nil 
-										   alternateButton:nil 
-											   otherButton:nil 
-								 informativeTextWithFormat:@"No proxy will be used.\r\rError: %@", [error localizedDescription]];
-			[alert runModal];
-			[self addToLog:@"WARNING: Proxy could not be retrieved. No proxy will be used."];
-		}
-		else
-		{
-            NSString *providedProxy = [[NSString alloc] initWithData:urlData encoding:NSUTF8StringEncoding];
-            scanner = [NSScanner scannerWithString:providedProxy];
-            NSString *proxyHost;
-            NSInteger proxyPort;
-            [scanner scanUpToString:@":" intoString:&proxyHost];
-            [scanner scanString:@":" intoString:nil];
-            [scanner scanInteger:&proxyPort];
-            [request setProxyHost:proxyHost];
-            [request setProxyPort:proxyPort];
-            [self addToLog:[NSString stringWithFormat:@"INFO: Using proxy %@",providedProxy] noTag:YES];
-		}
-	}
-
-    [request setProxyType:@"HTTP"];
-    [self addToLog:@"INFO: Requesting Auth." noTag:YES];
-    [request startAsynchronous];
     return self;
 }
 -(void)metaRequestFinished:(ASIHTTPRequest *)request
@@ -471,89 +392,7 @@
             [[NSFileManager defaultManager] removeItemAtPath:downloadPath error:nil];
             [self addToLog:@"WARNING: Download couldn't be resumed. Overwriting partial file." noTag:YES];
             [self addToLog:@"INFO: Preparing Request for Auth Info" noTag:YES];
-            
-            
-            errorCache = [[NSMutableString alloc] initWithString:@""];
-            errorTimer = [NSTimer scheduledTimerWithTimeInterval:.25 target:self selector:@selector(processError) userInfo:nil repeats:YES];
-            
-            NSString *body = [[NSString alloc] initWithData:[NSData dataWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"Body" ofType:nil]] 
-                                                   encoding:NSUTF8StringEncoding];
-            NSString *temp_id;
-            NSScanner *scanner = [NSScanner scannerWithString:[show url]];
-            [scanner scanUpToString:@"Filter=" intoString:nil];
-            [scanner scanString:@"Filter=" intoString:nil];
-            [scanner scanUpToString:@"kljkjj" intoString:&temp_id];
-            [show setRealPID:temp_id];
-            body = [body stringByReplacingOccurrencesOfString:@"!!!ID!!!" withString:temp_id];
-            
-            
-            NSURL *requestURL = [[NSURL alloc] initWithString:@"http://mercury.itv.com/PlaylistService.svc"];
-            
-            ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:requestURL];
-            [request addRequestHeader:@"Referer" value:@"http://www.itv.com/mercury/Mercury_VideoPlayer.swf?v=1.5.309/[[DYNAMIC]]/2"];
-            [request addRequestHeader:@"Content-Type" value:@"text/xml; charset=utf-8"];
-            [request addRequestHeader:@"SOAPAction" value:@"\"http://tempuri.org/PlaylistService/GetPlaylist\""];
-            [request setRequestMethod:@"POST"];
-            [request setPostBody:[NSMutableData dataWithData:[body dataUsingEncoding:NSUTF8StringEncoding]]];
-            [request setDidFinishSelector:@selector(metaRequestFinished:)];
-            [request setDelegate:self];
-            [request setTimeOutSeconds:10];
-            [request setNumberOfTimesToRetryOnTimeout:3];
-            
-            NSString *proxyOption = [[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"];
-            if ([proxyOption isEqualToString:@"Custom"])
-            {
-                NSString *proxyHost;
-                NSInteger proxyPort;
-                scanner = [NSScanner scannerWithString:[[NSUserDefaults standardUserDefaults] valueForKey:@"CustomProxy"]];
-                [scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:nil];
-                [scanner scanUpToString:@":" intoString:&proxyHost];
-                [scanner scanString:@":" intoString:nil];
-                if ([scanner scanInteger:&proxyPort]) [request setProxyPort:proxyPort];
-                [request setProxyHost:proxyHost];
-                [self addToLog:[NSString stringWithFormat:@"INFO: Using proxy %@",[[NSUserDefaults standardUserDefaults] valueForKey:@"CustomProxy"]] noTag:YES];
-            }
-            else
-            {
-                //Get provided proxy from my server.
-                NSURL *proxyURL = [[NSURL alloc] initWithString:@"http://tom-tech.com/get_iplayer/proxy.txt"];
-                NSURLRequest *proxyRequest = [NSURLRequest requestWithURL:proxyURL
-                                                              cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
-                                                          timeoutInterval:30];
-                NSData *urlData;
-                NSURLResponse *response;
-                NSError *error;
-                urlData = [NSURLConnection sendSynchronousRequest:proxyRequest
-                                                returningResponse:&response
-                                                            error:&error];
-                if (!urlData)
-                {
-                    NSAlert *alert = [NSAlert alertWithMessageText:@"Provided Proxy could not be retrieved!" 
-                                                     defaultButton:nil 
-                                                   alternateButton:nil 
-                                                       otherButton:nil 
-                                         informativeTextWithFormat:@"No proxy will be used.\r\rError: %@", [error localizedDescription]];
-                    [alert runModal];
-                    [self addToLog:@"WARNING: Proxy could not be retrieved. No proxy will be used."];
-                }
-                else
-                {
-                    NSString *providedProxy = [[NSString alloc] initWithData:urlData encoding:NSUTF8StringEncoding];
-                    scanner = [NSScanner scannerWithString:providedProxy];
-                    NSString *proxyHost;
-                    NSInteger proxyPort;
-                    [scanner scanUpToString:@":" intoString:&proxyHost];
-                    [scanner scanString:@":" intoString:nil];
-                    [scanner scanInteger:&proxyPort];
-                    [request setProxyHost:proxyHost];
-                    [request setProxyPort:proxyPort];
-                    [self addToLog:[NSString stringWithFormat:@"INFO: Using proxy %@",providedProxy] noTag:YES];
-                }
-            }
-            
-            [request setProxyType:@"HTTP"];
-            [self addToLog:@"INFO: Requesting Auth." noTag:YES];
-            [request startAsynchronous];
+            [self launchMetaRequest];
             return;
         }
     }
@@ -701,5 +540,89 @@
     [show setValue:@"Download Complete" forKey:@"status"];
     
     [nc postNotificationName:@"DownloadFinished" object:show];
+}
+- (void)launchMetaRequest
+{
+    errorCache = [[NSMutableString alloc] initWithString:@""];
+    errorTimer = [NSTimer scheduledTimerWithTimeInterval:.25 target:self selector:@selector(processError) userInfo:nil repeats:YES];
+    
+    NSString *body = [[NSString alloc] initWithData:[NSData dataWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"Body" ofType:nil]] 
+                                           encoding:NSUTF8StringEncoding];
+    NSString *temp_id;
+    NSScanner *scanner = [NSScanner scannerWithString:[show url]];
+    [scanner scanUpToString:@"Filter=" intoString:nil];
+    [scanner scanString:@"Filter=" intoString:nil];
+    [scanner scanUpToString:@"kljkjj" intoString:&temp_id];
+    [show setRealPID:temp_id];
+    body = [body stringByReplacingOccurrencesOfString:@"!!!ID!!!" withString:temp_id];
+    
+    
+    NSURL *requestURL = [[NSURL alloc] initWithString:@"http://mercury.itv.com/PlaylistService.svc"];
+    
+    ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:requestURL];
+    [request addRequestHeader:@"Referer" value:@"http://www.itv.com/mercury/Mercury_VideoPlayer.swf?v=1.5.309/[[DYNAMIC]]/2"];
+    [request addRequestHeader:@"Content-Type" value:@"text/xml; charset=utf-8"];
+    [request addRequestHeader:@"SOAPAction" value:@"\"http://tempuri.org/PlaylistService/GetPlaylist\""];
+    [request setRequestMethod:@"POST"];
+    [request setPostBody:[NSMutableData dataWithData:[body dataUsingEncoding:NSUTF8StringEncoding]]];
+    [request setDidFinishSelector:@selector(metaRequestFinished:)];
+    [request setTimeOutSeconds:10];
+    [request setNumberOfTimesToRetryOnTimeout:3];
+    [request setDelegate:self];
+    
+    NSString *proxyOption = [[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"];
+	if ([proxyOption isEqualToString:@"Custom"])
+	{
+        NSString *proxyHost;
+        NSInteger proxyPort;
+		scanner = [NSScanner scannerWithString:[[NSUserDefaults standardUserDefaults] valueForKey:@"CustomProxy"]];
+        [scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:nil];
+        [scanner scanUpToString:@":" intoString:&proxyHost];
+        [scanner scanString:@":" intoString:nil];
+        if ([scanner scanInteger:&proxyPort]) [request setProxyPort:proxyPort];
+        [request setProxyHost:proxyHost];
+        [self addToLog:[NSString stringWithFormat:@"INFO: Using proxy %@",[[NSUserDefaults standardUserDefaults] valueForKey:@"CustomProxy"]] noTag:YES];
+	}
+	else if ([proxyOption isEqualToString:@"Provided"])
+	{
+		//Get provided proxy from my server.
+		NSURL *proxyURL = [[NSURL alloc] initWithString:@"http://tom-tech.com/get_iplayer/proxy.txt"];
+		NSURLRequest *proxyRequest = [NSURLRequest requestWithURL:proxyURL
+													  cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
+												  timeoutInterval:30];
+		NSData *urlData;
+		NSURLResponse *response;
+		NSError *error;
+		urlData = [NSURLConnection sendSynchronousRequest:proxyRequest
+										returningResponse:&response
+													error:&error];
+		if (!urlData)
+		{
+			NSAlert *alert = [NSAlert alertWithMessageText:@"Provided Proxy could not be retrieved!" 
+											 defaultButton:nil 
+										   alternateButton:nil 
+											   otherButton:nil 
+								 informativeTextWithFormat:@"No proxy will be used.\r\rError: %@", [error localizedDescription]];
+			[alert runModal];
+			[self addToLog:@"WARNING: Proxy could not be retrieved. No proxy will be used."];
+		}
+		else
+		{
+            NSString *providedProxy = [[NSString alloc] initWithData:urlData encoding:NSUTF8StringEncoding];
+            scanner = [NSScanner scannerWithString:providedProxy];
+            NSString *proxyHost;
+            NSInteger proxyPort;
+            [scanner scanUpToString:@":" intoString:&proxyHost];
+            [scanner scanString:@":" intoString:nil];
+            [scanner scanInteger:&proxyPort];
+            [request setProxyHost:proxyHost];
+            [request setProxyPort:proxyPort];
+            [self addToLog:[NSString stringWithFormat:@"INFO: Using proxy %@",providedProxy] noTag:YES];
+		}
+	}
+    
+    [request setProxyType:@"HTTP"];
+    [self addToLog:@"INFO: Requesting Auth." noTag:YES];
+    [request startAsynchronous];
 }
 @end

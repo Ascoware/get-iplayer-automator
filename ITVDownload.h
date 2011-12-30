@@ -40,7 +40,10 @@
     
     NSArray *formatList;
     BOOL running;
+    
+    NSInteger attemptNumber;
 }
 - (id)initWithProgramme:(Programme *)tempShow itvFormats:(NSArray *)itvFormatList;
 - (void)processGetiPlayerOutput:(NSString *)outp;
+- (void)launchMetaRequest;
 @end
