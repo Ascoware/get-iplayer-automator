@@ -18,16 +18,7 @@ extern bool runDownloads;
 @interface BBCDownload : Download {
 	NSString *profileDirArg;
 	
-	NSTask *task;
-	NSPipe *pipe;
-	NSPipe *errorPipe;
-	NSFileHandle *fh;
-	NSFileHandle *errorFh;
-	
-	NSMutableString *errorCache;
-	NSTimer *processErrorCache;
 	BOOL runAgain;
-	BOOL running;
 	int i;
 	
 	BOOL foundLastLine;

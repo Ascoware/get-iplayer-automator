@@ -20,6 +20,37 @@
 	double oldRateAverage;
 	int outOfRange;
     NSMutableString *log;
+    
+    //RTMPDump Task
+    NSTask *task;
+    NSPipe *pipe;
+    NSPipe *errorPipe;
+    NSFileHandle *fh;
+    NSFileHandle *errorFh;
+    NSMutableString *errorCache;
+    NSTimer *processErrorCache;
+    
+    //ffmpeg Conversion
+    NSTask *ffTask;
+    NSPipe *ffPipe;
+    NSPipe *ffErrorPipe;
+    NSFileHandle *ffFh;
+    NSFileHandle *ffErrorFh;
+    
+    //AtomicParsley Tagging
+    NSTask *apTask;
+    NSPipe *apPipe;
+    NSFileHandle *apFh;
+    
+    //Download Information
+    NSString *subtitleURL;
+    NSString *thumbnailURL;
+    NSString *downloadPath;
+    
+    NSArray *formatList;
+    BOOL running;
+    
+    NSInteger attemptNumber;
 }
 - (void)setCurrentProgress:(NSString *)string;
 - (void)setPercentage:(double)d;
@@ -27,5 +58,11 @@
 - (void)addToLog:(NSString *)logMessage noTag:(BOOL)b;
 - (void)addToLog:(NSString *)logMessage;
 - (void)processFLVStreamerMessage:(NSString *)message;
+
+
+- (void)launchRTMPDumpWithArgs:(NSMutableArray *)args;
+- (void)processGetiPlayerOutput:(NSString *)outp;
+- (void)launchMetaRequest;
+
 @property (readonly) Programme *show;
 @end
