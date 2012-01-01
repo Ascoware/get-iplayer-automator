@@ -24,6 +24,7 @@ bool runUpdate=NO;
 	NSString *currentTypeArgument;
 	IBOutlet NSWindow *mainWindow;
 	IBOutlet NSApplication *application;
+    IBOutlet NSWindow *historyWindow;
 	
 	//Log Components
 	IBOutlet NSTextView *log;
@@ -52,6 +53,7 @@ bool runUpdate=NO;
 	IBOutlet NSProgressIndicator *pvrSearchIndicator;
 	IBOutlet NSArrayController *pvrResultsController;
 	IBOutlet NSArrayController *pvrQueueController;
+    IBOutlet NSPanel *pvrPanel;
 	NSMutableArray *pvrSearchResultsArray;
 	NSTask *pvrSearchTask;
 	NSPipe *pvrSearchPipe;
@@ -84,6 +86,7 @@ bool runUpdate=NO;
 	IBOutlet NSArrayController *radioFormatController;
     IBOutlet NSArrayController *itvFormatController;
     IBOutlet NSButton *itvTVCheckbox;
+    IBOutlet NSPanel *prefsPanel;
 	
 	//Scheduling a Start
 	IBOutlet NSPanel *scheduleWindow;
@@ -132,6 +135,7 @@ bool runUpdate=NO;
 - (IBAction)chooseDownloadPath:(id)sender;
 - (IBAction)restoreDefaults:(id)sender;
 - (IBAction)showFeedback:(id)sender;
+- (IBAction)closeWindow:(id)sender;
 
 //Queue
 - (IBAction)addToQueue:(id)sender;

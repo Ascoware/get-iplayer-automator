@@ -1955,6 +1955,13 @@
 }
 
 #pragma mark Misc.
+- (IBAction)closeWindow:(id)sender
+{
+    if ([logWindow isKeyWindow]) [logWindow performClose:self];
+    else if ([historyWindow isKeyWindow]) [historyWindow performClose:self];
+    else if ([pvrPanel isKeyWindow]) [pvrPanel performClose:self];
+    else if ([prefsPanel isKeyWindow]) [prefsPanel performClose:self];
+}
 - (void)addToiTunes:(Programme *)show
 {
 	NSString *path = [[NSString alloc] initWithString:[show path]];
