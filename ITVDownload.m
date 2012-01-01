@@ -135,25 +135,32 @@
     {
         [scanner scanString:@"<EpisodeTitle>" intoString:nil];
         [scanner scanUpToString:@"</EpisodeTitle>" intoString:&episodeName];
+        if (!episodeName) episodeName=@"(No Episode Name)";
         [show setEpisodeName:episodeName];
     }
     else
         [show setEpisodeName:@"(No Episode Name)"];
     
-    //Fix Showname
-    NSURLRequest *metaDataRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://www.itv.com/_app/Dynamic/CatchUpData.ashx?ViewType=5&Filter=%@",[show realPID]]]];
-    NSString *response = [[NSString alloc] initWithData:[NSURLConnection sendSynchronousRequest:metaDataRequest returningResponse:nil error:nil] encoding:NSUTF8StringEncoding];
-    NSScanner *metadataScanner = [NSScanner scannerWithString:response];
-    [metadataScanner scanUpToString:@"<h2>" intoString:nil];
-    [metadataScanner scanString:@"<h2>" intoString:nil];
-    NSString *description, *showname;
-    [metadataScanner scanUpToString:@"</h2>" intoString:&showname];
-    [metadataScanner scanUpToString:@"<p>" intoString:nil];
-    [metadataScanner scanString:@"<p>" intoString:nil];
-    [metadataScanner scanUpToString:@"</p>" intoString:&description];
-    showname = [NSString stringWithFormat:@"%@ - %@",showname,[show episodeName]];
-    [show setShowName:showname];
-    [show setDesc:description];
+    @try {
+        //Fix Showname
+        NSURLRequest *metaDataRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://www.itv.com/_app/Dynamic/CatchUpData.ashx?ViewType=5&Filter=%@",[show realPID]]]];
+        NSString *response = [[NSString alloc] initWithData:[NSURLConnection sendSynchronousRequest:metaDataRequest returningResponse:nil error:nil] encoding:NSUTF8StringEncoding];
+        NSScanner *metadataScanner = [NSScanner scannerWithString:response];
+        [metadataScanner scanUpToString:@"<h2>" intoString:nil];
+        [metadataScanner scanString:@"<h2>" intoString:nil];
+        NSString *description, *showname;
+        [metadataScanner scanUpToString:@"</h2>" intoString:&showname];
+        [metadataScanner scanUpToString:@"<p>" intoString:nil];
+        [metadataScanner scanString:@"<p>" intoString:nil];
+        [metadataScanner scanUpToString:@"</p>" intoString:&description];
+        showname = [NSString stringWithFormat:@"%@ - %@",showname,[show episodeName]];
+        [show setShowName:showname];
+        [show setDesc:description];
+    }
+    @catch (NSException *exception) {
+        [self addToLog:@"Could not fix showName. Likely to encounter trouble with metadata."];
+    }
+
     
     
     //Retrieve Episode Number
