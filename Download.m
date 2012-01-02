@@ -164,9 +164,9 @@
 - (void)rtmpdumpFinished:(NSNotification *)finishedNote
 {
     [self addToLog:@"RTMPDUMP finished"];
-    //[nc removeObserver:self name:NSFileHandleReadCompletionNotification object:fh];
-	//[nc removeObserver:self name:NSFileHandleReadCompletionNotification object:errorFh];
-    //[errorTimer invalidate];
+    [nc removeObserver:self name:NSFileHandleReadCompletionNotification object:fh];
+	[nc removeObserver:self name:NSFileHandleReadCompletionNotification object:errorFh];
+    [processErrorCache invalidate];
     
     NSInteger exitCode=[[finishedNote object] terminationStatus];
     NSLog(@"Exit Code = %ld",(long)exitCode);
