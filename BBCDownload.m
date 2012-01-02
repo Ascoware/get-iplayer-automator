@@ -302,6 +302,10 @@
                     [show setReasonForFailure:@"Specified_Modes"];
                     NSLog(@"Set Modes");
                 }
+                else if ([[show reasonForFailure] isEqualToString:@"InHistory"])
+                {
+                    NSLog(@"InHistory");
+                }
 				else if ([lastLine hasPrefix:@"INFO: Recorded"])
 				{
 					[show setValue:[NSNumber numberWithBool:YES] forKey:@"complete"];
@@ -547,6 +551,7 @@
             [show setValue:@"Failed: Download in History" forKey:@"status"];
             [self addToLog:[NSString stringWithFormat:@"%@ Failed",[show showName]]];
             [show setReasonForFailure:@"InHistory"];
+            foundLastLine=YES;
         }
         else if ([output hasPrefix:@"ERROR: Failed to get version pid"])
         {
