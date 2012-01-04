@@ -37,10 +37,12 @@
 	{
 		[nc postNotificationName:@"AddToLog" object:self userInfo:[NSDictionary dictionaryWithObject:logMessage forKey:@"message"]];
 	}
+    [log appendFormat:@"%@\n", logMessage];
 }
 - (void)addToLog:(NSString *)logMessage
 {
 	[nc postNotificationName:@"AddToLog" object:self userInfo:[NSDictionary dictionaryWithObject:logMessage forKey:@"message"]];
+    [log appendFormat:@"%@\n", logMessage];
 }
 - (void)setCurrentProgress:(NSString *)string
 {
