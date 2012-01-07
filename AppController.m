@@ -68,6 +68,7 @@
 	[defaultValues setObject:[NSNumber numberWithBool:NO] forKey:@"XBMC_naming"];
 	[defaultValues setObject:@"30" forKey:@"KeepSeriesFor"];
 	[defaultValues setObject:[NSNumber numberWithBool:NO] forKey:@"RemoveOldSeries"];
+    [defaultValues setObject:[NSNumber numberWithBool:NO] forKey:@"AudioDescribed"];
 	
 	[[NSUserDefaults standardUserDefaults] registerDefaults:defaultValues];
 	defaultValues = nil;

@@ -137,7 +137,14 @@
 	else
 		getArg = [[NSString alloc] initWithString:@"--pid"];		
 	NSString *searchArg = [[NSString alloc] initWithFormat:@"%@", [show pid]];
-	NSString *versionArg = [[NSString alloc] initWithString:@"--versions=default"];
+    
+    //AudioDescribed
+    NSString *versionArg;
+    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"AudioDescribed"] boolValue])
+        versionArg = [[NSString alloc] initWithString:@"--versions=audiodescribed,signed,default"];
+    else
+        versionArg = [[NSString alloc] initWithString:@"--versions=default"];
+    
 	//We don't want this to refresh now!
 	NSString *cacheExpiryArg = @"-e604800000000";
 	NSString *folder = @"~/Library/Application Support/Get iPlayer Automator/";
@@ -170,6 +177,7 @@
 		[args addObject:@"--file-prefix=<nameshort>.<senum>.<episode>"];
 		[args addObject:@"--subdir-format=<nameshort>"];
 	}
+    
 	
 	//if (floor(NSAppKitVersionNumber) > 949)
 		//[args addObject:@"--rtmp-tv-opts=-W http://www.bbc.co.uk/emp/10player.swf?revision=18269_21576"];
