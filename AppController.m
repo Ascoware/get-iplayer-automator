@@ -630,7 +630,6 @@
 		if (runScheduled) 
 		{
 			[self performSelectorOnMainThread:@selector(startDownloads:) withObject:self waitUntilDone:NO];
-			runScheduled=NO;
 		}
 	}
 	
@@ -1332,6 +1331,7 @@
         
 		BOOL foundOne=NO;
 		runDownloads=YES;
+        runScheduled=NO;
 		[mainWindow setDocumentEdited:YES];
 		[self addToLog:@"\rAppController: Starting Downloads" :nil];
 		//Clean-Up Queue
@@ -1408,14 +1408,24 @@
 	}
 	else
 	{
-		[whatAnIdiot runModal];
-		runDownloads=NO;
-		[mainWindow setDocumentEdited:NO];
+        runDownloads=NO;
+        [mainWindow setDocumentEdited:NO];
+		if (!runScheduled)
+            [whatAnIdiot runModal];
+        else if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"AutoRetryFailed"] boolValue])
+        {
+				NSDate *scheduledDate = [NSDate dateWithTimeIntervalSinceNow:60*[[[NSUserDefaults standardUserDefaults] valueForKey:@"AutoRetryTime"] doubleValue]];
+				[datePicker setDateValue:scheduledDate];
+				[self scheduleStart:self];
+        }
+        else if (runScheduled)
+            runScheduled=NO;
 	}
 }
 - (IBAction)stopDownloads:(id)sender
 {
 	runDownloads=NO;
+    runScheduled=NO;
 	[currentDownload cancelDownload:self];
 	[[currentDownload show] setStatus:@"Cancelled"];
 	if (!runUpdate)
@@ -1828,7 +1838,6 @@
 	if (runScheduled && !scheduleTimer) 
 	{
 		[self performSelectorOnMainThread:@selector(startDownloads:) withObject:self waitUntilDone:NO];
-		runScheduled=NO;
 	}
 	[self performSelectorOnMainThread:@selector(scheduleTimerForFinished:) withObject:nil waitUntilDone:NO];
 	NSLog(@"Series-Link Thread Finished");
