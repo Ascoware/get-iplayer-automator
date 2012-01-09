@@ -8,6 +8,7 @@
 
 #import "ITVDownload.h"
 #import "ASIHTTPRequest.h"
+#import "ITVMediaFileEntry.h"
 
 @implementation ITVDownload
 
@@ -189,42 +190,76 @@
         [scanner scanString:@"CDATA[" intoString:nil];
         [scanner scanUpToString:@"]]" intoString:&subtitleURL];
     }
-    
     //Retrieve Auth URL
     NSString *authURL;
     [scanner scanUpToString:@"rtmpe://" intoString:nil];
     [scanner scanUpToString:@"\"" intoString:&authURL];
     
     NSLog(@"Retrieving Playpath");
+    
     //Retrieve PlayPath
     NSString *playPath;
     NSArray *formatKeys = [NSArray arrayWithObjects:@"Flash - Very Low",@"Flash - Low",@"Flash - Standard",@"Flash - High",nil];
-    NSArray *formatObjects = [NSArray arrayWithObjects:@"400000",@"600000",@"800000",@"1200000",nil];
-    NSDictionary *formatDic = [NSDictionary dictionaryWithObjects:formatObjects forKeys:formatKeys];
-    [scanner scanUpToString:@"MediaFile delivery" intoString:nil];
-    [scanner scanString:@"MediaFile delivery" intoString:nil];
-    [scanner scanUpToString:@"MediaFile delivery" intoString:nil];
-    NSUInteger location = [scanner scanLocation];
-    NSMutableArray *bitrates = [[NSMutableArray alloc] init];
-    NSLog(@"ITVFormatList = %@",formatList);
-    for (TVFormat *format in formatList)
-        [bitrates addObject:[formatDic objectForKey:[format format]]];
-    NSLog(@"Birates=%@",bitrates);
-    for (NSString *bitrate in bitrates)
-    {
-        NSLog(@"Bitrate = %@",bitrate);
-        [scanner scanUpToString:[NSString stringWithFormat:@"bitrate=\"%@",bitrate] intoString:nil];
-        if ([scanner scanString:[NSString stringWithFormat:@"bitrate=\"%@",bitrate] intoString:nil])
-        {
-            NSLog(@"Found it");
-            [scanner scanUpToString:@"CDATA" intoString:nil];
-            [scanner scanString:@"CDATA[" intoString:nil];
-            [scanner scanUpToString:@"]]" intoString:&playPath];
-            break;
-        }
+    NSArray *itvRateObjects = [NSArray arrayWithObjects:@"400",@"600",@"800",@"1200",nil];
+    NSArray *bitrateObjects = [NSArray arrayWithObjects:@"400000",@"600000",@"800000",@"1200000",nil];
+    NSDictionary *itvRateDic = [NSDictionary dictionaryWithObjects:itvRateObjects forKeys:formatKeys];
+    NSDictionary *bitrateDic = [NSDictionary dictionaryWithObjects:bitrateObjects forKeys:formatKeys];
+    
+    NSMutableArray *itvRateArray = [[NSMutableArray alloc] init];
+    NSMutableArray *bitrateArray = [[NSMutableArray alloc] init];
+    
+    for (TVFormat *format in formatList) [itvRateArray addObject:[itvRateDic objectForKey:[format format]]];
+    for (TVFormat *format in formatList) [bitrateArray addObject:[bitrateDic objectForKey:[format format]]];
+    
+    NSMutableArray *mediaEntries = [[NSMutableArray alloc] init];
+    while ([scanner scanUpToString:@"MediaFile delivery" intoString:nil]) {
+        NSString *url, *bitrate, *itvRate;
+        ITVMediaFileEntry *entry = [[ITVMediaFileEntry alloc] init];
+        [scanner scanUpToString:@"bitrate=" intoString:nil];
+        [scanner scanString:@"bitrate=\"" intoString:nil];
+        [scanner scanUpToString:@"\"" intoString:&bitrate];
+        [scanner scanUpToString:@"CDATA" intoString:nil];
+        [scanner scanString:@"CDATA[" intoString:nil];
+        NSUInteger location = [scanner scanLocation];
+        [scanner scanUpToString:@"]]" intoString:&url];
         [scanner setScanLocation:location];
+        [scanner scanUpToString:@"_ITV" intoString:nil];
+        [scanner scanString:@"_ITV" intoString:nil];
+        [scanner scanUpToString:@"_" intoString:&itvRate];
+        [scanner setScanLocation:location];
+        [entry setBitrate:bitrate];
+        [entry setUrl:url];
+        [entry setItvRate:itvRate];
+        [mediaEntries addObject:entry];
     }
     
+    BOOL foundIt=FALSE;
+    for (NSString *rate in itvRateArray) {
+        for (ITVMediaFileEntry *entry in mediaEntries) {
+            if ([[entry itvRate] isEqualToString:rate]) {
+                foundIt=TRUE;
+                playPath=[entry url];
+                break;
+            }
+        }
+        if (foundIt) break;
+    }
+    if (!foundIt) for (NSString *rate in bitrateArray) {
+        for (ITVMediaFileEntry *entry in mediaEntries) {
+            if ([[entry bitrate] isEqualToString:rate]) {
+                foundIt=TRUE;
+                playPath=[entry url];
+                break;
+            }
+        }
+        if (foundIt) break;
+    }
+    
+    if (!foundIt) {
+        [self addToLog:@"ERROR: Could not find suitable playpath." noTag:YES];
+    }
+    else
+        NSLog(@"%@",playPath);
     [self addToLog:@"INFO: Program data processed." noTag:YES];
     
     //Create Download Path
@@ -234,12 +269,14 @@
     downloadPath = [downloadPath stringByAppendingPathComponent:[[[NSString stringWithFormat:@"%@.partial.flv",[show showName]] stringByReplacingOccurrencesOfString:@"/" withString:@"-"] stringByReplacingOccurrencesOfString:@":" withString:@" -"]];
     NSMutableArray *args;
     @try {
-        args = [NSMutableArray arrayWithObjects:
+        if (foundIt) args = [NSMutableArray arrayWithObjects:
                                 [NSString stringWithFormat:@"-r%@",authURL],
                                 @"-Whttp://www.itv.com/mediaplayer/ITVMediaPlayer.swf?v=11.20.654",
                                 [NSString stringWithFormat:@"-y%@",playPath],
                                 [NSString stringWithFormat:@"-o%@",downloadPath],
                                 nil];
+        else [NSException raise:@"NoShow" format:@"Could not find show"];
+        NSLog(@"%@",args);
     }
     @catch (NSException *exception) {
         [self addToLog:@"ERROR: Could not process ITV metadata." noTag:YES];
