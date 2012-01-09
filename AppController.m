@@ -225,6 +225,29 @@
 }
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
 {
+    if (runDownloads)
+    {
+        NSAlert *downloadAlert = [NSAlert alertWithMessageText:@"Are you sure you wish to quit?" 
+                                                 defaultButton:@"No" 
+                                               alternateButton:@"Yes" 
+                                                   otherButton:nil 
+                                     informativeTextWithFormat:@"You are currently downloading shows. If you quit, they will be cancelled."];
+        NSInteger response = [downloadAlert runModal];
+        if (response == NSAlertDefaultReturn) return NSTerminateCancel;
+    }
+    else if (runUpdate)
+    {
+        NSAlert *updateAlert = [NSAlert alertWithMessageText:@"Are you sure?" 
+                                               defaultButton:@"No" 
+                                             alternateButton:@"Yes" 
+                                                 otherButton:nil 
+                                   informativeTextWithFormat:@"Get iPlayer Automator is currently updating the cache." 
+                                @"If you proceed with quiting, some series-link information will be lost." 
+                                @"It is not reccommended to quit during an update. Are you sure you wish to quit?"];
+        NSInteger response = [updateAlert runModal];
+        if (response == NSAlertDefaultReturn) return NSTerminateCancel;
+    }
+    
 	return NSTerminateNow;
 }
 - (BOOL)windowShouldClose:(id)sender
