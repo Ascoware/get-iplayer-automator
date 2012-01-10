@@ -838,6 +838,9 @@
 				{
 					[p setValue:[NSNumber numberWithBool:YES] forKey:@"radio"];
 				}
+                else if ([temp_type isEqualToString:@"podcast"])
+                    [p setPodcast:[NSNumber numberWithBool:YES]];
+                
 				[resultsController addObject:p];
 				foundShow=YES;
 			}
@@ -987,6 +990,7 @@
                 [p setValue:tvNetwork forKey:@"tvNetwork"];
                 [p setUrl:url];
 				if ([type isEqualToString:@"radio"]) [p setValue:[NSNumber numberWithBool:YES] forKey:@"radio"];
+                else if ([type isEqualToString:@"podcast"]) [p setPodcast:[NSNumber numberWithBool:YES]];
 			}
 			else if ([wantedID isEqualToString:index])
 			{
@@ -995,6 +999,7 @@
                 [p setValue:tvNetwork forKey:@"tvNetwork"];
                 [p setUrl:url];
 				if ([type isEqualToString:@"radio"]) [p setValue:[NSNumber numberWithBool:YES] forKey:@"radio"];
+                else if ([type isEqualToString:@"podcast"]) [p setPodcast:[NSNumber numberWithBool:YES]];
 			}
 		}
 			
@@ -1943,6 +1948,7 @@
 					[p setEpisodeName:episode_Name];
                     [p setUrl:url];
 					if ([temp_type isEqualToString:@"radio"]) [p setValue:[NSNumber numberWithBool:YES] forKey:@"radio"];
+                    else if ([temp_type isEqualToString:@"podcast"]) [p setPodcast:[NSNumber numberWithBool:YES]];
 					[p setValue:@"Added by Series-Link" forKey:@"status"];
 					BOOL inQueue=NO;
 					for (Programme *show in currentQueue)

@@ -55,7 +55,7 @@
 	NSString *proxyArg;
 	NSString *partialProxyArg;
 	NSString *proxyOption = [[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"];
-	if ([proxyOption isEqualToString:@"None"])
+	if ([proxyOption isEqualToString:@"None"] || [[show podcast] boolValue])
 	{
 		//No Proxy
 		proxyArg = NULL;

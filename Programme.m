@@ -31,6 +31,7 @@ extern BOOL runDownloads;
     reasonForFailure=[[NSString alloc] init];
     availableModes=[[NSString alloc] init];
     desc=[[NSString alloc] init];
+    podcast=[[NSNumber alloc] initWithBool:NO];
 	return self;
 }
 - (id)initWithShow:(Programme *)show
@@ -52,6 +53,7 @@ extern BOOL runDownloads;
     reasonForFailure=[show reasonForFailure];
     availableModes=[[NSString alloc] init];
     desc=[[NSString alloc] init];
+    podcast = [show podcast];
 	return self;
 }
 - (id)init
@@ -81,6 +83,7 @@ extern BOOL runDownloads;
     reasonForFailure=[[NSString alloc] init];
     availableModes=[[NSString alloc] init];
     desc=[[NSString alloc] init];
+    podcast=[[NSNumber alloc] initWithBool:NO];
 	return self;
 }
 - (id)description
@@ -101,6 +104,7 @@ extern BOOL runDownloads;
 	[coder encodeObject:radio forKey:@"radio"];
 	[coder encodeObject:realPID forKey:@"realPID"];
     [coder encodeObject:url forKey:@"url"];
+    [coder encodeObject:podcast forKey:@"podcast"];
 }
 - (id) initWithCoder: (NSCoder *)coder
 {
@@ -123,6 +127,7 @@ extern BOOL runDownloads;
     reasonForFailure=[[NSString alloc] init];
     availableModes=[[NSString alloc] init];
     desc=[[NSString alloc] init];
+    podcast = [[coder decodeObjectForKey:@"podcast"] retain];
 	return self;
 }
 /*
@@ -159,4 +164,5 @@ extern BOOL runDownloads;
 @synthesize url;
 @synthesize dateAired;
 @synthesize desc;
+@synthesize podcast;
 @end
