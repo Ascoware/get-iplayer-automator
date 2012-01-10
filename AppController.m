@@ -2000,6 +2000,16 @@
     else if ([historyWindow isKeyWindow]) [historyWindow performClose:self];
     else if ([pvrPanel isKeyWindow]) [pvrPanel performClose:self];
     else if ([prefsPanel isKeyWindow]) [prefsPanel performClose:self];
+    else if ([mainWindow isKeyWindow])
+    {
+        NSAlert *downloadAlert = [NSAlert alertWithMessageText:@"Are you sure you wish to quit?" 
+                                                 defaultButton:@"Yes" 
+                                               alternateButton:@"No" 
+                                                   otherButton:nil 
+                                     informativeTextWithFormat:nil];
+        NSInteger response = [downloadAlert runModal];
+        if (response == NSAlertDefaultReturn) [mainWindow performClose:self];
+    }
 }
 - (void)addToiTunes:(Programme *)show
 {
