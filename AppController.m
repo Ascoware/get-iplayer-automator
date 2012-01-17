@@ -1827,7 +1827,7 @@
 		NSString *typeArgument = [self typeArgument:nil];
 		
 		NSMutableArray *autoRecordArgs = [[NSMutableArray alloc] initWithObjects:getiPlayerPath, noWarningArg,@"--nopurge",
-										  @"--listformat=<index>: <type>, ~<name> - <episode>~, <channel>, <timeadded>, <pid>,<url>", cacheExpiryArgument, 
+										  @"--listformat=<index>: <type>, ~<name> - <episode>~, <channel>, <timeadded>, <pid>,<web>", cacheExpiryArgument, 
 										  typeArgument, profileDirArg,@"--hide",[series showName],nil];
 		
 		NSTask *autoRecordTask = [[NSTask alloc] init];
