@@ -36,5 +36,7 @@
 	<string>NO</string>
 	<key>JRFeedbackURL</key>
 	<string>http://tom-tech.com/get_iplayer/feedback.php</string>
+	<key>LSApplicationCategoryType</key>
+	<string></string>
 </dict>
 </plist>
