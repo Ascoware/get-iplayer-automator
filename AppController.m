@@ -17,6 +17,7 @@
 #import "LiveTVChannel.h"
 #import "ReasonForFailure.h"
 #import "Chrome.h"
+#import "ASIHTTPRequest.h"
 
 @implementation AppController
 #pragma mark Overriden Methods
@@ -69,6 +70,7 @@
 	[defaultValues setObject:@"30" forKey:@"KeepSeriesFor"];
 	[defaultValues setObject:[NSNumber numberWithBool:NO] forKey:@"RemoveOldSeries"];
     [defaultValues setObject:[NSNumber numberWithBool:NO] forKey:@"AudioDescribed"];
+    [defaultValues setObject:[NSNumber numberWithBool:YES] forKey:@"QuickCache"];
 	
 	[[NSUserDefaults standardUserDefaults] registerDefaults:defaultValues];
 	defaultValues = nil;
@@ -103,6 +105,7 @@
 	getiPlayerPath = [[NSString alloc] initWithString:[[NSBundle mainBundle] bundlePath]];
 	getiPlayerPath = [getiPlayerPath stringByAppendingString:@"/Contents/Resources/get_iplayer.pl"];
 	runScheduled=NO;
+    quickUpdateFailed=NO;
 	return self;
 }
 #pragma mark Delegate Methods
@@ -116,7 +119,6 @@
     [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithBool:NO] forKey:@"CacheITV_TV"];
 #endif
     
-	[self updateCache:nil];
 	
 	[queueTableView registerForDraggedTypes:[NSArray arrayWithObject:@"com.thomaswillson.programme"]];
 	
@@ -138,6 +140,7 @@
 		rootObject = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
 		NSArray *tempQueue = [rootObject valueForKey:@"queue"];
 		NSArray *tempSeries = [rootObject valueForKey:@"serieslink"];
+        lastUpdate = [[rootObject valueForKey:@"lastUpdate"] retain];
 		[queueController addObjects:tempQueue];
 		[pvrQueueController addObjects:tempSeries];
 	}
@@ -218,6 +221,8 @@
 	NSString *infoPath = @"~/.swfinfo";
 	infoPath = [infoPath stringByExpandingTildeInPath];
 	if ([fileManager fileExistsAtPath:infoPath]) [fileManager removeItemAtPath:infoPath error:nil];
+    
+    [self updateCache:nil];
 }
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)application
 {
@@ -318,6 +323,7 @@
     
 	[rootObject setValue:tempQueue forKey:@"queue"];
 	[rootObject setValue:tempSeries forKey:@"serieslink"];
+    [rootObject setValue:lastUpdate forKey:@"lastUpdate"];
 	[NSKeyedArchiver archiveRootObject: rootObject toFile: filePath];
 	
 	filename = @"Formats.automatorqueue";
@@ -350,6 +356,7 @@
 {
 	runSinceChange=YES;
 	runUpdate=YES;
+    didUpdate=NO;
 	[mainWindow setDocumentEdited:YES];
 	
 	NSArray *tempQueue = [queueController arrangedObjects];
@@ -360,101 +367,168 @@
 			[queueController removeObject:show];
 		}
 	}
-	NSString *cacheExpiryArg;
-	if ([[sender class] isEqualTo:[[NSString stringWithString:@""] class]])
-	{
-		cacheExpiryArg = @"-e1";
-	}
-	else
-	{
-		cacheExpiryArg = [[NSString alloc] initWithFormat:@"-e%d", ([[[NSUserDefaults standardUserDefaults] objectForKey:@"CacheExpiryTime"] intValue]*3600)];
-	}
-	NSString *typeArgument = [[NSString alloc] initWithString:[self typeArgument:nil]];
-	
-	[self addToLog:@"Updating Program Index Feeds...\r" :self];
-	didUpdate=NO;
-	
-	//UI might not be loaded yet
-	@try
-	{
-		//Update Should Be Running:
-		[currentIndicator setIndeterminate:YES];
-		[currentIndicator startAnimation:nil];
-		[currentProgress setStringValue:@"Updating Program Indexes..."];
-		//Shouldn't search until update is done.
-		[searchField setEnabled:NO];
-		[stopButton setEnabled:NO];
-		[startButton setEnabled:NO];
-		[pvrSearchField setEnabled:NO];
-	}
-	@catch (NSException *e) {
-		NSLog(@"NO UI");
-	}
-	NSString *proxyArg=nil;
-	if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])
-	{
-		NSString *proxyOption = [[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"];
-		if ([proxyOption isEqualToString:@"None"])
-		{
-			//No Proxy
-			proxyArg = NULL;
-		}
-		else if ([proxyOption isEqualToString:@"Custom"])
-		{
-			if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CustomProxy"] hasPrefix:@"http"])
-				proxyArg = [[NSString alloc] initWithFormat:@"-p%@",[[NSUserDefaults standardUserDefaults] valueForKey:@"CustomProxy"]];
-			else
-				proxyArg = [[NSString alloc] initWithFormat:@"-phttp://%@",[[NSUserDefaults standardUserDefaults] valueForKey:@"CustomProxy"]];
-		}
-		else
-		{
-			//Get provided proxy from my server.
-			NSURL *proxyURL = [[NSURL alloc] initWithString:@"http://tom-tech.com/get_iplayer/proxy.txt"];
-			NSURLRequest *proxyRequest = [NSURLRequest requestWithURL:proxyURL
-														  cachePolicy:NSURLRequestReturnCacheDataElseLoad
-													  timeoutInterval:30];
-			NSData *urlData;
-			NSURLResponse *response;
-			NSError *error;
-			urlData = [NSURLConnection sendSynchronousRequest:proxyRequest
-											returningResponse:&response
-														error:&error];
-			if (!urlData)
-			{
-				NSAlert *alert = [NSAlert alertWithMessageText:@"Provided Proxy could not be retrieved!" 
-												 defaultButton:nil 
-											   alternateButton:nil 
-												   otherButton:nil 
-									 informativeTextWithFormat:@"No proxy will be used.\r\rError: %@", [error localizedDescription]];
-				[alert runModal];
-				[self addToLog:@"Proxy could not be retrieved. No proxy will be used." :self];
-				proxyArg=NULL;
-			}
-			else
-			{
-				NSString *providedProxy = [[NSString alloc] initWithData:urlData encoding:NSUTF8StringEncoding];
-				proxyArg = [[NSString alloc] initWithFormat:@"-phttp://%@", providedProxy];
-			}
-		}
-	}
-	getiPlayerUpdateArgs = [[NSArray alloc] initWithObjects:getiPlayerPath,cacheExpiryArg,typeArgument,@"--nopurge",profileDirArg,proxyArg,nil];
-	getiPlayerUpdateTask = [[NSTask alloc] init];
-	[getiPlayerUpdateTask setLaunchPath:@"/usr/bin/perl"];
-	[getiPlayerUpdateTask setArguments:getiPlayerUpdateArgs];
-	getiPlayerUpdatePipe = [[NSPipe alloc] init];
-	[getiPlayerUpdateTask setStandardOutput:getiPlayerUpdatePipe];
-	[getiPlayerUpdateTask setStandardError:getiPlayerUpdatePipe];
-	
-	NSFileHandle *fh = [getiPlayerUpdatePipe fileHandleForReading];
-	NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-	
-	[nc addObserver:self
-		   selector:@selector(dataReady:)
-			   name:NSFileHandleReadCompletionNotification
-			 object:fh];
-	[getiPlayerUpdateTask launch];
-	
-	[fh readInBackgroundAndNotify];
+    
+    //UI might not be loaded yet
+    @try
+    {
+        //Update Should Be Running:
+        [currentIndicator setIndeterminate:YES];
+        [currentIndicator startAnimation:nil];
+        [currentProgress setStringValue:@"Updating Program Indexes..."];
+        //Shouldn't search until update is done.
+        [searchField setEnabled:NO];
+        [stopButton setEnabled:NO];
+        [startButton setEnabled:NO];
+        [pvrSearchField setEnabled:NO];
+    }
+    @catch (NSException *e) {
+        NSLog(@"NO UI");
+    }
+    
+    
+    if (![[[NSUserDefaults standardUserDefaults] objectForKey:@"QuickCache"] boolValue] || quickUpdateFailed)
+    {
+        quickUpdateFailed=NO;
+        
+        NSString *cacheExpiryArg;
+        if ([[sender class] isEqualTo:[[NSString stringWithString:@""] class]])
+        {
+            cacheExpiryArg = @"-e1";
+        }
+        else
+        {
+            cacheExpiryArg = [[NSString alloc] initWithFormat:@"-e%d", ([[[NSUserDefaults standardUserDefaults] objectForKey:@"CacheExpiryTime"] intValue]*3600)];
+        }
+        NSString *typeArgument = [[NSString alloc] initWithString:[self typeArgument:nil]];
+        
+        [self addToLog:@"Updating Program Index Feeds...\r" :self];
+
+        
+        NSString *proxyArg=nil;
+        if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])
+        {
+            NSString *proxyOption = [[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"];
+            if ([proxyOption isEqualToString:@"None"])
+            {
+                //No Proxy
+                proxyArg = NULL;
+            }
+            else if ([proxyOption isEqualToString:@"Custom"])
+            {
+                if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CustomProxy"] hasPrefix:@"http"])
+                    proxyArg = [[NSString alloc] initWithFormat:@"-p%@",[[NSUserDefaults standardUserDefaults] valueForKey:@"CustomProxy"]];
+                else
+                    proxyArg = [[NSString alloc] initWithFormat:@"-phttp://%@",[[NSUserDefaults standardUserDefaults] valueForKey:@"CustomProxy"]];
+            }
+            else
+            {
+                //Get provided proxy from my server.
+                NSURL *proxyURL = [[NSURL alloc] initWithString:@"http://tom-tech.com/get_iplayer/proxy.txt"];
+                NSURLRequest *proxyRequest = [NSURLRequest requestWithURL:proxyURL
+                                                              cachePolicy:NSURLRequestReturnCacheDataElseLoad
+                                                          timeoutInterval:30];
+                NSData *urlData;
+                NSURLResponse *response;
+                NSError *error;
+                urlData = [NSURLConnection sendSynchronousRequest:proxyRequest
+                                                returningResponse:&response
+                                                            error:&error];
+                if (!urlData)
+                {
+                    NSAlert *alert = [NSAlert alertWithMessageText:@"Provided Proxy could not be retrieved!" 
+                                                     defaultButton:nil 
+                                                   alternateButton:nil 
+                                                       otherButton:nil 
+                                         informativeTextWithFormat:@"No proxy will be used.\r\rError: %@", [error localizedDescription]];
+                    [alert runModal];
+                    [self addToLog:@"Proxy could not be retrieved. No proxy will be used." :self];
+                    proxyArg=NULL;
+                }
+                else
+                {
+                    NSString *providedProxy = [[NSString alloc] initWithData:urlData encoding:NSUTF8StringEncoding];
+                    proxyArg = [[NSString alloc] initWithFormat:@"-phttp://%@", providedProxy];
+                }
+            }
+        }
+        getiPlayerUpdateArgs = [[NSArray alloc] initWithObjects:getiPlayerPath,cacheExpiryArg,typeArgument,@"--nopurge",profileDirArg,proxyArg,nil];
+        getiPlayerUpdateTask = [[NSTask alloc] init];
+        [getiPlayerUpdateTask setLaunchPath:@"/usr/bin/perl"];
+        [getiPlayerUpdateTask setArguments:getiPlayerUpdateArgs];
+        getiPlayerUpdatePipe = [[NSPipe alloc] init];
+        [getiPlayerUpdateTask setStandardOutput:getiPlayerUpdatePipe];
+        [getiPlayerUpdateTask setStandardError:getiPlayerUpdatePipe];
+        
+        NSFileHandle *fh = [getiPlayerUpdatePipe fileHandleForReading];
+        NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+        
+        [nc addObserver:self
+               selector:@selector(dataReady:)
+                   name:NSFileHandleReadCompletionNotification
+                 object:fh];
+        [getiPlayerUpdateTask launch];
+        
+        [fh readInBackgroundAndNotify];
+    }
+    else
+    {
+        [self addToLog:@"Updating Program Index Feeds from Server..." :nil];
+        
+        NSLog(@"%@",lastUpdate);
+        
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        if (!lastUpdate || ([[NSDate date] timeIntervalSinceDate:lastUpdate] > ([[defaults objectForKey:@"CacheExpiryTime"] intValue]*3600)) || [[sender class] isEqualTo:[[NSString stringWithString:@""] class]])
+        {
+            typesToCache = [[NSMutableArray alloc] initWithCapacity:5];
+            if ([[defaults objectForKey:@"CacheBBC_TV"] boolValue]) [typesToCache addObject:@"TV"];
+            if ([[defaults objectForKey:@"CacheITV_TV"] boolValue]) [typesToCache addObject:@"ITV"];
+            if ([[defaults objectForKey:@"CacheBBC_Radio"] boolValue]) [typesToCache addObject:@"Radio"];
+            if ([[defaults objectForKey:@"CacheBBC_Podcasts"] boolValue]) [typesToCache addObject:@"Podcast"];
+            
+            NSArray *urlKeys = [NSArray arrayWithObjects:@"TV",@"ITV",@"Radio",@"Podcast", nil];
+            NSArray *urlObjects = [NSArray arrayWithObjects:@"http://tom-tech.com/get_iplayer/cache/tv.cache",
+                                   @"http://tom-tech.com/get_iplayer/cache/itv.cache",
+                                   @"http://tom-tech.com/get_iplayer/cache/radio.cache",
+                                   @"http://tom-tech.com/get_iplayer/cache/podcast.cache", nil];
+            updateURLDic = [[NSDictionary alloc] initWithObjects:urlObjects forKeys:urlKeys];
+            
+            nextToCache=0;
+            if ([typesToCache count] > 0)
+                [self updateCacheForType:[typesToCache objectAtIndex:0]];
+        }
+        else [self getiPlayerUpdateFinished];
+        
+    }
+}
+- (void)updateCacheForType:(NSString *)type
+{
+    [self addToLog:[NSString stringWithFormat:@"    Retrieving %@ index feeds.",type] :nil];
+    [currentProgress setStringValue:[NSString stringWithFormat:@"Updating Program Indexes: Getting %@ index feeds from server...",type]];
+    
+    ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:[updateURLDic objectForKey:type]]];
+    [request setDelegate:self];
+    [request setDidFinishSelector:@selector(indexRequestFinished:)];
+    [request setDownloadDestinationPath:[[@"~/Library/Application Support/Get iPlayer Automator" stringByExpandingTildeInPath] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.cache",type]]];
+    [request startAsynchronous];
+}
+- (void)indexRequestFinished:(ASIHTTPRequest *)request
+{
+    if ([request responseStatusCode] != 200)
+    {
+        quickUpdateFailed=YES;
+        [self updateCache:@""];
+    }
+    else
+    {
+        didUpdate=YES;
+        nextToCache++;
+        if (nextToCache < [typesToCache count])
+            [self updateCacheForType:[typesToCache objectAtIndex:nextToCache]];
+        else
+        {
+            [self getiPlayerUpdateFinished];
+        }
+    }
 }
 - (void)dataReady:(NSNotification *)n
 {
@@ -517,6 +591,7 @@
 	getiPlayerUpdateTask = nil;
 	[startButton setEnabled:YES];
 	[pvrSearchField setEnabled:YES];
+    
 	
 	if (didUpdate)
 	{
@@ -528,6 +603,7 @@
 									   isSticky:NO
 								   clickContext:nil];
 		[self addToLog:@"Index Updated." :self];
+        lastUpdate=[[NSDate date] retain];
 	}
 	else
 	{

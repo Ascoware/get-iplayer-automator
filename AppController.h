@@ -36,8 +36,13 @@ bool runUpdate=NO;
 	NSTask *getiPlayerUpdateTask;
 	NSPipe *getiPlayerUpdatePipe;
 	NSArray *getiPlayerUpdateArgs;
+    NSMutableArray *typesToCache;
 	BOOL didUpdate;
 	BOOL runSinceChange;
+    BOOL quickUpdateFailed;
+    NSUInteger nextToCache;
+    NSDictionary *updateURLDic;
+    NSDate *lastUpdate;
 	
 	//Main Window: Search
 	IBOutlet NSTextField *searchField;
@@ -116,6 +121,7 @@ bool runUpdate=NO;
 - (void)getiPlayerUpdateFinished;
 - (IBAction)updateCache:(id)sender;
 - (IBAction)forceUpdate:(id)sender;
+- (void)updateCacheForType:(NSString *)type;
 //Log Components
 - (IBAction)showLog:(id)sender;
 - (IBAction)copyLog:(id)sender;
