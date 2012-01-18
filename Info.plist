@@ -19,7 +19,7 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>384</string>
+	<string>385</string>
 	<key>CFBundleShortVersionString</key>
 	<string>1.3.6</string>
 	<key>NSMainNibFile</key>
@@ -36,7 +36,5 @@
 	<string>NO</string>
 	<key>JRFeedbackURL</key>
 	<string>http://tom-tech.com/get_iplayer/feedback.php</string>
-	<key>LSApplicationCategoryType</key>
-	<string></string>
 </dict>
 </plist>

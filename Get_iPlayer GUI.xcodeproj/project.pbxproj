@@ -68,6 +68,7 @@
 		D9CC157B0FF9076F00D819E2 /* Stop.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D9CC157A0FF9076F00D819E2 /* Stop.tiff */; };
 		D9CCF3CC1023485A009205BE /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = D9CCF3CB1023485A009205BE /* dsa_pub.pem */; };
 		D9CCF54C1025AAF9009205BE /* Growl Registration Ticket.growlRegDict in Resources */ = {isa = PBXBuildFile; fileRef = D9CCF54B1025AAF9009205BE /* Growl Registration Ticket.growlRegDict */; };
+		D9D06C6F14BB91C200029340 /* ITVMediaFileEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = D9D06C6E14BB91C200029340 /* ITVMediaFileEntry.m */; };
 		D9D8239010B3B6D600556D1D /* Growl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9D8238F10B3B6D600556D1D /* Growl.framework */; };
 		D9D8239A10B3B6EA00556D1D /* Growl.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = D9D8238F10B3B6D600556D1D /* Growl.framework */; };
 		D9F668DB102C560500A9449B /* GetFireFoxURL.applescript in Resources */ = {isa = PBXBuildFile; fileRef = D9F668BF102C53D700A9449B /* GetFireFoxURL.applescript */; };
@@ -188,6 +189,8 @@
 		D9CCF4C310256E82009205BE /* iTunes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iTunes.h; sourceTree = "<group>"; };
 		D9CCF52E10259DED009205BE /* Features.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = Features.rtf; sourceTree = "<group>"; };
 		D9CCF54B1025AAF9009205BE /* Growl Registration Ticket.growlRegDict */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "Growl Registration Ticket.growlRegDict"; sourceTree = "<group>"; };
+		D9D06C6D14BB91C200029340 /* ITVMediaFileEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ITVMediaFileEntry.h; sourceTree = "<group>"; };
+		D9D06C6E14BB91C200029340 /* ITVMediaFileEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ITVMediaFileEntry.m; sourceTree = "<group>"; };
 		D9D8238F10B3B6D600556D1D /* Growl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Growl.framework; sourceTree = "<group>"; };
 		D9F668BF102C53D700A9449B /* GetFireFoxURL.applescript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.applescript; path = GetFireFoxURL.applescript; sourceTree = "<group>"; };
 		D9F66954102C5D0D00A9449B /* GetCaminoURL.applescript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.applescript; path = GetCaminoURL.applescript; sourceTree = "<group>"; };
@@ -380,6 +383,8 @@
 				D92687C91087F836000E8132 /* DownloadHistoryEntry.m */,
 				DFC865E013E96BE200606599 /* ReasonForFailure.h */,
 				DFC865E113E96BE200606599 /* ReasonForFailure.m */,
+				D9D06C6D14BB91C200029340 /* ITVMediaFileEntry.h */,
+				D9D06C6E14BB91C200029340 /* ITVMediaFileEntry.m */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -529,7 +534,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "set -o errexit\n\n#security find-generic-password -g -s \"$KEYCHAIN_PRIVKEY_NAME\" 2>&1 1>/dev/null\n\nVERSION=$(defaults read \"$BUILT_PRODUCTS_DIR/Get iPlayer Automator.app/Contents/Info\" CFBundleVersion)\nSHORTVERSION=$(defaults read \"$BUILT_PRODUCTS_DIR/Get iPlayer Automator.app/Contents/Info\" CFBundleShortVersionString)\nDOWNLOAD_BASE_URL=\"http://get-iplayer-automator.googlecode.com/files\"\nRELEASENOTES_URL=\"http://tom-tech.com/get_iplayer/releasenotes/$VERSION.html\"\n\nARCHIVE_FILENAME=\"GetiPlayerAutomator_$SHORTVERSION.zip\"\nDOWNLOAD_URL=\"$DOWNLOAD_BASE_URL/$ARCHIVE_FILENAME\"\nKEYCHAIN_PRIVKEY_NAME=\"Sparkle Private Key\"\n\nWD=$PWD\ncd \"$BUILT_PRODUCTS_DIR\"\nrm -f \"GetiPlayerAutomator\"*.zip\nditto -ck --keepParent \"Get iPlayer Automator.app\" \"$ARCHIVE_FILENAME\"\n\nSIZE=$(stat -f %z \"$ARCHIVE_FILENAME\")\nPUBDATE=$(date +\"%a, %d %b %G %T %z\")\nSIGNATURE=$(openssl dgst -sha1 -binary < \"$ARCHIVE_FILENAME\" | openssl dgst -dss1 -sign \"/Users/iphonedev/Code/Keys/Sparkle_Key.pem\" | openssl enc -base64)\n\n\n[ $SIGNATURE ] || { echo Unable to load signing private key with name \"'$KEYCHAIN_PRIVKEY_NAME'\" from keychain; false; }\n\ncat <<EOF\n\t\t<item>\n\t\t\t<title>Version $SHORTVERSION</title>\n\t\t\t<sparkle:releaseNotesLink>$RELEASENOTES_URL</sparkle:releaseNotesLink>\n\t\t\t<sparkle:minimumSystemVersion>10.6.0</sparkle:minimumSystemVersion>\n\t\t\t<pubDate>$PUBDATE</pubDate>\n\t\t\t<enclosure\n\t\t\t\turl=\"$DOWNLOAD_URL\"\n\t\t\t\tsparkle:version=\"$VERSION\"\n\t\t\t\tsparkle:shortVersionString=\"$SHORTVERSION\"\n\t\t\t\ttype=\"application/octet-stream\"\n\t\t\t\tlength=\"$SIZE\"\n\t\t\t\tsparkle:dsaSignature=\"$SIGNATURE\"\n\t\t\t/>\n\t\t</item>\nEOF";
+			shellScript = "set -o errexit\n\n#security find-generic-password -g -s \"$KEYCHAIN_PRIVKEY_NAME\" 2>&1 1>/dev/null\n\nVERSION=$(defaults read \"$BUILT_PRODUCTS_DIR/Get iPlayer Automator.app/Contents/Info\" CFBundleVersion)\nSHORTVERSION=$(defaults read \"$BUILT_PRODUCTS_DIR/Get iPlayer Automator.app/Contents/Info\" CFBundleShortVersionString)\nDOWNLOAD_BASE_URL=\"http://get-iplayer-automator.googlecode.com/files\"\nRELEASENOTES_URL=\"http://tom-tech.com/get_iplayer/releasenotes/$VERSION.html\"\n\nARCHIVE_FILENAME=\"GetiPlayerAutomator_$SHORTVERSION.zip\"\nDOWNLOAD_URL=\"$DOWNLOAD_BASE_URL/$ARCHIVE_FILENAME\"\nKEYCHAIN_PRIVKEY_NAME=\"Sparkle Private Key\"\n\nWD=$PWD\ncd \"$BUILT_PRODUCTS_DIR\"\nrm -f \"GetiPlayerAutomator\"*.zip\nditto -ck --keepParent \"Get iPlayer Automator.app\" \"$ARCHIVE_FILENAME\"\n\n#SIZE=$(stat -f %z \"$ARCHIVE_FILENAME\")\n#PUBDATE=$(date +\"%a, %d %b %G %T %z\")\n#SIGNATURE=$(openssl dgst -sha1 -binary < \"$ARCHIVE_FILENAME\" | openssl dgst -dss1 -sign \"/Users/iphonedev/Code/Keys/Sparkle_Key.pem\" | openssl enc -base64)\n\n\n#[ $SIGNATURE ] || { echo Unable to load signing private key with name \"'$KEYCHAIN_PRIVKEY_NAME'\" from keychain; false; }\n\n#cat <<EOF\n#\t\t<item>\n#\t\t\t<title>Version $SHORTVERSION</title>\n#\t\t\t<sparkle:releaseNotesLink>$RELEASENOTES_URL</sparkle:releaseNotesLink>\n#\t\t\t<sparkle:minimumSystemVersion>10.6.0</sparkle:minimumSystemVersion>\n#\t\t\t<pubDate>$PUBDATE</pubDate>\n#\t\t\t<enclosure\n#\t\t\t\turl=\"$DOWNLOAD_URL\"\n#\t\t\t\tsparkle:version=\"$VERSION\"\n#\t\t\t\tsparkle:shortVersionString=\"$SHORTVERSION\"\n#\t\t\t\ttype=\"application/octet-stream\"\n#\t\t\t\tlength=\"$SIZE\"\n#\t\t\t\tsparkle:dsaSignature=\"$SIGNATURE\"\n#\t\t\t/>\n#\t\t</item>\n#EOF";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -560,6 +565,7 @@
 				D921C9BC149BBE9F004CB558 /* ASINetworkQueue.m in Sources */,
 				D921C9E8149BCB16004CB558 /* ITVDownload.m in Sources */,
 				D921C9EB149BCDEB004CB558 /* Download.m in Sources */,
+				D9D06C6F14BB91C200029340 /* ITVMediaFileEntry.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -713,7 +719,7 @@
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				PRODUCT_NAME = Distribution;
-				ZERO_LINK = NO;
+				ZERO_LINK = YES;
 			};
 			name = Release;
 		};
