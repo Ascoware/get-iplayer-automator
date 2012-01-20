@@ -176,7 +176,9 @@
 		[args addObject:@"--file-prefix=<nameshort>.<senum>.<episode>"];
 		[args addObject:@"--subdir-format=<nameshort>"];
 	}
-    
+        //Tagging
+    if (![[[NSUserDefaults standardUserDefaults] objectForKey:@"TagShows"] boolValue])
+        [args addObject:@"--no-tag"];
 	
 	//if (floor(NSAppKitVersionNumber) > 949)
 		//[args addObject:@"--rtmp-tv-opts=-W http://www.bbc.co.uk/emp/10player.swf?revision=18269_21576"];
