@@ -119,6 +119,8 @@
     [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithBool:NO] forKey:@"CacheITV_TV"];
 #endif
     
+    [[mainWindow windowController] setShouldCascadeWindows:NO];      // Tell the controller to not cascade its windows.
+    [mainWindow setFrameAutosaveName:@"mainWindow"];  // Specify the autosave name for the window.
 	
 	[queueTableView registerForDraggedTypes:[NSArray arrayWithObject:@"com.thomaswillson.programme"]];
 	
