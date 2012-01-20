@@ -257,23 +257,33 @@
     [self addToLog:@"INFO: Finished Converting." noTag:YES];
     if ([[finishedNote object] terminationStatus] == 0)
     {
-        [[NSFileManager defaultManager] removeItemAtPath:downloadPath error:nil];
-        [show setValue:@"Tagging..." forKey:@"status"];
-        [self setPercentage:102];
-        [self setCurrentProgress:[NSString stringWithFormat:@"Downloading Thumbnail... -- %@",[show showName]]];
-        [self addToLog:@"INFO: Tagging the Show" noTag:YES];
-        [self addToLog:@"INFO: Downloading thumbnail" noTag:YES];
-        
-        ASIHTTPRequest *downloadThumb = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:thumbnailURL]];
-        [downloadThumb setDownloadDestinationPath:[[show path] stringByAppendingPathExtension:@"jpg"]];
-        [downloadThumb setDelegate:self];
-        [downloadThumb startAsynchronous];
-        [downloadThumb setDidFinishSelector:@selector(thumbnailRequestFinished:)];
+        if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"TagShows"] boolValue])
+        {
+            [[NSFileManager defaultManager] removeItemAtPath:downloadPath error:nil];
+            [show setValue:@"Tagging..." forKey:@"status"];
+            [self setPercentage:102];
+            [self setCurrentProgress:[NSString stringWithFormat:@"Downloading Thumbnail... -- %@",[show showName]]];
+            [self addToLog:@"INFO: Tagging the Show" noTag:YES];
+            [self addToLog:@"INFO: Downloading thumbnail" noTag:YES];
+            
+            ASIHTTPRequest *downloadThumb = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:thumbnailURL]];
+            [downloadThumb setDownloadDestinationPath:[[show path] stringByAppendingPathExtension:@"jpg"]];
+            [downloadThumb setDelegate:self];
+            [downloadThumb startAsynchronous];
+            [downloadThumb setDidFinishSelector:@selector(thumbnailRequestFinished:)];
+        }
+        else
+        {
+            [show setValue:@"Download Complete" forKey:@"status"];
+            
+            [nc postNotificationName:@"DownloadFinished" object:show];
+        }
     }
     else
     {
         [self addToLog:[NSString stringWithFormat:@"INFO: Exit Code = %ld",(long)[[finishedNote object]terminationStatus]] noTag:YES];
         [show setValue:@"Download Complete" forKey:@"status"];
+        [show setPath:downloadPath];
         [nc postNotificationName:@"DownloadFinished" object:show]; 
     }
 }

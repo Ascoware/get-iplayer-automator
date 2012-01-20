@@ -71,6 +71,7 @@
 	[defaultValues setObject:[NSNumber numberWithBool:NO] forKey:@"RemoveOldSeries"];
     [defaultValues setObject:[NSNumber numberWithBool:NO] forKey:@"AudioDescribed"];
     [defaultValues setObject:[NSNumber numberWithBool:YES] forKey:@"QuickCache"];
+    [defaultValues setObject:[NSNumber numberWithBool:YES] forKey:@"TagShows"];
 	
 	[[NSUserDefaults standardUserDefaults] registerDefaults:defaultValues];
 	defaultValues = nil;
