@@ -1610,7 +1610,7 @@
 				[self seasonEpisodeInfo:finishedShow];
 			}
 			if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"AddCompletedToiTunes"] isEqualTo:[NSNumber numberWithBool:YES]])
-				[self addToiTunes:finishedShow];
+				[NSThread detachNewThreadSelector:@selector(addToiTunes:) toTarget:self withObject:finishedShow];
 			else
 				[finishedShow setValue:@"Download Complete" forKey:@"status"];
 			
