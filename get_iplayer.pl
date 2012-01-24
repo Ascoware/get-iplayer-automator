@@ -2775,6 +2775,8 @@ sub StringUtils::sanitize_path {
 	$string =~ s/[\|\\\?\*\<\"\:\>\+\[\]\/]//gi if $opt->{fatfilename};
 	# Truncate multiple '_'
 	$string =~ s/_+/_/g;
+    # Don't allow showname to start with '.'
+    $string =~ s/^\.{1,3}//g;
 	return $string;
 }
 
