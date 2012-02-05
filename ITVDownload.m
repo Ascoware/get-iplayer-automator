@@ -97,7 +97,7 @@
     {
         output = [[NSString alloc] initWithData:urlData encoding:NSUTF8StringEncoding];
         NSLog(@"Auth Request: %@",output);
-        [self addToLog:@"INFO: Response recieved" noTag:YES];
+        [self addToLog:@"INFO: Response received" noTag:YES];
     }
     else
     {
