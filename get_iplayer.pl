@@ -136,6 +136,7 @@ my $opt_format = {
 	subtitles	=> [ 2, "subtitles|subs!", 'Recording', '--subtitles', "Download subtitles into srt/SubRip format if available and supported"],
 	subsonly	=> [ 1, "subtitlesonly|subsonly|subtitles-only|subs-only!", 'Recording', '--subtitles-only', "Only download the subtitles, not the programme"],
 	subsraw		=> [ 1, "subsraw!", 'Recording', '--subsraw', "Additionally save the raw subtitles file"],
+	tagonly		=> [ 1, "tagonly|tag-only!", 'Recording', '--tag-only', "Only update the programme tag and not download the programme (can also be used with --history)"],
 	test		=> [ 1, "test|t!", 'Recording', '--test, -t', "Test only - no recording (will show programme type)"],
 	thumb		=> [ 1, "thumb|thumbnail!", 'Recording', '--thumb', "Download Thumbnail image if available"],
 	thumbonly	=> [ 1, "thumbonly|thumbnailonly|thumbnail-only|thumb-only!", 'Recording', '--thumbnail-only', "Only Download Thumbnail image if available, not the programme"],
@@ -244,6 +245,7 @@ my $opt_format = {
 	mplayer		=> [ 1, "mplayer=s", 'External Program', '--mplayer <path>', "Location of mplayer binary"],
 
 	# Tagging
+	notag => [ 1, "notag|no-tag!", 'Tagging', '--no-tag', "Do not tag downloaded programmes"],
 	tag_fulltitle => [ 1, "tagfulltitle|tag-fulltitle!", 'Tagging', '--tag-fulltitle', "Use complete title (including series) instead of shorter episode title"],
 	tag_hdvideo => [ 1, "taghdvideo|tag-hdvideo!", 'Tagging', '--tag-hdvideo', "AtomicParsley supports --hdvideo argument for HD video flag"],
 	tag_longdesc => [ 1, "taglongdesc|tag-longdesc!", 'Tagging', '--tag-longdesc', "AtomicParsley supports --longdesc argument for long description text"],
@@ -646,7 +648,7 @@ sub init_search {
 	}
 
 	# Force nowrite if metadata/subs/thumb-only
-	if ( $opt->{metadataonly} || $opt->{subsonly} || $opt->{thumbonly} ) {
+	if ( $opt->{metadataonly} || $opt->{subsonly} || $opt->{thumbonly} || $opt->{tagonly} ) {
 		$opt->{nowrite} = 1;
 	}
 
@@ -673,7 +675,7 @@ sub init_search {
 
 	# Sanity check some conflicting options
 	if ( $opt->{nowrite} && ! $opt->{stdout} ) {
-		if ( ! ( $opt->{metadataonly} || $opt->{subsonly} || $opt->{thumbonly} ) ) {
+		if ( ! ( $opt->{metadataonly} || $opt->{subsonly} || $opt->{thumbonly} || $opt->{tagonly} ) ) {
 			logger "ERROR: Cannot record to nowhere\n";
 			exit 1;
 		}
@@ -787,7 +789,7 @@ sub find_pid_matches {
 		@try_types = (keys %{ $type });
 	}
 	logger "INFO: Will try prog types: ".(join ',', @try_types)."\n" if $opt->{verbose};
-	return 0 if ( ! ( $opt->{multimode} || $opt->{metadataonly} || $opt->{info} || $opt->{thumbonly} || $opt->{subsonly} ) ) && $hist->check( $pid );	
+	return 0 if ( ! ( $opt->{multimode} || $opt->{metadataonly} || $opt->{info} || $opt->{thumbonly} || $opt->{tagonly} || $opt->{subsonly} ) ) && $hist->check( $pid );	
 
 	# Maybe we don't want to populate caches - this slows down --pid recordings ...
 	# Populate cache with all specified prog types (strange perl bug?? - @try_types is empty after these calls if done in a $_ 'for' loop!!)
@@ -1170,8 +1172,8 @@ sub list_progs {
 				}
 			}
 		}
-		# Get info, create metadata, subtitles and/or thumbnail file (i.e. don't stream/record)
-		if ( $opt->{info} || $opt->{metadataonly} || $opt->{thumbonly} || $opt->{subsonly} || $opt->{streaminfo} ) {
+		# Get info, create metadata, subtitles, tag and/or thumbnail file (i.e. don't stream/record)
+		if ( $opt->{info} || $opt->{metadataonly} || $opt->{thumbonly} || $opt->{subsonly} || $opt->{tagonly} || $opt->{streaminfo} ) {
 			$this->get_metadata_general();
 			if ( $this->get_metadata( $ua ) ) {
 				main::logger "ERROR: Could not get programme metadata\n" if $opt->{verbose};
@@ -1199,6 +1201,13 @@ sub list_progs {
 			if ( $opt->{thumbonly} && $this->{thumbnail} ) {
 				$this->create_dir();
 				$this->download_thumbnail();
+			}
+			# tag
+			if ( $opt->{tagonly} && ! $opt->{notag} ) {
+				# this probably needs to be initialised earlier - needed for tagging
+				$bin->{atomicparsley} = $opt->{atomicparsley} || 'AtomicParsley';
+				$this->create_dir();
+				$this->tag_file;
 			}
 			# streaminfo
 			if ( $opt->{streaminfo} ) {
@@ -3706,7 +3715,10 @@ sub list_progs {
 			push @match_list, main::get_regex_matches( $prog, $_ );
 		}
 	}
-	
+
+	# force skipdeleted if --tagonly is specified
+	$opt->{skipdeleted} = 1 if $opt->{tagonly};
+
 	# Prune list of history entries with non-existant media files
 	if ( $opt->{skipdeleted} ) {
 		my @pruned = ();
@@ -3715,7 +3727,7 @@ sub list_progs {
 			if ( defined $this->{filename} && $this->{filename} ) {
 				# Skip if the originally recorded file no longer exists
 				if ( ! -f $this->{filename} ) {
-					main::logger "DEBUG: Skipping metadata/thumbnail - file no longer exists: '$this->{filename}'\n" if $opt->{verbose};
+					main::logger "DEBUG: Skipping metadata/thumbnail/tagging - file no longer exists: '$this->{filename}'\n" if $opt->{verbose};
 				} else {
 					push @pruned, $this;
 				}
@@ -4245,6 +4257,8 @@ sub mode_ver_download_retry_loop {
 				}
 				if ( ! $opt->{nowrite} ) {
 					$hist->add( $prog );
+					$prog->tag_file if ! $opt->{notag};
+				} elsif ( $opt->{tagonly} ) {
 					$prog->tag_file;
 				}
 				if ( $opt->{command} && ! $opt->{nowrite} ) {
@@ -4604,6 +4618,7 @@ sub generate_filenames {
 		&& ( ! $opt->{metadataonly} )
 		&& ( ! $opt->{thumbonly} )
 		&& ( ! $opt->{subsonly} )
+		&& ( ! $opt->{tagonly} )
 		&& -f $prog->{filename} 
 		&& stat($prog->{filename})->size > $prog->min_download_size()
 	) {
@@ -5307,8 +5322,8 @@ sub get_metadata {
 	if ( keys %{ $prog->{verpids} } == 0 ) {
 		if ( $prog->get_verpids( $ua ) ) {
 			main::logger "ERROR: Could not get version pid metadata\n" if $opt->{verbose};
-			# Only return at this stage unless we want metadata only for various reasons
-			return 1 if ! ( $opt->{info} || $opt->{metadataonly} || $opt->{thumbonly} )
+			# Only return at this stage unless we want metadata/tags only for various reasons
+			return 1 if ! ( $opt->{info} || $opt->{metadataonly} || $opt->{thumbonly} || $opt->{tagonly} )
 		}
 	}
 	$versions = join ',', sort keys %{ $prog->{verpids} };
@@ -6706,38 +6721,60 @@ sub get_links {
 				$xml = main::request_url_retry($ua, $url, 3, '.', "WARNING: Failed to get programme schedule feed for $channel_id from iplayer site\n");
 				decode_entities($xml);
 		
-				#      <broadcast>
-				#        <start>2010-01-11T11:25:00Z</start>
-				#        <end>2010-01-11T11:30:00Z</end>
-				#        <duration>300</duration>
-				#        <episode>
-				#          <pid>b00l6wjs</pid>
-				#          <title>Vampire Bats</title>
-				#          <short_synopsis>How to survive the most dangerous
-				#          situations that Mother Nature can chuck at
-				#          you.</short_synopsis>
-				#          <medium_synopsis>A light-hearted look at how to survive
-				#          the most dangerous situations that Mother Nature can
-				#          chuck at you.</medium_synopsis>
-				#          <long_synopsis></long_synopsis>
-				#          <iplayer>
-				#            <audio_expires />
-				#            <video_expires>2010-01-18T11:29:00Z</video_expires>
-				#          </iplayer>
-				#          <position>16</position>
-				#          <series>
-				#            <pid>b00kh5x3</pid>
-				#            <title>Shorts</title>
-				#          </series>
-				#          <brand>
-				#            <pid>b00kh5y8</pid>
-				#            <title>Sam and Mark's Guide to Dodging Disaster</title>
-				#          </brand>
-				#        </episode>
-				#      </broadcast>
+				# <broadcast is_repeat="1" is_blanked="0">
+				#   <pid>p00l44r8</pid>
+				#   <start>2011-10-24T00:45:00+01:00</start>
+				#   <end>2011-10-24T01:15:00+01:00</end>
+				#   <duration>1800</duration>
+				#   <programme type="episode">
+				#     <pid>b016c73c</pid>
+				#     <position>3</position>
+				#     <title>Episode 3</title>
+				#     <short_synopsis>With team captains Noel Fielding and Phill Jupitus, and a surprise special guest host.</short_synopsis>
+				#     <media_type>audio_video</media_type>
+				#     <duration>2100</duration>
+				#     <display_titles>
+				#       <title>Never Mind the Buzzcocks</title>
+				#       <subtitle>Series 25, Episode 3</subtitle>
+				#     </display_titles>
+				#     <first_broadcast_date>2011-10-17T22:00:00+01:00</first_broadcast_date>
+				#     <ownership>
+				#       <service type="tv" id="bbc_two" key="bbctwo">
+				#         <title>BBC Two</title>
+				#       </service>
+				#     </ownership>
+				#     <programme type="series">
+				#       <pid>b015skhy</pid>
+				#       <title>Series 25</title>
+				#       <position>25</position>
+				#       <expected_child_count>12</expected_child_count>
+				#       <first_broadcast_date>2011-10-03T22:00:00+01:00</first_broadcast_date>
+				#       <programme type="brand">
+				#         <pid>b006v0dz</pid>
+				#         <title>Never Mind the Buzzcocks</title>
+				#         <position />
+				#         <expected_child_count />
+				#         <first_broadcast_date>2007-06-20T22:00:00+01:00</first_broadcast_date>
+				#         <ownership>
+				#           <service type="tv" id="bbc_two" key="bbctwo">
+				#             <title>BBC Two</title>
+				#           </service>
+				#         </ownership>
+				#       </programme>
+				#     </programme>
+				#     <available_until>2011-10-30T23:29:00Z</available_until>
+				#     <actual_start>2011-10-17T22:30:00+01:00</actual_start>
+				#     <is_available_mediaset_pc_sd>1</is_available_mediaset_pc_sd>
+				#     <is_legacy_media>0</is_legacy_media>
+				#     <media format="video">
+				#       <expires>2011-10-30T23:29:00Z</expires>
+				#       <availability>11 days left to watch</availability>
+				#     </media>
+				#   </programme>
+				# </broadcast>
 
 				# get list of entries within <broadcast> </broadcast> tags
-				my @entries = split /<broadcast>/, $xml;
+				my @entries = split /<broadcast[^s]/, $xml;
 				# Discard first element == header
 				shift @entries;
 				main::logger "INFO: Got ".($#entries + 1)." programmes\n" if $opt->{verbose};
@@ -6748,11 +6785,11 @@ sub get_links {
 					my $entry_flat = $entry;
 					$entry_flat =~ s/\n/ /g;
 
-					$pid = $1 if $entry =~ m{<episode>.*?<pid>\s*(.+?)\s*</pid>};
+					$pid = $1 if $entry =~ m{<programme\s+type="episode">.*?<pid>\s*(.+?)\s*</pid>};
 
-					$episode = $1 if $entry =~ m{<episode>.*?<title>\s*(.*?)\s*</title>};
-					$nametitle = $1 if $entry =~ m{<brand>.*?<title>\s*(.*?)\s*</title>.*?</brand>};
-					$seriestitle = $1 if $entry =~ m{<series>.*?<title>\s*(.*?)\s*</title>.*?</series>};
+					$episode = $1 if $entry =~ m{<programme\s+type="episode">.*?<title>\s*(.*?)\s*</title>};
+					$nametitle = $1 if $entry =~ m{<programme\s+type="brand">.*?<title>\s*(.*?)\s*</title>.*?</programme>};
+					$seriestitle = $1 if $entry =~ m{<programme\s+type="series">.*?<title>\s*(.*?)\s*</title>.*?</programme>};
 
 					# Set name
 					if ( $nametitle && $seriestitle ) {
@@ -9170,7 +9207,7 @@ sub add {
 		return 1;
 	}
 	# Parse valid options and create array (ignore options from the options files that have not been overriden on the cmdline)
-	for ( grep !/(webrequest|future|nocopyright|^test|metadataonly|subsonly|thumbonly|stdout|^get|refresh|^save|^prefs|help|expiry|nowrite|tree|terse|streaminfo|listformat|^list|showoptions|hide|info|pvr.*)$/, sort {lc $a cmp lc $b} keys %{$opt_cmdline} ) {
+	for ( grep !/(webrequest|future|nocopyright|^test|metadataonly|subsonly|thumbonly|tagonly|stdout|^get|refresh|^save|^prefs|help|expiry|nowrite|tree|terse|streaminfo|listformat|^list|showoptions|hide|info|pvr.*)$/, sort {lc $a cmp lc $b} keys %{$opt_cmdline} ) {
 		if ( defined $opt_cmdline->{$_} ) {
 				push @options, "$_ $opt_cmdline->{$_}";
 				main::logger "DEBUG: Adding option $_ = $opt_cmdline->{$_}\n" if $opt->{debug};
