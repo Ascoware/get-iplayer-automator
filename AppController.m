@@ -764,6 +764,10 @@
 	NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
 	[nc postNotification:[NSNotification notificationWithName:@"Log" object:tempLog]];
 }
+-(void)addToLog:(NSString *)string
+{
+    [self addToLog:string :nil];
+}
 -(void)addToLog:(NSString *)string :(id)sender {
 	//Get Current Log
 	NSMutableAttributedString *current_log = [[NSMutableAttributedString alloc] initWithAttributedString:log_value];
@@ -2095,7 +2099,7 @@
 	NSString *path = [[NSString alloc] initWithString:[show path]];
 	NSString *ext = [path pathExtension];
 	
-	[self addToLog:[NSString stringWithFormat:@"Adding %@ to iTunes",[show showName]] :self];
+	[self performSelectorOnMainThread:@selector(addToLog:) withObject:[NSString stringWithFormat:@"Adding %@ to iTunes",[show showName]] waitUntilDone:NO];
 	
 	iTunesApplication *iTunes = [SBApplication applicationWithBundleIdentifier:@"com.apple.iTunes"];
 	
@@ -2126,22 +2130,22 @@
 			{
 				//[self addToLog:@"Setting Podcast Metadata:" :self];
 				[track setBookmarkable:YES];
-				[self addToLog:@"	Bookmarkable set" :self];
+				//[self addToLog:@"	Bookmarkable set" :self];
 				//[track setName:[show showName]];
 				//[self addToLog:@"	Name set" :self];
 				//[track setAlbum:[show seriesName]];
 				//[self addToLog:@"	Album set" :self];
 				[track setUnplayed:YES];
-				[self addToLog:@"	Unplayed set" :self];
+				//[self addToLog:@"	Unplayed set" :self];
 				//[track setArtist:[show tvNetwork]];
 				//[self addToLog:@"	Artist set" :self];
-				[self addToLog:@"All Metadata set." :self];
+				//[self addToLog:@"All Metadata set." :self];
                 [show setValue:@"Complete & in iTunes" forKey:@"status"];
 			}
 			else
             {
-                [self addToLog:@"iTunes did not accept file." :nil];
-                [self addToLog:@"Try setting iTunes to open in 32-bit mode." :nil];
+                [self performSelectorOnMainThread:@selector(addToLog:) withObject:@"iTunes did not accept file." waitUntilDone:YES];
+                [self performSelectorOnMainThread:@selector(addToLog:) withObject:@"Try setting iTunes to open in 32-bit mode." waitUntilDone:YES];
                 if ([[NSAlert alertWithMessageText:@"File could not be added to iTunes," defaultButton:@"Help Me!" alternateButton:@"Do nothing" otherButton:nil informativeTextWithFormat:@"This is usually fixed by running iTunes in 32-bit mode. Would you like instructions to do this?"] runModal] == NSAlertDefaultReturn)
                     [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"http://support.apple.com/kb/TS3771"]];
                 [show setValue:@"Complete: Not in iTunes" forKey:@"status"];
@@ -2149,15 +2153,15 @@
 		}
 		else
 		{
-			[self addToLog:@"Can't add to iTunes; incompatible format." :self];
-			[self addToLog:@"			iTunes Compatible Modes: Flash - High, Flash - Standard, Flash - HD, iPhone, Radio - MP3, Podcast" :nil];
+			[self performSelectorOnMainThread:@selector(addToLog:) withObject:@"Can't add to iTunes; incompatible format." waitUntilDone:YES];
+			[self performSelectorOnMainThread:@selector(addToLog:) withObject:@"			iTunes Compatible Modes: Flash - High, Flash - Standard, Flash - HD, iPhone, Radio - MP3, Podcast" waitUntilDone:YES];
 			[show setValue:@"Download Complete" forKey:@"status"];
 		}
 	}
 	@catch (NSException *e)
 	{
-		[self addToLog:@"Unable to Add to iTunes" :self];
-		NSLog(@"Unable %@ to iTunes",show);
+		[self performSelectorOnMainThread:@selector(addToLog:) withObject:@"Unable to Add to iTunes" waitUntilDone:YES];
+        NSLog(@"Unable %@ to iTunes",show);
 		[show setValue:@"Complete, Could not add to iTunes." forKey:@"status"];
 	}
 }

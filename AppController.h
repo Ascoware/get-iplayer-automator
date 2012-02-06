@@ -126,6 +126,7 @@ bool runUpdate=NO;
 - (IBAction)showLog:(id)sender;
 - (IBAction)copyLog:(id)sender;
 - (void)addToLog:(NSString *)string :(id)sender;
+- (void)addToLog:(NSString *)string;
 
 //Search
 - (IBAction)pvrSearch:(id)sender;
