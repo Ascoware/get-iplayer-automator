@@ -643,7 +643,7 @@
 										  [[NSDecimalNumber decimalNumberWithDecimal:percentage] doubleValue],
 										  [[NSDecimalNumber decimalNumberWithDecimal:recieved] doubleValue],
 										  [[NSDecimalNumber decimalNumberWithDecimal:total] doubleValue],
-										  adjustedSpeed,[show showName]]];
+										  adjustedSpeed]];
 				[show setValue:[NSString stringWithFormat:@"Getting MOV atom: %3.1f%%",
 								[[NSDecimalNumber decimalNumberWithDecimal:percentage] doubleValue]]
 						forKey:@"status"];
@@ -654,7 +654,7 @@
 										  [[NSDecimalNumber decimalNumberWithDecimal:percentage] doubleValue],
 										  [[NSDecimalNumber decimalNumberWithDecimal:recieved] doubleValue],
 										  [[NSDecimalNumber decimalNumberWithDecimal:total] doubleValue],
-										  adjustedSpeed,timeRemaining]];
+										  adjustedSpeed]];
 				[show setValue:[NSString stringWithFormat:@"Initializing: %3.1f%%",
 								[[NSDecimalNumber decimalNumberWithDecimal:percentage] doubleValue]]
 						forKey:@"status"];		

@@ -4424,7 +4424,7 @@ static NSOperationQueue *sharedQueue = nil;
 				if (err != noErr) return nil;
 				err = Gestalt(gestaltSystemVersionBugFix, &versionBugFix);
 				if (err != noErr) return nil;
-				OSVersion = [NSString stringWithFormat:@"%u.%u.%u", versionMajor, versionMinor, versionBugFix];
+				OSVersion = [NSString stringWithFormat:@"%lu.%lu.%lu", (unsigned long)versionMajor, (unsigned long)versionMinor, (unsigned long)versionBugFix];
 			#endif
 
 			// Takes the form "My Application 1.0 (Macintosh; Mac OS X 10.5.7; en_GB)"

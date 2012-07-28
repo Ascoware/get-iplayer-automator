@@ -394,7 +394,7 @@
         quickUpdateFailed=NO;
         
         NSString *cacheExpiryArg;
-        if ([[sender class] isEqualTo:[[NSString stringWithString:@""] class]])
+        if ([[sender class] isEqualTo:[@"" class]])
         {
             cacheExpiryArg = @"-e1";
         }
@@ -480,7 +480,7 @@
         NSLog(@"%@",lastUpdate);
         
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-        if (!lastUpdate || ([[NSDate date] timeIntervalSinceDate:lastUpdate] > ([[defaults objectForKey:@"CacheExpiryTime"] intValue]*3600)) || [[sender class] isEqualTo:[[NSString stringWithString:@""] class]])
+        if (!lastUpdate || ([[NSDate date] timeIntervalSinceDate:lastUpdate] > ([[defaults objectForKey:@"CacheExpiryTime"] intValue]*3600)) || [[sender class] isEqualTo:[@"" class]])
         {
             typesToCache = [[NSMutableArray alloc] initWithCapacity:5];
             if ([[defaults objectForKey:@"CacheBBC_TV"] boolValue]) [typesToCache addObject:@"TV"];
@@ -1489,9 +1489,9 @@
 			[nc addObserver:self selector:@selector(nextDownload:) name:@"DownloadFinished" object:nil];
             
 			tempQueue = [queueController arrangedObjects];
-			[self addToLog:[NSString stringWithFormat:@"\rDownloading Show %d/%d:\r",
-							(1),
-							[tempQueue count]]
+			[self addToLog:[NSString stringWithFormat:@"\rDownloading Show %lu/%lu:\r",
+							(unsigned long)1,
+							(unsigned long)[tempQueue count]]
 						  :nil];
 			for (Programme *show in tempQueue)
 			{
@@ -1667,9 +1667,9 @@
 				NSException *noneLeft = [NSException exceptionWithName:@"EndOfDownloads" reason:@"Done" userInfo:nil];
 				[noneLeft raise];
 			}
-			[self addToLog:[NSString stringWithFormat:@"\rDownloading Show %d/%d:\r",
-							([tempQueue indexOfObject:nextShow]+1),
-							[tempQueue count]]
+			[self addToLog:[NSString stringWithFormat:@"\rDownloading Show %lu/%lu:\r",
+							(unsigned long)([tempQueue indexOfObject:nextShow]+1),
+							(unsigned long)[tempQueue count]]
 						  :nil];
 			if ([[nextShow complete] isEqualToNumber:[NSNumber numberWithBool:NO]])
             {
@@ -1714,8 +1714,9 @@
 				}
 			}
 			tempQueue=nil;
-			[GrowlApplicationBridge notifyWithTitle:@"Downloads Finished" 
-										description:[NSString stringWithFormat:@"Downloads Successful = %d\nDownload Failed = %d",downloadsSuccessful,downloadsFailed] 
+			[GrowlApplicationBridge notifyWithTitle:@"Downloads Finished"
+										description:[NSString stringWithFormat:@"Downloads Successful = %lu\nDownload Failed = %lu",
+                                                     (unsigned long)downloadsSuccessful,(unsigned long)downloadsFailed]
 								   notificationName:@"Downloads Finished"
 										   iconData:nil
 										   priority:0
@@ -1905,7 +1906,7 @@
 	for (Series *series in seriesLink)
 	{
 		if (!runDownloads)
-			[currentProgress performSelectorOnMainThread:@selector(setStringValue:) withObject:[NSString stringWithFormat:@"Updating Series Link - %d/%d - %@",[seriesLink indexOfObject:series],[seriesLink count],[series showName]] waitUntilDone:YES];
+			[currentProgress performSelectorOnMainThread:@selector(setStringValue:) withObject:[NSString stringWithFormat:@"Updating Series Link - %lu/%lu - %@",(unsigned long)[seriesLink indexOfObject:series],(unsigned long)[seriesLink count],[series showName]] waitUntilDone:YES];
 		NSString *cacheExpiryArgument = [self cacheExpiryArgument:nil];
 		NSString *typeArgument = [self typeArgument:nil];
 		
@@ -2302,7 +2303,7 @@
 	[openPanel setCanChooseDirectories:YES];
 	[openPanel setAllowsMultipleSelection:NO];
     [openPanel setCanCreateDirectories:YES];
-	[openPanel runModalForTypes:nil];
+	[openPanel runModal];
 	NSArray *urls = [openPanel URLs];
 	[[NSUserDefaults standardUserDefaults] setValue:[[urls objectAtIndex:0] path] forKey:@"DownloadPath"];
 }
@@ -2429,9 +2430,9 @@
 	unsigned int unitFlags = NSHourCalendarUnit | NSMinuteCalendarUnit | NSDayCalendarUnit | NSSecondCalendarUnit;
 	NSDateComponents *conversionInfo = [[NSCalendar currentCalendar] components:unitFlags fromDate:currentTime toDate:startTime options:0];
 	
-	NSString *status = [NSString stringWithFormat:@"Time until Start (DD:HH:MM:SS): %2d:%2d:%2d:%2d", 
-						[conversionInfo day], [conversionInfo hour], 
-						[conversionInfo minute], [conversionInfo second]];
+	NSString *status = [NSString stringWithFormat:@"Time until Start (DD:HH:MM:SS): %2ld:%2ld:%2ld:%2ld",
+						(long)[conversionInfo day], (long)[conversionInfo hour],
+						(long)[conversionInfo minute],(long)[conversionInfo second]];
 	if (!runUpdate)
 		[currentProgress setStringValue:status];
 	[currentIndicator setIndeterminate:YES];
@@ -2493,7 +2494,7 @@
 	
 	//Set Proxy Argument
 	NSString *proxyArg;
-	NSString *partialProxyArg = [NSString stringWithString:@"--partial-proxy"];
+	NSString *partialProxyArg = @"--partial-proxy";
 	NSString *proxyOption = [[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"];
 	if ([proxyOption isEqualToString:@"None"])
 	{
