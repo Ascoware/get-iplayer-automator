@@ -11,6 +11,8 @@
 #import "Series.h"
 #import "ITVDownload.h"
 #import "Download.h"
+#import "FourODDownload.h"
+#import <IOKit/pwr_mgt/IOPMLib.h>
 
 bool runDownloads=NO;
 bool runUpdate=NO;
@@ -25,6 +27,7 @@ bool runUpdate=NO;
 	IBOutlet NSWindow *mainWindow;
 	IBOutlet NSApplication *application;
     IBOutlet NSWindow *historyWindow;
+    IOPMAssertionID powerAssertionID;
 	
 	//Log Components
 	IBOutlet NSTextView *log;
@@ -87,9 +90,11 @@ bool runUpdate=NO;
 	NSMutableArray *tvFormatList;
 	NSMutableArray *radioFormatList;
     NSMutableArray *itvFormatList;
+    NSMutableArray *fourODFormatList;
 	IBOutlet NSArrayController *tvFormatController;
 	IBOutlet NSArrayController *radioFormatController;
     IBOutlet NSArrayController *itvFormatController;
+    IBOutlet NSArrayController *fourODFormatController;
     IBOutlet NSButton *itvTVCheckbox;
     IBOutlet NSPanel *prefsPanel;
 	

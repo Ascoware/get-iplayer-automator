@@ -72,6 +72,7 @@
     [defaultValues setObject:[NSNumber numberWithBool:NO] forKey:@"AudioDescribed"];
     [defaultValues setObject:[NSNumber numberWithBool:YES] forKey:@"QuickCache"];
     [defaultValues setObject:[NSNumber numberWithBool:YES] forKey:@"TagShows"];
+    [defaultValues setObject:[NSNumber numberWithBool:YES] forKey:@"Cache4oD_TV"];
 	
 	[[NSUserDefaults standardUserDefaults] registerDefaults:defaultValues];
 	defaultValues = nil;
@@ -182,6 +183,18 @@
         [fileManager removeItemAtPath:filePath error:nil];
         rootObject=nil;
     }
+    
+    filename = @"4oDFormats.automator";
+    filePath = [folder stringByAppendingPathComponent:filename];
+    @try {
+        rootObject = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
+        [fourODFormatController addObjects:[rootObject valueForKey:@"fourODFormats"]];
+    }
+    @catch (NSException *exception) {
+        [fileManager removeItemAtPath:filePath error:nil];
+        rootObject=nil;
+    }
+    
 	//Adds Defaults to Type Preferences
 	if ([[tvFormatController arrangedObjects] count] == 0)
 	{
@@ -208,6 +221,14 @@
         TVFormat *format2 = [[TVFormat alloc] init];
         [format2 setFormat:@"Flash - Standard"];
         [itvFormatController addObjects:[NSArray arrayWithObjects:format1,format2,nil]];
+    }
+    if ([[fourODFormatController arrangedObjects] count] == 0)
+    {
+        TVFormat *format1 = [[TVFormat alloc] init];
+        [format1 setFormat:@"Flash - High"];
+        TVFormat *format2 = [[TVFormat alloc] init];
+        [format2 setFormat:@"Flash - Standard"];
+        [fourODFormatController addObjects:[NSArray arrayWithObjects:format1,format2,nil]];
     }
 		
 	//Growl Initialization
@@ -343,6 +364,12 @@
     rootObject = [NSMutableDictionary dictionary];
     [rootObject setValue:[itvFormatController arrangedObjects] forKey:@"itvFormats"];
     [NSKeyedArchiver archiveRootObject:rootObject toFile:filePath];
+    
+    filename = @"4oDFormats.automator";
+    filePath = [folder stringByAppendingPathComponent:filename];
+    rootObject = [NSMutableDictionary dictionary];
+    [rootObject setValue:[fourODFormatController arrangedObjects] forKey:@"fourODFormats"];
+    [NSKeyedArchiver archiveRootObject:rootObject toFile:filePath];
 }
 - (void)updater:(SUUpdater *)updater didFindValidUpdate:(SUAppcastItem *)update
 {
@@ -402,7 +429,7 @@
         {
             cacheExpiryArg = [[NSString alloc] initWithFormat:@"-e%d", ([[[NSUserDefaults standardUserDefaults] objectForKey:@"CacheExpiryTime"] intValue]*3600)];
         }
-        NSString *typeArgument = [[NSString alloc] initWithString:[self typeArgument:nil]];
+        NSString *typeArgument = [self typeArgument:nil];
         
         [self addToLog:@"Updating Program Index Feeds...\r" :self];
 
@@ -487,12 +514,14 @@
             if ([[defaults objectForKey:@"CacheITV_TV"] boolValue]) [typesToCache addObject:@"ITV"];
             if ([[defaults objectForKey:@"CacheBBC_Radio"] boolValue]) [typesToCache addObject:@"Radio"];
             if ([[defaults objectForKey:@"CacheBBC_Podcasts"] boolValue]) [typesToCache addObject:@"Podcast"];
+            if ([[defaults objectForKey:@"Cache4oD_TV"] boolValue]) [typesToCache addObject:@"CH4"];
             
-            NSArray *urlKeys = [NSArray arrayWithObjects:@"TV",@"ITV",@"Radio",@"Podcast", nil];
+            NSArray *urlKeys = [NSArray arrayWithObjects:@"TV",@"ITV",@"Radio",@"Podcast",@"CH4", nil];
             NSArray *urlObjects = [NSArray arrayWithObjects:@"http://tom-tech.com/get_iplayer/cache/tv.cache",
                                    @"http://tom-tech.com/get_iplayer/cache/itv.cache",
                                    @"http://tom-tech.com/get_iplayer/cache/radio.cache",
-                                   @"http://tom-tech.com/get_iplayer/cache/podcast.cache", nil];
+                                   @"http://tom-tech.com/get_iplayer/cache/podcast.cache",
+                                   @"http://tom-tech.com/get_iplayer/cache/ch4.cache", nil];
             updateURLDic = [[NSDictionary alloc] initWithObjects:urlObjects forKeys:urlKeys];
             
             nextToCache=0;
@@ -899,13 +928,13 @@
 				NSScanner *myScanner = [NSScanner scannerWithString:string];
 				NSString *temp_pid, *temp_showName, *temp_tvNetwork, *temp_type, *url;
 				[myScanner scanUpToString:@":" intoString:&temp_pid];
-				[myScanner scanUpToCharactersFromSet:[NSCharacterSet letterCharacterSet] intoString:NULL];
+				[myScanner scanUpToCharactersFromSet:[NSCharacterSet alphanumericCharacterSet] intoString:NULL];
 				[myScanner scanUpToString:@", ~" intoString:&temp_type];
 				[myScanner scanString:@", ~" intoString:NULL];
 				[myScanner scanUpToString:@"~," intoString:&temp_showName];
-				[myScanner scanUpToCharactersFromSet:[NSCharacterSet letterCharacterSet] intoString:NULL];
+				[myScanner scanUpToCharactersFromSet:[NSCharacterSet alphanumericCharacterSet] intoString:NULL];
 				[myScanner scanUpToString:@"," intoString:&temp_tvNetwork];
-                [myScanner scanUpToCharactersFromSet:[NSCharacterSet letterCharacterSet] intoString:NULL];
+                [myScanner scanUpToCharactersFromSet:[NSCharacterSet alphanumericCharacterSet] intoString:NULL];
                 [myScanner scanUpToString:@"kjkjkj" intoString:&url];
 				if ([temp_showName hasSuffix:@" - -"])
 				{
@@ -1483,6 +1512,8 @@
 		if (foundOne)
 		{
 			//Start First Download
+            IOPMAssertionCreateWithDescription(kIOPMAssertionTypePreventUserIdleSystemSleep, (CFStringRef)@"Downloading Show", (CFStringRef)@"GiA is downloading shows.", NULL, NULL, (double)0, NULL, &powerAssertionID);
+            
             NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
 			[nc addObserver:self selector:@selector(setPercentage:) name:@"setPercentage" object:nil];
 			[nc addObserver:self selector:@selector(setProgress:) name:@"setCurrentProgress" object:nil];
@@ -1499,6 +1530,8 @@
 				{
                     if ([[show tvNetwork] hasPrefix:@"ITV"])
                         currentDownload = [[ITVDownload alloc] initWithProgramme:show itvFormats:[itvFormatController arrangedObjects]];
+                    else if ([[show tvNetwork] hasPrefix:@"4oD"])
+                        currentDownload = [[FourODDownload alloc] initWithProgramme:show formats:[fourODFormatController arrangedObjects]];
                     else
                         currentDownload = [[BBCDownload alloc] initWithProgramme:show 
                                                                        tvFormats:[tvFormatController arrangedObjects] 
@@ -1535,6 +1568,8 @@
 }
 - (IBAction)stopDownloads:(id)sender
 {
+    IOPMAssertionRelease(powerAssertionID);
+    
 	runDownloads=NO;
     runScheduled=NO;
 	[currentDownload cancelDownload:self];
@@ -1675,6 +1710,8 @@
             {
                 if ([[nextShow tvNetwork] hasPrefix:@"ITV"])
                     currentDownload = [[ITVDownload alloc] initWithProgramme:nextShow itvFormats:[itvFormatController arrangedObjects]];
+                else if ([[nextShow tvNetwork] hasPrefix:@"4oD"])
+                    currentDownload = [[FourODDownload alloc] initWithProgramme:nextShow formats:[fourODFormatController arrangedObjects]];
                 else
                     currentDownload = [[BBCDownload alloc] initWithProgramme:nextShow 
                                                                    tvFormats:[tvFormatController arrangedObjects] 
@@ -1684,6 +1721,8 @@
 		@catch (NSException *e)
 		{
 			//Downloads must be finished.
+            IOPMAssertionRelease(powerAssertionID);
+            
 			[stopButton setEnabled:NO];
 			[startButton setEnabled:YES];
 			[currentProgress setStringValue:@""];
@@ -1824,11 +1863,11 @@
 				NSString *temp_pid, *temp_showName, *temp_tvNetwork;
 				NSInteger timeadded;
 				[myScanner scanUpToString:@":" intoString:&temp_pid];
-				[myScanner scanUpToCharactersFromSet:[NSCharacterSet letterCharacterSet] intoString:NULL];
+				[myScanner scanUpToCharactersFromSet:[NSCharacterSet alphanumericCharacterSet] intoString:NULL];
 				[myScanner scanUpToString:@", ~" intoString:NULL];
 				[myScanner scanString:@", ~" intoString:nil];
 				[myScanner scanUpToString:@"~," intoString:&temp_showName];
-				[myScanner scanUpToCharactersFromSet:[NSCharacterSet letterCharacterSet] intoString:NULL];
+				[myScanner scanUpToCharactersFromSet:[NSCharacterSet alphanumericCharacterSet] intoString:NULL];
 				[myScanner scanUpToString:@"," intoString:&temp_tvNetwork];
 				[myScanner scanString:@", " intoString:nil];
 				[myScanner scanInteger:&timeadded];
@@ -2327,6 +2366,7 @@
 	[sharedDefaults removeObjectForKey:@"CacheITV_TV"];
 	[sharedDefaults removeObjectForKey:@"CacheBBC_Radio"];
 	[sharedDefaults removeObjectForKey:@"CacheBBC_Podcasts"];
+    [sharedDefaults removeObjectForKey:@"Cache4oD_TV"];
 	[sharedDefaults removeObjectForKey:@"CacheExpiryTime"];
 	[sharedDefaults removeObjectForKey:@"Verbose"];
 	[sharedDefaults removeObjectForKey:@"SeriesLinkStartup"];
@@ -2341,10 +2381,16 @@
 	if (runSinceChange || !currentTypeArgument)
 	{
 		NSMutableString *typeArgument = [[NSMutableString alloc] initWithString:@"--type="];
-		if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheBBC_TV"] isEqualTo:[NSNumber numberWithBool:YES]]) [typeArgument appendString:@"tv,"];
-		if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheITV_TV"] isEqualTo:[NSNumber numberWithBool:YES]]) [typeArgument appendString:@"itv,"];
-		if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheBBC_Radio"] isEqualTo:[NSNumber numberWithBool:YES]]) [typeArgument appendString:@"radio,"];
-		if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheBBC_Podcasts"] isEqualTo:[NSNumber numberWithBool:YES]]) [typeArgument appendString:@"podcast,"];
+		if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheBBC_TV"] isEqualTo:[NSNumber numberWithBool:YES]])
+            [typeArgument appendString:@"tv,"];
+		if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheITV_TV"] isEqualTo:[NSNumber numberWithBool:YES]])
+            [typeArgument appendString:@"itv,"];
+		if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheBBC_Radio"] isEqualTo:[NSNumber numberWithBool:YES]])
+            [typeArgument appendString:@"radio,"];
+		if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheBBC_Podcasts"] isEqualTo:[NSNumber numberWithBool:YES]])
+            [typeArgument appendString:@"podcast,"];
+        if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"Cache4oD_TV"] isEqualTo:[NSNumber numberWithBool:YES]])
+            [typeArgument appendString:@"ch4,"];
 		[typeArgument deleteCharactersInRange:NSMakeRange([typeArgument length]-1,1)];
 		currentTypeArgument = [typeArgument copy];
 		return [NSString stringWithString:typeArgument];

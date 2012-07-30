@@ -59,10 +59,9 @@
 - (void)addToLog:(NSString *)logMessage;
 - (void)processFLVStreamerMessage:(NSString *)message;
 
-
+- (void)launchMetaRequest;
 - (void)launchRTMPDumpWithArgs:(NSMutableArray *)args;
 - (void)processGetiPlayerOutput:(NSString *)outp;
-- (void)launchMetaRequest;
 
 @property (readonly) Programme *show;
 @end

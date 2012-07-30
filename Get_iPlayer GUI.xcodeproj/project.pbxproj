@@ -78,6 +78,8 @@
 		DF3A234B13E5F59900B82C2E /* rtmpdump-2.4 in Resources */ = {isa = PBXBuildFile; fileRef = DF3A234A13E5F59900B82C2E /* rtmpdump-2.4 */; };
 		DF876E4013F0BCAD0097FD48 /* flvstreamer in Resources */ = {isa = PBXBuildFile; fileRef = DF876E3F13F0BCAC0097FD48 /* flvstreamer */; };
 		DFC865E213E96BE200606599 /* ReasonForFailure.m in Sources */ = {isa = PBXBuildFile; fileRef = DFC865E113E96BE200606599 /* ReasonForFailure.m */; };
+		DFC8D3F215C557E3008E369F /* FourODDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = DFC8D3F115C557E3008E369F /* FourODDownload.m */; };
+		DFC8D3F415C58B3B008E369F /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DFC8D3F315C58B3B008E369F /* IOKit.framework */; };
 		DFE5B67013E7062C0008571B /* librtmp.dylib in Resources */ = {isa = PBXBuildFile; fileRef = DF592B5313E70084000D0D11 /* librtmp.dylib */; };
 		DFE5B67413E70AC20008571B /* plugins in Resources */ = {isa = PBXBuildFile; fileRef = DFE5B67313E70AC20008571B /* plugins */; };
 		DFFF196713E96288007B52AC /* ReasonsForFailure.plist in Resources */ = {isa = PBXBuildFile; fileRef = DFFF196613E96288007B52AC /* ReasonsForFailure.plist */; };
@@ -202,6 +204,9 @@
 		DF876E3F13F0BCAC0097FD48 /* flvstreamer */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = flvstreamer; sourceTree = "<group>"; };
 		DFC865E013E96BE200606599 /* ReasonForFailure.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReasonForFailure.h; sourceTree = "<group>"; };
 		DFC865E113E96BE200606599 /* ReasonForFailure.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReasonForFailure.m; sourceTree = "<group>"; };
+		DFC8D3F015C557E3008E369F /* FourODDownload.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FourODDownload.h; sourceTree = "<group>"; };
+		DFC8D3F115C557E3008E369F /* FourODDownload.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FourODDownload.m; sourceTree = "<group>"; };
+		DFC8D3F315C58B3B008E369F /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/IOKit.framework; sourceTree = DEVELOPER_DIR; };
 		DFE5B67313E70AC20008571B /* plugins */ = {isa = PBXFileReference; lastKnownFileType = folder; path = plugins; sourceTree = "<group>"; };
 		DFFF196613E96288007B52AC /* ReasonsForFailure.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = ReasonsForFailure.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -211,6 +216,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DFC8D3F415C58B3B008E369F /* IOKit.framework in Frameworks */,
 				D921C9C0149BBF43004CB558 /* libz.dylib in Frameworks */,
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
 				D914BC59100C9F0100F7E68E /* ScriptingBridge.framework in Frameworks */,
@@ -235,6 +241,8 @@
 				D914BD28100CBFA900F7E68E /* BBCDownload.m */,
 				D921C9E6149BCB16004CB558 /* ITVDownload.h */,
 				D921C9E7149BCB16004CB558 /* ITVDownload.m */,
+				DFC8D3F015C557E3008E369F /* FourODDownload.h */,
+				DFC8D3F115C557E3008E369F /* FourODDownload.m */,
 				D92687C31087F81F000E8132 /* DownloadHistoryController.h */,
 				D92687C41087F81F000E8132 /* DownloadHistoryController.m */,
 				D91787021013803000B82736 /* Models */,
@@ -248,6 +256,7 @@
 			isa = PBXGroup;
 			children = (
 				D921C9BF149BBF43004CB558 /* libz.dylib */,
+				DFC8D3F315C58B3B008E369F /* IOKit.framework */,
 				D921C9C1149BBF51004CB558 /* CoreServices.framework */,
 				D9D8238F10B3B6D600556D1D /* Growl.framework */,
 				D941D99F1025DDCF0012A75F /* SystemConfiguration.framework */,
@@ -566,6 +575,7 @@
 				D921C9E8149BCB16004CB558 /* ITVDownload.m in Sources */,
 				D921C9EB149BCDEB004CB558 /* Download.m in Sources */,
 				D9D06C6F14BB91C200029340 /* ITVMediaFileEntry.m in Sources */,
+				DFC8D3F215C557E3008E369F /* FourODDownload.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -644,6 +654,7 @@
 					"\"$(SRCROOT)/Binaries\"",
 				);
 				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CODE_SIGN_FLAGS = "--timestamp=none";
 				OTHER_LDFLAGS = "-licucore";
 				PRODUCT_NAME = "Get iPlayer Automator";
 				PROVISIONING_PROFILE = "";
@@ -676,6 +687,7 @@
 					"\"$(SRCROOT)/Binaries\"",
 				);
 				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CODE_SIGN_FLAGS = "--timestamp=none";
 				OTHER_LDFLAGS = "-licucore";
 				PRODUCT_NAME = "Get iPlayer Automator";
 				PROVISIONING_PROFILE = "";

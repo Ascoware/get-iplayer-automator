@@ -416,4 +416,70 @@
             if([output length] > 1) [self addToLog:output noTag:YES];
     }
 }
+-(void)launchRTMPDumpWithArgs:(NSMutableArray *)args
+{
+    if ([[NSFileManager defaultManager] fileExistsAtPath:[[[downloadPath stringByDeletingPathExtension] stringByDeletingPathExtension] stringByAppendingPathExtension:@"mp4"]])
+    {
+        [self addToLog:@"ERROR: Destination file already exists." noTag:YES];
+        [show setComplete:[NSNumber numberWithBool:YES]];
+        [show setSuccessful:[NSNumber numberWithBool:NO]];
+        [show setValue:@"Download Failed" forKey:@"status"];
+        [show setReasonForFailure:@"FileExists"];
+        [nc postNotificationName:@"DownloadFinished" object:show];
+        return;
+    }
+    else if ([[NSFileManager defaultManager] fileExistsAtPath:downloadPath])
+    {
+        [self addToLog:@"WARNING: Partial file already exists...attempting to resume" noTag:YES];
+        [args addObject:@"--resume"];
+    }
+    
+    task = [[NSTask alloc] init];
+    pipe = [[NSPipe alloc] init];
+    errorPipe = [[NSPipe alloc] init];
+    [task setLaunchPath:[[NSBundle mainBundle] pathForResource:@"rtmpdump-2.4" ofType:nil]];
+    
+    /* rtmpdump -r "rtmpe://cp72511.edgefcs.net/ondemand?auth=eaEc.b4aodIcdbraJczd.aKchaza9cbdTc0cyaUc2aoblaLc3dsdkd5d9cBduczdLdn-bo64cN-eS-6ys1GDrlysDp&aifp=v002&slist=production/" -W http://www.itv.com/mediaplayer/ITVMediaPlayer.swf?v=11.20.654 -y "mp4:production/priority/CATCHUP/e48ab1e2/1a73/4620/adea/dda6f21f45ee/1-6178-0002-001_THE-ROYAL-VARIETY-PERFORMANCE-2011_TX141211_ITV1200_16X9.mp4" -o test2 */
+    
+    [task setArguments:[NSArray arrayWithArray:args]];
+    
+    
+    [task setStandardOutput:pipe];
+    [task setStandardError:errorPipe];
+    fh = [pipe fileHandleForReading];
+	errorFh = [errorPipe fileHandleForReading];
+    
+    NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:[task environment]];
+    [envVariableDictionary setObject:[[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"Contents/Resources"] forKey:@"DYLD_LIBRARY_PATH"];
+    [envVariableDictionary setObject:[@"~" stringByExpandingTildeInPath] forKey:@"HOME"];
+    [task setEnvironment:envVariableDictionary];
+    
+	
+	[nc addObserver:self
+		   selector:@selector(DownloadDataReady:)
+			   name:NSFileHandleReadCompletionNotification
+			 object:fh];
+	[nc addObserver:self
+		   selector:@selector(ErrorDataReady:)
+			   name:NSFileHandleReadCompletionNotification
+			 object:errorFh];
+    [nc addObserver:self
+           selector:@selector(rtmpdumpFinished:)
+               name:NSTaskDidTerminateNotification
+             object:task];
+    
+    [self addToLog:@"INFO: Launching RTMPDUMP..." noTag:YES];
+	[task launch];
+	[fh readInBackgroundAndNotify];
+	[errorFh readInBackgroundAndNotify];
+	[show setValue:@"Initiliasing..." forKey:@"status"];
+	
+	//Prepare UI
+	[self setCurrentProgress:[NSString stringWithFormat:@"Initialising RTMPDump... -- %@",[show showName]]];
+    [self setPercentage:102];
+}
+- (void)launchMetaRequest
+{
+    [[NSException exceptionWithName:@"InvalidDownload" reason:@"Launch Meta Request shouldn't be called on base class." userInfo:nil] raise];
+}
 @end
