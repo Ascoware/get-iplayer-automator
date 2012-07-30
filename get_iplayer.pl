@@ -24,7 +24,7 @@
 #
 #
 package main;
-my $version = 2.80;
+my $version = 2.82;
 #
 # Help:
 #	./get_iplayer --help | --longhelp
@@ -116,12 +116,12 @@ my %prog_types = (
 my $opt_format = {
 	# Recording
 	attempts	=> [ 1, "attempts=n", 'Recording', '--attempts <number>', "Number of attempts to make or resume a failed connection"],
-	force		=> [ 1, "force|force-download!", 'Recording', '--force', "Ignore programme history (unsets --hide option also). Forces a script update if used wth -u"],
-	get		=> [ 2, "get|record|g!", 'Recording', '--get, -g', "Start recording matching programmes"],
+	force		=> [ 1, "force|force-download!", 'Recording', '--force', "Ignore programme history (unsets --hide option also). Forces a script update if used with -u"],
+	get		=> [ 2, "get|record|g!", 'Recording', '--get, -g', "Start recording matching programmes. Search terms required unless --pid specified. Use  --search=.* to force download of all available programmes."],
 	hash		=> [ 1, "hash!", 'Recording', '--hash', "Show recording progress as hashes"],
 	metadataonly	=> [ 1, "metadataonly|metadata-only!", 'Recording', '--metadata-only', "Create specified metadata info file without any recording or streaming (can also be used with thumbnail option)."],
 	mmsnothread	=> [ 1, "mmsnothread!", 'Recording', '--mmsnothread', "Disable parallel threaded recording for mms"],
-	modes		=> [ 0, "modes=s", 'Recording', '--modes <mode>,<mode>,...', "Recoding modes: iphone,flashhd,flashvhigh,flashhigh,flashstd,flashnormal,flashlow,n95_wifi,flashaac,flashaachigh,flashaacstd,flashaaclow,flashaudio,realaudio,wma"],
+	modes		=> [ 0, "modes=s", 'Recording', '--modes <mode>,<mode>,...', "Recording modes: flashhd,flashvhigh,flashhigh,flashstd,flashnormal,flashlow,n95_wifi,flashaac,flashaachigh,flashaacstd,flashaaclow,flashaudio,realaudio,wma.  Use --modes=best to automatically select highest quality available."],
 	multimode	=> [ 1, "multimode!", 'Recording', '--multimode', "Allow the recording of more than one mode for the same programme - WARNING: will record all specified/default modes!!"],
 	overwrite	=> [ 1, "overwrite|over-write!", 'Recording', '--overwrite', "Overwrite recordings if they already exist"],
 	partialproxy	=> [ 1, "partial-proxy!", 'Recording', '--partial-proxy', "Only uses web proxy where absolutely required (try this extra option if your proxy fails)"],
@@ -130,8 +130,8 @@ my $opt_format = {
 	pidrecursive	=> [ 1, "pidrecursive|pid-recursive!", 'Recording', '--pid-recursive', "When used with --pid record all the embedded pids if the pid is a series or brand pid."],
 	proxy		=> [ 0, "proxy|p=s", 'Recording', '--proxy, -p <url>', "Web proxy URL e.g. 'http://USERNAME:PASSWORD\@SERVER:PORT' or 'http://SERVER:PORT'"],
 	raw		=> [ 0, "raw!", 'Recording', '--raw', "Don't transcode or change the recording/stream in any way (i.e. radio/realaudio, rtmp/flv)"],
-	start		=> [ 1, "start=s", 'Recording', '--start <secs>', "Recording/streaming start offset (rtmp and realaudio only)"],
-	stop		=> [ 1, "stop=s", 'Recording', '--stop <secs>', "Recording/streaming stop offset (can be used to limit live rtmp recording length) rtmp and realaudio only"],
+	start		=> [ 1, "start=s", 'Recording', '--start <secs|hh:mm:ss>', "Recording/streaming start offset (rtmp and realaudio only)"],
+	stop		=> [ 1, "stop=s", 'Recording', '--stop <secs|hh:mm:ss>', "Recording/streaming stop offset (can be used to limit live rtmp recording length) rtmp and realaudio only"],
 	suboffset	=> [ 1, "suboffset=n", 'Recording', '--suboffset <offset>', "Offset the subtitle timestamps by the specified number of milliseconds"],
 	subtitles	=> [ 2, "subtitles|subs!", 'Recording', '--subtitles', "Download subtitles into srt/SubRip format if available and supported"],
 	subsonly	=> [ 1, "subtitlesonly|subsonly|subtitles-only|subs-only!", 'Recording', '--subtitles-only', "Only download the subtitles, not the programme"],
@@ -148,7 +148,7 @@ my $opt_format = {
 	category 	=> [ 0, "category=s", 'Search', '--category <string>', "Narrow search to matched categories (regex or comma separated values)"],
 	channel		=> [ 0, "channel=s", 'Search', '--channel <string>', "Narrow search to matched channel(s) (regex or comma separated values)"],
 	exclude		=> [ 0, "exclude=s", 'Search', '--exclude <string>', "Narrow search to exclude matched programme names (regex or comma separated values)"],
-	excludecategory	=> [ 0, "xcat|exclude-category=s", 'Search', '--exclude-category <string>', "Narrow search to exclude matched catogories (regex or comma separated values)"],
+	excludecategory	=> [ 0, "xcat|exclude-category=s", 'Search', '--exclude-category <string>', "Narrow search to exclude matched categories (regex or comma separated values)"],
 	excludechannel	=> [ 0, "xchan|exclude-channel=s", 'Search', '--exclude-channel <string>', "Narrow search to exclude matched channel(s) (regex or comma separated values)"],
 	fields		=> [ 0, "fields=s", 'Search', '--fields <field1>,<field2>,..', "Searches only in the specified comma separated fields"],
 	future		=> [ 1, "future!", 'Search', '--future', "Search future programme schedule if it has been indexed (refresh cache with: --refresh --refresh-future)."],
@@ -157,7 +157,7 @@ my $opt_format = {
 	history		=> [ 1, "history!", 'Search', '--history', "Search/show recordings history"],
 	since		=> [ 0, "since=n", 'Search', '--since', "Limit search to programmes added to the cache in the last N hours"],
 	type		=> [ 2, "type=s", 'Search', '--type <type>', "Only search in these types of programmes: ".join(',', keys %prog_types).",all (tv is default)"],
-	versionlist	=> [ 1, "versionlist|versions|version-list=s", 'Search', '--versions <versions>', "Version of programme to search or record (e.g. '--versions signed,audiodescribed,default')"],
+	versionlist	=> [ 1, "versionlist|versions|version-list=s", 'Search', '--versions <versions>', "Version of programme to search or record.  List is processed from left to right and first version found is downloaded.  Example: '--versions signed,audiodescribed,default' will prefer signed and audiodescribed programmes if available.  Default: 'default'"],
 
 	# Output
 	command		=> [ 1, "c|command=s", 'Output', '--command, -c <command>', "Run user command after successful recording using args such as <pid>, <name> etc"],
@@ -245,7 +245,9 @@ my $opt_format = {
 	mplayer		=> [ 1, "mplayer=s", 'External Program', '--mplayer <path>', "Location of mplayer binary"],
 
 	# Tagging
+	noartwork => [ 1, "noartwork|no-artwork!", 'Tagging', '--no-artwork', "Do not embed thumbnail image in output file.  All other metadata values will be written."],
 	notag => [ 1, "notag|no-tag!", 'Tagging', '--no-tag', "Do not tag downloaded programmes"],
+	tag_cnid => [ 1, "tagcnid|tag-cnid!", 'Tagging', '--tag-cnid', "AtomicParsley supports --cnID argument to add catalog ID used for combining HD and SD versions in iTunes"],
 	tag_fulltitle => [ 1, "tagfulltitle|tag-fulltitle!", 'Tagging', '--tag-fulltitle', "Use complete title (including series) instead of shorter episode title"],
 	tag_hdvideo => [ 1, "taghdvideo|tag-hdvideo!", 'Tagging', '--tag-hdvideo', "AtomicParsley supports --hdvideo argument for HD video flag"],
 	tag_longdesc => [ 1, "taglongdesc|tag-longdesc!", 'Tagging', '--tag-longdesc', "AtomicParsley supports --longdesc argument for long description text"],
@@ -533,6 +535,13 @@ if ( $opt->{webrequest} ) {
 	delete $opt_cmdline->{webrequest};
 }
 
+# process --start and --stop if necessary
+foreach ('start', 'stop') {
+	if ($opt->{$_} && $opt->{$_} =~ /(\d\d):(\d\d)(:(\d\d))?/) {
+		$opt->{$_} = $1 * 3600 +  $2 * 60 + $4;
+	}
+}
+
 # Add --search option to @search_args if specified
 if ( defined $opt->{search} ) {
 	push @search_args, $opt->{search};
@@ -540,8 +549,10 @@ if ( defined $opt->{search} ) {
 	delete $opt->{search};
 	delete $opt_cmdline->{search};
 }
+# check if no search term(s) specified
+my $no_search_args = $#search_args < 0;
 # Assume search term is '.*' if nothing is specified - i.e. lists all programmes
-push @search_args, '.*' if ! $search_args[0];
+push @search_args, '.*' if ! $search_args[0] && ! $opt->{pid};
 
 # Auto-detect http:// url or <type>:http:// in a search term and set it as a --pid option (disable if --fields is used).
 if ( $search_args[0] =~ m{^(\w+:)?http://} && ( ! $opt->{pid} ) && ( ! $opt->{fields} ) ) {
@@ -565,6 +576,10 @@ $pvr->setvar('pvr_dir', "${profile_dir}/pvr/" );
 
 # PVR functions
 if ( $opt->{pvradd} ) {
+	if ( ! $opt->{pid} && $no_search_args ) {
+		main::logger "ERROR: Search term(s) or PID required for recording\n";
+		exit 1;
+	}
 	$pvr->add( $opt->{pvradd}, @search_args );
 
 } elsif ( $opt->{pvrdel} ) {
@@ -580,6 +595,10 @@ if ( $opt->{pvradd} ) {
 	$pvr->display_list();
 
 } elsif ( $opt->{pvrqueue} ) {
+	if ( ! $opt->{pid} && $no_search_args ) {
+		main::logger "ERROR: Search term(s) or PID required for recording\n";
+		exit 1;
+	}
 	$pvr->queue( @search_args );
 
 } elsif ( $opt->{pvrscheduler} ) {
@@ -616,6 +635,10 @@ if ( $opt->{pvradd} ) {
 
 # Else just process command line args
 } else {
+	if ( $opt->{get} && $no_search_args ) {
+		main::logger "ERROR: Search term(s) required for recording\n";
+		exit 1;
+	}
 	my $hist = History->new();
 	download_matches( $hist, find_matches( $hist, @search_args ) );
 	purge_downloaded_files( $hist, 30 );
@@ -1518,8 +1541,8 @@ sub get_links {
 			$prog->{$pid} = progclass( lc($memcache->{$prog_type}->{$pid}->{type}) )->new( 'pid' => $pid );
 			# Deep-copy of elements in memcache prog instance to %prog
 			$prog->{$pid}->{$_} = $memcache->{$prog_type}->{$pid}->{$_} for @cache_format;
-			# Copy pid into index_prog hash
-			$index_prog->{ $prog->{$pid}->{index} } = $pid;
+			# Copy object reference into index_prog hash
+			$index_prog->{ $prog->{$pid}->{index} } = $prog->{$pid};
 		}
 		logger "INFO: Got (quick) ".(keys %{ $memcache->{$prog_type} })." memcache entries for $prog_type\n" if $opt->{verbose};
 		return 0;
@@ -2008,22 +2031,12 @@ sub update_script {
 
 	# Are we flagged as installed using a pkg manager?
 	if ( $opt->{packagemanager} ) {
-		if ( $opt->{packagemanager} =~ /(apt|deb|dpkg)/i ) {
-			logger "INFO: Please run the following commands to update get_iplayer using $opt->{packagemanager}\n".
-			"  wget http://linuxcentre.net/get_iplayer/packages/get-iplayer-current.deb\n".
-			"  sudo dpkg -i get-iplayer-current.deb\n".
-			"  sudo apt-get -f install\n";
-		} elsif ( $opt->{packagemanager} =~ /yum/i ) {
-			logger "INFO: Please run the following commands as root to update get_iplayer using $opt->{packagemanager}\n".
-			"  wget http://linuxcentre.net/get_iplayer/packages/get_iplayer-current.noarch.rpm\n".
-			"  yum --nogpgcheck localinstall get_iplayer-current.noarch.rpm\n";
-		} elsif ( $opt->{packagemanager} =~ /rpm/i ) {
-			logger "INFO: Please run the following command as root to update get_iplayer using $opt->{packagemanager}\n".
-			"  rpm -Uvh http://linuxcentre.net/get_iplayer/packages/get_iplayer-current.noarch.rpm\n";
+		if ( $opt->{packagemanager} =~ /installer/i ) {
+			logger "ERROR: get_iplayer should only be updated using the Windows installer: http://www.infradead.org/get_iplayer_win/get_iplayer_setup_latest.exe\n";
 		} elsif ( $opt->{packagemanager} =~ /disable/i ) {
-			logger "ERROR: get_iplayer should only be updated using your local package management system, for more information see http://linuxcentre.net/installation\n";
+			logger "ERROR: get_iplayer should only be updated using your local package management system.  Please refer to your system documentation.\n";
 		} else {
-			logger "ERROR: get_iplayer was installed using '$opt->{packagemanager}' package manager please refer to the update documentation at http://linuxcentre.net/getiplayer/installation/\n";
+			logger "ERROR: get_iplayer was installed using the '$opt->{packagemanager}' package manager.  Please refer to the package manager documentation.\n";
 		}
 		exit 1;
 	} 
@@ -3088,7 +3101,7 @@ sub usage {
 	my @man;
 	my @dump;
 	push @man, 
-		'.TH GET_IPLAYER "1" "August 2011" "Phil Lewis" "get_iplayer Manual"',
+		'.TH GET_IPLAYER "1" "June 2012" "Phil Lewis" "get_iplayer Manual"',
 		'.SH NAME', 'get_iplayer - Stream Recording tool and PVR for BBC iPlayer, BBC Podcasts and more',
 		'.SH SYNOPSIS',
 		'\fBget_iplayer\fR [<options>] [<regex|index> ...]',
@@ -3115,8 +3128,7 @@ sub usage {
 		'.PP',
 		'If given no arguments, \fBget_iplayer\fR updates and displays the list of currently available programmes.',
 		'Each available programme has a numerical identifier, \fBpid\fR.',
-		'\fBget_iplayer\fR records BBC iPlayer programmes by pretending to be an iPhone, which means that some programmes in the list are unavailable for recording.',
-		'It can also utilise the \fBflvstreamer\fR tool to record programmes from RTMP flash streams at various qualities.',
+		'\fBget_iplayer\fR utilises the \fBrtmpdump\fR tool to record BBC iPlayer programmes from RTMP flash streams at various qualities.',
 		'.PP',
 		'In PVR mode, \fBget_iplayer\fR can be called from cron to record programmes to a schedule.',
 		'.SH "OPTIONS"' if $manpage;
@@ -4309,7 +4321,7 @@ sub tag_file {
 	# return if file does not exist
 	return if ! -f $prog->{filename};
 	# download thumbnail if necessary
-	$prog->download_thumbnail if ( ! -f $prog->{thumbfile} );
+	$prog->download_thumbnail if ( ! -f $prog->{thumbfile} && ! $opt->{noartwork} );
 	# create metadata
 	my $meta = $prog->tag_metadata;
 	# tag file
@@ -5010,7 +5022,7 @@ sub get_verpids {
 
 	# Detect noItems or no programmes
 	if ( $xml =~ m{<noItems\s+reason="noMedia"} || $xml !~ m{kind="(programme|radioProgramme)"} ) {
-		main::logger "\rWARNING: No programmes are available for this pid\n";
+		main::logger "\rWARNING: No programmes are available for this pid with version(s): ".($opt->{versionlist} ? $opt->{versionlist} : 'default').($prog->{versions} ? " ($prog->{versions} are available)\n" : "\n");
 		return 1;
 	}
 
@@ -5033,7 +5045,8 @@ sub get_verpids {
 		# Live TV
 		if ( m{\s+simulcast="true"} ) {
 			$version = 'default';
-			$verpid = "http://www.bbc.co.uk/emp/simulcast/".$1.".xml" if m{\s+live="true"\s+identifier="(.+?)"};
+			# <item kind="programme" live="true" liverewind="true" identifier="bbc_two_england" group="bbc_two_england" simulcast="true" availability_class="liverewind">
+			$verpid = "http://www.bbc.co.uk/emp/simulcast/".$2.".xml" if m{\s+live="true"\s+(liverewind="true"\s+)?identifier="(.+?)"};
 			main::logger "INFO: Using Live TV: $verpid\n" if $opt->{verbose} && $verpid;
 
 		# Live/Non-live EMP tv/radio XML URL
@@ -5610,7 +5623,7 @@ sub parse_rdf_brand {
 	my @pids = ();
 	my $bpid = extract_pid( $uri );
 	main::logger "INFO:  Brand: '".$rdf->{'po:Brand'}->{'dc:title'}."' ($bpid)\n";
-	for my $series_element ( @{ $rdf->{'po:Brand'}->{'po:series'} } ) {
+	for my $series_element ( ensure_array($rdf->{'po:Brand'}->{'po:series'}) ) {
 		main::logger "INFO: With Series pid '".$series_element->{'rdf:resource'}."'\n" if $opt->{debug};
 		push @pids, parse_rdf_series( $ua, $series_element->{'rdf:resource'} );
 	}
@@ -6122,7 +6135,7 @@ sub get_stream_data {
 			# Determine classifications of modes based mainly on bitrate
 
 			# flashhd modes
-			if ( $mattribs->{bitrate} > 3000 ) {
+			if ( $mattribs->{bitrate} > 2000 ) {
 				get_stream_data_cdn( $data, $mattribs, 'flashhd', 'rtmp', 'mp4' );
 
 			# flashvhigh modes
@@ -6325,7 +6338,7 @@ sub channels {
 		'bbctwo'			=> 'BBC Two',
 		'bbcthree'			=> 'BBC Three',
 		'bbcfour'			=> 'BBC Four',
-		'bbcnews'			=> 'BBC News 24',
+		'bbcnews'			=> 'BBC News',
 		'cbbc'				=> 'CBBC',
 		'cbeebies'			=> 'CBeebies',
 		'parliament'			=> 'BBC Parliament',
@@ -6349,10 +6362,25 @@ sub channels_schedule {
 		'bbcfour/programmes/schedules'		=> 'BBC Four',
 		'bbchd/programmes/schedules'		=> 'BBC HD',
 		'bbcnews/programmes/schedules'		=> 'BBC News 24',
+		'bbcone/programmes/schedules/cambridge'	=> 'BBC One Cambridgeshire',
+		'bbcone/programmes/schedules/channel_islands'	=> 'BBC One Channel Islands',
+		'bbcone/programmes/schedules/east'	=> 'BBC One East',
+		'bbcone/programmes/schedules/east_midlands'	=> 'BBC One East Midlands',
+		'bbcone/programmes/schedules/hd'	=> 'BBC One HD',
 		'bbcone/programmes/schedules/london'	=> 'BBC One London',
+		'bbcone/programmes/schedules/north_east'	=> 'BBC One North East & Cumbria',
+		'bbcone/programmes/schedules/north_west'	=> 'BBC One North West',
 		'bbcone/programmes/schedules/ni'	=> 'BBC One Northern Ireland',
+		'bbcone/programmes/schedules/oxford'	=> 'BBC One Oxfordshire',
 		'bbcone/programmes/schedules/scotland'	=> 'BBC One Scotland',
+		'bbcone/programmes/schedules/south'	=> 'BBC One South',
+		'bbcone/programmes/schedules/south_east'	=> 'BBC One South East',
+		'bbcone/programmes/schedules/south_west'	=> 'BBC One South West',
 		'bbcone/programmes/schedules/wales'	=> 'BBC One Wales',
+		'bbcone/programmes/schedules/west'	=> 'BBC One West',
+		'bbcone/programmes/schedules/west_midlands'	=> 'BBC One West Midlands',
+		'bbcone/programmes/schedules/east_yorkshire'	=> 'BBC One Yorks & Lincs',
+		'bbcone/programmes/schedules/yorkshire'	=> 'BBC One Yorkshire',
 		'parliament/programmes/schedules'	=> 'BBC Parliament',
 		'bbcthree/programmes/schedules'		=> 'BBC Three',
 		'bbctwo/programmes/schedules/england'	=> 'BBC Two England',
@@ -6368,7 +6396,7 @@ sub channels_schedule {
 # Class cmdline Options
 sub opt_format {
 	return {
-		tvmode		=> [ 1, "tvmode|vmode=s", 'Recording', '--tvmode <mode>,<mode>,...', "TV Recoding modes: iphone,rtmp,flashhd,flashvhigh,flashhigh,flashstd,flashnormal,flashlow,n95_wifi (default: flashhigh,flashstd,flashnormal)"],
+		tvmode		=> [ 1, "tvmode|vmode=s", 'Recording', '--tvmode <mode>,<mode>,...', "TV Recoding modes: rtmp,flashhd,flashvhigh,flashhigh,flashstd,flashnormal,flashlow,n95_wifi (default: flashhigh,flashstd,flashnormal). Use --tvmode=best to automatically select highest quality available."],
 		outputtv	=> [ 1, "outputtv=s", 'Output', '--outputtv <dir>', "Output directory for tv recordings"],
 		vlc		=> [ 1, "vlc=s", 'External Program', '--vlc <path>', "Location of vlc or cvlc binary"],
 		rtmptvopts	=> [ 1, "rtmp-tv-opts|rtmptvopts=s", 'Recording', '--rtmp-tv-opts <options>', "Add custom options to flvstreamer for tv"],
@@ -6406,7 +6434,7 @@ sub modelist {
 	# Deal with BBC TV fallback modes and expansions
 	# Valid modes are iphone,rtmp,flashhigh,flashnormal,flashlow,n95_wifi
 	# 'rtmp' or 'flash' => 'flashhigh,flashnormal'
-	$mlist = main::expand_list($mlist, 'best', 'flashhd,flashvhigh,flashhigh,iphone,flashstd,flashnormal,flashlow');
+	$mlist = main::expand_list($mlist, 'best', 'flashhd,flashvhigh,flashhigh,flashstd,flashnormal,flashlow');
 	$mlist = main::expand_list($mlist, 'flash', 'flashhigh,flashstd,flashnormal');
 	$mlist = main::expand_list($mlist, 'rtmp', 'flashhigh,flashstd,flashnormal');
 
@@ -6458,6 +6486,8 @@ sub clean_pid {
 	# If this is a BBC *iPlayer* Live channel
 	# e.g. http://www.bbc.co.uk/iplayer/playlive/bbc_radio_fourfm/
 	} elsif ( $prog->{pid} =~ m{http.+bbc\.co\.uk/iplayer}i ) {
+		# Remove trailing path for URLs like 'http://www.bbc.co.uk/iplayer/radio/bbc_radio_fourfm/listenlive'
+		$prog->{pid} =~ s/\/\w+live\/?$//;
 		# Remove extra URL path for URLs like 'http://www.bbc.co.uk/iplayer/playlive/bbc_one_london/' or 'http://www.bbc.co.uk/iplayer/tv/bbc_one'
 		$prog->{pid} =~ s/^http.+\/(.+?)\/?$/$1/g;
 	# Else this is an embedded media player URL (live or otherwise)
@@ -7202,7 +7232,6 @@ sub channels_schedule {
 		'5live/programmes/schedules'		=> 'BBC Radio 5 live',
 		'5livesportsextra/programmes/schedules'	=> 'BBC 5 live Sports Extra',
 		'6music/programmes/schedules'		=> 'BBC 6 Music',
-		'radio7/programmes/schedules'		=> 'BBC 7',
 		'asiannetwork/programmes/schedules'	=> 'BBC Asian Network',
 		'radiofoyle/programmes/schedules'	=> 'BBC Radio Foyle',
 		'radioscotland/programmes/schedules/fm'	=> 'BBC Radio Scotland', # fm,mw,orkney,shetland,highlandsandislands
@@ -7210,7 +7239,7 @@ sub channels_schedule {
 		'radioulster/programmes/schedules'	=> 'BBC Radio Ulster',
 		'radiowales/programmes/schedules/fm'	=> 'BBC Radio Wales FM',
 		'radiowales/programmes/schedules/mw'	=> 'BBC Radio Wales MW',
-		#'bbc_radio_cymru'			=> 'BBC Radio Cymru', # ????
+		'radiocymru/programmes/schedules'	=> 'BBC Radio Cymru',
 		'worldservice/programmes/schedules'	=> 'BBC World Service',
 		'cumbria/programmes/schedules'		=> 'BBC Cumbria',
 		'newcastle/programmes/schedules'	=> 'BBC Newcastle',
@@ -7259,7 +7288,7 @@ sub channels_schedule {
 # Class cmdline Options
 sub opt_format {
 	return {
-		radiomode	=> [ 1, "radiomode|amode=s", 'Recording', '--radiomode <mode>,<mode>,...', "Radio Recording mode(s): iphone,flashaac,flashaachigh,flashaacstd,flashaaclow,flashaudio,realaudio,wma (default: flashaachigh,flashaacstd,flashaudio,realaudio,flashaaclow)"],
+		radiomode	=> [ 1, "radiomode|amode=s", 'Recording', '--radiomode <mode>,<mode>,...', "Radio Recording mode(s): flashaac,flashaachigh,flashaacstd,flashaaclow,flashaudio,realaudio,wma (default: flashaachigh,flashaacstd,flashaudio,realaudio,flashaaclow). Use --radiomode=best to automatically select highest quality available."],
 		bandwidth 	=> [ 1, "bandwidth=n", 'Recording', '--bandwidth', "In radio realaudio mode specify the link bandwidth in bps for rtsp streaming (default 512000)"],
 		lame		=> [ 0, "lame=s", 'External Program', '--lame <path>', "Location of lame binary"],
 		outputradio	=> [ 1, "outputradio=s", 'Output', '--outputradio <dir>', "Output directory for radio recordings"],
@@ -7319,7 +7348,7 @@ sub modelist {
 	# 'rtmp' or 'flash' => 'flashaudio,flashaac'
 	# flashaac => flashaachigh,flashaacstd,flashaaclow
 	# flashaachigh => flashaachigh1,flashaachigh2
-	$mlist = main::expand_list($mlist, 'best', 'flashaachigh,flashaacstd,iphone,flashaudio,realaudio,flashaaclow,wma');
+	$mlist = main::expand_list($mlist, 'best', 'flashaachigh,flashaacstd,flashaudio,realaudio,flashaaclow,wma');
 	$mlist = main::expand_list($mlist, 'flash', 'flashaudio,flashaac');
 	$mlist = main::expand_list($mlist, 'rtmp', 'flashaudio,flashaac');
 	$mlist = main::expand_list($mlist, 'flashaac', 'flashaachigh,flashaacstd,flashaaclow');
@@ -7353,6 +7382,8 @@ sub clean_pid {
 
 	# e.g. http://www.bbc.co.uk/iplayer/playlive/bbc_radio_fourfm/
 	} elsif ( $prog->{pid} =~ m{http.+bbc\.co\.uk/iplayer}i ) {
+		# Remove trailing path for URLs like 'http://www.bbc.co.uk/iplayer/radio/bbc_radio_fourfm/listenlive'
+		$prog->{pid} =~ s/\/\w+live\/?$//;
 		# Remove extra URL path for URLs like 'http://www.bbc.co.uk/iplayer/playlive/bbc_radio_one/'
 		$prog->{pid} =~ s/^http.+\/(.+?)\/?$/$1/g;
 
@@ -7426,6 +7457,8 @@ sub clean_pid {
 	#	# Just leave the URL as the pid
 	# e.g. http://www.bbc.co.uk/iplayer/playlive/bbc_radio_fourfm/
 	if ( $prog->{pid} =~ m{http.+bbc\.co\.uk/iplayer}i ) {
+		# Remove trailing path for URLs like 'http://www.bbc.co.uk/iplayer/radio/bbc_radio_fourfm/listenlive'
+		$prog->{pid} =~ s/\/\w+live\/?$//;
 		# Remove extra URL path for URLs like 'http://www.bbc.co.uk/iplayer/playlive/bbc_radio_one/'
 		$prog->{pid} =~ s/^http.+\/(.+?)\/?$/$1/g;
 
@@ -7518,8 +7551,9 @@ sub channels {
 		'bbc_four'			=> 'BBC Four',
 		'cbbc'				=> 'CBBC',
 		'cbeebies'			=> 'CBeebies',
-		'bbc_news24'			=> 'BBC News 24',
+		'bbc_news24'			=> 'BBC News',
 		'bbc_parliament'		=> 'BBC Parliament',
+		'bbc_alba'			=> 'BBC Alba',
 	};
 }
 
@@ -7527,7 +7561,7 @@ sub channels {
 # Class cmdline Options
 sub opt_format {
 	return {
-		livetvmode	=> [ 1, "livetvmode=s", 'Recording', '--livetvmode <mode>,<mode>,...', "Live TV Recoding modes: flashhd,flashvhigh,flashhigh,flashstd,flashnormal (default: flashhd,flashvhigh,flashhigh,flashstd,flashnormal)"],
+		livetvmode	=> [ 1, "livetvmode=s", 'Recording', '--livetvmode <mode>,<mode>,...', "Live TV Recoding modes: flashhd,flashvhigh,flashhigh,flashstd,flashnormal (default: flashhd,flashvhigh,flashhigh,flashstd,flashnormal). Use --livetvmode=best to automatically select highest quality available."],
 		outputlivetv	=> [ 1, "outputlivetv=s", 'Output', '--outputlivetv <dir>', "Output directory for live tv recordings"],
 		rtmplivetvopts	=> [ 1, "rtmp-livetv-opts|rtmplivetvopts=s", 'Recording', '--rtmp-livetv-opts <options>', "Add custom options to flvstreamer for livetv"],
 	};
@@ -7612,7 +7646,6 @@ sub channels {
 		'bbc_radio_five_live'			=> 'BBC Radio 5 live',
 		'bbc_radio_five_live_sports_extra'	=> 'BBC 5 live Sports Extra',
 		'bbc_6music'				=> 'BBC 6 Music',
-		'bbc_7'					=> 'BBC 7',
 		'bbc_asian_network'			=> 'BBC Asian Network',
 		'bbc_radio_foyle'			=> 'BBC Radio Foyle',
 		'bbc_radio_scotland'			=> 'BBC Radio Scotland',
@@ -7620,8 +7653,7 @@ sub channels {
 		'bbc_radio_ulster'			=> 'BBC Radio Ulster',
 		'bbc_radio_wales'			=> 'BBC Radio Wales',
 		'bbc_radio_cymru'			=> 'BBC Radio Cymru',
-		'http://www.bbc.co.uk/worldservice/includes/1024/screen/audio_console.shtml?stream=live' => 'BBC World Service',
-		'bbc_world_service' 			=> 'BBC World Service Intl',
+		'bbc_world_service' 			=> 'BBC World Service',
 		'bbc_radio_cumbria'			=> 'BBC Cumbria',
 		'bbc_radio_newcastle'			=> 'BBC Newcastle',
 		'bbc_tees'				=> 'BBC Tees',
@@ -7670,7 +7702,7 @@ sub channels {
 # Class cmdline Options
 sub opt_format {
 	return {
-		liveradiomode	=> [ 1, "liveradiomode=s", 'Recording', '--liveradiomode <mode>,<mode>,..', "Live Radio Recording modes: flashaac,realaudio,wma"],
+		liveradiomode	=> [ 1, "liveradiomode=s", 'Recording', '--liveradiomode <mode>,<mode>,..', "Live Radio Recording modes: flashaac,realaudio,wma. Use --liveradiomode=best to automatically select highest quality available."],
 		outputliveradio	=> [ 1, "outputliveradio=s", 'Output', '--outputliveradio <dir>', "Output directory for live radio recordings"],
 		rtmpliveradioopts => [ 1, "rtmp-liveradio-opts|rtmpliveradioopts=s", 'Recording', '--rtmp-liveradio-opts <options>', "Add custom options to flvstreamer for liveradio"],
 	};
@@ -9011,12 +9043,12 @@ sub opt_format {
 		pvr		=> [ 0, "pvr|pvrrun|pvr-run!", 'PVR', '--pvr [pvr search name]', "Runs the PVR using all saved PVR searches (intended to be run every hour from cron etc). The list can be limited by adding a regex to the command. Synonyms: --pvrrun, --pvr-run"],
 		pvrexclude	=> [ 0, "pvrexclude|pvr-exclude=s", 'PVR', '--pvr-exclude <string>', "Exclude the PVR searches to run by search name (regex or comma separated values). Synonyms: --pvrexclude"],
 		pvrsingle	=> [ 0, "pvrsingle|pvr-single=s", 'PVR', '--pvr-single <search name>', "Runs a named PVR search. Synonyms: --pvrsingle"],
-		pvradd		=> [ 0, "pvradd|pvr-add=s", 'PVR', '--pvr-add <search name>', "Save the named PVR search with the specified search terms. Synonyms: --pvradd"],
+		pvradd		=> [ 0, "pvradd|pvr-add=s", 'PVR', '--pvr-add <search name>', "Save the named PVR search with the specified search terms.  Search terms required. Use --search=.* to force download of all available programmes. Synonyms: --pvradd"],
 		pvrdel		=> [ 0, "pvrdel|pvr-del=s", 'PVR', '--pvr-del <search name>', "Remove the named search from the PVR searches. Synonyms: --pvrdel"],
 		pvrdisable	=> [ 1, "pvrdisable|pvr-disable=s", 'PVR', '--pvr-disable <search name>', "Disable (not delete) a named PVR search. Synonyms: --pvrdisable"],
 		pvrenable	=> [ 1, "pvrenable|pvr-enable=s", 'PVR', '--pvr-enable <search name>', "Enable a previously disabled named PVR search. Synonyms: --pvrenable"],
 		pvrlist		=> [ 0, "pvrlist|pvr-list!", 'PVR', '--pvr-list', "Show the PVR search list. Synonyms: --pvrlist"],
-		pvrqueue	=> [ 0, "pvrqueue|pvr-queue!", 'PVR', '--pvr-queue', "Add currently matched programmes to queue for later one-off recording using the --pvr option. Synonyms: --pvrqueue"],
+		pvrqueue	=> [ 0, "pvrqueue|pvr-queue!", 'PVR', '--pvr-queue', "Add currently matched programmes to queue for later one-off recording using the --pvr option. Search terms required unless --pid specified. Use --search=.* to force download of all available programmes. Synonyms: --pvrqueue"],
 		pvrscheduler	=> [ 0, "pvrscheduler|pvr-scheduler=n", 'PVR', '--pvr-scheduler <seconds>', "Runs the PVR using all saved PVR searches every <seconds>. Synonyms: --pvrscheduler"],
 		comment		=> [ 1, "comment=s", 'PVR', '--comment <string>', "Adds a comment to a PVR search"],
 	};
@@ -9164,8 +9196,6 @@ sub queue {
 
 	# Switch on --hide option
 	$opt->{hide} = 1;
-	# Switch on --future option - we want to search upcoming programmes
-	$opt->{future} = 1;
 	my $hist = History->new();
 
 	# PID and TYPE specified
@@ -9453,7 +9483,7 @@ sub tags_from_metadata {
 	# iTunes media kind
 	$tags->{stik} = 'Normal';
 	if ( $meta->{ext} =~ /(mp4|m4v)/i) {
-		$tags->{stik} = $meta->{categories} =~ /(film|movie)/i ? 'Movie' : 'TV Show';
+		$tags->{stik} = $meta->{categories} =~ /(film|movie)/i ? 'Short Film' : 'TV Show';
 	}
 	$tags->{advisory} = $meta->{guidance} ? 'explicit' : 'remove';
 	# copyright message from download date
@@ -9498,8 +9528,8 @@ sub tags_from_metadata {
 	$tags->{disk} = $meta->{seriesnum};
 	# generate lyrics text with links if available
 	$tags->{lyrics} = $meta->{desc};
-	$tags->{lyrics} .= "\n\nEPISODE\n  $meta->{player}" if $meta->{player};
-	$tags->{lyrics} .= "\n\nSERIES\n  $meta->{web}" if $meta->{web};
+	$tags->{lyrics} .= "\n\nEPISODE\n$meta->{player}" if $meta->{player};
+	$tags->{lyrics} .= "\n\nSERIES\n$meta->{web}" if $meta->{web};
 	$tags->{description} = $meta->{descshort};
 	$tags->{longDescription} = $meta->{desc};
 	$tags->{hdvideo} = $meta->{mode} =~ /hd/i ? 'true' : 'false';
@@ -9605,7 +9635,7 @@ sub tag_file_id3 {
 			$mp3->select_id3v2_frame_by_descr('TGID', $tags->{podcastGUID});
 		}
 		# add artwork if available
-		if ( -f $meta->{thumbfile} ) {
+		if ( -f $meta->{thumbfile}  && ! $opt->{noartwork} ) {
 			my $data;
 			open(THUMB, $meta->{thumbfile});
 			binmode(THUMB);
@@ -9727,6 +9757,7 @@ sub tag_file_mp4 {
 		# video only
 		if ( $tags->{is_video} ) {
 			# all video
+			push @cmd, ( '--cnID', 3004 ) if $opt->{tag_cnid};
 			push @cmd, ( '--hdvideo', $tags->{hdvideo} ) if $opt->{tag_hdvideo};
 			# tv only
 			if ( $tags->{is_tvshow} ) {
@@ -9749,7 +9780,7 @@ sub tag_file_mp4 {
 			);
 		}
 		# add artwork if available
-		push @cmd, ( '--artwork', $meta->{thumbfile} ) if -f $meta->{thumbfile};
+		push @cmd, ( '--artwork', $meta->{thumbfile} ) if ( -f $meta->{thumbfile} && ! $opt->{noartwork} );
 		# run atomicparsley command
 		if ( main::run_cmd( 'STDERR', @cmd ) ) {
 			main::logger "WARNING: Failed to tag \U$meta->{ext}\E file\n";
