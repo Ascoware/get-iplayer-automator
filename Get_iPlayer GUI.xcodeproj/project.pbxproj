@@ -80,6 +80,9 @@
 		DFC865E213E96BE200606599 /* ReasonForFailure.m in Sources */ = {isa = PBXBuildFile; fileRef = DFC865E113E96BE200606599 /* ReasonForFailure.m */; };
 		DFC8D3F215C557E3008E369F /* FourODDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = DFC8D3F115C557E3008E369F /* FourODDownload.m */; };
 		DFC8D3F415C58B3B008E369F /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DFC8D3F315C58B3B008E369F /* IOKit.framework */; };
+		DFC8D40015C97099008E369F /* FourODTokenDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = DFC8D3FF15C97099008E369F /* FourODTokenDecoder.m */; };
+		DFC8D40215C970CA008E369F /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DFC8D40115C970CA008E369F /* Python.framework */; };
+		DFC8D40415C97310008E369F /* fourOD_token_decoder.py in Resources */ = {isa = PBXBuildFile; fileRef = DFC8D40315C97310008E369F /* fourOD_token_decoder.py */; };
 		DFE5B67013E7062C0008571B /* librtmp.dylib in Resources */ = {isa = PBXBuildFile; fileRef = DF592B5313E70084000D0D11 /* librtmp.dylib */; };
 		DFE5B67413E70AC20008571B /* plugins in Resources */ = {isa = PBXBuildFile; fileRef = DFE5B67313E70AC20008571B /* plugins */; };
 		DFFF196713E96288007B52AC /* ReasonsForFailure.plist in Resources */ = {isa = PBXBuildFile; fileRef = DFFF196613E96288007B52AC /* ReasonsForFailure.plist */; };
@@ -207,6 +210,10 @@
 		DFC8D3F015C557E3008E369F /* FourODDownload.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FourODDownload.h; sourceTree = "<group>"; };
 		DFC8D3F115C557E3008E369F /* FourODDownload.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FourODDownload.m; sourceTree = "<group>"; };
 		DFC8D3F315C58B3B008E369F /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/IOKit.framework; sourceTree = DEVELOPER_DIR; };
+		DFC8D3FE15C97098008E369F /* FourODTokenDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FourODTokenDecoder.h; sourceTree = "<group>"; };
+		DFC8D3FF15C97099008E369F /* FourODTokenDecoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FourODTokenDecoder.m; sourceTree = "<group>"; };
+		DFC8D40115C970CA008E369F /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/Python.framework; sourceTree = DEVELOPER_DIR; };
+		DFC8D40315C97310008E369F /* fourOD_token_decoder.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = fourOD_token_decoder.py; sourceTree = "<group>"; };
 		DFE5B67313E70AC20008571B /* plugins */ = {isa = PBXFileReference; lastKnownFileType = folder; path = plugins; sourceTree = "<group>"; };
 		DFFF196613E96288007B52AC /* ReasonsForFailure.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = ReasonsForFailure.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -216,6 +223,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DFC8D40215C970CA008E369F /* Python.framework in Frameworks */,
 				DFC8D3F415C58B3B008E369F /* IOKit.framework in Frameworks */,
 				D921C9C0149BBF43004CB558 /* libz.dylib in Frameworks */,
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
@@ -243,6 +251,8 @@
 				D921C9E7149BCB16004CB558 /* ITVDownload.m */,
 				DFC8D3F015C557E3008E369F /* FourODDownload.h */,
 				DFC8D3F115C557E3008E369F /* FourODDownload.m */,
+				DFC8D3FE15C97098008E369F /* FourODTokenDecoder.h */,
+				DFC8D3FF15C97099008E369F /* FourODTokenDecoder.m */,
 				D92687C31087F81F000E8132 /* DownloadHistoryController.h */,
 				D92687C41087F81F000E8132 /* DownloadHistoryController.m */,
 				D91787021013803000B82736 /* Models */,
@@ -256,6 +266,7 @@
 			isa = PBXGroup;
 			children = (
 				D921C9BF149BBF43004CB558 /* libz.dylib */,
+				DFC8D40115C970CA008E369F /* Python.framework */,
 				DFC8D3F315C58B3B008E369F /* IOKit.framework */,
 				D921C9C1149BBF51004CB558 /* CoreServices.framework */,
 				D9D8238F10B3B6D600556D1D /* Growl.framework */,
@@ -302,6 +313,7 @@
 		29B97315FDCFA39411CA2CEA /* Other Sources */ = {
 			isa = PBXGroup;
 			children = (
+				DFC8D40315C97310008E369F /* fourOD_token_decoder.py */,
 				D90EF1361029CB3100290A67 /* Scripting Headers */,
 				32CA4F630368D1EE00C91783 /* Get_iPlayer GUI_Prefix.pch */,
 				29B97316FDCFA39411CA2CEA /* main.m */,
@@ -526,6 +538,7 @@
 				DFFF196713E96288007B52AC /* ReasonsForFailure.plist in Resources */,
 				DF876E4013F0BCAD0097FD48 /* flvstreamer in Resources */,
 				D921C9ED149C4C6F004CB558 /* Body in Resources */,
+				DFC8D40415C97310008E369F /* fourOD_token_decoder.py in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -576,6 +589,7 @@
 				D921C9EB149BCDEB004CB558 /* Download.m in Sources */,
 				D9D06C6F14BB91C200029340 /* ITVMediaFileEntry.m in Sources */,
 				DFC8D3F215C557E3008E369F /* FourODDownload.m in Sources */,
+				DFC8D40015C97099008E369F /* FourODTokenDecoder.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -60,8 +60,9 @@
 - (void)processFLVStreamerMessage:(NSString *)message;
 
 - (void)launchMetaRequest;
-- (void)launchRTMPDumpWithArgs:(NSMutableArray *)args;
+- (void)launchRTMPDumpWithArgs:(NSArray *)args;
 - (void)processGetiPlayerOutput:(NSString *)outp;
+- (void)createDownloadPath;
 
 @property (readonly) Programme *show;
 @end

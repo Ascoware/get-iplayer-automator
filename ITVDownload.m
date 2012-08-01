@@ -351,7 +351,7 @@
     downloadPath = [downloadPath stringByAppendingPathComponent:[show seriesName]];
     [[NSFileManager defaultManager] createDirectoryAtPath:downloadPath withIntermediateDirectories:YES attributes:nil error:nil];
     downloadPath = [downloadPath stringByAppendingPathComponent:[[[NSString stringWithFormat:@"%@.partial.flv",[show showName]] stringByReplacingOccurrencesOfString:@"/" withString:@"-"] stringByReplacingOccurrencesOfString:@":" withString:@" -"]];
-    NSMutableArray *args;
+    NSArray *args;
     @try {
         if (foundIt) args = [NSMutableArray arrayWithObjects:
                                 [NSString stringWithFormat:@"-r%@",authURL],
@@ -372,20 +372,5 @@
         return;
     }
     [self launchRTMPDumpWithArgs:args];
-#pragma mark
-}
-
-- (void)cancelDownload:(id)sender
-{
-	//Some basic cleanup.
-	[task interrupt];
-	[nc removeObserver:self name:NSFileHandleReadCompletionNotification object:fh];
-	[nc removeObserver:self name:NSFileHandleReadCompletionNotification object:errorFh];
-	[show setValue:@"Cancelled" forKey:@"status"];
-    [show setComplete:[NSNumber numberWithBool:NO]];
-    [show setSuccessful:[NSNumber numberWithBool:NO]];
-	[self addToLog:@"Download Cancelled"];
-    [processErrorCache invalidate];
-    running=FALSE;
 }
 @end

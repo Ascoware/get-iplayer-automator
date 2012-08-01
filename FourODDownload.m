@@ -8,6 +8,7 @@
 
 #import "FourODDownload.h"
 #import "ASIHTTPRequest.h"
+#import "FourODTokenDecoder.h"
 
 @implementation FourODDownload
 - (id)initWithProgramme:(Programme *)tempShow formats:(NSArray *)fourODFormatList
@@ -33,6 +34,8 @@
 
 - (void)launchMetaRequest
 {
+    //Fix Showname
+    [show setShowName:[[show showName] stringByReplacingOccurrencesOfString:@"amp;" withString:@""]];
     errorCache = [[NSMutableString alloc] initWithString:@""];
     processErrorCache = [NSTimer scheduledTimerWithTimeInterval:.25 target:self selector:@selector(processError) userInfo:nil repeats:YES];
     NSScanner *scanner = [NSScanner scannerWithString:[show url]];
@@ -134,18 +137,22 @@
         [self addToLog:@"Download Failed" noTag:NO];
         return;
     }
+    
 
     NSString *responseString = [[NSString alloc] initWithData:[request responseData] encoding:NSUTF8StringEncoding];
     
+    NSLog(@"%@",responseString);
+    
     NSScanner *scanner = [NSScanner scannerWithString:responseString];
+    
     NSString *uriData;
     [scanner scanUpToString:@"<uriData>" intoString:nil];
     [scanner scanString:@"<uriData>" intoString:nil];
-    [scanner scanUpToString:@"<" intoString:&uriData];
+    [scanner scanUpToString:@"</uriData>" intoString:&uriData];
     
     scanner = [NSScanner scannerWithString:uriData];
     [scanner scanUpToString:@"<streamUri>" intoString:nil];
-    [scanner scanString:@"<streamUri" intoString:nil];
+    [scanner scanString:@"<streamUri>" intoString:nil];
     NSString *streamUri;
     [scanner scanUpToString:@"</" intoString:&streamUri];
     [scanner scanUpToString:@"<token>" intoString:nil];
@@ -157,6 +164,60 @@
     NSString *cdn;
     [scanner scanUpToString:@"</" intoString:&cdn];
     
+    NSString *decodedToken = [FourODTokenDecoder decodeToken:token];
+    NSLog(@"%@",decodedToken);
+    
+    NSString *auth;
+    if ([cdn isEqualToString:@"ll"])
+    {
+        [scanner setScanLocation:0];
+        NSString *e;
+        [scanner scanUpToString:@"<e>" intoString:nil];
+        [scanner scanString:@"<e>" intoString:nil];
+        [scanner scanUpToString:@"</e>" intoString:&e];
+        auth = [NSString stringWithFormat:@"e=%@&h=%@",e,decodedToken];
+    }
+    else
+    {
+        [scanner setScanLocation:0];
+        NSString *fingerprint, *slist;
+        [scanner scanUpToString:@"<fingerprint>" intoString:nil];
+        [scanner scanString:@"<fingerprint>" intoString:nil];
+        [scanner scanUpToString:@"</fingerprint>" intoString:&fingerprint];
+        [scanner setScanLocation:0];
+        [scanner scanUpToString:@"<slist>" intoString:nil];
+        [scanner scanString:@"<slist>" intoString:nil];
+        [scanner scanUpToString:@"</slist>" intoString:&slist];
+        auth = [NSString stringWithFormat:@"auth=%@&aifp=%@&slist=%@",decodedToken,fingerprint,slist];
+    }
+    
+    NSString *rtmpURL = [[streamUri componentsSeparatedByString:@"mp4:"] objectAtIndex:0];
+    rtmpURL = [rtmpURL stringByReplacingOccurrencesOfString:@".com/" withString:@".com:1935/"];
+    rtmpURL = [rtmpURL stringByAppendingFormat:@"?ovpfv=1.1&%@",auth];
+    
+    NSString *app;
+    scanner = [NSScanner scannerWithString:streamUri];
+    [scanner scanUpToString:@".com/" intoString:nil];
+    [scanner scanString:@".com/" intoString:nil];
+    [scanner scanUpToString:@"mp4:" intoString:&app];
+    
+    app = [app stringByAppendingFormat:@"?ovpfv=1.1&%@", auth];
+    
+    NSString *swfplayer = @"http://www.channel4.com/static/programmes/asset/flash/swf/4odplayer-11.27.4.swf";
+    NSString *playpath = [streamUri substringFromIndex:[scanner scanLocation]];
+    playpath = [playpath stringByAppendingFormat:@"?%@",auth];
+    [self createDownloadPath];
+    
+    NSArray *args = [NSArray arrayWithObjects:@"--rtmp",rtmpURL,
+                     @"--app",app,
+                     @"--flashVer",@"\"WIN 11,2,202,235\"",
+                     @"--swfVfy",swfplayer,
+                     @"--pageUrl",[show url],
+                     @"--conn",@"Z:",
+                     @"--playpath",playpath,
+                     @"-o",downloadPath,
+                     nil];
+    [self launchRTMPDumpWithArgs:args];
     
 }
 @end

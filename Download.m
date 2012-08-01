@@ -10,10 +10,6 @@
 #import "ASIHTTPRequest.h"
 
 @implementation Download
-- (void)cancelDownload:(id)sender
-{
-    NSLog(@"Cancel Download");
-}
 - (id)init
 {
     [super init];
@@ -257,7 +253,11 @@
     [self addToLog:@"INFO: Finished Converting." noTag:YES];
     if ([[finishedNote object] terminationStatus] == 0)
     {
-        if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"TagShows"] boolValue])
+        if (!thumbnailURL)
+        {
+            [self thumbnailRequestFinished:nil];
+        }
+        else if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"TagShows"] boolValue])
         {
             [[NSFileManager defaultManager] removeItemAtPath:downloadPath error:nil];
             [show setValue:@"Tagging..." forKey:@"status"];
@@ -298,22 +298,37 @@
     //[apTask setStandardError:apPipe];
     
     [apTask setLaunchPath:[[NSBundle mainBundle] pathForResource:@"AtomicParsley" ofType:nil]];
-    
-    [apTask setArguments:[NSArray arrayWithObjects:
-                          [NSString stringWithFormat:@"%@",[show path]],
-                          @"--stik",@"value=10",
-                          @"--TVNetwork",[show tvNetwork],
-                          @"--TVShowName",[show seriesName],
-                          @"--TVSeasonNum",[NSString stringWithFormat:@"%ld",(long)[show season]],
-                          @"--TVEpisodeNum",[NSString stringWithFormat:@"%ld",(long)[show episode]],
-                          @"--TVEpisode",[show episodeName],
-                          @"--title",[show showName],
-                          @"--artwork",[request downloadDestinationPath],
-                          @"--comment",[show desc],
-                          @"--description",[show desc],
-                          @"--artist",[show tvNetwork],
-                          @"--overWrite",
-                          nil]];
+    if (request)
+        [apTask setArguments:[NSArray arrayWithObjects:
+                              [NSString stringWithFormat:@"%@",[show path]],
+                              @"--stik",@"value=10",
+                              @"--TVNetwork",[show tvNetwork],
+                              @"--TVShowName",[show seriesName],
+                              @"--TVSeasonNum",[NSString stringWithFormat:@"%ld",(long)[show season]],
+                              @"--TVEpisodeNum",[NSString stringWithFormat:@"%ld",(long)[show episode]],
+                              @"--TVEpisode",[show episodeName],
+                              @"--title",[show showName],
+                              @"--artwork",[request downloadDestinationPath],
+                              @"--comment",[show desc],
+                              @"--description",[show desc],
+                              @"--artist",[show tvNetwork],
+                              @"--overWrite",
+                              nil]];
+    else
+        [apTask setArguments:[NSArray arrayWithObjects:
+                              [NSString stringWithFormat:@"%@",[show path]],
+                              @"--stik",@"value=10",
+                              @"--TVNetwork",[show tvNetwork],
+                              @"--TVShowName",[show seriesName],
+                              @"--TVSeasonNum",[NSString stringWithFormat:@"%ld",(long)[show season]],
+                              @"--TVEpisodeNum",[NSString stringWithFormat:@"%ld",(long)[show episode]],
+                              @"--TVEpisode",[show episodeName],
+                              @"--title",[show showName],
+                              @"--comment",[show desc],
+                              @"--description",[show desc],
+                              @"--artist",[show tvNetwork],
+                              @"--overWrite",
+                              nil]];
     [nc addObserver:self
            selector:@selector(DownloadDataReady:)
                name:NSFileHandleReadCompletionNotification
@@ -416,7 +431,7 @@
             if([output length] > 1) [self addToLog:output noTag:YES];
     }
 }
--(void)launchRTMPDumpWithArgs:(NSMutableArray *)args
+-(void)launchRTMPDumpWithArgs:(NSArray *)args
 {
     if ([[NSFileManager defaultManager] fileExistsAtPath:[[[downloadPath stringByDeletingPathExtension] stringByDeletingPathExtension] stringByAppendingPathExtension:@"mp4"]])
     {
@@ -431,7 +446,7 @@
     else if ([[NSFileManager defaultManager] fileExistsAtPath:downloadPath])
     {
         [self addToLog:@"WARNING: Partial file already exists...attempting to resume" noTag:YES];
-        [args addObject:@"--resume"];
+        args = [args arrayByAddingObject:@"--resume"];
     }
     
     task = [[NSTask alloc] init];
@@ -481,5 +496,26 @@
 - (void)launchMetaRequest
 {
     [[NSException exceptionWithName:@"InvalidDownload" reason:@"Launch Meta Request shouldn't be called on base class." userInfo:nil] raise];
+}
+- (void)createDownloadPath
+{
+    //Create Download Path
+    downloadPath = [[NSUserDefaults standardUserDefaults] valueForKey:@"DownloadPath"];
+    downloadPath = [downloadPath stringByAppendingPathComponent:[show seriesName]];
+    [[NSFileManager defaultManager] createDirectoryAtPath:downloadPath withIntermediateDirectories:YES attributes:nil error:nil];
+    downloadPath = [downloadPath stringByAppendingPathComponent:[[[NSString stringWithFormat:@"%@.partial.flv",[show showName]] stringByReplacingOccurrencesOfString:@"/" withString:@"-"] stringByReplacingOccurrencesOfString:@":" withString:@" -"]];
+}
+- (void)cancelDownload:(id)sender
+{
+	//Some basic cleanup.
+	[task interrupt];
+	[nc removeObserver:self name:NSFileHandleReadCompletionNotification object:fh];
+	[nc removeObserver:self name:NSFileHandleReadCompletionNotification object:errorFh];
+	[show setValue:@"Cancelled" forKey:@"status"];
+    [show setComplete:[NSNumber numberWithBool:NO]];
+    [show setSuccessful:[NSNumber numberWithBool:NO]];
+	[self addToLog:@"Download Cancelled"];
+    [processErrorCache invalidate];
+    running=FALSE;
 }
 @end
