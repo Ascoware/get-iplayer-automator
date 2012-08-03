@@ -208,7 +208,7 @@
     
     app = [app stringByAppendingFormat:@"?ovpfv=1.1&%@", auth];
     
-    NSString *swfplayer = @"http://www.channel4.com/static/programmes/asset/flash/swf/4odplayer-11.27.4.swf";
+    NSString *swfplayer = @"http://www.channel4.com/static/programmes/asset/flash/swf/4odplayer-11.28.2.swf";
     NSString *playpath = [streamUri substringFromIndex:[scanner scanLocation]];
     playpath = [playpath stringByAppendingFormat:@"?%@",auth];
     [self createDownloadPath];
@@ -243,12 +243,13 @@
     [show setDesc:description];
     
     [scanner scanUpToString:@"<h1 class=\"brandTitle\" data-wsbrandtitle=" intoString:nil];
+    [scanner scanString:@"<h1 class=\"brandTitle\" data-wsbrandtitle=" intoString:nil];
     [scanner scanUpToString:@"title=\"" intoString:nil];
     [scanner scanString:@"title=\"" intoString:nil];
     [scanner scanUpToString:@"\">" intoString:&seriesTitle];
     [show setSeriesName:seriesTitle];
     
-    [show setEpisodeName:[[seriesTitle componentsSeparatedByString:@" - "] objectAtIndex:1]];
+    [show setEpisodeName:[[[show showName] componentsSeparatedByString:@" - "] objectAtIndex:1]];
     
     NSInteger series, episode;
     [scanner scanUpToString:@"seriesNo" intoString:nil];
