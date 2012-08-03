@@ -80,7 +80,6 @@
 		DFC865E213E96BE200606599 /* ReasonForFailure.m in Sources */ = {isa = PBXBuildFile; fileRef = DFC865E113E96BE200606599 /* ReasonForFailure.m */; };
 		DFC8D3F215C557E3008E369F /* FourODDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = DFC8D3F115C557E3008E369F /* FourODDownload.m */; };
 		DFC8D3F415C58B3B008E369F /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DFC8D3F315C58B3B008E369F /* IOKit.framework */; };
-		DFC8D40015C97099008E369F /* FourODTokenDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = DFC8D3FF15C97099008E369F /* FourODTokenDecoder.m */; };
 		DFC8D40215C970CA008E369F /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DFC8D40115C970CA008E369F /* Python.framework */; };
 		DFC8D40415C97310008E369F /* fourOD_token_decoder.py in Resources */ = {isa = PBXBuildFile; fileRef = DFC8D40315C97310008E369F /* fourOD_token_decoder.py */; };
 		DFE5B67013E7062C0008571B /* librtmp.dylib in Resources */ = {isa = PBXBuildFile; fileRef = DF592B5313E70084000D0D11 /* librtmp.dylib */; };
@@ -210,8 +209,6 @@
 		DFC8D3F015C557E3008E369F /* FourODDownload.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FourODDownload.h; sourceTree = "<group>"; };
 		DFC8D3F115C557E3008E369F /* FourODDownload.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FourODDownload.m; sourceTree = "<group>"; };
 		DFC8D3F315C58B3B008E369F /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/IOKit.framework; sourceTree = DEVELOPER_DIR; };
-		DFC8D3FE15C97098008E369F /* FourODTokenDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FourODTokenDecoder.h; sourceTree = "<group>"; };
-		DFC8D3FF15C97099008E369F /* FourODTokenDecoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FourODTokenDecoder.m; sourceTree = "<group>"; };
 		DFC8D40115C970CA008E369F /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/Python.framework; sourceTree = DEVELOPER_DIR; };
 		DFC8D40315C97310008E369F /* fourOD_token_decoder.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = fourOD_token_decoder.py; sourceTree = "<group>"; };
 		DFE5B67313E70AC20008571B /* plugins */ = {isa = PBXFileReference; lastKnownFileType = folder; path = plugins; sourceTree = "<group>"; };
@@ -251,8 +248,6 @@
 				D921C9E7149BCB16004CB558 /* ITVDownload.m */,
 				DFC8D3F015C557E3008E369F /* FourODDownload.h */,
 				DFC8D3F115C557E3008E369F /* FourODDownload.m */,
-				DFC8D3FE15C97098008E369F /* FourODTokenDecoder.h */,
-				DFC8D3FF15C97099008E369F /* FourODTokenDecoder.m */,
 				D92687C31087F81F000E8132 /* DownloadHistoryController.h */,
 				D92687C41087F81F000E8132 /* DownloadHistoryController.m */,
 				D91787021013803000B82736 /* Models */,
@@ -589,7 +584,6 @@
 				D921C9EB149BCDEB004CB558 /* Download.m in Sources */,
 				D9D06C6F14BB91C200029340 /* ITVMediaFileEntry.m in Sources */,
 				DFC8D3F215C557E3008E369F /* FourODDownload.m in Sources */,
-				DFC8D40015C97099008E369F /* FourODTokenDecoder.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
