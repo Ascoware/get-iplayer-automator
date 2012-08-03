@@ -14,8 +14,7 @@ extern BOOL runDownloads;
 - (id)initWithInfo:(id)sender pid:(NSString *)PID programmeName:(NSString *)SHOWNAME network:(NSString *)TVNETWORK
 {
 	[super init];
-	pid = [[NSString alloc] initWithString:PID];
-    pid = [pid stringByReplacingOccurrencesOfString:@";amp" withString:nil];
+	pid = [PID stringByReplacingOccurrencesOfString:@";amp" withString:@""];
 	showName = [[NSString alloc] initWithString:SHOWNAME];
 	tvNetwork = [[NSString alloc] initWithString:TVNETWORK];
 	status = [[NSString alloc] init];
