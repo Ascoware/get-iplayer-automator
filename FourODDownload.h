@@ -9,5 +9,6 @@
 #import "Download.h"
 
 @interface FourODDownload : Download
-- (id)initWithProgramme:(Programme *)tempShow
+- (id)initWithProgramme:(Programme *)tempShow;
+- (NSString *)decodeToken:(NSString *)string;
 @end
