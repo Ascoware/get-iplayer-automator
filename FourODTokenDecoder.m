@@ -41,21 +41,21 @@
                 Py_DECREF(pFunc);
                 Py_DECREF(pModule);
                 PyErr_Print();
-                NSLog(stderr,"Call failed\n");
+                NSLog(@"Call failed\n");
                 return nil;
             }
         }
         else {
             if (PyErr_Occurred())
                 PyErr_Print();
-            NSLog(stderr, "Cannot find function \"%s\"\n", "Decode4odToken");
+            NSLog(@"Cannot find function \"%@\"\n", @"Decode4odToken");
         }
         Py_XDECREF(pFunc);
         Py_DECREF(pModule);
     }
     else {
         PyErr_Print();
-        NSLog(stderr, "Failed to load \"%s\"\n", "Token Decoder File");
+        NSLog(@"Failed to load \"%@\"\n", @"Token Decoder File");
         return nil;
     }
     Py_Finalize();
