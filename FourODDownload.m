@@ -11,6 +11,10 @@
 #import <Python/Python.h>
 
 @implementation FourODDownload
+- (id)description
+{
+	return [NSString stringWithFormat:@"4oD Download (ID=%@)", [show pid]];
+}
 - (id)initWithProgramme:(Programme *)tempShow
 {
     show = tempShow;

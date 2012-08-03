@@ -219,7 +219,7 @@
 }
 - (id)description
 {
-	return [NSString stringWithFormat:@"Download (ID=%@)", [show pid]];
+	return [NSString stringWithFormat:@"BBC Download (ID=%@)", [show pid]];
 }
 #pragma mark Task Control
 - (void)DownloadDataReady:(NSNotification *)note

@@ -23,7 +23,7 @@
 }
 - (id)description
 {
-	return [NSString stringWithFormat:@"Download (ID=%@)", [show pid]];
+	return [NSString stringWithFormat:@"ITV Download (ID=%@)", [show pid]];
 }
 - (id)initWithProgramme:(Programme *)tempShow itvFormats:(NSArray *)itvFormatList
 {
