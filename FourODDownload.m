@@ -11,7 +11,7 @@
 #import "FourODTokenDecoder.h"
 
 @implementation FourODDownload
-- (id)initWithProgramme:(Programme *)tempShow formats:(NSArray *)fourODFormatList
+- (id)initWithProgramme:(Programme *)tempShow
 {
     show = tempShow;
     attemptNumber=1;
@@ -23,7 +23,6 @@
     [self setPercentage:102];
     [tempShow setValue:@"Initialising..." forKey:@"status"];
     
-    formatList = [fourODFormatList copy];
     [self addToLog:[NSString stringWithFormat:@"Downloading %@",[show showName]] noTag:NO];
     [self addToLog:@"INFO: Preparing Request for Auth Info" noTag:YES];
     

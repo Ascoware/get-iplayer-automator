@@ -9,5 +9,5 @@
 #import "Download.h"
 
 @interface FourODDownload : Download
-- (id)initWithProgramme:(Programme *)tempShow formats:(NSArray *)formatList;
+- (id)initWithProgramme:(Programme *)tempShow
 @end

@@ -184,17 +184,6 @@
         rootObject=nil;
     }
     
-    filename = @"4oDFormats.automator";
-    filePath = [folder stringByAppendingPathComponent:filename];
-    @try {
-        rootObject = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
-        [fourODFormatController addObjects:[rootObject valueForKey:@"fourODFormats"]];
-    }
-    @catch (NSException *exception) {
-        [fileManager removeItemAtPath:filePath error:nil];
-        rootObject=nil;
-    }
-    
 	//Adds Defaults to Type Preferences
 	if ([[tvFormatController arrangedObjects] count] == 0)
 	{
@@ -221,14 +210,6 @@
         TVFormat *format2 = [[TVFormat alloc] init];
         [format2 setFormat:@"Flash - Standard"];
         [itvFormatController addObjects:[NSArray arrayWithObjects:format1,format2,nil]];
-    }
-    if ([[fourODFormatController arrangedObjects] count] == 0)
-    {
-        TVFormat *format1 = [[TVFormat alloc] init];
-        [format1 setFormat:@"Flash - High"];
-        TVFormat *format2 = [[TVFormat alloc] init];
-        [format2 setFormat:@"Flash - Standard"];
-        [fourODFormatController addObjects:[NSArray arrayWithObjects:format1,format2,nil]];
     }
 		
 	//Growl Initialization
@@ -363,12 +344,6 @@
     filePath = [folder stringByAppendingPathComponent:filename];
     rootObject = [NSMutableDictionary dictionary];
     [rootObject setValue:[itvFormatController arrangedObjects] forKey:@"itvFormats"];
-    [NSKeyedArchiver archiveRootObject:rootObject toFile:filePath];
-    
-    filename = @"4oDFormats.automator";
-    filePath = [folder stringByAppendingPathComponent:filename];
-    rootObject = [NSMutableDictionary dictionary];
-    [rootObject setValue:[fourODFormatController arrangedObjects] forKey:@"fourODFormats"];
     [NSKeyedArchiver archiveRootObject:rootObject toFile:filePath];
 }
 - (void)updater:(SUUpdater *)updater didFindValidUpdate:(SUAppcastItem *)update
@@ -1531,7 +1506,7 @@
                     if ([[show tvNetwork] hasPrefix:@"ITV"])
                         currentDownload = [[ITVDownload alloc] initWithProgramme:show itvFormats:[itvFormatController arrangedObjects]];
                     else if ([[show tvNetwork] hasPrefix:@"4oD"])
-                        currentDownload = [[FourODDownload alloc] initWithProgramme:show formats:[fourODFormatController arrangedObjects]];
+                        currentDownload = [[FourODDownload alloc] initWithProgramme:show];
                     else
                         currentDownload = [[BBCDownload alloc] initWithProgramme:show 
                                                                        tvFormats:[tvFormatController arrangedObjects] 
@@ -1711,7 +1686,7 @@
                 if ([[nextShow tvNetwork] hasPrefix:@"ITV"])
                     currentDownload = [[ITVDownload alloc] initWithProgramme:nextShow itvFormats:[itvFormatController arrangedObjects]];
                 else if ([[nextShow tvNetwork] hasPrefix:@"4oD"])
-                    currentDownload = [[FourODDownload alloc] initWithProgramme:nextShow formats:[fourODFormatController arrangedObjects]];
+                    currentDownload = [[FourODDownload alloc] initWithProgramme:nextShow];
                 else
                     currentDownload = [[BBCDownload alloc] initWithProgramme:nextShow 
                                                                    tvFormats:[tvFormatController arrangedObjects] 

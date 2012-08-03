@@ -90,11 +90,9 @@ bool runUpdate=NO;
 	NSMutableArray *tvFormatList;
 	NSMutableArray *radioFormatList;
     NSMutableArray *itvFormatList;
-    NSMutableArray *fourODFormatList;
 	IBOutlet NSArrayController *tvFormatController;
 	IBOutlet NSArrayController *radioFormatController;
     IBOutlet NSArrayController *itvFormatController;
-    IBOutlet NSArrayController *fourODFormatController;
     IBOutlet NSButton *itvTVCheckbox;
     IBOutlet NSPanel *prefsPanel;
 	
