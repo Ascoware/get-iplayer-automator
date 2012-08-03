@@ -41,7 +41,7 @@
     NSString *pid;
     [scanner scanUpToString:@"lklk" intoString:&pid];
     [show setRealPID:pid];
-    NSURL *requestURL = [[NSURL alloc] initWithString:[NSString stringWithFormat:@"http://ais.channel4.com/asset/%@",[show realPID]]];
+    NSURL *requestURL = [NSURL URLWithString:[NSString stringWithFormat:@"http://ais.channel4.com/asset/%@",[show realPID]]];
     NSLog(@"Request URL: %@",requestURL);
     
     ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:requestURL];
@@ -49,6 +49,14 @@
     [request setTimeOutSeconds:10];
     [request setNumberOfTimesToRetryOnTimeout:3];
     [request setDelegate:self];
+    
+    ASIHTTPRequest *dataRequest = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:[show url]]];
+    [dataRequest setDidFinishSelector:@selector(dataRequestFinished:)];
+    [dataRequest setTimeOutSeconds:10];
+    [dataRequest setNumberOfTimesToRetryOnTimeout:3];
+    [dataRequest setDelegate:self];
+    [dataRequest startAsynchronous];
+    
     
     NSString *proxyOption = [[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"];
 	if ([proxyOption isEqualToString:@"Custom"])
@@ -215,6 +223,41 @@
                      @"-o",downloadPath,
                      nil];
     [self launchRTMPDumpWithArgs:args];
+    
+}
+-(void)dataRequestFinished:(ASIHTTPRequest *)request
+{
+    NSString *responseString = [[NSString alloc] initWithData:[request responseData] encoding:NSUTF8StringEncoding];
+    
+    NSScanner *scanner = [NSScanner scannerWithString:responseString];
+    
+    [scanner scanUpToString:@"og:image" intoString:nil];
+    [scanner scanString:@"og:image\" content=\"" intoString:nil];
+    [scanner scanUpToString:@"\"" intoString:&thumbnailURL];
+    
+    NSString *description, *seriesTitle;
+    [scanner scanUpToString:@"<meta name=\"description\"" intoString:nil];
+    [scanner scanUpToString:@"4oD" intoString:nil];
+    [scanner scanString:@"4oD. " intoString:nil];
+    [scanner scanUpToString:@"\"/>" intoString:&description];
+    [show setDesc:description];
+    
+    [scanner scanUpToString:@"<h1 class=\"brandTitle\" data-wsbrandtitle=" intoString:nil];
+    [scanner scanUpToString:@"title=\"" intoString:nil];
+    [scanner scanString:@"title=\"" intoString:nil];
+    [scanner scanUpToString:@"\">" intoString:&seriesTitle];
+    [show setSeriesName:seriesTitle];
+    
+    [show setEpisodeName:[[seriesTitle componentsSeparatedByString:@" - "] objectAtIndex:1]];
+    
+    NSInteger series, episode;
+    [scanner scanUpToString:@"seriesNo" intoString:nil];
+    [scanner scanString:@"seriesNo\">Series " intoString:nil];
+    [scanner scanInteger:&series];
+    [scanner scanUpToString:@"episodeNo" intoString:nil];
+    [scanner scanString:@"episodeNo\">Episode " intoString:nil];
+    [scanner scanInteger:&episode];
+    
     
 }
 - (NSString *)decodeToken:(NSString *)string

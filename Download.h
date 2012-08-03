@@ -8,6 +8,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import "Programme.h"
+#import "ASIHTTPRequest.h"
 
 @interface Download : NSObject {
     NSNotificationCenter *nc;

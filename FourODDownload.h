@@ -11,4 +11,5 @@
 @interface FourODDownload : Download
 - (id)initWithProgramme:(Programme *)tempShow;
 - (NSString *)decodeToken:(NSString *)string;
+-(void)dataRequestFinished:(ASIHTTPRequest *)request;
 @end

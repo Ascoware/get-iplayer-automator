@@ -7,7 +7,6 @@
 //
 
 #import "Download.h"
-#import "ASIHTTPRequest.h"
 
 @implementation Download
 - (id)init
