@@ -34,8 +34,6 @@
 
 - (void)launchMetaRequest
 {
-    //Fix Showname
-    [show setShowName:[[show showName] stringByReplacingOccurrencesOfString:@"amp;" withString:@""]];
     errorCache = [[NSMutableString alloc] initWithString:@""];
     processErrorCache = [NSTimer scheduledTimerWithTimeInterval:.25 target:self selector:@selector(processError) userInfo:nil repeats:YES];
     NSScanner *scanner = [NSScanner scannerWithString:[show url]];

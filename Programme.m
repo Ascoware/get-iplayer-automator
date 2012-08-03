@@ -15,6 +15,7 @@ extern BOOL runDownloads;
 {
 	[super init];
 	pid = [[NSString alloc] initWithString:PID];
+    pid = [pid stringByReplacingOccurrencesOfString:@";amp" withString:nil];
 	showName = [[NSString alloc] initWithString:SHOWNAME];
 	tvNetwork = [[NSString alloc] initWithString:TVNETWORK];
 	status = [[NSString alloc] init];
@@ -143,6 +144,10 @@ extern BOOL runDownloads;
 	return [NSArray arrayWithObject:@"com.thomaswillson.programme"];
 }
  */
+-(void)setPid:(NSString *)pid
+{
+    self->pid = [pid stringByReplacingOccurrencesOfString:@"amp;" withString:@""];
+}
 @synthesize showName;
 @synthesize pid;
 @synthesize tvNetwork;
