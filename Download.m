@@ -88,9 +88,9 @@
         downloaded=downloaded/1024;
         if (total>0 && downloaded>0 && percent>0)
         {
-            if ([rateEntries count] == 100)
+            if ([rateEntries count] >= 50)
             {
-                
+                NSLog(@"Num of RateEntries: %ld",[rateEntries count]);
                 double rate = ((downloaded-lastDownloaded)/(-[lastDate timeIntervalSinceNow]));
                 if (rate < (oldRateAverage*5) && rate > (oldRateAverage/5) && rate < 50)
                 {
@@ -100,6 +100,7 @@
                 }
                 else 
                 {
+                    NSLog(@"Out of Range");
                     outOfRange++;
                     if (outOfRange>10)
                     {
@@ -114,7 +115,7 @@
                 {
                     rateSum=rateSum+[tempRate doubleValue];
                 }
-                double rateAverage = oldRateAverage = rateSum/100;
+                double rateAverage = oldRateAverage = rateSum/[rateEntries count];
                 lastDownloaded=downloaded;
                 lastDate = [NSDate date];
                 NSDate *predictedFinished = [NSDate dateWithTimeIntervalSinceNow:(total-downloaded)/rateAverage];
@@ -128,13 +129,19 @@
             {
                 if (lastDownloaded>0 && lastDate)
                 {
+                    NSLog(@"Initialising Time Remaining.");
                     double rate = ((downloaded-lastDownloaded)/(-[lastDate timeIntervalSinceNow]));
                     if (rate<50)
+                    {
+                        NSLog(@"Rate: %f",rate);
                         [rateEntries addObject:[NSNumber numberWithDouble:rate]];
+                        NSLog(@"Rate is less than 50: %ld",[rateEntries count]);
+                    }
                     lastDownloaded=downloaded;
                     lastDate = [NSDate date];
-                    if ([rateEntries count]>98)
+                    if ([rateEntries count]>48)
                     {
+                        NSLog(@"Rate Entries is greater than 48");
                         double rateSum=0;
                         for (NSNumber *entry in rateEntries)
                         {
@@ -147,6 +154,7 @@
                 {
                     lastDownloaded=downloaded;
                     lastDate = [NSDate date];
+                    NSLog(@"Setting \"last\" variables.");
                 }
                 if (percent != 102)
                     [self setCurrentProgress:[NSString stringWithFormat:@"%.1f%% - (%.2f MB/~%.0f MB) -- %@",percent,downloaded,total,[show valueForKey:@"showName"]]];

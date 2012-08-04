@@ -17,6 +17,8 @@
 }
 - (id)initWithProgramme:(Programme *)tempShow
 {
+    [super init];
+    
     show = tempShow;
     attemptNumber=1;
     nc = [NSNotificationCenter defaultCenter];

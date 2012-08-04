@@ -14,10 +14,7 @@
 
 - (id)init
 {
-    self = [super init];
-    if (self) {
-        // Initialization code here.
-    }
+    [super init];
     
     return self;
 }
@@ -27,6 +24,8 @@
 }
 - (id)initWithProgramme:(Programme *)tempShow itvFormats:(NSArray *)itvFormatList
 {
+    [super init];
+    
     show = tempShow;
     attemptNumber=1;
     nc = [NSNotificationCenter defaultCenter];
