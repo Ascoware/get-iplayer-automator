@@ -209,7 +209,11 @@
         [format1 setFormat:@"Flash - High"];
         TVFormat *format2 = [[TVFormat alloc] init];
         [format2 setFormat:@"Flash - Standard"];
-        [itvFormatController addObjects:[NSArray arrayWithObjects:format1,format2,nil]];
+        TVFormat *format3 = [[TVFormat alloc] init];
+        [format3 setFormat:@"Flash - Low"];
+        TVFormat *format4 = [[TVFormat alloc] init];
+        [format4 setFormat:@"Flash - Very Low"];
+        [itvFormatController addObjects:[NSArray arrayWithObjects:format1,format2,format3,format4,nil]];
     }
 		
 	//Growl Initialization
