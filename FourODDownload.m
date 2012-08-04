@@ -259,9 +259,11 @@
     [scanner scanUpToString:@"seriesNo" intoString:nil];
     [scanner scanString:@"seriesNo\">Series " intoString:nil];
     [scanner scanInteger:&series];
+    [show setSeason:series];
     [scanner scanUpToString:@"episodeNo" intoString:nil];
     [scanner scanString:@"episodeNo\">Episode " intoString:nil];
     [scanner scanInteger:&episode];
+    [show setEpisode:episode];
     
     
 }
