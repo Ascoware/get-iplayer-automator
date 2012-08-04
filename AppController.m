@@ -172,6 +172,7 @@
 		NSLog(@"Unable to load saved application data. Deleted the data file.");
 		rootObject=nil;
 	}
+    BOOL hasCached4oD = [[rootObject valueForKey:@"hasUpdatedCacheFor4oD"] boolValue];
     
     filename = @"ITVFormats.automator";
     filePath = [folder stringByAppendingPathComponent:filename];
@@ -231,7 +232,10 @@
 	infoPath = [infoPath stringByExpandingTildeInPath];
 	if ([fileManager fileExistsAtPath:infoPath]) [fileManager removeItemAtPath:infoPath error:nil];
     
-    [self updateCache:nil];
+    if (hasCached4oD)
+        [self updateCache:nil];
+    else
+        [self updateCache:@""];
 }
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)application
 {
@@ -342,6 +346,7 @@
 	
 	[rootObject setValue:[tvFormatController arrangedObjects] forKey:@"tvFormats"];
 	[rootObject setValue:[radioFormatController arrangedObjects] forKey:@"radioFormats"];
+    [rootObject setValue:[NSNumber numberWithBool:YES] forKey:@"hasUpdatedCacheFor4oD"];
 	[NSKeyedArchiver archiveRootObject:rootObject toFile:filePath];
     
     filename = @"ITVFormats.automator";
