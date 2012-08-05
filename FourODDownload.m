@@ -200,7 +200,10 @@
         [scanner scanString:@"<slist>" intoString:nil];
         [scanner scanUpToString:@"</slist>" intoString:&slist];
         @try {
-            auth = [NSString stringWithFormat:@"auth=%@&aifp=%@&slist=%@",decodedToken,fingerprint,slist];
+            if (decodedToken && fingerprint && slist)
+                auth = [NSString stringWithFormat:@"auth=%@&aifp=%@&slist=%@",decodedToken,fingerprint,slist];
+            else
+                [NSException raise:@"Error Processing Metadata" format:@"Could not process 4oD Metadata"];
         }
         @catch (NSException *exception) {
             [self addToLog:@"ERROR: Could not process 4oD metadata." noTag:YES];
