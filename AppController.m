@@ -836,6 +836,8 @@
 #pragma mark Search
 - (IBAction)mainSearch:(id)sender
 {
+    [searchField setEnabled:NO];
+    
 	NSString *searchTerms = [searchField stringValue];
 	
 	if([searchTerms length] > 0)
@@ -891,6 +893,7 @@
 }
 - (void)searchFinished:(NSNotification *)n
 {
+    [searchField setEnabled:YES];
 	BOOL foundShow=NO;
 	[resultsController removeObjectsAtArrangedObjectIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, [[resultsController arrangedObjects] count])]];
 	NSString *string = [NSString stringWithString:searchData];
