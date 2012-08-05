@@ -1147,11 +1147,13 @@
                             [[document URL] hasPrefix:@"http://bbc.co.uk/iplayer/episode/"] ||
                             [[document URL] hasPrefix:@"http://bbc.co.uk/iplayer/console/"] || 
                             [[document URL] hasPrefix:@"http://www.bbc.co.uk/iplayer/console/"] ||
-                            [[document URL] hasPrefix:@"http://www.itv.com/itvplayer/video/?Filter"])
+                            [[document URL] hasPrefix:@"http://www.itv.com/itvplayer/video/?Filter"] ||
+                            [[document URL] hasPrefix:@"http://bbc.co.uk/sport"])
 						{
 							url = [NSString stringWithString:[document URL]];
                             NSScanner *nameScanner = [NSScanner scannerWithString:[document name]];
                             [nameScanner scanString:@"BBC iPlayer - " intoString:nil];
+                            [nameScanner scanString:@"BBC Sport - " intoString:nil];
                             [nameScanner scanUpToString:@"kjklgfdjfgkdlj" intoString:&newShowName];
 							foundURL=YES;
 						}
@@ -1347,6 +1349,14 @@
 		[queueController addObject:newProg];
 		[self getNameForProgramme:newProg];
 	}
+    else if ([url hasPrefix:@"http://www.bbc.co.uk/sport/olympics/2012/live-video/"])
+    {
+        NSString *pid;
+        NSScanner *urlScanner = [NSScanner scannerWithString:url];
+        [urlScanner scanString:@"http://www.bbc.co.uk/sport/olympics/2012/live-video/" intoString:nil];
+        [urlScanner scanUpToString:@"kfejklfjklj" intoString:&pid];
+        [queueController addObject:[[Programme alloc] initWithInfo:nil pid:pid programmeName:newShowName network:@"BBC Sport"]];
+    }
 	else if ([url hasPrefix:@"http://www.itv.com/itvplayer/video/?Filter"])
 	{
 		NSString *pid;
