@@ -487,7 +487,7 @@
 	[task launch];
 	[fh readInBackgroundAndNotify];
 	[errorFh readInBackgroundAndNotify];
-	[show setValue:@"Initiliasing..." forKey:@"status"];
+	[show setValue:@"Initialising..." forKey:@"status"];
 	
 	//Prepare UI
 	[self setCurrentProgress:[NSString stringWithFormat:@"Initialising RTMPDump... -- %@",[show showName]]];
