@@ -199,7 +199,18 @@
         [scanner scanUpToString:@"<slist>" intoString:nil];
         [scanner scanString:@"<slist>" intoString:nil];
         [scanner scanUpToString:@"</slist>" intoString:&slist];
-        auth = [NSString stringWithFormat:@"auth=%@&aifp=%@&slist=%@",decodedToken,fingerprint,slist];
+        @try {
+            auth = [NSString stringWithFormat:@"auth=%@&aifp=%@&slist=%@",decodedToken,fingerprint,slist];
+        }
+        @catch (NSException *exception) {
+            [self addToLog:@"ERROR: Could not process 4oD metadata." noTag:YES];
+            [show setComplete:[NSNumber numberWithBool:YES]];
+            [show setSuccessful:[NSNumber numberWithBool:NO]];
+            [show setValue:@"Download Failed" forKey:@"status"];
+            [show setReasonForFailure:@"MetadataProcessing"];
+            [nc postNotificationName:@"DownloadFinished" object:show];
+            return;
+        }
     }
     
     NSString *rtmpURL = [[streamUri componentsSeparatedByString:@"mp4:"] objectAtIndex:0];
