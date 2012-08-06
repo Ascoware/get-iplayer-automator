@@ -203,10 +203,18 @@
             if (decodedToken && fingerprint && slist)
                 auth = [NSString stringWithFormat:@"auth=%@&aifp=%@&slist=%@",decodedToken,fingerprint,slist];
             else
-                [NSException raise:@"Error Processing Metadata" format:@"Could not process 4oD Metadata"];
+                [NSException raise:@"Parsing Error." format:@"Could not process 4oD Metadata"];
+            
+            NSString *rtmpURL = [[streamUri componentsSeparatedByString:@"mp4:"] objectAtIndex:0];
+            rtmpURL = [rtmpURL stringByReplacingOccurrencesOfString:@".com/" withString:@".com:1935/"];
+            rtmpURL = [rtmpURL stringByAppendingFormat:@"?ovpfv=1.1&%@",auth];
+            
+            if ([rtmpURL hasPrefix:@"http"])
+                [NSException raise:@"4oD: Unsupported HTTP Download." format:@"Could not process 4oD Metadat"];
         }
         @catch (NSException *exception) {
-            [self addToLog:@"ERROR: Could not process 4oD metadata." noTag:YES];
+            [self addToLog:[exception name]];
+            [self addToLog:[exception description]];
             [show setComplete:[NSNumber numberWithBool:YES]];
             [show setSuccessful:[NSNumber numberWithBool:NO]];
             [show setValue:@"Download Failed" forKey:@"status"];
