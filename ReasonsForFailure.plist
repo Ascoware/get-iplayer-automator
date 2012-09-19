@@ -37,5 +37,8 @@ like to download it again, delete the file first.</string>
 proxy option in preferences.</string>
 	<key>MetadataProcessing</key>
 	<string>GiA could not process this programme. Please submit a bug report.</string>
+    <key>4oDHTTP</key>
+    <string>GiA does not support downloading HTTP Dynamic Streaming programmes from 4oD.
+Unfortunately, this show is one of them.</string>
 </dict>
 </plist>

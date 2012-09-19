@@ -156,6 +156,18 @@
     
     NSScanner *scanner = [NSScanner scannerWithString:responseString];
     
+    if ([responseString rangeOfString:@"f4m"].location != NSNotFound)
+    {
+        [self addToLog:@"GiA does not support downloading this show."];
+        [self addToLog:@"    HTTP Dynamic Streaming Detected"];
+        [show setComplete:[NSNumber numberWithBool:YES]];
+        [show setSuccessful:[NSNumber numberWithBool:NO]];
+        [show setValue:@"Download Failed" forKey:@"status"];
+        [show setReasonForFailure:@"4oDHTTP"];
+        [nc postNotificationName:@"DownloadFinished" object:show];
+        return;
+    }
+    
     NSString *uriData;
     [scanner scanUpToString:@"<uriData>" intoString:nil];
     [scanner scanString:@"<uriData>" intoString:nil];
@@ -210,7 +222,7 @@
             rtmpURL = [rtmpURL stringByAppendingFormat:@"?ovpfv=1.1&%@",auth];
             
             if ([rtmpURL hasPrefix:@"http"])
-                [NSException raise:@"4oD: Unsupported HTTP Download." format:@"Could not process 4oD Metadat"];
+                [NSException raise:@"4oD: Unsupported HTTP Download." format:@"GiA does not support this programme."];
         }
         @catch (NSException *exception) {
             [self addToLog:[exception name]];
@@ -218,7 +230,10 @@
             [show setComplete:[NSNumber numberWithBool:YES]];
             [show setSuccessful:[NSNumber numberWithBool:NO]];
             [show setValue:@"Download Failed" forKey:@"status"];
-            [show setReasonForFailure:@"MetadataProcessing"];
+            if ([[exception name] isEqualToString:@"4oD: Unsupported HTTP Download."])
+                [show setReasonForFailure:@"4oDHTTP"];
+            else
+                [show setReasonForFailure:@"MetadataProcessing"];
             [nc postNotificationName:@"DownloadFinished" object:show];
             return;
         }
