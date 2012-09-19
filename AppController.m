@@ -1948,7 +1948,7 @@
 		
 		NSMutableArray *autoRecordArgs = [[NSMutableArray alloc] initWithObjects:getiPlayerPath, noWarningArg,@"--nopurge",
 										  @"--listformat=<index>: <type>, ~<name> - <episode>~, <channel>, <timeadded>, <pid>,<web>", cacheExpiryArgument, 
-										  typeArgument, profileDirArg,@"--hide",[series showName],nil];
+										  typeArgument, profileDirArg,@"--hide",[self escapeSpecialCharactersInString:[series showName]],nil];
 		
 		NSTask *autoRecordTask = [[NSTask alloc] init];
 		NSPipe *autoRecordPipe = [[NSPipe alloc] init];
@@ -2130,6 +2130,13 @@
         NSInteger response = [downloadAlert runModal];
         if (response == NSAlertDefaultReturn) [mainWindow performClose:self];
     }
+}
+- (NSString *)escapeSpecialCharactersInString:(NSString *)string
+{
+    NSArray *characters = [NSArray arrayWithObjects:@"+",@"-",@"&",@"!",@"(",@")",@"{",@"}",
+                           @"[",@"]"@"^",@"~",@"*",@"?",@":",@"\"", nil];
+    for (NSString *character in characters)
+        string = [string stringByReplacingOccurrencesOfString:character withString:[NSString stringWithFormat:@"\\%@",character]];
 }
 - (void)addToiTunes:(Programme *)show
 {
