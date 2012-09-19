@@ -271,6 +271,7 @@
             [downloadThumb setDelegate:self];
             [downloadThumb startAsynchronous];
             [downloadThumb setDidFinishSelector:@selector(thumbnailRequestFinished:)];
+            [downloadThumb setDidFailSelector:@selector(thumbnailRequestFinished:)];
         }
         else
         {
@@ -298,7 +299,7 @@
     //[apTask setStandardError:apPipe];
     
     [apTask setLaunchPath:[[NSBundle mainBundle] pathForResource:@"AtomicParsley" ofType:nil]];
-    if (request)
+    if (request && [request responseStatusCode] == 200)
         [apTask setArguments:[NSArray arrayWithObjects:
                               [NSString stringWithFormat:@"%@",[show path]],
                               @"--stik",@"value=10",
