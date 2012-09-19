@@ -2137,6 +2137,8 @@
                            @"[",@"]"@"^",@"~",@"*",@"?",@":",@"\"", nil];
     for (NSString *character in characters)
         string = [string stringByReplacingOccurrencesOfString:character withString:[NSString stringWithFormat:@"\\%@",character]];
+    
+    return string;
 }
 - (void)addToiTunes:(Programme *)show
 {
