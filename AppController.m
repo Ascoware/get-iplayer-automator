@@ -10,7 +10,6 @@
 #import "Programme.h"
 #import "Safari.h"
 #import "iTunes.h"
-#import "Camino.h"
 #import "Growl.framework/Headers/GrowlApplicationBridge.h"
 #import "Sparkle.framework/Headers/Sparkle.h"
 #import "JRFeedbackController.h"
@@ -1183,9 +1182,66 @@
 		}
 		
 	}
+    else if ([browser isEqualToString:@"Chrome"])
+	{
+		BOOL foundURL=NO;
+		ChromeApplication *Chrome = [SBApplication applicationWithBundleIdentifier:@"com.google.Chrome"];
+		if ([Chrome isRunning])
+		{
+			@try
+			{
+				SBElementArray *windows = [Chrome windows];
+				if ([[NSNumber numberWithUnsignedInteger:[windows count]] intValue])
+				{
+					for (ChromeWindow *window in windows)
+ 					{
+                        SBElementArray *tabs = [window tabs];
+                        for (ChromeTab *tab in tabs)
+                        {
+                            if ([[tab URL] hasPrefix:@"http://www.bbc.co.uk/iplayer/episode/"] ||
+                                [[tab URL] hasPrefix:@"http://bbc.co.uk/iplayer/episode/"] ||
+                                [[tab URL] hasPrefix:@"http://bbc.co.uk/iplayer/console/"] ||
+                                [[tab URL] hasPrefix:@"http://www.bbc.co.uk/iplayer/console/"] ||
+                                [[tab URL] hasPrefix:@"http://www.itv.com/itvplayer/video/?Filter"] ||
+                                [[tab URL] hasPrefix:@"http://bbc.co.uk/sport"])
+                            {
+                                url = [NSString stringWithString:[tab URL]];
+                                NSScanner *nameScanner = [NSScanner scannerWithString:[tab title]];
+                                [nameScanner scanString:@"BBC iPlayer - " intoString:nil];
+                                [nameScanner scanString:@"BBC Sport - " intoString:nil];
+                                [nameScanner scanUpToString:@"kjklgfdjfgkdlj" intoString:&newShowName];
+                                foundURL=YES;
+                            }
+                        }
+					}
+					if (foundURL==NO)
+					{
+						url = [NSString stringWithString:[[[windows objectAtIndex:0] activeTab] URL]];
+                        //Might be incorrect
+					}
+				}
+				else
+				{
+					[browserNotOpen runModal];
+					return;
+				}
+			}
+			@catch (NSException *e)
+			{
+				[browserNotOpen runModal];
+				return;
+			}
+		}
+		else
+		{
+			[browserNotOpen runModal];
+			return;
+		}
+		
+	}
     else
     {
-        [[NSAlert alertWithMessageText:@"Get iPlayer Automator currently only supports Safari." defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Please change your preferred browser in the preferences and try again."] runModal];
+        [[NSAlert alertWithMessageText:@"Get iPlayer Automator currently only supports Safari and Chrome." defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Please change your preferred browser in the preferences and try again."] runModal];
         return;
     }
 	/*else if ([browser isEqualToString:@"Firefox"])
