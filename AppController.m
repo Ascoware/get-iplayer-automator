@@ -2486,7 +2486,7 @@
 	unsigned int unitFlags = NSHourCalendarUnit | NSMinuteCalendarUnit | NSDayCalendarUnit | NSSecondCalendarUnit;
 	NSDateComponents *conversionInfo = [[NSCalendar currentCalendar] components:unitFlags fromDate:currentTime toDate:startTime options:0];
 	
-	NSString *status = [NSString stringWithFormat:@"Time until Start (DD:HH:MM:SS): %2ld:%2ld:%2ld:%2ld",
+	NSString *status = [NSString stringWithFormat:@"Time until Start (DD:HH:MM:SS): %02ld:%02ld:%02ld:%02ld",
 						(long)[conversionInfo day], (long)[conversionInfo hour],
 						(long)[conversionInfo minute],(long)[conversionInfo second]];
 	if (!runUpdate)
