@@ -229,6 +229,8 @@
         //Fix Showname
         NSURLRequest *metaDataRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://www.itv.com/_app/Dynamic/CatchUpData.ashx?ViewType=5&Filter=%@",[show realPID]]]];
         NSString *response = [[NSString alloc] initWithData:[NSURLConnection sendSynchronousRequest:metaDataRequest returningResponse:nil error:nil] encoding:NSUTF8StringEncoding];
+        if (!response)
+            [[NSException exceptionWithName:@"ITV Secondary Request Failed." reason:@"Nil Response String" userInfo:nil] raise];
         NSScanner *metadataScanner = [NSScanner scannerWithString:response];
         [metadataScanner scanUpToString:@"<h2>" intoString:nil];
         [metadataScanner scanString:@"<h2>" intoString:nil];
