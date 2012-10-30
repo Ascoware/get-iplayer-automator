@@ -29,6 +29,7 @@
     show = tempShow;
     attemptNumber=1;
     nc = [NSNotificationCenter defaultCenter];
+    defaultsPrefix = @"ITV_";
     
     running=TRUE;
     

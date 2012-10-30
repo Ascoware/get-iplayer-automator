@@ -47,6 +47,13 @@
     NSString *subtitleURL;
     NSString *thumbnailURL;
     NSString *downloadPath;
+    NSString *thumbnailPath;
+    NSString *subtitlePath;
+    
+    //Subtitle Conversion
+    NSTask *subsTask;
+    NSPipe *subsErrorPipe;
+    NSString *defaultsPrefix;
     
     NSArray *formatList;
     BOOL running;

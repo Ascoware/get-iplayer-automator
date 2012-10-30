@@ -253,31 +253,32 @@
     [self addToLog:@"INFO: Finished Converting." noTag:YES];
     if ([[finishedNote object] terminationStatus] == 0)
     {
-        if (!thumbnailURL)
+        [[NSFileManager defaultManager] removeItemAtPath:downloadPath error:nil];
+        if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"TagShows"] boolValue])
         {
-            [self thumbnailRequestFinished:nil];
-        }
-        else if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"TagShows"] boolValue])
-        {
-            [[NSFileManager defaultManager] removeItemAtPath:downloadPath error:nil];
             [show setValue:@"Tagging..." forKey:@"status"];
             [self setPercentage:102];
             [self setCurrentProgress:[NSString stringWithFormat:@"Downloading Thumbnail... -- %@",[show showName]]];
             [self addToLog:@"INFO: Tagging the Show" noTag:YES];
-            [self addToLog:@"INFO: Downloading thumbnail" noTag:YES];
-            
-            ASIHTTPRequest *downloadThumb = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:thumbnailURL]];
-            [downloadThumb setDownloadDestinationPath:[[show path] stringByAppendingPathExtension:@"jpg"]];
-            [downloadThumb setDelegate:self];
-            [downloadThumb startAsynchronous];
-            [downloadThumb setDidFinishSelector:@selector(thumbnailRequestFinished:)];
-            [downloadThumb setDidFailSelector:@selector(thumbnailRequestFinished:)];
+            if (thumbnailURL)
+            {
+                [self addToLog:@"INFO: Downloading thumbnail" noTag:YES];
+                thumbnailPath = [[show path] stringByAppendingPathExtension:@"jpg"];
+                ASIHTTPRequest *downloadThumb = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:thumbnailURL]];
+                [downloadThumb setDownloadDestinationPath:thumbnailPath];
+                [downloadThumb setDelegate:self];
+                [downloadThumb startAsynchronous];
+                [downloadThumb setDidFinishSelector:@selector(thumbnailRequestFinished:)];
+                [downloadThumb setDidFailSelector:@selector(thumbnailRequestFinished:)];
+            }
+            else
+            {
+                [self thumbnailRequestFinished:nil];
+            }
         }
         else
         {
-            [show setValue:@"Download Complete" forKey:@"status"];
-            
-            [nc postNotificationName:@"DownloadFinished" object:show];
+            [self atomicParsleyFinished:nil];
         }
     }
     else
@@ -334,7 +335,7 @@
            selector:@selector(DownloadDataReady:)
                name:NSFileHandleReadCompletionNotification
              object:apFh];
-    [nc addObserver:self 
+    [nc addObserver:self
            selector:@selector(atomicParsleyFinished:) 
                name:NSTaskDidTerminateNotification 
              object:apTask];
@@ -349,16 +350,115 @@
 }
 - (void)atomicParsleyFinished:(NSNotification *)finishedNote
 {
-    if ([[finishedNote object] terminationStatus] == 0)
+    if (finishedNote)
     {
-        [[NSFileManager defaultManager] removeItemAtPath:[[show path] stringByAppendingPathExtension:@"jpg"] error:nil];
-        [self addToLog:@"INFO: AtomicParsley Tagging finished." noTag:YES];
+        if ([[finishedNote object] terminationStatus] == 0)
+        {
+            [[NSFileManager defaultManager] removeItemAtPath:thumbnailPath error:nil];
+            [self addToLog:@"INFO: AtomicParsley Tagging finished." noTag:YES];
+        }
+        else
+            [self addToLog:@"INFO: Tagging failed." noTag:YES];
+    }
+    
+    if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"DownloadSubtitles"] boolValue])
+    {
+        if (subtitleURL)
+        {
+            [show setValue:@"Downloading Subtitles..." forKey:@"status"];
+            [self setPercentage:102];
+            [self setCurrentProgress:[NSString stringWithFormat:@"Downloading Subtitles... -- %@",[show showName]]];
+            [self addToLog:[NSString stringWithFormat:@"INFO: Downloading subtitles: %@", subtitleURL] noTag:YES];
+            
+            subtitlePath = [[show path] stringByAppendingPathExtension:@"xml"];
+            ASIHTTPRequest *downloadSubs = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:subtitleURL]];
+            [downloadSubs setDownloadDestinationPath:subtitlePath];
+            [downloadSubs setDelegate:self];
+            [downloadSubs setDidFinishSelector:@selector(subtitleRequestFinished:)];
+            [downloadSubs setDidFailSelector:@selector(subtitleRequestFinished:)];
+            [downloadSubs startAsynchronous];
+        }
+        else
+        {
+            [self subtitleRequestFinished:nil];
+        }
     }
     else
-        [self addToLog:@"INFO: Tagging failed." noTag:YES];
-    
+    {
+        [self convertSubtitlesFinished:nil];
+    }
+}
+- (void)subtitleRequestFinished:(ASIHTTPRequest *)request
+{
+    if (request)
+    {
+        if ([request responseStatusCode] == 200)
+        {
+            [self addToLog:@"INFO: Subtitles Download Completed" noTag:YES];
+            if ([subtitlePath pathExtension] != @"srt")
+            {
+                [show setValue:@"Converting Subtitles..." forKey:@"status"];
+                [self setPercentage:102];
+                [self setCurrentProgress:[NSString stringWithFormat:@"Converting Subtitles... -- %@",[show showName]]];
+                [self addToLog:@"INFO: Converting Subtitles..." noTag:YES];
+                [self convertSubtitles];
+            }
+        }
+        else
+        {
+            [self addToLog:@"INFO: Subtitles Download Failed" noTag:YES];
+            [self convertSubtitlesFinished:nil];
+        }
+    }
+    else
+    {
+        [self convertSubtitlesFinished:nil];
+    }
+}
+- (void)convertSubtitles
+{
+    [self addToLog:[NSString stringWithFormat:@"INFO: Converting to SubRip: %@", subtitlePath] noTag:YES];
+    NSString *ttml2srtPath = [[NSBundle mainBundle] pathForResource:@"ttml2srt.py" ofType:nil];
+    NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:ttml2srtPath, nil];
+    BOOL srtIgnoreColors = [[NSUserDefaults standardUserDefaults] boolForKey:[NSString stringWithFormat:@"%@SRTIgnoreColors", defaultsPrefix]];
+    if (srtIgnoreColors)
+    {
+        [args addObject:[[NSString alloc] initWithString:@"--srt-ignore-colors"]];
+    }
+    [args addObject:subtitlePath];
+    subsTask = [[NSTask alloc] init];
+    subsErrorPipe = [[NSPipe alloc] init];
+    [subsTask setStandardError:subsErrorPipe];
+    [nc addObserver:self selector:@selector(convertSubtitlesFinished:) name:NSTaskDidTerminateNotification object:subsTask];
+    [subsTask setLaunchPath:@"/usr/bin/python"];
+    [subsTask setArguments:args];
+    [subsTask launch];
+}
+- (void)convertSubtitlesFinished:(NSNotification *)aNotification
+{
+    if (aNotification)
+    {
+        if ([[aNotification object] terminationStatus] == 0)
+        {
+            BOOL keepRawSubtitles = [[NSUserDefaults standardUserDefaults] boolForKey:[NSString stringWithFormat:@"%@KeepRawSubtitles", defaultsPrefix]];
+            if (!keepRawSubtitles)
+            {
+                [[NSFileManager defaultManager] removeItemAtPath:subtitlePath error:nil];
+            }
+            [self addToLog:[NSString stringWithFormat:@"INFO: Conversion to SubRip complete: %@", [[show path] stringByAppendingPathExtension:@"srt"]] noTag:YES];
+        }
+        else
+        {
+            [self addToLog:[NSString stringWithFormat:@"ERROR: Conversion to SubRip failed: %@", subtitlePath] noTag:YES];
+            NSData *errData = [[subsErrorPipe fileHandleForReading] readDataToEndOfFile];
+            if ([errData length] > 0)
+            {
+                NSString *errOutput = [[NSString alloc] initWithData:errData encoding:NSUTF8StringEncoding];
+                [self addToLog:errOutput noTag:YES];
+            }
+        }
+    }
     [show setValue:@"Download Complete" forKey:@"status"];
-    
     [nc postNotificationName:@"DownloadFinished" object:show];
 }
 - (void)DownloadDataReady:(NSNotification *)note

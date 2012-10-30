@@ -525,11 +525,11 @@
 		if ([output hasPrefix:@"INFO: Downloading Subtitles"])
 		{
 			NSScanner *scanner = [NSScanner scannerWithString:output];
-			NSString *subtitlePath;
+			NSString *srtPath;
 			[scanner scanString:@"INFO: Downloading Subtitles to \'" intoString:nil];
-			[scanner scanUpToString:@".srt\'" intoString:&subtitlePath];
-			subtitlePath = [subtitlePath stringByAppendingPathExtension:@"srt"];
-			[show setSubtitlePath:subtitlePath];
+			[scanner scanUpToString:@".srt\'" intoString:&srtPath];
+			srtPath = [srtPath stringByAppendingPathExtension:@"srt"];
+			[show setSubtitlePath:srtPath];
 		}
 		if ([output hasPrefix:@"INFO: Recorded"])
 		{
