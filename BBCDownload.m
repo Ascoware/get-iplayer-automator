@@ -19,6 +19,7 @@
 	errorCache = [[NSMutableString alloc] init];
 	processErrorCache = [NSTimer scheduledTimerWithTimeInterval:.25 target:self selector:@selector(processError) userInfo:nil repeats:YES];
     reasonForFailure = [[NSString alloc] initWithString:@"None"];
+    defaultsPrefix = @"BBC_";
     
 	log = [[NSMutableString alloc] initWithString:@""];
 	nc = [NSNotificationCenter defaultCenter];
@@ -158,7 +159,7 @@
 	profileDirArg = [[NSString alloc] initWithFormat:@"--profile-dir=%@", folder];
 	
 		//Add Arguments that can't be NULL
-	NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:getiPlayerPath,profileDirArg,noWarningArg,noExpiryArg,mplayerArg,flvstreamerArg,lameArg,atomicParsleyArg,cacheExpiryArg,downloadPathArg,subDirArg,formatArg,getArg,searchArg,@"--attempts=5",@"--nopurge",@"--fatfilename",@"-w",@"--thumbsize=6",@"--tag-cnid",@"--tag-hdvideo",@"--tag-longdesc",versionArg,proxyArg,partialProxyArg,nil];
+	NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:getiPlayerPath,profileDirArg,noWarningArg,noExpiryArg,mplayerArg,flvstreamerArg,lameArg,atomicParsleyArg,cacheExpiryArg,downloadPathArg,subDirArg,formatArg,getArg,searchArg,@"--attempts=5",@"--nopurge",@"--fatfilename",@"-w",@"--thumbsize=6",@"--tag-hdvideo",@"--tag-longdesc",versionArg,proxyArg,partialProxyArg,nil];
 		//Verbose?
 	if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"Verbose"] isEqualTo:[NSNumber numberWithBool:YES]])
 		[args addObject:[[NSString alloc] initWithString:@"--verbose"]];
@@ -179,6 +180,10 @@
         //Tagging
     if (![[[NSUserDefaults standardUserDefaults] objectForKey:@"TagShows"] boolValue])
         [args addObject:@"--no-tag"];
+
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:[NSString stringWithFormat:@"%@TagCNID", defaultsPrefix]]) {
+		[args addObject:[[NSString alloc] initWithString:@"--tag-cnid"]];
+    }
 	
 	//if (floor(NSAppKitVersionNumber) > 949)
 		//[args addObject:@"--rtmp-tv-opts=-W http://www.bbc.co.uk/emp/10player.swf?revision=18269_21576"];
