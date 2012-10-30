@@ -992,7 +992,7 @@
 		BOOL add=YES;
 		for (Programme *queuedShow in queuedObjects)
 		{
-			if ([[show showName] isEqualToString:[queuedShow showName]]) add=NO;
+			if ([[show showName] isEqualToString:[queuedShow showName]] && [show pid] == [queuedShow pid]) add=NO;
 		}
 		if (add) 
 		{
@@ -2128,7 +2128,7 @@
 					[p setValue:@"Added by Series-Link" forKey:@"status"];
 					BOOL inQueue=NO;
 					for (Programme *show in currentQueue)
-						if ([[show showName] isEqualToString:[p showName]]) inQueue=YES;
+						if ([[show showName] isEqualToString:[p showName]] && [show pid] == [p pid]) inQueue=YES;
 					if (!inQueue) 
 					{
 						if (runDownloads) [p setValue:@"Waiting..." forKey:@"status"];
