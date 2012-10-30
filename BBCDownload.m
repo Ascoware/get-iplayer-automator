@@ -113,7 +113,7 @@
 	}
 		//Initialize the rest of the arguments
 	NSString *noWarningArg = [[NSString alloc] initWithString:@"--nocopyright"];
-	NSString *noExpiryArg = [[NSString alloc] initWithString:@"--nopurge"];
+	NSString *noPurgeArg = [[NSString alloc] initWithString:@"--nopurge"];
 	NSString *mplayerArg = [[NSString alloc] initWithFormat:@"--mplayer=%@", mplayerPath];
     NSString *flvstreamerArg;
    
@@ -159,7 +159,7 @@
 	profileDirArg = [[NSString alloc] initWithFormat:@"--profile-dir=%@", folder];
 	
 		//Add Arguments that can't be NULL
-	NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:getiPlayerPath,profileDirArg,noWarningArg,noExpiryArg,mplayerArg,flvstreamerArg,lameArg,atomicParsleyArg,cacheExpiryArg,downloadPathArg,subDirArg,formatArg,getArg,searchArg,@"--attempts=5",@"--nopurge",@"--fatfilename",@"-w",@"--thumbsize=6",@"--tag-hdvideo",@"--tag-longdesc",versionArg,proxyArg,partialProxyArg,nil];
+	NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:getiPlayerPath,profileDirArg,noWarningArg,noPurgeArg,mplayerArg,flvstreamerArg,lameArg,atomicParsleyArg,cacheExpiryArg,downloadPathArg,subDirArg,formatArg,getArg,searchArg,@"--attempts=5",@"--fatfilename",@"-w",@"--thumbsize=6",@"--tag-hdvideo",@"--tag-longdesc",versionArg,proxyArg,partialProxyArg,nil];
 		//Verbose?
 	if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"Verbose"] isEqualTo:[NSNumber numberWithBool:YES]])
 		[args addObject:[[NSString alloc] initWithString:@"--verbose"]];
