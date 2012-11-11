@@ -433,11 +433,18 @@
             [self addToLog:[NSString stringWithFormat:@"DEBUG: rtmpdump args: %@", args] noTag:YES];
     }
     @catch (NSException *exception) {
-        [self addToLog:@"ERROR: Could not process ITV metadata." noTag:YES];
         [show setComplete:[NSNumber numberWithBool:YES]];
         [show setSuccessful:[NSNumber numberWithBool:NO]];
         [show setValue:@"Download Failed" forKey:@"status"];
-        [show setReasonForFailure:@"MetadataProcessing"];
+        [self addToLog:[NSString stringWithFormat:@"%@ Failed",[show showName]]];
+        if ([[exception name] isEqualToString:@"NoShow"] && [mediaEntries count] > 0) {
+            [self addToLog:@"REASON FOR FAILURE: None of the modes in your download format list are available for this show." noTag:YES];
+            [self addToLog:@"Try adding more modes." noTag:YES];
+            [show setReasonForFailure:@"Specified_Modes"];
+        } else {
+            [self addToLog:@"ERROR: Could not process ITV metadata." noTag:YES];
+            [show setReasonForFailure:@"MetadataProcessing"];
+        }
         [nc postNotificationName:@"DownloadFinished" object:show];
         return;
     }
