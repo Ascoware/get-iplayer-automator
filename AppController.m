@@ -908,11 +908,11 @@
 	}
 	for (NSString *string in array)
 	{
-		if (![string isEqualToString:@"Matches:"] && ![string hasPrefix:@"INFO:"] && ![string hasPrefix:@"WARNING:"] && [string length]>0 && ![string hasPrefix:@"."])
+		if (![string isEqualToString:@"Matches:"] && ![string hasPrefix:@"INFO:"] && ![string hasPrefix:@"WARNING:"]  && ![string hasPrefix:@"ERROR:"] && [string length]>0 && ![string hasPrefix:@"."])
 		{
 			@try {
 				NSScanner *myScanner = [NSScanner scannerWithString:string];
-				NSString *temp_pid, *temp_showName, *temp_tvNetwork, *temp_type, *url;
+				NSString *temp_pid = nil, *temp_showName = nil, *temp_tvNetwork = nil, *temp_type = nil, *url = nil;
 				[myScanner scanUpToString:@":" intoString:&temp_pid];
 				[myScanner scanUpToCharactersFromSet:[NSCharacterSet alphanumericCharacterSet] intoString:NULL];
 				[myScanner scanUpToString:@", ~" intoString:&temp_type];
@@ -922,6 +922,10 @@
 				[myScanner scanUpToString:@"," intoString:&temp_tvNetwork];
                 [myScanner scanUpToCharactersFromSet:[NSCharacterSet alphanumericCharacterSet] intoString:NULL];
                 [myScanner scanUpToString:@"kjkjkj" intoString:&url];
+                if (temp_pid == nil || temp_showName == nil || temp_tvNetwork == nil || temp_type == nil || url == nil) {
+                    [self addToLog: [NSString stringWithFormat:@"WARNING: Skipped invalid search result: %@", string]];
+                    continue;
+                }
 				if ([temp_showName hasSuffix:@" - -"])
 				{
 					NSString *temp_showName2;
