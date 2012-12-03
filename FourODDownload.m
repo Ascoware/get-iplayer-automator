@@ -22,6 +22,7 @@
     show = tempShow;
     attemptNumber=1;
     nc = [NSNotificationCenter defaultCenter];
+    defaultsPrefix = @"4oD_";
     
     running=TRUE;
     
@@ -251,7 +252,10 @@
     
     app = [app stringByAppendingFormat:@"?ovpfv=1.1&%@", auth];
     
-    NSString *swfplayer = @"http://www.channel4.com/static/programmes/asset/flash/swf/4odplayer-11.31.2.swf";
+    NSString *swfplayer = [[NSUserDefaults standardUserDefaults] valueForKey:[NSString stringWithFormat:@"%@SWFURL", defaultsPrefix]];
+    if (!swfplayer) {
+        swfplayer = @"http://www.channel4.com/static/programmes/asset/flash/swf/4odplayer-11.31.2.swf";
+    }
     NSString *playpath = [streamUri substringFromIndex:[scanner scanLocation]];
     playpath = [playpath stringByAppendingFormat:@"?%@",auth];
     [self createDownloadPath];
