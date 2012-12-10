@@ -230,6 +230,20 @@
             [self launchMetaRequest];
             return;
         }
+        else if (attemptNumber < 4) //some other reason, so retry
+        {
+            attemptNumber++;
+            [self addToLog:[NSString stringWithFormat:@"WARNING: Trying download again. Attempt %ld/4",(long)attemptNumber] noTag:YES];
+            [self launchMetaRequest];
+        }
+        else // give up
+        {
+            [show setSuccessful:[NSNumber numberWithBool:NO]];
+            [show setComplete:[NSNumber numberWithBool:YES]];
+            [show setReasonForFailure:@"Unknown"];
+            [nc postNotificationName:@"DownloadFinished" object:show];
+            [show setValue:@"Download Failed" forKey:@"status"];
+        }
     }
     else if (exitCode==2 && attemptNumber<4 && running) //RTMPDump lost connection but should be able to resume.
     {
