@@ -549,6 +549,19 @@
         [self addToLog:@"WARNING: Partial file already exists...attempting to resume" noTag:YES];
         args = [args arrayByAddingObject:@"--resume"];
     }
+
+    NSMutableString *cmd = [NSMutableString stringWithCapacity:0];
+    [cmd appendString:@"rtmpdump"];
+    for (NSString *arg in args) {
+        if ([arg hasPrefix:@"-"] || [arg hasPrefix:@"\""])
+            [cmd appendString:[NSString stringWithFormat:@" %@", arg]];
+        else
+            [cmd appendString:[NSString stringWithFormat:@" \"%@\"", arg]];
+    }
+    NSLog(@"%@",cmd);
+    BOOL verbose = [[NSUserDefaults standardUserDefaults] boolForKey:@"Verbose"];
+    if (verbose)
+        [self addToLog:[NSString stringWithFormat:@"DEBUG: RTMPDump command: %@", cmd] noTag:YES];
     
     task = [[NSTask alloc] init];
     pipe = [[NSPipe alloc] init];
