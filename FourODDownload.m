@@ -169,7 +169,7 @@
         return;
     }
     
-    NSString *uriData;
+    NSString *uriData = nil;
     [scanner scanUpToString:@"<uriData>" intoString:nil];
     [scanner scanString:@"<uriData>" intoString:nil];
     [scanner scanUpToString:@"</uriData>" intoString:&uriData];
@@ -177,34 +177,53 @@
     scanner = [NSScanner scannerWithString:uriData];
     [scanner scanUpToString:@"<streamUri>" intoString:nil];
     [scanner scanString:@"<streamUri>" intoString:nil];
-    NSString *streamUri;
+    NSString *streamUri = nil;
     [scanner scanUpToString:@"</" intoString:&streamUri];
     [scanner scanUpToString:@"<token>" intoString:nil];
     [scanner scanString:@"<token>" intoString:nil];
-    NSString *token;
+    NSString *token = nil;
     [scanner scanUpToString:@"</" intoString:&token];
     [scanner scanUpToString:@"<cdn>" intoString:nil];
     [scanner scanString:@"<cdn>" intoString:nil];
-    NSString *cdn;
+    NSString *cdn = nil;
     [scanner scanUpToString:@"</" intoString:&cdn];
     
     NSString *decodedToken = [self decodeToken:token];
     NSLog(@"%@",decodedToken);
     
-    NSString *auth;
+    if (!(uriData && streamUri && token && cdn && decodedToken))
+        [NSException raise:@"Parsing Error." format:@"Could not process 4oD Metadata"];
+
+    NSString *auth = nil, *rtmpURL = nil;
     if ([cdn isEqualToString:@"ll"])
     {
         [scanner setScanLocation:0];
-        NSString *e;
-        [scanner scanUpToString:@"<e>" intoString:nil];
-        [scanner scanString:@"<e>" intoString:nil];
-        [scanner scanUpToString:@"</e>" intoString:&e];
-        auth = [NSString stringWithFormat:@"e=%@&h=%@",e,decodedToken];
+        NSString *av = nil, *te = nil, *st = nil, *et = nil;
+        [scanner scanUpToString:@"<av>" intoString:nil];
+        [scanner scanString:@"<av>" intoString:nil];
+        [scanner scanUpToString:@"</av>" intoString:&av];
+        [scanner scanUpToString:@"<te>" intoString:nil];
+        [scanner scanString:@"<te>" intoString:nil];
+        [scanner scanUpToString:@"</te>" intoString:&te];
+        [scanner scanUpToString:@"<st>" intoString:nil];
+        [scanner scanString:@"<st>" intoString:nil];
+        [scanner scanUpToString:@"</st>" intoString:&st];
+        [scanner scanUpToString:@"<et>" intoString:nil];
+        [scanner scanString:@"<et>" intoString:nil];
+        [scanner scanUpToString:@"</et>" intoString:&et];
+        NSString *mp = [[streamUri componentsSeparatedByString:@"mp4:"] objectAtIndex:1];
+        if (av && te && st && et && mp)
+            auth = [NSString stringWithFormat:@"as=adobe-hmac-sha256&av=%@&te=%@&st=%@&et=%@&mp=%@&fmta-token=%@",av,te,st,et,mp,decodedToken];
+        else
+            [NSException raise:@"Parsing Error." format:@"Could not process 4oD Metadata"];
+        rtmpURL = [[streamUri componentsSeparatedByString:@"mp4:"] objectAtIndex:0];
+        rtmpURL = [rtmpURL stringByReplacingOccurrencesOfString:@".com/" withString:@".com:1935/"];
+        rtmpURL = [rtmpURL stringByAppendingFormat:@"?%@",auth];
     }
     else
     {
         [scanner setScanLocation:0];
-        NSString *fingerprint, *slist;
+        NSString *fingerprint = nil, *slist = nil;
         [scanner scanUpToString:@"<fingerprint>" intoString:nil];
         [scanner scanString:@"<fingerprint>" intoString:nil];
         [scanner scanUpToString:@"</fingerprint>" intoString:&fingerprint];
@@ -213,14 +232,14 @@
         [scanner scanString:@"<slist>" intoString:nil];
         [scanner scanUpToString:@"</slist>" intoString:&slist];
         @try {
-            if (decodedToken && fingerprint && slist)
+            if (fingerprint && slist)
                 auth = [NSString stringWithFormat:@"auth=%@&aifp=%@&slist=%@",decodedToken,fingerprint,slist];
             else
                 [NSException raise:@"Parsing Error." format:@"Could not process 4oD Metadata"];
             
-            NSString *rtmpURL = [[streamUri componentsSeparatedByString:@"mp4:"] objectAtIndex:0];
+            rtmpURL = [[streamUri componentsSeparatedByString:@"mp4:"] objectAtIndex:0];
             rtmpURL = [rtmpURL stringByReplacingOccurrencesOfString:@".com/" withString:@".com:1935/"];
-            rtmpURL = [rtmpURL stringByAppendingFormat:@"?ovpfv=1.1&%@",auth];
+            rtmpURL = [rtmpURL stringByAppendingFormat:@"?%@",auth];
             
             if ([rtmpURL hasPrefix:@"http"])
                 [NSException raise:@"4oD: Unsupported HTTP Download." format:@"GiA does not support this programme."];
@@ -240,34 +259,30 @@
         }
     }
     
-    NSString *rtmpURL = [[streamUri componentsSeparatedByString:@"mp4:"] objectAtIndex:0];
-    rtmpURL = [rtmpURL stringByReplacingOccurrencesOfString:@".com/" withString:@".com:1935/"];
-    rtmpURL = [rtmpURL stringByAppendingFormat:@"?ovpfv=1.1&%@",auth];
-    
     NSString *app;
     scanner = [NSScanner scannerWithString:streamUri];
     [scanner scanUpToString:@".com/" intoString:nil];
     [scanner scanString:@".com/" intoString:nil];
     [scanner scanUpToString:@"mp4:" intoString:&app];
     
-    app = [app stringByAppendingFormat:@"?ovpfv=1.1&%@", auth];
+    app = [app stringByAppendingFormat:@"?%@", auth];
     
     NSString *swfplayer = [[NSUserDefaults standardUserDefaults] valueForKey:[NSString stringWithFormat:@"%@SWFURL", defaultsPrefix]];
     if (!swfplayer) {
         swfplayer = @"http://www.channel4.com/static/programmes/asset/flash/swf/4odplayer-11.32.2.swf";
     }
     NSString *playpath = [streamUri substringFromIndex:[scanner scanLocation]];
-    playpath = [playpath stringByAppendingFormat:@"?%@",auth];
     [self createDownloadPath];
     
     NSArray *args = [NSArray arrayWithObjects:@"--rtmp",rtmpURL,
                      @"--app",app,
-                     @"--flashVer",@"\"WIN 11,2,202,235\"",
+                     @"--flashVer",@"\"WIN 11,5,502,110\"",
                      @"--swfVfy",swfplayer,
                      @"--pageUrl",[show url],
-                     @"--conn",@"Z:",
                      @"--playpath",playpath,
-                     @"-o",downloadPath,
+                     @"--flv",downloadPath,
+                     @"--conn",@"O:1",
+                     @"--conn",@"O:0",
                      nil];
     [self launchRTMPDumpWithArgs:args];
     
