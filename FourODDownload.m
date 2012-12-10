@@ -117,7 +117,7 @@
 	}
     
     [request setProxyType:@"HTTP"];
-    [self addToLog:@"INFO: Requesting Auth." noTag:YES];
+    [self addToLog:@"INFO: Requesting Metadata." noTag:YES];
     [request startAsynchronous];
 }
 -(void)metaRequestFinished:(ASIHTTPRequest *)request
@@ -155,6 +155,10 @@
     
     NSLog(@"%@",responseString);
     
+    BOOL verbose = [[NSUserDefaults standardUserDefaults] boolForKey:@"Verbose"];
+    if (verbose)
+        [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata Response: %@", responseString] noTag:YES];
+    
     NSScanner *scanner = [NSScanner scannerWithString:responseString];
     
     if ([responseString rangeOfString:@"f4m"].location != NSNotFound)
@@ -191,6 +195,8 @@
     NSString *decodedToken = [self decodeToken:token];
     NSLog(@"%@",decodedToken);
     
+    if (verbose)
+        [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata Processed: uriData=%@ streamUri=%@ token=%@ cdn=%@ decodedToken=%@", uriData, streamUri, token, cdn, decodedToken]];
     if (!(uriData && streamUri && token && cdn && decodedToken))
         [NSException raise:@"Parsing Error." format:@"Could not process 4oD Metadata"];
 
@@ -198,7 +204,7 @@
     if ([cdn isEqualToString:@"ll"])
     {
         [scanner setScanLocation:0];
-        NSString *av = nil, *te = nil, *st = nil, *et = nil;
+        NSString *av = nil, *te = nil, *st = nil, *et = nil, *mp = nil;
         [scanner scanUpToString:@"<av>" intoString:nil];
         [scanner scanString:@"<av>" intoString:nil];
         [scanner scanUpToString:@"</av>" intoString:&av];
@@ -211,14 +217,28 @@
         [scanner scanUpToString:@"<et>" intoString:nil];
         [scanner scanString:@"<et>" intoString:nil];
         [scanner scanUpToString:@"</et>" intoString:&et];
-        NSString *mp = [[streamUri componentsSeparatedByString:@"mp4:"] objectAtIndex:1];
-        if (av && te && st && et && mp)
-            auth = [NSString stringWithFormat:@"as=adobe-hmac-sha256&av=%@&te=%@&st=%@&et=%@&mp=%@&fmta-token=%@",av,te,st,et,mp,decodedToken];
-        else
-            [NSException raise:@"Parsing Error." format:@"Could not process 4oD Metadata"];
-        rtmpURL = [[streamUri componentsSeparatedByString:@"mp4:"] objectAtIndex:0];
-        rtmpURL = [rtmpURL stringByReplacingOccurrencesOfString:@".com/" withString:@".com:1935/"];
-        rtmpURL = [rtmpURL stringByAppendingFormat:@"?%@",auth];
+        mp = [[streamUri componentsSeparatedByString:@"mp4:"] objectAtIndex:1];
+        if (verbose)
+            [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata Processed: av=%@ te=%@ st=%@ et=%@ mp=%@", av, te, st, et, mp]];
+        @try {
+            if (av && te && st && et && mp)
+                auth = [NSString stringWithFormat:@"as=adobe-hmac-sha256&av=%@&te=%@&st=%@&et=%@&mp=%@&fmta-token=%@",av,te,st,et,mp,decodedToken];
+            else
+                [NSException raise:@"Parsing Error." format:@"Could not process 4oD Metadata"];
+            rtmpURL = [[streamUri componentsSeparatedByString:@"mp4:"] objectAtIndex:0];
+            rtmpURL = [rtmpURL stringByReplacingOccurrencesOfString:@".com/" withString:@".com:1935/"];
+            rtmpURL = [rtmpURL stringByAppendingFormat:@"?%@",auth];
+        }
+        @catch (NSException *exception) {
+            [self addToLog:[exception name]];
+            [self addToLog:[exception description]];
+            [show setComplete:[NSNumber numberWithBool:YES]];
+            [show setSuccessful:[NSNumber numberWithBool:NO]];
+            [show setValue:@"Download Failed" forKey:@"status"];
+            [show setReasonForFailure:@"MetadataProcessing"];
+            [nc postNotificationName:@"DownloadFinished" object:show];
+            return;
+        }
     }
     else
     {
@@ -231,6 +251,8 @@
         [scanner scanUpToString:@"<slist>" intoString:nil];
         [scanner scanString:@"<slist>" intoString:nil];
         [scanner scanUpToString:@"</slist>" intoString:&slist];
+        if (verbose)
+            [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata Processed: fingerprint=%@ slist=%@", fingerprint, slist]];
         @try {
             if (fingerprint && slist)
                 auth = [NSString stringWithFormat:@"auth=%@&aifp=%@&slist=%@",decodedToken,fingerprint,slist];
@@ -259,7 +281,7 @@
         }
     }
     
-    NSString *app;
+    NSString *app = nil;
     scanner = [NSScanner scannerWithString:streamUri];
     [scanner scanUpToString:@".com/" intoString:nil];
     [scanner scanString:@".com/" intoString:nil];
