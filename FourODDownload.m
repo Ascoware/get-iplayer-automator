@@ -291,7 +291,7 @@
     
     NSString *swfplayer = [[NSUserDefaults standardUserDefaults] valueForKey:[NSString stringWithFormat:@"%@SWFURL", defaultsPrefix]];
     if (!swfplayer) {
-        swfplayer = @"http://www.channel4.com/static/programmes/asset/flash/swf/4odplayer-11.32.2.swf";
+        swfplayer = @"http://www.channel4.com/static/programmes/asset/flash/swf/4odplayer-11.34.1.swf";
     }
     NSString *playpath = [streamUri substringFromIndex:[scanner scanLocation]];
     [self createDownloadPath];
