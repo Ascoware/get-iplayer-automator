@@ -177,7 +177,7 @@
     }
     NSData *urlData = [request responseData];
     
-    NSString *output;
+    NSString *output = nil;
     if (urlData != nil)
     {
         output = [[NSString alloc] initWithData:urlData encoding:NSUTF8StringEncoding];
@@ -202,7 +202,7 @@
     output = [output stringByReplacingOccurrencesOfString:@"&amp;" withString:@"&"];
     NSScanner *scanner = [NSScanner scannerWithString:output];
     //Retrieve Series Name
-    NSString *seriesName;
+    NSString *seriesName = nil;
     [scanner scanUpToString:@"<ProgrammeTitle>" intoString:nil];
     [scanner scanString:@"<ProgrammeTitle>" intoString:nil];
     [scanner scanUpToString:@"</ProgrammeTitle>" intoString:&seriesName];
@@ -213,7 +213,7 @@
     [dateFormat setLocale:[[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"]];
 
     //Retrieve Transmission Date
-    NSString *dateString;
+    NSString *dateString = nil;
     [scanner scanUpToString:@"<TransmissionDate>" intoString:nil];
     [scanner scanString:@"<TransmissionDate>" intoString:nil];
     [scanner scanUpToString:@"</TransmissionDate>" intoString:&dateString];
@@ -221,7 +221,7 @@
     [show setDateAired:[dateFormat dateFromString:dateString]];
     
     //Retrieve Episode Name
-    NSString *episodeName;
+    NSString *episodeName = nil;
     [scanner scanUpToString:@"<EpisodeTitle" intoString:nil];
     if (![scanner scanString:@"<EpisodeTitle/>" intoString:nil])
     {
@@ -234,7 +234,7 @@
         [show setEpisodeName:@"(No Episode Name)"];
     
     //Retrieve Episode Number
-    NSInteger episodeNumber;
+    NSInteger episodeNumber = 0;
     [scanner scanUpToString:@"<EpisodeNumber" intoString:nil];
     if (![scanner scanString:@"<EpisodeNumber/>" intoString:nil])
     {
@@ -260,7 +260,7 @@
         [scanner scanUpToString:@"]]" intoString:&subtitleURL];
     }
     //Retrieve Auth URL
-    NSString *authURL;
+    NSString *authURL = nil;
     [scanner scanUpToString:@"rtmpe://" intoString:nil];
     [scanner scanUpToString:@"\"" intoString:&authURL];
     
@@ -283,7 +283,7 @@
         NSLog(@"Secondary Metadata Response: %@", response);
         if (verbose)
             [self addToLog:[NSString stringWithFormat:@"DEBUG: Secondary Metadata Response: %@", response] noTag:YES];
-        NSString *description, *showname, *epnum, *epname, *temp_showname;
+        NSString *description = nil, *showname = nil, *epnum = nil, *epname = nil, *temp_showname = nil;
         if (metaData != nil && [metaDataResponse statusCode] == 200) {
             [self addToLog:@"INFO: Secondary Metadata Response received" noTag:YES];
             epname = [show episodeName];
@@ -336,7 +336,7 @@
         [self addToLog:@"DEBUG: Retrieving Playpath" noTag:YES];
     
     //Retrieve PlayPath
-    NSString *playPath;
+    NSString *playPath = nil;
     NSArray *formatKeys = [NSArray arrayWithObjects:@"Flash - Very Low",@"Flash - Low",@"Flash - Standard",@"Flash - High",nil];
     NSArray *itvRateObjects = [NSArray arrayWithObjects:@"400",@"600",@"800",@"1200",nil];
     NSArray *bitrateObjects = [NSArray arrayWithObjects:@"400000",@"600000",@"800000",@"1200000",nil];
@@ -353,7 +353,7 @@
         [self addToLog:@"DEBUG: Parsing MediaFile entries" noTag:YES];
     NSMutableArray *mediaEntries = [[NSMutableArray alloc] init];
     while ([scanner scanUpToString:@"MediaFile delivery" intoString:nil]) {
-        NSString *url, *bitrate, *itvRate;
+        NSString *url = nil, *bitrate = nil, *itvRate = nil;
         ITVMediaFileEntry *entry = [[ITVMediaFileEntry alloc] init];
         [scanner scanUpToString:@"bitrate=" intoString:nil];
         [scanner scanString:@"bitrate=\"" intoString:nil];
