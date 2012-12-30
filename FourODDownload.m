@@ -42,6 +42,57 @@
 {
     errorCache = [[NSMutableString alloc] initWithString:@""];
     processErrorCache = [NSTimer scheduledTimerWithTimeInterval:.25 target:self selector:@selector(processError) userInfo:nil repeats:YES];
+
+    ASIHTTPRequest *dataRequest = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:[show url]]];
+    [dataRequest setDidFinishSelector:@selector(dataRequestFinished:)];
+    [dataRequest setTimeOutSeconds:10];
+    [dataRequest setNumberOfTimesToRetryOnTimeout:3];
+    [dataRequest setDelegate:self];
+    [dataRequest startAsynchronous];
+}
+
+-(void)dataRequestFinished:(ASIHTTPRequest *)request
+{
+    NSString *responseString = [[NSString alloc] initWithData:[request responseData] encoding:NSUTF8StringEncoding];
+    BOOL verbose = [[NSUserDefaults standardUserDefaults] boolForKey:@"Verbose"];
+    if (verbose)
+        [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme Data Response: %@", responseString] noTag:YES];
+    
+    NSScanner *scanner = [NSScanner scannerWithString:responseString];
+    
+    [scanner scanUpToString:@"og:image" intoString:nil];
+    [scanner scanString:@"og:image\" content=\"" intoString:nil];
+    [scanner scanUpToString:@"\"" intoString:&thumbnailURL];
+    
+    NSString *description = nil, *seriesTitle = nil;
+    [scanner scanUpToString:@"<meta name=\"description\"" intoString:nil];
+    [scanner scanUpToString:@"4oD" intoString:nil];
+    [scanner scanString:@"4oD. " intoString:nil];
+    [scanner scanUpToString:@"\"/>" intoString:&description];
+    [show setDesc:description];
+    
+    [scanner scanUpToString:@"<h1 class=\"brandTitle\" data-wsbrandtitle=" intoString:nil];
+    [scanner scanString:@"<h1 class=\"brandTitle\" data-wsbrandtitle=" intoString:nil];
+    [scanner scanUpToString:@"title=\"" intoString:nil];
+    [scanner scanString:@"title=\"" intoString:nil];
+    [scanner scanUpToString:@"\">" intoString:&seriesTitle];
+    [show setSeriesName:seriesTitle];
+    
+    [show setEpisodeName:[[[show showName] componentsSeparatedByString:@" - "] objectAtIndex:1]];
+    
+    NSInteger series, episode;
+    [scanner scanUpToString:@"seriesNo" intoString:nil];
+    [scanner scanString:@"seriesNo\">Series " intoString:nil];
+    [scanner scanInteger:&series];
+    [show setSeason:series];
+    [scanner scanUpToString:@"episodeNo" intoString:nil];
+    [scanner scanString:@"episodeNo\">Episode " intoString:nil];
+    [scanner scanInteger:&episode];
+    [show setEpisode:episode];
+
+    if (verbose)
+        [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme Data Processed: thumbnailURL=%@ description=%@ seriesTitle=%@ series=%ld episode=%ld", thumbnailURL, description, seriesTitle, series, episode]];
+    
     BOOL skipLookup = [[NSUserDefaults standardUserDefaults] boolForKey:[NSString stringWithFormat:@"%@SkipDNSLookup", defaultsPrefix]];
     if (skipLookup)
         [self hostLookupFinished:nil];
@@ -72,14 +123,6 @@
     [request setTimeOutSeconds:10];
     [request setNumberOfTimesToRetryOnTimeout:3];
     [request setDelegate:self];
-    
-    ASIHTTPRequest *dataRequest = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:[show url]]];
-    [dataRequest setDidFinishSelector:@selector(dataRequestFinished:)];
-    [dataRequest setTimeOutSeconds:10];
-    [dataRequest setNumberOfTimesToRetryOnTimeout:3];
-    [dataRequest setDelegate:self];
-    [dataRequest startAsynchronous];
-    
     
     NSString *proxyOption = [[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"];
 	if ([proxyOption isEqualToString:@"Custom"])
@@ -325,44 +368,7 @@
     [self launchRTMPDumpWithArgs:args];
     
 }
--(void)dataRequestFinished:(ASIHTTPRequest *)request
-{
-    NSString *responseString = [[NSString alloc] initWithData:[request responseData] encoding:NSUTF8StringEncoding];
-    
-    NSScanner *scanner = [NSScanner scannerWithString:responseString];
-    
-    [scanner scanUpToString:@"og:image" intoString:nil];
-    [scanner scanString:@"og:image\" content=\"" intoString:nil];
-    [scanner scanUpToString:@"\"" intoString:&thumbnailURL];
-    
-    NSString *description, *seriesTitle;
-    [scanner scanUpToString:@"<meta name=\"description\"" intoString:nil];
-    [scanner scanUpToString:@"4oD" intoString:nil];
-    [scanner scanString:@"4oD. " intoString:nil];
-    [scanner scanUpToString:@"\"/>" intoString:&description];
-    [show setDesc:description];
-    
-    [scanner scanUpToString:@"<h1 class=\"brandTitle\" data-wsbrandtitle=" intoString:nil];
-    [scanner scanString:@"<h1 class=\"brandTitle\" data-wsbrandtitle=" intoString:nil];
-    [scanner scanUpToString:@"title=\"" intoString:nil];
-    [scanner scanString:@"title=\"" intoString:nil];
-    [scanner scanUpToString:@"\">" intoString:&seriesTitle];
-    [show setSeriesName:seriesTitle];
-    
-    [show setEpisodeName:[[[show showName] componentsSeparatedByString:@" - "] objectAtIndex:1]];
-    
-    NSInteger series, episode;
-    [scanner scanUpToString:@"seriesNo" intoString:nil];
-    [scanner scanString:@"seriesNo\">Series " intoString:nil];
-    [scanner scanInteger:&series];
-    [show setSeason:series];
-    [scanner scanUpToString:@"episodeNo" intoString:nil];
-    [scanner scanString:@"episodeNo\">Episode " intoString:nil];
-    [scanner scanInteger:&episode];
-    [show setEpisode:episode];
-    
-    
-}
+
 - (NSString *)decodeToken:(NSString *)string
 {
     PyObject *pName, *pModule, *pFunc;
