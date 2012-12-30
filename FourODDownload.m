@@ -54,6 +54,8 @@
 
 -(void)dataRequestFinished:(ASIHTTPRequest *)request
 {
+    if (!running)
+        return;
     NSString *responseString = [[NSString alloc] initWithData:[request responseData] encoding:NSUTF8StringEncoding];
     BOOL verbose = [[NSUserDefaults standardUserDefaults] boolForKey:@"Verbose"];
     if (verbose)
@@ -103,6 +105,8 @@
 
 -(void)hostLookupFinished:(NSHost *)aHost
 {
+    if (!running)
+        return;
     NSString *hostAddr = nil;
     if (aHost)
         hostAddr = [aHost address];
@@ -117,7 +121,6 @@
     NSURL *requestURL = [NSURL URLWithString:[NSString stringWithFormat:@"http://%@/asset/%@",hostAddr,[show realPID]]];
     NSLog(@"Metadata URL: %@",requestURL);
     [self addToLog:[NSString stringWithFormat:@"INFO: Metadata URL: %@", requestURL] noTag:YES];
-
 
     ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:requestURL];
     [request setDidFinishSelector:@selector(metaRequestFinished:)];
@@ -180,8 +183,20 @@
     [self addToLog:@"INFO: Requesting Metadata." noTag:YES];
     [request startAsynchronous];
 }
+
 -(void)metaRequestFinished:(ASIHTTPRequest *)request
 {
+    if (!running)
+        return;
+    BOOL skipSearch = [[NSUserDefaults standardUserDefaults] boolForKey:[NSString stringWithFormat:@"%@SkipMP4Search", defaultsPrefix]];
+    NSInteger searchRange = [[NSUserDefaults standardUserDefaults] integerForKey:[NSString stringWithFormat:@"%@MP4SearchRange", defaultsPrefix]];
+    if (!searchRange)
+        searchRange = 10;
+    NSInteger realPID = [[show realPID] integerValue];
+    NSInteger minPID = realPID - searchRange;
+    NSInteger maxPID = realPID + searchRange;
+    NSInteger currentPID = [request tag];
+    NSString *mp4UriData = [[request userInfo] valueForKey:@"mp4UriData"];
     NSLog(@"Response Status Code: %ld",(long)[request responseStatusCode]);
     if ([request responseStatusCode] == 0)
     {
@@ -201,13 +216,37 @@
     }
     else if ([request responseStatusCode] != 200)
     {
-        [self addToLog:@"ERROR: Could not retrieve program metadata." noTag:YES];
-        [show setSuccessful:[NSNumber numberWithBool:NO]];
-        [show setComplete:[NSNumber numberWithBool:YES]];
-        [show setValue:@"Download Failed" forKey:@"status"];
-        [nc postNotificationName:@"DownloadFinished" object:show];
-        [self addToLog:@"Download Failed" noTag:NO];
-        return;
+        if (currentPID != 0)
+        {
+            if (currentPID < maxPID)
+            {
+                if (realPID - currentPID == 1)
+                    ++currentPID;
+                [self retryMetaRequest:request pid:++currentPID];
+                return;
+            }
+            else
+            {
+                [self addToLog:@"GiA does not support downloading this show."];
+                [self addToLog:@"    HTTP Dynamic Streaming Detected"];
+                [show setReasonForFailure:@"4oDHTTP"];
+                [show setComplete:[NSNumber numberWithBool:YES]];
+                [show setSuccessful:[NSNumber numberWithBool:NO]];
+                [show setValue:@"Download Failed" forKey:@"status"];
+                [nc postNotificationName:@"DownloadFinished" object:show];
+                return;
+            }
+        }
+        else
+        {
+            [self addToLog:@"ERROR: Could not retrieve program metadata." noTag:YES];
+            [show setSuccessful:[NSNumber numberWithBool:NO]];
+            [show setComplete:[NSNumber numberWithBool:YES]];
+            [show setValue:@"Download Failed" forKey:@"status"];
+            [nc postNotificationName:@"DownloadFinished" object:show];
+            [self addToLog:@"Download Failed" noTag:NO];
+            return;
+        }
     }
     
 
@@ -221,18 +260,16 @@
     
     NSScanner *scanner = [NSScanner scannerWithString:responseString];
     
-    if ([responseString rangeOfString:@"f4m"].location != NSNotFound)
-    {
-        [self addToLog:@"GiA does not support downloading this show."];
-        [self addToLog:@"    HTTP Dynamic Streaming Detected"];
-        [show setComplete:[NSNumber numberWithBool:YES]];
-        [show setSuccessful:[NSNumber numberWithBool:NO]];
-        [show setValue:@"Download Failed" forKey:@"status"];
-        [show setReasonForFailure:@"4oDHTTP"];
-        [nc postNotificationName:@"DownloadFinished" object:show];
-        return;
-    }
+    NSString *programmeNumber = nil;
+    [scanner scanUpToString:@"<programmeNumber>" intoString:nil];
+    [scanner scanString:@"<programmeNumber>" intoString:nil];
+    [scanner scanUpToString:@"</programmeNumber>" intoString:&programmeNumber];
     
+    NSString *brandTitle = nil;
+    [scanner scanUpToString:@"<brandTitle>" intoString:nil];
+    [scanner scanString:@"<brandTitle>" intoString:nil];
+    [scanner scanUpToString:@"</brandTitle>" intoString:&brandTitle];
+
     NSString *uriData = nil;
     [scanner scanUpToString:@"<uriData>" intoString:nil];
     [scanner scanString:@"<uriData>" intoString:nil];
@@ -242,6 +279,105 @@
     [scanner scanUpToString:@"<streamUri>" intoString:nil];
     [scanner scanString:@"<streamUri>" intoString:nil];
     NSString *streamUri = nil;
+    [scanner scanUpToString:@"</" intoString:&streamUri];
+
+    if (verbose)
+        [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata Processed: programmeNumber=%@ brandTitle=%@ uriData=%@ streamUri=%@", programmeNumber, brandTitle, uriData, streamUri]];
+
+    if ([streamUri hasSuffix:@".f4m"])
+    {
+        if (skipSearch)
+        {
+            [self addToLog:@"GiA does not support downloading this show."];
+            [self addToLog:@"    HTTP Dynamic Streaming Detected"];
+            [show setReasonForFailure:@"4oDHTTP"];
+            [show setComplete:[NSNumber numberWithBool:YES]];
+            [show setSuccessful:[NSNumber numberWithBool:NO]];
+            [show setValue:@"Download Failed" forKey:@"status"];
+            [nc postNotificationName:@"DownloadFinished" object:show];
+            return;
+        }
+        if (currentPID == 0)
+        {
+            [self retryMetaRequest:request pid:minPID brandTitle:brandTitle programmeNumber:programmeNumber];
+            return;
+        }
+        else if (currentPID < maxPID)
+        {
+            if (realPID - currentPID == 1)
+                ++currentPID;
+            [self retryMetaRequest:request pid:++currentPID];
+            return;
+        }
+    }
+    else if ([streamUri hasSuffix:@".mp4"])
+    {
+        if (currentPID != 0)
+        {
+            if ([brandTitle isEqualToString:[[request userInfo] valueForKey:@"brandTitle"]] && [programmeNumber isEqualToString:[[request userInfo] valueForKey:@"programmeNumber"]])
+            {
+                [self addToLog:[NSString stringWithFormat:@"INFO: MP4 Stream Found: %@", streamUri] noTag:YES];
+                mp4UriData = uriData;
+                if ([streamUri rangeOfString:@"PS3" options:NSCaseInsensitiveSearch].location == NSNotFound)
+                {
+                    if (currentPID < maxPID)
+                    {
+                        if (realPID - currentPID == 1)
+                            ++currentPID;
+                        [self retryMetaRequest:request pid:++currentPID brandTitle:brandTitle programmeNumber:programmeNumber mp4UriData:mp4UriData];
+                        return;
+                    }
+                }
+            }
+            else if (currentPID < maxPID)
+            {
+                if (realPID - currentPID == 1)
+                    ++currentPID;
+                [self retryMetaRequest:request pid:++currentPID];
+                return;
+            }
+        }
+        else
+        {
+            mp4UriData = uriData;
+        }
+    }
+    else if (currentPID != 0)
+    {
+        if (currentPID < maxPID)
+        {
+            if (realPID - currentPID == 1)
+                currentPID++;
+            [self retryMetaRequest:request pid:++currentPID];
+            return;
+        }
+    }
+    
+    if (!mp4UriData)
+    {
+        [self addToLog:@"GiA does not support downloading this show."];
+        if (currentPID != 0)
+        {
+            [self addToLog:@"    HTTP Dynamic Streaming Detected"];
+            [show setReasonForFailure:@"4oDHTTP"];
+        }
+        else
+        {
+            [self addToLog:@"    Did not find suitable download format"];
+            [show setReasonForFailure:@"4oDFormat"];
+        }
+        [show setComplete:[NSNumber numberWithBool:YES]];
+        [show setSuccessful:[NSNumber numberWithBool:NO]];
+        [show setValue:@"Download Failed" forKey:@"status"];
+        [nc postNotificationName:@"DownloadFinished" object:show];
+        return;
+    }
+    
+    uriData = mp4UriData;
+    scanner = [NSScanner scannerWithString:uriData];
+    [scanner scanUpToString:@"<streamUri>" intoString:nil];
+    [scanner scanString:@"<streamUri>" intoString:nil];
+    streamUri = nil;
     [scanner scanUpToString:@"</" intoString:&streamUri];
     [scanner scanUpToString:@"<token>" intoString:nil];
     [scanner scanString:@"<token>" intoString:nil];
@@ -254,15 +390,15 @@
     
     NSString *decodedToken = [self decodeToken:token];
     NSLog(@"%@",decodedToken);
-    
     if (verbose)
         [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata Processed: uriData=%@ streamUri=%@ token=%@ cdn=%@ decodedToken=%@", uriData, streamUri, token, cdn, decodedToken]];
-    if (!(uriData && streamUri && token && cdn && decodedToken))
-        [NSException raise:@"Parsing Error." format:@"Could not process 4oD Metadata"];
-
+    
     NSString *auth = nil, *rtmpURL = nil, *app = nil, *playpath = nil;
     @try
     {
+        if (!(uriData && streamUri && token && cdn && decodedToken))
+            [NSException raise:@"Parsing Error." format:@"Could not process 4oD Metadata"];
+
         if ([cdn isEqualToString:@"ll"])
         {
             [scanner setScanLocation:0];
@@ -397,6 +533,35 @@
                      nil];
     [self launchRTMPDumpWithArgs:args];
     
+}
+
+-(void)retryMetaRequest:(ASIHTTPRequest *)request pid:(NSInteger)pid pidInfo:(NSDictionary *)pidInfo
+{
+    NSURL *retryURL = [[[request url] URLByDeletingLastPathComponent] URLByAppendingPathComponent:[NSString stringWithFormat:@"%ld", pid]];
+    [self addToLog:[NSString stringWithFormat:@"INFO: Retry Metadata URL: %@", retryURL] noTag:YES];
+    ASIHTTPRequest *retryRequest = [[request copy] autorelease];
+    [retryRequest setURL:retryURL];
+    [retryRequest setTag:pid];
+    if (pidInfo)
+        [retryRequest setUserInfo:pidInfo];
+    [retryRequest startAsynchronous];
+}
+
+-(void)retryMetaRequest:(ASIHTTPRequest *)request pid:(NSInteger)pid
+{
+    [self retryMetaRequest:request pid:pid pidInfo:nil];
+}
+
+-(void)retryMetaRequest:(ASIHTTPRequest *)request pid:(NSInteger)pid brandTitle:(NSString *)brandTitle programmeNumber:(NSString *)programmeNumber
+{
+    NSDictionary *pidInfo = [NSDictionary dictionaryWithObjectsAndKeys: brandTitle, @"brandTitle", programmeNumber, @"programmeNumber", nil];
+    [self retryMetaRequest:request pid:pid pidInfo:pidInfo];
+}
+
+-(void)retryMetaRequest:(ASIHTTPRequest *)request pid:(NSInteger)pid brandTitle:(NSString *)brandTitle programmeNumber:(NSString *)programmeNumber mp4UriData:(NSString *)mp4UriData
+{
+    NSDictionary *pidInfo = [NSDictionary dictionaryWithObjectsAndKeys: brandTitle, @"brandTitle", programmeNumber, @"programmeNumber", mp4UriData, @"mp4UriData", nil];
+    [self retryMetaRequest:request pid:pid pidInfo:pidInfo];
 }
 
 - (NSString *)decodeToken:(NSString *)string

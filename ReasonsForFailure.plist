@@ -40,5 +40,7 @@ proxy option in preferences.</string>
     <key>4oDHTTP</key>
     <string>GiA does not support downloading HTTP Dynamic Streaming programmes from 4oD.
 Unfortunately, this show is one of them.</string>
+	<key>4oDFormat</key>
+	<string>GiA did not find a suitable download format for the 4oD programme.</string>
 </dict>
 </plist>
