@@ -42,15 +42,31 @@
 {
     errorCache = [[NSMutableString alloc] initWithString:@""];
     processErrorCache = [NSTimer scheduledTimerWithTimeInterval:.25 target:self selector:@selector(processError) userInfo:nil repeats:YES];
+    BOOL skipLookup = [[NSUserDefaults standardUserDefaults] boolForKey:[NSString stringWithFormat:@"%@SkipDNSLookup", defaultsPrefix]];
+    if (skipLookup)
+        [self hostLookupFinished:nil];
+    else
+        [NSHost hostWithName:@"ais.channel4.com" inBackgroundForReceiver:self selector:@selector(hostLookupFinished:)];
+}
+
+-(void)hostLookupFinished:(NSHost *)aHost
+{
+    NSString *hostAddr = nil;
+    if (aHost)
+        hostAddr = [aHost address];
+    if (!hostAddr)
+        hostAddr = @"ais.channel4.com";
     NSScanner *scanner = [NSScanner scannerWithString:[show url]];
     [scanner scanUpToString:@"#" intoString:nil];
     [scanner scanString:@"#" intoString:nil];
     NSString *pid;
     [scanner scanUpToString:@"lklk" intoString:&pid];
     [show setRealPID:pid];
-    NSURL *requestURL = [NSURL URLWithString:[NSString stringWithFormat:@"http://ais.channel4.com/asset/%@",[show realPID]]];
-    NSLog(@"Request URL: %@",requestURL);
-    
+    NSURL *requestURL = [NSURL URLWithString:[NSString stringWithFormat:@"http://%@/asset/%@",hostAddr,[show realPID]]];
+    NSLog(@"Metadata URL: %@",requestURL);
+    [self addToLog:[NSString stringWithFormat:@"INFO: Metadata URL: %@", requestURL] noTag:YES];
+
+
     ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:requestURL];
     [request setDidFinishSelector:@selector(metaRequestFinished:)];
     [request setTimeOutSeconds:10];

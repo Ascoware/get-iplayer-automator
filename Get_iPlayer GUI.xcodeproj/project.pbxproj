@@ -24,6 +24,7 @@
 /* Begin PBXBuildFile section */
 		1DDD58160DA1D0A300B32029 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD58140DA1D0A300B32029 /* MainMenu.xib */; };
 		3975484D1622504F00470DD1 /* ttml2srt.py in Resources */ = {isa = PBXBuildFile; fileRef = 3975484C1622504F00470DD1 /* ttml2srt.py */; };
+		39814023168E124C003FFF53 /* NSHost+ThreadedAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 39814022168E124B003FFF53 /* NSHost+ThreadedAdditions.m */; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
@@ -123,6 +124,8 @@
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		32CA4F630368D1EE00C91783 /* Get_iPlayer GUI_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Get_iPlayer GUI_Prefix.pch"; sourceTree = "<group>"; };
 		3975484C1622504F00470DD1 /* ttml2srt.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = ttml2srt.py; sourceTree = "<group>"; };
+		39814021168E124B003FFF53 /* NSHost+ThreadedAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSHost+ThreadedAdditions.h"; sourceTree = "<group>"; };
+		39814022168E124B003FFF53 /* NSHost+ThreadedAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSHost+ThreadedAdditions.m"; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* Get iPlayer Automator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Get iPlayer Automator.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D904F0491009F22E00D60BBF /* get_iplayer.pl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.perl; name = get_iplayer.pl; path = ../get_iplayer.pl; sourceTree = "<group>"; };
@@ -255,6 +258,7 @@
 				D91787021013803000B82736 /* Models */,
 				D921C9A3149BBE77004CB558 /* ASIHTTPRequest */,
 				D941D9551025DB440012A75F /* JRFeedback */,
+				39814024168E237A003FFF53 /* Other */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -347,6 +351,15 @@
 				1058C7A2FEA54F0111CA2CBB /* Other Frameworks */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		39814024168E237A003FFF53 /* Other */ = {
+			isa = PBXGroup;
+			children = (
+				39814021168E124B003FFF53 /* NSHost+ThreadedAdditions.h */,
+				39814022168E124B003FFF53 /* NSHost+ThreadedAdditions.m */,
+			);
+			name = Other;
 			sourceTree = "<group>";
 		};
 		D904F04D1009F28400D60BBF /* Binaries */ = {
@@ -588,6 +601,7 @@
 				D921C9EB149BCDEB004CB558 /* Download.m in Sources */,
 				D9D06C6F14BB91C200029340 /* ITVMediaFileEntry.m in Sources */,
 				DFC8D3F215C557E3008E369F /* FourODDownload.m in Sources */,
+				39814023168E124C003FFF53 /* NSHost+ThreadedAdditions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
