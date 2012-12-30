@@ -628,8 +628,11 @@
 - (void)createDownloadPath
 {
     //Create Download Path
+    NSString *dirName = [show seriesName];
+    if (!dirName)
+        dirName = [show showName];
     downloadPath = [[NSUserDefaults standardUserDefaults] valueForKey:@"DownloadPath"];
-    downloadPath = [downloadPath stringByAppendingPathComponent:[show seriesName]];
+    downloadPath = [downloadPath stringByAppendingPathComponent:[[dirName stringByReplacingOccurrencesOfString:@"/" withString:@"-"] stringByReplacingOccurrencesOfString:@":" withString:@" -"]];
     [[NSFileManager defaultManager] createDirectoryAtPath:downloadPath withIntermediateDirectories:YES attributes:nil error:nil];
     downloadPath = [downloadPath stringByAppendingPathComponent:[[[NSString stringWithFormat:@"%@.partial.flv",[show showName]] stringByReplacingOccurrencesOfString:@"/" withString:@"-"] stringByReplacingOccurrencesOfString:@":" withString:@" -"]];
 }
