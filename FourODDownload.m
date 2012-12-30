@@ -8,6 +8,7 @@
 
 #import "FourODDownload.h"
 #import "ASIHTTPRequest.h"
+#import "NSHost+ThreadedAdditions.h"
 #import <Python/Python.h>
 
 @implementation FourODDownload
