@@ -7,6 +7,7 @@
 //
 
 #import "Programme.h"
+#import "NSString+HTML.h"
 extern BOOL runDownloads;
 
 
@@ -15,7 +16,7 @@ extern BOOL runDownloads;
 {
 	[super init];
 	pid = [PID stringByReplacingOccurrencesOfString:@";amp" withString:@""];
-	showName = [[NSString alloc] initWithString:SHOWNAME];
+	showName = [[[NSString alloc] initWithString:SHOWNAME] stringByDecodingHTMLEntities];
 	tvNetwork = [[NSString alloc] initWithString:TVNETWORK];
 	status = [[NSString alloc] init];
 	complete = [[NSNumber alloc] initWithBool:NO];
@@ -37,7 +38,7 @@ extern BOOL runDownloads;
 - (id)initWithShow:(Programme *)show
 {
 	pid = [[NSString alloc] initWithString:[show pid]];
-	showName = [[NSString alloc] initWithString:[show showName]];
+	showName = [[[NSString alloc] initWithString:[show showName]] stringByDecodingHTMLEntities];
 	tvNetwork = [[NSString alloc] initWithString:[show tvNetwork]];
 	status = [[NSString alloc] initWithString:[show status]];
 	complete = [[NSNumber alloc] initWithBool:NO];
