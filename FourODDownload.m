@@ -260,100 +260,129 @@
     if (!(uriData && streamUri && token && cdn && decodedToken))
         [NSException raise:@"Parsing Error." format:@"Could not process 4oD Metadata"];
 
-    NSString *auth = nil, *rtmpURL = nil;
-    if ([cdn isEqualToString:@"ll"])
+    NSString *auth = nil, *rtmpURL = nil, *app = nil, *playpath = nil;
+    @try
     {
-        [scanner setScanLocation:0];
-        NSString *av = nil, *te = nil, *st = nil, *et = nil, *mp = nil;
-        [scanner scanUpToString:@"<av>" intoString:nil];
-        [scanner scanString:@"<av>" intoString:nil];
-        [scanner scanUpToString:@"</av>" intoString:&av];
-        [scanner scanUpToString:@"<te>" intoString:nil];
-        [scanner scanString:@"<te>" intoString:nil];
-        [scanner scanUpToString:@"</te>" intoString:&te];
-        [scanner scanUpToString:@"<st>" intoString:nil];
-        [scanner scanString:@"<st>" intoString:nil];
-        [scanner scanUpToString:@"</st>" intoString:&st];
-        [scanner scanUpToString:@"<et>" intoString:nil];
-        [scanner scanString:@"<et>" intoString:nil];
-        [scanner scanUpToString:@"</et>" intoString:&et];
-        mp = [[streamUri componentsSeparatedByString:@"mp4:"] objectAtIndex:1];
-        if (verbose)
-            [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata Processed: av=%@ te=%@ st=%@ et=%@ mp=%@", av, te, st, et, mp]];
-        @try {
-            if (av && te && st && et && mp)
-                auth = [NSString stringWithFormat:@"as=adobe-hmac-sha256&av=%@&te=%@&st=%@&et=%@&mp=%@&fmta-token=%@",av,te,st,et,mp,decodedToken];
+        if ([cdn isEqualToString:@"ll"])
+        {
+            [scanner setScanLocation:0];
+            if ([uriData rangeOfString:@"<e>"].location != NSNotFound)
+            {
+                NSString *e = nil;
+                [scanner scanUpToString:@"<e>" intoString:nil];
+                [scanner scanString:@"<e>" intoString:nil];
+                [scanner scanUpToString:@"</e>" intoString:&e];
+                if (verbose)
+                    [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata Processed: e=%@", e]];
+                if (e)
+                    auth = [NSString stringWithFormat:@"e=%@&h=%@",e,decodedToken];
+                else
+                    [NSException raise:@"Parsing Error." format:@"Could not process 4oD Metadata"];
+                rtmpURL = [[streamUri componentsSeparatedByString:@"mp4:"] objectAtIndex:0];
+                if ([rtmpURL hasPrefix:@"http"])
+                    [NSException raise:@"4oD: Unsupported HTTP Download." format:@"GiA does not support this programme."];
+                rtmpURL = [rtmpURL stringByReplacingOccurrencesOfString:@".com/" withString:@".com:1935/"];
+                scanner = [NSScanner scannerWithString:streamUri];
+                [scanner scanUpToString:@".com/" intoString:nil];
+                [scanner scanString:@".com/" intoString:nil];
+                [scanner scanUpToString:@"mp4:" intoString:&app];
+                playpath = [streamUri substringFromIndex:[scanner scanLocation]];
+                playpath = [playpath stringByAppendingFormat:@"?%@", auth];
+            }
+            else if ([uriData rangeOfString:@"<et>"].location != NSNotFound)
+            {
+                NSString *av = nil, *te = nil, *st = nil, *et = nil, *mp = nil;
+                [scanner scanUpToString:@"<av>" intoString:nil];
+                [scanner scanString:@"<av>" intoString:nil];
+                [scanner scanUpToString:@"</av>" intoString:&av];
+                [scanner scanUpToString:@"<te>" intoString:nil];
+                [scanner scanString:@"<te>" intoString:nil];
+                [scanner scanUpToString:@"</te>" intoString:&te];
+                [scanner scanUpToString:@"<st>" intoString:nil];
+                [scanner scanString:@"<st>" intoString:nil];
+                [scanner scanUpToString:@"</st>" intoString:&st];
+                [scanner scanUpToString:@"<et>" intoString:nil];
+                [scanner scanString:@"<et>" intoString:nil];
+                [scanner scanUpToString:@"</et>" intoString:&et];
+                mp = [[streamUri componentsSeparatedByString:@"mp4:"] objectAtIndex:1];
+                if (verbose)
+                    [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata Processed: av=%@ te=%@ st=%@ et=%@ mp=%@", av, te, st, et, mp]];
+                if (av && te && st && et && mp)
+                    auth = [NSString stringWithFormat:@"as=adobe-hmac-sha256&av=%@&te=%@&st=%@&et=%@&mp=%@&fmta-token=%@",av,te,st,et,mp,decodedToken];
+                else
+                    [NSException raise:@"Parsing Error." format:@"Could not process 4oD Metadata"];
+                rtmpURL = [[streamUri componentsSeparatedByString:@"mp4:"] objectAtIndex:0];
+                if ([rtmpURL hasPrefix:@"http"])
+                    [NSException raise:@"4oD: Unsupported HTTP Download." format:@"GiA does not support this programme."];
+                rtmpURL = [rtmpURL stringByReplacingOccurrencesOfString:@".com/" withString:@".com:1935/"];
+                rtmpURL = [rtmpURL stringByAppendingFormat:@"?%@",auth];
+                scanner = [NSScanner scannerWithString:streamUri];
+                [scanner scanUpToString:@".com/" intoString:nil];
+                [scanner scanString:@".com/" intoString:nil];
+                [scanner scanUpToString:@"mp4:" intoString:&app];
+                app = [app stringByAppendingFormat:@"?%@", auth];
+                playpath = [streamUri substringFromIndex:[scanner scanLocation]];
+            }
             else
+            {
                 [NSException raise:@"Parsing Error." format:@"Could not process 4oD Metadata"];
-            rtmpURL = [[streamUri componentsSeparatedByString:@"mp4:"] objectAtIndex:0];
-            rtmpURL = [rtmpURL stringByReplacingOccurrencesOfString:@".com/" withString:@".com:1935/"];
-            rtmpURL = [rtmpURL stringByAppendingFormat:@"?%@",auth];
+            }
         }
-        @catch (NSException *exception) {
-            [self addToLog:[exception name]];
-            [self addToLog:[exception description]];
-            [show setComplete:[NSNumber numberWithBool:YES]];
-            [show setSuccessful:[NSNumber numberWithBool:NO]];
-            [show setValue:@"Download Failed" forKey:@"status"];
-            [show setReasonForFailure:@"MetadataProcessing"];
-            [nc postNotificationName:@"DownloadFinished" object:show];
-            return;
-        }
-    }
-    else
-    {
-        [scanner setScanLocation:0];
-        NSString *fingerprint = nil, *slist = nil;
-        [scanner scanUpToString:@"<fingerprint>" intoString:nil];
-        [scanner scanString:@"<fingerprint>" intoString:nil];
-        [scanner scanUpToString:@"</fingerprint>" intoString:&fingerprint];
-        [scanner setScanLocation:0];
-        [scanner scanUpToString:@"<slist>" intoString:nil];
-        [scanner scanString:@"<slist>" intoString:nil];
-        [scanner scanUpToString:@"</slist>" intoString:&slist];
-        if (verbose)
-            [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata Processed: fingerprint=%@ slist=%@", fingerprint, slist]];
-        @try {
+        else if ([cdn isEqualToString:@"ak"])
+        {
+            [scanner setScanLocation:0];
+            NSString *fingerprint = nil, *slist = nil;
+            [scanner scanUpToString:@"<fingerprint>" intoString:nil];
+            [scanner scanString:@"<fingerprint>" intoString:nil];
+            [scanner scanUpToString:@"</fingerprint>" intoString:&fingerprint];
+            [scanner setScanLocation:0];
+            [scanner scanUpToString:@"<slist>" intoString:nil];
+            [scanner scanString:@"<slist>" intoString:nil];
+            [scanner scanUpToString:@"</slist>" intoString:&slist];
+            if (verbose)
+                [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata Processed: fingerprint=%@ slist=%@", fingerprint, slist]];
             if (fingerprint && slist)
                 auth = [NSString stringWithFormat:@"auth=%@&aifp=%@&slist=%@",decodedToken,fingerprint,slist];
             else
                 [NSException raise:@"Parsing Error." format:@"Could not process 4oD Metadata"];
-            
             rtmpURL = [[streamUri componentsSeparatedByString:@"mp4:"] objectAtIndex:0];
-            rtmpURL = [rtmpURL stringByReplacingOccurrencesOfString:@".com/" withString:@".com:1935/"];
-            rtmpURL = [rtmpURL stringByAppendingFormat:@"?%@",auth];
-            
             if ([rtmpURL hasPrefix:@"http"])
                 [NSException raise:@"4oD: Unsupported HTTP Download." format:@"GiA does not support this programme."];
+            rtmpURL = [rtmpURL stringByReplacingOccurrencesOfString:@".com/" withString:@".com:1935/"];
+            rtmpURL = [rtmpURL stringByAppendingFormat:@"?%@",auth];
+            scanner = [NSScanner scannerWithString:streamUri];
+            [scanner scanUpToString:@".com/" intoString:nil];
+            [scanner scanString:@".com/" intoString:nil];
+            [scanner scanUpToString:@"mp4:" intoString:&app];
+            app = [app stringByAppendingFormat:@"?%@", auth];
+            playpath = [streamUri substringFromIndex:[scanner scanLocation]];
         }
-        @catch (NSException *exception) {
-            [self addToLog:[exception name]];
-            [self addToLog:[exception description]];
-            [show setComplete:[NSNumber numberWithBool:YES]];
-            [show setSuccessful:[NSNumber numberWithBool:NO]];
-            [show setValue:@"Download Failed" forKey:@"status"];
-            if ([[exception name] isEqualToString:@"4oD: Unsupported HTTP Download."])
-                [show setReasonForFailure:@"4oDHTTP"];
-            else
-                [show setReasonForFailure:@"MetadataProcessing"];
-            [nc postNotificationName:@"DownloadFinished" object:show];
-            return;
+        else
+        {
+            [NSException raise:@"Parsing Error." format:@"Could not process 4oD Metadata"];
         }
     }
+    @catch (NSException *exception)
+    {
+        [self addToLog:[exception name]];
+        [self addToLog:[exception description]];
+        [show setComplete:[NSNumber numberWithBool:YES]];
+        [show setSuccessful:[NSNumber numberWithBool:NO]];
+        [show setValue:@"Download Failed" forKey:@"status"];
+        if ([[exception name] isEqualToString:@"4oD: Unsupported HTTP Download."])
+            [show setReasonForFailure:@"4oDHTTP"];
+        else
+            [show setReasonForFailure:@"MetadataProcessing"];
+        [nc postNotificationName:@"DownloadFinished" object:show];
+        return;
+    }
     
-    NSString *app = nil;
-    scanner = [NSScanner scannerWithString:streamUri];
-    [scanner scanUpToString:@".com/" intoString:nil];
-    [scanner scanString:@".com/" intoString:nil];
-    [scanner scanUpToString:@"mp4:" intoString:&app];
-    
-    app = [app stringByAppendingFormat:@"?%@", auth];
     
     NSString *swfplayer = [[NSUserDefaults standardUserDefaults] valueForKey:[NSString stringWithFormat:@"%@SWFURL", defaultsPrefix]];
     if (!swfplayer) {
         swfplayer = @"http://www.channel4.com/static/programmes/asset/flash/swf/4odplayer-11.34.1.swf";
     }
-    NSString *playpath = [streamUri substringFromIndex:[scanner scanLocation]];
+
     [self createDownloadPath];
     
     NSArray *args = [NSArray arrayWithObjects:@"--rtmp",rtmpURL,
