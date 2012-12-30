@@ -100,13 +100,13 @@
         seriesTitle = [seriesTitle stringByDecodingHTMLEntities];
         [show setSeriesName:seriesTitle];
 
-        NSInteger episodeNumber;
+        NSInteger episodeNumber = 0;
         [scanner scanUpToString:@"<episodeNumber>" intoString:nil];
         [scanner scanString:@"<episodeNumber>" intoString:nil];
         [scanner scanInteger:&episodeNumber];
         [show setEpisode:episodeNumber];
         
-        NSInteger seriesNumber;
+        NSInteger seriesNumber = 0;
         [scanner scanUpToString:@"<seriesNumber>" intoString:nil];
         [scanner scanString:@"<seriesNumber>" intoString:nil];
         [scanner scanInteger:&seriesNumber];
