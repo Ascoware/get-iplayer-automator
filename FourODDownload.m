@@ -9,6 +9,7 @@
 #import "FourODDownload.h"
 #import "ASIHTTPRequest.h"
 #import "NSHost+ThreadedAdditions.h"
+#import "NSString+HTML.h"
 #import <Python/Python.h>
 
 @implementation FourODDownload
@@ -44,7 +45,26 @@
     errorCache = [[NSMutableString alloc] initWithString:@""];
     processErrorCache = [NSTimer scheduledTimerWithTimeInterval:.25 target:self selector:@selector(processError) userInfo:nil repeats:YES];
 
-    ASIHTTPRequest *dataRequest = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:[show url]]];
+    NSScanner *scanner = [NSScanner scannerWithString:[show url]];
+    [scanner scanUpToString:@"#" intoString:nil];
+    [scanner scanString:@"#" intoString:nil];
+    NSString *pid = nil;
+    [scanner scanUpToString:@"lklk" intoString:&pid];
+
+    if (!pid)
+    {
+        [self addToLog:[NSString stringWithFormat:@"ERROR: GiA cannot interpret the 4oD URL: %@", [show url]]];
+        [show setReasonForFailure:@"MetadataProcessing"];
+        [show setComplete:[NSNumber numberWithBool:YES]];
+        [show setSuccessful:[NSNumber numberWithBool:NO]];
+        [show setValue:@"Download Failed" forKey:@"status"];
+        [nc postNotificationName:@"DownloadFinished" object:show];
+        return;
+    }
+    
+    [show setRealPID:pid];
+    NSURL *requestURL = [NSURL URLWithString:[NSString stringWithFormat:@"http://www.channel4.com/programmes/asset/%@",[show realPID]]];
+    ASIHTTPRequest *dataRequest = [ASIHTTPRequest requestWithURL:requestURL];
     [dataRequest setDidFinishSelector:@selector(dataRequestFinished:)];
     [dataRequest setTimeOutSeconds:10];
     [dataRequest setNumberOfTimesToRetryOnTimeout:3];
@@ -56,51 +76,123 @@
 {
     if (!running)
         return;
-    NSString *responseString = [[NSString alloc] initWithData:[request responseData] encoding:NSUTF8StringEncoding];
-    BOOL verbose = [[NSUserDefaults standardUserDefaults] boolForKey:@"Verbose"];
-    if (verbose)
-        [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme Data Response: %@", responseString] noTag:YES];
-    
-    NSScanner *scanner = [NSScanner scannerWithString:responseString];
-    
-    [scanner scanUpToString:@"og:image" intoString:nil];
-    [scanner scanString:@"og:image\" content=\"" intoString:nil];
-    [scanner scanUpToString:@"\"" intoString:&thumbnailURL];
-    
-    NSString *description = nil, *seriesTitle = nil;
-    [scanner scanUpToString:@"<meta name=\"description\"" intoString:nil];
-    [scanner scanUpToString:@"4oD" intoString:nil];
-    [scanner scanString:@"4oD. " intoString:nil];
-    [scanner scanUpToString:@"\"/>" intoString:&description];
-    [show setDesc:description];
-    
-    [scanner scanUpToString:@"<h1 class=\"brandTitle\" data-wsbrandtitle=" intoString:nil];
-    [scanner scanString:@"<h1 class=\"brandTitle\" data-wsbrandtitle=" intoString:nil];
-    [scanner scanUpToString:@"title=\"" intoString:nil];
-    [scanner scanString:@"title=\"" intoString:nil];
-    [scanner scanUpToString:@"\">" intoString:&seriesTitle];
-    [show setSeriesName:seriesTitle];
-    
-    [show setEpisodeName:[[[show showName] componentsSeparatedByString:@" - "] objectAtIndex:1]];
-    
-    NSInteger series, episode;
-    [scanner scanUpToString:@"seriesNo" intoString:nil];
-    [scanner scanString:@"seriesNo\">Series " intoString:nil];
-    [scanner scanInteger:&series];
-    [show setSeason:series];
-    [scanner scanUpToString:@"episodeNo" intoString:nil];
-    [scanner scanString:@"episodeNo\">Episode " intoString:nil];
-    [scanner scanInteger:&episode];
-    [show setEpisode:episode];
+    NSLog(@"Response Status Code: %ld",(long)[request responseStatusCode]);
+    if ([request responseStatusCode] == 200)
+    {
+        NSString *responseString = [[NSString alloc] initWithData:[request responseData] encoding:NSUTF8StringEncoding];
+        BOOL verbose = [[NSUserDefaults standardUserDefaults] boolForKey:@"Verbose"];
+        if (verbose)
+            [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme Data Response: %@", responseString] noTag:YES];
+        
+        NSScanner *scanner = [NSScanner scannerWithString:responseString];
+        
+        NSString *episodeTitle = nil;
+        [scanner scanUpToString:@"<episodeTitle>" intoString:nil];
+        [scanner scanString:@"<episodeTitle>" intoString:nil];
+        [scanner scanUpToString:@"</" intoString:&episodeTitle];
+        episodeTitle = [episodeTitle stringByDecodingHTMLEntities];
+        [show setEpisodeName:episodeTitle];
 
-    if (verbose)
-        [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme Data Processed: thumbnailURL=%@ description=%@ seriesTitle=%@ series=%ld episode=%ld", thumbnailURL, description, seriesTitle, series, episode]];
-    
+        NSString *seriesTitle = nil;
+        [scanner scanUpToString:@"<brandTitle>" intoString:nil];
+        [scanner scanString:@"<brandTitle>" intoString:nil];
+        [scanner scanUpToString:@"</" intoString:&seriesTitle];
+        seriesTitle = [seriesTitle stringByDecodingHTMLEntities];
+        [show setSeriesName:seriesTitle];
+
+        NSInteger episodeNumber;
+        [scanner scanUpToString:@"<episodeNumber>" intoString:nil];
+        [scanner scanString:@"<episodeNumber>" intoString:nil];
+        [scanner scanInteger:&episodeNumber];
+        [show setEpisode:episodeNumber];
+        
+        NSInteger seriesNumber;
+        [scanner scanUpToString:@"<seriesNumber>" intoString:nil];
+        [scanner scanString:@"<seriesNumber>" intoString:nil];
+        [scanner scanInteger:&seriesNumber];
+        [show setSeason:seriesNumber];
+
+        NSString *imagePath = nil;
+        [scanner scanUpToString:@"<imagePath>" intoString:nil];
+        [scanner scanString:@"<imagePath>" intoString:nil];
+        [scanner scanUpToString:@"</" intoString:&imagePath];
+        if (imagePath)
+            thumbnailURL = [NSString stringWithFormat:@"http://www.channel4.com%@",imagePath];
+        
+        NSString *episodeGuideUrl = nil;
+        [scanner scanUpToString:@"<episodeGuideUrl>" intoString:nil];
+        [scanner scanString:@"<episodeGuideUrl>" intoString:nil];
+        [scanner scanUpToString:@"</" intoString:&episodeGuideUrl];
+
+        if (!(episodeTitle && seriesTitle && episodeNumber && seriesNumber && imagePath && episodeGuideUrl))
+            [self addToLog:[NSString stringWithFormat:@"INFO: Some programme data not found. Tagging will be incomplete."] noTag:YES];
+        
+        if (verbose)
+            [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme Data Processed: episodeTitle=%@ seriesTitle=%@ episodeNumber=%ld seriesNumber=%ld imagePath=%@ episodeGuideUrl=%@", episodeTitle, seriesTitle, episodeNumber, seriesNumber, imagePath, episodeGuideUrl]];        
+        
+        if (episodeGuideUrl)
+        {
+            NSURL *requestURL = [NSURL URLWithString:[NSString stringWithFormat:@"http://www.channel4.com%@",episodeGuideUrl]];
+            ASIHTTPRequest *descRequest = [ASIHTTPRequest requestWithURL:requestURL];
+            [descRequest setDidFinishSelector:@selector(descRequestFinished:)];
+            [descRequest setTimeOutSeconds:10];
+            [descRequest setNumberOfTimesToRetryOnTimeout:3];
+            [descRequest setDelegate:self];
+            [descRequest startAsynchronous];
+        }
+        else
+        {
+            [self doHostLookup];
+        }
+    }
+    else
+    {
+       [self addToLog:[NSString stringWithFormat:@"WARNING: Programme data request failed. Tagging will be incomplete."] noTag:YES];
+       [self doHostLookup];
+    }
+}
+
+-(void)descRequestFinished:(ASIHTTPRequest *)request
+{
+    if (!running)
+        return;
+    NSLog(@"Response Status Code: %ld",(long)[request responseStatusCode]);
+    if ([request responseStatusCode] == 200)
+    {
+        NSString *responseString = [[NSString alloc] initWithData:[request responseData] encoding:NSUTF8StringEncoding];
+        BOOL verbose = [[NSUserDefaults standardUserDefaults] boolForKey:@"Verbose"];
+        if (verbose)
+            [self addToLog:[NSString stringWithFormat:@"DEBUG: Description Data Response: %@", responseString] noTag:YES];
+
+        NSScanner *scanner = [NSScanner scannerWithString:responseString];
+
+        NSString *synopsis = nil;
+        [scanner scanUpToString:@"<meta name=\"synopsis\" content=\"" intoString:nil];
+        [scanner scanString:@"<meta name=\"synopsis\" content=\"" intoString:nil];
+        [scanner scanUpToString:@"\"/>" intoString:&synopsis];
+        synopsis = [synopsis stringByConvertingHTMLToPlainText];
+        [show setDesc:synopsis];
+
+        if (!synopsis)
+            [self addToLog:[NSString stringWithFormat:@"INFO: Programme description not found. Tagging may be incomplete."] noTag:YES];
+        
+        if (verbose)
+            [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme Data Processed: synopsis=%@", synopsis]];
+    }
+    else
+    {
+        [self addToLog:[NSString stringWithFormat:@"WARNING: Programme description request failed. Tagging will be incomplete."] noTag:YES];
+    }
+    [self doHostLookup];
+}
+
+-(void)doHostLookup
+{
     BOOL skipLookup = [[NSUserDefaults standardUserDefaults] boolForKey:[NSString stringWithFormat:@"%@SkipDNSLookup", defaultsPrefix]];
     if (skipLookup)
         [self hostLookupFinished:nil];
     else
-        [NSHost hostWithName:@"ais.channel4.com" inBackgroundForReceiver:self selector:@selector(hostLookupFinished:)];
+        [NSHost hostWithName:@"ais.channel4.com" inBackgroundForReceiver:self selector:@selector(hostLookupFinished:)];    
 }
 
 -(void)hostLookupFinished:(NSHost *)aHost
@@ -112,12 +204,6 @@
         hostAddr = [aHost address];
     if (!hostAddr)
         hostAddr = @"ais.channel4.com";
-    NSScanner *scanner = [NSScanner scannerWithString:[show url]];
-    [scanner scanUpToString:@"#" intoString:nil];
-    [scanner scanString:@"#" intoString:nil];
-    NSString *pid;
-    [scanner scanUpToString:@"lklk" intoString:&pid];
-    [show setRealPID:pid];
     NSURL *requestURL = [NSURL URLWithString:[NSString stringWithFormat:@"http://%@/asset/%@",hostAddr,[show realPID]]];
     NSLog(@"Metadata URL: %@",requestURL);
     [self addToLog:[NSString stringWithFormat:@"INFO: Metadata URL: %@", requestURL] noTag:YES];
@@ -128,6 +214,7 @@
     [request setNumberOfTimesToRetryOnTimeout:3];
     [request setDelegate:self];
     
+    NSScanner *scanner = nil;
     NSString *proxyOption = [[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"];
 	if ([proxyOption isEqualToString:@"Custom"])
 	{
