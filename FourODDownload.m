@@ -34,6 +34,8 @@
     
     [self addToLog:[NSString stringWithFormat:@"Downloading %@",[show showName]] noTag:NO];
     [self addToLog:@"INFO: Preparing Request for Auth Info" noTag:YES];
+
+    resolveHostNamesForProxy = [[NSUserDefaults standardUserDefaults] boolForKey:[NSString stringWithFormat:@"%@ResolveHostNamesForProxy", defaultsPrefix]];
     
     [self launchMetaRequest];
     
@@ -141,13 +143,13 @@
         }
         else
         {
-            [self doHostLookup];
+            [self doMetaHostLookup];
         }
     }
     else
     {
        [self addToLog:[NSString stringWithFormat:@"WARNING: Programme data request failed. Tagging will be incomplete."] noTag:YES];
-       [self doHostLookup];
+       [self doMetaHostLookup];
     }
 }
 
@@ -181,19 +183,18 @@
     {
         [self addToLog:[NSString stringWithFormat:@"WARNING: Programme description request failed. Tagging will be incomplete."] noTag:YES];
     }
-    [self doHostLookup];
+    [self doMetaHostLookup];
 }
 
--(void)doHostLookup
+-(void)doMetaHostLookup
 {
-    BOOL skipLookup = [[NSUserDefaults standardUserDefaults] boolForKey:[NSString stringWithFormat:@"%@SkipDNSLookup", defaultsPrefix]];
-    if (skipLookup)
-        [self hostLookupFinished:nil];
+    if (resolveHostNamesForProxy)
+        [NSHost hostWithName:@"ais.channel4.com" inBackgroundForReceiver:self selector:@selector(metaHostLookupFinished:)];
     else
-        [NSHost hostWithName:@"ais.channel4.com" inBackgroundForReceiver:self selector:@selector(hostLookupFinished:)];    
+        [self metaHostLookupFinished:nil];
 }
 
--(void)hostLookupFinished:(NSHost *)aHost
+-(void)metaHostLookupFinished:(NSHost *)aHost
 {
     if (!running)
         return;

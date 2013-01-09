@@ -9,6 +9,9 @@
 #import "Download.h"
 
 @interface FourODDownload : Download
+{
+    BOOL resolveHostNamesForProxy;
+}
 - (id)initWithProgramme:(Programme *)tempShow;
 - (NSString *)decodeToken:(NSString *)string;
 -(void)dataRequestFinished:(ASIHTTPRequest *)request;
