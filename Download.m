@@ -17,6 +17,8 @@
 	rateEntries = [[NSMutableArray alloc] init];
 	lastDownloaded=0;
 	outOfRange=0;
+    verbose = [[NSUserDefaults standardUserDefaults] boolForKey:@"Verbose"];
+    downloadParams = [[NSMutableDictionary alloc] init];
     
     return self;
 }
@@ -573,7 +575,6 @@
             [cmd appendString:[NSString stringWithFormat:@" \"%@\"", arg]];
     }
     NSLog(@"%@",cmd);
-    BOOL verbose = [[NSUserDefaults standardUserDefaults] boolForKey:@"Verbose"];
     if (verbose)
         [self addToLog:[NSString stringWithFormat:@"DEBUG: RTMPDump command: %@", cmd] noTag:YES];
     

@@ -161,7 +161,7 @@
 		//Add Arguments that can't be NULL
 	NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:getiPlayerPath,profileDirArg,noWarningArg,noPurgeArg,mplayerArg,flvstreamerArg,lameArg,atomicParsleyArg,cacheExpiryArg,downloadPathArg,subDirArg,formatArg,getArg,searchArg,@"--attempts=5",@"--fatfilename",@"-w",@"--thumbsize=6",@"--tag-hdvideo",@"--tag-longdesc",versionArg,proxyArg,partialProxyArg,nil];
 		//Verbose?
-	if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"Verbose"] isEqualTo:[NSNumber numberWithBool:YES]])
+    if (verbose)
 		[args addObject:[[NSString alloc] initWithString:@"--verbose"]];
 	if (ffmpegArg) [args addObject:ffmpegArg];
 	if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"DownloadSubtitles"] isEqualTo:[NSNumber numberWithBool:YES]])

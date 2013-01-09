@@ -132,7 +132,6 @@
 -(void)metaRequestFinished:(ASIHTTPRequest *)request
 {
     NSLog(@"Response Status Code: %ld",(long)[request responseStatusCode]);
-    BOOL verbose = [[NSUserDefaults standardUserDefaults] boolForKey:@"Verbose"];
     if ([request responseStatusCode] == 0)
     {
         [self addToLog:@"ERROR: No response received. Probably a proxy issue." noTag:YES];

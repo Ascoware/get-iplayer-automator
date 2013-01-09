@@ -80,7 +80,6 @@
     if ([request responseStatusCode] == 200)
     {
         NSString *responseString = [[NSString alloc] initWithData:[request responseData] encoding:NSUTF8StringEncoding];
-        BOOL verbose = [[NSUserDefaults standardUserDefaults] boolForKey:@"Verbose"];
         if (verbose)
             [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme Data Response: %@", responseString] noTag:YES];
         
@@ -160,7 +159,6 @@
     if ([request responseStatusCode] == 200)
     {
         NSString *responseString = [[NSString alloc] initWithData:[request responseData] encoding:NSUTF8StringEncoding];
-        BOOL verbose = [[NSUserDefaults standardUserDefaults] boolForKey:@"Verbose"];
         if (verbose)
             [self addToLog:[NSString stringWithFormat:@"DEBUG: Description Data Response: %@", responseString] noTag:YES];
 
@@ -341,7 +339,6 @@
     
     NSLog(@"%@",responseString);
     
-    BOOL verbose = [[NSUserDefaults standardUserDefaults] boolForKey:@"Verbose"];
     if (verbose)
         [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata Response: %@", responseString] noTag:YES];
     

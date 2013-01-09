@@ -59,6 +59,12 @@
     BOOL running;
     
     NSInteger attemptNumber;
+
+    //Verbose Logging
+    BOOL verbose;
+    
+    //Download Parameters
+    NSMutableDictionary *downloadParams;
 }
 - (void)setCurrentProgress:(NSString *)string;
 - (void)setPercentage:(double)d;
