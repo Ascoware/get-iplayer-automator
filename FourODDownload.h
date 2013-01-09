@@ -14,5 +14,5 @@
     BOOL skipMP4Search;
     NSInteger mp4SearchRange;
 }
-- (id)initWithProgramme:(Programme *)tempShow;
+- (id)initWithProgramme:(Programme *)tempShow proxy:(HTTPProxy *)aProxy;
 @end

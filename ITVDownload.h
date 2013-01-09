@@ -14,5 +14,5 @@
     
 
 }
-- (id)initWithProgramme:(Programme *)tempShow itvFormats:(NSArray *)itvFormatList;
+- (id)initWithProgramme:(Programme *)tempShow itvFormats:(NSArray *)itvFormatList proxy:(HTTPProxy *)aProxy;
 @end

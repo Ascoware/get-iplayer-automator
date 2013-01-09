@@ -7,6 +7,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "HTTPProxy.h"
 #import "Programme.h"
 #import "ASIHTTPRequest.h"
 
@@ -65,6 +66,9 @@
     
     //Download Parameters
     NSMutableDictionary *downloadParams;
+
+    //Proxy Info
+    HTTPProxy *proxy;   
 }
 - (void)setCurrentProgress:(NSString *)string;
 - (void)setPercentage:(double)d;

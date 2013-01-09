@@ -7,6 +7,7 @@
 //
 
 #import "AppController.h"
+#import "HTTPProxy.h"
 #import "Programme.h"
 #import "Safari.h"
 #import "iTunes.h"
@@ -37,7 +38,9 @@
 	queueArray = [NSMutableArray array];
 	
 	//Initialize Log
-	log_value = [[NSMutableAttributedString alloc] initWithString:@"Get iPlayer Automator Initialized."];
+    NSString *version = [NSString stringWithFormat:@"%@", [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"]];
+    NSLog(@"Get iPlayer Automator %@ Initialized.", version);
+	log_value = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Get iPlayer Automator %@ Initialized.", version]];
 	[self addToLog:@"" :nil];
 	[nc addObserver:self selector:@selector(addToLogNotification:) name:@"AddToLog" object:nil];
 	[nc addObserver:self selector:@selector(postLog:) name:@"NeedLog" object:nil];
@@ -107,6 +110,7 @@
 	getiPlayerPath = [getiPlayerPath stringByAppendingString:@"/Contents/Resources/get_iplayer.pl"];
 	runScheduled=NO;
     quickUpdateFailed=NO;
+    proxyDict = [[NSMutableDictionary alloc] init];
 	return self;
 }
 #pragma mark Delegate Methods
@@ -367,6 +371,41 @@
 #pragma mark Cache Update
 - (IBAction)updateCache:(id)sender
 {
+    @try
+    {
+        [searchField setEnabled:NO];
+        [stopButton setEnabled:NO];
+        [startButton setEnabled:NO];
+        [pvrSearchField setEnabled:NO];
+    }
+    @catch (NSException *e) {
+        NSLog(@"NO UI: updateCache:");
+    }
+    if ((![[[NSUserDefaults standardUserDefaults] objectForKey:@"QuickCache"] boolValue] || quickUpdateFailed) && [[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])
+    {
+        [self loadProxyInBackgroundForSelector:@selector(updateCache:proxyError:) withObject:sender];
+    }
+    else
+    {
+        [self updateCache:sender proxyError:nil];
+    }
+}
+
+- (void)updateCache:(id)sender proxyError:(NSError *)proxyError
+{
+    // reset after proxy load
+    @try
+    {
+        [searchField setEnabled:YES];
+        [stopButton setEnabled:YES];
+        [startButton setEnabled:YES];
+        [pvrSearchField setEnabled:YES];
+    }
+    @catch (NSException *e) {
+        NSLog(@"NO UI: updateCache:proxyError:");
+    }
+    if ([proxyError code] == kProxyLoadCancelled)
+        return;
 	runSinceChange=YES;
 	runUpdate=YES;
     didUpdate=NO;
@@ -398,7 +437,6 @@
         NSLog(@"NO UI");
     }
     
-    
     if (![[[NSUserDefaults standardUserDefaults] objectForKey:@"QuickCache"] boolValue] || quickUpdateFailed)
     {
         quickUpdateFailed=NO;
@@ -412,58 +450,17 @@
         {
             cacheExpiryArg = [[NSString alloc] initWithFormat:@"-e%d", ([[[NSUserDefaults standardUserDefaults] objectForKey:@"CacheExpiryTime"] intValue]*3600)];
         }
+
         NSString *typeArgument = [self typeArgument:nil];
         
-        [self addToLog:@"Updating Program Index Feeds...\r" :self];
-
-        
-        NSString *proxyArg=nil;
-        if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])
+        NSString *proxyArg = NULL;
+        if (proxy && [[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])
         {
-            NSString *proxyOption = [[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"];
-            if ([proxyOption isEqualToString:@"None"])
-            {
-                //No Proxy
-                proxyArg = NULL;
-            }
-            else if ([proxyOption isEqualToString:@"Custom"])
-            {
-                if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CustomProxy"] hasPrefix:@"http"])
-                    proxyArg = [[NSString alloc] initWithFormat:@"-p%@",[[NSUserDefaults standardUserDefaults] valueForKey:@"CustomProxy"]];
-                else
-                    proxyArg = [[NSString alloc] initWithFormat:@"-phttp://%@",[[NSUserDefaults standardUserDefaults] valueForKey:@"CustomProxy"]];
-            }
-            else
-            {
-                //Get provided proxy from my server.
-                NSURL *proxyURL = [[NSURL alloc] initWithString:@"http://tom-tech.com/get_iplayer/proxy.txt"];
-                NSURLRequest *proxyRequest = [NSURLRequest requestWithURL:proxyURL
-                                                              cachePolicy:NSURLRequestReturnCacheDataElseLoad
-                                                          timeoutInterval:30];
-                NSData *urlData;
-                NSURLResponse *response;
-                NSError *error;
-                urlData = [NSURLConnection sendSynchronousRequest:proxyRequest
-                                                returningResponse:&response
-                                                            error:&error];
-                if (!urlData)
-                {
-                    NSAlert *alert = [NSAlert alertWithMessageText:@"Provided Proxy could not be retrieved!" 
-                                                     defaultButton:nil 
-                                                   alternateButton:nil 
-                                                       otherButton:nil 
-                                         informativeTextWithFormat:@"No proxy will be used.\r\rError: %@", [error localizedDescription]];
-                    [alert runModal];
-                    [self addToLog:@"Proxy could not be retrieved. No proxy will be used." :self];
-                    proxyArg=NULL;
-                }
-                else
-                {
-                    NSString *providedProxy = [[NSString alloc] initWithData:urlData encoding:NSUTF8StringEncoding];
-                    proxyArg = [[NSString alloc] initWithFormat:@"-phttp://%@", providedProxy];
-                }
-            }
+            proxyArg = [[NSString alloc] initWithFormat:@"-p%@", [proxy url]];
         }
+        
+        [self addToLog:@"Updating Program Index Feeds...\r" :self];
+        
         getiPlayerUpdateArgs = [[NSArray alloc] initWithObjects:getiPlayerPath,cacheExpiryArg,typeArgument,@"--nopurge",profileDirArg,proxyArg,nil];
         getiPlayerUpdateTask = [[NSTask alloc] init];
         [getiPlayerUpdateTask setLaunchPath:@"/usr/bin/perl"];
@@ -487,7 +484,7 @@
     {
         [self addToLog:@"Updating Program Index Feeds from Server..." :nil];
         
-        NSLog(@"%@",lastUpdate);
+        NSLog(@"DEBUG: Last cache update: %@",lastUpdate);
         
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
         if (!lastUpdate || ([[NSDate date] timeIntervalSinceDate:lastUpdate] > ([[defaults objectForKey:@"CacheExpiryTime"] intValue]*3600)) || [[sender class] isEqualTo:[@"" class]])
@@ -1513,7 +1510,31 @@
 #pragma mark Download Controller
 - (IBAction)startDownloads:(id)sender
 {
-	NSAlert *whatAnIdiot = [NSAlert alertWithMessageText:@"No Shows in Queue!" 
+    @try
+    {
+        [stopButton setEnabled:NO];
+        [startButton setEnabled:NO];
+    }
+    @catch (NSException *e) {
+        NSLog(@"NO UI: startDownloads:");
+    }
+    [self loadProxyInBackgroundForSelector:@selector(startDownloads:proxyError:) withObject:sender];
+}
+
+- (void)startDownloads:(id)sender proxyError:(NSError *)proxyError
+{
+    // reset after proxy load
+    @try
+    {
+        [stopButton setEnabled:YES];
+        [startButton setEnabled:YES];
+    }
+    @catch (NSException *e) {
+        NSLog(@"NO UI: startDownloads:proxyError:");
+    }
+    if ([proxyError code] == kProxyLoadCancelled)
+        return;
+	NSAlert *whatAnIdiot = [NSAlert alertWithMessageText:@"No Shows in Queue!"
 										   defaultButton:nil 
 										 alternateButton:nil 
 											 otherButton:nil 
@@ -1586,13 +1607,14 @@
 				if ([[show complete] isEqualToNumber:[NSNumber numberWithBool:NO]])
 				{
                     if ([[show tvNetwork] hasPrefix:@"ITV"])
-                        currentDownload = [[ITVDownload alloc] initWithProgramme:show itvFormats:[itvFormatController arrangedObjects]];
+                        currentDownload = [[ITVDownload alloc] initWithProgramme:show itvFormats:[itvFormatController arrangedObjects] proxy:proxy];
                     else if ([[show tvNetwork] hasPrefix:@"4oD"])
-                        currentDownload = [[FourODDownload alloc] initWithProgramme:show];
+                        currentDownload = [[FourODDownload alloc] initWithProgramme:show proxy:proxy];
                     else
                         currentDownload = [[BBCDownload alloc] initWithProgramme:show 
                                                                        tvFormats:[tvFormatController arrangedObjects] 
-                                                                    radioFormats:[radioFormatController arrangedObjects]];
+                                                                    radioFormats:[radioFormatController arrangedObjects]
+                                                                           proxy:proxy];
 					break;
 				}
 			}
@@ -1766,13 +1788,14 @@
 			if ([[nextShow complete] isEqualToNumber:[NSNumber numberWithBool:NO]])
             {
                 if ([[nextShow tvNetwork] hasPrefix:@"ITV"])
-                    currentDownload = [[ITVDownload alloc] initWithProgramme:nextShow itvFormats:[itvFormatController arrangedObjects]];
+                    currentDownload = [[ITVDownload alloc] initWithProgramme:nextShow itvFormats:[itvFormatController arrangedObjects] proxy:proxy];
                 else if ([[nextShow tvNetwork] hasPrefix:@"4oD"])
-                    currentDownload = [[FourODDownload alloc] initWithProgramme:nextShow];
+                    currentDownload = [[FourODDownload alloc] initWithProgramme:nextShow proxy:proxy];
                 else
                     currentDownload = [[BBCDownload alloc] initWithProgramme:nextShow 
                                                                    tvFormats:[tvFormatController arrangedObjects] 
-                                                                radioFormats:[radioFormatController arrangedObjects]];
+                                                                radioFormats:[radioFormatController arrangedObjects]
+                                                                       proxy:proxy];
             }
 		}
 		@catch (NSException *e)
@@ -2511,7 +2534,7 @@
 													  selector:@selector(runScheduledDownloads:) 
 													  userInfo:nil 
 													   repeats:NO];
-	interfaceTimer = [NSTimer scheduledTimerWithTimeInterval:1 
+	interfaceTimer = [NSTimer scheduledTimerWithTimeInterval:1
 															   target:self 
 															 selector:@selector(updateScheduleStatus:) 
 															 userInfo:nil 
@@ -2590,8 +2613,16 @@
 		}
 	}
 }
+
 - (IBAction)startLiveTV:(id)sender
 {
+    [self loadProxyInBackgroundForSelector:@selector(startLiveTV:proxyError:) withObject:sender];
+}
+
+- (IBAction)startLiveTV:(id)sender proxyError:(NSError *)proxyError
+{
+    if ([proxyError code] == kProxyLoadCancelled)
+        return;
 	getiPlayerStreamer = [[NSTask alloc] init];
 	mplayerStreamer = [[NSTask alloc] init];
 	liveTVPipe = [[NSPipe alloc] init];
@@ -2608,50 +2639,17 @@
 	//Get selected channel
 	LiveTVChannel *selectedChannel = [[liveTVChannelController arrangedObjects] objectAtIndex:[liveTVChannelController selectionIndex]];
 	
-	//Set Proxy Argument
-	NSString *proxyArg;
-	NSString *partialProxyArg = @"--partial-proxy";
-	NSString *proxyOption = [[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"];
-	if ([proxyOption isEqualToString:@"None"])
-	{
-		//No Proxy
-		proxyArg = NULL;
-	}
-	else if ([proxyOption isEqualToString:@"Custom"])
-	{
-		//Get the Custom Proxy.
-		proxyArg = [[NSString alloc] initWithFormat:@"-p%@",[[NSUserDefaults standardUserDefaults] valueForKey:@"CustomProxy"]];
-	}
-	else
-	{
-		//Get provided proxy from my server.
-		NSURL *proxyURL = [[NSURL alloc] initWithString:@"http://tom-tech.com/get_iplayer/proxy.txt"];
-		NSURLRequest *proxyRequest = [NSURLRequest requestWithURL:proxyURL
-													  cachePolicy:NSURLRequestReturnCacheDataElseLoad
-												  timeoutInterval:30];
-		NSData *urlData;
-		NSURLResponse *response;
-		NSError *error;
-		urlData = [NSURLConnection sendSynchronousRequest:proxyRequest
-										returningResponse:&response
-													error:&error];
-		if (!urlData)
-		{
-			NSAlert *alert = [NSAlert alertWithMessageText:@"Provided Proxy could not be retrieved!" 
-											 defaultButton:nil 
-										   alternateButton:nil 
-											   otherButton:nil 
-								 informativeTextWithFormat:@"No proxy will be used.\r\rError: %@", [error localizedDescription]];
-			[alert runModal];
-			[self addToLog:@"Proxy could not be retrieved. No proxy will be used." :nil];
-			proxyArg=NULL;
-		}
-		else
-		{
-			NSString *providedProxy = [[NSString alloc] initWithData:urlData encoding:NSUTF8StringEncoding];
-			proxyArg = [[NSString alloc] initWithFormat:@"-phttp://%@", providedProxy];
-		}
-	}
+	//Set Proxy Arguments
+	NSString *proxyArg = NULL;
+	NSString *partialProxyArg = NULL;
+    if (proxy)
+    {
+        proxyArg = [[NSString alloc] initWithFormat:@"-p%@", [proxy url]];
+        if (![[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])
+        {
+            partialProxyArg = [[NSString alloc] initWithString:@"--partial-proxy"];
+        }
+    }
 	
 	//Prepare Arguments	
 	NSArray *args = [NSArray arrayWithObjects:[[NSBundle mainBundle] pathForResource:@"get_iplayer" ofType:@"pl"],
@@ -2675,6 +2673,7 @@
 	[liveStart setEnabled:NO];
 	[liveStop setEnabled:YES];
 }
+
 - (IBAction)stopLiveTV:(id)sender
 {
 	[getiPlayerStreamer interrupt];
@@ -2682,7 +2681,250 @@
 	[liveStart setEnabled:YES];
 	[liveStop setEnabled:NO];
 }
-	
+
+#pragma mark Proxy
+- (void)loadProxyInBackgroundForSelector:(SEL)selector withObject:(id)object
+{
+    [self updateProxyLoadStatus:YES message:@"Loading proxy settings..."];
+    NSLog(@"INFO: Loading proxy settings...");
+    [self addToLog:@"INFO: Loading proxy settings..."];
+    [proxyDict removeAllObjects];
+    [proxyDict setObject:[NSValue valueWithPointer:selector] forKey:@"selector"];
+    if (object)
+        [proxyDict setObject:object forKey:@"object"];
+    proxy = nil;
+    NSString *proxyOption = [[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"];
+	if ([proxyOption isEqualToString:@"Custom"])
+	{
+        NSString *proxyValue = [[[[NSUserDefaults standardUserDefaults] valueForKey:@"CustomProxy"] lowercaseString] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        if ([proxyValue length] == 0)
+        {
+            NSLog(@"WARNING: Custom proxy setting was blank. No proxy will be used.");
+            [self addToLog:@"WARNING: Custom proxy setting was blank. No proxy will be used."];
+            if (!runScheduled)
+            {
+                NSAlert *alert = [NSAlert alertWithMessageText:@"Custom proxy setting was blank.\nDownloads and cache updates may fail.\nDo you wish to continue without a proxy?"
+                                                 defaultButton:@"No"
+                                               alternateButton:@"Yes"
+                                                   otherButton:nil
+                                     informativeTextWithFormat:@""];
+                [alert setAlertStyle:NSCriticalAlertStyle];
+                if ([alert runModal] == NSAlertDefaultReturn)
+                {
+                    [self cancelProxyLoad];
+                }
+                else
+                {
+                    [self failProxyLoad];
+                }
+            }
+        }
+        else
+        {
+            proxy = [[HTTPProxy alloc] initWithString:proxyValue];
+            [self finishProxyLoad];
+        }
+	}
+	else if ([proxyOption isEqualToString:@"Provided"])
+	{
+        ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:@"http://tom-tech.com/get_iplayer/proxy.txt"]];
+        [request setUserInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSValue valueWithPointer:selector], @"selector", object, @"object", nil]];
+        [request setDelegate:self];
+        [request setDidFailSelector:@selector(providedProxyDidFinish:)];
+        [request setDidFinishSelector:@selector(providedProxyDidFinish:)];
+        [request setTimeOutSeconds:30];
+        [self updateProxyLoadStatus:YES message:[NSString stringWithFormat:@"Loading provided proxy (may take up to %ld seconds)...", (NSInteger)[request timeOutSeconds]]];
+        NSLog(@"INFO: Loading provided proxy (may take up to %ld seconds)...", (NSInteger)[request timeOutSeconds]);
+        [self addToLog:[NSString stringWithFormat:@"INFO: Loading provided proxy (may take up to %ld seconds)...", (NSInteger)[request timeOutSeconds]]];
+        [request startAsynchronous];
+	}
+    else
+    {
+        NSLog(@"INFO: No proxy to load");
+        [self addToLog:@"INFO: No proxy to load"];
+        [self finishProxyLoad];
+    }
+}
+
+- (void)providedProxyDidFinish:(ASIHTTPRequest *)request
+{
+    NSData *urlData = [request responseData];
+    if ([request responseStatusCode] != 200 || !urlData)
+    {
+        NSLog(@"WARNING: Provided proxy could not be retrieved. No proxy will be used.");
+        [self addToLog:@"WARNING: Provided proxy could not be retrieved. No proxy will be used."];
+        if (!runScheduled)
+        {
+            NSError *error = [request error];
+            NSAlert *alert = [NSAlert alertWithMessageText:@"Provided proxy could not be retrieved.\nDownloads and cache updates may fail.\nDo you wish to continue without a proxy?"
+                                             defaultButton:@"No"
+                                           alternateButton:@"Yes"
+                                               otherButton:nil
+                                 informativeTextWithFormat:@"Error: %@", (error ? [error localizedDescription] : @"Unknown error")];
+            [alert setAlertStyle:NSCriticalAlertStyle];
+            if ([alert runModal] == NSAlertDefaultReturn)
+                [self cancelProxyLoad];
+            else
+                [self failProxyLoad];
+        }
+    }
+    else
+    {
+        NSString *proxyValue = [[[[NSString alloc] initWithData:urlData encoding:NSUTF8StringEncoding] lowercaseString] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        if ([proxyValue length] == 0)
+        {
+            NSLog(@"WARNING: Provided proxy value was blank. No proxy will be used.");
+            [self addToLog:@"WARNING: Provided proxy value was blank. No proxy will be used."];
+            if (!runScheduled)
+            {
+                NSAlert *alert = [NSAlert alertWithMessageText:@"Provided proxy value was blank.\nDownloads and cache updates may fail.\nDo you wish to continue without a proxy?"
+                                                 defaultButton:@"No"
+                                               alternateButton:@"Yes"
+                                                   otherButton:nil
+                                     informativeTextWithFormat:@""];
+                [alert setAlertStyle:NSCriticalAlertStyle];
+                if ([alert runModal] == NSAlertDefaultReturn)
+                    [self cancelProxyLoad];
+                else
+                    [self failProxyLoad];
+            }
+        }
+        else
+        {
+            proxy = [[HTTPProxy alloc] initWithString:proxyValue];
+            [self finishProxyLoad];
+        }
+    }
+}
+
+- (void)cancelProxyLoad
+{
+    [self returnFromProxyLoadWithError:[NSError errorWithDomain:@"Proxy" code:kProxyLoadCancelled userInfo:[NSDictionary dictionaryWithObject:@"Proxy Load Cancelled" forKey:NSLocalizedDescriptionKey]]];
+}
+
+- (void)failProxyLoad
+{
+    [self returnFromProxyLoadWithError:[NSError errorWithDomain:@"Proxy" code:kProxyLoadFailed userInfo:[NSDictionary dictionaryWithObject:@"Proxy Load Failed" forKey:NSLocalizedDescriptionKey]]];
+}
+
+- (void)finishProxyLoad
+{
+    NSLog(@"INFO: Proxy load complete.");
+    [self addToLog:@"INFO: Proxy load complete."];
+    if (proxy && [[NSUserDefaults standardUserDefaults] boolForKey:@"TestProxy"])
+    {
+        [self testProxyOnLoad];
+        return;
+    }
+    [self returnFromProxyLoadWithError:nil];
+}
+
+- (void)testProxyOnLoad
+{
+    if (proxy)
+    {
+        NSString *testURL = [[NSUserDefaults standardUserDefaults] stringForKey:@"ProxyTestURL"];
+        if (!testURL)
+            testURL = @"http://www.google.com";
+        ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:testURL]];
+        [request setDelegate:self];
+        [request setDidFailSelector:@selector(proxyTestDidFinish:)];
+        [request setDidFinishSelector:@selector(proxyTestDidFinish:)];
+        [request setTimeOutSeconds:30];
+        [request setProxyType:proxy.type];
+        [request setProxyHost:proxy.host];
+        if (proxy.port)
+            [request setProxyPort:proxy.port];
+        [self updateProxyLoadStatus:YES message:[NSString stringWithFormat:@"Testing proxy (may take up to %ld seconds)...", (NSInteger)[request timeOutSeconds]]];
+        NSLog(@"INFO: Testing proxy (may take up to %ld seconds)...", (NSInteger)[request timeOutSeconds]);
+        [self addToLog:[NSString stringWithFormat:@"INFO: Testing proxy (may take up to %ld seconds)...", (NSInteger)[request timeOutSeconds]]];
+        [request startAsynchronous];
+    }
+    else
+    {
+        NSLog(@"INFO: No proxy to test");
+        [self addToLog:@"INFO: No proxy to test"];
+        [self finishProxyTest];
+    }
+}
+
+- (void)proxyTestDidFinish:(ASIHTTPRequest *)request
+{
+    if ([request responseStatusCode] != 200)
+    {
+        NSLog(@"WARNING: Proxy failed to load test page: %@", [request url]);
+        [self addToLog:[NSString stringWithFormat:@"WARNING: Proxy failed to load test page: %@", [request url]]];
+        if (!runScheduled)
+        {
+            NSError *error = [request error];
+            NSAlert *alert = [NSAlert alertWithMessageText:@"Proxy failed to load test page.\nDownloads and cache updates may fail.\nHowever, this may be a temporary condition.\nDo you wish to continue anyway?"
+                                             defaultButton:@"No"
+                                           alternateButton:@"Yes"
+                                               otherButton:nil
+                                 informativeTextWithFormat:@"Failed to load %@ within %ld seconds\nUsing proxy: %@\nError: %@", [request url], (NSInteger)[request timeOutSeconds], [proxy url], (error ? [error localizedDescription] : @"Unknown error")];
+            [alert setAlertStyle:NSCriticalAlertStyle];
+            if ([alert runModal] == NSAlertDefaultReturn)
+                [self cancelProxyLoad];
+            else
+                [self failProxyTest];
+        }
+    }
+    else
+    {
+        [self finishProxyTest];
+    }
+}
+
+- (void)failProxyTest
+{
+    [self returnFromProxyLoadWithError:[NSError errorWithDomain:@"Proxy" code:kProxyLoadFailed userInfo:[NSDictionary dictionaryWithObject:@"Proxy Text Failed" forKey:NSLocalizedDescriptionKey]]];
+}
+
+- (void)finishProxyTest
+{
+    NSLog(@"INFO: Proxy test complete.");
+    [self addToLog:@"INFO: Proxy test complete."];
+    [self returnFromProxyLoadWithError:nil];
+}
+
+- (void)returnFromProxyLoadWithError:(NSError *)error
+{
+    if (proxy)
+    {
+        NSLog(@"INFO: Using proxy: %@", proxy.url);
+        [self addToLog:[NSString stringWithFormat:@"INFO: Using proxy: %@", proxy.url]];
+    }
+    else
+    {
+        NSLog(@"INFO: No proxy will be used");
+        [self addToLog:@"INFO: No proxy will be used"];
+    }
+    [self updateProxyLoadStatus:NO message:nil];
+    [self performSelector:[[proxyDict objectForKey:@"selector"] pointerValue] withObject:[proxyDict objectForKey:@"object"] withObject:error];
+}
+
+- (void)updateProxyLoadStatus:(BOOL)working message:(NSString *)message
+{
+    @try
+    {
+        if (working)
+        {
+            [currentIndicator setIndeterminate:YES];
+            [currentIndicator startAnimation:nil];
+            [currentProgress setStringValue:message];
+        }
+        else
+        {
+            [currentIndicator setIndeterminate:NO];
+            [currentIndicator stopAnimation:nil];
+            [currentProgress setStringValue:@""];
+        }
+    }
+    @catch (NSException *e) {
+        NSLog(@"NO UI: updateProxyLoadStatus:message:");
+    }
+}
+
 @synthesize log_value;
 @synthesize getiPlayerPath;
 @end

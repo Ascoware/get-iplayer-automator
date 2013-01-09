@@ -10,7 +10,7 @@
 
 @implementation BBCDownload
 #pragma mark Overridden Methods
-- (id)initWithProgramme:(Programme *)tempShow tvFormats:(NSArray *)tvFormatList radioFormats:(NSArray *)radioFormatList
+- (id)initWithProgramme:(Programme *)tempShow tvFormats:(NSArray *)tvFormatList radioFormats:(NSArray *)radioFormatList proxy:(HTTPProxy *)aProxy
 {
 	[super init];
 	runAgain = NO;
@@ -20,6 +20,7 @@
 	processErrorCache = [NSTimer scheduledTimerWithTimeInterval:.25 target:self selector:@selector(processError) userInfo:nil repeats:YES];
     reasonForFailure = [[NSString alloc] initWithString:@"None"];
     defaultsPrefix = @"BBC_";
+    proxy = aProxy;
     
 	log = [[NSMutableString alloc] initWithString:@""];
 	nc = [NSNotificationCenter defaultCenter];
@@ -52,65 +53,17 @@
         [temp_Format appendFormat:@"%@,",[tvFormats valueForKey:[format format]]];
     formatArg = [NSString stringWithString:temp_Format];
 
-		//Set Proxy Argument
-	NSString *proxyArg;
-	NSString *partialProxyArg;
-	NSString *proxyOption = [[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"];
-	if ([proxyOption isEqualToString:@"None"] || [[show podcast] boolValue])
-	{
-		//No Proxy
-		proxyArg = NULL;
-	}
-	else if ([proxyOption isEqualToString:@"Custom"]/* && (![[show radio] isEqualToNumber:[NSNumber numberWithBool:YES]] || [[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])*/)
-	{
-		if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CustomProxy"] hasPrefix:@"http"])
-			proxyArg = [[NSString alloc] initWithFormat:@"-p%@",[[NSUserDefaults standardUserDefaults] valueForKey:@"CustomProxy"]];
-		else
-			proxyArg = [[NSString alloc] initWithFormat:@"-phttp://%@",[[NSUserDefaults standardUserDefaults] valueForKey:@"CustomProxy"]];
-	}
-	else
-	{
-		//Get provided proxy from my server.
-		NSURL *proxyURL = [[NSURL alloc] initWithString:@"http://tom-tech.com/get_iplayer/proxy.txt"];
-		NSURLRequest *proxyRequest = [NSURLRequest requestWithURL:proxyURL
-													  cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
-												  timeoutInterval:30];
-		NSData *urlData;
-		NSURLResponse *response;
-		NSError *error;
-		urlData = [NSURLConnection sendSynchronousRequest:proxyRequest
-										returningResponse:&response
-													error:&error];
-		if (!urlData)
-		{
-			NSAlert *alert = [NSAlert alertWithMessageText:@"Provided Proxy could not be retrieved!" 
-											 defaultButton:nil 
-										   alternateButton:nil 
-											   otherButton:nil 
-								 informativeTextWithFormat:@"No proxy will be used.\r\rError: %@", [error localizedDescription]];
-			[alert runModal];
-			[self addToLog:@"WARNING: Proxy could not be retrieved. No proxy will be used."];
-			proxyArg=NULL;
-		}
-		else
-		{
-			if (/*![[show radio] isEqualToNumber:[NSNumber numberWithBool:YES]] || [[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue]*/TRUE)
-			{	
-				NSString *providedProxy = [[NSString alloc] initWithData:urlData encoding:NSUTF8StringEncoding];
-				proxyArg = [[NSString alloc] initWithFormat:@"-phttp://%@", providedProxy];
-			}
-			else proxyArg=NULL;
-		}
-	}
-		//Partial Proxy?
-	if (![[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])
-	{
-		partialProxyArg = [[NSString alloc] initWithString:@"--partial-proxy"];
-	}
-	else
-	{
-		partialProxyArg = NULL;
-	}
+    //Set Proxy Arguments
+    NSString *proxyArg = NULL;
+	NSString *partialProxyArg = NULL;
+    if (proxy)
+    {
+        proxyArg = [[NSString alloc] initWithFormat:@"-p%@", [proxy url]];
+        if (![[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])
+        {
+            partialProxyArg = [[NSString alloc] initWithString:@"--partial-proxy"];
+        }
+    }
 		//Initialize the rest of the arguments
 	NSString *noWarningArg = [[NSString alloc] initWithString:@"--nocopyright"];
 	NSString *noPurgeArg = [[NSString alloc] initWithString:@"--nopurge"];

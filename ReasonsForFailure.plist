@@ -33,12 +33,12 @@ remove it, and try again.</string>
 	<string>This show already exists in the download directory. If you would
 like to download it again, delete the file first.</string>
 	<key>Outside_UK</key>
-	<string>ITV thinks you are outside the UK. Please enable the provided
+	<string>Broadcaster thinks you are outside the UK. Please enable the provided
 proxy option in preferences.</string>
 	<key>MetadataProcessing</key>
 	<string>GiA could not process this programme. Please submit a bug report.</string>
-    <key>4oDHTTP</key>
-    <string>GiA does not support downloading HTTP Dynamic Streaming programmes from 4oD.
+	<key>4oDHTTP</key>
+	<string>GiA does not support downloading HTTP Dynamic Streaming programmes from 4oD.
 Unfortunately, this show is one of them.</string>
 	<key>4oDFormat</key>
 	<string>GiA did not find a suitable download format for the 4oD programme.</string>

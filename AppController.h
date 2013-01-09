@@ -119,6 +119,15 @@ bool runUpdate=NO;
     IBOutlet NSArrayController *solutionsArrayController;
     IBOutlet NSTableView *solutionsTableView;
     NSDictionary *solutionsDictionary;
+    
+    //Proxy
+    HTTPProxy *proxy;
+    NSMutableDictionary *proxyDict;
+    enum {
+        kProxyLoadCancelled = 1,
+        kProxyLoadFailed = 2,
+        kProxyTestFailed = 3
+    };
 }
 //Update
 - (void)getiPlayerUpdateFinished;

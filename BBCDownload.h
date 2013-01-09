@@ -25,7 +25,7 @@ extern bool runDownloads;
 	NSString *LastLine;
 	NSString *reasonForFailure;
 }
-- (id)initWithProgramme:(Programme *)tempShow tvFormats:(NSArray *)tvFormatList radioFormats:(NSArray *)radioFormatList;
+- (id)initWithProgramme:(Programme *)tempShow tvFormats:(NSArray *)tvFormatList radioFormats:(NSArray *)radioFormatList proxy:(HTTPProxy *)aProxy;
 - (void)processGetiPlayerOutput:(NSString *)outp;
 
 @end

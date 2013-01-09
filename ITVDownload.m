@@ -23,10 +23,11 @@
 {
 	return [NSString stringWithFormat:@"ITV Download (ID=%@)", [show pid]];
 }
-- (id)initWithProgramme:(Programme *)tempShow itvFormats:(NSArray *)itvFormatList
+- (id)initWithProgramme:(Programme *)tempShow itvFormats:(NSArray *)itvFormatList proxy:(HTTPProxy *)aProxy
 {
     [super init];
     
+    proxy = aProxy;
     show = tempShow;
     attemptNumber=1;
     nc = [NSNotificationCenter defaultCenter];
@@ -43,7 +44,6 @@
     [self addToLog:@"INFO: Preparing Request for Auth Info" noTag:YES];
     
     [self launchMetaRequest];
-    
     return self;
 }
 
@@ -84,66 +84,19 @@
     [request addRequestHeader:@"SOAPAction" value:@"\"http://tempuri.org/PlaylistService/GetPlaylist\""];
     [request setRequestMethod:@"POST"];
     [request setPostBody:[NSMutableData dataWithData:[body dataUsingEncoding:NSUTF8StringEncoding]]];
+    [request setDelegate:self];
     [request setDidFailSelector:@selector(metaRequestFinished:)];
     [request setDidFinishSelector:@selector(metaRequestFinished:)];
     [request setTimeOutSeconds:10];
     [request setNumberOfTimesToRetryOnTimeout:3];
     [request addRequestHeader:@"Accept" value:@"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"];
-    [request setDelegate:self];
-    
-    NSString *proxyOption = [[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"];
-	if ([proxyOption isEqualToString:@"Custom"])
-	{
-        NSString *proxyHost;
-        NSInteger proxyPort;
-		scanner = [NSScanner scannerWithString:[[NSUserDefaults standardUserDefaults] valueForKey:@"CustomProxy"]];
-        [scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:nil];
-        [scanner scanUpToString:@":" intoString:&proxyHost];
-        [scanner scanString:@":" intoString:nil];
-        if ([scanner scanInteger:&proxyPort]) [request setProxyPort:proxyPort];
-        [request setProxyHost:proxyHost];
-        [self addToLog:[NSString stringWithFormat:@"INFO: Using proxy %@",[[NSUserDefaults standardUserDefaults] valueForKey:@"CustomProxy"]] noTag:YES];
-	}
-	else if ([proxyOption isEqualToString:@"Provided"])
-	{
-		//Get provided proxy from my server.
-		NSURL *proxyURL = [[NSURL alloc] initWithString:@"http://tom-tech.com/get_iplayer/proxy.txt"];
-		NSURLRequest *proxyRequest = [NSURLRequest requestWithURL:proxyURL
-													  cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
-												  timeoutInterval:30];
-		NSData *urlData;
-		NSURLResponse *response;
-		NSError *error;
-		urlData = [NSURLConnection sendSynchronousRequest:proxyRequest
-										returningResponse:&response
-													error:&error];
-		if (!urlData)
-		{
-			NSAlert *alert = [NSAlert alertWithMessageText:@"Provided Proxy could not be retrieved!"
-											 defaultButton:nil
-										   alternateButton:nil
-											   otherButton:nil
-								 informativeTextWithFormat:@"No proxy will be used.\r\rError: %@", [error localizedDescription]];
-			[alert runModal];
-            NSLog(@"WARNING: Proxy could not be retrieved. No proxy will be used.");
-			[self addToLog:@"WARNING: Proxy could not be retrieved. No proxy will be used."];
-		}
-		else
-		{
-            NSString *providedProxy = [[NSString alloc] initWithData:urlData encoding:NSUTF8StringEncoding];
-            scanner = [NSScanner scannerWithString:providedProxy];
-            NSString *proxyHost;
-            NSInteger proxyPort;
-            [scanner scanUpToString:@":" intoString:&proxyHost];
-            [scanner scanString:@":" intoString:nil];
-            [scanner scanInteger:&proxyPort];
-            [request setProxyHost:proxyHost];
-            [request setProxyPort:proxyPort];
-            [self addToLog:[NSString stringWithFormat:@"INFO: Using proxy %@",providedProxy] noTag:YES];
-		}
-	}
-    
-    [request setProxyType:@"HTTP"];
+    if (proxy)
+    {
+        [request setProxyType:proxy.type];
+        [request setProxyHost:proxy.host];
+        if (proxy.port)
+            [request setProxyPort:proxy.port];
+    }
     NSLog(@"INFO: Requesting Metadata.");
     [self addToLog:@"INFO: Requesting Metadata." noTag:YES];
     [request startAsynchronous];
@@ -160,10 +113,11 @@
     NSLog(@"DEBUG: Metadata response: %@",responseString);
     if (verbose)
         [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata response: %@", responseString] noTag:YES];
+    NSError *error = [request error];
     if ([request responseStatusCode] == 0)
     {
-        NSLog(@"ERROR: No response received. Probably a proxy issue.");
-        [self addToLog:@"ERROR: No response received. Probably a proxy issue."];
+        NSLog(@"ERROR: No response received (probably a proxy issue): %@", (error ? [error localizedDescription] : @"Unknown error"));
+        [self addToLog:[NSString stringWithFormat:@"ERROR: No response received (probably a proxy issue): %@", (error ? [error localizedDescription] : @"Unknown error")]];
         [show setSuccessful:[NSNumber numberWithBool:NO]];
         [show setComplete:[NSNumber numberWithBool:YES]];
         if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"] isEqualTo:@"Provided"])
@@ -177,10 +131,22 @@
         [self addToLog:@"Download Failed" noTag:NO];
         return;
     }
+    else if ([responseString length] > 0 && [responseString rangeOfString:@"InvalidGeoRegion" options:NSCaseInsensitiveSearch].location != NSNotFound)
+    {
+        NSLog(@"ERROR: Access denied to users outside UK.");
+        [self addToLog:@"ERROR: Access denied to users outside UK."];
+        [show setSuccessful:[NSNumber numberWithBool:NO]];
+        [show setComplete:[NSNumber numberWithBool:YES]];
+        [show setReasonForFailure:@"Outside_UK"];
+        [show setValue:@"Failed: Outside UK" forKey:@"status"];
+        [nc postNotificationName:@"DownloadFinished" object:show];
+        [self addToLog:@"Download Failed" noTag:NO];
+        return;
+    }
     else if ([request responseStatusCode] != 200 || [responseString length] == 0)
     {
-        NSLog(@"ERROR: Could not retrieve programme metadata.");
-        [self addToLog:@"ERROR: Could not retrieve programme metadata."];
+        NSLog(@"ERROR: Could not retrieve programme metadata: %@", (error ? [error localizedDescription] : @"Unknown error"));
+        [self addToLog:[NSString stringWithFormat:@"ERROR: Could not retrieve programme metadata: %@", (error ? [error localizedDescription] : @"Unknown error")]];
         [show setSuccessful:[NSNumber numberWithBool:NO]];
         [show setComplete:[NSNumber numberWithBool:YES]];
         [show setValue:@"Download Failed" forKey:@"status"];
@@ -391,6 +357,7 @@
     NSLog(@"DEBUG: Programme data response: %@", responseString);
     if (verbose)
         [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme data response: %@", responseString] noTag:YES];
+    NSError *error = [request error];
     NSString *description = nil, *showname = nil, *epnum = nil, *epname = nil, *temp_showname = nil;
     if ([request responseStatusCode] == 200 && [responseString length] > 0)
     {
@@ -408,9 +375,9 @@
     {
         NSLog(@"WARNING: Programme data request failed. Tagging will be incomplete.");
         [self addToLog:[NSString stringWithFormat:@"WARNING: Programme data request failed. Tagging will be incomplete."] noTag:YES];
-        NSLog(@"DEBUG: Programme data response error: %@", [[request error] localizedDescription]);
+        NSLog(@"DEBUG: Programme data response error: %@", (error ? [error localizedDescription] : @"Unknown error"));
         if (verbose)
-            [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme data response error: %@", [[request error] localizedDescription]] noTag:YES];
+            [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme data response error: %@", (error ? [error localizedDescription] : @"Unknown error")] noTag:YES];
         
     }
     //Init date formatter
@@ -435,7 +402,7 @@
             epnum = [NSString stringWithFormat:@"Episode %ld", [show episode]];
         else
             epnum = [NSString stringWithFormat:@"%@", [show realPID]];
-        showname = [NSString stringWithFormat:@"%@ - %@", showname, epnum];
+        showname = [NSString stringWithFormat:@"%@ - %@ - %@", temp_showname, epnum, epname];
     }
     if (!description)
         description = @"(No Description)";
