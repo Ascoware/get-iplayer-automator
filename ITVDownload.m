@@ -8,6 +8,7 @@
 
 #import "ITVDownload.h"
 #import "ASIHTTPRequest.h"
+#import "NSString+HTML.h"
 #import "ITVMediaFileEntry.h"
 
 @implementation ITVDownload
@@ -38,40 +39,56 @@
     [tempShow setValue:@"Initialising..." forKey:@"status"];
     
     formatList = [itvFormatList copy];
-    [self addToLog:[NSString stringWithFormat:@"Downloading %@",[show showName]] noTag:NO];
+    [self addToLog:[NSString stringWithFormat:@"Downloading %@",[show showName]]];
     [self addToLog:@"INFO: Preparing Request for Auth Info" noTag:YES];
     
     [self launchMetaRequest];
     
     return self;
 }
+
 - (void)launchMetaRequest
 {
     errorCache = [[NSMutableString alloc] initWithString:@""];
     processErrorCache = [NSTimer scheduledTimerWithTimeInterval:.25 target:self selector:@selector(processError) userInfo:nil repeats:YES];
-    
-    NSString *body = [[NSString alloc] initWithData:[NSData dataWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"Body" ofType:nil]]
-                                           encoding:NSUTF8StringEncoding];
-    NSString *temp_id;
+
+    NSString *pid = nil;
     NSScanner *scanner = [NSScanner scannerWithString:[show url]];
     [scanner scanUpToString:@"Filter=" intoString:nil];
     [scanner scanString:@"Filter=" intoString:nil];
-    [scanner scanUpToString:@"kljkjj" intoString:&temp_id];
-    [show setRealPID:temp_id];
-    body = [body stringByReplacingOccurrencesOfString:@"!!!ID!!!" withString:temp_id];
+    [scanner scanUpToString:@"kljkjj" intoString:&pid];
+    if (!pid)
+    {
+        NSLog(@"ERROR: GiA cannot interpret the ITV URL: %@", [show url]);
+        [self addToLog:[NSString stringWithFormat:@"ERROR: GiA cannot interpret the ITV URL: %@", [show url]]];
+        [show setReasonForFailure:@"MetadataProcessing"];
+        [show setComplete:[NSNumber numberWithBool:YES]];
+        [show setSuccessful:[NSNumber numberWithBool:NO]];
+        [show setValue:@"Download Failed" forKey:@"status"];
+        [nc postNotificationName:@"DownloadFinished" object:show];
+        return;
+    }
+    [show setRealPID:pid];
+
+    NSString *body = [[NSString alloc] initWithData:[NSData dataWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"Body" ofType:nil]]
+                                           encoding:NSUTF8StringEncoding];
+    body = [body stringByReplacingOccurrencesOfString:@"!!!ID!!!" withString:[show realPID]];
     
-    
-    NSURL *requestURL = [[NSURL alloc] initWithString:@"http://mercury.itv.com/PlaylistService.svc"];
-    
+    NSURL *requestURL = [NSURL URLWithString:@"http://mercury.itv.com/PlaylistService.svc"];
+    NSLog(@"DEBUG: Metadata URL: %@",requestURL);
+    if (verbose)
+        [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata URL: %@", requestURL] noTag:YES];
     ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:requestURL];
     [request addRequestHeader:@"Referer" value:@"http://www.itv.com/mercury/Mercury_VideoPlayer.swf?v=1.5.309/[[DYNAMIC]]/2"];
     [request addRequestHeader:@"Content-Type" value:@"text/xml; charset=utf-8"];
     [request addRequestHeader:@"SOAPAction" value:@"\"http://tempuri.org/PlaylistService/GetPlaylist\""];
     [request setRequestMethod:@"POST"];
     [request setPostBody:[NSMutableData dataWithData:[body dataUsingEncoding:NSUTF8StringEncoding]]];
+    [request setDidFailSelector:@selector(metaRequestFinished:)];
     [request setDidFinishSelector:@selector(metaRequestFinished:)];
     [request setTimeOutSeconds:10];
     [request setNumberOfTimesToRetryOnTimeout:3];
+    [request addRequestHeader:@"Accept" value:@"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"];
     [request setDelegate:self];
     
     NSString *proxyOption = [[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"];
@@ -108,6 +125,7 @@
 											   otherButton:nil
 								 informativeTextWithFormat:@"No proxy will be used.\r\rError: %@", [error localizedDescription]];
 			[alert runModal];
+            NSLog(@"WARNING: Proxy could not be retrieved. No proxy will be used.");
 			[self addToLog:@"WARNING: Proxy could not be retrieved. No proxy will be used."];
 		}
 		else
@@ -126,15 +144,26 @@
 	}
     
     [request setProxyType:@"HTTP"];
+    NSLog(@"INFO: Requesting Metadata.");
     [self addToLog:@"INFO: Requesting Metadata." noTag:YES];
     [request startAsynchronous];
 }
+
 -(void)metaRequestFinished:(ASIHTTPRequest *)request
 {
-    NSLog(@"Response Status Code: %ld",(long)[request responseStatusCode]);
+    if (!running)
+        return;
+    NSLog(@"DEBUG: Metadata response status code: %d", [request responseStatusCode]);
+    if (verbose)
+        [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata response status code: %d", [request responseStatusCode]] noTag:YES];
+    NSString *responseString = [[NSString alloc] initWithData:[request responseData] encoding:NSUTF8StringEncoding];
+    NSLog(@"DEBUG: Metadata response: %@",responseString);
+    if (verbose)
+        [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata response: %@", responseString] noTag:YES];
     if ([request responseStatusCode] == 0)
     {
-        [self addToLog:@"ERROR: No response received. Probably a proxy issue." noTag:YES];
+        NSLog(@"ERROR: No response received. Probably a proxy issue.");
+        [self addToLog:@"ERROR: No response received. Probably a proxy issue."];
         [show setSuccessful:[NSNumber numberWithBool:NO]];
         [show setComplete:[NSNumber numberWithBool:YES]];
         if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"] isEqualTo:@"Provided"])
@@ -148,25 +177,10 @@
         [self addToLog:@"Download Failed" noTag:NO];
         return;
     }
-    else if ([request responseStatusCode] == 500)
+    else if ([request responseStatusCode] != 200 || [responseString length] == 0)
     {
-        [self addToLog:@"ERROR: Show not Available."  noTag:YES];
-        [show setSuccessful:[NSNumber numberWithBool:NO]];
-        [show setComplete:[NSNumber numberWithBool:YES]];
-        if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"] isEqualTo:@"Provided"])
-            [show setReasonForFailure:@"ShowNotFound"];
-        else if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"] isEqualTo:@"Custom"])
-            [show setReasonForFailure:@"ShowNotFound"];
-        else
-            [show setReasonForFailure:@"ShowNotFound"];
-        [show setValue:@"Failed: Not Available" forKey:@"status"];
-        [nc postNotificationName:@"DownloadFinished" object:show];
-        [self addToLog:@"Download Failed" noTag:NO];
-        return;
-    }
-    else if ([request responseStatusCode] != 200)
-    {
-        [self addToLog:@"ERROR: Could not retrieve program metadata." noTag:YES];
+        NSLog(@"ERROR: Could not retrieve programme metadata.");
+        [self addToLog:@"ERROR: Could not retrieve programme metadata."];
         [show setSuccessful:[NSNumber numberWithBool:NO]];
         [show setComplete:[NSNumber numberWithBool:YES]];
         [show setValue:@"Download Failed" forKey:@"status"];
@@ -174,32 +188,9 @@
         [self addToLog:@"Download Failed" noTag:NO];
         return;
     }
-    NSData *urlData = [request responseData];
-    
-    NSString *output = nil;
-    if (urlData != nil)
-    {
-        output = [[NSString alloc] initWithData:urlData encoding:NSUTF8StringEncoding];
-        NSLog(@"Metadata Response: %@",output);
-        if (verbose)
-            [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata Response: %@", output] noTag:YES];
-        [self addToLog:@"INFO: Metadata Response received" noTag:YES];
-    }
-    else
-    {
-        NSLog(@"Could not retrieve program metadata");
-        [show setValue:[NSNumber numberWithBool:YES] forKey:@"complete"];
-        [show setValue:[NSNumber numberWithBool:NO] forKey:@"successful"];
-        [show setValue:@"Download Failed" forKey:@"status"];
-        [self addToLog:[NSString stringWithFormat:@"%@ Failed",[show showName]]];
-        [show setReasonForFailure:@"ITVUnknown"];
-        [nc postNotificationName:@"DownloadFinished" object:show];
-        return;
-    }
-        
-    
-    output = [output stringByReplacingOccurrencesOfString:@"&amp;" withString:@"&"];
-    NSScanner *scanner = [NSScanner scannerWithString:output];
+
+    responseString = [responseString stringByDecodingHTMLEntities];
+    NSScanner *scanner = [NSScanner scannerWithString:responseString];
     //Retrieve Series Name
     NSString *seriesName = nil;
     [scanner scanUpToString:@"<ProgrammeTitle>" intoString:nil];
@@ -263,74 +254,13 @@
     [scanner scanUpToString:@"rtmpe://" intoString:nil];
     [scanner scanUpToString:@"\"" intoString:&authURL];
     
-    NSLog(@"Metadata Processed");
+    NSLog(@"DEBUG: Metadata processed: seriesName=%@ dateString=%@ episodeName=%@ episodeNumber=%ld thumbnailURL=%@ subtitleURL=%@ authURL=%@",
+          seriesName, dateString, episodeName, episodeNumber, thumbnailURL, subtitleURL, authURL);
     if (verbose)
-        [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata Processed: seriesName=%@ dateString=%@ episodeName=%@ episodeNumber=%ld thumbnailURL=%@ subtitleURL=%@ authURL=%@",
+        [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata processed: seriesName=%@ dateString=%@ episodeName=%@ episodeNumber=%ld thumbnailURL=%@ subtitleURL=%@ authURL=%@",
                         seriesName, dateString, episodeName, episodeNumber, thumbnailURL, subtitleURL, authURL] noTag:YES];
-    
-    @try {
-        //Fix Showname
-        NSHTTPURLResponse *metaDataResponse = nil;
-        NSError *metaDataError = nil;
-        NSURLRequest *metaDataRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://www.itv.com/_app/Dynamic/CatchUpData.ashx?ViewType=5&Filter=%@",[show realPID]]]];
-        NSData *metaData = [NSURLConnection sendSynchronousRequest:metaDataRequest returningResponse:&metaDataResponse error:&metaDataError];
-        if (metaDataError != nil) {
-            NSLog(@"Secondary Metadata Error: %ld %@", [metaDataError code], [metaDataError localizedDescription]);
-        }
-        NSLog(@"Secondary Metadata Result: %ld %@", [metaDataResponse statusCode], [NSHTTPURLResponse localizedStringForStatusCode:[metaDataResponse statusCode]]);
-        NSString *response = [[NSString alloc] initWithData:metaData encoding:NSUTF8StringEncoding];
-        NSLog(@"Secondary Metadata Response: %@", response);
-        if (verbose)
-            [self addToLog:[NSString stringWithFormat:@"DEBUG: Secondary Metadata Response: %@", response] noTag:YES];
-        NSString *description = nil, *showname = nil, *epnum = nil, *epname = nil, *temp_showname = nil;
-        if (metaData != nil && [metaDataResponse statusCode] == 200) {
-            [self addToLog:@"INFO: Secondary Metadata Response received" noTag:YES];
-            epname = [show episodeName];
-            NSScanner *metadataScanner = [NSScanner scannerWithString:response];
-            [metadataScanner scanUpToString:@"<h2>" intoString:nil];
-            [metadataScanner scanString:@"<h2>" intoString:nil];
-            [metadataScanner scanUpToString:@"</h2>" intoString:&temp_showname];
-            [metadataScanner scanUpToString:@"<p>" intoString:nil];
-            [metadataScanner scanString:@"<p>" intoString:nil];
-            [metadataScanner scanUpToString:@"</p>" intoString:&description];
-        }
-        else {
-            [self addToLog:[NSString stringWithFormat:@"INFO: Secondary Metadata Request failed: %ld %@", [metaDataResponse statusCode], [NSHTTPURLResponse localizedStringForStatusCode:[metaDataResponse statusCode]]] noTag:YES];
-            if ([show episodeName] != @"(No Episode Name)")
-                epname = [show episodeName];
-            else {
-                [dateFormat setDateFormat:@"dd/MM/yyyy"];
-                epname = [dateFormat stringFromDate:[show dateAired]];
-            }
-            temp_showname = nil;
-            description = nil;
-        }
-        if (!temp_showname)
-            temp_showname = [show seriesName];
-        showname = [NSString stringWithFormat:@"%@ - %@", temp_showname, epname];
-        // add episode identifier if episode name contains only date
-        [dateFormat setDateFormat:@"dd/MM/yyyy"];
-        if ([dateFormat dateFromString:epname]) {
-            if ([show episode] != 0)
-                epnum = [NSString stringWithFormat:@"Episode %ld", [show episode]];
-            else
-                epnum = [NSString stringWithFormat:@"%@", [show realPID]];
-            showname = [NSString stringWithFormat:@"%@ - %@", showname, epnum];
-        }
-        if (!description)
-            description = @"(No Description)";
-        [show setShowName:showname];
-        [show setDesc:description];
-        NSLog(@"Secondary Metadata Processed");
-        if (verbose)
-            [self addToLog:[NSString stringWithFormat:@"DEBUG: Secondary Metadata Processed: showname=%@ temp_showname=%@ epname=%@ epnum=%@ description=%@",
-                            showname, temp_showname, epname, epnum, description] noTag:YES];
-    }
-    @catch (NSException *exception) {
-        [self addToLog:@"Could not fix showName. Likely to encounter trouble with metadata."];
-    }
 
-    NSLog(@"Retrieving Playpath");
+    NSLog(@"DEBUG: Retrieving Playpath");
     if (verbose)
         [self addToLog:@"DEBUG: Retrieving Playpath" noTag:YES];
     
@@ -348,6 +278,7 @@
     for (TVFormat *format in formatList) [itvRateArray addObject:[itvRateDic objectForKey:[format format]]];
     for (TVFormat *format in formatList) [bitrateArray addObject:[bitrateDic objectForKey:[format format]]];
     
+    NSLog(@"DEBUG: Parsing MediaFile entries");
     if (verbose)
         [self addToLog:@"DEBUG: Parsing MediaFile entries" noTag:YES];
     NSMutableArray *mediaEntries = [[NSMutableArray alloc] init];
@@ -369,10 +300,12 @@
         [entry setUrl:url];
         [entry setItvRate:itvRate];
         [mediaEntries addObject:entry];
+        NSLog(@"DEBUG: ITVMediaFileEntry: bitrate=%@ itvRate=%@ url=%@", bitrate, itvRate, url);
         if (verbose)
             [self addToLog:[NSString stringWithFormat:@"DEBUG: ITVMediaFileEntry: bitrate=%@ itvRate=%@ url=%@", bitrate, itvRate, url] noTag:YES];
     }
     
+    NSLog(@"DEBUG: Searching for itvRate match");
     if (verbose)
         [self addToLog:@"DEBUG: Searching for itvRate match" noTag:YES];
     BOOL foundIt=FALSE;
@@ -381,6 +314,7 @@
             if ([[entry itvRate] isEqualToString:rate]) {
                 foundIt=TRUE;
                 playPath=[entry url];
+                NSLog(@"DEBUG: foundIt (itvRate): rate=%@ url=%@", rate, playPath);
                 if (verbose)
                     [self addToLog:[NSString stringWithFormat:@"DEBUG: foundIt (itvRate): rate=%@ url=%@", rate, playPath] noTag:YES];
                 break;
@@ -388,65 +322,150 @@
         }
         if (foundIt) break;
     }
-    if (verbose)
-        [self addToLog:@"DEBUG: Searching for bitrate match" noTag:YES];
-    if (!foundIt) for (NSString *rate in bitrateArray) {
-        for (ITVMediaFileEntry *entry in mediaEntries) {
-            if ([[entry bitrate] isEqualToString:rate]) {
-                foundIt=TRUE;
-                playPath=[entry url];
-                if (verbose)
-                    [self addToLog:[NSString stringWithFormat:@"DEBUG: foundIt (bitrate): rate=%@ url=%@", rate, playPath] noTag:YES];
-                break;
+    if (!foundIt)
+    {
+        NSLog(@"DEBUG: Searching for bitrate match");
+        if (verbose)
+            [self addToLog:@"DEBUG: Searching for bitrate match" noTag:YES];
+        for (NSString *rate in bitrateArray) {
+            for (ITVMediaFileEntry *entry in mediaEntries) {
+                if ([[entry bitrate] isEqualToString:rate]) {
+                    foundIt=TRUE;
+                    playPath=[entry url];
+                    NSLog(@"DEBUG: foundIt (bitrate): rate=%@ url=%@", rate, playPath);
+                    if (verbose)
+                        [self addToLog:[NSString stringWithFormat:@"DEBUG: foundIt (bitrate): rate=%@ url=%@", rate, playPath] noTag:YES];
+                    break;
+                }
             }
+            if (foundIt) break;
         }
-        if (foundIt) break;
     }
     
     if (!foundIt) {
-        [self addToLog:@"ERROR: Could not find suitable playpath." noTag:YES];
-    }
-    else {
-        NSLog(@"%@",playPath);
-        if (verbose)
-            [self addToLog:[NSString stringWithFormat:@"DEBUG: playPath = %@", playPath] noTag:YES];
-    }
-    [self addToLog:@"INFO: Program data processed." noTag:YES];
-    
-    //Create Download Path
-    downloadPath = [[NSUserDefaults standardUserDefaults] valueForKey:@"DownloadPath"];
-    downloadPath = [downloadPath stringByAppendingPathComponent:[show seriesName]];
-    [[NSFileManager defaultManager] createDirectoryAtPath:downloadPath withIntermediateDirectories:YES attributes:nil error:nil];
-    downloadPath = [downloadPath stringByAppendingPathComponent:[[[NSString stringWithFormat:@"%@.partial.flv",[show showName]] stringByReplacingOccurrencesOfString:@"/" withString:@"-"] stringByReplacingOccurrencesOfString:@":" withString:@" -"]];
-    NSArray *args;
-    @try {
-        if (foundIt) args = [NSMutableArray arrayWithObjects:
-                                [NSString stringWithFormat:@"-r%@",authURL],
-                                @"-Whttp://www.itv.com/mediaplayer/ITVMediaPlayer.swf?v=11.20.654",
-                                [NSString stringWithFormat:@"-y%@",playPath],
-                                [NSString stringWithFormat:@"-o%@",downloadPath],
-                                nil];
-        else [NSException raise:@"NoShow" format:@"Could not find show"];
-        NSLog(@"%@",args);
-        if (verbose)
-            [self addToLog:[NSString stringWithFormat:@"DEBUG: rtmpdump args: %@", args] noTag:YES];
-    }
-    @catch (NSException *exception) {
+        NSLog(@"ERROR: None of the modes in your download format list are available for this show. Try adding more modes if possible.");
+        [self addToLog:@"ERROR: None of the modes in your download format list are available for this show. Try adding more modes if possible."];
         [show setComplete:[NSNumber numberWithBool:YES]];
         [show setSuccessful:[NSNumber numberWithBool:NO]];
         [show setValue:@"Download Failed" forKey:@"status"];
-        [self addToLog:[NSString stringWithFormat:@"%@ Failed",[show showName]]];
-        if ([[exception name] isEqualToString:@"NoShow"] && [mediaEntries count] > 0) {
-            [self addToLog:@"REASON FOR FAILURE: None of the modes in your download format list are available for this show." noTag:YES];
-            [self addToLog:@"Try adding more modes." noTag:YES];
-            [show setReasonForFailure:@"Specified_Modes"];
-        } else {
-            [self addToLog:@"ERROR: Could not process ITV metadata." noTag:YES];
-            [show setReasonForFailure:@"MetadataProcessing"];
-        }
         [nc postNotificationName:@"DownloadFinished" object:show];
         return;
     }
+    else {
+        NSLog(@"DEBUG: playPath = %@",playPath);
+        if (verbose)
+            [self addToLog:[NSString stringWithFormat:@"DEBUG: playPath = %@", playPath] noTag:YES];
+    }
+    
+    [downloadParams setObject:authURL forKey:@"authURL"];
+    [downloadParams setObject:playPath forKey:@"playPath"];
+
+    NSLog(@"INFO: Metadata processed.");
+    [self addToLog:@"INFO: Metadata processed." noTag:YES];
+    
+    NSURL *dataURL = [NSURL URLWithString:[NSString stringWithFormat:@"http://www.itv.com/_app/Dynamic/CatchUpData.ashx?ViewType=5&Filter=%@",[show realPID]]];
+    NSLog(@"DEBUG: Programme data URL: %@",dataURL);
+    if (verbose)
+        [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme data URL: %@", dataURL] noTag:YES];
+    ASIHTTPRequest *dataRequest = [ASIHTTPRequest requestWithURL:dataURL];
+    [dataRequest setDidFailSelector:@selector(dataRequestFinished:)];
+    [dataRequest setDidFinishSelector:@selector(dataRequestFinished:)];
+    [dataRequest setTimeOutSeconds:10];
+    [dataRequest setNumberOfTimesToRetryOnTimeout:3];
+    [dataRequest setDelegate:self];
+    [dataRequest addRequestHeader:@"Accept" value:@"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"];
+    NSLog(@"INFO: Requesting programme data.");
+    [self addToLog:@"INFO: Requesting programme data." noTag:YES];
+    [dataRequest startAsynchronous];
+}
+
+-(void)dataRequestFinished:(ASIHTTPRequest *)request
+{
+    if (!running)
+        return;
+    NSScanner *scanner = nil;
+    NSLog(@"DEBUG: Programme data response status code: %d", [request responseStatusCode]);
+    if (verbose)
+        [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme data response status code: %d", [request responseStatusCode]] noTag:YES];
+    NSString *responseString = [[NSString alloc] initWithData:[request responseData] encoding:NSUTF8StringEncoding];
+    NSLog(@"DEBUG: Programme data response: %@", responseString);
+    if (verbose)
+        [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme data response: %@", responseString] noTag:YES];
+    NSString *description = nil, *showname = nil, *epnum = nil, *epname = nil, *temp_showname = nil;
+    if ([request responseStatusCode] == 200 && [responseString length] > 0)
+    {
+        scanner = [NSScanner scannerWithString:responseString];
+        [scanner scanUpToString:@"<h2>" intoString:nil];
+        [scanner scanString:@"<h2>" intoString:nil];
+        [scanner scanUpToString:@"</h2>" intoString:&temp_showname];
+        [scanner scanUpToString:@"<p>" intoString:nil];
+        [scanner scanString:@"<p>" intoString:nil];
+        [scanner scanUpToString:@"</p>" intoString:&description];
+        temp_showname = [temp_showname stringByConvertingHTMLToPlainText];
+        description = [description stringByConvertingHTMLToPlainText];
+    }
+    else
+    {
+        NSLog(@"WARNING: Programme data request failed. Tagging will be incomplete.");
+        [self addToLog:[NSString stringWithFormat:@"WARNING: Programme data request failed. Tagging will be incomplete."] noTag:YES];
+        NSLog(@"DEBUG: Programme data response error: %@", [[request error] localizedDescription]);
+        if (verbose)
+            [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme data response error: %@", [[request error] localizedDescription]] noTag:YES];
+        
+    }
+    //Init date formatter
+    NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
+    [dateFormat setLocale:[[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"]];
+    //Fix Showname
+    epname = [show episodeName];
+    if (!epname || [epname isEqualToString:@"(No Episode Name)"])
+    {
+        //Air date as backup
+        [dateFormat setDateFormat:@"dd/MM/yyyy"];
+        epname = [dateFormat stringFromDate:[show dateAired]];
+    }
+    if (!temp_showname)
+        temp_showname = [show seriesName];
+    showname = [NSString stringWithFormat:@"%@ - %@", temp_showname, epname];
+    // add episode identifier if episode name contains only date
+    [dateFormat setDateFormat:@"dd/MM/yyyy"];
+    if ([dateFormat dateFromString:epname])
+    {
+        if ([show episode] != 0)
+            epnum = [NSString stringWithFormat:@"Episode %ld", [show episode]];
+        else
+            epnum = [NSString stringWithFormat:@"%@", [show realPID]];
+        showname = [NSString stringWithFormat:@"%@ - %@", showname, epnum];
+    }
+    if (!description)
+        description = @"(No Description)";
+    [show setShowName:showname];
+    [show setDesc:description];
+    NSLog(@"DEBUG: Programme data processed: showname=%@ temp_showname=%@ epname=%@ epnum=%@ description=%@", showname, temp_showname, epname, epnum, description);
+    if (verbose)
+        [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme data processed: showname=%@ temp_showname=%@ epname=%@ epnum=%@ description=%@",
+                        showname, temp_showname, epname, epnum, description] noTag:YES];
+
+    NSLog(@"INFO: Program data processed.");
+    [self addToLog:@"INFO: Program data processed." noTag:YES];
+    
+    //Create Download Path
+    [self createDownloadPath];
+    
+    NSString *swfplayer = [[NSUserDefaults standardUserDefaults] valueForKey:[NSString stringWithFormat:@"%@SWFURL", defaultsPrefix]];
+    if (!swfplayer) {
+        swfplayer = @"http://www.itv.com/mediaplayer/ITVMediaPlayer.swf?v=11.20.654";
+    }
+
+    NSArray *args = [NSMutableArray arrayWithObjects:
+                    [NSString stringWithFormat:@"-r%@",[downloadParams objectForKey:@"authURL"]],
+                    [NSString stringWithFormat:@"-W%@",swfplayer],
+                    [NSString stringWithFormat:@"-y%@",[downloadParams objectForKey:@"playPath"]],
+                    [NSString stringWithFormat:@"-o%@",downloadPath],
+                    nil];
+    NSLog(@"DEBUG: RTMPDump args: %@",args);
+    if (verbose)
+        [self addToLog:[NSString stringWithFormat:@"DEBUG: RTMPDump args: %@", args] noTag:YES];
     [self launchRTMPDumpWithArgs:args];
 }
 @end
