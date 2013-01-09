@@ -11,8 +11,8 @@
 @interface FourODDownload : Download
 {
     BOOL resolveHostNamesForProxy;
+    BOOL skipMP4Search;
+    NSInteger mp4SearchRange;
 }
 - (id)initWithProgramme:(Programme *)tempShow;
-- (NSString *)decodeToken:(NSString *)string;
--(void)dataRequestFinished:(ASIHTTPRequest *)request;
 @end

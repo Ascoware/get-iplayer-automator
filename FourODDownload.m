@@ -32,13 +32,17 @@
     [self setPercentage:102];
     [tempShow setValue:@"Initialising..." forKey:@"status"];
     
-    [self addToLog:[NSString stringWithFormat:@"Downloading %@",[show showName]] noTag:NO];
+    [self addToLog:[NSString stringWithFormat:@"Downloading %@",[show showName]]];
     [self addToLog:@"INFO: Preparing Request for Auth Info" noTag:YES];
 
     resolveHostNamesForProxy = [[NSUserDefaults standardUserDefaults] boolForKey:[NSString stringWithFormat:@"%@ResolveHostNamesForProxy", defaultsPrefix]];
     
-    [self launchMetaRequest];
+    skipMP4Search = [[NSUserDefaults standardUserDefaults] boolForKey:[NSString stringWithFormat:@"%@SkipMP4Search", defaultsPrefix]];
+    mp4SearchRange = [[NSUserDefaults standardUserDefaults] integerForKey:[NSString stringWithFormat:@"%@MP4SearchRange", defaultsPrefix]];
+    if (!mp4SearchRange)
+        mp4SearchRange = 10;
     
+    [self launchMetaRequest];
     return self;
 }
 
@@ -52,10 +56,10 @@
     [scanner scanString:@"#" intoString:nil];
     NSString *pid = nil;
     [scanner scanUpToString:@"lklk" intoString:&pid];
-
     if (!pid)
     {
-        [self addToLog:[NSString stringWithFormat:@"ERROR: GiA cannot interpret the 4oD URL: %@", [show url]]];
+        NSLog(@"ERROR: GiA cannot interpret the 4oD URL: %@", [show url]);
+        [self addToLog:[NSString stringWithFormat:@"ERROR: GiA cannot interpret the 4oD URL: %@", [show url]] noTag:YES];
         [show setReasonForFailure:@"MetadataProcessing"];
         [show setComplete:[NSNumber numberWithBool:YES]];
         [show setSuccessful:[NSNumber numberWithBool:NO]];
@@ -63,126 +67,7 @@
         [nc postNotificationName:@"DownloadFinished" object:show];
         return;
     }
-    
     [show setRealPID:pid];
-    NSURL *requestURL = [NSURL URLWithString:[NSString stringWithFormat:@"http://www.channel4.com/programmes/asset/%@",[show realPID]]];
-    ASIHTTPRequest *dataRequest = [ASIHTTPRequest requestWithURL:requestURL];
-    [dataRequest setDidFinishSelector:@selector(dataRequestFinished:)];
-    [dataRequest setTimeOutSeconds:10];
-    [dataRequest setNumberOfTimesToRetryOnTimeout:3];
-    [dataRequest setDelegate:self];
-    [dataRequest startAsynchronous];
-}
-
--(void)dataRequestFinished:(ASIHTTPRequest *)request
-{
-    if (!running)
-        return;
-    NSLog(@"Response Status Code: %ld",(long)[request responseStatusCode]);
-    if ([request responseStatusCode] == 200)
-    {
-        NSString *responseString = [[NSString alloc] initWithData:[request responseData] encoding:NSUTF8StringEncoding];
-        if (verbose)
-            [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme Data Response: %@", responseString] noTag:YES];
-        
-        NSScanner *scanner = [NSScanner scannerWithString:responseString];
-        
-        NSString *episodeTitle = nil;
-        [scanner scanUpToString:@"<episodeTitle>" intoString:nil];
-        [scanner scanString:@"<episodeTitle>" intoString:nil];
-        [scanner scanUpToString:@"</" intoString:&episodeTitle];
-        episodeTitle = [episodeTitle stringByDecodingHTMLEntities];
-        [show setEpisodeName:episodeTitle];
-
-        NSString *seriesTitle = nil;
-        [scanner scanUpToString:@"<brandTitle>" intoString:nil];
-        [scanner scanString:@"<brandTitle>" intoString:nil];
-        [scanner scanUpToString:@"</" intoString:&seriesTitle];
-        seriesTitle = [seriesTitle stringByDecodingHTMLEntities];
-        [show setSeriesName:seriesTitle];
-
-        NSInteger episodeNumber = 0;
-        [scanner scanUpToString:@"<episodeNumber>" intoString:nil];
-        [scanner scanString:@"<episodeNumber>" intoString:nil];
-        [scanner scanInteger:&episodeNumber];
-        [show setEpisode:episodeNumber];
-        
-        NSInteger seriesNumber = 0;
-        [scanner scanUpToString:@"<seriesNumber>" intoString:nil];
-        [scanner scanString:@"<seriesNumber>" intoString:nil];
-        [scanner scanInteger:&seriesNumber];
-        [show setSeason:seriesNumber];
-
-        NSString *imagePath = nil;
-        [scanner scanUpToString:@"<imagePath>" intoString:nil];
-        [scanner scanString:@"<imagePath>" intoString:nil];
-        [scanner scanUpToString:@"</" intoString:&imagePath];
-        if (imagePath)
-            thumbnailURL = [NSString stringWithFormat:@"http://www.channel4.com%@",imagePath];
-        
-        NSString *episodeGuideUrl = nil;
-        [scanner scanUpToString:@"<episodeGuideUrl>" intoString:nil];
-        [scanner scanString:@"<episodeGuideUrl>" intoString:nil];
-        [scanner scanUpToString:@"</" intoString:&episodeGuideUrl];
-
-        if (!(episodeTitle && seriesTitle && episodeNumber && seriesNumber && imagePath && episodeGuideUrl))
-            [self addToLog:[NSString stringWithFormat:@"INFO: Some programme data not found. Tagging will be incomplete."] noTag:YES];
-        
-        if (verbose)
-            [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme Data Processed: episodeTitle=%@ seriesTitle=%@ episodeNumber=%ld seriesNumber=%ld imagePath=%@ episodeGuideUrl=%@", episodeTitle, seriesTitle, episodeNumber, seriesNumber, imagePath, episodeGuideUrl]];        
-        
-        if (episodeGuideUrl)
-        {
-            NSURL *requestURL = [NSURL URLWithString:[NSString stringWithFormat:@"http://www.channel4.com%@",episodeGuideUrl]];
-            ASIHTTPRequest *descRequest = [ASIHTTPRequest requestWithURL:requestURL];
-            [descRequest setDidFinishSelector:@selector(descRequestFinished:)];
-            [descRequest setTimeOutSeconds:10];
-            [descRequest setNumberOfTimesToRetryOnTimeout:3];
-            [descRequest setDelegate:self];
-            [descRequest startAsynchronous];
-        }
-        else
-        {
-            [self doMetaHostLookup];
-        }
-    }
-    else
-    {
-       [self addToLog:[NSString stringWithFormat:@"WARNING: Programme data request failed. Tagging will be incomplete."] noTag:YES];
-       [self doMetaHostLookup];
-    }
-}
-
--(void)descRequestFinished:(ASIHTTPRequest *)request
-{
-    if (!running)
-        return;
-    NSLog(@"Response Status Code: %ld",(long)[request responseStatusCode]);
-    if ([request responseStatusCode] == 200)
-    {
-        NSString *responseString = [[NSString alloc] initWithData:[request responseData] encoding:NSUTF8StringEncoding];
-        if (verbose)
-            [self addToLog:[NSString stringWithFormat:@"DEBUG: Description Data Response: %@", responseString] noTag:YES];
-
-        NSScanner *scanner = [NSScanner scannerWithString:responseString];
-
-        NSString *synopsis = nil;
-        [scanner scanUpToString:@"<meta name=\"synopsis\" content=\"" intoString:nil];
-        [scanner scanString:@"<meta name=\"synopsis\" content=\"" intoString:nil];
-        [scanner scanUpToString:@"\"/>" intoString:&synopsis];
-        synopsis = [synopsis stringByConvertingHTMLToPlainText];
-        [show setDesc:synopsis];
-
-        if (!synopsis)
-            [self addToLog:[NSString stringWithFormat:@"INFO: Programme description not found. Tagging may be incomplete."] noTag:YES];
-        
-        if (verbose)
-            [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme Data Processed: synopsis=%@", synopsis]];
-    }
-    else
-    {
-        [self addToLog:[NSString stringWithFormat:@"WARNING: Programme description request failed. Tagging will be incomplete."] noTag:YES];
-    }
     [self doMetaHostLookup];
 }
 
@@ -204,10 +89,12 @@
     if (!hostAddr)
         hostAddr = @"ais.channel4.com";
     NSURL *requestURL = [NSURL URLWithString:[NSString stringWithFormat:@"http://%@/asset/%@",hostAddr,[show realPID]]];
-    NSLog(@"Metadata URL: %@",requestURL);
-    [self addToLog:[NSString stringWithFormat:@"INFO: Metadata URL: %@", requestURL] noTag:YES];
+    NSLog(@"DEBUG: Metadata URL: %@",requestURL);
+    if (verbose)
+        [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata URL: %@", requestURL] noTag:YES];
 
     ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:requestURL];
+    [request setDidFailSelector:@selector(metaRequestFinished:)];
     [request setDidFinishSelector:@selector(metaRequestFinished:)];
     [request setTimeOutSeconds:10];
     [request setNumberOfTimesToRetryOnTimeout:3];
@@ -266,6 +153,8 @@
 	}
     
     [request setProxyType:@"HTTP"];
+    [request addRequestHeader:@"Accept" value:@"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"];
+    NSLog(@"INFO: Requesting Metadata.");
     [self addToLog:@"INFO: Requesting Metadata." noTag:YES];
     [request startAsynchronous];
 }
@@ -274,19 +163,21 @@
 {
     if (!running)
         return;
-    BOOL skipSearch = [[NSUserDefaults standardUserDefaults] boolForKey:[NSString stringWithFormat:@"%@SkipMP4Search", defaultsPrefix]];
-    NSInteger searchRange = [[NSUserDefaults standardUserDefaults] integerForKey:[NSString stringWithFormat:@"%@MP4SearchRange", defaultsPrefix]];
-    if (!searchRange)
-        searchRange = 10;
     NSInteger realPID = [[show realPID] integerValue];
-    NSInteger minPID = realPID - searchRange;
-    NSInteger maxPID = realPID + searchRange;
+    NSInteger minPID = realPID - mp4SearchRange;
+    NSInteger maxPID = realPID + mp4SearchRange;
     NSInteger currentPID = [request tag];
-    NSString *mp4UriData = [[request userInfo] valueForKey:@"mp4UriData"];
-    NSLog(@"Response Status Code: %ld",(long)[request responseStatusCode]);
+    NSLog(@"DEBUG: Metadata response status code: %d", [request responseStatusCode]);
+    if (verbose)
+        [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata response status code: %d", [request responseStatusCode]] noTag:YES];
+    NSString *responseString = [[NSString alloc] initWithData:[request responseData] encoding:NSUTF8StringEncoding];
+    NSLog(@"DEBUG: Metadata response: %@",responseString);
+    if (verbose)
+        [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata response: %@", responseString] noTag:YES];
     if ([request responseStatusCode] == 0)
     {
-        [self addToLog:@"ERROR: No response received. Probably a proxy issue." noTag:YES];
+        NSLog(@"ERROR: No response received. Probably a proxy issue.");
+        [self addToLog:@"ERROR: No response received. Probably a proxy issue."];
         [show setSuccessful:[NSNumber numberWithBool:NO]];
         [show setComplete:[NSNumber numberWithBool:YES]];
         if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"] isEqualTo:@"Provided"])
@@ -297,7 +188,7 @@
             [show setReasonForFailure:@"Internet_Connection"];
         [show setValue:@"Failed: Bad Proxy" forKey:@"status"];
         [nc postNotificationName:@"DownloadFinished" object:show];
-        [self addToLog:@"Download Failed" noTag:NO];
+        [self addToLog:@"Download Failed"];
         return;
     }
     else if ([request responseStatusCode] != 200)
@@ -311,39 +202,10 @@
                 [self retryMetaRequest:request pid:++currentPID];
                 return;
             }
-            else
-            {
-                [self addToLog:@"GiA does not support downloading this show."];
-                [self addToLog:@"    HTTP Dynamic Streaming Detected"];
-                [show setReasonForFailure:@"4oDHTTP"];
-                [show setComplete:[NSNumber numberWithBool:YES]];
-                [show setSuccessful:[NSNumber numberWithBool:NO]];
-                [show setValue:@"Download Failed" forKey:@"status"];
-                [nc postNotificationName:@"DownloadFinished" object:show];
-                return;
-            }
-        }
-        else
-        {
-            [self addToLog:@"ERROR: Could not retrieve program metadata." noTag:YES];
-            [show setSuccessful:[NSNumber numberWithBool:NO]];
-            [show setComplete:[NSNumber numberWithBool:YES]];
-            [show setValue:@"Download Failed" forKey:@"status"];
-            [nc postNotificationName:@"DownloadFinished" object:show];
-            [self addToLog:@"Download Failed" noTag:NO];
-            return;
         }
     }
     
-
-    NSString *responseString = [[NSString alloc] initWithData:[request responseData] encoding:NSUTF8StringEncoding];
-    
-    NSLog(@"%@",responseString);
-    
-    if (verbose)
-        [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata Response: %@", responseString] noTag:YES];
-    
-    NSScanner *scanner = [NSScanner scannerWithString:responseString];
+    NSScanner *scanner = [NSScanner scannerWithString:[responseString stringByDecodingHTMLEntities]];
     
     NSString *programmeNumber = nil;
     [scanner scanUpToString:@"<programmeNumber>" intoString:nil];
@@ -366,15 +228,16 @@
     NSString *streamUri = nil;
     [scanner scanUpToString:@"</" intoString:&streamUri];
 
+    NSLog(@"DEBUG: Metadata processed: programmeNumber=%@ brandTitle=%@ uriData=%@ streamUri=%@", programmeNumber, brandTitle, uriData, streamUri);
     if (verbose)
-        [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata Processed: programmeNumber=%@ brandTitle=%@ uriData=%@ streamUri=%@", programmeNumber, brandTitle, uriData, streamUri]];
+        [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata processed: programmeNumber=%@ brandTitle=%@ uriData=%@ streamUri=%@", programmeNumber, brandTitle, uriData, streamUri] noTag:YES];
 
     if ([streamUri hasSuffix:@".f4m"])
     {
-        if (skipSearch)
+        if (skipMP4Search)
         {
-            [self addToLog:@"GiA does not support downloading this show."];
-            [self addToLog:@"    HTTP Dynamic Streaming Detected"];
+            NSLog(@"GiA does not support downloading this show. HTTP Dynamic Streaming Detected.");
+            [self addToLog:@"GiA does not support downloading this show. HTTP Dynamic Streaming Detected."];
             [show setReasonForFailure:@"4oDHTTP"];
             [show setComplete:[NSNumber numberWithBool:YES]];
             [show setSuccessful:[NSNumber numberWithBool:NO]];
@@ -384,7 +247,9 @@
         }
         if (currentPID == 0)
         {
-            [self retryMetaRequest:request pid:minPID brandTitle:brandTitle programmeNumber:programmeNumber];
+            [downloadParams setObject:brandTitle forKey:@"brandTitle"];
+            [downloadParams setObject:programmeNumber forKey:@"programmeNumber"];
+            [self retryMetaRequest:request pid:minPID];
             return;
         }
         else if (currentPID < maxPID)
@@ -399,17 +264,19 @@
     {
         if (currentPID != 0)
         {
-            if ([brandTitle isEqualToString:[[request userInfo] valueForKey:@"brandTitle"]] && [programmeNumber isEqualToString:[[request userInfo] valueForKey:@"programmeNumber"]])
+            if ([brandTitle isEqualToString:[downloadParams objectForKey:@"brandTitle"]] && [programmeNumber isEqualToString:[downloadParams objectForKey:@"programmeNumber"]])
             {
-                [self addToLog:[NSString stringWithFormat:@"INFO: MP4 Stream Found: %@", streamUri] noTag:YES];
-                mp4UriData = uriData;
+                NSLog(@"DEBUG: MP4 Stream Found: %@", streamUri);
+                if (verbose)
+                    [self addToLog:[NSString stringWithFormat:@"DEBUG: MP4 Stream Found: %@", streamUri] noTag:YES];
+                [downloadParams setObject:uriData forKey:@"mp4UriData"];
                 if ([streamUri rangeOfString:@"PS3" options:NSCaseInsensitiveSearch].location == NSNotFound)
                 {
                     if (currentPID < maxPID)
                     {
                         if (realPID - currentPID == 1)
                             ++currentPID;
-                        [self retryMetaRequest:request pid:++currentPID brandTitle:brandTitle programmeNumber:programmeNumber mp4UriData:mp4UriData];
+                        [self retryMetaRequest:request pid:++currentPID];
                         return;
                     }
                 }
@@ -424,7 +291,7 @@
         }
         else
         {
-            mp4UriData = uriData;
+            [downloadParams setObject:uriData forKey:@"mp4UriData"];
         }
     }
     else if (currentPID != 0)
@@ -438,17 +305,18 @@
         }
     }
     
-    if (!mp4UriData)
+    if (![downloadParams objectForKey:@"mp4UriData"])
     {
-        [self addToLog:@"GiA does not support downloading this show."];
         if (currentPID != 0)
         {
-            [self addToLog:@"    HTTP Dynamic Streaming Detected"];
+            NSLog(@"ERROR: GiA does not support downloading this show. HTTP Dynamic Streaming Detected.");
+            [self addToLog:@"ERROR: GiA does not support downloading this show. HTTP Dynamic Streaming Detected."];
             [show setReasonForFailure:@"4oDHTTP"];
         }
         else
         {
-            [self addToLog:@"    Did not find suitable download format"];
+            NSLog(@"ERROR: GiA does not support downloading this show. Did not find suitable download format.");
+            [self addToLog:@"ERROR: GiA does not support downloading this show. Did not find suitable download format."];
             [show setReasonForFailure:@"4oDFormat"];
         }
         [show setComplete:[NSNumber numberWithBool:YES]];
@@ -458,7 +326,7 @@
         return;
     }
     
-    uriData = mp4UriData;
+    uriData = [downloadParams objectForKey:@"mp4UriData"];
     scanner = [NSScanner scannerWithString:uriData];
     [scanner scanUpToString:@"<streamUri>" intoString:nil];
     [scanner scanString:@"<streamUri>" intoString:nil];
@@ -474,15 +342,15 @@
     [scanner scanUpToString:@"</" intoString:&cdn];
     
     NSString *decodedToken = [self decodeToken:token];
-    NSLog(@"%@",decodedToken);
+    NSLog(@"DEBUG: Metadata processed: uriData=%@ streamUri=%@ token=%@ cdn=%@ decodedToken=%@", uriData, streamUri, token, cdn, decodedToken);
     if (verbose)
-        [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata Processed: uriData=%@ streamUri=%@ token=%@ cdn=%@ decodedToken=%@", uriData, streamUri, token, cdn, decodedToken]];
+        [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata processed: uriData=%@ streamUri=%@ token=%@ cdn=%@ decodedToken=%@", uriData, streamUri, token, cdn, decodedToken] noTag:YES];
     
     NSString *auth = nil, *rtmpURL = nil, *app = nil, *playpath = nil;
     @try
     {
         if (!(uriData && streamUri && token && cdn && decodedToken))
-            [NSException raise:@"Parsing Error." format:@"Could not process 4oD Metadata"];
+            [NSException raise:@"Parsing Error" format:@"Could not process 4oD Metadata"];
 
         if ([cdn isEqualToString:@"ll"])
         {
@@ -493,15 +361,16 @@
                 [scanner scanUpToString:@"<e>" intoString:nil];
                 [scanner scanString:@"<e>" intoString:nil];
                 [scanner scanUpToString:@"</e>" intoString:&e];
+                NSLog(@"DEBUG: Metadata Processed: e=%@", e);
                 if (verbose)
-                    [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata Processed: e=%@", e]];
+                    [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata Processed: e=%@", e] noTag:YES];
                 if (e)
                     auth = [NSString stringWithFormat:@"e=%@&h=%@",e,decodedToken];
                 else
-                    [NSException raise:@"Parsing Error." format:@"Could not process 4oD Metadata"];
+                    [NSException raise:@"Parsing Error" format:@"Could not process 4oD Metadata"];
                 rtmpURL = [[streamUri componentsSeparatedByString:@"mp4:"] objectAtIndex:0];
                 if ([rtmpURL hasPrefix:@"http"])
-                    [NSException raise:@"4oD: Unsupported HTTP Download." format:@"GiA does not support this programme."];
+                    [NSException raise:@"4oD: Unsupported HTTP Download" format:@"GiA does not support this programme."];
                 rtmpURL = [rtmpURL stringByReplacingOccurrencesOfString:@".com/" withString:@".com:1935/"];
                 scanner = [NSScanner scannerWithString:streamUri];
                 [scanner scanUpToString:@".com/" intoString:nil];
@@ -526,15 +395,16 @@
                 [scanner scanString:@"<et>" intoString:nil];
                 [scanner scanUpToString:@"</et>" intoString:&et];
                 mp = [[streamUri componentsSeparatedByString:@"mp4:"] objectAtIndex:1];
+                NSLog(@"DEBUG: Metadata Processed: av=%@ te=%@ st=%@ et=%@ mp=%@", av, te, st, et, mp);
                 if (verbose)
-                    [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata Processed: av=%@ te=%@ st=%@ et=%@ mp=%@", av, te, st, et, mp]];
+                    [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata Processed: av=%@ te=%@ st=%@ et=%@ mp=%@", av, te, st, et, mp] noTag:YES];
                 if (av && te && st && et && mp)
-                    auth = [NSString stringWithFormat:@"as=adobe-hmac-sha256&av=%@&te=%@&st=%@&et=%@&mp=%@&fmta-token=%@",av,te,st,et,mp,decodedToken];
+                    auth = [NSString stringWithFormat:@"as=adobe-hmac-sha256&av=%@&te=%@&st=%@&et=%@&mp=%@&fmta-token=%@", av, te, st, et, mp, decodedToken];
                 else
-                    [NSException raise:@"Parsing Error." format:@"Could not process 4oD Metadata"];
+                    [NSException raise:@"Parsing Error" format:@"Could not process 4oD Metadata"];
                 rtmpURL = [[streamUri componentsSeparatedByString:@"mp4:"] objectAtIndex:0];
                 if ([rtmpURL hasPrefix:@"http"])
-                    [NSException raise:@"4oD: Unsupported HTTP Download." format:@"GiA does not support this programme."];
+                    [NSException raise:@"4oD: Unsupported HTTP Download" format:@"GiA does not support this programme."];
                 rtmpURL = [rtmpURL stringByReplacingOccurrencesOfString:@".com/" withString:@".com:1935/"];
                 rtmpURL = [rtmpURL stringByAppendingFormat:@"?%@",auth];
                 scanner = [NSScanner scannerWithString:streamUri];
@@ -546,7 +416,7 @@
             }
             else
             {
-                [NSException raise:@"Parsing Error." format:@"Could not process 4oD Metadata"];
+                [NSException raise:@"Parsing Error" format:@"Could not process 4oD Metadata"];
             }
         }
         else if ([cdn isEqualToString:@"ak"])
@@ -560,15 +430,16 @@
             [scanner scanUpToString:@"<slist>" intoString:nil];
             [scanner scanString:@"<slist>" intoString:nil];
             [scanner scanUpToString:@"</slist>" intoString:&slist];
+            NSLog(@"DEBUG: Metadata Processed: fingerprint=%@ slist=%@", fingerprint, slist);
             if (verbose)
-                [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata Processed: fingerprint=%@ slist=%@", fingerprint, slist]];
+                [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata Processed: fingerprint=%@ slist=%@", fingerprint, slist] noTag:YES];
             if (fingerprint && slist)
                 auth = [NSString stringWithFormat:@"auth=%@&aifp=%@&slist=%@",decodedToken,fingerprint,slist];
             else
-                [NSException raise:@"Parsing Error." format:@"Could not process 4oD Metadata"];
+                [NSException raise:@"Parsing Error" format:@"Could not process 4oD Metadata"];
             rtmpURL = [[streamUri componentsSeparatedByString:@"mp4:"] objectAtIndex:0];
             if ([rtmpURL hasPrefix:@"http"])
-                [NSException raise:@"4oD: Unsupported HTTP Download." format:@"GiA does not support this programme."];
+                [NSException raise:@"4oD: Unsupported HTTP Download" format:@"GiA does not support this programme."];
             rtmpURL = [rtmpURL stringByReplacingOccurrencesOfString:@".com/" withString:@".com:1935/"];
             rtmpURL = [rtmpURL stringByAppendingFormat:@"?%@",auth];
             scanner = [NSScanner scannerWithString:streamUri];
@@ -580,17 +451,17 @@
         }
         else
         {
-            [NSException raise:@"Parsing Error." format:@"Could not process 4oD Metadata"];
+            [NSException raise:@"Parsing Error" format:@"Could not process 4oD Metadata"];
         }
     }
     @catch (NSException *exception)
     {
-        [self addToLog:[exception name]];
-        [self addToLog:[exception description]];
+        NSLog(@"ERROR: %@: %@", [exception name], [exception description]);
+        [self addToLog:[NSString stringWithFormat:@"ERROR: %@: %@", [exception name], [exception description]]];
         [show setComplete:[NSNumber numberWithBool:YES]];
         [show setSuccessful:[NSNumber numberWithBool:NO]];
         [show setValue:@"Download Failed" forKey:@"status"];
-        if ([[exception name] isEqualToString:@"4oD: Unsupported HTTP Download."])
+        if ([[exception name] isEqualToString:@"4oD: Unsupported HTTP Download"])
             [show setReasonForFailure:@"4oDHTTP"];
         else
             [show setReasonForFailure:@"MetadataProcessing"];
@@ -598,55 +469,203 @@
         return;
     }
     
+    [downloadParams setObject:rtmpURL forKey:@"rtmpURL"];
+    [downloadParams setObject:app forKey:@"app"];
+    [downloadParams setObject:playpath forKey:@"playpath"];
     
-    NSString *swfplayer = [[NSUserDefaults standardUserDefaults] valueForKey:[NSString stringWithFormat:@"%@SWFURL", defaultsPrefix]];
-    if (!swfplayer) {
-        swfplayer = @"http://www.channel4.com/static/programmes/asset/flash/swf/4odplayer-11.34.1.swf";
-    }
-
-    [self createDownloadPath];
+    NSLog(@"INFO: Metadata processed.");
+    [self addToLog:@"INFO: Metadata processed." noTag:YES];
     
-    NSArray *args = [NSArray arrayWithObjects:@"--rtmp",rtmpURL,
-                     @"--app",app,
-                     @"--flashVer",@"\"WIN 11,5,502,110\"",
-                     @"--swfVfy",swfplayer,
-                     @"--pageUrl",[show url],
-                     @"--playpath",playpath,
-                     @"--flv",downloadPath,
-                     @"--conn",@"O:1",
-                     @"--conn",@"O:0",
-                     nil];
-    [self launchRTMPDumpWithArgs:args];
-    
-}
-
--(void)retryMetaRequest:(ASIHTTPRequest *)request pid:(NSInteger)pid pidInfo:(NSDictionary *)pidInfo
-{
-    NSURL *retryURL = [[[request url] URLByDeletingLastPathComponent] URLByAppendingPathComponent:[NSString stringWithFormat:@"%ld", pid]];
-    [self addToLog:[NSString stringWithFormat:@"INFO: Retry Metadata URL: %@", retryURL] noTag:YES];
-    ASIHTTPRequest *retryRequest = [[request copy] autorelease];
-    [retryRequest setURL:retryURL];
-    [retryRequest setTag:pid];
-    if (pidInfo)
-        [retryRequest setUserInfo:pidInfo];
-    [retryRequest startAsynchronous];
+    NSURL *dataURL = [NSURL URLWithString:[NSString stringWithFormat:@"http://www.channel4.com/programmes/asset/%@",[show realPID]]];
+    NSLog(@"DEBUG: Programme data URL: %@",dataURL);
+    if (verbose)
+        [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme data URL: %@", dataURL] noTag:YES];
+    ASIHTTPRequest *dataRequest = [ASIHTTPRequest requestWithURL:dataURL];
+    [dataRequest setDidFailSelector:@selector(dataRequestFinished:)];
+    [dataRequest setDidFinishSelector:@selector(dataRequestFinished:)];
+    [dataRequest setTimeOutSeconds:10];
+    [dataRequest setNumberOfTimesToRetryOnTimeout:3];
+    [dataRequest setDelegate:self];
+    [dataRequest addRequestHeader:@"Accept" value:@"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"];
+    NSLog(@"INFO: Requesting programme data.");
+    [self addToLog:@"INFO: Requesting programme data." noTag:YES];
+    [dataRequest startAsynchronous];
+  
 }
 
 -(void)retryMetaRequest:(ASIHTTPRequest *)request pid:(NSInteger)pid
 {
-    [self retryMetaRequest:request pid:pid pidInfo:nil];
+    NSURL *retryURL = [[[request url] URLByDeletingLastPathComponent] URLByAppendingPathComponent:[NSString stringWithFormat:@"%ld", pid]];
+    NSLog(@"DEBUG: Retry metadata URL: %@", retryURL);
+    if (verbose)
+        [self addToLog:[NSString stringWithFormat:@"DEBUG: Retry metadata URL: %@", retryURL] noTag:YES];
+    ASIHTTPRequest *retryRequest = [request copy];
+    [retryRequest setURL:retryURL];
+    [retryRequest setTag:pid];
+    NSLog(@"INFO: Retry metadata: %ld", pid);
+    [self addToLog:[NSString stringWithFormat:@"INFO: Retry metadata: %ld", pid] noTag:YES];
+    [retryRequest startAsynchronous];
 }
 
--(void)retryMetaRequest:(ASIHTTPRequest *)request pid:(NSInteger)pid brandTitle:(NSString *)brandTitle programmeNumber:(NSString *)programmeNumber
+-(void)dataRequestFinished:(ASIHTTPRequest *)request
 {
-    NSDictionary *pidInfo = [NSDictionary dictionaryWithObjectsAndKeys: brandTitle, @"brandTitle", programmeNumber, @"programmeNumber", nil];
-    [self retryMetaRequest:request pid:pid pidInfo:pidInfo];
+    if (!running)
+        return;
+    NSLog(@"DEBUG: Programme data response status code: %d", [request responseStatusCode]);
+    if (verbose)
+        [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme data response code: %d", [request responseStatusCode]] noTag:YES];
+    NSString *responseString = [[NSString alloc] initWithData:[request responseData] encoding:NSUTF8StringEncoding];
+    NSLog(@"DEBUG: Programme data response: %@", responseString);
+    if (verbose)
+        [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme data response: %@", responseString] noTag:YES];
+    if ([request responseStatusCode] == 200 && [responseString length] > 0)
+    {
+        NSScanner *scanner = [NSScanner scannerWithString:[responseString stringByDecodingHTMLEntities]];
+        
+        NSString *episodeTitle = nil;
+        [scanner scanUpToString:@"<episodeTitle>" intoString:nil];
+        [scanner scanString:@"<episodeTitle>" intoString:nil];
+        [scanner scanUpToString:@"</" intoString:&episodeTitle];
+        [show setEpisodeName:episodeTitle];
+        
+        NSString *seriesTitle = nil;
+        [scanner scanUpToString:@"<brandTitle>" intoString:nil];
+        [scanner scanString:@"<brandTitle>" intoString:nil];
+        [scanner scanUpToString:@"</" intoString:&seriesTitle];
+        [show setSeriesName:seriesTitle];
+        
+        NSInteger episodeNumber = 0;
+        [scanner scanUpToString:@"<episodeNumber>" intoString:nil];
+        [scanner scanString:@"<episodeNumber>" intoString:nil];
+        [scanner scanInteger:&episodeNumber];
+        [show setEpisode:episodeNumber];
+        
+        NSInteger seriesNumber = 0;
+        [scanner scanUpToString:@"<seriesNumber>" intoString:nil];
+        [scanner scanString:@"<seriesNumber>" intoString:nil];
+        [scanner scanInteger:&seriesNumber];
+        [show setSeason:seriesNumber];
+        
+        NSString *imagePath = nil;
+        [scanner scanUpToString:@"<imagePath>" intoString:nil];
+        [scanner scanString:@"<imagePath>" intoString:nil];
+        [scanner scanUpToString:@"</" intoString:&imagePath];
+        if (imagePath)
+            thumbnailURL = [NSString stringWithFormat:@"http://www.channel4.com%@",imagePath];
+        
+        NSString *episodeGuideUrl = nil;
+        [scanner scanUpToString:@"<episodeGuideUrl>" intoString:nil];
+        [scanner scanString:@"<episodeGuideUrl>" intoString:nil];
+        [scanner scanUpToString:@"</" intoString:&episodeGuideUrl];
+        
+        if (!(episodeTitle && seriesTitle && episodeNumber && seriesNumber && imagePath && episodeGuideUrl))
+        {
+            NSLog(@"WARNING: Some programme data not found. Tagging will be incomplete.");
+            [self addToLog:[NSString stringWithFormat:@"WARNING: Some programme data not found. Tagging will be incomplete."] noTag:YES];
+        }
+        NSLog(@"DEBUG: Programme data processed: episodeTitle=%@ seriesTitle=%@ episodeNumber=%ld seriesNumber=%ld imagePath=%@ episodeGuideUrl=%@", episodeTitle, seriesTitle, episodeNumber, seriesNumber, imagePath, episodeGuideUrl);
+        if (verbose)
+            [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme data processed: episodeTitle=%@ seriesTitle=%@ episodeNumber=%ld seriesNumber=%ld imagePath=%@ episodeGuideUrl=%@", episodeTitle, seriesTitle, episodeNumber, seriesNumber, imagePath, episodeGuideUrl] noTag:YES];
+
+        NSLog(@"INFO: Programme data processed.");
+        [self addToLog:@"INFO: Programme data processed." noTag:YES];
+
+        if (episodeGuideUrl)
+        {
+            NSURL *descURL = [NSURL URLWithString:[NSString stringWithFormat:@"http://%@%@", [[request url] host], episodeGuideUrl]];
+            NSLog(@"DEBUG: Programme description URL: %@",descURL);
+            if (verbose)
+                [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme description URL: %@", descURL] noTag:YES];
+            ASIHTTPRequest *descRequest = [ASIHTTPRequest requestWithURL:descURL];
+            [descRequest setDidFailSelector:@selector(descRequestFinished:)];
+            [descRequest setDidFinishSelector:@selector(descRequestFinished:)];
+            [descRequest setTimeOutSeconds:10];
+            [descRequest setNumberOfTimesToRetryOnTimeout:3];
+            [descRequest setDelegate:self];
+            [descRequest addRequestHeader:@"Accept" value:@"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"];
+            NSLog(@"INFO: Requesting programme description.");
+            [self addToLog:@"INFO: Requesting programme description." noTag:YES];
+            [descRequest startAsynchronous];
+            return;
+        }
+    }
+    else
+    {
+        NSLog(@"WARNING: Programme data request failed. Tagging will be incomplete.");
+        [self addToLog:[NSString stringWithFormat:@"WARNING: Programme data request failed. Tagging will be incomplete."] noTag:YES];
+        NSLog(@"DEBUG: Programme data response error: %@", [[request error] localizedDescription]);
+        if (verbose)
+            [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme data response error: %@", [[request error] localizedDescription]] noTag:YES];
+    }
+    [self descRequestFinished:nil];
 }
 
--(void)retryMetaRequest:(ASIHTTPRequest *)request pid:(NSInteger)pid brandTitle:(NSString *)brandTitle programmeNumber:(NSString *)programmeNumber mp4UriData:(NSString *)mp4UriData
+-(void)descRequestFinished:(ASIHTTPRequest *)request
 {
-    NSDictionary *pidInfo = [NSDictionary dictionaryWithObjectsAndKeys: brandTitle, @"brandTitle", programmeNumber, @"programmeNumber", mp4UriData, @"mp4UriData", nil];
-    [self retryMetaRequest:request pid:pid pidInfo:pidInfo];
+    if (!running)
+        return;
+    NSLog(@"DEBUG: Programme description response status code: %d", [request responseStatusCode]);
+    if (verbose)
+        [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme description response status code: %d", [request responseStatusCode]] noTag:YES];
+    NSString *responseString = [[NSString alloc] initWithData:[request responseData] encoding:NSUTF8StringEncoding];
+//    NSLog(@"DEBUG: Programme Description Response: %@", responseString);
+//    if (verbose)
+//        [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme Description Response: %@", responseString] noTag:YES];
+    if ([request responseStatusCode] == 200 && [responseString length] > 0)
+    {
+        
+        NSScanner *scanner = [NSScanner scannerWithString:responseString];
+        
+        NSString *synopsis = nil;
+        [scanner scanUpToString:@"<meta name=\"synopsis\" content=\"" intoString:nil];
+        [scanner scanString:@"<meta name=\"synopsis\" content=\"" intoString:nil];
+        [scanner scanUpToString:@"\"/>" intoString:&synopsis];
+        synopsis = [synopsis stringByConvertingHTMLToPlainText];
+        [show setDesc:synopsis];
+        
+        if (!synopsis)
+        {
+            NSLog(@"WARNING: Programme description not found. Tagging may be incomplete.");
+            [self addToLog:[NSString stringWithFormat:@"WARNING: Programme description not found. Tagging may be incomplete."] noTag:YES];
+        }
+        
+        NSLog(@"DEBUG: Programme description processed: synopsis=%@", synopsis);
+        if (verbose)
+            [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme description processed: synopsis=%@", synopsis] noTag:YES];
+
+        NSLog(@"INFO: Programme description processed.");
+        [self addToLog:@"INFO: Programme description processed." noTag:YES];
+    }
+    else
+    {
+        NSLog(@"WARNING: Programme description request failed. Tagging will be incomplete.");
+        [self addToLog:[NSString stringWithFormat:@"WARNING: Programme description request failed. Tagging will be incomplete."] noTag:YES];
+        NSLog(@"DEBUG: Programme description response error: %@", [[request error] localizedDescription]);
+        if (verbose)
+            [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme description response error: %@", [[request error] localizedDescription]] noTag:YES];
+    }
+
+    [self createDownloadPath];
+
+    NSString *swfplayer = [[NSUserDefaults standardUserDefaults] valueForKey:[NSString stringWithFormat:@"%@SWFURL", defaultsPrefix]];
+    if (!swfplayer) {
+        swfplayer = @"http://www.channel4.com/static/programmes/asset/flash/swf/4odplayer-11.34.1.swf";
+    }
+    
+    NSArray *args = [NSArray arrayWithObjects:@"--rtmp",[downloadParams objectForKey:@"rtmpURL"],
+                     @"--app",[downloadParams objectForKey:@"app"],
+                     @"--flashVer",@"\"WIN 11,5,502,110\"",
+                     @"--swfVfy",swfplayer,
+                     @"--pageUrl",[show url],
+                     @"--playpath",[downloadParams objectForKey:@"playpath"],
+                     @"--flv",downloadPath,
+                     @"--conn",@"O:1",
+                     @"--conn",@"O:0",
+                     nil];
+    NSLog(@"DEBUG: RTMPDump args: %@",args);
+    if (verbose)
+        [self addToLog:[NSString stringWithFormat:@"DEBUG: RTMPDump args: %@", args] noTag:YES];
+    [self launchRTMPDumpWithArgs:args];
 }
 
 - (NSString *)decodeToken:(NSString *)string
