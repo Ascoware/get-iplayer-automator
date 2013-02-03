@@ -329,6 +329,8 @@
                               @"--artwork",[request downloadDestinationPath],
                               @"--comment",[show desc],
                               @"--description",[show desc],
+                              @"--longdesc",[show desc],
+                              @"--lyrics",[show desc],
                               @"--artist",[show tvNetwork],
                               @"--overWrite",
                               nil]];
@@ -344,6 +346,8 @@
                               @"--title",[show showName],
                               @"--comment",[show desc],
                               @"--description",[show desc],
+                              @"--longdesc",[show desc],
+                              @"--lyrics",[show desc],
                               @"--artist",[show tvNetwork],
                               @"--overWrite",
                               nil]];
