@@ -444,10 +444,10 @@
     }
 
     NSArray *args = [NSMutableArray arrayWithObjects:
-                    [NSString stringWithFormat:@"-r%@",[downloadParams objectForKey:@"authURL"]],
-                    [NSString stringWithFormat:@"-W%@",swfplayer],
-                    [NSString stringWithFormat:@"-y%@",[downloadParams objectForKey:@"playPath"]],
-                    [NSString stringWithFormat:@"-o%@",downloadPath],
+                    @"-r",[downloadParams objectForKey:@"authURL"],
+                    @"-W",swfplayer,
+                    @"-y",[downloadParams objectForKey:@"playPath"],
+                    @"-o",downloadPath,
                     nil];
     NSLog(@"DEBUG: RTMPDump args: %@",args);
     if (verbose)
