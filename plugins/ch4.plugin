@@ -340,7 +340,7 @@ sub get_links {
             
 
 			# <div class="episodeDetails"> .... <p> description </p>....<a class="playLink hide"
-			$desc = $1 if $entry =~ m{data-episodesynopsis\"<p>(.*?)</p>\"};
+			$desc = $1 if $entry =~ m{data-episodesynopsis=\"<p>(.*?)</p>};
 			# Remove unwanted html tags and extra whitespace
 			#$desc =~ s!</?(br|b|i|p|strong)\s*/?>!!gi;
 			#$desc =~ s/\s+/ /g;
