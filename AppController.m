@@ -1476,7 +1476,7 @@
 	NSArray *temp_queue = [queueController selectedObjects];
 	for (Programme *show in temp_queue)
 	{
-		if ([show realPID])
+		if ([show realPID] && [[show status] isEqualToString:@"Added by Series-Link"])
 		{
 			NSDictionary *info = [NSDictionary dictionaryWithObject:show forKey:@"Programme"];
 			[[NSNotificationCenter defaultCenter] postNotificationName:@"AddProgToHistory" object:self userInfo:info];

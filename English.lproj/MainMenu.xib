@@ -1838,7 +1838,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA</b
 						<object class="NSButton" id="600980876">
 							<reference key="NSNextResponder" ref="439893737"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{258, 62}, {534, 23}}</string>
+							<string key="NSFrame">{{380, 62}, {412, 23}}</string>
 							<reference key="NSSuperview" ref="439893737"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="307574110"/>
@@ -1861,7 +1861,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA</b
 						<object class="NSButton" id="613897096">
 							<reference key="NSNextResponder" ref="439893737"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{76, 62}, {184, 23}}</string>
+							<string key="NSFrame">{{76, 62}, {305, 23}}</string>
 							<reference key="NSSuperview" ref="439893737"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="600980876"/>
@@ -1869,7 +1869,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA</b
 							<object class="NSButtonCell" key="NSCell" id="724193068">
 								<int key="NSCellFlags">-2080374784</int>
 								<int key="NSCellFlags2">150994944</int>
-								<string key="NSContents">Hide Selected Show(s)</string>
+								<string key="NSContents">Permanently Skip Selected Series-Link Entries</string>
 								<reference key="NSSupport" ref="478878141"/>
 								<reference key="NSControlView" ref="613897096"/>
 								<int key="NSButtonFlags">-2036580352</int>
