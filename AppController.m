@@ -2141,8 +2141,11 @@
 					temp_showName = temp_showName2;
 					temp_showName = [temp_showName stringByAppendingFormat:@" - %@", temp_showName2];
 				}
-				
-				if (([[series2 added] integerValue] < timeadded) && ([temp_tvNetwork isEqualToString:[series2 tvNetwork]]))
+				if (([[series2 added] integerValue] > timeadded) && ([temp_tvNetwork isEqualToString:[series2 tvNetwork]]))
+                {
+                    [series2 setAdded:[NSNumber numberWithInteger:timeadded]];
+                }
+				if (([[series2 added] integerValue] <= timeadded) && ([temp_tvNetwork isEqualToString:[series2 tvNetwork]]))
 				{
 					oneFound=YES;
 					Programme *p = [[Programme alloc] initWithInfo:nil pid:temp_pid programmeName:temp_showName network:temp_tvNetwork];
