@@ -2114,11 +2114,11 @@
 				NSString *temp_pid, *temp_showName, *temp_tvNetwork, *temp_type, *temp_realPID, *url;
 				NSInteger timeadded;
 				[myScanner scanUpToString:@":" intoString:&temp_pid];
-				[myScanner scanUpToCharactersFromSet:[NSCharacterSet letterCharacterSet] intoString:NULL];
+				[myScanner scanUpToCharactersFromSet:[NSCharacterSet alphanumericCharacterSet] intoString:NULL];
 				[myScanner scanUpToString:@", ~" intoString:&temp_type];
 				[myScanner scanString:@", ~" intoString:nil];
 				[myScanner scanUpToString:@"~," intoString:&temp_showName];
-				[myScanner scanUpToCharactersFromSet:[NSCharacterSet letterCharacterSet] intoString:NULL];
+				[myScanner scanUpToCharactersFromSet:[NSCharacterSet alphanumericCharacterSet] intoString:NULL];
 				[myScanner scanUpToString:@"," intoString:&temp_tvNetwork];
 				[myScanner scanString:@"," intoString:nil];
 				[myScanner scanInteger:&timeadded];
