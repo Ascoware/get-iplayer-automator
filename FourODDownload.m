@@ -597,22 +597,21 @@
         
         NSScanner *scanner = [NSScanner scannerWithString:responseString];
         
-        NSString *synopsis = nil;
-        [scanner scanUpToString:@"<meta name=\"synopsis\" content=\"" intoString:nil];
-        [scanner scanString:@"<meta name=\"synopsis\" content=\"" intoString:nil];
-        [scanner scanUpToString:@"\"/>" intoString:&synopsis];
-        synopsis = [synopsis stringByConvertingHTMLToPlainText];
-        [show setDesc:synopsis];
+        NSString *desc = nil;
+        [scanner scanUpToString:@"<div id=\"EpisodeSummary\"" intoString:nil];
+        [scanner scanUpToString:@"<p>" intoString:nil];
+        [scanner scanUpToString:@"<a" intoString:&desc];
+        [show setDesc:[desc stringByConvertingHTMLToPlainText]];
         
-        if (!synopsis)
+        if (!desc)
         {
             NSLog(@"WARNING: Programme description not found. Tagging may be incomplete.");
             [self addToLog:[NSString stringWithFormat:@"WARNING: Programme description not found. Tagging may be incomplete."] noTag:YES];
         }
         
-        NSLog(@"DEBUG: Programme description processed: synopsis=%@", synopsis);
+        NSLog(@"DEBUG: Programme description processed: desc=%@", desc);
         if (verbose)
-            [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme description processed: synopsis=%@", synopsis] noTag:YES];
+            [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme description processed: synopsis=%@", desc] noTag:YES];
 
         NSLog(@"INFO: Programme description processed.");
         [self addToLog:@"INFO: Programme description processed." noTag:YES];
