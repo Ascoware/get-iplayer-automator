@@ -206,7 +206,26 @@
     [scanner scanUpToString:@"CDATA" intoString:nil];
     [scanner scanString:@"CDATA[" intoString:nil];
     [scanner scanUpToString:@"]]" intoString:&thumbnailURL];
-    
+ 
+    //Increase thumbnail size to 640x360
+    NSInteger thumbWidth = 0;
+    NSScanner *thumbScanner = [NSScanner scannerWithString:thumbnailURL];
+    [thumbScanner scanUpToString:@"?w=" intoString:nil];
+    [thumbScanner scanString:@"?w=" intoString:nil];
+    [thumbScanner scanInteger:&thumbWidth];
+    if (thumbWidth != 0 && thumbWidth < 640)
+    {
+        NSRange thumbSizeRange = [thumbnailURL rangeOfString:@"?w=" options:NSCaseInsensitiveSearch];
+        if (thumbSizeRange.location != NSNotFound)
+        {
+            thumbSizeRange.length = [thumbnailURL length] - thumbSizeRange.location;
+            thumbnailURL = [thumbnailURL stringByReplacingCharactersInRange:thumbSizeRange withString:@"?w=640&h=360"];
+            NSLog(@"DEBUG: Thumbnail URL changed: %@", thumbnailURL);
+            if (verbose)
+                [self addToLog:[NSString stringWithFormat:@"DEBUG: Thumbnail URL changed: %@", thumbnailURL] noTag:YES];
+        }
+    }
+
     //Retrieve Subtitle URL
     [scanner scanUpToString:@"<ClosedCaptioning" intoString:nil];
     if(![scanner scanString:@"<ClosedCaptioningURIs/>" intoString:nil])
