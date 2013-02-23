@@ -51,26 +51,36 @@
 {
     errorCache = [[NSMutableString alloc] initWithString:@""];
     processErrorCache = [NSTimer scheduledTimerWithTimeInterval:.25 target:self selector:@selector(processError) userInfo:nil repeats:YES];
-
-    NSString *pid = nil;
-    NSScanner *scanner = [NSScanner scannerWithString:[show url]];
-    [scanner scanUpToString:@"Filter=" intoString:nil];
-    [scanner scanString:@"Filter=" intoString:nil];
-    [scanner scanUpToString:@"kljkjj" intoString:&pid];
-    if (!pid)
-    {
-        NSLog(@"ERROR: GiA cannot interpret the ITV URL: %@", [show url]);
-        [self addToLog:[NSString stringWithFormat:@"ERROR: GiA cannot interpret the ITV URL: %@", [show url]]];
-        [show setReasonForFailure:@"MetadataProcessing"];
-        [show setComplete:[NSNumber numberWithBool:YES]];
-        [show setSuccessful:[NSNumber numberWithBool:NO]];
-        [show setValue:@"Download Failed" forKey:@"status"];
-        [nc postNotificationName:@"DownloadFinished" object:show];
-        return;
+    
+    NSString *soapBody = nil;
+    if ([[show pid] rangeOfCharacterFromSet:[[NSCharacterSet decimalDigitCharacterSet] invertedSet]].location != NSNotFound) {
+        [show setRealPID:[show pid]];
+        soapBody = @"Body2";
+        [downloadParams setValue:YES forKey:@"UseCurrentWebPage"];
     }
-    [show setRealPID:pid];
+    else
+    {
+        NSString *pid = nil;
+        NSScanner *scanner = [NSScanner scannerWithString:[show url]];
+        [scanner scanUpToString:@"Filter=" intoString:nil];
+        [scanner scanString:@"Filter=" intoString:nil];
+        [scanner scanUpToString:@"kljkjj" intoString:&pid];
+        if (!pid)
+        {
+            NSLog(@"ERROR: GiA cannot interpret the ITV URL: %@", [show url]);
+            [self addToLog:[NSString stringWithFormat:@"ERROR: GiA cannot interpret the ITV URL: %@", [show url]]];
+            [show setReasonForFailure:@"MetadataProcessing"];
+            [show setComplete:[NSNumber numberWithBool:YES]];
+            [show setSuccessful:[NSNumber numberWithBool:NO]];
+            [show setValue:@"Download Failed" forKey:@"status"];
+            [nc postNotificationName:@"DownloadFinished" object:show];
+            return;
+        }
+        [show setRealPID:pid];
+        soapBody = @"Body";
+    }
 
-    NSString *body = [[NSString alloc] initWithData:[NSData dataWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"Body" ofType:nil]]
+    NSString *body = [[NSString alloc] initWithData:[NSData dataWithContentsOfFile:[[NSBundle mainBundle] pathForResource:soapBody ofType:nil]]
                                            encoding:NSUTF8StringEncoding];
     body = [body stringByReplacingOccurrencesOfString:@"!!!ID!!!" withString:[show realPID]];
     
@@ -157,6 +167,17 @@
 
     responseString = [responseString stringByDecodingHTMLEntities];
     NSScanner *scanner = [NSScanner scannerWithString:responseString];
+
+    if ([downloadParams objectForKey:@"UseCurrentWebPage"])
+    {
+        //Reset to numeric PID if originated from current web page
+        NSString *pid = nil;
+        [scanner scanUpToString:@"<Vodcrid>crid://itv.com/" intoString:nil];
+        [scanner scanString:@"<Vodcrid>crid://itv.com/" intoString:nil];
+        [scanner scanUpToString:@"</Vodcrid>" intoString:&pid];
+        [show setRealPID:pid];
+    }
+
     //Retrieve Series Name
     NSString *seriesName = nil;
     [scanner scanUpToString:@"<ProgrammeTitle>" intoString:nil];
@@ -359,7 +380,6 @@
 
     NSLog(@"INFO: Metadata processed.");
     [self addToLog:@"INFO: Metadata processed." noTag:YES];
-    
     NSURL *dataURL = [NSURL URLWithString:[NSString stringWithFormat:@"http://www.itv.com/_app/Dynamic/CatchUpData.ashx?ViewType=5&Filter=%@",[show realPID]]];
     NSLog(@"DEBUG: Programme data URL: %@",dataURL);
     if (verbose)

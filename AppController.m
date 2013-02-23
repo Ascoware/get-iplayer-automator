@@ -1120,7 +1120,8 @@
 	NSString *browser = [[NSUserDefaults standardUserDefaults] objectForKey:@"DefaultBrowser"];
 	
 	//Prepare Pointer for URL
-	NSString *url;
+	NSString *url = nil;
+    NSString *source = nil;
 	
 	//Prepare Alert in Case the Browser isn't Open
 	NSAlert *browserNotOpen = [[NSAlert alloc] init];
@@ -1147,7 +1148,6 @@
                             [[document URL] hasPrefix:@"http://bbc.co.uk/iplayer/episode/"] ||
                             [[document URL] hasPrefix:@"http://bbc.co.uk/iplayer/console/"] || 
                             [[document URL] hasPrefix:@"http://www.bbc.co.uk/iplayer/console/"] ||
-                            [[document URL] hasPrefix:@"http://www.itv.com/itvplayer/video/?Filter"] ||
                             [[document URL] hasPrefix:@"http://bbc.co.uk/sport"])
 						{
 							url = [NSString stringWithString:[document URL]];
@@ -1157,6 +1157,13 @@
                             [nameScanner scanUpToString:@"kjklgfdjfgkdlj" intoString:&newShowName];
 							foundURL=YES;
 						}
+                        else if ([[document URL] hasPrefix:@"https://www.itv.com/itvplayer/"] ||
+                                 [[document URL] hasPrefix:@"http://www.channel4.com/programmes/"])
+                        {
+                            url = [NSString stringWithString:[document URL]];
+                            source = [document source];
+                            foundURL=YES;
+                        }
 					}
 					if (foundURL==NO)
 					{
@@ -1203,7 +1210,6 @@
                                 [[tab URL] hasPrefix:@"http://bbc.co.uk/iplayer/episode/"] ||
                                 [[tab URL] hasPrefix:@"http://bbc.co.uk/iplayer/console/"] ||
                                 [[tab URL] hasPrefix:@"http://www.bbc.co.uk/iplayer/console/"] ||
-                                [[tab URL] hasPrefix:@"http://www.itv.com/itvplayer/video/?Filter"] ||
                                 [[tab URL] hasPrefix:@"http://bbc.co.uk/sport"])
                             {
                                 url = [NSString stringWithString:[tab URL]];
@@ -1211,6 +1217,13 @@
                                 [nameScanner scanString:@"BBC iPlayer - " intoString:nil];
                                 [nameScanner scanString:@"BBC Sport - " intoString:nil];
                                 [nameScanner scanUpToString:@"kjklgfdjfgkdlj" intoString:&newShowName];
+                                foundURL=YES;
+                            }
+                            else if ([[tab URL] hasPrefix:@"https://www.itv.com/itvplayer/"] ||
+                                     [[tab URL] hasPrefix:@"http://www.channel4.com/programmes/"])
+                            {
+                                url = [NSString stringWithString:[tab URL]];
+                                source = [tab executeJavascript:@"document.getElementsByTagName('html')[0].innerHTML"];
                                 foundURL=YES;
                             }
                         }
@@ -1389,7 +1402,7 @@
 	//Process URL
 	if([url hasPrefix:@"http://www.bbc.co.uk/iplayer/episode/"] || [url hasPrefix:@"http://beta.bbc.co.uk/iplayer/episode"])
 	{
-		NSString *pid;
+		NSString *pid = nil;
 		NSScanner *urlScanner = [[NSScanner alloc] initWithString:url];
 		[urlScanner scanUpToString:@"/episode/" intoString:nil];
 		if ([urlScanner isAtEnd]) {
@@ -1408,32 +1421,82 @@
 	}
     else if ([url hasPrefix:@"http://www.bbc.co.uk/sport/olympics/2012/live-video/"])
     {
-        NSString *pid;
+        NSString *pid = nil;
         NSScanner *urlScanner = [NSScanner scannerWithString:url];
         [urlScanner scanString:@"http://www.bbc.co.uk/sport/olympics/2012/live-video/" intoString:nil];
         [urlScanner scanUpToString:@"kfejklfjklj" intoString:&pid];
         [queueController addObject:[[Programme alloc] initWithInfo:nil pid:pid programmeName:newShowName network:@"BBC Sport"]];
     }
-	else if ([url hasPrefix:@"http://www.itv.com/itvplayer/video/?Filter"])
+	else if ([url hasPrefix:@"https://www.itv.com/itvplayer/"])
 	{
-		NSString *pid;
-		NSScanner *urlScanner = [NSScanner scannerWithString:url];
-		[urlScanner scanUpToString:@"Filter" intoString:nil];
-		[urlScanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:nil];
-		[urlScanner scanUpToString:@"&" intoString:&pid];
+        NSString *series = nil, *eptitle = nil, *productionId = nil, *pay_rights = nil;
+		NSScanner *scanner = [NSScanner scannerWithString:source];
+        [scanner scanUpToString:@"\"series\":" intoString:nil];
+        [scanner scanString:@"\"series\":\"" intoString:nil];
+        [scanner scanUpToString:@"\"" intoString:&series];
+        [scanner scanUpToString:@"\"eptitle\":" intoString:nil];
+        [scanner scanString:@"\"eptitle\":\"" intoString:nil];
+        [scanner scanUpToString:@"\"" intoString:&eptitle];
+        [scanner scanUpToString:@"\"productionId\":" intoString:nil];
+        [scanner scanString:@"\"productionId\":\"" intoString:nil];
+        [scanner scanUpToString:@"\"" intoString:&productionId];
+        [scanner scanUpToString:@"\"pay_rights\":" intoString:nil];
+        [scanner scanString:@"\"pay_rights\":\"" intoString:nil];
+        [scanner scanUpToString:@"\"" intoString:&pay_rights];
+        if (!series || !eptitle || !productionId || ![pay_rights isEqualToString:@"free"]) {
+            NSAlert *invalidPage = [[NSAlert alloc] init];
+            [invalidPage addButtonWithTitle:@"OK"];
+            [invalidPage setMessageText:[NSString stringWithFormat:@"Invalid Page: %@",url]];
+            [invalidPage setInformativeText:@"Please ensure the browser is open to an ITV Player free catch-up episode page."];
+            [invalidPage setAlertStyle:NSWarningAlertStyle];
+            [invalidPage runModal];
+            return;
+        }
+        NSString *pid = [productionId stringByReplacingOccurrencesOfString:@"\\" withString:@""];
+        NSString *showName = [[[NSString stringWithFormat:@"%@ %@", series, eptitle] stringByReplacingOccurrencesOfString:@"." withString:@" "] capitalizedString];
 		Programme *newProg = [[Programme alloc] init];
-		[newProg setValue:pid forKey:@"pid"];
+        [newProg setPid:pid];
+        [newProg setShowName:showName];
+        [newProg setTvNetwork:@"ITV"];
+        [newProg setProcessedPID:[NSNumber numberWithBool:YES]];
 		[queueController addObject:newProg];
-		[self getNameForProgramme:newProg];
 	}
+	else if ([url hasPrefix:@"http://www.channel4.com/programmes/"])
+	{
+		NSString *pid = nil;
+		NSScanner *urlScanner = [NSScanner scannerWithString:url];
+		[urlScanner scanUpToString:@"#" intoString:nil];
+		[urlScanner scanString:@"#" intoString:nil];
+		[urlScanner scanCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:&pid];
+        if (!pid) {
+            NSScanner *scanner = [NSScanner scannerWithString:source];
+            [scanner scanUpToString:@"data-assetid=\"" intoString:nil];
+            [scanner scanString:@"data-assetid=\"" intoString:nil];
+            [scanner scanUpToString:@"\"" intoString:&pid];
+        }
+        if (!pid)
+        {
+            NSAlert *invalidPage = [[NSAlert alloc] init];
+            [invalidPage addButtonWithTitle:@"OK"];
+            [invalidPage setMessageText:[NSString stringWithFormat:@"Invalid Page: %@",url]];
+            [invalidPage setInformativeText:@"Please ensure the browser is open to a 4oD episode page."];
+            [invalidPage setAlertStyle:NSWarningAlertStyle];
+            [invalidPage runModal];
+            return;
+        }
+ 		Programme *newProg = [[Programme alloc] init];
+        [newProg setPid:pid];
+ 		[queueController addObject:newProg];
+        [self getNameForProgramme:newProg];
+    }
 	else
 	{
-		NSAlert *invalidURL = [[NSAlert alloc] init];
-		[invalidURL addButtonWithTitle:@"OK"];
-		[invalidURL setMessageText:[NSString stringWithFormat:@"Invalid URL: %@",url]];
-		[invalidURL setInformativeText:@"Please ensure the browser is open to an iPlayer page."];
-		[invalidURL setAlertStyle:NSWarningAlertStyle];
-		[invalidURL runModal];
+		NSAlert *invalidPage = [[NSAlert alloc] init];
+		[invalidPage addButtonWithTitle:@"OK"];
+		[invalidPage setMessageText:[NSString stringWithFormat:@"Invalid Page: %@",url]];
+		[invalidPage setInformativeText:@"Please ensure the browser is open to an iPlayer episode page, ITV Player free catch-up episode page or 4oD episode page."];
+		[invalidPage setAlertStyle:NSWarningAlertStyle];
+		[invalidPage runModal];
 	}
 
 }

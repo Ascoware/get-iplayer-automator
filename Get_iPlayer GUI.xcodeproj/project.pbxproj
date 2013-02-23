@@ -26,6 +26,7 @@
 		392A41A4169735340053DEA5 /* HTTPProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 392A41A3169735340053DEA5 /* HTTPProxy.m */; };
 		3975484D1622504F00470DD1 /* ttml2srt.py in Resources */ = {isa = PBXBuildFile; fileRef = 3975484C1622504F00470DD1 /* ttml2srt.py */; };
 		39814023168E124C003FFF53 /* NSHost+ThreadedAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 39814022168E124B003FFF53 /* NSHost+ThreadedAdditions.m */; };
+		398516A716D1A02500EBB4CE /* Body2 in Resources */ = {isa = PBXBuildFile; fileRef = 398516A616D1A02500EBB4CE /* Body2 */; };
 		39879DAF16904B9F0050CA7D /* GTMNSString+HTML.m in Sources */ = {isa = PBXBuildFile; fileRef = 39879DAC16904B9F0050CA7D /* GTMNSString+HTML.m */; };
 		39879DB016904B9F0050CA7D /* NSString+HTML.m in Sources */ = {isa = PBXBuildFile; fileRef = 39879DAE16904B9F0050CA7D /* NSString+HTML.m */; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
@@ -131,6 +132,7 @@
 		3975484C1622504F00470DD1 /* ttml2srt.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = ttml2srt.py; sourceTree = "<group>"; };
 		39814021168E124B003FFF53 /* NSHost+ThreadedAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSHost+ThreadedAdditions.h"; sourceTree = "<group>"; };
 		39814022168E124B003FFF53 /* NSHost+ThreadedAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSHost+ThreadedAdditions.m"; sourceTree = "<group>"; };
+		398516A616D1A02500EBB4CE /* Body2 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Body2; sourceTree = "<group>"; };
 		39879DAB16904B9F0050CA7D /* GTMNSString+HTML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "GTMNSString+HTML.h"; sourceTree = "<group>"; };
 		39879DAC16904B9F0050CA7D /* GTMNSString+HTML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "GTMNSString+HTML.m"; sourceTree = "<group>"; };
 		39879DAD16904B9F0050CA7D /* NSString+HTML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+HTML.h"; sourceTree = "<group>"; };
@@ -335,6 +337,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				398516A616D1A02500EBB4CE /* Body2 */,
 				D921C9EC149C4C6F004CB558 /* Body */,
 				DFE5B67313E70AC20008571B /* plugins */,
 				D948C40B103436DE000CF853 /* icon.icns */,
@@ -566,6 +569,7 @@
 				D921C9ED149C4C6F004CB558 /* Body in Resources */,
 				DFC8D40415C97310008E369F /* fourOD_token_decoder.py in Resources */,
 				3975484D1622504F00470DD1 /* ttml2srt.py in Resources */,
+				398516A716D1A02500EBB4CE /* Body2 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
