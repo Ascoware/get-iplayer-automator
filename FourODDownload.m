@@ -502,41 +502,64 @@
     {
         NSScanner *scanner = [NSScanner scannerWithString:[responseString stringByDecodingHTMLEntities]];
         
+        NSUInteger scanloc = [scanner scanLocation];
         NSString *episodeTitle = nil;
         [scanner scanUpToString:@"<episodeTitle>" intoString:nil];
         [scanner scanString:@"<episodeTitle>" intoString:nil];
         [scanner scanUpToString:@"</" intoString:&episodeTitle];
         [show setEpisodeName:episodeTitle];
+        if (!episodeTitle)
+            [scanner setScanLocation:scanloc];
         
+        scanloc = [scanner scanLocation];
         NSString *seriesTitle = nil;
         [scanner scanUpToString:@"<brandTitle>" intoString:nil];
         [scanner scanString:@"<brandTitle>" intoString:nil];
         [scanner scanUpToString:@"</" intoString:&seriesTitle];
         [show setSeriesName:seriesTitle];
+        if (!seriesTitle)
+            [scanner setScanLocation:scanloc];
         
+        scanloc = [scanner scanLocation];
         NSInteger episodeNumber = 0;
         [scanner scanUpToString:@"<episodeNumber>" intoString:nil];
         [scanner scanString:@"<episodeNumber>" intoString:nil];
         [scanner scanInteger:&episodeNumber];
         [show setEpisode:episodeNumber];
+        if (!episodeNumber)
+            [scanner setScanLocation:scanloc];
         
+        scanloc = [scanner scanLocation];
         NSInteger seriesNumber = 0;
         [scanner scanUpToString:@"<seriesNumber>" intoString:nil];
         [scanner scanString:@"<seriesNumber>" intoString:nil];
         [scanner scanInteger:&seriesNumber];
         [show setSeason:seriesNumber];
+        if (!seriesNumber)
+            [scanner setScanLocation:scanloc];
         
+        scanloc = [scanner scanLocation];
         NSString *imagePath = nil;
         [scanner scanUpToString:@"<imagePath>" intoString:nil];
         [scanner scanString:@"<imagePath>" intoString:nil];
         [scanner scanUpToString:@"</" intoString:&imagePath];
         if (imagePath)
             thumbnailURL = [NSString stringWithFormat:@"http://www.channel4.com%@",imagePath];
+        else
+            [scanner setScanLocation:scanloc];
         
+        scanloc = [scanner scanLocation];
         NSString *episodeGuideUrl = nil;
         [scanner scanUpToString:@"<episodeGuideUrl>" intoString:nil];
         [scanner scanString:@"<episodeGuideUrl>" intoString:nil];
         [scanner scanUpToString:@"</" intoString:&episodeGuideUrl];
+        
+        if (episodeTitle && ![[show showName] hasPrefix:episodeTitle]) {
+            [show setShowName:[NSString stringWithFormat:@"%@ - %@", [show showName], episodeTitle]];
+        }
+        else if (episodeTitle && [episodeTitle isEqualToString:seriesTitle]) {
+            [show setShowName:episodeTitle];
+        }
         
         if (!(episodeTitle && seriesTitle && episodeNumber && seriesNumber && imagePath && episodeGuideUrl))
         {
