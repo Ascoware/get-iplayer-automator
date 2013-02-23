@@ -342,6 +342,18 @@
             [self addToLog:[NSString stringWithFormat:@"DEBUG: playPath = %@", playPath] noTag:YES];
     }
     
+    NSInteger seriesNumber = 0;
+    if ([mediaEntries count] > 0) {
+        NSScanner *mescanner = [NSScanner scannerWithString:[[mediaEntries objectAtIndex:0] url]];
+        [mescanner scanUpToString:@"(series-" intoString:nil];
+        [mescanner scanString:@"(series-" intoString:nil];
+        [mescanner scanInteger:&seriesNumber];
+    }
+    [show setSeason:seriesNumber];
+    NSLog(@"DEBUG: seriesNumber=%ld", seriesNumber);
+    if (verbose)
+        [self addToLog:[NSString stringWithFormat:@"DEBUG: seriesNumber=%ld", seriesNumber] noTag:YES];
+
     [downloadParams setObject:authURL forKey:@"authURL"];
     [downloadParams setObject:playPath forKey:@"playPath"];
 
@@ -377,7 +389,7 @@
     if (verbose)
         [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme data response: %@", responseString] noTag:YES];
     NSError *error = [request error];
-    NSString *description = nil, *showname = nil, *epnum = nil, *epname = nil, *temp_showname = nil;
+    NSString *description = nil, *showname = nil, *senum = nil, *epnum = nil, *epname = nil, *temp_showname = nil;
     if ([request responseStatusCode] == 200 && [responseString length] > 0)
     {
         scanner = [NSScanner scannerWithString:responseString];
@@ -399,38 +411,41 @@
             [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme data response error: %@", (error ? [error localizedDescription] : @"Unknown error")] noTag:YES];
         
     }
-    //Init date formatter
-    NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
-    [dateFormat setLocale:[[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"]];
     //Fix Showname
+    if (!temp_showname)
+        temp_showname = [show seriesName];
+    showname = temp_showname;
+    if ([show season] != 0)
+        senum = [NSString stringWithFormat:@"Series %ld", [show season]];
+    if ([show episode] != 0)
+        epnum = [NSString stringWithFormat:@"Episode %ld", [show episode]];
+    else
+        epnum = [show realPID];
     epname = [show episodeName];
     if (!epname || [epname isEqualToString:@"(No Episode Name)"])
     {
         //Air date as backup
+        NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
+        [dateFormat setLocale:[[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"]];
         [dateFormat setDateFormat:@"dd/MM/yyyy"];
         epname = [dateFormat stringFromDate:[show dateAired]];
     }
-    if (!temp_showname)
-        temp_showname = [show seriesName];
-    showname = [NSString stringWithFormat:@"%@ - %@", temp_showname, epname];
-    // add episode identifier if episode name contains only date
-    [dateFormat setDateFormat:@"dd/MM/yyyy"];
-    if ([dateFormat dateFromString:epname])
-    {
-        if ([show episode] != 0)
-            epnum = [NSString stringWithFormat:@"Episode %ld", [show episode]];
-        else
-            epnum = [NSString stringWithFormat:@"%@", [show realPID]];
-        showname = [NSString stringWithFormat:@"%@ - %@ - %@", temp_showname, epnum, epname];
-    }
+    if (senum)
+        showname = [NSString stringWithFormat:@"%@ - %@", showname, senum];
+        if (epnum && ![epname hasPrefix:epnum])
+            showname = [NSString stringWithFormat:@"%@ %@", showname, epnum];
+    else if (epnum && ![epname hasPrefix:epnum])
+        showname = [NSString stringWithFormat:@"%@ - %@", showname, epnum];
+    if (epname && ![epname isEqualToString:temp_showname])
+        showname = [NSString stringWithFormat:@"%@ - %@", showname, epname];
+    [show setShowName:showname];
     if (!description)
         description = @"(No Description)";
-    [show setShowName:showname];
     [show setDesc:description];
-    NSLog(@"DEBUG: Programme data processed: showname=%@ temp_showname=%@ epname=%@ epnum=%@ description=%@", showname, temp_showname, epname, epnum, description);
+    NSLog(@"DEBUG: Programme data processed: showname=%@ temp_showname=%@ senum=%@ epnum=%@ epname=%@ description=%@", showname, temp_showname, senum, epnum, epname, description);
     if (verbose)
-        [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme data processed: showname=%@ temp_showname=%@ epname=%@ epnum=%@ description=%@",
-                        showname, temp_showname, epname, epnum, description] noTag:YES];
+        [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme data processed: showname=%@ temp_showname=%@ senum=%@ epnum=%@ epname=%@ description=%@",
+                        showname, temp_showname, senum, epnum, epname, description] noTag:YES];
 
     NSLog(@"INFO: Program data processed.");
     [self addToLog:@"INFO: Program data processed." noTag:YES];
