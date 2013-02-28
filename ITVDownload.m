@@ -53,7 +53,7 @@
     processErrorCache = [NSTimer scheduledTimerWithTimeInterval:.25 target:self selector:@selector(processError) userInfo:nil repeats:YES];
     
     NSString *soapBody = nil;
-    if ([[show pid] rangeOfCharacterFromSet:[[NSCharacterSet decimalDigitCharacterSet] invertedSet]].location != NSNotFound) {
+    if ([show url] && [[show url] rangeOfString:@"Filter=" options:NSCaseInsensitiveSearch].location == NSNotFound) {
         [show setRealPID:[show pid]];
         soapBody = @"Body2";
         [downloadParams setValue:YES forKey:@"UseCurrentWebPage"];

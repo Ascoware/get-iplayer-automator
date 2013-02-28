@@ -1429,21 +1429,18 @@
     }
 	else if ([url hasPrefix:@"https://www.itv.com/itvplayer/"])
 	{
-        NSString *series = nil, *eptitle = nil, *productionId = nil, *pay_rights = nil;
+        NSString *progname = nil, *productionId = nil, *pay_rights = nil;
 		NSScanner *scanner = [NSScanner scannerWithString:source];
-        [scanner scanUpToString:@"\"series\":" intoString:nil];
-        [scanner scanString:@"\"series\":\"" intoString:nil];
-        [scanner scanUpToString:@"\"" intoString:&series];
-        [scanner scanUpToString:@"\"eptitle\":" intoString:nil];
-        [scanner scanString:@"\"eptitle\":\"" intoString:nil];
-        [scanner scanUpToString:@"\"" intoString:&eptitle];
+        [scanner scanUpToString:@"\"progname\":" intoString:nil];
+        [scanner scanString:@"\"progname\":\"" intoString:nil];
+        [scanner scanUpToString:@"\"" intoString:&progname];
         [scanner scanUpToString:@"\"productionId\":" intoString:nil];
         [scanner scanString:@"\"productionId\":\"" intoString:nil];
         [scanner scanUpToString:@"\"" intoString:&productionId];
         [scanner scanUpToString:@"\"pay_rights\":" intoString:nil];
         [scanner scanString:@"\"pay_rights\":\"" intoString:nil];
         [scanner scanUpToString:@"\"" intoString:&pay_rights];
-        if (!series || !eptitle || !productionId || ![pay_rights isEqualToString:@"free"]) {
+        if (!progname || !productionId || ![pay_rights isEqualToString:@"free"]) {
             NSAlert *invalidPage = [[NSAlert alloc] init];
             [invalidPage addButtonWithTitle:@"OK"];
             [invalidPage setMessageText:[NSString stringWithFormat:@"Invalid Page: %@",url]];
@@ -1453,12 +1450,13 @@
             return;
         }
         NSString *pid = [productionId stringByReplacingOccurrencesOfString:@"\\" withString:@""];
-        NSString *showName = [[[NSString stringWithFormat:@"%@ %@", series, eptitle] stringByReplacingOccurrencesOfString:@"." withString:@" "] capitalizedString];
+        NSString *showName = [NSString stringWithFormat:@"%@ - %@", [[progname stringByReplacingOccurrencesOfString:@"." withString:@" "] capitalizedString], pid];
 		Programme *newProg = [[Programme alloc] init];
         [newProg setPid:pid];
         [newProg setShowName:showName];
         [newProg setTvNetwork:@"ITV"];
         [newProg setProcessedPID:[NSNumber numberWithBool:YES]];
+        [newProg setUrl:url];
 		[queueController addObject:newProg];
 	}
 	else if ([url hasPrefix:@"http://www.channel4.com/programmes/"])
