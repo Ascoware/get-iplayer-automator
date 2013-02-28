@@ -56,7 +56,7 @@
     if ([show url] && [[show url] rangeOfString:@"Filter=" options:NSCaseInsensitiveSearch].location == NSNotFound) {
         [show setRealPID:[show pid]];
         soapBody = @"Body2";
-        [downloadParams setValue:YES forKey:@"UseCurrentWebPage"];
+        [downloadParams setObject:[NSNumber numberWithBool:YES] forKey:@"UseCurrentWebPage"];
     }
     else
     {
@@ -410,7 +410,7 @@
     if (verbose)
         [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme data response: %@", responseString] noTag:YES];
     NSError *error = [request error];
-    NSString *description = nil, *showname = nil, *senum = nil, *epnum = nil, *epname = nil, *temp_showname;
+    NSString *description = nil, *showname = nil, *senum = nil, *epnum = nil, *epname = nil, *temp_showname = nil;
     if ([request responseStatusCode] == 200 && [responseString length] > 0)
     {
         scanner = [NSScanner scannerWithString:responseString];
