@@ -192,12 +192,12 @@
     NSScanner *scanner = [NSScanner scannerWithString:[responseString stringByDecodingHTMLEntities]];
     
     NSUInteger scanloc = [scanner scanLocation];
-    NSInteger programmeNumber = 0;
+    NSString *programmeNumber = nil;
     [scanner scanUpToString:@"<programmeNumber>" intoString:nil];
     [scanner scanString:@"<programmeNumber>" intoString:nil];
-    [scanner scanInteger:&programmeNumber];
+    [scanner scanUpToString:@"</programmeNumber>" intoString:&programmeNumber];
     if (programmeNumber)
-        [show setEpisode:programmeNumber];
+        [show setEpisode:[programmeNumber integerValue]];
     else
         [scanner setScanLocation:scanloc];
     
@@ -232,9 +232,9 @@
     NSString *streamUri = nil;
     [scanner scanUpToString:@"</" intoString:&streamUri];
 
-    NSLog(@"DEBUG: Metadata processed: programmeNumber=%ld brandTitle=%@ episodeTitle=%@ uriData=%@ streamUri=%@", programmeNumber, brandTitle, episodeTitle, uriData, streamUri);
+    NSLog(@"DEBUG: Metadata processed: programmeNumber=%@ brandTitle=%@ episodeTitle=%@ uriData=%@ streamUri=%@", programmeNumber, brandTitle, episodeTitle, uriData, streamUri);
     if (verbose)
-        [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata processed: programmeNumber=%ld brandTitle=%@ episodeTitle=%@ uriData=%@ streamUri=%@", programmeNumber, brandTitle, episodeTitle, uriData, streamUri] noTag:YES];
+        [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata processed: programmeNumber=%@ brandTitle=%@ episodeTitle=%@ uriData=%@ streamUri=%@", programmeNumber, brandTitle, episodeTitle, uriData, streamUri] noTag:YES];
 
     if ([streamUri hasSuffix:@".f4m"])
     {
