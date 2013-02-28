@@ -52,23 +52,28 @@
     errorCache = [[NSMutableString alloc] initWithString:@""];
     processErrorCache = [NSTimer scheduledTimerWithTimeInterval:.25 target:self selector:@selector(processError) userInfo:nil repeats:YES];
 
-    NSScanner *scanner = [NSScanner scannerWithString:[show url]];
-    [scanner scanUpToString:@"#" intoString:nil];
-    [scanner scanString:@"#" intoString:nil];
-    NSString *pid = nil;
-    [scanner scanUpToString:@"lklk" intoString:&pid];
-    if (!pid)
-    {
-        NSLog(@"ERROR: GiA cannot interpret the 4oD URL: %@", [show url]);
-        [self addToLog:[NSString stringWithFormat:@"ERROR: GiA cannot interpret the 4oD URL: %@", [show url]] noTag:YES];
-        [show setReasonForFailure:@"MetadataProcessing"];
-        [show setComplete:[NSNumber numberWithBool:YES]];
-        [show setSuccessful:[NSNumber numberWithBool:NO]];
-        [show setValue:@"Download Failed" forKey:@"status"];
-        [nc postNotificationName:@"DownloadFinished" object:show];
-        return;
+    if ([[show url] hasPrefix:@"http://ps3.channel4.com"]) {
+        [show setRealPID:[show pid]];
     }
-    [show setRealPID:pid];
+    else {
+        NSScanner *scanner = [NSScanner scannerWithString:[show url]];
+        [scanner scanUpToString:@"#" intoString:nil];
+        [scanner scanString:@"#" intoString:nil];
+        NSString *pid = nil;
+        [scanner scanUpToString:@"lklk" intoString:&pid];
+        if (!pid)
+        {
+            NSLog(@"ERROR: GiA cannot interpret the 4oD URL: %@", [show url]);
+            [self addToLog:[NSString stringWithFormat:@"ERROR: GiA cannot interpret the 4oD URL: %@", [show url]] noTag:YES];
+            [show setReasonForFailure:@"MetadataProcessing"];
+            [show setComplete:[NSNumber numberWithBool:YES]];
+            [show setSuccessful:[NSNumber numberWithBool:NO]];
+            [show setValue:@"Download Failed" forKey:@"status"];
+            [nc postNotificationName:@"DownloadFinished" object:show];
+            return;
+        }
+        [show setRealPID:pid];
+    }
     [self doMetaHostLookup];
 }
 

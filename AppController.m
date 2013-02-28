@@ -1159,7 +1159,8 @@
                             foundURL=YES;
                         }
                         else if ([[tab URL] hasPrefix:@"https://www.itv.com/itvplayer/"] ||
-                                 [[tab URL] hasPrefix:@"http://www.channel4.com/programmes/"])
+                                 [[tab URL] hasPrefix:@"http://www.channel4.com/programmes/"] ||
+                                 [[tab URL] hasPrefix:@"http://ps3.channel4.com"])
                         {
                             url = [NSString stringWithString:[tab URL]];
                             source = [Safari doJavaScript:@"document.documentElement.outerHTML" in:tab];
@@ -1218,7 +1219,8 @@
                             foundURL=YES;
                         }
                         else if ([[tab URL] hasPrefix:@"https://www.itv.com/itvplayer/"] ||
-                                 [[tab URL] hasPrefix:@"http://www.channel4.com/programmes/"])
+                                 [[tab URL] hasPrefix:@"http://www.channel4.com/programmes/"] ||
+                                 [[tab URL] hasPrefix:@"http://ps3.channel4.com"])
                         {
                             url = [NSString stringWithString:[tab URL]];
                             source = [tab executeJavascript:@"document.documentElement.outerHTML"];
@@ -1484,12 +1486,41 @@
  		[queueController addObject:newProg];
         [self getNameForProgramme:newProg];
     }
+    else if ([url hasPrefix:@"http://ps3.channel4.com"])
+    {
+        NSString *pid = nil, *seriesName = nil;
+    	NSScanner *ps3Scanner = [NSScanner scannerWithString:source];
+        [ps3Scanner scanUpToString:@"brandTitle=" intoString:nil];
+        [ps3Scanner scanString:@"brandTitle=" intoString:nil];
+        [ps3Scanner scanUpToString:@"&" intoString:&seriesName];
+        [ps3Scanner scanUpToString:@"preSelectAsset=" intoString:nil];
+        [ps3Scanner scanString:@"preSelectAsset=" intoString:nil];
+        [ps3Scanner scanCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:&pid];
+        if (!pid || !seriesName)
+        {
+            NSAlert *invalidPage = [[NSAlert alloc] init];
+            [invalidPage addButtonWithTitle:@"OK"];
+            [invalidPage setMessageText:[NSString stringWithFormat:@"Invalid Page: %@",url]];
+            [invalidPage setInformativeText:@"Please ensure the frontmost browser tab is open to a 4oD PS3 episode page."];
+            [invalidPage setAlertStyle:NSWarningAlertStyle];
+            [invalidPage runModal];
+            return;
+        }
+        NSString *showName = [NSString stringWithFormat:@"%@ - %@", seriesName, pid];
+        Programme *newProg = [[Programme alloc] init];
+        [newProg setPid:pid];
+        [newProg setShowName:showName];
+        [newProg setTvNetwork:@"4oD C4"];
+        [newProg setUrl:url];
+        [newProg setProcessedPID:[NSNumber numberWithBool:YES]];
+        [queueController addObject:newProg];
+    }
 	else
 	{
 		NSAlert *invalidPage = [[NSAlert alloc] init];
 		[invalidPage addButtonWithTitle:@"OK"];
 		[invalidPage setMessageText:[NSString stringWithFormat:@"Invalid Page: %@",url]];
-		[invalidPage setInformativeText:@"Please ensure the frontmost browser tab is open to an iPlayer episode page, ITV Player free catch-up episode page or 4oD episode page."];
+		[invalidPage setInformativeText:@"Please ensure the frontmost browser tab is open to an iPlayer episode page, ITV Player free catch-up episode page, 4oD episode page or 4oD PS3 episode page."];
 		[invalidPage setAlertStyle:NSWarningAlertStyle];
 		[invalidPage runModal];
 	}
