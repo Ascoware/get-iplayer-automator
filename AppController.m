@@ -1139,35 +1139,36 @@
 		{
 			@try
 			{
-				SBElementArray *documents = [Safari documents];
-				if ([[NSNumber numberWithUnsignedInteger:[documents count]] intValue])
+				SBElementArray *windows = [Safari windows];
+				if ([[NSNumber numberWithUnsignedInteger:[windows count]] intValue])
 				{
-					for (SafariDocument *document in documents)
+					for (SafariWindow *window in windows)
  					{
-						if ([[document URL] hasPrefix:@"http://www.bbc.co.uk/iplayer/episode/"] ||
-                            [[document URL] hasPrefix:@"http://bbc.co.uk/iplayer/episode/"] ||
-                            [[document URL] hasPrefix:@"http://bbc.co.uk/iplayer/console/"] || 
-                            [[document URL] hasPrefix:@"http://www.bbc.co.uk/iplayer/console/"] ||
-                            [[document URL] hasPrefix:@"http://bbc.co.uk/sport"])
-						{
-							url = [NSString stringWithString:[document URL]];
-                            NSScanner *nameScanner = [NSScanner scannerWithString:[document name]];
+                        SafariTab *tab = [window currentTab];
+                        if ([[tab URL] hasPrefix:@"http://www.bbc.co.uk/iplayer/episode/"] ||
+                            [[tab URL] hasPrefix:@"http://bbc.co.uk/iplayer/episode/"] ||
+                            [[tab URL] hasPrefix:@"http://bbc.co.uk/iplayer/console/"] ||
+                            [[tab URL] hasPrefix:@"http://www.bbc.co.uk/iplayer/console/"] ||
+                            [[tab URL] hasPrefix:@"http://bbc.co.uk/sport"])
+                        {
+                            url = [NSString stringWithString:[tab URL]];
+                            NSScanner *nameScanner = [NSScanner scannerWithString:[tab name]];
                             [nameScanner scanString:@"BBC iPlayer - " intoString:nil];
                             [nameScanner scanString:@"BBC Sport - " intoString:nil];
                             [nameScanner scanUpToString:@"kjklgfdjfgkdlj" intoString:&newShowName];
-							foundURL=YES;
-						}
-                        else if ([[document URL] hasPrefix:@"https://www.itv.com/itvplayer/"] ||
-                                 [[document URL] hasPrefix:@"http://www.channel4.com/programmes/"])
+                            foundURL=YES;
+                        }
+                        else if ([[tab URL] hasPrefix:@"https://www.itv.com/itvplayer/"] ||
+                                 [[tab URL] hasPrefix:@"http://www.channel4.com/programmes/"])
                         {
-                            url = [NSString stringWithString:[document URL]];
-                            source = [document source];
+                            url = [NSString stringWithString:[tab URL]];
+                            source = [Safari doJavaScript:@"document.documentElement.outerHTML" in:tab];
                             foundURL=YES;
                         }
 					}
 					if (foundURL==NO)
 					{
-						url = [NSString stringWithString:[[documents objectAtIndex:0] URL]];
+						url = [NSString stringWithString:[[[windows objectAtIndex:0] currentTab] URL]];
                         //Might be incorrect
 					}
 				}
@@ -1188,7 +1189,6 @@
 			[browserNotOpen runModal];
 			return;
 		}
-		
 	}
     else if ([browser isEqualToString:@"Chrome"])
 	{
@@ -1203,29 +1203,26 @@
 				{
 					for (ChromeWindow *window in windows)
  					{
-                        SBElementArray *tabs = [window tabs];
-                        for (ChromeTab *tab in tabs)
+                        ChromeTab *tab = [window activeTab];
+                        if ([[tab URL] hasPrefix:@"http://www.bbc.co.uk/iplayer/episode/"] ||
+                            [[tab URL] hasPrefix:@"http://bbc.co.uk/iplayer/episode/"] ||
+                            [[tab URL] hasPrefix:@"http://bbc.co.uk/iplayer/console/"] ||
+                            [[tab URL] hasPrefix:@"http://www.bbc.co.uk/iplayer/console/"] ||
+                            [[tab URL] hasPrefix:@"http://bbc.co.uk/sport"])
                         {
-                            if ([[tab URL] hasPrefix:@"http://www.bbc.co.uk/iplayer/episode/"] ||
-                                [[tab URL] hasPrefix:@"http://bbc.co.uk/iplayer/episode/"] ||
-                                [[tab URL] hasPrefix:@"http://bbc.co.uk/iplayer/console/"] ||
-                                [[tab URL] hasPrefix:@"http://www.bbc.co.uk/iplayer/console/"] ||
-                                [[tab URL] hasPrefix:@"http://bbc.co.uk/sport"])
-                            {
-                                url = [NSString stringWithString:[tab URL]];
-                                NSScanner *nameScanner = [NSScanner scannerWithString:[tab title]];
-                                [nameScanner scanString:@"BBC iPlayer - " intoString:nil];
-                                [nameScanner scanString:@"BBC Sport - " intoString:nil];
-                                [nameScanner scanUpToString:@"kjklgfdjfgkdlj" intoString:&newShowName];
-                                foundURL=YES;
-                            }
-                            else if ([[tab URL] hasPrefix:@"https://www.itv.com/itvplayer/"] ||
-                                     [[tab URL] hasPrefix:@"http://www.channel4.com/programmes/"])
-                            {
-                                url = [NSString stringWithString:[tab URL]];
-                                source = [tab executeJavascript:@"document.getElementsByTagName('html')[0].innerHTML"];
-                                foundURL=YES;
-                            }
+                            url = [NSString stringWithString:[tab URL]];
+                            NSScanner *nameScanner = [NSScanner scannerWithString:[tab title]];
+                            [nameScanner scanString:@"BBC iPlayer - " intoString:nil];
+                            [nameScanner scanString:@"BBC Sport - " intoString:nil];
+                            [nameScanner scanUpToString:@"kjklgfdjfgkdlj" intoString:&newShowName];
+                            foundURL=YES;
+                        }
+                        else if ([[tab URL] hasPrefix:@"https://www.itv.com/itvplayer/"] ||
+                                 [[tab URL] hasPrefix:@"http://www.channel4.com/programmes/"])
+                        {
+                            url = [NSString stringWithString:[tab URL]];
+                            source = [tab executeJavascript:@"document.documentElement.outerHTML"];
+                            foundURL=YES;
                         }
 					}
 					if (foundURL==NO)
@@ -1444,7 +1441,7 @@
             NSAlert *invalidPage = [[NSAlert alloc] init];
             [invalidPage addButtonWithTitle:@"OK"];
             [invalidPage setMessageText:[NSString stringWithFormat:@"Invalid Page: %@",url]];
-            [invalidPage setInformativeText:@"Please ensure the browser is open to an ITV Player free catch-up episode page."];
+            [invalidPage setInformativeText:@"Please ensure the frontmost browser tab is open to an ITV Player free catch-up episode page."];
             [invalidPage setAlertStyle:NSWarningAlertStyle];
             [invalidPage runModal];
             return;
@@ -1477,7 +1474,7 @@
             NSAlert *invalidPage = [[NSAlert alloc] init];
             [invalidPage addButtonWithTitle:@"OK"];
             [invalidPage setMessageText:[NSString stringWithFormat:@"Invalid Page: %@",url]];
-            [invalidPage setInformativeText:@"Please ensure the browser is open to a 4oD episode page."];
+            [invalidPage setInformativeText:@"Please ensure the frontmost browser tab is open to a 4oD episode page."];
             [invalidPage setAlertStyle:NSWarningAlertStyle];
             [invalidPage runModal];
             return;
@@ -1492,7 +1489,7 @@
 		NSAlert *invalidPage = [[NSAlert alloc] init];
 		[invalidPage addButtonWithTitle:@"OK"];
 		[invalidPage setMessageText:[NSString stringWithFormat:@"Invalid Page: %@",url]];
-		[invalidPage setInformativeText:@"Please ensure the browser is open to an iPlayer episode page, ITV Player free catch-up episode page or 4oD episode page."];
+		[invalidPage setInformativeText:@"Please ensure the frontmost browser tab is open to an iPlayer episode page, ITV Player free catch-up episode page or 4oD episode page."];
 		[invalidPage setAlertStyle:NSWarningAlertStyle];
 		[invalidPage runModal];
 	}
