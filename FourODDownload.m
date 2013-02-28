@@ -186,15 +186,35 @@
     
     NSScanner *scanner = [NSScanner scannerWithString:[responseString stringByDecodingHTMLEntities]];
     
-    NSString *programmeNumber = nil;
+    NSUInteger scanloc = [scanner scanLocation];
+    NSInteger programmeNumber = 0;
     [scanner scanUpToString:@"<programmeNumber>" intoString:nil];
     [scanner scanString:@"<programmeNumber>" intoString:nil];
-    [scanner scanUpToString:@"</programmeNumber>" intoString:&programmeNumber];
+    [scanner scanInteger:&programmeNumber];
+    if (programmeNumber)
+        [show setEpisode:programmeNumber];
+    else
+        [scanner setScanLocation:scanloc];
     
+    scanloc = [scanner scanLocation];
     NSString *brandTitle = nil;
     [scanner scanUpToString:@"<brandTitle>" intoString:nil];
     [scanner scanString:@"<brandTitle>" intoString:nil];
     [scanner scanUpToString:@"</brandTitle>" intoString:&brandTitle];
+    if (brandTitle)
+        [show setSeriesName:brandTitle];
+    else
+        [scanner setScanLocation:scanloc];
+
+    scanloc = [scanner scanLocation];
+    NSString *episodeTitle = nil;
+    [scanner scanUpToString:@"<brandTitle>" intoString:nil];
+    [scanner scanString:@"<brandTitle>" intoString:nil];
+    [scanner scanUpToString:@"</brandTitle>" intoString:&episodeTitle];
+    if (episodeTitle)
+        [show setEpisodeName:episodeTitle];
+    else
+        [scanner setScanLocation:scanloc];
 
     NSString *uriData = nil;
     [scanner scanUpToString:@"<uriData>" intoString:nil];
@@ -207,9 +227,9 @@
     NSString *streamUri = nil;
     [scanner scanUpToString:@"</" intoString:&streamUri];
 
-    NSLog(@"DEBUG: Metadata processed: programmeNumber=%@ brandTitle=%@ uriData=%@ streamUri=%@", programmeNumber, brandTitle, uriData, streamUri);
+    NSLog(@"DEBUG: Metadata processed: programmeNumber=%ld brandTitle=%@ episodeTitle=%@ uriData=%@ streamUri=%@", programmeNumber, brandTitle, episodeTitle, uriData, streamUri);
     if (verbose)
-        [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata processed: programmeNumber=%@ brandTitle=%@ uriData=%@ streamUri=%@", programmeNumber, brandTitle, uriData, streamUri] noTag:YES];
+        [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata processed: programmeNumber=%ld brandTitle=%@ episodeTitle=%@ uriData=%@ streamUri=%@", programmeNumber, brandTitle, episodeTitle, uriData, streamUri] noTag:YES];
 
     if ([streamUri hasSuffix:@".f4m"])
     {
@@ -507,8 +527,9 @@
         [scanner scanUpToString:@"<episodeTitle>" intoString:nil];
         [scanner scanString:@"<episodeTitle>" intoString:nil];
         [scanner scanUpToString:@"</" intoString:&episodeTitle];
-        [show setEpisodeName:episodeTitle];
-        if (!episodeTitle)
+        if (episodeTitle)
+            [show setEpisodeName:episodeTitle];
+        else
             [scanner setScanLocation:scanloc];
         
         scanloc = [scanner scanLocation];
@@ -516,8 +537,9 @@
         [scanner scanUpToString:@"<brandTitle>" intoString:nil];
         [scanner scanString:@"<brandTitle>" intoString:nil];
         [scanner scanUpToString:@"</" intoString:&seriesTitle];
-        [show setSeriesName:seriesTitle];
-        if (!seriesTitle)
+        if (seriesTitle)
+            [show setSeriesName:seriesTitle];
+        else
             [scanner setScanLocation:scanloc];
         
         scanloc = [scanner scanLocation];
@@ -525,8 +547,9 @@
         [scanner scanUpToString:@"<episodeNumber>" intoString:nil];
         [scanner scanString:@"<episodeNumber>" intoString:nil];
         [scanner scanInteger:&episodeNumber];
-        [show setEpisode:episodeNumber];
-        if (!episodeNumber)
+        if (episodeNumber)
+            [show setEpisode:episodeNumber];
+        else
             [scanner setScanLocation:scanloc];
         
         scanloc = [scanner scanLocation];
@@ -534,8 +557,9 @@
         [scanner scanUpToString:@"<seriesNumber>" intoString:nil];
         [scanner scanString:@"<seriesNumber>" intoString:nil];
         [scanner scanInteger:&seriesNumber];
-        [show setSeason:seriesNumber];
-        if (!seriesNumber)
+        if (seriesNumber)
+            [show setSeason:seriesNumber];
+        else
             [scanner setScanLocation:scanloc];
         
         scanloc = [scanner scanLocation];
@@ -554,12 +578,28 @@
         [scanner scanString:@"<episodeGuideUrl>" intoString:nil];
         [scanner scanUpToString:@"</" intoString:&episodeGuideUrl];
         
-        if (episodeTitle && ![[show showName] hasPrefix:episodeTitle]) {
-            [show setShowName:[NSString stringWithFormat:@"%@ - %@", [show showName], episodeTitle]];
+        NSString *showname = nil, *senum = nil, *epnum = nil, *epname = nil;
+        showname = [show seriesName];
+        if ([show season])
+            senum = [NSString stringWithFormat:@"Series %ld", [show season]];
+        if ([show episode])
+            epnum = [NSString stringWithFormat:@"Episode %ld", [show episode]];
+        epname = [show episodeName];
+        if (senum) {
+            if (epnum) {
+                showname = [NSString stringWithFormat:@"%@ - %@ %@", showname, senum, epnum];
+            }
+            else {
+                showname = [NSString stringWithFormat:@"%@ - %@", showname, senum];
+            }
         }
-        else if (episodeTitle && [episodeTitle isEqualToString:seriesTitle]) {
-            [show setShowName:episodeTitle];
+        else if (epnum) {
+            showname = [NSString stringWithFormat:@"%@ - %@", showname, epnum];
         }
+        if (epname && ![epname isEqualToString:[show seriesName]] && ![epname isEqualToString:epnum]) {
+            showname = [NSString stringWithFormat:@"%@ - %@", showname, epname];
+        }
+        [show setShowName:showname];
         
         if (!(episodeTitle && seriesTitle && episodeNumber && seriesNumber && imagePath && episodeGuideUrl))
         {

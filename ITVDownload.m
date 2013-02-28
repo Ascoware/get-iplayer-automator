@@ -364,11 +364,12 @@
     }
     
     NSInteger seriesNumber = 0;
-    if ([mediaEntries count] > 0) {
-        NSScanner *mescanner = [NSScanner scannerWithString:[[mediaEntries objectAtIndex:0] url]];
+    for (ITVMediaFileEntry *entry in mediaEntries) {
+        NSScanner *mescanner = [NSScanner scannerWithString:[entry url]];
         [mescanner scanUpToString:@"(series-" intoString:nil];
         [mescanner scanString:@"(series-" intoString:nil];
-        [mescanner scanInteger:&seriesNumber];
+        if ([mescanner scanInteger:&seriesNumber])
+            break;
     }
     [show setSeason:seriesNumber];
     NSLog(@"DEBUG: seriesNumber=%ld", seriesNumber);
@@ -409,7 +410,7 @@
     if (verbose)
         [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme data response: %@", responseString] noTag:YES];
     NSError *error = [request error];
-    NSString *description = nil, *showname = nil, *senum = nil, *epnum = nil, *epname = nil, *temp_showname = nil;
+    NSString *description = nil, *showname = nil, *senum = nil, *epnum = nil, *epname = nil, *temp_showname;
     if ([request responseStatusCode] == 200 && [responseString length] > 0)
     {
         scanner = [NSScanner scannerWithString:responseString];
@@ -435,12 +436,10 @@
     if (!temp_showname)
         temp_showname = [show seriesName];
     showname = temp_showname;
-    if ([show season] != 0)
+    if ([show season])
         senum = [NSString stringWithFormat:@"Series %ld", [show season]];
-    if ([show episode] != 0)
+    if ([show episode])
         epnum = [NSString stringWithFormat:@"Episode %ld", [show episode]];
-    else
-        epnum = [show realPID];
     epname = [show episodeName];
     if (!epname || [epname isEqualToString:@"(No Episode Name)"])
     {
@@ -450,14 +449,20 @@
         [dateFormat setDateFormat:@"dd/MM/yyyy"];
         epname = [dateFormat stringFromDate:[show dateAired]];
     }
-    if (senum)
-        showname = [NSString stringWithFormat:@"%@ - %@", showname, senum];
-        if (epnum && ![epname hasPrefix:epnum])
-            showname = [NSString stringWithFormat:@"%@ %@", showname, epnum];
-    else if (epnum && ![epname hasPrefix:epnum])
+    if (senum) {
+        if (epnum) {
+            showname = [NSString stringWithFormat:@"%@ - %@ %@", showname, senum, epnum];
+        }
+        else {
+            showname = [NSString stringWithFormat:@"%@ - %@", showname, senum];
+        }
+    }
+    else if (epnum) {
         showname = [NSString stringWithFormat:@"%@ - %@", showname, epnum];
-    if (epname && ![epname isEqualToString:temp_showname])
+    }
+    if (epname && ![epname isEqualToString:temp_showname] && ![epname isEqualToString:epnum]) {
         showname = [NSString stringWithFormat:@"%@ - %@", showname, epname];
+    }
     [show setShowName:showname];
     if (!description)
         description = @"(No Description)";
