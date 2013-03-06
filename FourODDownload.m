@@ -353,8 +353,10 @@
     NSString *auth = nil, *rtmpURL = nil, *app = nil, *playpath = nil;
     @try
     {
-        if (!(uriData && streamUri && token && cdn && decodedToken))
+        if (!(uriData && streamUri && token && cdn))
             [NSException raise:@"Parsing Error" format:@"Could not process 4oD Metadata"];
+        if (!decodedToken)
+            [NSException raise:@"Decoding Error" format:@"Could not decode 4oD token"];
 
         if ([cdn isEqualToString:@"ll"])
         {
@@ -467,6 +469,8 @@
         [show setValue:@"Download Failed" forKey:@"status"];
         if ([[exception name] isEqualToString:@"4oD: Unsupported HTTP Download"])
             [show setReasonForFailure:@"4oDHTTP"];
+        else if ([[exception name] isEqualToString:@"Decoding Error"])
+            [show setReasonForFailure:@"4oDToken"];
         else
             [show setReasonForFailure:@"MetadataProcessing"];
         [nc postNotificationName:@"DownloadFinished" object:show];
