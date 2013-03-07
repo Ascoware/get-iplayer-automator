@@ -701,7 +701,7 @@
 
     NSString *swfplayer = [[NSUserDefaults standardUserDefaults] valueForKey:[NSString stringWithFormat:@"%@SWFURL", defaultsPrefix]];
     if (!swfplayer) {
-        swfplayer = @"http://www.channel4.com/static/programmes/asset/flash/swf/4odplayer-11.36.swf";
+        swfplayer = @"http://www.channel4.com/static/programmes/asset/flash/swf/4odplayer-11.37.swf";
     }
     
     NSArray *args = [NSArray arrayWithObjects:@"--rtmp",[downloadParams objectForKey:@"rtmpURL"],
