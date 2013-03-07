@@ -470,7 +470,7 @@
         if ([[exception name] isEqualToString:@"4oD: Unsupported HTTP Download"])
             [show setReasonForFailure:@"4oDHTTP"];
         else if ([[exception name] isEqualToString:@"Decoding Error"])
-            [show setReasonForFailure:@"4oDToken"];
+            [show setReasonForFailure:@"4oDUnavailable"];
         else
             [show setReasonForFailure:@"MetadataProcessing"];
         [nc postNotificationName:@"DownloadFinished" object:show];

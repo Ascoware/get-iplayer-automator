@@ -42,8 +42,8 @@ proxy option in preferences.</string>
 Unfortunately, this show is one of them.</string>
 	<key>4oDFormat</key>
 	<string>GiA did not find a suitable download format for the 4oD programme.</string>
-	<key>4oDToken</key>
-	<string>GiA cannot download many 4oD programmes older than 30 days.
+	<key>4oDUnavailable</key>
+	<string>Many 4oD programmes are unavailable to GiA.
 Unfortunately, this programme is one of them.</string>
 </dict>
 </plist>
