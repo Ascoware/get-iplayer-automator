@@ -507,9 +507,21 @@
     NSLog(@"DEBUG: Retry metadata URL: %@", retryURL);
     if (verbose)
         [self addToLog:[NSString stringWithFormat:@"DEBUG: Retry metadata URL: %@", retryURL] noTag:YES];
-    ASIHTTPRequest *retryRequest = [request copy];
-    [retryRequest setURL:retryURL];
+    ASIHTTPRequest *retryRequest = [ASIHTTPRequest requestWithURL:retryURL];
     [retryRequest setTag:pid];
+    [retryRequest setDelegate:self];
+    [retryRequest setDidFailSelector:@selector(metaRequestFinished:)];
+    [retryRequest setDidFinishSelector:@selector(metaRequestFinished:)];
+    [retryRequest setTimeOutSeconds:10];
+    [retryRequest setNumberOfTimesToRetryOnTimeout:3];
+    [retryRequest addRequestHeader:@"Accept" value:@"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"];
+    if (proxy)
+    {
+        [retryRequest setProxyType:proxy.type];
+        [retryRequest setProxyHost:proxy.host];
+        if (proxy.port)
+            [retryRequest setProxyPort:proxy.port];
+    }
     NSLog(@"INFO: Retry metadata: %ld", pid);
     [self addToLog:[NSString stringWithFormat:@"INFO: Retry metadata: %ld", pid] noTag:YES];
     [retryRequest startAsynchronous];
