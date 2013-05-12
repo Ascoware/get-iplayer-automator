@@ -32,6 +32,7 @@
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
+		D9041ABF16AC81A5000C3820 /* ActivityWindow@2X.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D9041ABE16AC81A5000C3820 /* ActivityWindow@2X.tiff */; };
 		D904F04A1009F22E00D60BBF /* get_iplayer.pl in Resources */ = {isa = PBXBuildFile; fileRef = D904F0491009F22E00D60BBF /* get_iplayer.pl */; };
 		D904F0731009F6B800D60BBF /* mplayer in Resources */ = {isa = PBXBuildFile; fileRef = D904F0721009F6B800D60BBF /* mplayer */; };
 		D904F424100B077600D60BBF /* Programme.m in Sources */ = {isa = PBXBuildFile; fileRef = D904F423100B077600D60BBF /* Programme.m */; };
@@ -139,6 +140,7 @@
 		39879DAE16904B9F0050CA7D /* NSString+HTML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+HTML.m"; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* Get iPlayer Automator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Get iPlayer Automator.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D9041ABE16AC81A5000C3820 /* ActivityWindow@2X.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "ActivityWindow@2X.tiff"; sourceTree = "<group>"; };
 		D904F0491009F22E00D60BBF /* get_iplayer.pl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.perl; name = get_iplayer.pl; path = ../get_iplayer.pl; sourceTree = "<group>"; };
 		D904F0721009F6B800D60BBF /* mplayer */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = mplayer; sourceTree = "<group>"; };
 		D904F422100B077600D60BBF /* Programme.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Programme.h; sourceTree = "<group>"; };
@@ -480,6 +482,7 @@
 		D9CC156B0FF9073D00D819E2 /* Buttons */ = {
 			isa = PBXGroup;
 			children = (
+				D9041ABE16AC81A5000C3820 /* ActivityWindow@2X.tiff */,
 				D91783EF1013035B00B82736 /* camstudio_record_button.png */,
 				D9CC157A0FF9076F00D819E2 /* Stop.tiff */,
 				D9CC15670FF9071700D819E2 /* Play.tiff */,
