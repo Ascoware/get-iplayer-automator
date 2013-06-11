@@ -415,7 +415,7 @@
         if ([request responseStatusCode] == 200)
         {
             [self addToLog:@"INFO: Subtitles Download Completed" noTag:YES];
-            if ([subtitlePath pathExtension] != @"srt")
+            if (![[subtitlePath pathExtension] isEqual: @"srt"])
             {
                 [show setValue:@"Converting Subtitles..." forKey:@"status"];
                 [self setPercentage:102];

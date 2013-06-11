@@ -144,9 +144,9 @@ extern BOOL runDownloads;
 	return [NSArray arrayWithObject:@"com.thomaswillson.programme"];
 }
  */
--(void)setPid:(NSString *)pid
+-(void)setPid:(NSString *)newPID
 {
-    self->pid = [pid stringByReplacingOccurrencesOfString:@"amp;" withString:@""];
+    self->pid = [newPID stringByReplacingOccurrencesOfString:@"amp;" withString:@""];
 }
 @synthesize showName;
 @synthesize pid;

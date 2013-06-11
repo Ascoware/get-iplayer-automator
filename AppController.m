@@ -1774,7 +1774,7 @@
 {
 	if (!runDownloads)
 	{
-		[[[note userInfo] show] setValue:@"Cancelled" forKey:@"status"];
+		[[(Download*)[note userInfo] show] setValue:@"Cancelled" forKey:@"status"];
 		currentDownload=nil;
 		NSLog(@"Download should read cancelled");
 	}
