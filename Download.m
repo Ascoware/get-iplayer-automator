@@ -76,15 +76,13 @@
         if (![scanner scanDouble:&percent]) percent=102.0;
         if (downloaded>0 && percent>0 && percent!=102) total = ((downloaded/1024)/(percent/100));
         else total=0;
-        if (percent != 102)
-            [self setCurrentProgress:[NSString stringWithFormat:@"%.1f%% - (%.2f MB/~%.0f MB) -- %@",percent,downloaded/1024,total,[show valueForKey:@"showName"]]];
-        else
-            [self setCurrentProgress:[NSString stringWithFormat:@"%.2f MB Downloaded -- %@",downloaded/1024,[show showName]]];
-        [self setPercentage:percent];
-        if (percent != 102)
+        if (percent != 102) {
             [show setValue:[NSString stringWithFormat:@"Downloading: %.1f%%", percent] forKey:@"status"];
-        else 
+        }
+        else {
             [show setValue:@"Downloading..." forKey:@"status"];
+        }
+        [self setPercentage:percent];
         
         //Calculate Time Remaining
         downloaded=downloaded/1024;
@@ -93,6 +91,7 @@
             if ([rateEntries count] >= 50)
             {
                 double rate = ((downloaded-lastDownloaded)/(-[lastDate timeIntervalSinceNow]));
+                double oldestRate = [[rateEntries objectAtIndex:0] doubleValue];
                 if (rate < (oldRateAverage*5) && rate > (oldRateAverage/5) && rate < 50)
                 {
                     [rateEntries removeObjectAtIndex:0];
@@ -110,12 +109,8 @@
                 }
                 
                 
-                double rateSum=0;
-                for (NSNumber *tempRate in rateEntries)
-                {
-                    rateSum=rateSum+[tempRate doubleValue];
-                }
-                double rateAverage = oldRateAverage = rateSum/[rateEntries count];
+                double rateSum= (oldRateAverage*50)-oldestRate+rate;
+                double rateAverage = oldRateAverage = rateSum/50;
                 lastDownloaded=downloaded;
                 lastDate = [NSDate date];
                 NSDate *predictedFinished = [NSDate dateWithTimeIntervalSinceNow:(total-downloaded)/rateAverage];
