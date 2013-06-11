@@ -347,65 +347,34 @@
 	{
 		NSString *outp = [errorCache copy];
 		errorCache = [NSMutableString stringWithString:@""];
-		if ([outp length] > 0) {
-			BOOL status=YES;
-			NSString *outpt = [[NSString alloc] initWithString:outp];
-			NSString *string = [NSString stringWithString:outpt];
-			NSUInteger length = [string length];
-			NSUInteger paraStart = 0, paraEnd = 0, contentsEnd = 0;
-			NSMutableArray *array = [NSMutableArray array];
-			NSRange currentRange;
-			while (paraEnd < length) {
-				[string getParagraphStart:&paraStart end:&paraEnd
-							  contentsEnd:&contentsEnd forRange:NSMakeRange(paraEnd, 0)];
-				currentRange = NSMakeRange(paraStart, contentsEnd - paraStart);
-				[array addObject:[string substringWithRange:currentRange]];
-			}
-			for (NSString *s in array)
+		if ([outp length] > 0) {          
+            NSArray *array = [outp componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+            
+			for (NSString *message in array)
 			{
-				NSString *s2;
-				NSScanner *scanner = [NSScanner scannerWithString:s];
-				//Check if BBC Flash status Message
-				if (![scanner scanFloat:nil])
-				{
-					if ([s length] != 0)
-					{
-						//If not...
-						if ([s hasPrefix:@"frame="]) s2= @"Converting...";
-						else if ([s hasPrefix:@" Progress"]) s2= @"Processing Download...";
-						else 
-						{
-							s2 = [NSString stringWithFormat:@"Initialising... -- %@", [show valueForKey:@"showName"]];
-							[self addToLog:s noTag:YES];
-						}
-						status=NO;
-						[scanner setScanLocation:0];
-						if ([s hasPrefix:@"ERROR:"] || [s hasPrefix:@"\rERROR:"] || [s hasPrefix:@"\nERROR:"])
-						{
-							if ([scanner scanUpToString:@"corrupt file!" intoString:nil] && [scanner scanString:@"corrupt file!" intoString:nil])
-							{
-								[self addToLog:@"Unresumable file, please delete the partial file and try again." noTag:NO];
-								[task interrupt];
-								reasonForFailure=@"unresumable";
-                                [show setReasonForFailure:@"Unresumable_File"];
-							}
-						}
-                        [scanner setScanLocation:0];
-                        [scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:nil];
-					}
-					else
-					{
-						status=NO;
-						s2=nil;
-						[scanner setScanLocation:0];
-                        [scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:nil];
-					}
-				}
-				else
-                    [self processFLVStreamerMessage:[scanner string]];
-
-				//If an MPlayer (Real Audio) status message...
-				if ([s hasPrefix:@"A:"])
+                NSString *shortStatus=nil;
+                NSScanner *scanner = [NSScanner scannerWithString:message];
+                if ([message length] == 0){
+                    continue;
+                }
+                else if ([scanner scanFloat:nil]) //RTMPDump
+                {
+                    [self processFLVStreamerMessage:message];
+                    continue;
+                }
+				else if ([message hasPrefix:@"frame="]) shortStatus= @"Converting..."; //FFMpeg
+                else if ([message hasPrefix:@" Progress"]) shortStatus= @"Processing Download..."; //Download Artwork
+                else if ([message hasPrefix:@"ERROR:"] || [message hasPrefix:@"\rERROR:"] || [message hasPrefix:@"\nERROR:"]) //Could be unresumable.
+                {
+                    if ([scanner scanUpToString:@"corrupt file!" intoString:nil] && [scanner scanString:@"corrupt file!" intoString:nil])
+                    {
+                        [self addToLog:@"Unresumable file, please delete the partial file and try again." noTag:NO];
+                        [task interrupt];
+                        reasonForFailure=@"unresumable";
+                        [show setReasonForFailure:@"Unresumable_File"];
+                    }
+                }
+				else if ([message hasPrefix:@"A:"]) //MPlayer
 				{
                     double downloaded, percent, total;
 					NSString *downloadedString, *totalString;
@@ -418,35 +387,25 @@
 					if (![scanner scanDouble:&total]) total=0.0;
 					[scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:nil];
 					[scanner scanUpToString:@")" intoString:&totalString];
-					if (total>0) percent = (downloaded/total)*100; 
+					if (total>0) percent = (downloaded/total)*100;
 					else percent = 0.0;
 					if ([downloadedString length] < 7) downloadedString = [@"00:" stringByAppendingString:downloadedString];
 					[self setCurrentProgress:[NSString stringWithFormat:@"%.1f%% - (%@/%@) -- %@",percent,downloadedString,totalString,[show valueForKey:@"showName"]]];
 					[self setPercentage:percent];
 					[show setValue:[NSString stringWithFormat:@"Downloading: %.1f%%", percent] forKey:@"status"];
+                    continue;
 				}
-				else
-				{	
-					//Otherwise, use the indeterminate display.
-					if ([s2 isEqualToString:@"Converting..."])
-					{
-						[self setCurrentProgress:[NSString stringWithFormat:@"Converting... -- %@",[show valueForKey:@"showName"]]];
-						[self setPercentage:102];
-						[show setValue:@"Converting..." forKey:@"status"];
-					}
-					else if ([s2 isEqualToString:@"Processing Download..."])
-					{
-						[self setCurrentProgress:[NSString stringWithFormat:@"Processing Download... -- %@", [show valueForKey:@"showName"]]];
-						[self setPercentage:102];
-						[show setValue:@"Processing Download..." forKey:@"status"];
-					}
-					else if (s2 != nil) 
-					{
-						[self setCurrentProgress:s2];
-						[self setPercentage:102];
-						[show setValue:@"Downloading..." forKey:@"status"];
-					}
-				}
+                else //Other
+                {
+                    shortStatus = [NSString stringWithFormat:@"Initialising... -- %@", [show valueForKey:@"showName"]];
+                    [self addToLog:message noTag:YES];
+                } 
+                if (shortStatus != nil)
+                {
+                    [self setCurrentProgress:[NSString stringWithFormat:@"%@ -- %@",shortStatus,[show valueForKey:@"showName"]]];
+                    [self setPercentage:102];
+                    [show setValue:shortStatus forKey:@"status"];
+                }
 			}
 			
 		}
@@ -464,19 +423,7 @@
 }
 - (void)processGetiPlayerOutput:(NSString *)outp
 {
-	//Separate the output by line.
-	NSString *outpt = [[NSString alloc] initWithString:outp];
-	NSString *string = [NSString stringWithString:outpt];
-	NSUInteger length = [string length];
-	NSUInteger paraStart = 0, paraEnd = 0, contentsEnd = 0;
-	NSMutableArray *array = [NSMutableArray array];
-	NSRange currentRange;
-	while (paraEnd < length) {
-		[string getParagraphStart:&paraStart end:&paraEnd
-					  contentsEnd:&contentsEnd forRange:NSMakeRange(paraEnd, 0)];
-		currentRange = NSMakeRange(paraStart, contentsEnd - paraStart);
-		[array addObject:[string substringWithRange:currentRange]];
-	}
+	NSArray *array = [outp componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
 	//Parse each line individually.
 	for (NSString *output in array)
 	{
