@@ -772,6 +772,7 @@
             if (PyErr_Occurred())
                 PyErr_Print();
             NSLog(@"Cannot find function \"%@\"\n", @"Decode4odToken");
+            return nil;
         }
         Py_XDECREF(pFunc);
         Py_DECREF(pModule);
