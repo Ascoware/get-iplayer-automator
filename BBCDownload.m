@@ -38,24 +38,23 @@
 	NSString *ffmpegPath = [bundlePath stringByAppendingString:@"/Contents/Resources/ffmpeg"];
 	downloadPath = [[NSString alloc] initWithString:[[NSUserDefaults standardUserDefaults] valueForKey:@"DownloadPath"]];
 		//Initialize Formats
-	NSArray *tvFormatKeys = [NSArray arrayWithObjects:@"iPhone",@"Flash - High",@"Flash - Low",@"Flash - HD",@"Flash - Standard",@"Flash - Normal",@"Flash - Very High",nil];
-	NSArray *tvFormatObjects = [NSArray arrayWithObjects:@"iphone",@"flashhigh2,flashhigh1",@"flashlow2,flashlow1",@"flashhd2,flashhd1",@"flashstd2,flashstd1",@"flashstd2,flashstd1",@"flashvhigh2,flashvhigh1",nil];
+	NSArray *tvFormatKeys = @[@"iPhone",@"Flash - High",@"Flash - Low",@"Flash - HD",@"Flash - Standard",@"Flash - Normal",@"Flash - Very High",nil];
+	NSArray *tvFormatObjects = @[@"iphone",@"flashhigh2,flashhigh1",@"flashlow2,flashlow1",@"flashhd2,flashhd1",@"flashstd2,flashstd1",@"flashstd2,flashstd1",@"flashvhigh2,flashvhigh1",nil];
 	NSDictionary *tvFormats = [[NSDictionary alloc] initWithObjects:tvFormatObjects forKeys:tvFormatKeys];
-	NSArray *radioFormatKeys = [NSArray arrayWithObjects:@"iPhone",@"Flash - MP3",@"Flash - AAC",@"WMA",@"Real Audio",@"Flash",@"Flash AAC - High",@"Flash AAC - Standard",@"Flash AAC - Low",nil];
-	NSArray *radioFormatObjects = [NSArray arrayWithObjects:@"iphone", @"flashaudio",@"flashaac",@"wma",@"realaudio",@"flashaudio",@"flashaachigh",@"flashaacstd",@"flashaaclow",nil];
+	NSArray *radioFormatKeys = @[@"iPhone",@"Flash - MP3",@"Flash - AAC",@"WMA",@"Real Audio",@"Flash",@"Flash AAC - High",@"Flash AAC - Standard",@"Flash AAC - Low",nil];
+	NSArray *radioFormatObjects = @[@"iphone", @"flashaudio",@"flashaac",@"wma",@"realaudio",@"flashaudio",@"flashaachigh",@"flashaacstd",@"flashaaclow",nil];
 	NSDictionary *radioFormats = [[NSDictionary alloc] initWithObjects:radioFormatObjects forKeys:radioFormatKeys];
-	NSString *formatArg;
     NSMutableString *temp_Format;
     temp_Format = [[NSMutableString alloc] initWithString:@"--modes="];
     for (RadioFormat *format in radioFormatList)
         [temp_Format appendFormat:@"%@,", [radioFormats valueForKey:[format format]]];
     for (TVFormat *format in tvFormatList)
         [temp_Format appendFormat:@"%@,",[tvFormats valueForKey:[format format]]];
-    formatArg = [NSString stringWithString:temp_Format];
+    NSString *formatArg = [NSString stringWithString:temp_Format];
 
     //Set Proxy Arguments
-    NSString *proxyArg = NULL;
-	NSString *partialProxyArg = NULL;
+    NSString *proxyArg = nil;
+	NSString *partialProxyArg = nil;
     if (proxy)
     {
         proxyArg = [[NSString alloc] initWithFormat:@"-p%@", [proxy url]];
@@ -68,21 +67,11 @@
 	NSString *noWarningArg = [[NSString alloc] initWithString:@"--nocopyright"];
 	NSString *noPurgeArg = [[NSString alloc] initWithString:@"--nopurge"];
 	NSString *mplayerArg = [[NSString alloc] initWithFormat:@"--mplayer=%@", mplayerPath];
-    NSString *flvstreamerArg;
-   
-#ifdef __x86_64__
-    NSString *rtmpdumpPath = [bundlePath stringByAppendingString:@"/Contents/Resources/rtmpdump-2.4"];
-    flvstreamerArg = [[NSString alloc] initWithFormat:@"--flvstreamer=%@", rtmpdumpPath];
-#else
-    NSString *flvstreamerPath = [bundlePath stringByAppendingString:@"/Contents/Resources/flvstreamer"];
-    flvstreamerArg = [[NSString alloc] initWithFormat:@"--flvstreamer=%@", flvstreamerPath];
-#endif
+    NSString *flvstreamerArg = [[NSString alloc] initWithFormat:@"--flvstreamer=%@", [[NSBundle mainBundle] pathForResource:@"rtmpdump-2.4" ofType:nil]];
 
 	NSString *lameArg = [[NSString alloc] initWithFormat:@"--lame=%@", lamePath];
 	NSString *atomicParsleyArg = [[NSString alloc] initWithFormat:@"--atomicparsley=%@", atomicParsleyPath];
-	NSString *ffmpegArg;
-	if (ffmpegPath) ffmpegArg = [[NSString alloc] initWithFormat:@"--ffmpeg=%@", ffmpegPath];
-	else ffmpegArg = nil;
+	NSString *ffmpegArg = [[NSString alloc] initWithFormat:@"--ffmpeg=%@", ffmpegPath];
 	NSString *downloadPathArg = [[NSString alloc] initWithFormat:@"--output=%@", downloadPath];
 	NSString *subDirArg = [[NSString alloc] initWithString:@"--subdir"];
 	NSString *getArg;
@@ -101,15 +90,15 @@
     
 	//We don't want this to refresh now!
 	NSString *cacheExpiryArg = @"-e604800000000";
-	NSString *folder = @"~/Library/Application Support/Get iPlayer Automator/";
+	NSString *appSupportFolder = @"~/Library/Application Support/Get iPlayer Automator/";
 		//Profile Override Argument
-	folder = [folder stringByExpandingTildeInPath];
+	appSupportFolder = [appSupportFolder stringByExpandingTildeInPath];
 	NSFileManager *fileManager = [NSFileManager defaultManager];
-	if ([fileManager fileExistsAtPath: folder] == NO)
+	if ([fileManager fileExistsAtPath: appSupportFolder] == NO)
 	{
-		[fileManager createDirectoryAtPath:folder withIntermediateDirectories:NO attributes:nil error:nil];
+		[fileManager createDirectoryAtPath:appSupportFolder withIntermediateDirectories:NO attributes:nil error:nil];
 	}
-	profileDirArg = [[NSString alloc] initWithFormat:@"--profile-dir=%@", folder];
+	profileDirArg = [[NSString alloc] initWithFormat:@"--profile-dir=%@", appSupportFolder];
 	
 		//Add Arguments that can't be NULL
 	NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:getiPlayerPath,profileDirArg,noWarningArg,noPurgeArg,mplayerArg,flvstreamerArg,lameArg,atomicParsleyArg,cacheExpiryArg,downloadPathArg,subDirArg,formatArg,getArg,searchArg,@"--attempts=5",@"--fatfilename",@"-w",@"--thumbsize=6",@"--tag-hdvideo",@"--tag-longdesc",versionArg,proxyArg,partialProxyArg,nil];
@@ -137,9 +126,6 @@
     if ([[NSUserDefaults standardUserDefaults] boolForKey:[NSString stringWithFormat:@"%@TagCNID", defaultsPrefix]]) {
 		[args addObject:[[NSString alloc] initWithString:@"--tag-cnid"]];
     }
-	
-	//if (floor(NSAppKitVersionNumber) > 949)
-		//[args addObject:@"--rtmp-tv-opts=-W http://www.bbc.co.uk/emp/10player.swf?revision=18269_21576"];
 
 	task = [[NSTask alloc] init];
 	pipe = [[NSPipe alloc] init];
