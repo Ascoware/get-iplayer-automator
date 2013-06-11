@@ -338,6 +338,7 @@
 		{
 			//Close the error pipe when it is empty.
 			errorPipe = nil;
+            [processErrorCache invalidate];
 		}
 	}
 }
