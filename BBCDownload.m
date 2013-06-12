@@ -26,18 +26,14 @@
 	nc = [NSNotificationCenter defaultCenter];
 	show = tempShow;
 	[self addToLog:[NSString stringWithFormat:@"Downloading %@", [show showName]]];
-	i=0;
-	//Prepare Arguments
-		//Initialize Paths
-	NSString *bundlePath = [[NSString alloc] initWithString:[[NSBundle mainBundle] bundlePath]];
-    NSString *resourcesPath = [bundlePath stringByAppendingString:@"/Contents/Resources/"];
-	NSString *getiPlayerPath = [bundlePath stringByAppendingString:@"/Contents/Resources/get_iplayer.pl"];
-	NSString *mplayerPath = [bundlePath stringByAppendingString:@"/Contents/Resources/mplayer"];
-	NSString *atomicParsleyPath = [bundlePath stringByAppendingString:@"/Contents/Resources/AtomicParsley"];
-	NSString *lamePath = [bundlePath stringByAppendingString:@"/Contents/Resources/lame"];
-	NSString *ffmpegPath = [bundlePath stringByAppendingString:@"/Contents/Resources/ffmpeg"];
+	noDataCount=0;
+		
+    //Initialize Paths
+    NSBundle *bundle = [NSBundle mainBundle];
+	NSString *getiPlayerPath = [bundle pathForResource:@"get_iplayer" ofType:@"pl"];
 	downloadPath = [[NSString alloc] initWithString:[[NSUserDefaults standardUserDefaults] valueForKey:@"DownloadPath"]];
-		//Initialize Formats
+		
+    //Initialize Formats
 	NSArray *tvFormatKeys = @[@"iPhone",@"Flash - High",@"Flash - Low",@"Flash - HD",@"Flash - Standard",@"Flash - Normal",@"Flash - Very High",nil];
 	NSArray *tvFormatObjects = @[@"iphone",@"flashhigh2,flashhigh1",@"flashlow2,flashlow1",@"flashhd2,flashhd1",@"flashstd2,flashstd1",@"flashstd2,flashstd1",@"flashvhigh2,flashvhigh1",nil];
 	NSDictionary *tvFormats = [[NSDictionary alloc] initWithObjects:tvFormatObjects forKeys:tvFormatKeys];
@@ -63,17 +59,16 @@
             partialProxyArg = [[NSString alloc] initWithString:@"--partial-proxy"];
         }
     }
-		//Initialize the rest of the arguments
+    //Initialize the rest of the arguments
 	NSString *noWarningArg = [[NSString alloc] initWithString:@"--nocopyright"];
 	NSString *noPurgeArg = [[NSString alloc] initWithString:@"--nopurge"];
-	NSString *mplayerArg = [[NSString alloc] initWithFormat:@"--mplayer=%@", mplayerPath];
-    NSString *flvstreamerArg = [[NSString alloc] initWithFormat:@"--flvstreamer=%@", [[NSBundle mainBundle] pathForResource:@"rtmpdump-2.4" ofType:nil]];
-
-	NSString *lameArg = [[NSString alloc] initWithFormat:@"--lame=%@", lamePath];
-	NSString *atomicParsleyArg = [[NSString alloc] initWithFormat:@"--atomicparsley=%@", atomicParsleyPath];
-	NSString *ffmpegArg = [[NSString alloc] initWithFormat:@"--ffmpeg=%@", ffmpegPath];
+	NSString *mplayerArg = [[NSString alloc] initWithFormat:@"--mplayer=%@", [bundle pathForResource:@"mplayer" ofType:nil]];
+    NSString *flvstreamerArg = [[NSString alloc] initWithFormat:@"--flvstreamer=%@", [bundle pathForResource:@"rtmpdump-2.4" ofType:nil]];
+	NSString *lameArg = [[NSString alloc] initWithFormat:@"--lame=%@", [bundle pathForResource:@"lame" ofType:nil]];
+	NSString *atomicParsleyArg = [[NSString alloc] initWithFormat:@"--atomicparsley=%@", [bundle pathForResource:@"atomicparlsey" ofType:nil]];
+	NSString *ffmpegArg = [[NSString alloc] initWithFormat:@"--ffmpeg=%@", [bundle pathForResource:@"ffmpeg" ofType:nil]];
 	NSString *downloadPathArg = [[NSString alloc] initWithFormat:@"--output=%@", downloadPath];
-	NSString *subDirArg = [[NSString alloc] initWithString:@"--subdir"];
+	NSString *subDirArg = @"--subdir";
 	NSString *getArg;
 	if ([[show processedPID] boolValue])
 		getArg = [[NSString alloc] initWithString:@"--get"];
@@ -90,26 +85,23 @@
     
 	//We don't want this to refresh now!
 	NSString *cacheExpiryArg = @"-e604800000000";
-	NSString *appSupportFolder = @"~/Library/Application Support/Get iPlayer Automator/";
-		//Profile Override Argument
-	appSupportFolder = [appSupportFolder stringByExpandingTildeInPath];
+	NSString *appSupportFolder = [@"~/Library/Application Support/Get iPlayer Automator/" stringByAbbreviatingWithTildeInPath];
 	NSFileManager *fileManager = [NSFileManager defaultManager];
-	if ([fileManager fileExistsAtPath: appSupportFolder] == NO)
+	if (![fileManager fileExistsAtPath: appSupportFolder])
 	{
 		[fileManager createDirectoryAtPath:appSupportFolder withIntermediateDirectories:NO attributes:nil error:nil];
 	}
 	profileDirArg = [[NSString alloc] initWithFormat:@"--profile-dir=%@", appSupportFolder];
 	
-		//Add Arguments that can't be NULL
-	NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:getiPlayerPath,profileDirArg,noWarningArg,noPurgeArg,mplayerArg,flvstreamerArg,lameArg,atomicParsleyArg,cacheExpiryArg,downloadPathArg,subDirArg,formatArg,getArg,searchArg,@"--attempts=5",@"--fatfilename",@"-w",@"--thumbsize=6",@"--tag-hdvideo",@"--tag-longdesc",versionArg,proxyArg,partialProxyArg,nil];
-		//Verbose?
+    //Add Arguments that can't be NULL
+	NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:getiPlayerPath,profileDirArg,noWarningArg,noPurgeArg,mplayerArg,flvstreamerArg,lameArg,atomicParsleyArg,cacheExpiryArg,downloadPathArg,subDirArg,formatArg,getArg,searchArg,@"--attempts=5",@"--fatfilename",@"-w",@"--thumbsize=6",@"--tag-hdvideo",@"--tag-longdesc",versionArg,ffmpegArg,proxyArg,partialProxyArg,nil];
+    //Verbose?
     if (verbose)
 		[args addObject:[[NSString alloc] initWithString:@"--verbose"]];
-	if (ffmpegArg) [args addObject:ffmpegArg];
 	if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"DownloadSubtitles"] isEqualTo:[NSNumber numberWithBool:YES]])
 		[args addObject:@"--subtitles"];
 	
-		//Naming Convention
+    //Naming Convention
 	if (![[[NSUserDefaults standardUserDefaults] valueForKey:@"XBMC_naming"] boolValue])
 	{
 		[args addObject:@"--file-prefix=<name> - <episode> ((<modeshort>))"];
@@ -119,7 +111,7 @@
 		[args addObject:@"--file-prefix=<nameshort>.<senum>.<episode>"];
 		[args addObject:@"--subdir-format=<nameshort>"];
 	}
-        //Tagging
+    //Tagging
     if (![[[NSUserDefaults standardUserDefaults] objectForKey:@"TagShows"] boolValue])
         [args addObject:@"--no-tag"];
 
@@ -135,10 +127,10 @@
 	[task setLaunchPath:@"/usr/bin/perl"];
 	[task setStandardOutput:pipe];
 	[task setStandardError:errorPipe];
+    
     NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:[task environment]];
-    [envVariableDictionary setObject:resourcesPath forKey:@"DYLD_LIBRARY_PATH"];
+    [envVariableDictionary setObject:[bundle resourcePath] forKey:@"DYLD_LIBRARY_PATH"];
     [envVariableDictionary setObject:[@"~" stringByExpandingTildeInPath] forKey:@"HOME"];
-    NSLog(@"%@",envVariableDictionary);
     [task setEnvironment:envVariableDictionary];
 	
 	fh = [pipe fileHandleForReading];
@@ -155,10 +147,11 @@
 	[task launch];
 	[fh readInBackgroundAndNotify];
 	[errorFh readInBackgroundAndNotify];
-	[show setValue:@"Starting..." forKey:@"status"];
 	
 	//Prepare UI
 	[self setCurrentProgress:@"Beginning..."];
+    [show setValue:@"Starting..." forKey:@"status"];
+    
 	return self;
 }
 - (id)description
@@ -169,8 +162,7 @@
 - (void)DownloadDataReady:(NSNotification *)note
 {
 	[[pipe fileHandleForReading] readInBackgroundAndNotify];
-	NSData *d;
-    d = [[note userInfo] valueForKey:NSFileHandleNotificationDataItem];
+    NSData *d = [[note userInfo] valueForKey:NSFileHandleNotificationDataItem];
 	
     if ([d length] > 0) {
 		NSString *s = [[NSString alloc] initWithData:d
@@ -179,8 +171,8 @@
 	}
 	else
 	{
-		i++;
-		if (i>20 && running)
+		noDataCount++;
+		if (noDataCount>20 && running)
 		{
 			running=NO;
 			//Download Finished Handler
@@ -188,27 +180,10 @@
 			pipe = nil;
 			if (runDownloads)
 			{
-				NSString *lastLine;
 				if (!foundLastLine)
-				{
-					NSUInteger length = [log length];
-					NSUInteger paraStart = 0, paraEnd = 0, contentsEnd = 0;
-					NSMutableArray *array = [NSMutableArray array];
-					NSRange currentRange;
-					while (paraEnd < length) {
-						[log getParagraphStart:&paraStart end:&paraEnd
-									  contentsEnd:&contentsEnd forRange:NSMakeRange(paraEnd, 0)];
-						currentRange = NSMakeRange(paraStart, contentsEnd - paraStart);
-						[array addObject:[log substringWithRange:currentRange]];
-					}
-					lastLine = [array objectAtIndex:([array count]-1)];
-				}
-				else 
-				{
-					lastLine = LastLine;
-				}
+					LastLine = [[log componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]] lastObject];
 
-				NSScanner *scn = [NSScanner scannerWithString:lastLine];
+				NSScanner *scn = [NSScanner scannerWithString:LastLine];
 				if ([reasonForFailure isEqualToString:@"unresumable"])
 				{
 					[show setValue:[NSNumber numberWithBool:YES] forKey:@"complete"];
@@ -259,12 +234,12 @@
                 {
                     NSLog(@"InHistory");
                 }
-				else if ([lastLine hasPrefix:@"INFO: Recorded"])
+				else if ([LastLine hasPrefix:@"INFO: Recorded"])
 				{
 					[show setValue:[NSNumber numberWithBool:YES] forKey:@"complete"];
 					[show setValue:[NSNumber numberWithBool:YES] forKey:@"successful"];
 					[show setValue:@"Download Complete" forKey:@"status"];
-					NSScanner *scanner = [NSScanner scannerWithString:lastLine];
+					NSScanner *scanner = [NSScanner scannerWithString:LastLine];
 					NSString *path;
 					[scanner scanString:@"INFO: Recorded" intoString:nil];
 					if (![scanner scanFloat:nil])
@@ -280,7 +255,7 @@
 					[show setPath:path];
 					[self addToLog:[NSString stringWithFormat:@"%@ Completed Successfully",[show showName]]];
 				}
-				else if ([lastLine hasPrefix:@"INFO: All streaming threads completed"])
+				else if ([LastLine hasPrefix:@"INFO: All streaming threads completed"])
 				{
 					[show setValue:[NSNumber numberWithBool:YES] forKey:@"complete"];
 					[show setValue:[NSNumber numberWithBool:YES] forKey:@"successful"];
@@ -311,16 +286,15 @@
 - (void)ErrorDataReady:(NSNotification *)note
 {
 	[[errorPipe fileHandleForReading] readInBackgroundAndNotify];
-	NSData *d;
-    d = [[note userInfo] valueForKey:NSFileHandleNotificationDataItem];
+    NSData *d = [[note userInfo] valueForKey:NSFileHandleNotificationDataItem];
     if ([d length] > 0)
 	{
 		[errorCache appendString:[[NSString alloc] initWithData:d encoding:NSUTF8StringEncoding]];
 	}
 	else
 	{
-		i++;
-		if (i>20)
+		noDataCount++;
+		if (noDataCount>20)
 		{
 			//Close the error pipe when it is empty.
 			errorPipe = nil;

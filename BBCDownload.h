@@ -19,7 +19,7 @@ extern bool runDownloads;
 	NSString *profileDirArg;
 	
 	BOOL runAgain;
-	int i;
+	int noDataCount;
 	
 	BOOL foundLastLine;
 	NSString *LastLine;
