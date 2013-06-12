@@ -66,8 +66,8 @@
             NSLog(@"ERROR: GiA cannot interpret the 4oD URL: %@", [show url]);
             [self addToLog:[NSString stringWithFormat:@"ERROR: GiA cannot interpret the 4oD URL: %@", [show url]] noTag:YES];
             [show setReasonForFailure:@"MetadataProcessing"];
-            [show setComplete:[NSNumber numberWithBool:YES]];
-            [show setSuccessful:[NSNumber numberWithBool:NO]];
+            [show setComplete:@YES];
+            [show setSuccessful:@NO];
             [show setValue:@"Download Failed" forKey:@"status"];
             [nc postNotificationName:@"DownloadFinished" object:show];
             return;
@@ -138,8 +138,8 @@
     {
         NSLog(@"ERROR: No response received (probably a proxy issue): %@", (error ? [error localizedDescription] : @"Unknown error"));
         [self addToLog:[NSString stringWithFormat:@"ERROR: No response received (probably a proxy issue): %@", (error ? [error localizedDescription] : @"Unknown error")]];
-        [show setSuccessful:[NSNumber numberWithBool:NO]];
-        [show setComplete:[NSNumber numberWithBool:YES]];
+        [show setSuccessful:@NO];
+        [show setComplete:@YES];
         if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"] isEqualTo:@"Provided"])
             [show setReasonForFailure:@"Provided_Proxy"];
         else if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"] isEqualTo:@"Custom"])
@@ -155,8 +155,8 @@
     {
         NSLog(@"ERROR: Access denied to users outside UK.");
         [self addToLog:@"ERROR: Access denied to users outside UK."];
-        [show setSuccessful:[NSNumber numberWithBool:NO]];
-        [show setComplete:[NSNumber numberWithBool:YES]];
+        [show setSuccessful:@NO];
+        [show setComplete:@YES];
         [show setReasonForFailure:@"Outside_UK"];
         [show setValue:@"Failed: Outside UK" forKey:@"status"];
         [nc postNotificationName:@"DownloadFinished" object:show];
@@ -169,8 +169,8 @@
         {
             NSLog(@"ERROR: Could not retrieve programme metadata: %@", (error ? [error localizedDescription] : @"Unknown error"));
             [self addToLog:[NSString stringWithFormat:@"ERROR: Could not retrieve programme metadata: %@", (error ? [error localizedDescription] : @"Unknown error")]];
-            [show setSuccessful:[NSNumber numberWithBool:NO]];
-            [show setComplete:[NSNumber numberWithBool:YES]];
+            [show setSuccessful:@NO];
+            [show setComplete:@YES];
             [show setValue:@"Download Failed" forKey:@"status"];
             [nc postNotificationName:@"DownloadFinished" object:show];
             [self addToLog:@"Download Failed" noTag:NO];
@@ -243,16 +243,16 @@
             NSLog(@"GiA does not support downloading this show. HTTP Dynamic Streaming Detected.");
             [self addToLog:@"GiA does not support downloading this show. HTTP Dynamic Streaming Detected."];
             [show setReasonForFailure:@"4oDHTTP"];
-            [show setComplete:[NSNumber numberWithBool:YES]];
-            [show setSuccessful:[NSNumber numberWithBool:NO]];
+            [show setComplete:@YES];
+            [show setSuccessful:@NO];
             [show setValue:@"Download Failed" forKey:@"status"];
             [nc postNotificationName:@"DownloadFinished" object:show];
             return;
         }
         if (currentPID == 0)
         {
-            [downloadParams setObject:brandTitle forKey:@"brandTitle"];
-            [downloadParams setObject:programmeNumber forKey:@"programmeNumber"];
+            downloadParams[@"brandTitle"] = brandTitle;
+            downloadParams[@"programmeNumber"] = programmeNumber;
             [self retryMetaRequest:request pid:minPID];
             return;
         }
@@ -268,12 +268,12 @@
     {
         if (currentPID != 0)
         {
-            if ([brandTitle isEqualToString:[downloadParams objectForKey:@"brandTitle"]] && [programmeNumber isEqualToString:[downloadParams objectForKey:@"programmeNumber"]])
+            if ([brandTitle isEqualToString:downloadParams[@"brandTitle"]] && [programmeNumber isEqualToString:downloadParams[@"programmeNumber"]])
             {
                 NSLog(@"DEBUG: MP4 Stream Found: %@", streamUri);
                 if (verbose)
                     [self addToLog:[NSString stringWithFormat:@"DEBUG: MP4 Stream Found: %@", streamUri] noTag:YES];
-                [downloadParams setObject:uriData forKey:@"mp4UriData"];
+                downloadParams[@"mp4UriData"] = uriData;
                 if ([streamUri rangeOfString:@"PS3" options:NSCaseInsensitiveSearch].location == NSNotFound)
                 {
                     if (currentPID < maxPID)
@@ -295,7 +295,7 @@
         }
         else
         {
-            [downloadParams setObject:uriData forKey:@"mp4UriData"];
+            downloadParams[@"mp4UriData"] = uriData;
         }
     }
     else if (currentPID != 0)
@@ -309,7 +309,7 @@
         }
     }
     
-    if (![downloadParams objectForKey:@"mp4UriData"])
+    if (!downloadParams[@"mp4UriData"])
     {
         if (currentPID != 0)
         {
@@ -323,14 +323,14 @@
             [self addToLog:@"ERROR: GiA does not support downloading this show. Did not find suitable download format."];
             [show setReasonForFailure:@"4oDFormat"];
         }
-        [show setComplete:[NSNumber numberWithBool:YES]];
-        [show setSuccessful:[NSNumber numberWithBool:NO]];
+        [show setComplete:@YES];
+        [show setSuccessful:@NO];
         [show setValue:@"Download Failed" forKey:@"status"];
         [nc postNotificationName:@"DownloadFinished" object:show];
         return;
     }
     
-    uriData = [downloadParams objectForKey:@"mp4UriData"];
+    uriData = downloadParams[@"mp4UriData"];
     scanner = [NSScanner scannerWithString:uriData];
     [scanner scanUpToString:@"<streamUri>" intoString:nil];
     [scanner scanString:@"<streamUri>" intoString:nil];
@@ -374,7 +374,7 @@
                     auth = [NSString stringWithFormat:@"e=%@&h=%@",e,decodedToken];
                 else
                     [NSException raise:@"Parsing Error" format:@"Could not process 4oD Metadata"];
-                rtmpURL = [[streamUri componentsSeparatedByString:@"mp4:"] objectAtIndex:0];
+                rtmpURL = [streamUri componentsSeparatedByString:@"mp4:"][0];
                 if ([rtmpURL hasPrefix:@"http"])
                     [NSException raise:@"4oD: Unsupported HTTP Download" format:@"GiA does not support this programme."];
                 rtmpURL = [rtmpURL stringByReplacingOccurrencesOfString:@".com/" withString:@".com:1935/"];
@@ -400,7 +400,7 @@
                 [scanner scanUpToString:@"<et>" intoString:nil];
                 [scanner scanString:@"<et>" intoString:nil];
                 [scanner scanUpToString:@"</et>" intoString:&et];
-                mp = [[streamUri componentsSeparatedByString:@"mp4:"] objectAtIndex:1];
+                mp = [streamUri componentsSeparatedByString:@"mp4:"][1];
                 NSLog(@"DEBUG: Metadata Processed: av=%@ te=%@ st=%@ et=%@ mp=%@", av, te, st, et, mp);
                 if (verbose)
                     [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata Processed: av=%@ te=%@ st=%@ et=%@ mp=%@", av, te, st, et, mp] noTag:YES];
@@ -408,7 +408,7 @@
                     auth = [NSString stringWithFormat:@"as=adobe-hmac-sha256&av=%@&te=%@&st=%@&et=%@&mp=%@&fmta-token=%@", av, te, st, et, mp, decodedToken];
                 else
                     [NSException raise:@"Parsing Error" format:@"Could not process 4oD Metadata"];
-                rtmpURL = [[streamUri componentsSeparatedByString:@"mp4:"] objectAtIndex:0];
+                rtmpURL = [streamUri componentsSeparatedByString:@"mp4:"][0];
                 if ([rtmpURL hasPrefix:@"http"])
                     [NSException raise:@"4oD: Unsupported HTTP Download" format:@"GiA does not support this programme."];
                 rtmpURL = [rtmpURL stringByReplacingOccurrencesOfString:@".com/" withString:@".com:1935/"];
@@ -443,7 +443,7 @@
                 auth = [NSString stringWithFormat:@"auth=%@&aifp=%@&slist=%@",decodedToken,fingerprint,slist];
             else
                 [NSException raise:@"Parsing Error" format:@"Could not process 4oD Metadata"];
-            rtmpURL = [[streamUri componentsSeparatedByString:@"mp4:"] objectAtIndex:0];
+            rtmpURL = [streamUri componentsSeparatedByString:@"mp4:"][0];
             if ([rtmpURL hasPrefix:@"http"])
                 [NSException raise:@"4oD: Unsupported HTTP Download" format:@"GiA does not support this programme."];
             rtmpURL = [rtmpURL stringByReplacingOccurrencesOfString:@".com/" withString:@".com:1935/"];
@@ -464,8 +464,8 @@
     {
         NSLog(@"ERROR: %@: %@", [exception name], [exception description]);
         [self addToLog:[NSString stringWithFormat:@"ERROR: %@: %@", [exception name], [exception description]]];
-        [show setComplete:[NSNumber numberWithBool:YES]];
-        [show setSuccessful:[NSNumber numberWithBool:NO]];
+        [show setComplete:@YES];
+        [show setSuccessful:@NO];
         [show setValue:@"Download Failed" forKey:@"status"];
         if ([[exception name] isEqualToString:@"4oD: Unsupported HTTP Download"])
             [show setReasonForFailure:@"4oDHTTP"];
@@ -477,9 +477,9 @@
         return;
     }
     
-    [downloadParams setObject:rtmpURL forKey:@"rtmpURL"];
-    [downloadParams setObject:app forKey:@"app"];
-    [downloadParams setObject:playpath forKey:@"playpath"];
+    downloadParams[@"rtmpURL"] = rtmpURL;
+    downloadParams[@"app"] = app;
+    downloadParams[@"playpath"] = playpath;
     
     NSLog(@"INFO: Metadata processed.");
     [self addToLog:@"INFO: Metadata processed." noTag:YES];
@@ -716,16 +716,15 @@
         swfplayer = @"http://www.channel4.com/static/programmes/asset/flash/swf/4odplayer-11.37.swf";
     }
     
-    NSArray *args = [NSArray arrayWithObjects:@"--rtmp",[downloadParams objectForKey:@"rtmpURL"],
-                     @"--app",[downloadParams objectForKey:@"app"],
+    NSArray *args = @[@"--rtmp",downloadParams[@"rtmpURL"],
+                     @"--app",downloadParams[@"app"],
                      @"--flashVer",@"\"WIN 11,5,502,110\"",
                      @"--swfVfy",swfplayer,
                      @"--pageUrl",[show url],
-                     @"--playpath",[downloadParams objectForKey:@"playpath"],
+                     @"--playpath",downloadParams[@"playpath"],
                      @"--flv",downloadPath,
                      @"--conn",@"O:1",
-                     @"--conn",@"O:0",
-                     nil];
+                     @"--conn",@"O:0"];
     NSLog(@"DEBUG: RTMPDump args: %@",args);
     if (verbose)
         [self addToLog:[NSString stringWithFormat:@"DEBUG: RTMPDump args: %@", args] noTag:YES];
@@ -757,7 +756,7 @@
             pValue = PyObject_CallObject(pFunc, pArgs);
             Py_DECREF(pArgs);
             if (pValue != NULL) {
-                result = [NSString stringWithCString:PyString_AsString(pValue) encoding:NSUTF8StringEncoding];
+                result = @(PyString_AsString(pValue));
                 Py_DECREF(pValue);
             }
             else {

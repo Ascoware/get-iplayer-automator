@@ -85,7 +85,7 @@ NSString *JRFeedbackType[JRFeedbackController_SectionCount] = {
     [segmentedControl setSegmentStyle:NSSegmentStyleTexturedSquare];
 #endif
     NSString* fmt = NSLocalizedStringFromTable(@"Title", @"JRFeedbackProvider", nil);
-    NSString* title = [NSString stringWithFormat:fmt, [[[NSBundle bundleForClass:[self class]] infoDictionary] objectForKey:(NSString*)kCFBundleNameKey]];
+    NSString* title = [NSString stringWithFormat:fmt, [[NSBundle bundleForClass:[self class]] infoDictionary][(NSString*)kCFBundleNameKey]];
     [[self window] setTitle:title];
     
     NSTextStorage *text = [textView textStorage];
@@ -191,7 +191,7 @@ NSString *JRFeedbackType[JRFeedbackController_SectionCount] = {
         
         NSTask *scriptTask = [[[NSTask alloc] init] autorelease];
         [scriptTask setLaunchPath:@"/usr/sbin/system_profiler"];
-        [scriptTask setArguments:[NSArray arrayWithObjects:@"-detailLevel", @"mini", nil]];
+        [scriptTask setArguments:@[@"-detailLevel", @"mini"]];
         [scriptTask setStandardOutput:outputPipe];
         [scriptTask launch];
         
@@ -210,19 +210,19 @@ NSString *JRFeedbackType[JRFeedbackController_SectionCount] = {
     form = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                  JRFeedbackType[currentSection], @"feedbackType",
                                  [sectionStrings[currentSection] string], @"feedback",
-                                 [[[NSBundle bundleForClass:[self class]] infoDictionary] objectForKey:@"CFBundleName"], @"appName",
-                                 [[[NSBundle bundleForClass:[self class]] infoDictionary] objectForKey:@"CFBundleIdentifier"], @"bundleID",
-                                 [[[NSBundle bundleForClass:[self class]] infoDictionary] objectForKey:@"CFBundleShortVersionString"], @"version",
+                                 [[NSBundle bundleForClass:[self class]] infoDictionary][@"CFBundleName"], @"appName",
+                                 [[NSBundle bundleForClass:[self class]] infoDictionary][@"CFBundleIdentifier"], @"bundleID",
+                                 [[NSBundle bundleForClass:[self class]] infoDictionary][@"CFBundleShortVersionString"], @"version",
                                  nil];
     if (systemProfile) {
-        [form setObject:systemProfile forKey:@"systemProfile"];
+        form[@"systemProfile"] = systemProfile;
     }
     if ([self includeContactInfo]) {
         if ([[emailAddressComboBox stringValue] length]) {
-            [form setObject:[emailAddressComboBox stringValue] forKey:@"email"];
+            form[@"email"] = [emailAddressComboBox stringValue];
         }
         if ([[nameTextField stringValue] length]) {
-            [form setObject:[nameTextField stringValue] forKey:@"name"];
+            form[@"name"] = [nameTextField stringValue];
         }
     }
 	if ([includeLogCheckbox state] == NSOnState)
@@ -318,7 +318,7 @@ NSString *JRFeedbackType[JRFeedbackController_SectionCount] = {
 }
 
 + (NSURL*)postURL {
-    NSString *postURLString = [[[NSBundle bundleForClass:[self class]] infoDictionary] objectForKey:@"JRFeedbackURL"];
+    NSString *postURLString = [[NSBundle bundleForClass:[self class]] infoDictionary][@"JRFeedbackURL"];
     if ([[NSUserDefaults standardUserDefaults] stringForKey:@"JRFeedbackURL"]) {
         postURLString = [[NSUserDefaults standardUserDefaults] stringForKey:@"JRFeedbackURL"];
     }
@@ -334,7 +334,7 @@ NSString *JRFeedbackType[JRFeedbackController_SectionCount] = {
 {
 	NSString *log = [note object];
 	log = [log stringByReplacingOccurrencesOfString:@"\r" withString:@"\n"];
-	[form setObject:[log copy] forKey:@"log"];
+	form[@"log"] = [log copy];
 	[self finish];
 }
 

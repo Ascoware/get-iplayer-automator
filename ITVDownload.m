@@ -56,7 +56,7 @@
     if ([show url] && [[show url] rangeOfString:@"Filter=" options:NSCaseInsensitiveSearch].location == NSNotFound) {
         [show setRealPID:[show pid]];
         soapBody = @"Body2";
-        [downloadParams setObject:[NSNumber numberWithBool:YES] forKey:@"UseCurrentWebPage"];
+        downloadParams[@"UseCurrentWebPage"] = @YES;
     }
     else
     {
@@ -70,8 +70,8 @@
             NSLog(@"ERROR: GiA cannot interpret the ITV URL: %@", [show url]);
             [self addToLog:[NSString stringWithFormat:@"ERROR: GiA cannot interpret the ITV URL: %@", [show url]]];
             [show setReasonForFailure:@"MetadataProcessing"];
-            [show setComplete:[NSNumber numberWithBool:YES]];
-            [show setSuccessful:[NSNumber numberWithBool:NO]];
+            [show setComplete:@YES];
+            [show setSuccessful:@NO];
             [show setValue:@"Download Failed" forKey:@"status"];
             [nc postNotificationName:@"DownloadFinished" object:show];
             return;
@@ -128,8 +128,8 @@
     {
         NSLog(@"ERROR: No response received (probably a proxy issue): %@", (error ? [error localizedDescription] : @"Unknown error"));
         [self addToLog:[NSString stringWithFormat:@"ERROR: No response received (probably a proxy issue): %@", (error ? [error localizedDescription] : @"Unknown error")]];
-        [show setSuccessful:[NSNumber numberWithBool:NO]];
-        [show setComplete:[NSNumber numberWithBool:YES]];
+        [show setSuccessful:@NO];
+        [show setComplete:@YES];
         if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"] isEqualTo:@"Provided"])
             [show setReasonForFailure:@"Provided_Proxy"];
         else if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"] isEqualTo:@"Custom"])
@@ -145,8 +145,8 @@
     {
         NSLog(@"ERROR: Access denied to users outside UK.");
         [self addToLog:@"ERROR: Access denied to users outside UK."];
-        [show setSuccessful:[NSNumber numberWithBool:NO]];
-        [show setComplete:[NSNumber numberWithBool:YES]];
+        [show setSuccessful:@NO];
+        [show setComplete:@YES];
         [show setReasonForFailure:@"Outside_UK"];
         [show setValue:@"Failed: Outside UK" forKey:@"status"];
         [nc postNotificationName:@"DownloadFinished" object:show];
@@ -157,8 +157,8 @@
     {
         NSLog(@"ERROR: Could not retrieve programme metadata: %@", (error ? [error localizedDescription] : @"Unknown error"));
         [self addToLog:[NSString stringWithFormat:@"ERROR: Could not retrieve programme metadata: %@", (error ? [error localizedDescription] : @"Unknown error")]];
-        [show setSuccessful:[NSNumber numberWithBool:NO]];
-        [show setComplete:[NSNumber numberWithBool:YES]];
+        [show setSuccessful:@NO];
+        [show setComplete:@YES];
         [show setValue:@"Download Failed" forKey:@"status"];
         [nc postNotificationName:@"DownloadFinished" object:show];
         [self addToLog:@"Download Failed" noTag:NO];
@@ -168,7 +168,7 @@
     responseString = [responseString stringByDecodingHTMLEntities];
     NSScanner *scanner = [NSScanner scannerWithString:responseString];
 
-    if ([downloadParams objectForKey:@"UseCurrentWebPage"])
+    if (downloadParams[@"UseCurrentWebPage"])
     {
         //Reset to numeric PID if originated from current web page
         NSString *pid = nil;
@@ -272,17 +272,17 @@
     
     //Retrieve PlayPath
     NSString *playPath = nil;
-    NSArray *formatKeys = [NSArray arrayWithObjects:@"Flash - Very Low",@"Flash - Low",@"Flash - Standard",@"Flash - High",nil];
-    NSArray *itvRateObjects = [NSArray arrayWithObjects:@"400",@"600",@"800",@"1200",nil];
-    NSArray *bitrateObjects = [NSArray arrayWithObjects:@"400000",@"600000",@"800000",@"1200000",nil];
+    NSArray *formatKeys = @[@"Flash - Very Low",@"Flash - Low",@"Flash - Standard",@"Flash - High"];
+    NSArray *itvRateObjects = @[@"400",@"600",@"800",@"1200"];
+    NSArray *bitrateObjects = @[@"400000",@"600000",@"800000",@"1200000"];
     NSDictionary *itvRateDic = [NSDictionary dictionaryWithObjects:itvRateObjects forKeys:formatKeys];
     NSDictionary *bitrateDic = [NSDictionary dictionaryWithObjects:bitrateObjects forKeys:formatKeys];
     
     NSMutableArray *itvRateArray = [[NSMutableArray alloc] init];
     NSMutableArray *bitrateArray = [[NSMutableArray alloc] init];
     
-    for (TVFormat *format in formatList) [itvRateArray addObject:[itvRateDic objectForKey:[format format]]];
-    for (TVFormat *format in formatList) [bitrateArray addObject:[bitrateDic objectForKey:[format format]]];
+    for (TVFormat *format in formatList) [itvRateArray addObject:itvRateDic[[format format]]];
+    for (TVFormat *format in formatList) [bitrateArray addObject:bitrateDic[[format format]]];
     
     NSLog(@"DEBUG: Parsing MediaFile entries");
     if (verbose)
@@ -351,8 +351,8 @@
     if (!foundIt) {
         NSLog(@"ERROR: None of the modes in your download format list are available for this show. Try adding more modes if possible.");
         [self addToLog:@"ERROR: None of the modes in your download format list are available for this show. Try adding more modes if possible."];
-        [show setComplete:[NSNumber numberWithBool:YES]];
-        [show setSuccessful:[NSNumber numberWithBool:NO]];
+        [show setComplete:@YES];
+        [show setSuccessful:@NO];
         [show setValue:@"Download Failed" forKey:@"status"];
         [nc postNotificationName:@"DownloadFinished" object:show];
         return;
@@ -376,8 +376,8 @@
     if (verbose)
         [self addToLog:[NSString stringWithFormat:@"DEBUG: seriesNumber=%ld", seriesNumber] noTag:YES];
 
-    [downloadParams setObject:authURL forKey:@"authURL"];
-    [downloadParams setObject:playPath forKey:@"playPath"];
+    downloadParams[@"authURL"] = authURL;
+    downloadParams[@"playPath"] = playPath;
 
     NSLog(@"INFO: Metadata processed.");
     [self addToLog:@"INFO: Metadata processed." noTag:YES];
@@ -484,9 +484,9 @@
     }
 
     NSArray *args = [NSMutableArray arrayWithObjects:
-                    @"-r",[downloadParams objectForKey:@"authURL"],
+                    @"-r",downloadParams[@"authURL"],
                     @"-W",swfplayer,
-                    @"-y",[downloadParams objectForKey:@"playPath"],
+                    @"-y",downloadParams[@"playPath"],
                     @"-o",downloadPath,
                     nil];
     NSLog(@"DEBUG: RTMPDump args: %@",args);

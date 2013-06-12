@@ -28,29 +28,29 @@
 {
 	if (b)
 	{
-		[nc postNotificationName:@"AddToLog" object:nil userInfo:[NSDictionary dictionaryWithObject:logMessage forKey:@"message"]];
+		[nc postNotificationName:@"AddToLog" object:nil userInfo:@{@"message": logMessage}];
 	}
 	else
 	{
-		[nc postNotificationName:@"AddToLog" object:self userInfo:[NSDictionary dictionaryWithObject:logMessage forKey:@"message"]];
+		[nc postNotificationName:@"AddToLog" object:self userInfo:@{@"message": logMessage}];
 	}
     [log appendFormat:@"%@\n", logMessage];
 }
 - (void)addToLog:(NSString *)logMessage
 {
-	[nc postNotificationName:@"AddToLog" object:self userInfo:[NSDictionary dictionaryWithObject:logMessage forKey:@"message"]];
+	[nc postNotificationName:@"AddToLog" object:self userInfo:@{@"message": logMessage}];
     [log appendFormat:@"%@\n", logMessage];
 }
 - (void)setCurrentProgress:(NSString *)string
 {
-	[nc postNotificationName:@"setCurrentProgress" object:self userInfo:[NSDictionary dictionaryWithObject:string forKey:@"string"]];
+	[nc postNotificationName:@"setCurrentProgress" object:self userInfo:@{@"string": string}];
 }
 - (void)setPercentage:(double)d
 {
 	if (d<=100.0)
 	{
 		NSNumber *value = [[NSNumber alloc] initWithDouble:d];
-		[nc postNotificationName:@"setPercentage" object:self userInfo:[NSDictionary dictionaryWithObject:value forKey:@"nsDouble"]];
+		[nc postNotificationName:@"setPercentage" object:self userInfo:@{@"nsDouble": value}];
 	}
 	else
 	{
@@ -91,11 +91,11 @@
             if ([rateEntries count] >= 50)
             {
                 double rate = ((downloaded-lastDownloaded)/(-[lastDate timeIntervalSinceNow]));
-                double oldestRate = [[rateEntries objectAtIndex:0] doubleValue];
+                double oldestRate = [rateEntries[0] doubleValue];
                 if (rate < (oldRateAverage*5) && rate > (oldRateAverage/5) && rate < 50)
                 {
                     [rateEntries removeObjectAtIndex:0];
-                    [rateEntries addObject:[NSNumber numberWithDouble:rate]];
+                    [rateEntries addObject:@(rate)];
                     outOfRange=0;
                 }
                 else 
@@ -127,7 +127,7 @@
                     double rate = ((downloaded-lastDownloaded)/(-[lastDate timeIntervalSinceNow]));
                     if (rate<50)
                     {
-                        [rateEntries addObject:[NSNumber numberWithDouble:rate]];
+                        [rateEntries addObject:@(rate)];
                     }
                     lastDownloaded=downloaded;
                     lastDate = [NSDate date];
@@ -167,9 +167,9 @@
     NSLog(@"Exit Code = %ld",(long)exitCode);
     if (exitCode==0) //RTMPDump is successful
     {
-        [show setComplete:[NSNumber numberWithBool:YES]];
-        [show setSuccessful:[NSNumber numberWithBool:YES]];
-        NSDictionary *info = [NSDictionary dictionaryWithObject:show forKey:@"Programme"];
+        [show setComplete:@YES];
+        [show setSuccessful:@YES];
+        NSDictionary *info = @{@"Programme": show};
         [[NSNotificationCenter defaultCenter] postNotificationName:@"AddProgToHistory" object:self userInfo:info];
         
         ffTask = [[NSTask alloc] init];
@@ -188,12 +188,10 @@
         
         [ffTask setLaunchPath:[[NSBundle mainBundle] pathForResource:@"ffmpeg" ofType:nil]];
         
-        [ffTask setArguments:[NSArray arrayWithObjects:
-                              @"-i",[NSString stringWithFormat:@"%@",downloadPath],
+        [ffTask setArguments:@[@"-i",[NSString stringWithFormat:@"%@",downloadPath],
                               @"-vcodec",@"copy",
                               @"-acodec",@"copy",
-                              [NSString stringWithFormat:@"%@",completeDownloadPath],
-                              nil]];
+                              [NSString stringWithFormat:@"%@",completeDownloadPath]]];
         
         [nc addObserver:self
                selector:@selector(DownloadDataReady:)
@@ -235,8 +233,8 @@
         }
         else // give up
         {
-            [show setSuccessful:[NSNumber numberWithBool:NO]];
-            [show setComplete:[NSNumber numberWithBool:YES]];
+            [show setSuccessful:@NO];
+            [show setComplete:@YES];
             [show setReasonForFailure:@"Unknown"];
             [nc postNotificationName:@"DownloadFinished" object:show];
             [show setValue:@"Download Failed" forKey:@"status"];
@@ -250,8 +248,8 @@
     }
     else //Some undocumented exit code or too many attempts
     {
-        [show setSuccessful:[NSNumber numberWithBool:NO]];
-        [show setComplete:[NSNumber numberWithBool:YES]];
+        [show setSuccessful:@NO];
+        [show setComplete:@YES];
         [show setReasonForFailure:@"Unknown"];
         [nc postNotificationName:@"DownloadFinished" object:show];
         [show setValue:@"Download Failed" forKey:@"status"];
@@ -312,8 +310,7 @@
     
     [apTask setLaunchPath:[[NSBundle mainBundle] pathForResource:@"AtomicParsley" ofType:nil]];
     if (request && [request responseStatusCode] == 200)
-        [apTask setArguments:[NSArray arrayWithObjects:
-                              [NSString stringWithFormat:@"%@",[show path]],
+        [apTask setArguments:@[[NSString stringWithFormat:@"%@",[show path]],
                               @"--stik",@"value=10",
                               @"--TVNetwork",[show tvNetwork],
                               @"--TVShowName",[show seriesName],
@@ -327,11 +324,9 @@
                               @"--longdesc",[show desc],
                               @"--lyrics",[show desc],
                               @"--artist",[show tvNetwork],
-                              @"--overWrite",
-                              nil]];
+                              @"--overWrite"]];
     else
-        [apTask setArguments:[NSArray arrayWithObjects:
-                              [NSString stringWithFormat:@"%@",[show path]],
+        [apTask setArguments:@[[NSString stringWithFormat:@"%@",[show path]],
                               @"--stik",@"value=10",
                               @"--TVNetwork",[show tvNetwork],
                               @"--TVShowName",[show seriesName],
@@ -344,8 +339,7 @@
                               @"--longdesc",[show desc],
                               @"--lyrics",[show desc],
                               @"--artist",[show tvNetwork],
-                              @"--overWrite",
-                              nil]];
+                              @"--overWrite"]];
     [nc addObserver:self
            selector:@selector(DownloadDataReady:)
                name:NSFileHandleReadCompletionNotification
@@ -552,8 +546,8 @@
     if ([[NSFileManager defaultManager] fileExistsAtPath:[[[downloadPath stringByDeletingPathExtension] stringByDeletingPathExtension] stringByAppendingPathExtension:@"mp4"]])
     {
         [self addToLog:@"ERROR: Destination file already exists." noTag:YES];
-        [show setComplete:[NSNumber numberWithBool:YES]];
-        [show setSuccessful:[NSNumber numberWithBool:NO]];
+        [show setComplete:@YES];
+        [show setSuccessful:@NO];
         [show setValue:@"Download Failed" forKey:@"status"];
         [show setReasonForFailure:@"FileExists"];
         [nc postNotificationName:@"DownloadFinished" object:show];
@@ -593,8 +587,8 @@
 	errorFh = [errorPipe fileHandleForReading];
     
     NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:[task environment]];
-    [envVariableDictionary setObject:[[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"Contents/Resources"] forKey:@"DYLD_LIBRARY_PATH"];
-    [envVariableDictionary setObject:[@"~" stringByExpandingTildeInPath] forKey:@"HOME"];
+    envVariableDictionary[@"DYLD_LIBRARY_PATH"] = [[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"Contents/Resources"];
+    envVariableDictionary[@"HOME"] = [@"~" stringByExpandingTildeInPath];
     [task setEnvironment:envVariableDictionary];
     
 	
@@ -643,8 +637,8 @@
 	[nc removeObserver:self name:NSFileHandleReadCompletionNotification object:fh];
 	[nc removeObserver:self name:NSFileHandleReadCompletionNotification object:errorFh];
 	[show setValue:@"Cancelled" forKey:@"status"];
-    [show setComplete:[NSNumber numberWithBool:NO]];
-    [show setSuccessful:[NSNumber numberWithBool:NO]];
+    [show setComplete:@NO];
+    [show setSuccessful:@NO];
 	[self addToLog:@"Download Cancelled"];
     [processErrorCache invalidate];
     running=FALSE;

@@ -34,11 +34,11 @@
 	downloadPath = [[NSString alloc] initWithString:[[NSUserDefaults standardUserDefaults] valueForKey:@"DownloadPath"]];
 		
     //Initialize Formats
-	NSArray *tvFormatKeys = @[@"iPhone",@"Flash - High",@"Flash - Low",@"Flash - HD",@"Flash - Standard",@"Flash - Normal",@"Flash - Very High",nil];
-	NSArray *tvFormatObjects = @[@"iphone",@"flashhigh2,flashhigh1",@"flashlow2,flashlow1",@"flashhd2,flashhd1",@"flashstd2,flashstd1",@"flashstd2,flashstd1",@"flashvhigh2,flashvhigh1",nil];
+	NSArray *tvFormatKeys = @[@"iPhone",@"Flash - High",@"Flash - Low",@"Flash - HD",@"Flash - Standard",@"Flash - Normal",@"Flash - Very High"];
+	NSArray *tvFormatObjects = @[@"iphone",@"flashhigh2,flashhigh1",@"flashlow2,flashlow1",@"flashhd2,flashhd1",@"flashstd2,flashstd1",@"flashstd2,flashstd1",@"flashvhigh2,flashvhigh1"];
 	NSDictionary *tvFormats = [[NSDictionary alloc] initWithObjects:tvFormatObjects forKeys:tvFormatKeys];
-	NSArray *radioFormatKeys = @[@"iPhone",@"Flash - MP3",@"Flash - AAC",@"WMA",@"Real Audio",@"Flash",@"Flash AAC - High",@"Flash AAC - Standard",@"Flash AAC - Low",nil];
-	NSArray *radioFormatObjects = @[@"iphone", @"flashaudio",@"flashaac",@"wma",@"realaudio",@"flashaudio",@"flashaachigh",@"flashaacstd",@"flashaaclow",nil];
+	NSArray *radioFormatKeys = @[@"iPhone",@"Flash - MP3",@"Flash - AAC",@"WMA",@"Real Audio",@"Flash",@"Flash AAC - High",@"Flash AAC - Standard",@"Flash AAC - Low"];
+	NSArray *radioFormatObjects = @[@"iphone", @"flashaudio",@"flashaac",@"wma",@"realaudio",@"flashaudio",@"flashaachigh",@"flashaacstd",@"flashaaclow"];
 	NSDictionary *radioFormats = [[NSDictionary alloc] initWithObjects:radioFormatObjects forKeys:radioFormatKeys];
     NSMutableString *temp_Format;
     temp_Format = [[NSMutableString alloc] initWithString:@"--modes="];
@@ -98,7 +98,7 @@
     //Verbose?
     if (verbose)
 		[args addObject:[[NSString alloc] initWithString:@"--verbose"]];
-	if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"DownloadSubtitles"] isEqualTo:[NSNumber numberWithBool:YES]])
+	if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"DownloadSubtitles"] isEqualTo:@YES])
 		[args addObject:@"--subtitles"];
 	
     //Naming Convention
@@ -129,8 +129,8 @@
 	[task setStandardError:errorPipe];
     
     NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:[task environment]];
-    [envVariableDictionary setObject:[bundle resourcePath] forKey:@"DYLD_LIBRARY_PATH"];
-    [envVariableDictionary setObject:[@"~" stringByExpandingTildeInPath] forKey:@"HOME"];
+    envVariableDictionary[@"DYLD_LIBRARY_PATH"] = [bundle resourcePath];
+    envVariableDictionary[@"HOME"] = [@"~" stringByExpandingTildeInPath];
     [task setEnvironment:envVariableDictionary];
 	
 	fh = [pipe fileHandleForReading];
@@ -186,15 +186,15 @@
 				NSScanner *scn = [NSScanner scannerWithString:LastLine];
 				if ([reasonForFailure isEqualToString:@"unresumable"])
 				{
-					[show setValue:[NSNumber numberWithBool:YES] forKey:@"complete"];
-					[show setValue:[NSNumber numberWithBool:NO] forKey:@"successful"];
+					[show setValue:@YES forKey:@"complete"];
+					[show setValue:@NO forKey:@"successful"];
 					[show setValue:@"Failed: Unresumable File" forKey:@"status"];
                     [show setReasonForFailure:@"Unresumable_File"];
 				}
 				else if ([reasonForFailure isEqualToString:@"proxy"])
 				{
-					[show setValue:[NSNumber numberWithBool:YES] forKey:@"complete"];
-					[show setValue:[NSNumber numberWithBool:NO] forKey:@"successful"];
+					[show setValue:@YES forKey:@"complete"];
+					[show setValue:@NO forKey:@"successful"];
 					NSString *proxyOption = [[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"];
 					if ([proxyOption isEqualToString:@"None"])
 					{
@@ -221,8 +221,8 @@
 				}
                 else if ([reasonForFailure isEqualToString:@"modes"])
                 {
-                    [show setValue:[NSNumber numberWithBool:YES] forKey:@"complete"];
-					[show setValue:[NSNumber numberWithBool:NO] forKey:@"successful"];
+                    [show setValue:@YES forKey:@"complete"];
+					[show setValue:@NO forKey:@"successful"];
                     [show setValue:@"Failed: No Specified Modes" forKey:@"status"];
                     [self addToLog:@"REASON FOR FAILURE: None of the modes in your download format list are available for this show." noTag:YES];
                     [self addToLog:@"Try adding more modes." noTag:YES];
@@ -236,8 +236,8 @@
                 }
 				else if ([LastLine hasPrefix:@"INFO: Recorded"])
 				{
-					[show setValue:[NSNumber numberWithBool:YES] forKey:@"complete"];
-					[show setValue:[NSNumber numberWithBool:YES] forKey:@"successful"];
+					[show setValue:@YES forKey:@"complete"];
+					[show setValue:@YES forKey:@"successful"];
 					[show setValue:@"Download Complete" forKey:@"status"];
 					NSScanner *scanner = [NSScanner scannerWithString:LastLine];
 					NSString *path;
@@ -257,24 +257,24 @@
 				}
 				else if ([LastLine hasPrefix:@"INFO: All streaming threads completed"])
 				{
-					[show setValue:[NSNumber numberWithBool:YES] forKey:@"complete"];
-					[show setValue:[NSNumber numberWithBool:YES] forKey:@"successful"];
+					[show setValue:@YES forKey:@"complete"];
+					[show setValue:@YES forKey:@"successful"];
 					[show setValue:@"Download Complete" forKey:@"status"];
 					[show setPath:@"Unknown"];
 				}
 				else if ([scn scanUpToString:@"Already in history" intoString:nil] && 
 						 [scn scanString:@"Already in" intoString:nil])
 				{
-					[show setValue:[NSNumber numberWithBool:YES] forKey:@"complete"];
-					[show setValue:[NSNumber numberWithBool:NO] forKey:@"successful"];
+					[show setValue:@YES forKey:@"complete"];
+					[show setValue:@NO forKey:@"successful"];
 					[show setValue:@"Failed: Download in History" forKey:@"status"];
 					[self addToLog:[NSString stringWithFormat:@"%@ Failed",[show showName]]];
                     [show setReasonForFailure:@"InHistory"];
 				}
 				else
 				{
-					[show setValue:[NSNumber numberWithBool:YES] forKey:@"complete"];
-					[show setValue:[NSNumber numberWithBool:NO] forKey:@"successful"];
+					[show setValue:@YES forKey:@"complete"];
+					[show setValue:@NO forKey:@"successful"];
 					[show setValue:@"Download Failed" forKey:@"status"];
 					[self addToLog:[NSString stringWithFormat:@"%@ Failed",[show showName]]];
 				}
@@ -421,8 +421,8 @@
         }
         else if ([output hasSuffix:@"use --force to override"])
         {
-            [show setValue:[NSNumber numberWithBool:YES] forKey:@"complete"];
-            [show setValue:[NSNumber numberWithBool:NO] forKey:@"successful"];
+            [show setValue:@YES forKey:@"complete"];
+            [show setValue:@NO forKey:@"successful"];
             [show setValue:@"Failed: Download in History" forKey:@"status"];
             [self addToLog:[NSString stringWithFormat:@"%@ Failed",[show showName]]];
             [show setReasonForFailure:@"InHistory"];
@@ -488,20 +488,20 @@
 			NSDecimal recieved, total, percentage;
 			NSInteger speed=0;
 			NSString *timeRemaining;
-			if(![scanner scanDecimal:&recieved]) recieved = [[NSNumber numberWithInt:0]decimalValue];
+			if(![scanner scanDecimal:&recieved]) recieved = [@0decimalValue];
 			[scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] 
 									intoString:nil];
-			if(![scanner scanDecimal:&total]) total = [[NSNumber numberWithInt:0]decimalValue];
+			if(![scanner scanDecimal:&total]) total = [@0decimalValue];
 			[scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] 
 									intoString:nil];
-			if(![scanner scanInteger:&speed]) speed = [[NSNumber numberWithInt:0]integerValue];
+			if(![scanner scanInteger:&speed]) speed = [@0integerValue];
 			[scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] 
 									intoString:nil];
-			if(![scanner scanDecimal:&percentage]) percentage = [[NSNumber numberWithInt:0]decimalValue];
+			if(![scanner scanDecimal:&percentage]) percentage = [@0decimalValue];
 			[scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] 
 									intoString:nil];
 			if(![scanner scanUpToString:@"rem" intoString:&timeRemaining]) timeRemaining=@"Unknown";
-			double adjustedSpeed = [[NSNumber numberWithInteger:speed] doubleValue]/8;
+			double adjustedSpeed = [@(speed) doubleValue]/8;
 			[self setPercentage:[[NSDecimalNumber decimalNumberWithDecimal:percentage] doubleValue]];
 			if ([[NSDecimalNumber decimalNumberWithDecimal:total] doubleValue] < 5.00 && [[NSDecimalNumber decimalNumberWithDecimal:recieved] doubleValue] > 0)
 			{

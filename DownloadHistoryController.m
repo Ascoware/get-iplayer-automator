@@ -167,6 +167,6 @@
 }
 - (void)addToLog:(NSString *)logMessage
 {
-	[[NSNotificationCenter defaultCenter] postNotificationName:@"AddToLog" object:self userInfo:[NSDictionary dictionaryWithObject:logMessage forKey:@"message"]];
+	[[NSNotificationCenter defaultCenter] postNotificationName:@"AddToLog" object:self userInfo:@{@"message": logMessage}];
 }
 @end

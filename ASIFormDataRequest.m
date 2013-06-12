@@ -85,8 +85,8 @@
 	// Remove any existing value
 	NSUInteger i;
 	for (i=0; i<[[self postData] count]; i++) {
-		NSDictionary *val = [[self postData] objectAtIndex:i];
-		if ([[val objectForKey:@"key"] isEqualToString:key]) {
+		NSDictionary *val = [self postData][i];
+		if ([val[@"key"] isEqualToString:key]) {
 			[[self postData] removeObjectAtIndex:i];
 			i--;
 		}
@@ -105,7 +105,7 @@
 	BOOL isDirectory = NO;
 	BOOL fileExists = [[[[NSFileManager alloc] init] autorelease] fileExistsAtPath:filePath isDirectory:&isDirectory];
 	if (!fileExists || isDirectory) {
-		[self failWithError:[NSError errorWithDomain:NetworkRequestErrorDomain code:ASIInternalErrorWhileBuildingRequestType userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:@"No file exists at %@",filePath],NSLocalizedDescriptionKey,nil]]];
+		[self failWithError:[NSError errorWithDomain:NetworkRequestErrorDomain code:ASIInternalErrorWhileBuildingRequestType userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:@"No file exists at %@",filePath]}]];
 	}
 
 	// If the caller didn't specify a custom file name, we'll use the file name of the file we were passed
@@ -130,8 +130,8 @@
 	// Remove any existing value
 	NSUInteger i;
 	for (i=0; i<[[self fileData] count]; i++) {
-		NSDictionary *val = [[self fileData] objectAtIndex:i];
-		if ([[val objectForKey:@"key"] isEqualToString:key]) {
+		NSDictionary *val = [self fileData][i];
+		if ([val[@"key"] isEqualToString:key]) {
 			[[self fileData] removeObjectAtIndex:i];
 			i--;
 		}
@@ -172,8 +172,8 @@
 	// Remove any existing value
 	NSUInteger i;
 	for (i=0; i<[[self fileData] count]; i++) {
-		NSDictionary *val = [[self fileData] objectAtIndex:i];
-		if ([[val objectForKey:@"key"] isEqualToString:key]) {
+		NSDictionary *val = [self fileData][i];
+		if ([val[@"key"] isEqualToString:key]) {
 			[[self fileData] removeObjectAtIndex:i];
 			i--;
 		}
@@ -236,8 +236,8 @@
 	NSString *endItemBoundary = [NSString stringWithFormat:@"\r\n--%@\r\n",stringBoundary];
 	NSUInteger i=0;
 	for (NSDictionary *val in [self postData]) {
-		[self appendPostString:[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"%@\"\r\n\r\n",[val objectForKey:@"key"]]];
-		[self appendPostString:[val objectForKey:@"value"]];
+		[self appendPostString:[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"%@\"\r\n\r\n",val[@"key"]]];
+		[self appendPostString:val[@"value"]];
 		i++;
 		if (i != [[self postData] count] || [[self fileData] count] > 0) { //Only add the boundary if this is not the last item in the post body
 			[self appendPostString:endItemBoundary];
@@ -248,10 +248,10 @@
 	i=0;
 	for (NSDictionary *val in [self fileData]) {
 
-		[self appendPostString:[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"%@\"; filename=\"%@\"\r\n", [val objectForKey:@"key"], [val objectForKey:@"fileName"]]];
-		[self appendPostString:[NSString stringWithFormat:@"Content-Type: %@\r\n\r\n", [val objectForKey:@"contentType"]]];
+		[self appendPostString:[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"%@\"; filename=\"%@\"\r\n", val[@"key"], val[@"fileName"]]];
+		[self appendPostString:[NSString stringWithFormat:@"Content-Type: %@\r\n\r\n", val[@"contentType"]]];
 		
-		id data = [val objectForKey:@"data"];
+		id data = val[@"data"];
 		if ([data isKindOfClass:[NSString class]]) {
 			[self appendPostDataFromFile:data];
 		} else {
@@ -294,7 +294,7 @@
 	NSUInteger i=0;
 	NSUInteger count = [[self postData] count]-1;
 	for (NSDictionary *val in [self postData]) {
-        NSString *data = [NSString stringWithFormat:@"%@=%@%@", [self encodeURL:[val objectForKey:@"key"]], [self encodeURL:[val objectForKey:@"value"]],(i<count ?  @"&" : @"")]; 
+        NSString *data = [NSString stringWithFormat:@"%@=%@%@", [self encodeURL:val[@"key"]], [self encodeURL:val[@"value"]],(i<count ?  @"&" : @"")]; 
 		[self appendPostString:data];
 		i++;
 	}

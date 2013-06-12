@@ -50,31 +50,31 @@
 	NSMutableDictionary *defaultValues = [[NSMutableDictionary alloc] init];
 	
     NSString *defaultDownloadDirectory = [[NSString alloc] initWithString:@"~/Movies/TV Shows"];
-	[defaultValues setObject:[defaultDownloadDirectory stringByExpandingTildeInPath] forKey:@"DownloadPath"];
-	[defaultValues setObject:@"Provided" forKey:@"Proxy"];
-	[defaultValues setObject:@"" forKey:@"CustomProxy"];
-	[defaultValues setObject:[NSNumber numberWithBool:YES] forKey:@"AutoRetryFailed"];
-	[defaultValues setObject:@"30" forKey:@"AutoRetryTime"];
-	[defaultValues setObject:[NSNumber numberWithBool:YES] forKey:@"AddCompletedToiTunes"];
-	[defaultValues setObject:@"Safari" forKey:@"DefaultBrowser"];
-	[defaultValues setObject:@"iPhone" forKey:@"DefaultFormat"];
-	[defaultValues setObject:@"Flash - Standard" forKey:@"AlternateFormat"];
-	[defaultValues setObject:[NSNumber numberWithBool:YES] forKey:@"CacheBBC_TV"];
-	[defaultValues setObject:[NSNumber numberWithBool:YES] forKey:@"CacheITV_TV"];
-	[defaultValues setObject:[NSNumber numberWithBool:NO] forKey:@"CacheBBC_Radio"];
-	[defaultValues setObject:[NSNumber numberWithBool:NO] forKey:@"CacheBBC_Podcasts"];
-	[defaultValues setObject:@"4" forKey:@"CacheExpiryTime"];
-	[defaultValues setObject:[NSNumber numberWithBool:NO] forKey:@"Verbose"];
-	[defaultValues setObject:[NSNumber numberWithBool:YES] forKey:@"SeriesLinkStartup"];
-	[defaultValues setObject:[NSNumber numberWithBool:NO] forKey:@"DownloadSubtitles"];
-	[defaultValues setObject:[NSNumber numberWithBool:NO] forKey:@"AlwaysUseProxy"];
-	[defaultValues setObject:[NSNumber numberWithBool:NO] forKey:@"XBMC_naming"];
-	[defaultValues setObject:@"30" forKey:@"KeepSeriesFor"];
-	[defaultValues setObject:[NSNumber numberWithBool:NO] forKey:@"RemoveOldSeries"];
-    [defaultValues setObject:[NSNumber numberWithBool:NO] forKey:@"AudioDescribed"];
-    [defaultValues setObject:[NSNumber numberWithBool:YES] forKey:@"QuickCache"];
-    [defaultValues setObject:[NSNumber numberWithBool:YES] forKey:@"TagShows"];
-    [defaultValues setObject:[NSNumber numberWithBool:YES] forKey:@"Cache4oD_TV"];
+	defaultValues[@"DownloadPath"] = [defaultDownloadDirectory stringByExpandingTildeInPath];
+	defaultValues[@"Proxy"] = @"Provided";
+	defaultValues[@"CustomProxy"] = @"";
+	defaultValues[@"AutoRetryFailed"] = @YES;
+	defaultValues[@"AutoRetryTime"] = @"30";
+	defaultValues[@"AddCompletedToiTunes"] = @YES;
+	defaultValues[@"DefaultBrowser"] = @"Safari";
+	defaultValues[@"DefaultFormat"] = @"iPhone";
+	defaultValues[@"AlternateFormat"] = @"Flash - Standard";
+	defaultValues[@"CacheBBC_TV"] = @YES;
+	defaultValues[@"CacheITV_TV"] = @YES;
+	defaultValues[@"CacheBBC_Radio"] = @NO;
+	defaultValues[@"CacheBBC_Podcasts"] = @NO;
+	defaultValues[@"CacheExpiryTime"] = @"4";
+	defaultValues[@"Verbose"] = @NO;
+	defaultValues[@"SeriesLinkStartup"] = @YES;
+	defaultValues[@"DownloadSubtitles"] = @NO;
+	defaultValues[@"AlwaysUseProxy"] = @NO;
+	defaultValues[@"XBMC_naming"] = @NO;
+	defaultValues[@"KeepSeriesFor"] = @"30";
+	defaultValues[@"RemoveOldSeries"] = @NO;
+    defaultValues[@"AudioDescribed"] = @NO;
+    defaultValues[@"QuickCache"] = @YES;
+    defaultValues[@"TagShows"] = @YES;
+    defaultValues[@"Cache4oD_TV"] = @YES;
 	
 	[[NSUserDefaults standardUserDefaults] registerDefaults:defaultValues];
 	defaultValues = nil;
@@ -127,7 +127,7 @@
     [[mainWindow windowController] setShouldCascadeWindows:NO];      // Tell the controller to not cascade its windows.
     [mainWindow setFrameAutosaveName:@"mainWindow"];  // Specify the autosave name for the window.
 	
-	[queueTableView registerForDraggedTypes:[NSArray arrayWithObject:@"com.thomaswillson.programme"]];
+	[queueTableView registerForDraggedTypes:@[@"com.thomaswillson.programme"]];
 	
 	//Read Queue & Series-Link from File
 	NSFileManager *fileManager = [NSFileManager defaultManager];
@@ -195,7 +195,7 @@
 		[format1 setFormat:@"Flash - High"];
 		TVFormat *format2 = [[TVFormat alloc] init];
 		[format2 setFormat:@"Flash - Standard"];
-		[tvFormatController addObjects:[NSArray arrayWithObjects:format2,format1,nil]];
+		[tvFormatController addObjects:@[format2,format1]];
 	}
 	if ([[radioFormatController arrangedObjects] count] == 0)
 	{
@@ -205,7 +205,7 @@
 		[format2 setFormat:@"Flash AAC - Standard"];
 		RadioFormat *format3 = [[RadioFormat alloc] init];
 		[format3 setFormat:@"Flash - MP3"];
-		[radioFormatController addObjects:[NSArray arrayWithObjects:format1,format2,format3,nil]];
+		[radioFormatController addObjects:@[format1,format2,format3]];
 	}
     if ([[itvFormatController arrangedObjects] count] == 0)
     {
@@ -217,7 +217,7 @@
         [format3 setFormat:@"Flash - Low"];
         TVFormat *format4 = [[TVFormat alloc] init];
         [format4 setFormat:@"Flash - Very Low"];
-        [itvFormatController addObjects:[NSArray arrayWithObjects:format1,format2,format3,format4,nil]];
+        [itvFormatController addObjects:@[format1,format2,format3,format4]];
     }
 		
 	//Growl Initialization
@@ -227,7 +227,7 @@
 	LiveTVChannel *bbcOne = [[LiveTVChannel alloc] initWithChannelName:@"BBC One"];
 	LiveTVChannel *bbcTwo = [[LiveTVChannel alloc] initWithChannelName:@"BBC Two"];
 	LiveTVChannel *bbcNews24 = [[LiveTVChannel alloc] initWithChannelName:@"BBC News 24"];
-	[liveTVChannelController setContent:[NSArray arrayWithObjects:bbcOne,bbcTwo,bbcNews24,nil]];
+	[liveTVChannelController setContent:@[bbcOne,bbcTwo,bbcNews24]];
 	[liveTVTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
 	
 	//Remove SWFinfo
@@ -320,7 +320,7 @@
 	NSMutableArray *temptempQueue = [[NSMutableArray alloc] initWithArray:tempQueue];
 	for (Programme *show in temptempQueue)
 	{
-		if (([[show complete] isEqualToNumber:[NSNumber numberWithBool:YES]] && [[show successful] isEqualToNumber:[NSNumber numberWithBool:YES]]) 
+		if (([[show complete] isEqualToNumber:@YES] && [[show successful] isEqualToNumber:@YES]) 
 			|| [[show status] isEqualToString:@"Added by Series-Link"]) [tempQueue removeObject:show];
 	}
 	NSFileManager *fileManager = [NSFileManager defaultManager];
@@ -349,7 +349,7 @@
 	
 	[rootObject setValue:[tvFormatController arrangedObjects] forKey:@"tvFormats"];
 	[rootObject setValue:[radioFormatController arrangedObjects] forKey:@"radioFormats"];
-    [rootObject setValue:[NSNumber numberWithBool:YES] forKey:@"hasUpdatedCacheFor4oD"];
+    [rootObject setValue:@YES forKey:@"hasUpdatedCacheFor4oD"];
 	[NSKeyedArchiver archiveRootObject:rootObject toFile:filePath];
     
     filename = @"ITVFormats.automator";
@@ -414,7 +414,7 @@
 	NSArray *tempQueue = [queueController arrangedObjects];
 	for (Programme *show in tempQueue)
 	{
-		if (![[show successful] isEqualToNumber:[NSNumber numberWithBool:NO]])
+		if (![[show successful] isEqualToNumber:@NO])
 		{
 			[queueController removeObject:show];
 		}
@@ -496,17 +496,17 @@
             if ([[defaults objectForKey:@"CacheBBC_Podcasts"] boolValue]) [typesToCache addObject:@"Podcast"];
             if ([[defaults objectForKey:@"Cache4oD_TV"] boolValue]) [typesToCache addObject:@"CH4"];
             
-            NSArray *urlKeys = [NSArray arrayWithObjects:@"TV",@"ITV",@"Radio",@"Podcast",@"CH4", nil];
-            NSArray *urlObjects = [NSArray arrayWithObjects:@"http://tom-tech.com/get_iplayer/cache/tv.cache",
+            NSArray *urlKeys = @[@"TV",@"ITV",@"Radio",@"Podcast",@"CH4"];
+            NSArray *urlObjects = @[@"http://tom-tech.com/get_iplayer/cache/tv.cache",
                                    @"http://tom-tech.com/get_iplayer/cache/itv.cache",
                                    @"http://tom-tech.com/get_iplayer/cache/radio.cache",
                                    @"http://tom-tech.com/get_iplayer/cache/podcast.cache",
-                                   @"http://tom-tech.com/get_iplayer/cache/ch4.cache", nil];
+                                   @"http://tom-tech.com/get_iplayer/cache/ch4.cache"];
             updateURLDic = [[NSDictionary alloc] initWithObjects:urlObjects forKeys:urlKeys];
             
             nextToCache=0;
             if ([typesToCache count] > 0)
-                [self updateCacheForType:[typesToCache objectAtIndex:0]];
+                [self updateCacheForType:typesToCache[0]];
         }
         else [self getiPlayerUpdateFinished];
         
@@ -517,7 +517,7 @@
     [self addToLog:[NSString stringWithFormat:@"    Retrieving %@ index feeds.",type] :nil];
     [currentProgress setStringValue:[NSString stringWithFormat:@"Updating Program Indexes: Getting %@ index feeds from server...",type]];
     
-    ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:[updateURLDic objectForKey:type]]];
+    ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:updateURLDic[type]]];
     [request setDelegate:self];
     [request setDidFinishSelector:@selector(indexRequestFinished:)];
     [request setDownloadDestinationPath:[[@"~/Library/Application Support/Get iPlayer Automator" stringByExpandingTildeInPath] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.cache",type]]];
@@ -535,7 +535,7 @@
         didUpdate=YES;
         nextToCache++;
         if (nextToCache < [typesToCache count])
-            [self updateCacheForType:[typesToCache objectAtIndex:nextToCache]];
+            [self updateCacheForType:typesToCache[nextToCache]];
         else
         {
             [self getiPlayerUpdateFinished];
@@ -645,8 +645,8 @@
 				[pipeTask setStandardOutput:newPipe];
 				[pipeTask setStandardError:newPipe];
 				[pipeTask setLaunchPath:@"/usr/bin/perl"];
-				[pipeTask setArguments:[NSArray arrayWithObjects:getiPlayerPath,profileDirArg,@"--nopurge",noWarningArg,[self typeArgument:nil],[self cacheExpiryArgument:nil],listFormat,
-										searchArgument,nil]];
+				[pipeTask setArguments:@[getiPlayerPath,profileDirArg,@"--nopurge",noWarningArg,[self typeArgument:nil],[self cacheExpiryArgument:nil],listFormat,
+										searchArgument]];
 				NSMutableString *taskData = [[NSMutableString alloc] initWithString:@""];
 				[pipeTask launch];
 				while ((someData = [readHandle2 availableData]) && [someData length]) {
@@ -694,7 +694,7 @@
 							[p setValue:temp_showName forKey:@"showName"];
 							[p setValue:temp_tvNetwork forKey:@"tvNetwork"];
                             [p setUrl:url];
-							if ([temp_type isEqualToString:@"radio"]) [p setValue:[NSNumber numberWithBool:YES] forKey:@"radio"];
+							if ([temp_type isEqualToString:@"radio"]) [p setValue:@YES forKey:@"radio"];
 							if ([[p showName] isEqualToString:[show showName]] || ([[p url] isEqualToString:[show url]] && [show url]))
 							{
 								[show setValue:[p pid] forKey:@"pid"];
@@ -723,8 +723,8 @@
 				if (!foundMatch)
 				{
 					[show setValue:@"Not Currently Available" forKey:@"status"];
-					[show setValue:[NSNumber numberWithBool:YES] forKey:@"complete"];
-					[show setValue:[NSNumber numberWithBool:NO] forKey:@"successful"];
+					[show setValue:@YES forKey:@"complete"];
+					[show setValue:@NO forKey:@"successful"];
 				}
 		}
 		
@@ -818,7 +818,7 @@
 }
 - (void)addToLogNotification:(NSNotification *)note
 {
-	NSString *logMessage = [[note userInfo] objectForKey:@"message"];
+	NSString *logMessage = [note userInfo][@"message"];
 	[self addToLog:logMessage :[note object]];
 }
 - (IBAction)copyLog:(id)sender
@@ -935,10 +935,10 @@
                 [p setUrl:url];
 				if ([temp_type isEqualToString:@"radio"])
 				{
-					[p setValue:[NSNumber numberWithBool:YES] forKey:@"radio"];
+					[p setValue:@YES forKey:@"radio"];
 				}
                 else if ([temp_type isEqualToString:@"podcast"])
-                    [p setPodcast:[NSNumber numberWithBool:YES]];
+                    [p setPodcast:@YES];
                 
 				[resultsController addObject:p];
 				foundShow=YES;
@@ -1088,8 +1088,8 @@
 				[p setValue:index forKey:@"pid"];
                 [p setValue:tvNetwork forKey:@"tvNetwork"];
                 [p setUrl:url];
-				if ([type isEqualToString:@"radio"]) [p setValue:[NSNumber numberWithBool:YES] forKey:@"radio"];
-                else if ([type isEqualToString:@"podcast"]) [p setPodcast:[NSNumber numberWithBool:YES]];
+				if ([type isEqualToString:@"radio"]) [p setValue:@YES forKey:@"radio"];
+                else if ([type isEqualToString:@"podcast"]) [p setPodcast:@YES];
 			}
 			else if ([wantedID isEqualToString:index])
 			{
@@ -1097,8 +1097,8 @@
 				[p setValue:showName forKey:@"showName"];
                 [p setValue:tvNetwork forKey:@"tvNetwork"];
                 [p setUrl:url];
-				if ([type isEqualToString:@"radio"]) [p setValue:[NSNumber numberWithBool:YES] forKey:@"radio"];
-                else if ([type isEqualToString:@"podcast"]) [p setPodcast:[NSNumber numberWithBool:YES]];
+				if ([type isEqualToString:@"radio"]) [p setValue:@YES forKey:@"radio"];
+                else if ([type isEqualToString:@"podcast"]) [p setPodcast:@YES];
 			}
 		}
 			
@@ -1110,7 +1110,7 @@
         [p setProcessedPID:[[NSNumber alloc] initWithBool:NO]];
     }
 	else
-		[p setProcessedPID:[NSNumber numberWithBool:YES]];
+		[p setProcessedPID:@YES];
 	
 }
 - (IBAction)getCurrentWebpage:(id)sender
@@ -1140,7 +1140,7 @@
 			@try
 			{
 				SBElementArray *windows = [Safari windows];
-				if ([[NSNumber numberWithUnsignedInteger:[windows count]] intValue])
+				if ([@([windows count]) intValue])
 				{
 					for (SafariWindow *window in windows)
  					{
@@ -1170,7 +1170,7 @@
 					}
 					if (foundURL==NO)
 					{
-						url = [NSString stringWithString:[[[windows objectAtIndex:0] currentTab] URL]];
+						url = [NSString stringWithString:[[windows[0] currentTab] URL]];
                         //Might be incorrect
 					}
 				}
@@ -1201,7 +1201,7 @@
 			@try
 			{
 				SBElementArray *windows = [Chrome windows];
-				if ([[NSNumber numberWithUnsignedInteger:[windows count]] intValue])
+				if ([@([windows count]) intValue])
 				{
 					for (ChromeWindow *window in windows)
  					{
@@ -1231,7 +1231,7 @@
 					}
 					if (foundURL==NO)
 					{
-						url = [NSString stringWithString:[[[windows objectAtIndex:0] activeTab] URL]];
+						url = [NSString stringWithString:[[windows[0] activeTab] URL]];
                         //Might be incorrect
 					}
 				}
@@ -1459,7 +1459,7 @@
         [newProg setPid:pid];
         [newProg setShowName:showName];
         [newProg setTvNetwork:@"ITV"];
-        [newProg setProcessedPID:[NSNumber numberWithBool:YES]];
+        [newProg setProcessedPID:@YES];
         [newProg setUrl:url];
 		[queueController addObject:newProg];
 	}
@@ -1518,7 +1518,7 @@
         [newProg setShowName:showName];
         [newProg setTvNetwork:@"4oD C4"];
         [newProg setUrl:url];
-        [newProg setProcessedPID:[NSNumber numberWithBool:YES]];
+        [newProg setProcessedPID:@YES];
         [queueController addObject:newProg];
     }
 	else
@@ -1541,7 +1541,7 @@
 		NSArray *selected = [queueController selectedObjects];
 		for (Programme *show in selected)
 		{
-			if (![[show status] isEqualToString:@"Waiting..."] && ![[show complete] isEqualToNumber:[NSNumber numberWithBool:YES]])
+			if (![[show status] isEqualToString:@"Waiting..."] && ![[show complete] isEqualToNumber:@YES])
 			{
 				downloading = YES;
 			}
@@ -1573,7 +1573,7 @@
 	{
 		if ([show realPID] && [[show status] isEqualToString:@"Added by Series-Link"])
 		{
-			NSDictionary *info = [NSDictionary dictionaryWithObject:show forKey:@"Programme"];
+			NSDictionary *info = @{@"Programme": show};
 			[[NSNotificationCenter defaultCenter] postNotificationName:@"AddProgToHistory" object:self userInfo:info];
 			[queueController removeObject:show];
 		}
@@ -1651,11 +1651,11 @@
 		NSArray *tempQueue = [queueController arrangedObjects];
 		for (Programme *show in tempQueue)
 		{
-			if ([[show successful] isEqualToNumber:[NSNumber numberWithBool:NO]])
+			if ([[show successful] isEqualToNumber:@NO])
 			{
 				if ([[show processedPID] boolValue])
 				{
-					[show setComplete:[NSNumber numberWithBool:NO]];
+					[show setComplete:@NO];
 					[show setStatus:@"Waiting..."];
 					foundOne=YES;
 				}
@@ -1664,14 +1664,14 @@
 					[self getNameForProgramme:show];
 					if ([[show showName] isEqualToString:@"Unknown - Not in Cache"])
 					{
-						[show setComplete:[NSNumber numberWithBool:YES]];
-						[show setSuccessful:[NSNumber numberWithBool:NO]];
+						[show setComplete:@YES];
+						[show setSuccessful:@NO];
 						[show setStatus:@"Failed: Please set the show name"];
 						[self addToLog:@"Could not download. Please set a show name first." :self];
 					}
 					else
 					{
-						[show setComplete:[NSNumber numberWithBool:NO]];
+						[show setComplete:@NO];
 						[show setStatus:@"Waiting..."];
 						foundOne=YES;
 					}
@@ -1699,7 +1699,7 @@
 						  :nil];
 			for (Programme *show in tempQueue)
 			{
-				if ([[show complete] isEqualToNumber:[NSNumber numberWithBool:NO]])
+				if ([[show complete] isEqualToNumber:@NO])
 				{
                     if ([[show tvNetwork] hasPrefix:@"ITV"])
                         currentDownload = [[ITVDownload alloc] initWithProgramme:show itvFormats:[itvFormatController arrangedObjects] proxy:proxy];
@@ -1822,7 +1822,7 @@
 				[self cleanUpPath:finishedShow];
 				[self seasonEpisodeInfo:finishedShow];
 			}
-			if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"AddCompletedToiTunes"] isEqualTo:[NSNumber numberWithBool:YES]])
+			if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"AddCompletedToiTunes"] isEqualTo:@YES])
 				[NSThread detachNewThreadSelector:@selector(addToiTunes:) toTarget:self withObject:finishedShow];
 			else
 				[finishedShow setValue:@"Download Complete" forKey:@"status"];
@@ -1880,7 +1880,7 @@
 							(unsigned long)([tempQueue indexOfObject:nextShow]+1),
 							(unsigned long)[tempQueue count]]
 						  :nil];
-			if ([[nextShow complete] isEqualToNumber:[NSNumber numberWithBool:NO]])
+			if ([[nextShow complete] isEqualToNumber:@NO])
             {
                 if ([[nextShow tvNetwork] hasPrefix:@"ITV"])
                     currentDownload = [[ITVDownload alloc] initWithProgramme:nextShow itvFormats:[itvFormatController arrangedObjects] proxy:proxy];
@@ -2050,7 +2050,7 @@
 				[p setValue:temp_pid forKey:@"pid"];
 				[p setValue:temp_showName forKey:@"showName"];
 				[p setValue:temp_tvNetwork forKey:@"tvNetwork"];
-				NSNumber *added = [NSNumber numberWithInteger:timeadded];
+				NSNumber *added = @(timeadded);
 				[p setValue:added forKey:@"timeadded"];
 				[pvrResultsController addObject:p];
 			}
@@ -2238,7 +2238,7 @@
 				}
 				if (([[series2 added] integerValue] > timeadded) && ([temp_tvNetwork isEqualToString:[series2 tvNetwork]]))
                 {
-                    [series2 setAdded:[NSNumber numberWithInteger:timeadded]];
+                    [series2 setAdded:@(timeadded)];
                 }
 				if (([[series2 added] integerValue] <= timeadded) && ([temp_tvNetwork isEqualToString:[series2 tvNetwork]]))
 				{
@@ -2248,8 +2248,8 @@
 					[p setSeriesName:series_Name];
 					[p setEpisodeName:episode_Name];
                     [p setUrl:url];
-					if ([temp_type isEqualToString:@"radio"]) [p setValue:[NSNumber numberWithBool:YES] forKey:@"radio"];
-                    else if ([temp_type isEqualToString:@"podcast"]) [p setPodcast:[NSNumber numberWithBool:YES]];
+					if ([temp_type isEqualToString:@"radio"]) [p setValue:@YES forKey:@"radio"];
+                    else if ([temp_type isEqualToString:@"podcast"]) [p setPodcast:@YES];
 					[p setValue:@"Added by Series-Link" forKey:@"status"];
 					BOOL inQueue=NO;
 					for (Programme *show in currentQueue)
@@ -2314,8 +2314,8 @@
 }
 - (NSString *)escapeSpecialCharactersInString:(NSString *)string
 {
-    NSArray *characters = [NSArray arrayWithObjects:@"+",@"-",@"&",@"!",@"(",@")",@"{",@"}",
-                           @"[",@"]"@"^",@"~",@"*",@"?",@":",@"\"", nil];
+    NSArray *characters = @[@"+",@"-",@"&",@"!",@"(",@")",@"{",@"}",
+                           @"[",@"]"@"^",@"~",@"*",@"?",@":",@"\""];
     for (NSString *character in characters)
         string = [string stringByReplacingOccurrencesOfString:character withString:[NSString stringWithFormat:@"\\%@",character]];
     
@@ -2335,7 +2335,7 @@
 	
 	iTunesApplication *iTunes = [SBApplication applicationWithBundleIdentifier:@"com.apple.iTunes"];
 	
-	NSArray *fileToAdd = [NSArray arrayWithObject:[NSURL fileURLWithPath:path]];
+	NSArray *fileToAdd = @[[NSURL fileURLWithPath:path]];
 	if (![iTunes isRunning]) [iTunes activate];
 	@try
 	{
@@ -2535,7 +2535,7 @@
     [openPanel setCanCreateDirectories:YES];
 	[openPanel runModal];
 	NSArray *urls = [openPanel URLs];
-	[[NSUserDefaults standardUserDefaults] setValue:[[urls objectAtIndex:0] path] forKey:@"DownloadPath"];
+	[[NSUserDefaults standardUserDefaults] setValue:[urls[0] path] forKey:@"DownloadPath"];
 }
 - (IBAction)showFeedback:(id)sender
 {
@@ -2572,15 +2572,15 @@
 	if (runSinceChange || !currentTypeArgument)
 	{
 		NSMutableString *typeArgument = [[NSMutableString alloc] initWithString:@"--type="];
-		if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheBBC_TV"] isEqualTo:[NSNumber numberWithBool:YES]])
+		if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheBBC_TV"] isEqualTo:@YES])
             [typeArgument appendString:@"tv,"];
-		if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheITV_TV"] isEqualTo:[NSNumber numberWithBool:YES]])
+		if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheITV_TV"] isEqualTo:@YES])
             [typeArgument appendString:@"itv,"];
-		if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheBBC_Radio"] isEqualTo:[NSNumber numberWithBool:YES]])
+		if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheBBC_Radio"] isEqualTo:@YES])
             [typeArgument appendString:@"radio,"];
-		if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheBBC_Podcasts"] isEqualTo:[NSNumber numberWithBool:YES]])
+		if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheBBC_Podcasts"] isEqualTo:@YES])
             [typeArgument appendString:@"podcast,"];
-        if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"Cache4oD_TV"] isEqualTo:[NSNumber numberWithBool:YES]])
+        if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"Cache4oD_TV"] isEqualTo:@YES])
             [typeArgument appendString:@"ch4,"];
 		[typeArgument deleteCharactersInRange:NSMakeRange([typeArgument length]-1,1)];
 		currentTypeArgument = [typeArgument copy];
@@ -2735,7 +2735,7 @@
 	[mplayerStreamer setStandardOutput:liveTVError];
 	
 	//Get selected channel
-	LiveTVChannel *selectedChannel = [[liveTVChannelController arrangedObjects] objectAtIndex:[liveTVChannelController selectionIndex]];
+	LiveTVChannel *selectedChannel = [liveTVChannelController arrangedObjects][[liveTVChannelController selectionIndex]];
 	
 	//Set Proxy Arguments
 	NSString *proxyArg = NULL;
@@ -2750,7 +2750,7 @@
     }
 	
 	//Prepare Arguments	
-	NSArray *args = [NSArray arrayWithObjects:[[NSBundle mainBundle] pathForResource:@"get_iplayer" ofType:@"pl"],
+	NSArray *args = @[[[NSBundle mainBundle] pathForResource:@"get_iplayer" ofType:@"pl"],
 					 profileDirArg,
 					 @"--stream",
 					 @"--modes=flashnormal",
@@ -2759,11 +2759,10 @@
 					 //@"--player=mplayer -cache 3072 -",
 					// [NSString stringWithFormat:@"--player=\"%@\" -cache 3072 -", [[NSBundle mainBundle] pathForResource:@"mplayer" ofType:nil]],
 					 proxyArg,
-					 partialProxyArg,
-					 nil];
+					 partialProxyArg];
 	[getiPlayerStreamer setArguments:args];
 	
-	[mplayerStreamer setArguments:[NSArray arrayWithObjects:@"-cache",@"3072",@"-",nil]];
+	[mplayerStreamer setArguments:@[@"-cache",@"3072",@"-"]];
 	
 	
 	[getiPlayerStreamer launch];
@@ -2787,9 +2786,9 @@
     NSLog(@"INFO: Loading proxy settings...");
     [self addToLog:@"INFO: Loading proxy settings..."];
     [proxyDict removeAllObjects];
-    [proxyDict setObject:[NSValue valueWithPointer:selector] forKey:@"selector"];
+    proxyDict[@"selector"] = [NSValue valueWithPointer:selector];
     if (object)
-        [proxyDict setObject:object forKey:@"object"];
+        proxyDict[@"object"] = object;
     proxy = nil;
     NSString *proxyOption = [[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"];
 	if ([proxyOption isEqualToString:@"Custom"])
@@ -2826,7 +2825,7 @@
 	else if ([proxyOption isEqualToString:@"Provided"])
 	{
         ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:@"http://tom-tech.com/get_iplayer/proxy.txt"]];
-        [request setUserInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSValue valueWithPointer:selector], @"selector", object, @"object", nil]];
+        [request setUserInfo:@{@"selector": [NSValue valueWithPointer:selector], @"object": object}];
         [request setDelegate:self];
         [request setDidFailSelector:@selector(providedProxyDidFinish:)];
         [request setDidFinishSelector:@selector(providedProxyDidFinish:)];
@@ -2897,12 +2896,12 @@
 
 - (void)cancelProxyLoad
 {
-    [self returnFromProxyLoadWithError:[NSError errorWithDomain:@"Proxy" code:kProxyLoadCancelled userInfo:[NSDictionary dictionaryWithObject:@"Proxy Load Cancelled" forKey:NSLocalizedDescriptionKey]]];
+    [self returnFromProxyLoadWithError:[NSError errorWithDomain:@"Proxy" code:kProxyLoadCancelled userInfo:@{NSLocalizedDescriptionKey: @"Proxy Load Cancelled"}]];
 }
 
 - (void)failProxyLoad
 {
-    [self returnFromProxyLoadWithError:[NSError errorWithDomain:@"Proxy" code:kProxyLoadFailed userInfo:[NSDictionary dictionaryWithObject:@"Proxy Load Failed" forKey:NSLocalizedDescriptionKey]]];
+    [self returnFromProxyLoadWithError:[NSError errorWithDomain:@"Proxy" code:kProxyLoadFailed userInfo:@{NSLocalizedDescriptionKey: @"Proxy Load Failed"}]];
 }
 
 - (void)finishProxyLoad
@@ -2975,7 +2974,7 @@
 
 - (void)failProxyTest
 {
-    [self returnFromProxyLoadWithError:[NSError errorWithDomain:@"Proxy" code:kProxyLoadFailed userInfo:[NSDictionary dictionaryWithObject:@"Proxy Text Failed" forKey:NSLocalizedDescriptionKey]]];
+    [self returnFromProxyLoadWithError:[NSError errorWithDomain:@"Proxy" code:kProxyLoadFailed userInfo:@{NSLocalizedDescriptionKey: @"Proxy Text Failed"}]];
 }
 
 - (void)finishProxyTest
@@ -2998,7 +2997,7 @@
         [self addToLog:@"INFO: No proxy will be used"];
     }
     [self updateProxyLoadStatus:NO message:nil];
-    [self performSelector:[[proxyDict objectForKey:@"selector"] pointerValue] withObject:[proxyDict objectForKey:@"object"] withObject:error];
+    [self performSelector:[proxyDict[@"selector"] pointerValue] withObject:proxyDict[@"object"] withObject:error];
 }
 
 - (void)updateProxyLoadStatus:(BOOL)working message:(NSString *)message

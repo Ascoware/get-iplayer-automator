@@ -264,11 +264,11 @@ static NSOperationQueue *sharedQueue = nil;
 		sessionCredentialsLock = [[NSRecursiveLock alloc] init];
 		delegateAuthenticationLock = [[NSRecursiveLock alloc] init];
 		bandwidthUsageTracker = [[NSMutableArray alloc] initWithCapacity:5];
-		ASIRequestTimedOutError = [[NSError alloc] initWithDomain:NetworkRequestErrorDomain code:ASIRequestTimedOutErrorType userInfo:[NSDictionary dictionaryWithObjectsAndKeys:@"The request timed out",NSLocalizedDescriptionKey,nil]];  
-		ASIAuthenticationError = [[NSError alloc] initWithDomain:NetworkRequestErrorDomain code:ASIAuthenticationErrorType userInfo:[NSDictionary dictionaryWithObjectsAndKeys:@"Authentication needed",NSLocalizedDescriptionKey,nil]];
-		ASIRequestCancelledError = [[NSError alloc] initWithDomain:NetworkRequestErrorDomain code:ASIRequestCancelledErrorType userInfo:[NSDictionary dictionaryWithObjectsAndKeys:@"The request was cancelled",NSLocalizedDescriptionKey,nil]];
-		ASIUnableToCreateRequestError = [[NSError alloc] initWithDomain:NetworkRequestErrorDomain code:ASIUnableToCreateRequestErrorType userInfo:[NSDictionary dictionaryWithObjectsAndKeys:@"Unable to create request (bad url?)",NSLocalizedDescriptionKey,nil]];
-		ASITooMuchRedirectionError = [[NSError alloc] initWithDomain:NetworkRequestErrorDomain code:ASITooMuchRedirectionErrorType userInfo:[NSDictionary dictionaryWithObjectsAndKeys:@"The request failed because it redirected too many times",NSLocalizedDescriptionKey,nil]];
+		ASIRequestTimedOutError = [[NSError alloc] initWithDomain:NetworkRequestErrorDomain code:ASIRequestTimedOutErrorType userInfo:@{NSLocalizedDescriptionKey: @"The request timed out"}];  
+		ASIAuthenticationError = [[NSError alloc] initWithDomain:NetworkRequestErrorDomain code:ASIAuthenticationErrorType userInfo:@{NSLocalizedDescriptionKey: @"Authentication needed"}];
+		ASIRequestCancelledError = [[NSError alloc] initWithDomain:NetworkRequestErrorDomain code:ASIRequestCancelledErrorType userInfo:@{NSLocalizedDescriptionKey: @"The request was cancelled"}];
+		ASIUnableToCreateRequestError = [[NSError alloc] initWithDomain:NetworkRequestErrorDomain code:ASIUnableToCreateRequestErrorType userInfo:@{NSLocalizedDescriptionKey: @"Unable to create request (bad url?)"}];
+		ASITooMuchRedirectionError = [[NSError alloc] initWithDomain:NetworkRequestErrorDomain code:ASITooMuchRedirectionErrorType userInfo:@{NSLocalizedDescriptionKey: @"The request failed because it redirected too many times"}];
 		sharedQueue = [[NSOperationQueue alloc] init];
 		[sharedQueue setMaxConcurrentOperationCount:4];
 
@@ -477,7 +477,7 @@ static NSOperationQueue *sharedQueue = nil;
 	if (!requestHeaders) {
 		[self setRequestHeaders:[NSMutableDictionary dictionaryWithCapacity:1]];
 	}
-	[requestHeaders setObject:value forKey:header];
+	requestHeaders[header] = value;
 }
 
 // This function will be called either just before a request starts, or when postLength is needed, whichever comes first
@@ -517,7 +517,7 @@ static NSOperationQueue *sharedQueue = nil;
 		NSError *err = nil;
 		[self setPostLength:[[[[[NSFileManager alloc] init] autorelease] attributesOfItemAtPath:path error:&err] fileSize]];
 		if (err) {
-			[self failWithError:[NSError errorWithDomain:NetworkRequestErrorDomain code:ASIFileManagementError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:@"Failed to get attributes for file at path '%@'",path],NSLocalizedDescriptionKey,error,NSUnderlyingErrorKey,nil]]];
+			[self failWithError:[NSError errorWithDomain:NetworkRequestErrorDomain code:ASIFileManagementError userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to get attributes for file at path '%@'",path],NSUnderlyingErrorKey: error}]];
 			return;
 		}
 		
@@ -767,7 +767,7 @@ static NSOperationQueue *sharedQueue = nil;
 
 - (BOOL)isResponseCompressed
 {
-	NSString *encoding = [[self responseHeaders] objectForKey:@"Content-Encoding"];
+	NSString *encoding = [self responseHeaders][@"Content-Encoding"];
 	return encoding && [encoding rangeOfString:@"gzip"].location != NSNotFound;
 }
 
@@ -922,13 +922,13 @@ static NSOperationQueue *sharedQueue = nil;
 
 				NSDictionary *cachedHeaders = [[self downloadCache] cachedResponseHeadersForURL:[self url]];
 				if (cachedHeaders) {
-					NSString *etag = [cachedHeaders objectForKey:@"Etag"];
+					NSString *etag = cachedHeaders[@"Etag"];
 					if (etag) {
-						[[self requestHeaders] setObject:etag forKey:@"If-None-Match"];
+						[self requestHeaders][@"If-None-Match"] = etag;
 					}
-					NSString *lastModified = [cachedHeaders objectForKey:@"Last-Modified"];
+					NSString *lastModified = cachedHeaders[@"Last-Modified"];
 					if (lastModified) {
-						[[self requestHeaders] setObject:lastModified forKey:@"If-Modified-Since"];
+						[self requestHeaders][@"If-Modified-Since"] = lastModified;
 					}
 				}
 			}
@@ -939,7 +939,7 @@ static NSOperationQueue *sharedQueue = nil;
 		
 		NSString *header;
 		for (header in [self requestHeaders]) {
-			CFHTTPMessageSetHeaderFieldValue(request, (CFStringRef)header, (CFStringRef)[[self requestHeaders] objectForKey:header]);
+			CFHTTPMessageSetHeaderFieldValue(request, (CFStringRef)header, (CFStringRef)[self requestHeaders][header]);
 		}
 
 		// If we immediately have access to proxy settings, start the request
@@ -950,7 +950,7 @@ static NSOperationQueue *sharedQueue = nil;
 
 	} @catch (NSException *exception) {
 		NSError *underlyingError = [NSError errorWithDomain:NetworkRequestErrorDomain code:ASIUnhandledExceptionError userInfo:[exception userInfo]];
-		[self failWithError:[NSError errorWithDomain:NetworkRequestErrorDomain code:ASIUnhandledExceptionError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[exception name],NSLocalizedDescriptionKey,[exception reason],NSLocalizedFailureReasonErrorKey,underlyingError,NSUnderlyingErrorKey,nil]]];
+		[self failWithError:[NSError errorWithDomain:NetworkRequestErrorDomain code:ASIUnhandledExceptionError userInfo:@{NSLocalizedDescriptionKey: [exception name],NSLocalizedFailureReasonErrorKey: [exception reason],NSUnderlyingErrorKey: underlyingError}]];
 
 	} @finally {
 		[[self cancelledLock] unlock];
@@ -970,7 +970,7 @@ static NSOperationQueue *sharedQueue = nil;
 	NSDictionary *credentials = nil;
 
 	// Do we already have an auth header?
-	if (![[self requestHeaders] objectForKey:@"Authorization"]) {
+	if (![self requestHeaders][@"Authorization"]) {
 
 		// If we have basic authentication explicitly set and a username and password set on the request, add a basic auth header
 		if ([self username] && [self password] && [[self authenticationScheme] isEqualToString:(NSString *)kCFHTTPAuthenticationSchemeBasic]) {
@@ -990,16 +990,16 @@ static NSOperationQueue *sharedQueue = nil;
 
 					// When the Authentication key is set, the credentials were stored after an authentication challenge, so we can let CFNetwork apply them
 					// (credentials for Digest and NTLM will always be stored like this)
-					if ([credentials objectForKey:@"Authentication"]) {
+					if (credentials[@"Authentication"]) {
 
 						// If we've already talked to this server and have valid credentials, let's apply them to the request
-						if (CFHTTPMessageApplyCredentialDictionary(request, (CFHTTPAuthenticationRef)[credentials objectForKey:@"Authentication"], (CFDictionaryRef)[credentials objectForKey:@"Credentials"], NULL)) {
-							[self setAuthenticationScheme:[credentials objectForKey:@"AuthenticationScheme"]];
+						if (CFHTTPMessageApplyCredentialDictionary(request, (CFHTTPAuthenticationRef)credentials[@"Authentication"], (CFDictionaryRef)credentials[@"Credentials"], NULL)) {
+							[self setAuthenticationScheme:credentials[@"AuthenticationScheme"]];
 							#if DEBUG_HTTP_AUTHENTICATION
 							ASI_DEBUG_LOG(@"[AUTH] Request %@ found cached credentials (%@), will reuse without waiting for an authentication challenge",self,[credentials objectForKey:@"AuthenticationScheme"]);
 							#endif
 						} else {
-							[[self class] removeAuthenticationCredentialsFromSessionStore:[credentials objectForKey:@"Credentials"]];
+							[[self class] removeAuthenticationCredentialsFromSessionStore:credentials[@"Credentials"]];
 							#if DEBUG_HTTP_AUTHENTICATION
 							ASI_DEBUG_LOG(@"[AUTH] Failed to apply cached credentials to request %@. These will be removed from the session store, and this request will wait for an authentication challenge",self);
 							#endif
@@ -1008,8 +1008,8 @@ static NSOperationQueue *sharedQueue = nil;
 					// If the Authentication key is not set, these credentials were stored after a username and password set on a previous request passed basic authentication
 					// When this happens, we'll need to create the Authorization header ourselves
 					} else {
-						NSDictionary *usernameAndPassword = [credentials objectForKey:@"Credentials"];
-						[self addBasicAuthenticationHeaderWithUsername:[usernameAndPassword objectForKey:(NSString *)kCFHTTPAuthenticationUsername] andPassword:[usernameAndPassword objectForKey:(NSString *)kCFHTTPAuthenticationPassword]];
+						NSDictionary *usernameAndPassword = credentials[@"Credentials"];
+						[self addBasicAuthenticationHeaderWithUsername:usernameAndPassword[(NSString *)kCFHTTPAuthenticationUsername] andPassword:usernameAndPassword[(NSString *)kCFHTTPAuthenticationPassword]];
 						#if DEBUG_HTTP_AUTHENTICATION
 						ASI_DEBUG_LOG(@"[AUTH] Request %@ found cached BASIC credentials from a previous request. Will send credentials without waiting for an authentication challenge",self);
 						#endif
@@ -1023,8 +1023,8 @@ static NSOperationQueue *sharedQueue = nil;
 	if ([self useSessionPersistence]) {
 		credentials = [self findSessionProxyAuthenticationCredentials];
 		if (credentials) {
-			if (!CFHTTPMessageApplyCredentialDictionary(request, (CFHTTPAuthenticationRef)[credentials objectForKey:@"Authentication"], (CFDictionaryRef)[credentials objectForKey:@"Credentials"], NULL)) {
-				[[self class] removeProxyAuthenticationCredentialsFromSessionStore:[credentials objectForKey:@"Credentials"]];
+			if (!CFHTTPMessageApplyCredentialDictionary(request, (CFHTTPAuthenticationRef)credentials[@"Authentication"], (CFDictionaryRef)credentials[@"Credentials"], NULL)) {
+				[[self class] removeProxyAuthenticationCredentialsFromSessionStore:credentials[@"Credentials"]];
 			}
 		}
 	}
@@ -1080,7 +1080,7 @@ static NSOperationQueue *sharedQueue = nil;
 	[self applyCookieHeader];
 	
 	// Build and set the user agent string if the request does not already have a custom user agent specified
-	if (![[self requestHeaders] objectForKey:@"User-Agent"]) {
+	if (![self requestHeaders][@"User-Agent"]) {
 		NSString *userAgentString = [self userAgent];
 		if (!userAgentString) {
 			userAgentString = [ASIHTTPRequest defaultUserAgentString];
@@ -1116,7 +1116,7 @@ static NSOperationQueue *sharedQueue = nil;
 		NSError *err = nil;
 		[self setPartialDownloadSize:[[fileManager attributesOfItemAtPath:[self temporaryFileDownloadPath] error:&err] fileSize]];
 		if (err) {
-			[self failWithError:[NSError errorWithDomain:NetworkRequestErrorDomain code:ASIFileManagementError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:@"Failed to get attributes for file at path '%@'",[self temporaryFileDownloadPath]],NSLocalizedDescriptionKey,error,NSUnderlyingErrorKey,nil]]];
+			[self failWithError:[NSError errorWithDomain:NetworkRequestErrorDomain code:ASIFileManagementError userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to get attributes for file at path '%@'",[self temporaryFileDownloadPath]],NSUnderlyingErrorKey: error}]];
 			return;
 		}
 	}
@@ -1187,7 +1187,7 @@ static NSOperationQueue *sharedQueue = nil;
 	}
 
 	if (![self readStream]) {
-		[self failWithError:[NSError errorWithDomain:NetworkRequestErrorDomain code:ASIInternalErrorWhileBuildingRequestType userInfo:[NSDictionary dictionaryWithObjectsAndKeys:@"Unable to create read stream",NSLocalizedDescriptionKey,nil]]];
+		[self failWithError:[NSError errorWithDomain:NetworkRequestErrorDomain code:ASIInternalErrorWhileBuildingRequestType userInfo:@{NSLocalizedDescriptionKey: @"Unable to create read stream"}]];
         return;
     }
 
@@ -1205,9 +1205,9 @@ static NSOperationQueue *sharedQueue = nil;
             // see: http://iphonedevelopment.blogspot.com/2010/05/nsstream-tcp-and-ssl.html
             
             NSDictionary *sslProperties = [[NSDictionary alloc] initWithObjectsAndKeys:
-                                      [NSNumber numberWithBool:YES], kCFStreamSSLAllowsExpiredCertificates,
-                                      [NSNumber numberWithBool:YES], kCFStreamSSLAllowsAnyRoot,
-                                      [NSNumber numberWithBool:NO],  kCFStreamSSLValidatesCertificateChain,
+                                      @YES, kCFStreamSSLAllowsExpiredCertificates,
+                                      @YES, kCFStreamSSLAllowsAnyRoot,
+                                      @NO,  kCFStreamSSLValidatesCertificateChain,
                                       kCFNull,kCFStreamSSLPeerName,
                                       nil];
             
@@ -1230,7 +1230,7 @@ static NSOperationQueue *sharedQueue = nil;
 				[certificates addObject:cert];
 			}
             
-            [sslProperties setObject:certificates forKey:(NSString *)kCFStreamSSLCertificates];
+            sslProperties[(NSString *)kCFStreamSSLCertificates] = certificates;
             
             CFReadStreamSetProperty((CFReadStreamRef)[self readStream], kCFStreamPropertySSLSettings, sslProperties);
         }
@@ -1260,7 +1260,7 @@ static NSOperationQueue *sharedQueue = nil;
 				portKey = (NSString *)kCFStreamPropertyHTTPSProxyPort;
 			}
 		}
-		NSMutableDictionary *proxyToUse = [NSMutableDictionary dictionaryWithObjectsAndKeys:[self proxyHost],hostKey,[NSNumber numberWithInt:[self proxyPort]],portKey,nil];
+		NSMutableDictionary *proxyToUse = [NSMutableDictionary dictionaryWithObjectsAndKeys:[self proxyHost],hostKey,@([self proxyPort]),portKey,nil];
 
 		if ([[self proxyType] isEqualToString:(NSString *)kCFProxyTypeSOCKS]) {
 			CFReadStreamSetProperty((CFReadStreamRef)[self readStream], kCFStreamPropertySOCKSProxy, proxyToUse);
@@ -1294,18 +1294,18 @@ static NSOperationQueue *sharedQueue = nil;
 		// If we are redirecting, we will re-use the current connection only if we are connecting to the same server
 		if ([self connectionInfo]) {
 			
-			if (![[[self connectionInfo] objectForKey:@"host"] isEqualToString:[[self url] host]] || ![[[self connectionInfo] objectForKey:@"scheme"] isEqualToString:[[self url] scheme]] || [(NSNumber *)[[self connectionInfo] objectForKey:@"port"] intValue] != [[[self url] port] intValue]) {
+			if (![[self connectionInfo][@"host"] isEqualToString:[[self url] host]] || ![[self connectionInfo][@"scheme"] isEqualToString:[[self url] scheme]] || [(NSNumber *)[self connectionInfo][@"port"] intValue] != [[[self url] port] intValue]) {
 				[self setConnectionInfo:nil];
 
 			// Check if we should have expired this connection
-			} else if ([[[self connectionInfo] objectForKey:@"expires"] timeIntervalSinceNow] < 0) {
+			} else if ([[self connectionInfo][@"expires"] timeIntervalSinceNow] < 0) {
 				#if DEBUG_PERSISTENT_CONNECTIONS
 				ASI_DEBUG_LOG(@"[CONNECTION] Not re-using connection #%i because it has expired",[[[self connectionInfo] objectForKey:@"id"] intValue]);
 				#endif
 				[persistentConnectionsPool removeObject:[self connectionInfo]];
 				[self setConnectionInfo:nil];
 
-			} else if ([[self connectionInfo] objectForKey:@"request"] != nil) {
+			} else if ([self connectionInfo][@"request"] != nil) {
                 //Some other request reused this connection already - we'll have to create a new one
 				#if DEBUG_PERSISTENT_CONNECTIONS
                 ASI_DEBUG_LOG(@"%@ - Not re-using connection #%i for request #%i because it is already used by request #%i",self,[[[self connectionInfo] objectForKey:@"id"] intValue],[[self requestID] intValue],[[[self connectionInfo] objectForKey:@"request"] intValue]);
@@ -1320,14 +1320,14 @@ static NSOperationQueue *sharedQueue = nil;
 			
 			// Look for a connection to the same server in the pool
 			for (NSMutableDictionary *existingConnection in persistentConnectionsPool) {
-				if (![existingConnection objectForKey:@"request"] && [[existingConnection objectForKey:@"host"] isEqualToString:[[self url] host]] && [[existingConnection objectForKey:@"scheme"] isEqualToString:[[self url] scheme]] && [(NSNumber *)[existingConnection objectForKey:@"port"] intValue] == [[[self url] port] intValue]) {
+				if (!existingConnection[@"request"] && [existingConnection[@"host"] isEqualToString:[[self url] host]] && [existingConnection[@"scheme"] isEqualToString:[[self url] scheme]] && [(NSNumber *)existingConnection[@"port"] intValue] == [[[self url] port] intValue]) {
 					[self setConnectionInfo:existingConnection];
 				}
 			}
 		}
 		
-		if ([[self connectionInfo] objectForKey:@"stream"]) {
-			oldStream = [[[self connectionInfo] objectForKey:@"stream"] retain];
+		if ([self connectionInfo][@"stream"]) {
+			oldStream = [[self connectionInfo][@"stream"] retain];
 
 		}
 		
@@ -1335,20 +1335,20 @@ static NSOperationQueue *sharedQueue = nil;
 		if (![self connectionInfo]) {
 			[self setConnectionInfo:[NSMutableDictionary dictionary]];
 			nextConnectionNumberToCreate++;
-			[[self connectionInfo] setObject:[NSNumber numberWithInt:nextConnectionNumberToCreate] forKey:@"id"];
-			[[self connectionInfo] setObject:[[self url] host] forKey:@"host"];
-			[[self connectionInfo] setObject:[NSNumber numberWithInt:[[[self url] port] intValue]] forKey:@"port"];
-			[[self connectionInfo] setObject:[[self url] scheme] forKey:@"scheme"];
+			[self connectionInfo][@"id"] = [NSNumber numberWithInt:nextConnectionNumberToCreate];
+			[self connectionInfo][@"host"] = [[self url] host];
+			[self connectionInfo][@"port"] = @([[[self url] port] intValue]);
+			[self connectionInfo][@"scheme"] = [[self url] scheme];
 			[persistentConnectionsPool addObject:[self connectionInfo]];
 		}
 		
 		// If we are retrying this request, it will already have a requestID
 		if (![self requestID]) {
 			nextRequestID++;
-			[self setRequestID:[NSNumber numberWithUnsignedInt:nextRequestID]];
+			[self setRequestID:@(nextRequestID)];
 		}
-		[[self connectionInfo] setObject:[self requestID] forKey:@"request"];		
-		[[self connectionInfo] setObject:[self readStream] forKey:@"stream"];
+		[self connectionInfo][@"request"] = [self requestID];		
+		[self connectionInfo][@"stream"] = [self readStream];
 		CFReadStreamSetProperty((CFReadStreamRef)[self readStream],  kCFStreamPropertyHTTPAttemptPersistentConnection, kCFBooleanTrue);
 		
 		#if DEBUG_PERSISTENT_CONNECTIONS
@@ -1359,7 +1359,7 @@ static NSOperationQueue *sharedQueue = nil;
 		// Tag the stream with an id that tells it which connection to use behind the scenes
 		// See http://lists.apple.com/archives/macnetworkprog/2008/Dec/msg00001.html for details on this approach
 		
-		CFReadStreamSetProperty((CFReadStreamRef)[self readStream], CFSTR("ASIStreamID"), [[self connectionInfo] objectForKey:@"id"]);
+		CFReadStreamSetProperty((CFReadStreamRef)[self readStream], CFSTR("ASIStreamID"), [self connectionInfo][@"id"]);
 	
 	} else {
 		#if DEBUG_PERSISTENT_CONNECTIONS
@@ -1397,7 +1397,7 @@ static NSOperationQueue *sharedQueue = nil;
 	if (!streamSuccessfullyOpened) {
 		[self setConnectionCanBeReused:NO];
 		[self destroyReadStream];
-		[self failWithError:[NSError errorWithDomain:NetworkRequestErrorDomain code:ASIInternalErrorWhileBuildingRequestType userInfo:[NSDictionary dictionaryWithObjectsAndKeys:@"Unable to start HTTP connection",NSLocalizedDescriptionKey,nil]]];
+		[self failWithError:[NSError errorWithDomain:NetworkRequestErrorDomain code:ASIInternalErrorWhileBuildingRequestType userInfo:@{NSLocalizedDescriptionKey: @"Unable to start HTTP connection"}]];
 		return;	
 	}
 	
@@ -2080,7 +2080,7 @@ static NSOperationQueue *sharedQueue = nil;
 		[self destroyReadStream];
 	}
 	if ([self connectionCanBeReused]) {
-		[[self connectionInfo] setObject:[NSDate dateWithTimeIntervalSinceNow:[self persistentConnectionTimeoutSeconds]] forKey:@"expires"];
+		[self connectionInfo][@"expires"] = [NSDate dateWithTimeIntervalSinceNow:[self persistentConnectionTimeoutSeconds]];
 	}
 	
     if ([self isCancelled] || [self error]) {
@@ -2184,14 +2184,14 @@ static NSOperationQueue *sharedQueue = nil;
 			#endif
 			
 			NSMutableDictionary *newCredentials = [NSMutableDictionary dictionaryWithCapacity:2];
-			[newCredentials setObject:[self username] forKey:(NSString *)kCFHTTPAuthenticationUsername];
-			[newCredentials setObject:[self password] forKey:(NSString *)kCFHTTPAuthenticationPassword];
+			newCredentials[(NSString *)kCFHTTPAuthenticationUsername] = [self username];
+			newCredentials[(NSString *)kCFHTTPAuthenticationPassword] = [self password];
 			
 			// Store the credentials in the session 
 			NSMutableDictionary *sessionCredentials = [NSMutableDictionary dictionary];
-			[sessionCredentials setObject:newCredentials forKey:@"Credentials"];
-			[sessionCredentials setObject:[self url] forKey:@"URL"];
-			[sessionCredentials setObject:(NSString *)kCFHTTPAuthenticationSchemeBasic forKey:@"AuthenticationScheme"];
+			sessionCredentials[@"Credentials"] = newCredentials;
+			sessionCredentials[@"URL"] = [self url];
+			sessionCredentials[@"AuthenticationScheme"] = (NSString *)kCFHTTPAuthenticationSchemeBasic;
 			[[self class] storeAuthenticationCredentialsInSessionStore:sessionCredentials];
 		}
 	}
@@ -2248,7 +2248,7 @@ static NSOperationQueue *sharedQueue = nil;
 	// Handle connection persistence
 	if ([self shouldAttemptPersistentConnection]) {
 		
-		NSString *connectionHeader = [[[self responseHeaders] objectForKey:@"Connection"] lowercaseString];
+		NSString *connectionHeader = [[self responseHeaders][@"Connection"] lowercaseString];
 
 		NSString *httpVersion = [NSMakeCollectable(CFHTTPMessageCopyVersion(message)) autorelease];
 		
@@ -2258,7 +2258,7 @@ static NSOperationQueue *sharedQueue = nil;
 			// See if server explicitly told us to close the connection
 			if (![connectionHeader isEqualToString:@"close"]) {
 				
-				NSString *keepAliveHeader = [[self responseHeaders] objectForKey:@"Keep-Alive"];
+				NSString *keepAliveHeader = [self responseHeaders][@"Keep-Alive"];
 				
 				// If we got a keep alive header, we'll reuse the connection for as long as the server tells us
 				if (keepAliveHeader) { 
@@ -2319,8 +2319,8 @@ static NSOperationQueue *sharedQueue = nil;
 		[self setPostLength:0];
 
 		// Perhaps there are other headers we should be preserving, but it's hard to know what we need to keep and what to throw away.
-		NSString *userAgentHeader = [[self requestHeaders] objectForKey:@"User-Agent"];
-		NSString *acceptHeader = [[self requestHeaders] objectForKey:@"Accept"];
+		NSString *userAgentHeader = [self requestHeaders][@"User-Agent"];
+		NSString *acceptHeader = [self requestHeaders][@"Accept"];
 		[self setRequestHeaders:nil];
 		if (userAgentHeader) {
 			[self addRequestHeader:@"User-Agent" value:userAgentHeader];
@@ -2369,7 +2369,7 @@ static NSOperationQueue *sharedQueue = nil;
 
 - (void)saveProxyCredentialsToKeychain:(NSDictionary *)newCredentials
 {
-	NSURLCredential *authenticationCredentials = [NSURLCredential credentialWithUser:[newCredentials objectForKey:(NSString *)kCFHTTPAuthenticationUsername] password:[newCredentials objectForKey:(NSString *)kCFHTTPAuthenticationPassword] persistence:NSURLCredentialPersistencePermanent];
+	NSURLCredential *authenticationCredentials = [NSURLCredential credentialWithUser:newCredentials[(NSString *)kCFHTTPAuthenticationUsername] password:newCredentials[(NSString *)kCFHTTPAuthenticationPassword] persistence:NSURLCredentialPersistencePermanent];
 	if (authenticationCredentials) {
 		[ASIHTTPRequest saveCredentials:authenticationCredentials forProxy:[self proxyHost] port:[self proxyPort] realm:[self proxyAuthenticationRealm]];
 	}	
@@ -2378,7 +2378,7 @@ static NSOperationQueue *sharedQueue = nil;
 
 - (void)saveCredentialsToKeychain:(NSDictionary *)newCredentials
 {
-	NSURLCredential *authenticationCredentials = [NSURLCredential credentialWithUser:[newCredentials objectForKey:(NSString *)kCFHTTPAuthenticationUsername] password:[newCredentials objectForKey:(NSString *)kCFHTTPAuthenticationPassword] persistence:NSURLCredentialPersistencePermanent];
+	NSURLCredential *authenticationCredentials = [NSURLCredential credentialWithUser:newCredentials[(NSString *)kCFHTTPAuthenticationUsername] password:newCredentials[(NSString *)kCFHTTPAuthenticationPassword] persistence:NSURLCredentialPersistencePermanent];
 	
 	if (authenticationCredentials) {
 		[ASIHTTPRequest saveCredentials:authenticationCredentials forHost:[[self url] host] port:[[[self url] port] intValue] protocol:[[self url] scheme] realm:[self authenticationRealm]];
@@ -2400,11 +2400,11 @@ static NSOperationQueue *sharedQueue = nil;
 			}
 			if (useSessionPersistence) {
 				NSMutableDictionary *sessionProxyCredentials = [NSMutableDictionary dictionary];
-				[sessionProxyCredentials setObject:(id)proxyAuthentication forKey:@"Authentication"];
-				[sessionProxyCredentials setObject:newCredentials forKey:@"Credentials"];
-				[sessionProxyCredentials setObject:[self proxyHost] forKey:@"Host"];
-				[sessionProxyCredentials setObject:[NSNumber numberWithInt:[self proxyPort]] forKey:@"Port"];
-				[sessionProxyCredentials setObject:[self proxyAuthenticationScheme] forKey:@"AuthenticationScheme"];
+				sessionProxyCredentials[@"Authentication"] = (id)proxyAuthentication;
+				sessionProxyCredentials[@"Credentials"] = newCredentials;
+				sessionProxyCredentials[@"Host"] = [self proxyHost];
+				sessionProxyCredentials[@"Port"] = @([self proxyPort]);
+				sessionProxyCredentials[@"AuthenticationScheme"] = [self proxyAuthenticationScheme];
 				[[self class] storeProxyAuthenticationCredentialsInSessionStore:sessionProxyCredentials];
 			}
 			[self setProxyCredentials:newCredentials];
@@ -2431,12 +2431,12 @@ static NSOperationQueue *sharedQueue = nil;
 			if (useSessionPersistence) {
 				
 				NSMutableDictionary *sessionCredentials = [NSMutableDictionary dictionary];
-				[sessionCredentials setObject:(id)requestAuthentication forKey:@"Authentication"];
-				[sessionCredentials setObject:newCredentials forKey:@"Credentials"];
-				[sessionCredentials setObject:[self url] forKey:@"URL"];
-				[sessionCredentials setObject:[self authenticationScheme] forKey:@"AuthenticationScheme"];
+				sessionCredentials[@"Authentication"] = (id)requestAuthentication;
+				sessionCredentials[@"Credentials"] = newCredentials;
+				sessionCredentials[@"URL"] = [self url];
+				sessionCredentials[@"AuthenticationScheme"] = [self authenticationScheme];
 				if ([self authenticationRealm]) {
-					[sessionCredentials setObject:[self authenticationRealm] forKey:@"AuthenticationRealm"];
+					sessionCredentials[@"AuthenticationRealm"] = [self authenticationRealm];
 				}
 				[[self class] storeAuthenticationCredentialsInSessionStore:sessionCredentials];
 
@@ -2499,8 +2499,8 @@ static NSOperationQueue *sharedQueue = nil;
 			// Let's try to extract it from the username
 			NSArray* ntlmComponents = [user componentsSeparatedByString:@"\\"];
 			if ([ntlmComponents count] == 2) {
-				ntlmDomain = [ntlmComponents objectAtIndex:0];
-				user = [ntlmComponents objectAtIndex:1];
+				ntlmDomain = ntlmComponents[0];
+				user = ntlmComponents[1];
 
 			// If we are connecting to a website using NTLM, but we are connecting via a proxy, the string we need may be in the domain property
 			} else {
@@ -2510,14 +2510,14 @@ static NSOperationQueue *sharedQueue = nil;
 				ntlmDomain = @"";
 			}
 		}
-		[newCredentials setObject:ntlmDomain forKey:(NSString *)kCFHTTPAuthenticationAccountDomain];
+		newCredentials[(NSString *)kCFHTTPAuthenticationAccountDomain] = ntlmDomain;
 	}
 
 
 	// If we have a username and password, let's apply them to the request and continue
 	if (user && pass) {
-		[newCredentials setObject:user forKey:(NSString *)kCFHTTPAuthenticationUsername];
-		[newCredentials setObject:pass forKey:(NSString *)kCFHTTPAuthenticationPassword];
+		newCredentials[(NSString *)kCFHTTPAuthenticationUsername] = user;
+		newCredentials[(NSString *)kCFHTTPAuthenticationPassword] = pass;
 		return newCredentials;
 	}
 	return nil;
@@ -2584,17 +2584,17 @@ static NSOperationQueue *sharedQueue = nil;
 			ntlmDomain = @"";
 			NSArray* ntlmComponents = [user componentsSeparatedByString:@"\\"];
 			if ([ntlmComponents count] == 2) {
-				ntlmDomain = [ntlmComponents objectAtIndex:0];
-				user = [ntlmComponents objectAtIndex:1];
+				ntlmDomain = ntlmComponents[0];
+				user = ntlmComponents[1];
 			}
 		}
-		[newCredentials setObject:ntlmDomain forKey:(NSString *)kCFHTTPAuthenticationAccountDomain];
+		newCredentials[(NSString *)kCFHTTPAuthenticationAccountDomain] = ntlmDomain;
 	}
 
 	// If we have a username and password, let's apply them to the request and continue
 	if (user && pass) {
-		[newCredentials setObject:user forKey:(NSString *)kCFHTTPAuthenticationUsername];
-		[newCredentials setObject:pass forKey:(NSString *)kCFHTTPAuthenticationPassword];
+		newCredentials[(NSString *)kCFHTTPAuthenticationUsername] = user;
+		newCredentials[(NSString *)kCFHTTPAuthenticationPassword] = pass;
 		return newCredentials;
 	}
 	return nil;
@@ -2767,7 +2767,7 @@ static NSOperationQueue *sharedQueue = nil;
 	// If we haven't got a CFHTTPAuthenticationRef by now, something is badly wrong, so we'll have to give up
 	if (!proxyAuthentication) {
 		[self cancelLoad];
-		[self failWithError:[NSError errorWithDomain:NetworkRequestErrorDomain code:ASIInternalErrorWhileApplyingCredentialsType userInfo:[NSDictionary dictionaryWithObjectsAndKeys:@"Failed to get authentication object from response headers",NSLocalizedDescriptionKey,nil]]];
+		[self failWithError:[NSError errorWithDomain:NetworkRequestErrorDomain code:ASIInternalErrorWhileApplyingCredentialsType userInfo:@{NSLocalizedDescriptionKey: @"Failed to get authentication object from response headers"}]];
 		return;
 	}
 	
@@ -2805,7 +2805,7 @@ static NSOperationQueue *sharedQueue = nil;
 			// Now we've acquired the lock, it may be that the session contains credentials we can re-use for this request
 			if ([self useSessionPersistence]) {
 				NSDictionary *credentials = [self findSessionProxyAuthenticationCredentials];
-				if (credentials && [self applyProxyCredentials:[credentials objectForKey:@"Credentials"]]) {
+				if (credentials && [self applyProxyCredentials:credentials[@"Credentials"]]) {
 					[delegateAuthenticationLock unlock];
 					[self startRequest];
 					return;
@@ -2845,7 +2845,7 @@ static NSOperationQueue *sharedQueue = nil;
 			
 		// Something went wrong, we'll have to give up
 		} else {
-			[self failWithError:[NSError errorWithDomain:NetworkRequestErrorDomain code:ASIInternalErrorWhileApplyingCredentialsType userInfo:[NSDictionary dictionaryWithObjectsAndKeys:@"Failed to apply proxy credentials to request",NSLocalizedDescriptionKey,nil]]];
+			[self failWithError:[NSError errorWithDomain:NetworkRequestErrorDomain code:ASIInternalErrorWhileApplyingCredentialsType userInfo:@{NSLocalizedDescriptionKey: @"Failed to apply proxy credentials to request"}]];
 		}
 		
 	// Are a user name & password needed?
@@ -2863,7 +2863,7 @@ static NSOperationQueue *sharedQueue = nil;
 		// Now we've acquired the lock, it may be that the session contains credentials we can re-use for this request
 		if ([self useSessionPersistence]) {
 			NSDictionary *credentials = [self findSessionProxyAuthenticationCredentials];
-			if (credentials && [self applyProxyCredentials:[credentials objectForKey:@"Credentials"]]) {
+			if (credentials && [self applyProxyCredentials:credentials[@"Credentials"]]) {
 				[delegateAuthenticationLock unlock];
 				[self startRequest];
 				return;
@@ -2880,7 +2880,7 @@ static NSOperationQueue *sharedQueue = nil;
 				[self startRequest];
 			} else {
 				[delegateAuthenticationLock unlock];
-				[self failWithError:[NSError errorWithDomain:NetworkRequestErrorDomain code:ASIInternalErrorWhileApplyingCredentialsType userInfo:[NSDictionary dictionaryWithObjectsAndKeys:@"Failed to apply proxy credentials to request",NSLocalizedDescriptionKey,nil]]];
+				[self failWithError:[NSError errorWithDomain:NetworkRequestErrorDomain code:ASIInternalErrorWhileApplyingCredentialsType userInfo:@{NSLocalizedDescriptionKey: @"Failed to apply proxy credentials to request"}]];
 			}
 			
 			return;
@@ -2947,7 +2947,7 @@ static NSOperationQueue *sharedQueue = nil;
 		#endif
 
 		[self cancelLoad];
-		[self failWithError:[NSError errorWithDomain:NetworkRequestErrorDomain code:ASIInternalErrorWhileApplyingCredentialsType userInfo:[NSDictionary dictionaryWithObjectsAndKeys:@"Failed to get authentication object from response headers",NSLocalizedDescriptionKey,nil]]];
+		[self failWithError:[NSError errorWithDomain:NetworkRequestErrorDomain code:ASIInternalErrorWhileApplyingCredentialsType userInfo:@{NSLocalizedDescriptionKey: @"Failed to get authentication object from response headers"}]];
 		return;
 	}
 	
@@ -3006,7 +3006,7 @@ static NSOperationQueue *sharedQueue = nil;
 			// Now we've acquired the lock, it may be that the session contains credentials we can re-use for this request
 			if ([self useSessionPersistence]) {
 				NSDictionary *credentials = [self findSessionAuthenticationCredentials];
-				if (credentials && [self applyCredentials:[credentials objectForKey:@"Credentials"]]) {
+				if (credentials && [self applyCredentials:credentials[@"Credentials"]]) {
 
 					#if DEBUG_HTTP_AUTHENTICATION
 					ASI_DEBUG_LOG(@"[AUTH] Request %@ will reuse cached credentials from the session (%@)",self,[credentials objectForKey:@"AuthenticationScheme"]);
@@ -3071,7 +3071,7 @@ static NSOperationQueue *sharedQueue = nil;
 			ASI_DEBUG_LOG(@"[AUTH] Request %@ had credentials and they were not marked as bad, but we got a 401 all the same.",self);
 			#endif
 
-			[self failWithError:[NSError errorWithDomain:NetworkRequestErrorDomain code:ASIInternalErrorWhileApplyingCredentialsType userInfo:[NSDictionary dictionaryWithObjectsAndKeys:@"Failed to apply credentials to request",NSLocalizedDescriptionKey,nil]]];
+			[self failWithError:[NSError errorWithDomain:NetworkRequestErrorDomain code:ASIInternalErrorWhileApplyingCredentialsType userInfo:@{NSLocalizedDescriptionKey: @"Failed to apply credentials to request"}]];
 		}
 		
 		// Are a user name & password needed?
@@ -3094,7 +3094,7 @@ static NSOperationQueue *sharedQueue = nil;
 		// Now we've acquired the lock, it may be that the session contains credentials we can re-use for this request
 		if ([self useSessionPersistence]) {
 			NSDictionary *credentials = [self findSessionAuthenticationCredentials];
-			if (credentials && [self applyCredentials:[credentials objectForKey:@"Credentials"]]) {
+			if (credentials && [self applyCredentials:credentials[@"Credentials"]]) {
 
 				#if DEBUG_HTTP_AUTHENTICATION
 				ASI_DEBUG_LOG(@"[AUTH] Request %@ will reuse cached credentials from the session (%@)",self,[credentials objectForKey:@"AuthenticationScheme"]);
@@ -3120,7 +3120,7 @@ static NSOperationQueue *sharedQueue = nil;
 				ASI_DEBUG_LOG(@"[AUTH] Request %@ failed to apply credentials",self);
 				#endif
 				[delegateAuthenticationLock unlock];
-				[self failWithError:[NSError errorWithDomain:NetworkRequestErrorDomain code:ASIInternalErrorWhileApplyingCredentialsType userInfo:[NSDictionary dictionaryWithObjectsAndKeys:@"Failed to apply credentials to request",NSLocalizedDescriptionKey,nil]]];
+				[self failWithError:[NSError errorWithDomain:NetworkRequestErrorDomain code:ASIInternalErrorWhileApplyingCredentialsType userInfo:@{NSLocalizedDescriptionKey: @"Failed to apply credentials to request"}]];
 			}
 			return;
 		}
@@ -3340,8 +3340,8 @@ static NSOperationQueue *sharedQueue = nil;
 			if (![self fileDownloadOutputStream]) {
 				if (![self temporaryFileDownloadPath]) {
 					[self setTemporaryFileDownloadPath:[NSTemporaryDirectory() stringByAppendingPathComponent:[[NSProcessInfo processInfo] globallyUniqueString]]];
-				} else if ([self allowResumeForFileDownloads] && [[self requestHeaders] objectForKey:@"Range"]) {
-					if ([[self responseHeaders] objectForKey:@"Content-Range"]) {
+				} else if ([self allowResumeForFileDownloads] && [self requestHeaders][@"Range"]) {
+					if ([self responseHeaders][@"Content-Range"]) {
 						append = YES;
 					} else {
 						[self incrementDownloadSizeBy:-[self partialDownloadSize]];
@@ -3441,7 +3441,7 @@ static NSOperationQueue *sharedQueue = nil;
 				NSError *moveError = nil;
 				[[[[NSFileManager alloc] init] autorelease] moveItemAtPath:[self temporaryUncompressedDataDownloadPath] toPath:[self downloadDestinationPath] error:&moveError];
 				if (moveError) {
-					fileError = [NSError errorWithDomain:NetworkRequestErrorDomain code:ASIFileManagementError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:@"Failed to move file from '%@' to '%@'",[self temporaryFileDownloadPath],[self downloadDestinationPath]],NSLocalizedDescriptionKey,moveError,NSUnderlyingErrorKey,nil]];
+					fileError = [NSError errorWithDomain:NetworkRequestErrorDomain code:ASIFileManagementError userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to move file from '%@' to '%@'",[self temporaryFileDownloadPath],[self downloadDestinationPath]],NSUnderlyingErrorKey: moveError}];
 				}
 				[self setTemporaryUncompressedDataDownloadPath:nil];
 
@@ -3461,7 +3461,7 @@ static NSOperationQueue *sharedQueue = nil;
 			if (!fileError) {
 				[[[[NSFileManager alloc] init] autorelease] moveItemAtPath:[self temporaryFileDownloadPath] toPath:[self downloadDestinationPath] error:&moveError];
 				if (moveError) {
-					fileError = [NSError errorWithDomain:NetworkRequestErrorDomain code:ASIFileManagementError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:@"Failed to move file from '%@' to '%@'",[self temporaryFileDownloadPath],[self downloadDestinationPath]],NSLocalizedDescriptionKey,moveError,NSUnderlyingErrorKey,nil]];
+					fileError = [NSError errorWithDomain:NetworkRequestErrorDomain code:ASIFileManagementError userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to move file from '%@' to '%@'",[self temporaryFileDownloadPath],[self downloadDestinationPath]],NSUnderlyingErrorKey: moveError}];
 				}
 				[self setTemporaryFileDownloadPath:nil];
 			}
@@ -3487,7 +3487,7 @@ static NSOperationQueue *sharedQueue = nil;
 	}
 	#endif
 	[[self connectionInfo] removeObjectForKey:@"request"];
-	[[self connectionInfo] setObject:[NSDate dateWithTimeIntervalSinceNow:[self persistentConnectionTimeoutSeconds]] forKey:@"expires"];
+	[self connectionInfo][@"expires"] = [NSDate dateWithTimeIntervalSinceNow:[self persistentConnectionTimeoutSeconds]];
 	[connectionsLock unlock];
 	
 	if (![self authenticationNeeded]) {
@@ -3574,7 +3574,7 @@ static NSOperationQueue *sharedQueue = nil;
 
 	if (headers && dataPath) {
 
-		[self setResponseStatusCode:[[headers objectForKey:@"X-ASIHTTPRequest-Response-Status-Code"] intValue]];
+		[self setResponseStatusCode:[headers[@"X-ASIHTTPRequest-Response-Status-Code"] intValue]];
 		[self setDidUseCachedResponse:YES];
 		[theRequest setResponseHeaders:headers];
 
@@ -3583,7 +3583,7 @@ static NSOperationQueue *sharedQueue = nil;
 		} else {
 			[theRequest setRawResponseData:[NSMutableData dataWithData:[[self downloadCache] cachedResponseDataForURL:[self url]]]];
 		}
-		[theRequest setContentLength:[[[self responseHeaders] objectForKey:@"Content-Length"] longLongValue]];
+		[theRequest setContentLength:[[self responseHeaders][@"Content-Length"] longLongValue]];
 		[theRequest setTotalBytesRead:[self contentLength]];
 
 		[theRequest parseStringEncodingFromHeaders];
@@ -3671,7 +3671,7 @@ static NSOperationQueue *sharedQueue = nil;
 			}
 		}
 		[self cancelLoad];
-		[self failWithError:[NSError errorWithDomain:NetworkRequestErrorDomain code:ASIConnectionFailureErrorType userInfo:[NSDictionary dictionaryWithObjectsAndKeys:reason,NSLocalizedDescriptionKey,underlyingError,NSUnderlyingErrorKey,nil]]];
+		[self failWithError:[NSError errorWithDomain:NetworkRequestErrorDomain code:ASIConnectionFailureErrorType userInfo:@{NSLocalizedDescriptionKey: reason,NSUnderlyingErrorKey: underlyingError}]];
 	} else {
 		[self cancelLoad];
 	}
@@ -3793,7 +3793,7 @@ static NSOperationQueue *sharedQueue = nil;
 		[fileManager removeItemAtPath:path error:&removeError];
 		if (removeError) {
 			if (err) {
-				*err = [NSError errorWithDomain:NetworkRequestErrorDomain code:ASIFileManagementError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:@"Failed to delete file at path '%@'",path],NSLocalizedDescriptionKey,removeError,NSUnderlyingErrorKey,nil]];
+				*err = [NSError errorWithDomain:NetworkRequestErrorDomain code:ASIFileManagementError userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to delete file at path '%@'",path],NSUnderlyingErrorKey: removeError}];
 			}
 			return NO;
 		}
@@ -3830,9 +3830,9 @@ static NSOperationQueue *sharedQueue = nil;
 			proxies = [NSMakeCollectable(CFNetworkCopyProxiesForURL((CFURLRef)[self url], (CFDictionaryRef)proxySettings)) autorelease];
 
 			// Now check to see if the proxy settings contained a PAC url, we need to run the script to get the real list of proxies if so
-			NSDictionary *settings = [proxies objectAtIndex:0];
-			if ([settings objectForKey:(NSString *)kCFProxyAutoConfigurationURLKey]) {
-				[self setPACurl:[settings objectForKey:(NSString *)kCFProxyAutoConfigurationURLKey]];
+			NSDictionary *settings = proxies[0];
+			if (settings[(NSString *)kCFProxyAutoConfigurationURLKey]) {
+				[self setPACurl:settings[(NSString *)kCFProxyAutoConfigurationURLKey]];
 				[self fetchPACFile];
 				return NO;
 			}
@@ -3840,16 +3840,16 @@ static NSOperationQueue *sharedQueue = nil;
 
 		if (!proxies) {
 			[self setReadStream:nil];
-			[self failWithError:[NSError errorWithDomain:NetworkRequestErrorDomain code:ASIInternalErrorWhileBuildingRequestType userInfo:[NSDictionary dictionaryWithObjectsAndKeys:@"Unable to obtain information on proxy servers needed for request",NSLocalizedDescriptionKey,nil]]];
+			[self failWithError:[NSError errorWithDomain:NetworkRequestErrorDomain code:ASIInternalErrorWhileBuildingRequestType userInfo:@{NSLocalizedDescriptionKey: @"Unable to obtain information on proxy servers needed for request"}]];
 			return NO;
 		}
 		// I don't really understand why the dictionary returned by CFNetworkCopyProxiesForURL uses different key names from CFNetworkCopySystemProxySettings/SCDynamicStoreCopyProxies
 		// and why its key names are documented while those we actually need to use don't seem to be (passing the kCF* keys doesn't seem to work)
 		if ([proxies count] > 0) {
-			NSDictionary *settings = [proxies objectAtIndex:0];
-			[self setProxyHost:[settings objectForKey:(NSString *)kCFProxyHostNameKey]];
-			[self setProxyPort:[[settings objectForKey:(NSString *)kCFProxyPortNumberKey] intValue]];
-			[self setProxyType:[settings objectForKey:(NSString *)kCFProxyTypeKey]];
+			NSDictionary *settings = proxies[0];
+			[self setProxyHost:settings[(NSString *)kCFProxyHostNameKey]];
+			[self setProxyPort:[settings[(NSString *)kCFProxyPortNumberKey] intValue]];
+			[self setProxyType:settings[(NSString *)kCFProxyTypeKey]];
 		}
 	}
 	return YES;
@@ -3981,10 +3981,10 @@ static NSOperationQueue *sharedQueue = nil;
 		CFErrorRef err = NULL;
 		NSArray *proxies = [NSMakeCollectable(CFNetworkCopyProxiesForAutoConfigurationScript((CFStringRef)script,(CFURLRef)[self url], &err)) autorelease];
 		if (!err && [proxies count] > 0) {
-			NSDictionary *settings = [proxies objectAtIndex:0];
-			[self setProxyHost:[settings objectForKey:(NSString *)kCFProxyHostNameKey]];
-			[self setProxyPort:[[settings objectForKey:(NSString *)kCFProxyPortNumberKey] intValue]];
-			[self setProxyType:[settings objectForKey:(NSString *)kCFProxyTypeKey]];
+			NSDictionary *settings = proxies[0];
+			[self setProxyHost:settings[(NSString *)kCFProxyHostNameKey]];
+			[self setProxyPort:[settings[(NSString *)kCFProxyPortNumberKey] intValue]];
+			[self setProxyType:settings[(NSString *)kCFProxyTypeKey]];
 		}
 	}
 }
@@ -4013,7 +4013,7 @@ static NSOperationQueue *sharedQueue = nil;
 
 - (NSNumber *)connectionID
 {
-	return [[self connectionInfo] objectForKey:@"id"];
+	return [self connectionInfo][@"id"];
 }
 
 + (void)expirePersistentConnections
@@ -4021,12 +4021,12 @@ static NSOperationQueue *sharedQueue = nil;
 	[connectionsLock lock];
 	NSUInteger i;
 	for (i=0; i<[persistentConnectionsPool count]; i++) {
-		NSDictionary *existingConnection = [persistentConnectionsPool objectAtIndex:i];
-		if (![existingConnection objectForKey:@"request"] && [[existingConnection objectForKey:@"expires"] timeIntervalSinceNow] <= 0) {
+		NSDictionary *existingConnection = persistentConnectionsPool[i];
+		if (!existingConnection[@"request"] && [existingConnection[@"expires"] timeIntervalSinceNow] <= 0) {
 #if DEBUG_PERSISTENT_CONNECTIONS
 			ASI_DEBUG_LOG(@"[CONNECTION] Closing connection #%i because it has expired",[[existingConnection objectForKey:@"id"] intValue]);
 #endif
-			NSInputStream *stream = [existingConnection objectForKey:@"stream"];
+			NSInputStream *stream = existingConnection[@"stream"];
 			if (stream) {
 				[stream close];
 			}
@@ -4149,7 +4149,7 @@ static NSOperationQueue *sharedQueue = nil;
 + (void)storeProxyAuthenticationCredentialsInSessionStore:(NSDictionary *)credentials
 {
 	[sessionCredentialsLock lock];
-	[self removeProxyAuthenticationCredentialsFromSessionStore:[credentials objectForKey:@"Credentials"]];
+	[self removeProxyAuthenticationCredentialsFromSessionStore:credentials[@"Credentials"]];
 	[[[self class] sessionProxyCredentialsStore] addObject:credentials];
 	[sessionCredentialsLock unlock];
 }
@@ -4157,7 +4157,7 @@ static NSOperationQueue *sharedQueue = nil;
 + (void)storeAuthenticationCredentialsInSessionStore:(NSDictionary *)credentials
 {
 	[sessionCredentialsLock lock];
-	[self removeAuthenticationCredentialsFromSessionStore:[credentials objectForKey:@"Credentials"]];
+	[self removeAuthenticationCredentialsFromSessionStore:credentials[@"Credentials"]];
 	[[[self class] sessionCredentialsStore] addObject:credentials];
 	[sessionCredentialsLock unlock];
 }
@@ -4168,8 +4168,8 @@ static NSOperationQueue *sharedQueue = nil;
 	NSMutableArray *sessionCredentialsList = [[self class] sessionProxyCredentialsStore];
 	NSUInteger i;
 	for (i=0; i<[sessionCredentialsList count]; i++) {
-		NSDictionary *theCredentials = [sessionCredentialsList objectAtIndex:i];
-		if ([theCredentials objectForKey:@"Credentials"] == credentials) {
+		NSDictionary *theCredentials = sessionCredentialsList[i];
+		if (theCredentials[@"Credentials"] == credentials) {
 			[sessionCredentialsList removeObjectAtIndex:i];
 			[sessionCredentialsLock unlock];
 			return;
@@ -4184,8 +4184,8 @@ static NSOperationQueue *sharedQueue = nil;
 	NSMutableArray *sessionCredentialsList = [[self class] sessionCredentialsStore];
 	NSUInteger i;
 	for (i=0; i<[sessionCredentialsList count]; i++) {
-		NSDictionary *theCredentials = [sessionCredentialsList objectAtIndex:i];
-		if ([theCredentials objectForKey:@"Credentials"] == credentials) {
+		NSDictionary *theCredentials = sessionCredentialsList[i];
+		if (theCredentials[@"Credentials"] == credentials) {
 			[sessionCredentialsList removeObjectAtIndex:i];
 			[sessionCredentialsLock unlock];
 			return;
@@ -4199,7 +4199,7 @@ static NSOperationQueue *sharedQueue = nil;
 	[sessionCredentialsLock lock];
 	NSMutableArray *sessionCredentialsList = [[self class] sessionProxyCredentialsStore];
 	for (NSDictionary *theCredentials in sessionCredentialsList) {
-		if ([[theCredentials objectForKey:@"Host"] isEqualToString:[self proxyHost]] && [[theCredentials objectForKey:@"Port"] intValue] == [self proxyPort]) {
+		if ([theCredentials[@"Host"] isEqualToString:[self proxyHost]] && [theCredentials[@"Port"] intValue] == [self proxyPort]) {
 			[sessionCredentialsLock unlock];
 			return theCredentials;
 		}
@@ -4222,7 +4222,7 @@ static NSOperationQueue *sharedQueue = nil;
 	for (NSDictionary *theCredentials in sessionCredentialsList) {
 		
 		haveFoundExactMatch = NO;
-		NSURL *cachedCredentialsURL = [theCredentials objectForKey:@"URL"];
+		NSURL *cachedCredentialsURL = theCredentials[@"URL"];
 
 		// Find an exact match (same url)
 		if ([cachedCredentialsURL isEqual:[self url]]) {
@@ -4239,15 +4239,15 @@ static NSOperationQueue *sharedQueue = nil;
 		}
 
 		// Just a sanity check to ensure we never choose credentials from a different realm. Can't really do more than that, as either this request or the stored credentials may not have a realm when the other does
-		if ([self authenticationRealm] && ([theCredentials objectForKey:@"AuthenticationRealm"] && ![[theCredentials objectForKey:@"AuthenticationRealm"] isEqualToString:[self authenticationRealm]])) {
+		if ([self authenticationRealm] && (theCredentials[@"AuthenticationRealm"] && ![theCredentials[@"AuthenticationRealm"] isEqualToString:[self authenticationRealm]])) {
 			continue;
 		}
 
 		// If we have a username and password set on the request, check that they are the same as the cached ones
 		if ([self username] && [self password]) {
-			NSDictionary *usernameAndPassword = [theCredentials objectForKey:@"Credentials"];
-			NSString *storedUsername = [usernameAndPassword objectForKey:(NSString *)kCFHTTPAuthenticationUsername];
-			NSString *storedPassword = [usernameAndPassword objectForKey:(NSString *)kCFHTTPAuthenticationPassword];
+			NSDictionary *usernameAndPassword = theCredentials[@"Credentials"];
+			NSString *storedUsername = usernameAndPassword[(NSString *)kCFHTTPAuthenticationUsername];
+			NSString *storedPassword = usernameAndPassword[(NSString *)kCFHTTPAuthenticationPassword];
 			if (![storedUsername isEqualToString:[self username]] || ![storedPassword isEqualToString:[self password]]) {
 				continue;
 			}
@@ -4342,7 +4342,7 @@ static NSOperationQueue *sharedQueue = nil;
 	NSUInteger i;
 	NSUInteger max = [[ASIHTTPRequest sessionCookies] count];
 	for (i=0; i<max; i++) {
-		cookie = [[ASIHTTPRequest sessionCookies] objectAtIndex:i];
+		cookie = [ASIHTTPRequest sessionCookies][i];
 		if ([[cookie domain] isEqualToString:[newCookie domain]] && [[cookie path] isEqualToString:[newCookie path]] && [[cookie name] isEqualToString:[newCookie name]]) {
 			[[ASIHTTPRequest sessionCookies] removeObjectAtIndex:i];
 			break;
@@ -4552,7 +4552,7 @@ static NSOperationQueue *sharedQueue = nil;
 	#if DEBUG_THROTTLING
 	ASI_DEBUG_LOG(@"[THROTTLING] ===Used: %u bytes of bandwidth in last measurement period===",bandwidthUsedInLastSecond);
 	#endif
-	[bandwidthUsageTracker addObject:[NSNumber numberWithUnsignedLong:bandwidthUsedInLastSecond]];
+	[bandwidthUsageTracker addObject:@(bandwidthUsedInLastSecond)];
 	[bandwidthMeasurementDate release];
 	bandwidthMeasurementDate = [[NSDate dateWithTimeIntervalSinceNow:1] retain];
 	bandwidthUsedInLastSecond = 0;
@@ -4847,7 +4847,7 @@ static NSOperationQueue *sharedQueue = nil;
   
 	// If we weren't given a custom max-age, lets look for one in the response headers
 	if (!maxAge) {
-		NSString *cacheControl = [[responseHeaders objectForKey:@"Cache-Control"] lowercaseString];
+		NSString *cacheControl = [responseHeaders[@"Cache-Control"] lowercaseString];
 		if (cacheControl) {
 			NSScanner *scanner = [NSScanner scannerWithString:cacheControl];
 			[scanner scanUpToString:@"max-age" intoString:NULL];
@@ -4862,7 +4862,7 @@ static NSOperationQueue *sharedQueue = nil;
 	if (maxAge) {
 		return [[NSDate date] addTimeInterval:maxAge];
 	} else {
-		NSString *expires = [responseHeaders objectForKey:@"Expires"];
+		NSString *expires = responseHeaders[@"Expires"];
 		if (expires) {
 			return [ASIHTTPRequest dateFromRFC1123String:expires];
 		}
