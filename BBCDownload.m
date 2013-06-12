@@ -488,16 +488,16 @@
 			NSDecimal recieved, total, percentage;
 			NSInteger speed=0;
 			NSString *timeRemaining;
-			if(![scanner scanDecimal:&recieved]) recieved = [@0decimalValue];
+			if(![scanner scanDecimal:&recieved]) recieved = [@0 decimalValue];
 			[scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] 
 									intoString:nil];
-			if(![scanner scanDecimal:&total]) total = [@0decimalValue];
+			if(![scanner scanDecimal:&total]) total = [@0 decimalValue];
 			[scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] 
 									intoString:nil];
-			if(![scanner scanInteger:&speed]) speed = [@0integerValue];
+			if(![scanner scanInteger:&speed]) speed = [@0 integerValue];
 			[scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] 
 									intoString:nil];
-			if(![scanner scanDecimal:&percentage]) percentage = [@0decimalValue];
+			if(![scanner scanDecimal:&percentage]) percentage = [@0 decimalValue];
 			[scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] 
 									intoString:nil];
 			if(![scanner scanUpToString:@"rem" intoString:&timeRemaining]) timeRemaining=@"Unknown";
