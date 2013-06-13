@@ -14,7 +14,7 @@ extern BOOL runDownloads;
 @implementation Programme
 - (id)initWithInfo:(id)sender pid:(NSString *)PID programmeName:(NSString *)SHOWNAME network:(NSString *)TVNETWORK
 {
-	[super init];
+	if (!(self = [super init])) return nil;
 	pid = [PID stringByReplacingOccurrencesOfString:@";amp" withString:@""];
 	showName = [[[NSString alloc] initWithString:SHOWNAME] stringByDecodingHTMLEntities];
 	tvNetwork = [[NSString alloc] initWithString:TVNETWORK];
@@ -109,7 +109,7 @@ extern BOOL runDownloads;
 }
 - (id) initWithCoder: (NSCoder *)coder
 {
-	[super init];
+	if (!(self = [super init])) return nil;
 	pid = [[NSString alloc] initWithString:[coder decodeObjectForKey:@"pid"]];
 	showName = [[NSString alloc] initWithString:[coder decodeObjectForKey:@"showName"]];
 	tvNetwork = [[NSString alloc] initWithString:[coder decodeObjectForKey:@"tvNetwork"]];
@@ -119,16 +119,16 @@ extern BOOL runDownloads;
 	path = [[NSString alloc] initWithString:[coder decodeObjectForKey:@"path"]];
 	seriesName = [[NSString alloc] initWithString:[coder decodeObjectForKey:@"seriesName"]];
 	episodeName = [[NSString alloc] initWithString:[coder decodeObjectForKey:@"episodeName"]];
-	timeadded = [[coder decodeObjectForKey:@"timeadded"] retain];
-	processedPID = [[coder decodeObjectForKey:@"processedPID"] retain];
-	radio = [[coder decodeObjectForKey:@"radio"] retain];
-	realPID = [[coder decodeObjectForKey:@"realPID"] retain];
-    url = [[coder decodeObjectForKey:@"url"] retain];
+	timeadded = [coder decodeObjectForKey:@"timeadded"];
+	processedPID = [coder decodeObjectForKey:@"processedPID"];
+	radio = [coder decodeObjectForKey:@"radio"];
+	realPID = [coder decodeObjectForKey:@"realPID"];
+    url = [coder decodeObjectForKey:@"url"];
 	subtitlePath=[[NSString alloc] init];
     reasonForFailure=[[NSString alloc] init];
     availableModes=[[NSString alloc] init];
     desc=[[NSString alloc] init];
-    podcast = [[coder decodeObjectForKey:@"podcast"] retain];
+    podcast = [coder decodeObjectForKey:@"podcast"];
 	return self;
 }
 /*

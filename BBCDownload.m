@@ -12,7 +12,7 @@
 #pragma mark Overridden Methods
 - (id)initWithProgramme:(Programme *)tempShow tvFormats:(NSArray *)tvFormatList radioFormats:(NSArray *)radioFormatList proxy:(HTTPProxy *)aProxy
 {
-	[super init];
+	if (!(self = [super init])) return nil;
 	runAgain = NO;
 	running=YES;
 	foundLastLine=NO;

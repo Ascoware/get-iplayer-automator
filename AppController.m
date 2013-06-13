@@ -27,7 +27,7 @@
 }
 - (id)init { 
 	//Initialization
-	[super init];
+	if (!(self = [super init])) return nil;
 	NSNotificationCenter *nc;
 	nc = [NSNotificationCenter defaultCenter];
 	
@@ -147,7 +147,7 @@
 		rootObject = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
 		NSArray *tempQueue = [rootObject valueForKey:@"queue"];
 		NSArray *tempSeries = [rootObject valueForKey:@"serieslink"];
-        lastUpdate = [[rootObject valueForKey:@"lastUpdate"] retain];
+        lastUpdate = [rootObject valueForKey:@"lastUpdate"];
 		[queueController addObjects:tempQueue];
 		[pvrQueueController addObjects:tempSeries];
 	}
@@ -615,7 +615,7 @@
 									   isSticky:NO
 								   clickContext:nil];
 		[self addToLog:@"Index Updated." :self];
-        lastUpdate=[[NSDate date] retain];
+        lastUpdate=[NSDate date];
 	}
 	else
 	{
@@ -2014,8 +2014,6 @@
 }
 - (void)pvrSearchFinished:(NSNotification *)n
 {
-	[pvrSearchTask dealloc];
-	[pvrSearchPipe dealloc];
 	[pvrResultsController removeObjectsAtArrangedObjectIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, [[pvrResultsController arrangedObjects] count])]];
 	NSString *string = [NSString stringWithString:pvrSearchData];
 	NSUInteger length = [string length];

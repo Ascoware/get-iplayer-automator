@@ -12,7 +12,7 @@
 
 - (id)init
 {
-	[super init];
+	if (!(self = [super init])) return nil;
 	showName = [[NSString alloc] init];
     solution = [[NSString alloc] init];
 	return self;

@@ -39,13 +39,13 @@
 		D914BD29100CBFA900F7E68E /* BBCDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = D914BD28100CBFA900F7E68E /* BBCDownload.m */; };
 		D91783F01013035B00B82736 /* camstudio_record_button.png in Resources */ = {isa = PBXBuildFile; fileRef = D91783EF1013035B00B82736 /* camstudio_record_button.png */; };
 		D9178595101345D700B82736 /* Series.m in Sources */ = {isa = PBXBuildFile; fileRef = D9178594101345D700B82736 /* Series.m */; };
-		D921C9B6149BBE9F004CB558 /* ASIDataCompressor.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9A6149BBE9F004CB558 /* ASIDataCompressor.m */; };
-		D921C9B7149BBE9F004CB558 /* ASIDataDecompressor.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9A8149BBE9F004CB558 /* ASIDataDecompressor.m */; };
-		D921C9B8149BBE9F004CB558 /* ASIDownloadCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9AA149BBE9F004CB558 /* ASIDownloadCache.m */; };
-		D921C9B9149BBE9F004CB558 /* ASIFormDataRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9AC149BBE9F004CB558 /* ASIFormDataRequest.m */; };
-		D921C9BA149BBE9F004CB558 /* ASIHTTPRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9AE149BBE9F004CB558 /* ASIHTTPRequest.m */; };
-		D921C9BB149BBE9F004CB558 /* ASIInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9B2149BBE9F004CB558 /* ASIInputStream.m */; };
-		D921C9BC149BBE9F004CB558 /* ASINetworkQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9B4149BBE9F004CB558 /* ASINetworkQueue.m */; };
+		D921C9B6149BBE9F004CB558 /* ASIDataCompressor.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9A6149BBE9F004CB558 /* ASIDataCompressor.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		D921C9B7149BBE9F004CB558 /* ASIDataDecompressor.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9A8149BBE9F004CB558 /* ASIDataDecompressor.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		D921C9B8149BBE9F004CB558 /* ASIDownloadCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9AA149BBE9F004CB558 /* ASIDownloadCache.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		D921C9B9149BBE9F004CB558 /* ASIFormDataRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9AC149BBE9F004CB558 /* ASIFormDataRequest.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		D921C9BA149BBE9F004CB558 /* ASIHTTPRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9AE149BBE9F004CB558 /* ASIHTTPRequest.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		D921C9BB149BBE9F004CB558 /* ASIInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9B2149BBE9F004CB558 /* ASIInputStream.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		D921C9BC149BBE9F004CB558 /* ASINetworkQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9B4149BBE9F004CB558 /* ASINetworkQueue.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		D921C9C0149BBF43004CB558 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D921C9BF149BBF43004CB558 /* libz.dylib */; };
 		D921C9E8149BCB16004CB558 /* ITVDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9E7149BCB16004CB558 /* ITVDownload.m */; };
 		D921C9EB149BCDEB004CB558 /* Download.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9EA149BCDEA004CB558 /* Download.m */; };
@@ -680,6 +680,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_IDENTITY = "Developer ID Application: Thomas Willson";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
@@ -688,7 +689,7 @@
 					"\"$(SRCROOT)\"",
 				);
 				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_OBJC_GC = supported;
+				GCC_ENABLE_OBJC_GC = unsupported;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -719,6 +720,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_IDENTITY = "Developer ID Application: Thomas Willson";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -726,7 +728,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
 				);
-				GCC_ENABLE_OBJC_GC = supported;
+				GCC_ENABLE_OBJC_GC = unsupported;
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Get_iPlayer GUI_Prefix.pch";

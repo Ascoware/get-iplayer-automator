@@ -15,7 +15,7 @@
 
 - (id)init
 {
-    [super init];
+    if (!(self = [super init])) return nil;
     
     return self;
 }
@@ -25,7 +25,7 @@
 }
 - (id)initWithProgramme:(Programme *)tempShow itvFormats:(NSArray *)itvFormatList proxy:(HTTPProxy *)aProxy
 {
-    [super init];
+    if (!(self = [super init])) return nil;
     
     proxy = aProxy;
     show = tempShow;
@@ -226,7 +226,10 @@
     [scanner scanUpToString:@"<PosterFrame>" intoString:nil];
     [scanner scanUpToString:@"CDATA" intoString:nil];
     [scanner scanString:@"CDATA[" intoString:nil];
-    [scanner scanUpToString:@"]]" intoString:&thumbnailURL];
+    NSString *url;
+    [scanner scanUpToString:@"]]" intoString:&url];
+    thumbnailURL=url;
+    url=nil;
  
     //Increase thumbnail size to 640x360
     NSInteger thumbWidth = 0;
@@ -253,7 +256,10 @@
     {
         [scanner scanUpToString:@"CDATA[" intoString:nil];
         [scanner scanString:@"CDATA[" intoString:nil];
-        [scanner scanUpToString:@"]]" intoString:&subtitleURL];
+        NSString *url;
+        [scanner scanUpToString:@"]]" intoString:&url];
+        subtitleURL=url;
+        url=nil;
     }
     //Retrieve Auth URL
     NSString *authURL = nil;

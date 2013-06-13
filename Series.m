@@ -12,7 +12,7 @@
 @implementation Series
  - (id)init
 {
-	[super init];
+	if (!(self = [super init])) return nil;
 	showName = [[NSString alloc] init];
 	tvNetwork = [[NSString alloc] init];
 	lastFound = [[NSDate alloc] init];
@@ -20,7 +20,7 @@
 }
 - (id)initWithShowname:(NSString *)SHOWNAME
 {
-	[super init];
+	if (!(self = [super init])) return nil;
 	showName = [[NSString alloc] initWithString:SHOWNAME];
 	tvNetwork = [[NSString alloc] init];
 	lastFound = [NSDate date];
@@ -35,7 +35,7 @@
 }
 - (id) initWithCoder: (NSCoder *)coder
 {
-	[super init];
+	if (!(self = [super init])) return nil;
 	showName = [[NSString alloc] initWithString:[coder decodeObjectForKey:@"showName"]];
 	added = [coder decodeObjectForKey:@"added"];
 	tvNetwork = [[NSString alloc] initWithString:[coder decodeObjectForKey:@"tvNetwork"]];

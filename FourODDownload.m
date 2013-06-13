@@ -19,7 +19,7 @@
 }
 - (id)initWithProgramme:(Programme *)tempShow proxy:(HTTPProxy *)aProxy
 {
-    [super init];
+    if (!(self = [super init])) return nil;
     
     proxy = aProxy;
     show = tempShow;

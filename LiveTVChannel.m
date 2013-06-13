@@ -12,13 +12,13 @@
 @implementation LiveTVChannel
 - (id)init
 {
-	[super init];
+	if (!(self = [super init])) return nil;
 	channel = [[NSString alloc] init];
 	return self;
 }
 - (id)initWithChannelName:(NSString *)channelName
 {
-	[super init];
+	if (!(self = [super init])) return nil;
 	channel = [channelName copy];
 	return self;
 }

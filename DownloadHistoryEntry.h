@@ -21,12 +21,12 @@
 - (id)initWithPID:(NSString *)temp_pid showName:(NSString *)temp_showName episodeName:(NSString *)temp_episodeName type:(NSString *)temp_type someNumber:(NSString *)temp_someNumber downloadFormat:(NSString *)temp_downloadFormat downloadPath:(NSString *)temp_downloadPath;
 - (NSString *)entryString;
 
-@property(readwrite,assign) NSString *pid;
-@property(readwrite,assign) NSString *showName;
-@property(readwrite,assign) NSString *episodeName;
-@property(readwrite,assign) NSString *type;
-@property(readwrite,assign) NSString *someNumber;
-@property(readwrite,assign) NSString *downloadFormat;
-@property(readwrite,assign) NSString *downloadPath;
+@property(readwrite) NSString *pid;
+@property(readwrite) NSString *showName;
+@property(readwrite) NSString *episodeName;
+@property(readwrite) NSString *type;
+@property(readwrite) NSString *someNumber;
+@property(readwrite) NSString *downloadFormat;
+@property(readwrite) NSString *downloadPath;
 
 @end

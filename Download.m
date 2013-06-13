@@ -11,7 +11,7 @@
 @implementation Download
 - (id)init
 {
-    [super init];
+    if (!(self = [super init])) return nil;
     
     //Prepare Time Remaining
 	rateEntries = [[NSMutableArray alloc] init];

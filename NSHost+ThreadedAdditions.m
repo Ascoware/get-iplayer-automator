@@ -51,11 +51,11 @@ static void SwizzleClassMethods(Class class, SEL firstSelector, SEL secondSelect
 	self = [super init];
 	if (self)
 	{
-		receiver = [aReceiver retain];
+		receiver = aReceiver;
 		receiverSelector = aReceiverSelector;
-		receivingThread = [aReceivingThread retain];
+		receivingThread = aReceivingThread;
 		lookupSelector = aLookupSelector;
-		parameter = [aParameter retain];
+		parameter = aParameter;
 	}
 	return self;
 }
@@ -69,13 +69,6 @@ static void SwizzleClassMethods(Class class, SEL firstSelector, SEL secondSelect
 		waitUntilDone:NO];
 }
 
-- (void)dealloc
-{
-	[receiver release];
-	[receivingThread release];
-	[parameter release];
-	[super dealloc];
-}
 
 @end
 

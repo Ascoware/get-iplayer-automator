@@ -12,6 +12,6 @@
 @interface LiveTVChannel : NSObject {
 	NSString *channel;
 }
-@property (readwrite, assign) NSString *channel;
+@property (readwrite) NSString *channel;
 -(id)initWithChannelName:(NSString *)channelName;
 @end

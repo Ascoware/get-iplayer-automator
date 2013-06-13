@@ -12,7 +12,7 @@
 @implementation DownloadHistoryEntry
 - (id)initWithPID:(NSString *)temp_pid showName:(NSString *)temp_showName episodeName:(NSString *)temp_episodeName type:(NSString *)temp_type someNumber:(NSString *)temp_someNumber downloadFormat:(NSString *)temp_downloadFormat downloadPath:(NSString *)temp_downloadPath
 {
-	[super init];
+	if (!(self = [super init])) return nil;
 	pid=[temp_pid copy];
 	showName=[temp_showName copy];
 	episodeName=[temp_episodeName copy];

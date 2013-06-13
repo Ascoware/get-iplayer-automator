@@ -14,7 +14,7 @@
 @implementation DownloadHistoryController
 - (id)init
 {
-	[super init];
+	if (!(self = [super init])) return nil;
 	[self readHistory:self];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(addToHistory:) name:@"AddProgToHistory" object:nil];
 	return self;

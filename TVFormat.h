@@ -12,5 +12,5 @@
 @interface TVFormat : NSObject <NSCoding> {
 	NSString *format;
 }
-@property (readwrite, assign) NSString *format;
+@property (readwrite) NSString *format;
 @end

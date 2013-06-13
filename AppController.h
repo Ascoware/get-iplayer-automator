@@ -194,7 +194,7 @@ bool runUpdate=NO;
 //- (IBAction)saveSolutionsAsText:(id)sender;
 
 //Key-Value Coding
-@property (readwrite, assign) NSMutableAttributedString *log_value;
+@property (readwrite) NSMutableAttributedString *log_value;
 @property (readonly) NSString *getiPlayerPath;
 
 @end

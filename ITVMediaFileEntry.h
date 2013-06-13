@@ -13,7 +13,7 @@
     NSString *itvRate;
     NSString *url;
 }
-@property (readwrite,assign) NSString *bitrate;
-@property (readwrite,assign) NSString *itvRate;
-@property (readwrite,assign) NSString *url;
+@property (readwrite) NSString *bitrate;
+@property (readwrite) NSString *itvRate;
+@property (readwrite) NSString *url;
 @end

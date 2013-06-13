@@ -13,7 +13,7 @@
     NSString *solution;
 }
 
-@property (readwrite,assign) NSString *showName;
-@property (readwrite,assign) NSString *solution;
+@property (readwrite) NSString *showName;
+@property (readwrite) NSString *solution;
 
 @end

@@ -19,7 +19,7 @@
 - (void)appendFormat:(NSString *)format, ... {
     va_list args;
 	va_start(args, format);
-	NSString *string = [[[NSString alloc] initWithFormat:format arguments:args] autorelease];
+	NSString *string = [[NSString alloc] initWithFormat:format arguments:args];
 	va_end(args);
     [self appendString:string];
 }
@@ -49,12 +49,12 @@
     
     // TODO scan `values` to ensure uniqueness of `boundary`. Loop+regen UUID if collision is discovered.
     CFUUIDRef cfUuid = CFUUIDCreate(kCFAllocatorDefault);
-    NSString * uuid = (id)CFUUIDCreateString(kCFAllocatorDefault, cfUuid);
+    NSString * uuid = (id)CFBridgingRelease(CFUUIDCreateString(kCFAllocatorDefault, cfUuid));
     CFRelease(cfUuid);
 #if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
-    uuid = NSMakeCollectable(uuid);
+    uuid = CFBridgingRelease(CFBridgingRetain(uuid));
 #endif
-    uuid = [uuid autorelease];
+    uuid = uuid;
     NSString *boundary = [NSString stringWithFormat:@"x-mime-boundary://%@", uuid];
     
     //--

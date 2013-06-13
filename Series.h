@@ -12,12 +12,12 @@
 @interface Series : NSObject <NSCoding> {
 	NSString *showName;
 	NSString *tvNetwork;
-	NSNumber *added;
+	NSNumber *__strong added;
 	NSDate *lastFound;
 }
 - (id)initWithShowname:(NSString *)SHOWNAME;
-@property (readwrite, assign) NSString *showName;
-@property (readwrite, assign) NSNumber *added;
-@property (readwrite, assign) NSString *tvNetwork;
-@property (readwrite, assign) NSDate *lastFound;
+@property (readwrite) NSString *showName;
+@property (readwrite, strong) NSNumber *added;
+@property (readwrite) NSString *tvNetwork;
+@property (readwrite) NSDate *lastFound;
 @end
