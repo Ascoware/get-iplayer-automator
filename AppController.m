@@ -75,6 +75,7 @@
     defaultValues[@"QuickCache"] = @YES;
     defaultValues[@"TagShows"] = @YES;
     defaultValues[@"Cache4oD_TV"] = @YES;
+    defaultValues[@"TestProxy"] = @YES;
 	
 	[[NSUserDefaults standardUserDefaults] registerDefaults:defaultValues];
 	defaultValues = nil;
@@ -2819,7 +2820,7 @@
             [self addToLog:@"WARNING: Custom proxy setting was blank. No proxy will be used."];
             if (!runScheduled)
             {
-                NSAlert *alert = [NSAlert alertWithMessageText:@"Custom proxy setting was blank.\nDownloads and cache updates may fail.\nDo you wish to continue without a proxy?"
+                NSAlert *alert = [NSAlert alertWithMessageText:@"Custom proxy setting was blank.\nDownloads may fail.\nDo you wish to continue?"
                                                  defaultButton:@"No"
                                                alternateButton:@"Yes"
                                                    otherButton:nil
@@ -2872,7 +2873,7 @@
         if (!runScheduled)
         {
             NSError *error = [request error];
-            NSAlert *alert = [NSAlert alertWithMessageText:@"Provided proxy could not be retrieved.\nDownloads and cache updates may fail.\nDo you wish to continue without a proxy?"
+            NSAlert *alert = [NSAlert alertWithMessageText:@"Provided proxy could not be retrieved.\nDownloads may fail.\nDo you wish to continue?"
                                              defaultButton:@"No"
                                            alternateButton:@"Yes"
                                                otherButton:nil
@@ -2893,7 +2894,7 @@
             [self addToLog:@"WARNING: Provided proxy value was blank. No proxy will be used."];
             if (!runScheduled)
             {
-                NSAlert *alert = [NSAlert alertWithMessageText:@"Provided proxy value was blank.\nDownloads and cache updates may fail.\nDo you wish to continue without a proxy?"
+                NSAlert *alert = [NSAlert alertWithMessageText:@"Provided proxy value was blank.\nDownloads may fail.\nDo you wish to continue?"
                                                  defaultButton:@"No"
                                                alternateButton:@"Yes"
                                                    otherButton:nil
@@ -2973,7 +2974,7 @@
         if (!runScheduled)
         {
             NSError *error = [request error];
-            NSAlert *alert = [NSAlert alertWithMessageText:@"Proxy failed to load test page.\nDownloads and cache updates may fail.\nHowever, this may be a temporary condition.\nDo you wish to continue anyway?"
+            NSAlert *alert = [NSAlert alertWithMessageText:@"Proxy failed to load test page.\nDownloads may fail.\nDo you wish to continue?"
                                              defaultButton:@"No"
                                            alternateButton:@"Yes"
                                                otherButton:nil
