@@ -2088,7 +2088,17 @@
 		[show setValue:[programme timeadded] forKey:@"added"];
 		[show setValue:[programme tvNetwork] forKey:@"tvNetwork"];
 		[show setValue:[NSDate date] forKey:@"lastFound"];
-		[pvrQueueController addObject:show];
+        //Check to make sure the programme isn't already in the queue before adding it.
+        NSArray *queuedObjects = [pvrQueueController arrangedObjects];
+        BOOL add=YES;
+        for (Programme *queuedShow in queuedObjects)
+        {
+            if ([[show showName] isEqualToString:[queuedShow showName]] && [show tvNetwork] == [queuedShow tvNetwork]) add=NO;
+        }
+        if (add)
+        {
+            [pvrQueueController addObject:show];
+        }
 	}
 }
 - (IBAction)addSeriesLinkToQueue:(id)sender
