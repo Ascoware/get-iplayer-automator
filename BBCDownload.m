@@ -65,7 +65,7 @@
 	NSString *mplayerArg = [[NSString alloc] initWithFormat:@"--mplayer=%@", [bundle pathForResource:@"mplayer" ofType:nil]];
     NSString *flvstreamerArg = [[NSString alloc] initWithFormat:@"--flvstreamer=%@", [bundle pathForResource:@"rtmpdump-2.4" ofType:nil]];
 	NSString *lameArg = [[NSString alloc] initWithFormat:@"--lame=%@", [bundle pathForResource:@"lame" ofType:nil]];
-	NSString *atomicParsleyArg = [[NSString alloc] initWithFormat:@"--atomicparsley=%@", [bundle pathForResource:@"atomicparlsey" ofType:nil]];
+	NSString *atomicParsleyArg = [[NSString alloc] initWithFormat:@"--atomicparsley=%@", [bundle pathForResource:@"AtomicParsley" ofType:nil]];
 	NSString *ffmpegArg = [[NSString alloc] initWithFormat:@"--ffmpeg=%@", [bundle pathForResource:@"ffmpeg" ofType:nil]];
 	NSString *downloadPathArg = [[NSString alloc] initWithFormat:@"--output=%@", downloadPath];
 	NSString *subDirArg = @"--subdir";
@@ -85,7 +85,7 @@
     
 	//We don't want this to refresh now!
 	NSString *cacheExpiryArg = @"-e604800000000";
-	NSString *appSupportFolder = [@"~/Library/Application Support/Get iPlayer Automator/" stringByAbbreviatingWithTildeInPath];
+	NSString *appSupportFolder = [@"~/Library/Application Support/Get iPlayer Automator/" stringByExpandingTildeInPath];
 	NSFileManager *fileManager = [NSFileManager defaultManager];
 	if (![fileManager fileExistsAtPath: appSupportFolder])
 	{
