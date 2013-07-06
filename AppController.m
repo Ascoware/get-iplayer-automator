@@ -706,7 +706,7 @@
 							NSAlert *searchException = [[NSAlert alloc] init];
 							[searchException addButtonWithTitle:@"OK"];
 							[searchException setMessageText:[NSString stringWithFormat:@"Invalid Output!"]];
-							[searchException setInformativeText:@"Please check your query. You query must not alter the output format of Get_iPlayer."];
+							[searchException setInformativeText:@"Please check your query. Your query must not alter the output format of Get_iPlayer."];
 							[searchException setAlertStyle:NSWarningAlertStyle];
 							[searchException runModal];
 							searchException = nil;
@@ -947,7 +947,7 @@
 				NSAlert *searchException = [[NSAlert alloc] init];
 				[searchException addButtonWithTitle:@"OK"];
 				[searchException setMessageText:[NSString stringWithFormat:@"Invalid Output!"]];
-				[searchException setInformativeText:@"Please check your query. You query must not alter the output format of Get_iPlayer."];
+				[searchException setInformativeText:@"Please check your query. Your query must not alter the output format of Get_iPlayer."];
 				[searchException setAlertStyle:NSWarningAlertStyle];
 				[searchException runModal];
 				searchException = nil;
@@ -2154,7 +2154,7 @@
 		if (![self processAutoRecordData:[autoRecordData copy] forSeries:series])
 			[seriesToBeRemoved addObject:series];
 	}
-	[pvrQueueController removeObjects:seriesToBeRemoved];
+	[pvrQueueController performSelectorOnMainThread:@selector(removeObjects:) withObject:seriesToBeRemoved waitUntilDone:NO];
 }
 - (void)seriesLinkFinished:(NSNotification *)note
 {
@@ -2250,30 +2250,41 @@
                 }
 				if (([[series2 added] integerValue] <= timeadded) && ([temp_tvNetwork isEqualToString:[series2 tvNetwork]]))
 				{
-					oneFound=YES;
-					Programme *p = [[Programme alloc] initWithInfo:nil pid:temp_pid programmeName:temp_showName network:temp_tvNetwork];
-					[p setRealPID:temp_realPID];
-					[p setSeriesName:series_Name];
-					[p setEpisodeName:episode_Name];
-                    [p setUrl:url];
-					if ([temp_type isEqualToString:@"radio"]) [p setValue:@YES forKey:@"radio"];
-                    else if ([temp_type isEqualToString:@"podcast"]) [p setPodcast:@YES];
-					[p setValue:@"Added by Series-Link" forKey:@"status"];
-					BOOL inQueue=NO;
-					for (Programme *show in currentQueue)
-						if ([[show showName] isEqualToString:[p showName]] && [[show pid] isEqualToString:[p pid]]) inQueue=YES;
-					if (!inQueue) 
-					{
-						if (runDownloads) [p setValue:@"Waiting..." forKey:@"status"];
-						[queueController addObject:p];
-					}
+                    @try {
+                        oneFound=YES;
+                        Programme *p = [[Programme alloc] initWithInfo:nil pid:temp_pid programmeName:temp_showName network:temp_tvNetwork];
+                        [p setRealPID:temp_realPID];
+                        [p setSeriesName:series_Name];
+                        [p setEpisodeName:episode_Name];
+                        [p setUrl:url];
+                        if ([temp_type isEqualToString:@"radio"]) [p setValue:@YES forKey:@"radio"];
+                        else if ([temp_type isEqualToString:@"podcast"]) [p setPodcast:@YES];
+                        [p setValue:@"Added by Series-Link" forKey:@"status"];
+                        BOOL inQueue=NO;
+                        for (Programme *show in currentQueue)
+                            if ([[show showName] isEqualToString:[p showName]] && [[show pid] isEqualToString:[p pid]]) inQueue=YES;
+                        if (!inQueue) 
+                        {
+                            if (runDownloads) [p setValue:@"Waiting..." forKey:@"status"];
+                            [queueController performSelectorOnMainThread:@selector(addObject:) withObject:p waitUntilDone:NO];
+                        }
+                    }
+                    @catch (NSException *e) {
+                        NSAlert *queueException = [[NSAlert alloc] init];
+                        [queueException addButtonWithTitle:@"OK"];
+                        [queueException setMessageText:[NSString stringWithFormat:@"Series-Link to Queue Transfer Failed"]];
+                        [queueException setInformativeText:@"The recording queue is in an unknown state.  Please restart GiA and clear the recording queue."];
+                        [queueException setAlertStyle:NSWarningAlertStyle];
+                        [queueException runModal];
+                        queueException = nil;
+                    }
 				}
 			}
 			@catch (NSException *e) {
 				NSAlert *searchException = [[NSAlert alloc] init];
 				[searchException addButtonWithTitle:@"OK"];
 				[searchException setMessageText:[NSString stringWithFormat:@"Invalid Output!"]];
-				[searchException setInformativeText:@"Please check your query. You query must not alter the output format of Get_iPlayer."];
+				[searchException setInformativeText:@"Please check your query. Your query must not alter the output format of Get_iPlayer."];
 				[searchException setAlertStyle:NSWarningAlertStyle];
 				[searchException runModal];
 				searchException = nil;
