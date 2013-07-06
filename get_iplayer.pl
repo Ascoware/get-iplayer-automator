@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 #
 # get_iplayer - Lists, Records and Streams BBC iPlayer TV and Radio programmes + other Programmes via 3rd-party plugins
 #
@@ -19,21 +19,23 @@
 #
 # Author: Phil Lewis
 # Email: iplayer2 (at sign) linuxcentre.net
-# Web: http://linuxcentre.net/iplayer
+# Web: https://github.com/dinkypumpkin/get_iplayer/wiki
 # License: GPLv3 (see LICENSE.txt)
 #
 #
 package main;
-my $version = 2.82;
+my $version = 2.83;
+my $version_text;
+$version_text = sprintf("v%.2f", $version) unless $version_text;
 #
 # Help:
 #	./get_iplayer --help | --longhelp
 #
 # Changelog:
-# 	http://linuxcentre.net/get_iplayer/CHANGELOG.txt
+# 	https://github.com/dinkypumpkin/get_iplayer/commits/master
 #
-# Example Usage and Documentation:
-# 	http://linuxcentre.net/getiplayer/documentation
+# Example Usage and Examples:
+# 	https://github.com/dinkypumpkin/get_iplayer/wiki/documentation
 #
 # Todo:
 # * Fix non-uk detection - iphone auth?
@@ -121,7 +123,7 @@ my $opt_format = {
 	hash		=> [ 1, "hash!", 'Recording', '--hash', "Show recording progress as hashes"],
 	metadataonly	=> [ 1, "metadataonly|metadata-only!", 'Recording', '--metadata-only', "Create specified metadata info file without any recording or streaming (can also be used with thumbnail option)."],
 	mmsnothread	=> [ 1, "mmsnothread!", 'Recording', '--mmsnothread', "Disable parallel threaded recording for mms"],
-	modes		=> [ 0, "modes=s", 'Recording', '--modes <mode>,<mode>,...', "Recording modes: flashhd,flashvhigh,flashhigh,flashstd,flashnormal,flashlow,n95_wifi,flashaac,flashaachigh,flashaacstd,flashaaclow,flashaudio,realaudio,wma.  Use --modes=best to automatically select highest quality available."],
+	modes		=> [ 0, "modes=s", 'Recording', '--modes <mode>,<mode>,...', "Recording modes.  See --tvmode and --radiomode for available modes and defaults. Shortcuts: default,good,better(=default),best. Use --modes=best to select highest quality available (incl. HD TV)."],
 	multimode	=> [ 1, "multimode!", 'Recording', '--multimode', "Allow the recording of more than one mode for the same programme - WARNING: will record all specified/default modes!!"],
 	overwrite	=> [ 1, "overwrite|over-write!", 'Recording', '--overwrite', "Overwrite recordings if they already exist"],
 	partialproxy	=> [ 1, "partial-proxy!", 'Recording', '--partial-proxy', "Only uses web proxy where absolutely required (try this extra option if your proxy fails)"],
@@ -140,7 +142,7 @@ my $opt_format = {
 	test		=> [ 1, "test|t!", 'Recording', '--test, -t', "Test only - no recording (will show programme type)"],
 	thumb		=> [ 1, "thumb|thumbnail!", 'Recording', '--thumb', "Download Thumbnail image if available"],
 	thumbonly	=> [ 1, "thumbonly|thumbnailonly|thumbnail-only|thumb-only!", 'Recording', '--thumbnail-only', "Only Download Thumbnail image if available, not the programme"],
-	aactomp3	=> [ 1, "aactomp3", 'Recording', '--aactomp3', "Transcode AAC audio to MP3 with ffmpeg (CBR 128k unless --mp3vbr is specified)"],
+	aactomp3	=> [ 1, "aactomp3", 'Recording', '--aactomp3', "Transcode AAC audio to MP3 with ffmpeg/avconv (CBR 128k unless --mp3vbr is specified)"],
 	mp3vbr		=> [ 1, "mp3vbr=n", 'Recording', '--mp3vbr', "Set LAME VBR mode to N (0 to 9) for AAC transcoding. 0 = target bitrate 245 Kbit/s, 9 = target bitrate 65 Kbit/s (requires --aactomp3)"],
 
 	# Search
@@ -164,6 +166,10 @@ my $opt_format = {
 	email		=> [ 1, "email=s", 'Output', '--email <address>', "Email HTML index of matching programmes to specified address"],
 	emailsmtp	=> [ 1, "emailsmtpserver|email-smtp=s", 'Output', '--email-smtp <hostname>', "SMTP server IP address to use to send email (default: localhost)"],
 	emailsender	=> [ 1, "emailsender|email-sender=s", 'Output', '--email-sender <address>', "Optional email sender address"],
+	emailsecurity	=> [ 1, "emailsecurity|email-security=s", 'Output', '--email-security <TLS|SSL>', "Email security TLS, SSL (default: none)"],
+	emailpassword	=> [ 1, "emailpassword|email-password=s", 'Output', '--email-password <password>', "Email password"],
+	emailport       => [ 1, "emailport|email-port=s", 'Output', '--email-port <port number>', "Email port number (default: appropriate port for --email-security)"],
+	emailuser	=> [ 1, "emailuser|email-user=s", 'Output', '--email-user <username>', "Email username"],
 	fatfilename	=> [ 1, "fatfilenames|fatfilename!", 'Output', '--fatfilename', "Omit characters forbidden by FAT filesystems from filenames but keep whitespace"],
 	fileprefix	=> [ 1, "file-prefix|fileprefix=s", 'Output', '--file-prefix <format>', "The filename prefix (excluding dir and extension) using formatting fields. e.g. '<name>-<episode>-<pid>'"],
 	fxd		=> [ 1, "fxd=s", 'Output', '--fxd <file>', "Create Freevo FXD XML of matching programmes in specified file"],
@@ -247,7 +253,7 @@ my $opt_format = {
 	# Tagging
 	noartwork => [ 1, "noartwork|no-artwork!", 'Tagging', '--no-artwork', "Do not embed thumbnail image in output file.  All other metadata values will be written."],
 	notag => [ 1, "notag|no-tag!", 'Tagging', '--no-tag', "Do not tag downloaded programmes"],
-	tag_cnid => [ 1, "tagcnid|tag-cnid!", 'Tagging', '--tag-cnid', "AtomicParsley supports --cnID argument to add catalog ID used for combining HD and SD versions in iTunes"],
+	tag_cnid => [ 1, "tagcnid|tag-cnid!", 'Tagging', '--tag-cnid', "Use AtomicParsley --cnID argument (if supported) to add catalog ID used for combining HD and SD versions in iTunes"],
 	tag_fulltitle => [ 1, "tagfulltitle|tag-fulltitle!", 'Tagging', '--tag-fulltitle', "Use complete title (including series) instead of shorter episode title"],
 	tag_hdvideo => [ 1, "taghdvideo|tag-hdvideo!", 'Tagging', '--tag-hdvideo', "AtomicParsley supports --hdvideo argument for HD video flag"],
 	tag_longdesc => [ 1, "taglongdesc|tag-longdesc!", 'Tagging', '--tag-longdesc', "AtomicParsley supports --longdesc argument for long description text"],
@@ -348,7 +354,12 @@ mkpath $profile_dir if ! -d $profile_dir;
 
 
 # get list of additional user plugins and load plugin
-my $plugin_dir_system = '/usr/share/get_iplayer/plugins';
+my $plugin_dir_system;
+if ( defined $ENV{ALLUSERSPROFILE} ) {
+    $plugin_dir_system = $ENV{ALLUSERSPROFILE}.'/get_iplayer/plugins';
+} else {
+    $plugin_dir_system = '/usr/share/get_iplayer/plugins';
+}
 my $plugin_dir_user = "$profile_dir/plugins";
 for my $plugin_dir ( ( $plugin_dir_user, $plugin_dir_system ) ) {
 	if ( opendir( DIR, $plugin_dir ) ) {
@@ -746,7 +757,10 @@ sub init_search {
 	push @{ $binopts->{mplayer} }, '-v' if $opt->{debug};
 	push @{ $binopts->{mplayer} }, '-really-quiet' if $opt->{quiet};
 
-	$bin->{ffmpeg}		= $opt->{ffmpeg} || 'ffmpeg';
+	$bin->{ffmpeg}		= $opt->{ffmpeg} || 'avconv';
+	if (! main::exists_in_path('ffmpeg') ) {
+		$bin->{ffmpeg} = 'ffmpeg';
+	}
 
 	$bin->{lame}		= $opt->{lame} || 'lame';
 	delete $binopts->{lame};
@@ -762,16 +776,16 @@ sub init_search {
 
 	$bin->{tee}		= 'tee';
 
-	$bin->{flvstreamer}	= $opt->{flvstreamer} || 'rtmpdump';
-	if (! main::exists_in_path('flvstreamer') ) {
-		$bin->{flvstreamer} = 'flvstreamer';
+	$bin->{rtmpdump}	= $opt->{rtmpdump} || 'rtmpdump';
+	if (! main::exists_in_path('rtmpdump') ) {
+		$bin->{rtmpdump} = 'rtmpdump';
 	}
 
-	delete $binopts->{flvstreamer};
-	push @{ $binopts->{flvstreamer} }, ( '--timeout', 10 );
-	push @{ $binopts->{flvstreamer}	}, '--quiet' if $opt->{quiet};
-	push @{ $binopts->{flvstreamer}	}, '--verbose' if $opt->{verbose};
-	push @{ $binopts->{flvstreamer}	}, '--debug' if $opt->{debug};
+	delete $binopts->{rtmpdump};
+	push @{ $binopts->{rtmpdump} }, ( '--timeout', 10 );
+	push @{ $binopts->{rtmpdump}	}, '--quiet' if $opt->{quiet};
+	push @{ $binopts->{rtmpdump}	}, '--verbose' if $opt->{verbose};
+	push @{ $binopts->{rtmpdump}	}, '--debug' if $opt->{debug};
 
 	# quote binaries which allows for spaces in the path (only required if used via a shell)
 	for ( $bin->{lame}, $bin->{tee} ) {
@@ -2226,15 +2240,15 @@ sub create_xml {
 			$program_count{ $this->{name} }++;
 		}
 		for my $name ( sort keys %program_index ) {
-			print XML "\t\t<container title=\"".encode_entities( $name )." ($program_count{$name})\">\n" if $opt->{fxd};
+			print XML "\t\t<container title=\"".encode_entities( $name, '&<>"\'' )." ($program_count{$name})\">\n" if $opt->{fxd};
 			print XML "\t<Streams>\n" if $opt->{mythtv};
-			print XML "\t\t<Name>".encode_entities( $name )."</Name>\n" if $opt->{mythtv};
+			print XML "\t\t<Name>".encode_entities( $name, '&<>"\'' )."</Name>\n" if $opt->{mythtv};
 			for my $this (@_) {
 				my $pid = $this->{pid};
 				# loop through and find matches for each progname
 				if ( $this->{name} eq $name ) {
-					my $episode = encode_entities( $this->{episode} );
-					my $desc = encode_entities( $this->{desc} );
+					my $episode = encode_entities( $this->{episode}, '&<>"\'' );
+					my $desc = encode_entities( $this->{desc}, '&<>"\'' );
 					my $title = "${episode}";
 					$title .= " ($this->{available})" if $this->{available} !~ /^(unknown|)$/i;
 					if ( $opt->{fxd} ) {
@@ -2279,10 +2293,10 @@ sub create_xml {
 			push @{ $channels{ $this->{channel} } }, $this->{name};
 		}
 		for my $channel ( sort keys %channels ) {
-			print XML "\t\t<container title=\"".encode_entities( $channel )."\">\n" if $opt->{fxd};
+			print XML "\t\t<container title=\"".encode_entities( $channel, '&<>"\'' )."\">\n" if $opt->{fxd};
 			print XML
 				"\t<Feed>\n".
-				"\t\t<Name>".encode_entities( $channel )."</Name>\n".
+				"\t\t<Name>".encode_entities( $channel, '&<>"\'' )."</Name>\n".
 				"\t\t<Provider>BBC</Provider>\n".
 				"\t\t<Streams>\n" if $opt->{mythtv};
 			for my $name ( sort keys %program_index ) {
@@ -2292,14 +2306,14 @@ sub create_xml {
 					$match = 1 if $_ eq $name;
 				}
 				if ( $match ) {
-					print XML "\t\t\t<container title=\"".encode_entities( $name )." ($program_count{$name})\">\n" if $opt->{fxd};
+					print XML "\t\t\t<container title=\"".encode_entities( $name, '&<>"\'' )." ($program_count{$name})\">\n" if $opt->{fxd};
 					#print XML "\t\t<Stream>\n" if $opt->{mythtv};
 					for my $this (@_) {
 						# loop through and find matches for each progname for this channel
 						my $pid = $this->{pid};
 						if ( $this->{channel} eq $channel && $this->{name} eq $name ) {
-							my $episode = encode_entities( $this->{episode} );
-							my $desc = encode_entities( $this->{desc} );
+							my $episode = encode_entities( $this->{episode}, '&<>"\'' );
+							my $desc = encode_entities( $this->{desc}, '&<>"\'' );
 							my $title = "${episode} ($this->{available})";
 							if ( $opt->{fxd} ) {
 								print XML
@@ -2314,7 +2328,7 @@ sub create_xml {
 							} elsif ( $opt->{mythtv} ) {
 								print XML 
 									"\t\t\t<Stream>\n".
-									"\t\t\t\t<Name>".encode_entities( $name )."</Name>\n".
+									"\t\t\t\t<Name>".encode_entities( $name, '&<>"\'' )."</Name>\n".
 									"\t\t\t\t<index>$this->{index}</index>\n".
 									"\t\t\t\t<type>$this->{type}</type>\n".
 									"\t\t\t\t<Url>${pid}.mov</Url>\n".
@@ -2354,9 +2368,9 @@ sub create_xml {
 			print XML "\t\t<container title=\"$folder\">\n";
 			for my $this (@_) {
 				my $pid = $this->{pid};
-				my $name = encode_entities( $this->{name} );
-				my $episode = encode_entities( $this->{episode} );
-				my $desc = encode_entities( $this->{desc} );
+				my $name = encode_entities( $this->{name}, '&<>"\'' );
+				my $episode = encode_entities( $this->{episode}, '&<>"\'' );
+				my $desc = encode_entities( $this->{desc}, '&<>"\'' );
 				my $title = "${name} - ${episode} ($this->{available})";
 				my $regex = $table{$folder};
 				if ( $name =~ /^$regex/i ) {
@@ -2410,19 +2424,44 @@ sub create_html_file {
 
 
 # Usage: create_email( @prog_objects )
-# Reference: http://sial.org/howto/perl/Net-SMTP/
+# References: http://sial.org/howto/perl/Net-SMTP/, http://cpansearch.perl.org/src/RJBS/Email-Send-2.198/lib/Email/Send/SMTP.pm
 # Credit: Network Ned, andy <AT SIGN> networkned.co.uk, http://networkned.co.uk
 sub create_html_email {
-	# Check if we have Net::SMTP installed - might not be for the windows installer
-	eval "use Net::SMTP";
+	# Check if we have Net::SMTP::TLS::ButMaintained/Net::SMTP::TLS/Net::SMTP::SSL/Net::SMTP installed
+	my $smtpclass;
+	if ( $opt->{emailsecurity} eq "TLS" ) {
+		# prefer Net::SMTP::TLS::ButMaintained if installed
+		$smtpclass = 'Net::SMTP::TLS::ButMaintained';
+		eval "use $smtpclass";
+		if ($@) {
+			$smtpclass = 'Net::SMTP::TLS';
+		}
+	} elsif ( $opt->{emailsecurity} eq "SSL" ) {
+		$smtpclass = 'Net::SMTP::SSL';
+		eval "use Authen::SASL";
+		if ($@) {
+			main::logger "WARNING: Authen::SASL Perl module is required for --email-security=$opt->{emailsecurity}.\n";
+			return 0;
+		}
+	} else {
+		$smtpclass = 'Net::SMTP';
+	}
+	eval "use $smtpclass";
 	if ($@) {
-		main::logger "WARNING: Please download and run latest installer or install the Net::SMTP perl module to use --email options\n";
+		main::logger "WARNING: Please download and run latest installer or install the $smtpclass Perl module to use --email-security=$opt->{emailsecurity}.\n";
 		return 0;
 	};
 	my $search_args = shift;
 	my $recipient = $opt->{email};
 	my $sender = $opt->{emailsender} || 'get_iplayer <>';
 	my $smtphost = $opt->{emailsmtp} || 'localhost';
+	my $password = $opt->{emailpassword};
+	my $user = $opt->{emailuser};
+	my $port = $opt->{emailport};
+	if ( ! $port ) {
+		$port = ( $opt->{emailsecurity} eq "SSL" ) ? 465
+			: ( $opt->{emailsecurity} eq "TLS" ) ? 587 : 25;
+	}
 	my @mail_failure;
 	my @subject;
 	# Set the subject using the currently set cmdline options
@@ -2440,18 +2479,53 @@ sub create_html_email {
 		.create_html( @_ )."\n";
 	main::logger "DEBUG: Email message to $recipient:\n$message\n\n" if $opt->{debug};
 
-	my $smtp = Net::SMTP->new($smtphost);
+	my $smtp;
+	if ( $opt->{emailsecurity} ne 'TLS' ) {
+		$smtp = $smtpclass->new($smtphost, Port => $port);
+	} else {
+		eval {
+			$smtp = $smtpclass->new(
+				$smtphost,
+				Port => $port,
+				User => $user,
+				Password=> $password
+			);
+		};
+	}
 	if ( ! $smtp ) {
 		main::logger "ERROR: Could not find or connect to specified SMTP server\n";
 		return 1;
 	};
 
-	$smtp->mail( $sender ) || push @mail_failure, "MAIL FROM: $sender";
-	$smtp->to( $recipient ) || push @mail_failure, "RCPT TO: $recipient";
-	$smtp->data() || push @mail_failure, 'DATA';
-	$smtp->datasend( $message ) || push @mail_failure, 'Message Data';
-	$smtp->dataend() || push @mail_failure, 'End of DATA';
-	$smtp->quit() || push @mail_failure, 'QUIT';
+	if ( $opt->{emailsecurity} ne 'TLS' && $user ) {
+		if ( ! $smtp->auth($user, $password) ) {
+			main::logger "ERROR: Could not authenticate to specified SMTP server\n";
+			return 1;
+		}
+	}
+
+	if ( $opt->{emailsecurity} ne 'TLS' ) {
+		$smtp->mail( $sender ) || push @mail_failure, "MAIL FROM: $sender";
+		$smtp->to( $recipient ) || push @mail_failure, "RCPT TO: $recipient";
+		$smtp->data() || push @mail_failure, 'DATA';
+		$smtp->datasend( $message ) || push @mail_failure, 'Message Data';
+		$smtp->dataend() || push @mail_failure, 'End of DATA';
+		$smtp->quit() || push @mail_failure, 'QUIT';
+	} else {
+		# ::TLS has no useful return value, but will croak on failure.
+		eval { $smtp->mail( $sender ) };
+		push @mail_failure, "MAIL FROM: $sender" if $@;
+		eval { $smtp->to( $recipient ) };
+		push @mail_failure, "RCPT TO: $recipient" if $@;
+		eval { $smtp->data() };
+		push @mail_failure, 'DATA' if $@;
+		eval { $smtp->datasend( $message ) };
+		push @mail_failure, 'Message Data' if $@;
+		eval { $smtp->dataend() };
+		push @mail_failure, 'End of DATA' if $@;
+		eval { $smtp->quit() };
+		push @mail_failure, 'QUIT' if $@;
+	}
 
 	if ( @mail_failure ) {
 		main::logger "ERROR: Sending of email failed with $mail_failure[0]\n";
@@ -2656,7 +2730,7 @@ sub run_cmd {
 	my $USE_SYSTEM = 0;
 	#my $system_suffix;
 
-	main::logger "\n\nINFO: Command: ".(join ' ', @cmd)."\n\n" if $opt->{verbose};
+	main::logger "\n\nINFO: Command: ".(join ' ', map {s/\"/\\\"/g; "\"$_\"";} @cmd)."\n\n" if $opt->{verbose};
 
 	# Define what to do with STDOUT and STDERR of the child process
 	my $fh_child_out = ">&STDOUT";
@@ -2789,16 +2863,12 @@ sub StringUtils::sanitize_path {
 
 	# Replace backslashes with _ regardless
 	$string =~ s/\\/_/g;
-	# Replace :'s with -'s
-	$string =~ s/:/ -/g;
 	# Sanitize by default
 	$string =~ s/\s+/_/g if (! $opt->{whitespace}) && (! $allow_fwd_slash);
 	$string =~ s/[^\w_\-\.\/\s]//gi if ! $opt->{whitespace};
 	$string =~ s/[\|\\\?\*\<\"\:\>\+\[\]\/]//gi if $opt->{fatfilename};
 	# Truncate multiple '_'
 	$string =~ s/_+/_/g;
-    # Don't allow showname to start with '.'
-    $string =~ s/^\.{1,3}//g;
 	return $string;
 }
 
@@ -3073,7 +3143,7 @@ sub parse {
 
 sub copyright_notice {
 	shift;
-	my $text = sprintf "get_iplayer v%.2f, ", $version;
+	my $text = "get_iplayer $version_text, ";
 	$text .= <<'EOF';
 Copyright (C) 2008-2010 Phil Lewis
   This program comes with ABSOLUTELY NO WARRANTY; for details use --warranty.
@@ -3101,7 +3171,7 @@ sub usage {
 	my @man;
 	my @dump;
 	push @man, 
-		'.TH GET_IPLAYER "1" "June 2012" "Phil Lewis" "get_iplayer Manual"',
+		'.TH GET_IPLAYER "1" "June 2013" "Phil Lewis" "get_iplayer Manual"',
 		'.SH NAME', 'get_iplayer - Stream Recording tool and PVR for BBC iPlayer, BBC Podcasts and more',
 		'.SH SYNOPSIS',
 		'\fBget_iplayer\fR [<options>] [<regex|index> ...]',
@@ -3132,7 +3202,7 @@ sub usage {
 		'.PP',
 		'In PVR mode, \fBget_iplayer\fR can be called from cron to record programmes to a schedule.',
 		'.SH "OPTIONS"' if $manpage;
-	push @usage, 'Usage ( Also see http://linuxcentre.net/getiplayer/documentation ):';
+	push @usage, 'Usage ( Also see https://github.com/dinkypumpkin/get_iplayer/wiki/documentation ):';
 	push @usage, ' List All Programmes:            get_iplayer [--type=<TYPE>]';
 	push @usage, ' Search Programmes:              get_iplayer <REGEX>';
 	push @usage, ' Record Programmes by Search:    get_iplayer <REGEX> --get';
@@ -4078,7 +4148,7 @@ sub generate_version_list {
 	}
 
 	if ( $got == 0 ) {
-		main::logger "INFO: No versions of this programme were selected (".(join ',', sort keys %{ $prog->{verpids} })." are available)\n";
+		main::logger "INFO: No versions of this programme were selected (available versions: ".(join ',', sort keys %{ $prog->{verpids} }).")\n";
 	} else {
 		main::logger "INFO: Will search for versions: ".(join ',', @version_list)."\n" if $opt->{verbose};
 	}
@@ -4477,7 +4547,7 @@ sub substitute {
 			$replace = StringUtils::sanitize_path( $value );
 		# html entity encode
 		} elsif ($sanitize_mode == 3) {
-			$replace = encode_entities( $value );
+			$replace = encode_entities( $value, '&<>"\'' );
 		# escape these chars: ! ` \ "
 		} elsif ($sanitize_mode == 4) {
 			$replace = $value;
@@ -4488,16 +4558,24 @@ sub substitute {
 		} else {
 			$replace = $value;
 		}
-		$key = $tag_begin.$key.$tag_end;
-		$string =~ s|$key|$replace|gi;
+		# special handling for <episode*>
+		$replace = '' if $replace eq '-' && $key =~ /episode/i;
+		# look for prefix in tag
+		my $pfx_key = $tag_begin.'([^A-Za-z0-9'.$tag_end.']*?)'.$key.$tag_end;
+		(my $prefix = $1) if $string =~ m/$pfx_key/;
+		$pfx_key = $tag_begin."\Q$prefix\E".$key.$tag_end;
+		$prefix = '' if ! $replace;
+		$string =~ s|$pfx_key|$prefix$replace|gi;
 	}
 
 	if ( $sanitize_mode == 0 || $sanitize_mode == 1 ) {
-		# Remove empty tags
+		# Remove unused tags
 		my $key = $tag_begin.'.*?'.$tag_end;
-		$string =~ s|$key||m;
+		$string =~ s|$key||mg;
 		# Strip whitespace if required
 		$string =~ s/[\s_]+/_/g if ! $opt->{whitespace};
+		# Strip leading ellipsis
+		$string =~ s/^\.+/_/;
 		# Remove/replace all non-nice-filename chars if required except for fwd slashes
 		return StringUtils::sanitize_path( $string, 1 );
 	} else {
@@ -4963,7 +5041,7 @@ sub get_verpids {
 	} else {
 		$url = 'http://www.bbc.co.uk/iplayer/playlist/'.$prog->{pid};
 		# use the audiodescribed playlist url if non-default versions are specified
-		$url .= '/ad' if defined $opt->{versionlist} && $opt->{versionlist} ne 'default';
+		$url .= '/ad' if defined $opt->{versionlist} && $opt->{versionlist} =~ /(audiodescribed|signed)/i;
 	}
 	
 	main::logger "INFO: iPlayer metadata URL = $url\n" if $opt->{verbose};
@@ -5022,7 +5100,7 @@ sub get_verpids {
 
 	# Detect noItems or no programmes
 	if ( $xml =~ m{<noItems\s+reason="noMedia"} || $xml !~ m{kind="(programme|radioProgramme)"} ) {
-		main::logger "\rWARNING: No programmes are available for this pid with version(s): ".($opt->{versionlist} ? $opt->{versionlist} : 'default').($prog->{versions} ? " ($prog->{versions} are available)\n" : "\n");
+		main::logger "\rWARNING: No programmes are available for this pid with version(s): ".($opt->{versionlist} ? $opt->{versionlist} : 'default').($prog->{versions} ? " (available versions: $prog->{versions})\n" : "\n");
 		return 1;
 	}
 
@@ -5083,27 +5161,26 @@ sub get_verpids {
 		} else {
 			#  duration="3600" identifier="b00dp4xn" group="b00dlrc8" publisher="pips">
 			$verpid = $1 if m{\s+duration=".*?"\s+identifier="(.+?)"};
+			# assume default version
+			my $curr_version = "default";
 			# <alternate id="default" />
 			if ( m{<alternate\s+id="(.+?)"} ) {
-				my $curr_version = lc($1);
+				$curr_version = lc($1);
 				# Remap version name from 'default' => 'audiodescribed' if we are using the /ad playlist URL:
-				if ( defined $opt->{versionlist} && $opt->{versionlist} ne 'default' ) {
+				if ( defined $opt->{versionlist} && $opt->{versionlist} =~ /(audiodescribed|signed)/i ) {
 					$curr_version = 'audiodescribed' if $curr_version eq 'default';
 				}
-				$version = $curr_version;
-				# if current version is already defined, add a numeric suffix
-				if ( $prog->{verpids}->{$curr_version} ) {
-					my $vercount = 1;
-					# Search for the next free suffix
-					while ( $prog->{verpids}->{$curr_version} ) {
-						$vercount++;
-						$curr_version = $version.$vercount;
-					}
-					$version = $curr_version;
+			}
+			$version = $curr_version;
+			# check version collisions
+			if ( $prog->{verpids}->{$curr_version} ) {
+				my $vercount = 1;
+				# Search for the next free suffix
+				while ( $prog->{verpids}->{$curr_version} ) {
+					$vercount++;
+					$curr_version = $version.$vercount;
 				}
-			# If this item has no version name then this is assumed to be the 'default' version
-			} else {
-				$version = 'default';
+				$version = $curr_version;
 			}
 			main::logger "INFO: Using Not Live standard TV and Radio: $verpid\n" if $opt->{verbose} && $verpid;
 		}
@@ -5428,6 +5505,11 @@ sub get_metadata {
 		$episodenum = main::convert_words_to_number( $1 );
 	}
 
+	# minimum episode number = 1 if not a film and series number == 0
+	$episodenum = 1 if ( $seriesnum == 0 && $episodenum == 0 && $prog->{type} eq 'tv' && $categories !~ "Films" && $prog->{categories} !~ "Films" );
+	# minimum series number = 1 if episode number != 0
+	$seriesnum = 1 if ( $seriesnum == 0 && $episodenum != 0 );
+	
 	# Re-insert the episode number if the episode text doesn't have it
 	if ( $episodenum && $episodetitle =~ /^\d+\./ && $episode !~ /^(.+:\s+)?\d+\./ ) {
 		$episode =~ s/^(.+:\s+)?(.*)$/$1$episodenum. $2/;
@@ -5850,7 +5932,7 @@ sub get_stream_data_cdn {
 		# swfurl = Default iPlayer swf version
 		my $conn = {
 			swfurl		=> "http://www.bbc.co.uk/emp/releases/iplayer/revisions/617463_618125_4/617463_618125_4_emp.swf",
-			ext         => $ext,
+			ext		=> $ext,
 			streamer	=> $streamer,
 			bitrate		=> $mattribs->{bitrate},
 			server		=> $cattribs->{server},
@@ -5949,6 +6031,10 @@ sub get_stream_data_cdn {
 
 		# iphone new
 		} elsif ( $cattribs->{kind} eq 'securesis' ) {
+			$conn->{streamurl} = $cattribs->{href};
+
+		# asx playlist
+		} elsif ( $cattribs->{kind} eq 'asx' ) {
 			$conn->{streamurl} = $cattribs->{href};
 
 		# Unknown CDN
@@ -6223,7 +6309,7 @@ sub get_stream_data {
 				get_stream_data_cdn( $data, $mattribs, 'flashaacstd', 'rtmp', 'aac' );
 
 			# flashaaclow
-			} else {
+			} elsif ( $mattribs->{service} !~ /3gp/ ) {
 				get_stream_data_cdn( $data, $mattribs, 'flashaaclow', 'rtmp', 'aac' );
 			}
 
@@ -6241,8 +6327,8 @@ sub get_stream_data {
 			get_stream_data_cdn( $data, $mattribs, 'realaudio', 'rtsp', 'mp3' );
 
 		# wma modes
-		} elsif (	$mattribs->{type} eq 'audio/wma' &&
-				$mattribs->{encoding} eq 'wma'
+		} elsif (	( $mattribs->{type} eq 'audio/wma' || $mattribs->{type} eq "audio/x-ms-asf" ) &&
+				$mattribs->{encoding} =~ /wma/
 		) {
 			get_stream_data_cdn( $data, $mattribs, 'wma', 'mms', 'wma' );
 
@@ -6339,6 +6425,7 @@ sub channels {
 		'bbcthree'			=> 'BBC Three',
 		'bbcfour'			=> 'BBC Four',
 		'bbcnews'			=> 'BBC News',
+		'bbcnews24'			=> 'BBC News',
 		'cbbc'				=> 'CBBC',
 		'cbeebies'			=> 'CBeebies',
 		'parliament'			=> 'BBC Parliament',
@@ -6360,7 +6447,6 @@ sub channels_schedule {
 	return {
 		'bbcalba/programmes/schedules'		=> 'BBC Alba',
 		'bbcfour/programmes/schedules'		=> 'BBC Four',
-		'bbchd/programmes/schedules'		=> 'BBC HD',
 		'bbcnews/programmes/schedules'		=> 'BBC News 24',
 		'bbcone/programmes/schedules/cambridge'	=> 'BBC One Cambridgeshire',
 		'bbcone/programmes/schedules/channel_islands'	=> 'BBC One Channel Islands',
@@ -6396,10 +6482,11 @@ sub channels_schedule {
 # Class cmdline Options
 sub opt_format {
 	return {
-		tvmode		=> [ 1, "tvmode|vmode=s", 'Recording', '--tvmode <mode>,<mode>,...', "TV Recoding modes: rtmp,flashhd,flashvhigh,flashhigh,flashstd,flashnormal,flashlow,n95_wifi (default: flashhigh,flashstd,flashnormal). Use --tvmode=best to automatically select highest quality available."],
+		tvmode		=> [ 1, "tvmode|vmode=s", 'Recording', '--tvmode <mode>,<mode>,...', "TV recording modes: flashhd,flashvhigh,flashhigh,flashstd,flashnormal,flashlow. Shortcuts: default,good,better(=default),best,rtmp,flash. (Use 'best' for HD TV. 'default'=flashvhigh,flashhigh,flashstd,flashnormal,flashlow)"],
 		outputtv	=> [ 1, "outputtv=s", 'Output', '--outputtv <dir>', "Output directory for tv recordings"],
 		vlc		=> [ 1, "vlc=s", 'External Program', '--vlc <path>', "Location of vlc or cvlc binary"],
-		rtmptvopts	=> [ 1, "rtmp-tv-opts|rtmptvopts=s", 'Recording', '--rtmp-tv-opts <options>', "Add custom options to flvstreamer for tv"],
+		rtmptvopts	=> [ 1, "rtmp-tv-opts|rtmptvopts=s", 'Recording', '--rtmp-tv-opts <options>', "Add custom options to rtmpdump for tv"],
+		ffmpegtvopts	=> [ 1, "ffmpeg-tv-opts|ffmpegtvopts=s", 'Recording', '--ffmpeg-tv-opts <options>', "Add custom options to ffmpeg re-muxing for tv"],
 	};
 }
 
@@ -6424,19 +6511,19 @@ sub modelist {
 	
 	# Defaults
 	if ( ! $mlist ) {
-		if ( ! main::exists_in_path('flvstreamer') ) {
-			main::logger "WARNING: Not using flash modes since flvstreamer is not found\n" if $opt->{verbose};
-			$mlist = 'iphone';
+		if ( ! main::exists_in_path('rtmpdump') ) {
+			main::logger "WARNING: Not using flash modes since rtmpdump is not found\n" if $opt->{verbose};
 		} else {
-			$mlist = 'flashhigh,flashstd,flashnormal';
+			$mlist = 'default';
 		}
 	}
 	# Deal with BBC TV fallback modes and expansions
-	# Valid modes are iphone,rtmp,flashhigh,flashnormal,flashlow,n95_wifi
-	# 'rtmp' or 'flash' => 'flashhigh,flashnormal'
-	$mlist = main::expand_list($mlist, 'best', 'flashhd,flashvhigh,flashhigh,flashstd,flashnormal,flashlow');
-	$mlist = main::expand_list($mlist, 'flash', 'flashhigh,flashstd,flashnormal');
-	$mlist = main::expand_list($mlist, 'rtmp', 'flashhigh,flashstd,flashnormal');
+	$mlist = main::expand_list($mlist, 'rtmp', 'flash');
+	$mlist = main::expand_list($mlist, 'flash', 'default');
+	$mlist = main::expand_list($mlist, 'default', 'better');
+	$mlist = main::expand_list($mlist, 'best', 'flashhd,better');
+	$mlist = main::expand_list($mlist, 'better', 'flashvhigh,good');
+	$mlist = main::expand_list($mlist, 'good', 'flashhigh,flashstd,flashnormal,flashlow');
 
 	return $mlist;
 }
@@ -6936,14 +7023,14 @@ sub download {
 		main::logger "\nWARNING: Required vlc does not exist\n";
 		return 'next';
 	}
-	# if flvstreamer does not exist
-	if ( $mode =~ /^flash/ && ! main::exists_in_path('flvstreamer')) {
-		main::logger "WARNING: Required program flvstreamer does not exist (see http://linuxcentre.net/getiplayer/installation and http://linuxcentre.net/getiplayer/download)\n";
+	# if rtmpdump does not exist
+	if ( $mode =~ /^(rtmp|flash)/ && ! main::exists_in_path('rtmpdump')) {
+		main::logger "WARNING: Required rtmpdump does not exist - cannot download Flash audio/video\n";
 		return 'next';
 	}
 	# Force raw mode if ffmpeg is not installed
-	if ( $mode =~ /^flash/ && ! main::exists_in_path('ffmpeg')) {
-		main::logger "\nWARNING: ffmpeg does not exist - not converting flv file\n";
+	if ( $mode =~ /^(rtmp|flash)/ && ! main::exists_in_path('ffmpeg')) {
+		main::logger "\nWARNING: Required ffmpeg/avconv does not exist - not converting flv file\n";
 		$opt->{raw} = 1;
 	}
 
@@ -6958,8 +7045,14 @@ sub download {
 	$prog->{ext} = 'wav' if $opt->{wav} &&  $mode =~ /^real/;
 	# Override flash ext based on raw
 	$prog->{ext} = 'flv' if $opt->{raw} && $mode =~ /^flash/;
-	# Override flashaac ext based on aactomp3
-	$prog->{ext} = 'mp3' if ! $opt->{raw} && $opt->{aactomp3} && $mode =~ /^flashaac/;
+	# Override flashaac ext
+	if ( ! $opt->{raw} && $mode =~ /^flashaac/ ) {
+		if ( $opt->{aactomp3} ) {
+			$prog->{ext} = 'mp3';
+		} else {
+			$prog->{ext} = 'm4a';
+		}
+	}
 	# Override ext based on mkv option
 	$prog->{ext} = 'mkv' if ! $opt->{raw} && $opt->{mkv} && $prog->{type} eq 'tv';
 
@@ -7033,7 +7126,11 @@ sub download_subtitles {
 		return 0;
 	}
 
-	$suburl = $prog->{streams}->{$prog->{version}}->{subtitles1}->{streamurl};
+	# Find subtitles stream
+	for ( keys %{$prog->{streams}} ) {
+		$suburl = $prog->{streams}->{$_}->{subtitles1}->{streamurl};
+		last if $suburl;
+	}
 	# Return if we have no url
 	if (! $suburl) {
 		main::logger "INFO: Subtitles not available\n";
@@ -7045,7 +7142,7 @@ sub download_subtitles {
 	# Open subs file
 	unlink($file);
 	open( my $fh, "> $file" );
-	binmode $fh;
+	binmode($fh, ":utf8");
 
 	# Download subs
 	$subs = main::request_url_retry($ua, $suburl, 2);
@@ -7240,47 +7337,47 @@ sub channels_schedule {
 		'radiowales/programmes/schedules/fm'	=> 'BBC Radio Wales FM',
 		'radiowales/programmes/schedules/mw'	=> 'BBC Radio Wales MW',
 		'radiocymru/programmes/schedules'	=> 'BBC Radio Cymru',
-		'worldservice/programmes/schedules'	=> 'BBC World Service',
-		'cumbria/programmes/schedules'		=> 'BBC Cumbria',
-		'newcastle/programmes/schedules'	=> 'BBC Newcastle',
-		'tees/programmes/schedules'		=> 'BBC Tees',
-		'lancashire/programmes/schedules'	=> 'BBC Lancashire',
-		'merseyside/programmes/schedules'	=> 'BBC Merseyside',
-		'manchester/programmes/schedules'	=> 'BBC Manchester',
-		'leeds/programmes/schedules'		=> 'BBC Leeds',
-		'sheffield/programmes/schedules'	=> 'BBC Sheffield',
-		'york/programmes/schedules'		=> 'BBC York',
-		'humberside/programmes/schedules'	=> 'BBC Humberside',
-		'lincolnshire/programmes/schedules'	=> 'BBC Lincolnshire',
-		'nottingham/programmes/schedules'	=> 'BBC Nottingham',
-		'leicester/programmes/schedules'	=> 'BBC Leicester',
-		'derby/programmes/schedules'		=> 'BBC Derby',
-		'stoke/programmes/schedules'		=> 'BBC Stoke',
-		'shropshire/programmes/schedules'	=> 'BBC Shropshire',
+		'worldserviceradio/programmes/schedules'	=> 'BBC World Service',
+		'radiocumbria/programmes/schedules'		=> 'BBC Cumbria',
+		'bbcnewcastle/programmes/schedules'	=> 'BBC Newcastle',
+		'bbctees/programmes/schedules'		=> 'BBC Tees',
+		'radiolancashire/programmes/schedules'	=> 'BBC Lancashire',
+		'radiomerseyside/programmes/schedules'	=> 'BBC Merseyside',
+		'radiomanchester/programmes/schedules'	=> 'BBC Manchester',
+		'radioleeds/programmes/schedules'		=> 'BBC Leeds',
+		'radiosheffield/programmes/schedules'	=> 'BBC Sheffield',
+		'radioyork/programmes/schedules'		=> 'BBC York',
+		'radiohumberside/programmes/schedules'	=> 'BBC Humberside',
+		'bbclincolnshire/programmes/schedules'	=> 'BBC Lincolnshire',
+		'radionottingham/programmes/schedules'	=> 'BBC Nottingham',
+		'radioleicester/programmes/schedules'	=> 'BBC Leicester',
+		'radioderby/programmes/schedules'		=> 'BBC Derby',
+		'radiostoke/programmes/schedules'		=> 'BBC Stoke',
+		'radioshropshire/programmes/schedules'	=> 'BBC Shropshire',
 		'wm/programmes/schedules'		=> 'BBC WM',
-		'coventry/programmes/schedules'		=> 'BBC Coventry & Warwickshire',
-		'herefordandworcester/programmes/schedules'=> 'BBC Hereford & Worcester',
-		'northampton/programmes/schedules'	=> 'BBC Northampton',
-		'threecounties/programmes/schedules'	=> 'BBC Three Counties',
-		'cambridgeshire/programmes/schedules'	=> 'BBC Cambridgeshire',
-		'norfolk/programmes/schedules'		=> 'BBC Norfolk',
-		'suffolk/programmes/schedules'		=> 'BBC Suffolk',
-		'essex/programmes/schedules'		=> 'BBC Essex',
-		'london/programmes/schedules'		=> 'BBC London',
-		'kent/programmes/schedules'		=> 'BBC Kent',
-		'surrey/programmes/schedules'		=> 'BBC Surrey',
-		'sussex/programmes/schedules'		=> 'BBC Sussex',
-		'oxford/programmes/schedules'		=> 'BBC Oxford',
-		'berkshire/programmes/schedules'	=> 'BBC Berkshire',
-		'solent/programmes/schedules'		=> 'BBC Solent',
-		'gloucestershire/programmes/schedules'	=> 'BBC Gloucestershire',
-		'wiltshire/programmes/schedules'	=> 'BBC Wiltshire',
-		'bristol/programmes/schedules'		=> 'BBC Bristol',
-		'somerset/programmes/schedules'		=> 'BBC Somerset',
-		'devon/programmes/schedules'		=> 'BBC Devon',
-		'cornwall/programmes/schedules'		=> 'BBC Cornwall',
-		'guernsey/programmes/schedules'		=> 'BBC Guernsey',
-		'jersey/programmes/schedules'		=> 'BBC Jersey',
+		'bbccoventryandwarwickshire/programmes/schedules'		=> 'BBC Coventry & Warwickshire',
+		'bbcherefordandworcester/programmes/schedules'=> 'BBC Hereford & Worcester',
+		'radionorthampton/programmes/schedules'	=> 'BBC Northampton',
+		'threecountiesradio/programmes/schedules'	=> 'BBC Three Counties',
+		'radiocambridgeshire/programmes/schedules'	=> 'BBC Cambridgeshire',
+		'radionorfolk/programmes/schedules'		=> 'BBC Norfolk',
+		'radiosuffolk/programmes/schedules'		=> 'BBC Suffolk',
+		'bbcessex/programmes/schedules'		=> 'BBC Essex',
+		'bbclondon/programmes/schedules'		=> 'BBC London',
+		'radiokent/programmes/schedules'		=> 'BBC Kent',
+		'bbcsurrey/programmes/schedules'		=> 'BBC Surrey',
+		'bbcsussex/programmes/schedules'		=> 'BBC Sussex',
+		'bbcoxford/programmes/schedules'		=> 'BBC Oxford',
+		'radioberkshire/programmes/schedules'	=> 'BBC Berkshire',
+		'radiosolent/programmes/schedules'		=> 'BBC Solent',
+		'radiogloucestershire/programmes/schedules'	=> 'BBC Gloucestershire',
+		'bbcwiltshire/programmes/schedules'	=> 'BBC Wiltshire',
+		'radiobristol/programmes/schedules'		=> 'BBC Bristol',
+		'bbcsomerset/programmes/schedules'		=> 'BBC Somerset',
+		'radiodevon/programmes/schedules'		=> 'BBC Devon',
+		'radiocornwall/programmes/schedules'		=> 'BBC Cornwall',
+		'bbcguernsey/programmes/schedules'		=> 'BBC Guernsey',
+		'radiojersey/programmes/schedules'		=> 'BBC Jersey',
 	};
 }
 
@@ -7288,12 +7385,13 @@ sub channels_schedule {
 # Class cmdline Options
 sub opt_format {
 	return {
-		radiomode	=> [ 1, "radiomode|amode=s", 'Recording', '--radiomode <mode>,<mode>,...', "Radio Recording mode(s): flashaac,flashaachigh,flashaacstd,flashaaclow,flashaudio,realaudio,wma (default: flashaachigh,flashaacstd,flashaudio,realaudio,flashaaclow). Use --radiomode=best to automatically select highest quality available."],
+		radiomode	=> [ 1, "radiomode|amode=s", 'Recording', '--radiomode <mode>,<mode>,...', "Radio recording modes: flashaachigh,flashaacstd,flashaudio,flashaaclow,wma. Shortcuts: default,good,better(=default),best,rtmp,flash,flashaac. ('default'=flashaachigh,flashaacstd,flashaudio,flashaaclow,wma)"],
 		bandwidth 	=> [ 1, "bandwidth=n", 'Recording', '--bandwidth', "In radio realaudio mode specify the link bandwidth in bps for rtsp streaming (default 512000)"],
 		lame		=> [ 0, "lame=s", 'External Program', '--lame <path>', "Location of lame binary"],
 		outputradio	=> [ 1, "outputradio=s", 'Output', '--outputradio <dir>', "Output directory for radio recordings"],
 		wav		=> [ 1, "wav!", 'Recording', '--wav', "In radio realaudio mode output as wav and don't transcode to mp3"],
-		rtmpradioopts	=> [ 1, "rtmp-radio-opts|rtmpradioopts=s", 'Recording', '--rtmp-radio-opts <options>', "Add custom options to flvstreamer for radio"],
+		rtmpradioopts	=> [ 1, "rtmp-radio-opts|rtmpradioopts=s", 'Recording', '--rtmp-radio-opts <options>', "Add custom options to rtmpdump for radio"],
+		ffmpegradioopts	=> [ 1, "ffmpeg-radio-opts|ffmpegradioopts=s", 'Recording', '--ffmpeg-radio-opts <options>', "Add custom options to ffmpeg re-muxing for radio"],
 	};
 }
 
@@ -7336,21 +7434,24 @@ sub modelist {
 	
 	# Defaults
 	if ( ! $mlist ) {
-		if ( ! main::exists_in_path('flvstreamer') ) {
-			main::logger "WARNING: Not using flash modes since flvstreamer is not found\n" if $opt->{verbose};
-			$mlist = 'rtspaudio,realaudio,wma';
+		if ( ! main::exists_in_path('rtmpdump') ) {
+			main::logger "WARNING: Not using flash modes since rtmpdump is not found\n" if $opt->{verbose};
+			if ( ! main::exists_in_path('mplayer') ) {
+				main::logger "WARNING: Not using wma mode since mplayer is not found\n" if $opt->{verbose};
+			} else {
+				$mlist = 'wma';
+			}
 		} else {
-			$mlist = 'flashaachigh,flashaacstd,flashaudio,rtspaudio,realaudio,flashaaclow,wma';
+			$mlist = 'default';
 		}
 	}
 	# Deal with BBC Radio fallback modes and expansions
-	# Valid modes are iphone,rtmp,flashaac,flashaudio,realaudio,wmv
-	# 'rtmp' or 'flash' => 'flashaudio,flashaac'
-	# flashaac => flashaachigh,flashaacstd,flashaaclow
-	# flashaachigh => flashaachigh1,flashaachigh2
-	$mlist = main::expand_list($mlist, 'best', 'flashaachigh,flashaacstd,flashaudio,realaudio,flashaaclow,wma');
-	$mlist = main::expand_list($mlist, 'flash', 'flashaudio,flashaac');
-	$mlist = main::expand_list($mlist, 'rtmp', 'flashaudio,flashaac');
+	$mlist = main::expand_list($mlist, 'best', 'default');
+	$mlist = main::expand_list($mlist, 'better', 'default');
+	$mlist = main::expand_list($mlist, 'good', 'default');
+	$mlist = main::expand_list($mlist, 'default', 'flash,wma');
+	$mlist = main::expand_list($mlist, 'rtmp', 'flash');
+	$mlist = main::expand_list($mlist, 'flash', 'flashaachigh,flashaacstd,flashaudio,flashaaclow');
 	$mlist = main::expand_list($mlist, 'flashaac', 'flashaachigh,flashaacstd,flashaaclow');
 
 	return $mlist;
@@ -7561,9 +7662,10 @@ sub channels {
 # Class cmdline Options
 sub opt_format {
 	return {
-		livetvmode	=> [ 1, "livetvmode=s", 'Recording', '--livetvmode <mode>,<mode>,...', "Live TV Recoding modes: flashhd,flashvhigh,flashhigh,flashstd,flashnormal (default: flashhd,flashvhigh,flashhigh,flashstd,flashnormal). Use --livetvmode=best to automatically select highest quality available."],
+		livetvmode	=> [ 1, "livetvmode=s", 'Recording', '--livetvmode <mode>,<mode>,...', "Live TV recording modes: flashhd,flashvhigh,flashhigh,flashstd,flashnormal,flashlow. Shortcuts: default,good,better(=default),best,rtmp,flash. ('default'=flashvhigh,flashhigh,flashstd,flashnormal,flashlow)"],
 		outputlivetv	=> [ 1, "outputlivetv=s", 'Output', '--outputlivetv <dir>', "Output directory for live tv recordings"],
-		rtmplivetvopts	=> [ 1, "rtmp-livetv-opts|rtmplivetvopts=s", 'Recording', '--rtmp-livetv-opts <options>', "Add custom options to flvstreamer for livetv"],
+		rtmplivetvopts	=> [ 1, "rtmp-livetv-opts|rtmplivetvopts=s", 'Recording', '--rtmp-livetv-opts <options>', "Add custom options to rtmpdump for livetv"],
+		ffmpeglivetvopts	=> [ 1, "ffmpeg-livetv-opts|ffmpeglivetvopts=s", 'Recording', '--ffmpeg-livetv-opts <options>', "Add custom options to ffmpeg re-muxing for livetv"],
 	};
 }
 
@@ -7587,14 +7689,19 @@ sub modelist {
 	
 	# Defaults
 	if ( ! $mlist ) {
-		$mlist = 'flashhd,flashvhigh,flashhigh,flashstd,flashnormal';
+		if ( ! main::exists_in_path('rtmpdump') ) {
+			main::logger "WARNING: Not using flash modes since rtmpdump is not found\n" if $opt->{verbose};
+		} else {
+			$mlist = 'default';
+		}
 	}
 	# Deal with BBC TV fallback modes and expansions
-	# Valid modes are rtmp,flashhigh,flashstd
-	# 'rtmp' or 'flash' => 'flashhigh,flashnormal'
-	$mlist = main::expand_list($mlist, 'best', 'flashhd,flashvhigh,flashhigh,flashstd,flashnormal,flashlow');
-	$mlist = main::expand_list($mlist, 'flash', 'flashhd,flashvhigh,flashhigh,flashstd,flashnormal,flashlow');
-	$mlist = main::expand_list($mlist, 'rtmp', 'flashhd,flashvhigh,flashhigh,flashstd,flashnormal,flashlow');
+	$mlist = main::expand_list($mlist, 'rtmp', 'flash');
+	$mlist = main::expand_list($mlist, 'flash', 'default');
+	$mlist = main::expand_list($mlist, 'default', 'better');
+	$mlist = main::expand_list($mlist, 'best', 'flashhd,better');
+	$mlist = main::expand_list($mlist, 'better', 'flashvhigh,good');
+	$mlist = main::expand_list($mlist, 'good', 'flashhigh,flashstd,flashnormal,flashlow');
 
 	return $mlist;
 }
@@ -7702,9 +7809,10 @@ sub channels {
 # Class cmdline Options
 sub opt_format {
 	return {
-		liveradiomode	=> [ 1, "liveradiomode=s", 'Recording', '--liveradiomode <mode>,<mode>,..', "Live Radio Recording modes: flashaac,realaudio,wma. Use --liveradiomode=best to automatically select highest quality available."],
+		liveradiomode	=> [ 1, "liveradiomode=s", 'Recording', '--liveradiomode <mode>,<mode>,..', "Live Radio recording modes: flashaachigh,flashaacstd,flashaudio,flashaaclow,wma. Shortcuts: default,good,better(=default),best,rtmp,flash,flashaac. ('default'=flashaachigh,flashaacstd,flashaaclow,wma)"],
 		outputliveradio	=> [ 1, "outputliveradio=s", 'Output', '--outputliveradio <dir>', "Output directory for live radio recordings"],
-		rtmpliveradioopts => [ 1, "rtmp-liveradio-opts|rtmpliveradioopts=s", 'Recording', '--rtmp-liveradio-opts <options>', "Add custom options to flvstreamer for liveradio"],
+		rtmpliveradioopts => [ 1, "rtmp-liveradio-opts|rtmpliveradioopts=s", 'Recording', '--rtmp-liveradio-opts <options>', "Add custom options to rtmpdump for liveradio"],
+		ffmpegliveradioopts => [ 1, "ffmpeg-liveradio-opts|ffmpegliveradioopts=s", 'Recording', '--ffmpeg-liveradio-opts <options>', "Add custom options to ffmpeg re-muxing for liveradio"],
 	};
 }
 
@@ -7732,21 +7840,24 @@ sub modelist {
 	
 	# Defaults
 	if ( ! $mlist ) {
-		if ( ! main::exists_in_path('flvstreamer') ) {
-			main::logger "WARNING: Not using flash modes since flvstreamer is not found\n" if $opt->{verbose};
-			$mlist = 'realaudio,wma';
+		if ( ! main::exists_in_path('rtmpdump') ) {
+			main::logger "WARNING: Not using flash modes since rtmpdump is not found\n" if $opt->{verbose};
+			if ( ! main::exists_in_path('mplayer') ) {
+				main::logger "WARNING: Not using wma mode since mplayer is not found\n" if $opt->{verbose};
+			} else {
+				$mlist = 'wma';
+			}
 		} else {
-			$mlist = 'flashaachigh,flashaacstd,realaudio,flashaaclow,wma';
+			$mlist = 'default';
 		}
 	}
 	# Deal with BBC Radio fallback modes and expansions
-	# Valid modes are rtmp,flashaac,realaudio,wmv
-	# 'rtmp' or 'flash' => 'flashaac'
-	# flashaac => flashaachigh,flashaacstd,flashaaclow
-	# flashaachigh => flashaachigh1,flashaachigh2
-	$mlist = main::expand_list($mlist, 'best', 'flashaachigh,flashaacstd,realaudio,flashaaclow,wma');
-	$mlist = main::expand_list($mlist, 'flash', 'flashaac');
-	$mlist = main::expand_list($mlist, 'rtmp', 'flashaac');
+	$mlist = main::expand_list($mlist, 'best', 'default');
+	$mlist = main::expand_list($mlist, 'better', 'default');
+	$mlist = main::expand_list($mlist, 'good', 'default');
+	$mlist = main::expand_list($mlist, 'default', 'flash,wma');
+	$mlist = main::expand_list($mlist, 'rtmp', 'flash');
+	$mlist = main::expand_list($mlist, 'flash', 'flashaachigh,flashaacstd,flashaudio,flashaaclow');
 	$mlist = main::expand_list($mlist, 'flashaac', 'flashaachigh,flashaacstd,flashaaclow');
 
 	return $mlist;
@@ -8039,9 +8150,9 @@ use URI;
 
 sub opt_format {
 	return {
-		ffmpeg		=> [ 0, "ffmpeg=s", 'External Program', '--ffmpeg <path>', "Location of ffmpeg binary"],
+		ffmpeg		=> [ 0, "ffmpeg|avconv=s", 'External Program', '--ffmpeg <path>', "Location of ffmpeg or avconv binary. Synonyms: --avconv"],
 		rtmpport	=> [ 1, "rtmpport=n", 'Recording', '--rtmpport <port>', "Override the RTMP port (e.g. 443)"],
-		flvstreamer	=> [ 0, "flvstreamer=s", 'External Program', '--flvstreamer <path>', "Location of flvstreamer binary"],
+		rtmpdump	=> [ 0, "rtmpdump|flvstreamer=s", 'External Program', '--rtmpdump <path>', "Location of rtmpdump binary. Synonyms: --flvstreamer"],
 	};
 }
 
@@ -8075,25 +8186,25 @@ sub get {
 		$file_tmp = $prog->{filepart}.'.flv'
 	}
 
-	# Remove failed file recording (below a certain size) - hack to get around flvstreamer not returning correct exit code
+	# Remove failed file recording (below a certain size) - hack to get around rtmpdump not returning correct exit code
 	if ( -f $file_tmp && stat($file_tmp)->size < $prog->min_download_size() ) {
 		unlink( $file_tmp );
 	}
 		
-	# Add custom options to flvstreamer for this type if specified with --rtmp-<type>-opts
+	# Add custom options to rtmpdump for this type if specified with --rtmp-<type>-opts
 	if ( defined $opt->{'rtmp'.$prog->{type}.'opts'} ) {
 		push @cmdopts, ( split /\s+/, $opt->{'rtmp'.$prog->{type}.'opts'} );
 	}
 
-	# flvstreamer version detection e.g. 'FLVStreamer v1.8a'
-	my $rtmpver = `"$bin->{flvstreamer}" --help 2>&1`;
+	# rtmpdump version detection e.g. 'RTMPDump v2.4'
+	my $rtmpver = `"$bin->{rtmpdump}" --help 2>&1`;
 	if ( $rtmpver =~ /swfVfy/ ) {
 		$swfarg = "--swfVfy";
 	} else {
-		main::logger "WARNING: Your version of flvstreamer/rtmpdump does not support SWF Verification\n";
+		main::logger "WARNING: Your version of rtmpdump/flvstreamer does not support SWF Verification\n";
 	}
 	$rtmpver =~ s/^\w+\s+v?([\.\d]+)(.*\n)*$/$1/g;
-	main::logger "INFO: $bin->{flvstreamer} version $rtmpver\n" if $opt->{verbose};
+	main::logger "INFO: $bin->{rtmpdump} version $rtmpver\n" if $opt->{verbose};
 	main::logger "INFO: RTMP_URL: $url_2, tcUrl: $tcurl, application: $application, authString: $authstring, swfUrl: $swfurl, file: $prog->{filepart}, file_done: $prog->{filename}\n" if $opt->{verbose};
 
 	# Save the effort and don't support < v1.8
@@ -8123,14 +8234,14 @@ sub get {
 		exit 4;
 	}
 	push @cmdopts, ( '--resume', '-o', $file_tmp ) if ! ( $opt->{stdout} && $opt->{nowrite} );
-	push @cmdopts, @{ $binopts->{flvstreamer} } if $binopts->{flvstreamer};
+	push @cmdopts, @{ $binopts->{rtmpdump} } if $binopts->{rtmpdump};
 	
 	my $return;
 	# Different invocation depending on version
 	# if playpath is defined
 	if ( $playpath ) {
 		@cmd = (
-			$bin->{flvstreamer},
+			$bin->{rtmpdump},
 			'--port', $port,
 			'--protocol', $protocol,
 			'--playpath', $playpath,
@@ -8144,7 +8255,7 @@ sub get {
 	# Using just streamurl (i.e. no playpath defined)
 	} else {
 		@cmd = (
-			$bin->{flvstreamer},
+			$bin->{rtmpdump},
 			'--port', $port,
 			'--protocol', $protocol,
 			'--rtmp', $streamdata{streamurl},
@@ -8175,6 +8286,12 @@ sub get {
 		return 'next';
 	}
 	
+	# Add custom options to ffmpeg for this type if specified with -ffmpeg-<type>-opts
+	my @ffmpeg_opts = ();
+	if ( defined $opt->{'ffmpeg'.$prog->{type}.'opts'} ) {
+		push @ffmpeg_opts, ( split /\s+/, $opt->{'ffmpeg'.$prog->{type}.'opts'} );
+	}
+
 	# Retain raw flv format if required
 	if ( $opt->{raw} ) {
 		move($file_tmp, $prog->{filename}) if $file_tmp ne $prog->{filename} && ! $opt->{stdout};
@@ -8208,6 +8325,7 @@ sub get {
 				'-i', $file_tmp,
 				'-vn',
 				'-acodec', 'libmp3lame', '-ac', '2', @br_opts,
+				@ffmpeg_opts,
 				'-y', $prog->{filepart},
 			);
 		} else {
@@ -8216,26 +8334,18 @@ sub get {
 				'-i', $file_tmp,
 				'-vn',
 				'-acodec', 'copy',
+				@ffmpeg_opts,
 				'-y', $prog->{filepart},
 			);
 		}
-	# Convert video flv to mkv if required
-	} elsif ( $opt->{mkv} ) {
-		@cmd = (
-			$bin->{ffmpeg},
-			'-i', $file_tmp,
-			'-vcodec', 'copy',
-			'-acodec', 'copy',
-			'-y', $prog->{filepart},
-		);
-	# Convert video flv to mp4/avi if required
+	# Convert video flv to mp4/mkv if required
 	} else {
 		@cmd = (
 			$bin->{ffmpeg},
 			'-i', $file_tmp,
 			'-vcodec', 'copy',
 			'-acodec', 'copy',
-			'-f', $prog->{ext},
+			@ffmpeg_opts,
 			'-y', $prog->{filepart},
 		);
 	}
@@ -8244,46 +8354,6 @@ sub get {
 	my $return = main::run_cmd( 'STDERR', @cmd );
 	if ( (! $return) && -f $prog->{filepart} && stat($prog->{filepart})->size > $prog->min_download_size() ) {
 			unlink( $file_tmp );
-
-			# If we have an aac file use ffmpeg to pack in m4a container and remove adts headers
-			# Have to do a second ffmpeg call because remuxing flv to m4a with -absf aac_adtstoasc gives corrupt m4a
-			# flv -> aac -> m4a works
-			if ( $mode =~ /flashaac/ && $prog->{ext} eq 'aac' && ! $opt->{aactomp3} ) {
-
-				# Temp file is now partial file from flv->aac conversion
-				# Change the extension to m4a for later info / debug messages
-				# final and partial filenames use new extension
-				$file_tmp = $prog->{filepart};
-				$prog->{ext} = 'm4a';
-				$prog->{filename} = File::Spec->catfile($prog->{dir}, "$prog->{fileprefix}.$prog->{ext}");
-				$prog->{filepart} = File::Spec->catfile($prog->{dir}, "$prog->{fileprefix}.partial.$prog->{ext}");
-
-				@cmd = (
-					$bin->{ffmpeg},
-					'-i', $file_tmp,
-					'-vn',
-					'-acodec', 'copy',
-					'-absf', 'aac_adtstoasc',
-					'-y', $prog->{filepart},
-				);
-
-				# Run aac conversion and delete source file on success
-				my $return = main::run_cmd( 'STDERR', @cmd );
-				if ( (! $return) && -f $prog->{filepart} && stat($prog->{filepart})->size > $prog->min_download_size() ) {
-					unlink( $file_tmp );
-
-				# If the ffmpeg conversion failed, remove the failed-converted file attempt - move the file as done anyway
-				} else {
-					main::logger "WARNING: aac conversion failed - retaining aac file\n";
-					unlink $prog->{filepart};
-					$prog->{filepart} = $file_tmp;
-					$prog->{filename} = $file_tmp;
-
-					# reset the extension to aac for later info / debug messages
-					$prog->{ext} = 'aac';
-				}
-			}
-
 	# If the ffmpeg conversion failed, remove the failed-converted file attempt - move the file as done anyway
 	} else {
 		main::logger "WARNING: flv conversion failed - retaining flv file\n";
@@ -9177,6 +9247,10 @@ sub run_scheduler {
 	while ( 1 ) {
 		my $start_time = time();
 		$opt_cmdline->{pvr} = 1;
+		# empty mem cache before each run to force cache file refresh
+		for ( keys %$memcache ) {
+			delete $memcache->{$_};
+		}
 		$pvr->run();
 		my $remaining = $interval - ( time() - $start_time );
 		if ( $remaining > 0 ) {
