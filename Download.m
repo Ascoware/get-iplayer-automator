@@ -648,6 +648,7 @@
 }
 - (void)cancelDownload:(id)sender
 {
+    [currentRequest clearDelegatesAndCancel];
 	//Some basic cleanup.
 	[task interrupt];
 	[nc removeObserver:self name:NSFileHandleReadCompletionNotification object:fh];

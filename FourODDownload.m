@@ -99,23 +99,24 @@
     if (verbose)
         [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata URL: %@", requestURL] noTag:YES];
 
-    ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:requestURL];
-    [request setDelegate:self];
-    [request setDidFailSelector:@selector(metaRequestFinished:)];
-    [request setDidFinishSelector:@selector(metaRequestFinished:)];
-    [request setTimeOutSeconds:10];
-    [request setNumberOfTimesToRetryOnTimeout:3];
-    [request addRequestHeader:@"Accept" value:@"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"];
+    [currentRequest clearDelegatesAndCancel];
+    currentRequest = [ASIHTTPRequest requestWithURL:requestURL];
+    [currentRequest setDelegate:self];
+    [currentRequest setDidFailSelector:@selector(metaRequestFinished:)];
+    [currentRequest setDidFinishSelector:@selector(metaRequestFinished:)];
+    [currentRequest setTimeOutSeconds:10];
+    [currentRequest setNumberOfTimesToRetryOnTimeout:3];
+    [currentRequest addRequestHeader:@"Accept" value:@"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"];
     if (proxy)
     {
-        [request setProxyType:proxy.type];
-        [request setProxyHost:proxy.host];
+        [currentRequest setProxyType:proxy.type];
+        [currentRequest setProxyHost:proxy.host];
         if (proxy.port)
-            [request setProxyPort:proxy.port];
+            [currentRequest setProxyPort:proxy.port];
     }
     NSLog(@"INFO: Requesting Metadata.");
     [self addToLog:@"INFO: Requesting Metadata." noTag:YES];
-    [request startAsynchronous];
+    [currentRequest startAsynchronous];
 }
 
 -(void)metaRequestFinished:(ASIHTTPRequest *)request
@@ -488,16 +489,17 @@
     NSLog(@"DEBUG: Programme data URL: %@",dataURL);
     if (verbose)
         [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme data URL: %@", dataURL] noTag:YES];
-    ASIHTTPRequest *dataRequest = [ASIHTTPRequest requestWithURL:dataURL];
-    [dataRequest setDidFailSelector:@selector(dataRequestFinished:)];
-    [dataRequest setDidFinishSelector:@selector(dataRequestFinished:)];
-    [dataRequest setTimeOutSeconds:10];
-    [dataRequest setNumberOfTimesToRetryOnTimeout:3];
-    [dataRequest setDelegate:self];
-    [dataRequest addRequestHeader:@"Accept" value:@"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"];
+    [currentRequest clearDelegatesAndCancel];
+    currentRequest = [ASIHTTPRequest requestWithURL:dataURL];
+    [currentRequest setDidFailSelector:@selector(dataRequestFinished:)];
+    [currentRequest setDidFinishSelector:@selector(dataRequestFinished:)];
+    [currentRequest setTimeOutSeconds:10];
+    [currentRequest setNumberOfTimesToRetryOnTimeout:3];
+    [currentRequest setDelegate:self];
+    [currentRequest addRequestHeader:@"Accept" value:@"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"];
     NSLog(@"INFO: Requesting programme data.");
     [self addToLog:@"INFO: Requesting programme data." noTag:YES];
-    [dataRequest startAsynchronous];
+    [currentRequest startAsynchronous];
   
 }
 
@@ -507,24 +509,25 @@
     NSLog(@"DEBUG: Retry metadata URL: %@", retryURL);
     if (verbose)
         [self addToLog:[NSString stringWithFormat:@"DEBUG: Retry metadata URL: %@", retryURL] noTag:YES];
-    ASIHTTPRequest *retryRequest = [ASIHTTPRequest requestWithURL:retryURL];
-    [retryRequest setTag:pid];
-    [retryRequest setDelegate:self];
-    [retryRequest setDidFailSelector:@selector(metaRequestFinished:)];
-    [retryRequest setDidFinishSelector:@selector(metaRequestFinished:)];
-    [retryRequest setTimeOutSeconds:10];
-    [retryRequest setNumberOfTimesToRetryOnTimeout:3];
-    [retryRequest addRequestHeader:@"Accept" value:@"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"];
+    [currentRequest clearDelegatesAndCancel];
+    currentRequest = [ASIHTTPRequest requestWithURL:retryURL];
+    [currentRequest setTag:pid];
+    [currentRequest setDelegate:self];
+    [currentRequest setDidFailSelector:@selector(metaRequestFinished:)];
+    [currentRequest setDidFinishSelector:@selector(metaRequestFinished:)];
+    [currentRequest setTimeOutSeconds:10];
+    [currentRequest setNumberOfTimesToRetryOnTimeout:3];
+    [currentRequest addRequestHeader:@"Accept" value:@"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"];
     if (proxy)
     {
-        [retryRequest setProxyType:proxy.type];
-        [retryRequest setProxyHost:proxy.host];
+        [currentRequest setProxyType:proxy.type];
+        [currentRequest setProxyHost:proxy.host];
         if (proxy.port)
-            [retryRequest setProxyPort:proxy.port];
+            [currentRequest setProxyPort:proxy.port];
     }
     NSLog(@"INFO: Retry metadata: %ld", pid);
     [self addToLog:[NSString stringWithFormat:@"INFO: Retry metadata: %ld", pid] noTag:YES];
-    [retryRequest startAsynchronous];
+    [currentRequest startAsynchronous];
 }
 
 -(void)dataRequestFinished:(ASIHTTPRequest *)request
@@ -653,16 +656,17 @@
             NSLog(@"DEBUG: Programme description URL: %@",descURL);
             if (verbose)
                 [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme description URL: %@", descURL] noTag:YES];
-            ASIHTTPRequest *descRequest = [ASIHTTPRequest requestWithURL:descURL];
-            [descRequest setDidFailSelector:@selector(descRequestFinished:)];
-            [descRequest setDidFinishSelector:@selector(descRequestFinished:)];
-            [descRequest setTimeOutSeconds:10];
-            [descRequest setNumberOfTimesToRetryOnTimeout:3];
-            [descRequest setDelegate:self];
-            [descRequest addRequestHeader:@"Accept" value:@"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"];
+            [currentRequest clearDelegatesAndCancel];
+            currentRequest = [ASIHTTPRequest requestWithURL:descURL];
+            [currentRequest setDidFailSelector:@selector(descRequestFinished:)];
+            [currentRequest setDidFinishSelector:@selector(descRequestFinished:)];
+            [currentRequest setTimeOutSeconds:10];
+            [currentRequest setNumberOfTimesToRetryOnTimeout:3];
+            [currentRequest setDelegate:self];
+            [currentRequest addRequestHeader:@"Accept" value:@"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"];
             NSLog(@"INFO: Requesting programme description.");
             [self addToLog:@"INFO: Requesting programme description." noTag:YES];
-            [descRequest startAsynchronous];
+            [currentRequest startAsynchronous];
             return;
         }
     }

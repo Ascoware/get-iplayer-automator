@@ -32,7 +32,7 @@
     attemptNumber=1;
     nc = [NSNotificationCenter defaultCenter];
     defaultsPrefix = @"ITV_";
-    
+
     running=TRUE;
     
     [self setCurrentProgress:[NSString stringWithFormat:@"Retrieving Programme Metadata... -- %@",[show showName]]];
@@ -88,28 +88,29 @@
     NSLog(@"DEBUG: Metadata URL: %@",requestURL);
     if (verbose)
         [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata URL: %@", requestURL] noTag:YES];
-    ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:requestURL];
-    [request addRequestHeader:@"Referer" value:@"http://www.itv.com/mercury/Mercury_VideoPlayer.swf?v=1.5.309/[[DYNAMIC]]/2"];
-    [request addRequestHeader:@"Content-Type" value:@"text/xml; charset=utf-8"];
-    [request addRequestHeader:@"SOAPAction" value:@"\"http://tempuri.org/PlaylistService/GetPlaylist\""];
-    [request setRequestMethod:@"POST"];
-    [request setPostBody:[NSMutableData dataWithData:[body dataUsingEncoding:NSUTF8StringEncoding]]];
-    [request setDelegate:self];
-    [request setDidFailSelector:@selector(metaRequestFinished:)];
-    [request setDidFinishSelector:@selector(metaRequestFinished:)];
-    [request setTimeOutSeconds:10];
-    [request setNumberOfTimesToRetryOnTimeout:3];
-    [request addRequestHeader:@"Accept" value:@"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"];
+    [currentRequest clearDelegatesAndCancel];
+    currentRequest = [ASIHTTPRequest requestWithURL:requestURL];
+    [currentRequest addRequestHeader:@"Referer" value:@"http://www.itv.com/mercury/Mercury_VideoPlayer.swf?v=1.5.309/[[DYNAMIC]]/2"];
+    [currentRequest addRequestHeader:@"Content-Type" value:@"text/xml; charset=utf-8"];
+    [currentRequest addRequestHeader:@"SOAPAction" value:@"\"http://tempuri.org/PlaylistService/GetPlaylist\""];
+    [currentRequest setRequestMethod:@"POST"];
+    [currentRequest setPostBody:[NSMutableData dataWithData:[body dataUsingEncoding:NSUTF8StringEncoding]]];
+    [currentRequest setDelegate:self];
+    [currentRequest setDidFailSelector:@selector(metaRequestFinished:)];
+    [currentRequest setDidFinishSelector:@selector(metaRequestFinished:)];
+    [currentRequest setTimeOutSeconds:10];
+    [currentRequest setNumberOfTimesToRetryOnTimeout:3];
+    [currentRequest addRequestHeader:@"Accept" value:@"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"];
     if (proxy)
     {
-        [request setProxyType:proxy.type];
-        [request setProxyHost:proxy.host];
+        [currentRequest setProxyType:proxy.type];
+        [currentRequest setProxyHost:proxy.host];
         if (proxy.port)
-            [request setProxyPort:proxy.port];
+            [currentRequest setProxyPort:proxy.port];
     }
     NSLog(@"INFO: Requesting Metadata.");
     [self addToLog:@"INFO: Requesting Metadata." noTag:YES];
-    [request startAsynchronous];
+    [currentRequest startAsynchronous];
 }
 
 -(void)metaRequestFinished:(ASIHTTPRequest *)request
@@ -401,16 +402,17 @@
     NSLog(@"DEBUG: Programme data URL: %@",dataURL);
     if (verbose)
         [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme data URL: %@", dataURL] noTag:YES];
-    ASIHTTPRequest *dataRequest = [ASIHTTPRequest requestWithURL:dataURL];
-    [dataRequest setDidFailSelector:@selector(dataRequestFinished:)];
-    [dataRequest setDidFinishSelector:@selector(dataRequestFinished:)];
-    [dataRequest setTimeOutSeconds:10];
-    [dataRequest setNumberOfTimesToRetryOnTimeout:3];
-    [dataRequest setDelegate:self];
-    [dataRequest addRequestHeader:@"Accept" value:@"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"];
+    [currentRequest clearDelegatesAndCancel];
+    currentRequest = [ASIHTTPRequest requestWithURL:dataURL];
+    [currentRequest setDidFailSelector:@selector(dataRequestFinished:)];
+    [currentRequest setDidFinishSelector:@selector(dataRequestFinished:)];
+    [currentRequest setTimeOutSeconds:10];
+    [currentRequest setNumberOfTimesToRetryOnTimeout:3];
+    [currentRequest setDelegate:self];
+    [currentRequest addRequestHeader:@"Accept" value:@"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"];
     NSLog(@"INFO: Requesting programme data.");
     [self addToLog:@"INFO: Requesting programme data." noTag:YES];
-    [dataRequest startAsynchronous];
+    [currentRequest startAsynchronous];
 }
 
 -(void)dataRequestFinished:(ASIHTTPRequest *)request

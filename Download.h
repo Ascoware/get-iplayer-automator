@@ -71,6 +71,8 @@
     HTTPProxy *proxy;
     
     BOOL isFilm;
+
+    ASIHTTPRequest *currentRequest;
 }
 - (void)setCurrentProgress:(NSString *)string;
 - (void)setPercentage:(double)d;
