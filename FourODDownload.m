@@ -562,6 +562,19 @@
             [show setSeriesName:seriesTitle];
         else
             [scanner setScanLocation:scanloc];
+
+        scanloc = [scanner scanLocation];
+        NSString *primaryCategoryTitle = nil;
+        [scanner scanUpToString:@"<primaryCategoryTitle>" intoString:nil];
+        [scanner scanString:@"<primaryCategoryTitle>" intoString:nil];
+        [scanner scanUpToString:@"</" intoString:&primaryCategoryTitle];
+        if (primaryCategoryTitle) {
+            if ([primaryCategoryTitle isEqual:@"Film"]) {
+                isFilm = YES;
+            }
+        } else {
+            [scanner setScanLocation:scanloc];
+        }
         
         scanloc = [scanner scanLocation];
         NSInteger episodeNumber = 0;
@@ -622,14 +635,14 @@
         }
         [show setShowName:showname];
         
-        if (!(episodeTitle && seriesTitle && episodeNumber && seriesNumber && imagePath && episodeGuideUrl))
+        if (!(episodeTitle && seriesTitle && primaryCategoryTitle && episodeNumber && seriesNumber && imagePath && episodeGuideUrl))
         {
             NSLog(@"WARNING: Some programme data not found. Tagging will be incomplete.");
             [self addToLog:[NSString stringWithFormat:@"WARNING: Some programme data not found. Tagging will be incomplete."] noTag:YES];
         }
-        NSLog(@"DEBUG: Programme data processed: episodeTitle=%@ seriesTitle=%@ episodeNumber=%ld seriesNumber=%ld imagePath=%@ episodeGuideUrl=%@", episodeTitle, seriesTitle, episodeNumber, seriesNumber, imagePath, episodeGuideUrl);
+        NSLog(@"DEBUG: Programme data processed: episodeTitle=%@ seriesTitle=%@ primaryCategoryTitle=%@ episodeNumber=%ld seriesNumber=%ld imagePath=%@ episodeGuideUrl=%@", episodeTitle, seriesTitle, primaryCategoryTitle, episodeNumber, seriesNumber, imagePath, episodeGuideUrl);
         if (verbose)
-            [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme data processed: episodeTitle=%@ seriesTitle=%@ episodeNumber=%ld seriesNumber=%ld imagePath=%@ episodeGuideUrl=%@", episodeTitle, seriesTitle, episodeNumber, seriesNumber, imagePath, episodeGuideUrl] noTag:YES];
+            [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme data processed: episodeTitle=%@ seriesTitle=%@ primaryCategoryTitle=%@ episodeNumber=%ld seriesNumber=%ld imagePath=%@ episodeGuideUrl=%@", episodeTitle, seriesTitle, primaryCategoryTitle, episodeNumber, seriesNumber, imagePath, episodeGuideUrl] noTag:YES];
 
         NSLog(@"INFO: Programme data processed.");
         [self addToLog:@"INFO: Programme data processed." noTag:YES];

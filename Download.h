@@ -68,7 +68,9 @@
     NSMutableDictionary *downloadParams;
 
     //Proxy Info
-    HTTPProxy *proxy;   
+    HTTPProxy *proxy;
+    
+    BOOL isFilm;
 }
 - (void)setCurrentProgress:(NSString *)string;
 - (void)setPercentage:(double)d;

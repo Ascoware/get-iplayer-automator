@@ -621,6 +621,22 @@
 }
 - (void)createDownloadPath
 {
+    NSString *fileName = [show showName];
+    // XBMC naming
+	if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"XBMC_naming"] boolValue]) {
+        if ([show seriesName])
+            fileName = [show seriesName];
+        if (!isFilm) {
+            if (![show season]) {
+                [show setSeason:1];
+                if (![show episode]) {
+                    [show setEpisode:1];
+                }
+            }
+            NSString *format = [show episodeName] ? @"%@.s%02lde%02ld.%@" : @"%@.s%02lde%02ld";
+            fileName = [NSString stringWithFormat:format, fileName, (long)[show season], (long)[show episode], [show episodeName]];
+        }
+	}
     //Create Download Path
     NSString *dirName = [show seriesName];
     if (!dirName)
@@ -628,7 +644,7 @@
     downloadPath = [[NSUserDefaults standardUserDefaults] valueForKey:@"DownloadPath"];
     downloadPath = [downloadPath stringByAppendingPathComponent:[[dirName stringByReplacingOccurrencesOfString:@"/" withString:@"-"] stringByReplacingOccurrencesOfString:@":" withString:@" -"]];
     [[NSFileManager defaultManager] createDirectoryAtPath:downloadPath withIntermediateDirectories:YES attributes:nil error:nil];
-    downloadPath = [downloadPath stringByAppendingPathComponent:[[[NSString stringWithFormat:@"%@.partial.flv",[show showName]] stringByReplacingOccurrencesOfString:@"/" withString:@"-"] stringByReplacingOccurrencesOfString:@":" withString:@" -"]];
+    downloadPath = [downloadPath stringByAppendingPathComponent:[[[NSString stringWithFormat:@"%@.partial.flv",fileName] stringByReplacingOccurrencesOfString:@"/" withString:@"-"] stringByReplacingOccurrencesOfString:@":" withString:@" -"]];
 }
 - (void)cancelDownload:(id)sender
 {

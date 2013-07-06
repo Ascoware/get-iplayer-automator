@@ -294,6 +294,7 @@
     if (verbose)
         [self addToLog:@"DEBUG: Parsing MediaFile entries" noTag:YES];
     NSMutableArray *mediaEntries = [[NSMutableArray alloc] init];
+    NSUInteger beforeMediaFiles = [scanner scanLocation];
     while ([scanner scanUpToString:@"MediaFile delivery" intoString:nil]) {
         NSString *url = nil, *bitrate = nil, *itvRate = nil;
         ITVMediaFileEntry *entry = [[ITVMediaFileEntry alloc] init];
@@ -382,6 +383,15 @@
     if (verbose)
         [self addToLog:[NSString stringWithFormat:@"DEBUG: seriesNumber=%ld", seriesNumber] noTag:YES];
 
+    [scanner setScanLocation:beforeMediaFiles];
+    [scanner scanUpToString:@"proggenre=films" intoString:nil];
+    if ([scanner scanString:@"proggenre=films" intoString:nil]) {
+        isFilm = YES;
+    }
+    NSLog(@"DEBUG: isFilm = %d",isFilm);
+    if (verbose)
+        [self addToLog:[NSString stringWithFormat:@"DEBUG: isFilm = %d", isFilm] noTag:YES];
+    
     downloadParams[@"authURL"] = authURL;
     downloadParams[@"playPath"] = playPath;
 
