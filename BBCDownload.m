@@ -108,7 +108,7 @@
 	}
 	else 
 	{
-		[args addObject:@"--file-prefix=<nameshort>.<senum>.<episode>"];
+		[args addObject:@"--file-prefix=<nameshort><.senum><.episodeshort>"];
 		[args addObject:@"--subdir-format=<nameshort>"];
 	}
     //Tagging
