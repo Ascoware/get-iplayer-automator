@@ -432,7 +432,7 @@
     BOOL srtIgnoreColors = [[NSUserDefaults standardUserDefaults] boolForKey:[NSString stringWithFormat:@"%@SRTIgnoreColors", defaultsPrefix]];
     if (srtIgnoreColors)
     {
-        [args addObject:[[NSString alloc] initWithString:@"--srt-ignore-colors"]];
+        [args addObject:@"--srt-ignore-colors"];
     }
     [args addObject:subtitlePath];
     subsTask = [[NSTask alloc] init];

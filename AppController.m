@@ -49,7 +49,7 @@
 	//Register Default Preferences
 	NSMutableDictionary *defaultValues = [[NSMutableDictionary alloc] init];
 	
-    NSString *defaultDownloadDirectory = [[NSString alloc] initWithString:@"~/Movies/TV Shows"];
+    NSString *defaultDownloadDirectory = @"~/Movies/TV Shows";
 	defaultValues[@"DownloadPath"] = [defaultDownloadDirectory stringByExpandingTildeInPath];
 	defaultValues[@"Proxy"] = @"Provided";
 	defaultValues[@"CustomProxy"] = @"";
@@ -103,8 +103,8 @@
 	
 	
 	//Initialize Arguments
-	noWarningArg = [[NSString alloc] initWithString:@"--nocopyright"];
-	listFormat = [[NSString alloc] initWithString:@"--listformat=<index>: <type>, ~<name> - <episode>~, <channel>, <web>"];
+	noWarningArg = @"--nocopyright";
+	listFormat = @"--listformat=<index>: <type>, ~<name> - <episode>~, <channel>, <web>";
 	profileDirArg = [[NSString alloc] initWithFormat:@"--profile-dir=%@", folder];
 	
 	getiPlayerPath = [[NSString alloc] initWithString:[[NSBundle mainBundle] bundlePath]];
@@ -2084,8 +2084,7 @@
 		NSScanner *scanner = [NSScanner scannerWithString:episodeName];
 		NSString *tempName;
 		[scanner scanUpToString:@" - " intoString:&tempName];
-		Series *show = [Series alloc];
-		[show initWithShowname:tempName];
+		Series *show = [[Series alloc] initWithShowname:tempName];
 		[show setValue:[programme timeadded] forKey:@"added"];
 		[show setValue:[programme tvNetwork] forKey:@"tvNetwork"];
 		[show setValue:[NSDate date] forKey:@"lastFound"];
@@ -2765,7 +2764,7 @@
         proxyArg = [[NSString alloc] initWithFormat:@"-p%@", [proxy url]];
         if (![[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])
         {
-            partialProxyArg = [[NSString alloc] initWithString:@"--partial-proxy"];
+            partialProxyArg = @"--partial-proxy";
         }
     }
 	

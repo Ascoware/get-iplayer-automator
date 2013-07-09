@@ -18,7 +18,7 @@
 	foundLastLine=NO;
 	errorCache = [[NSMutableString alloc] init];
 	processErrorCache = [NSTimer scheduledTimerWithTimeInterval:.25 target:self selector:@selector(processError) userInfo:nil repeats:YES];
-    reasonForFailure = [[NSString alloc] initWithString:@"None"];
+    reasonForFailure = @"None";
     defaultsPrefix = @"BBC_";
     proxy = aProxy;
     
@@ -56,12 +56,12 @@
         proxyArg = [[NSString alloc] initWithFormat:@"-p%@", [proxy url]];
         if (![[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])
         {
-            partialProxyArg = [[NSString alloc] initWithString:@"--partial-proxy"];
+            partialProxyArg = @"--partial-proxy";
         }
     }
     //Initialize the rest of the arguments
-	NSString *noWarningArg = [[NSString alloc] initWithString:@"--nocopyright"];
-	NSString *noPurgeArg = [[NSString alloc] initWithString:@"--nopurge"];
+	NSString *noWarningArg = @"--nocopyright";
+	NSString *noPurgeArg = @"--nopurge";
 	NSString *mplayerArg = [[NSString alloc] initWithFormat:@"--mplayer=%@", [bundle pathForResource:@"mplayer" ofType:nil]];
     NSString *flvstreamerArg = [[NSString alloc] initWithFormat:@"--flvstreamer=%@", [bundle pathForResource:@"rtmpdump-2.4" ofType:nil]];
 	NSString *lameArg = [[NSString alloc] initWithFormat:@"--lame=%@", [bundle pathForResource:@"lame" ofType:nil]];
@@ -71,17 +71,17 @@
 	NSString *subDirArg = @"--subdir";
 	NSString *getArg;
 	if ([[show processedPID] boolValue])
-		getArg = [[NSString alloc] initWithString:@"--get"];
+		getArg = @"--get";
 	else
-		getArg = [[NSString alloc] initWithString:@"--pid"];		
+		getArg = @"--pid";
 	NSString *searchArg = [[NSString alloc] initWithFormat:@"%@", [show pid]];
     
     //AudioDescribed
     NSString *versionArg;
     if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"AudioDescribed"] boolValue])
-        versionArg = [[NSString alloc] initWithString:@"--versions=audiodescribed,signed,default"];
+        versionArg = @"--versions=audiodescribed,signed,default";
     else
-        versionArg = [[NSString alloc] initWithString:@"--versions=default"];
+        versionArg = @"--versions=default";
     
 	//We don't want this to refresh now!
 	NSString *cacheExpiryArg = @"-e604800000000";
@@ -97,7 +97,7 @@
 	NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:getiPlayerPath,profileDirArg,noWarningArg,noPurgeArg,mplayerArg,flvstreamerArg,lameArg,atomicParsleyArg,cacheExpiryArg,downloadPathArg,subDirArg,formatArg,getArg,searchArg,@"--attempts=5",@"--fatfilename",@"-w",@"--thumbsize=6",@"--tag-hdvideo",@"--tag-longdesc",versionArg,ffmpegArg,proxyArg,partialProxyArg,nil];
     //Verbose?
     if (verbose)
-		[args addObject:[[NSString alloc] initWithString:@"--verbose"]];
+		[args addObject:@"--verbose"];
 	if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"DownloadSubtitles"] isEqualTo:@YES])
 		[args addObject:@"--subtitles"];
 	
@@ -116,7 +116,7 @@
         [args addObject:@"--no-tag"];
 
     if ([[NSUserDefaults standardUserDefaults] boolForKey:[NSString stringWithFormat:@"%@TagCNID", defaultsPrefix]]) {
-		[args addObject:[[NSString alloc] initWithString:@"--tag-cnid"]];
+		[args addObject:@"--tag-cnid"];
     }
 
 	task = [[NSTask alloc] init];

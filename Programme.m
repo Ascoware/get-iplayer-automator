@@ -21,7 +21,7 @@ extern BOOL runDownloads;
 	status = [[NSString alloc] init];
 	complete = [[NSNumber alloc] initWithBool:NO];
 	successful = [[NSNumber alloc] initWithBool:NO];
-	path = [[NSString alloc] initWithString:@"Unknown"];
+	path = @"Unknown";
 	seriesName = [[NSString alloc] init];
 	episodeName = [[NSString alloc] init];
 	timeadded = [[NSNumber alloc] init];
@@ -75,7 +75,7 @@ extern BOOL runDownloads;
 	complete = [[NSNumber alloc] initWithBool:NO];
 	successful = [[NSNumber alloc] initWithBool:NO];
 	timeadded = [[NSNumber alloc] init];
-	path = [[NSString alloc] initWithString:@"Unknown"];
+	path = @"Unknown";
 	processedPID = [[NSNumber alloc] initWithBool:NO];
 	radio = [[NSNumber alloc] initWithBool:NO];
     url = [[NSString alloc] init];
@@ -113,7 +113,7 @@ extern BOOL runDownloads;
 	pid = [[NSString alloc] initWithString:[coder decodeObjectForKey:@"pid"]];
 	showName = [[NSString alloc] initWithString:[coder decodeObjectForKey:@"showName"]];
 	tvNetwork = [[NSString alloc] initWithString:[coder decodeObjectForKey:@"tvNetwork"]];
-	status = [[NSString alloc] initWithString:@""];
+	status = @"";
 	complete = [[NSNumber alloc] initWithBool:NO];
 	successful = [[NSNumber alloc] initWithBool:NO];
 	path = [[NSString alloc] initWithString:[coder decodeObjectForKey:@"path"]];
@@ -148,8 +148,11 @@ extern BOOL runDownloads;
 {
     self->pid = [newPID stringByReplacingOccurrencesOfString:@"amp;" withString:@""];
 }
+-(NSString *)pid
+{
+    return pid;
+}
 @synthesize showName;
-@synthesize pid;
 @synthesize tvNetwork;
 @synthesize status;
 @synthesize complete;
