@@ -75,8 +75,6 @@
 		D9CCF3CC1023485A009205BE /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = D9CCF3CB1023485A009205BE /* dsa_pub.pem */; };
 		D9CCF54C1025AAF9009205BE /* Growl Registration Ticket.growlRegDict in Resources */ = {isa = PBXBuildFile; fileRef = D9CCF54B1025AAF9009205BE /* Growl Registration Ticket.growlRegDict */; };
 		D9D06C6F14BB91C200029340 /* ITVMediaFileEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = D9D06C6E14BB91C200029340 /* ITVMediaFileEntry.m */; };
-		D9D8239010B3B6D600556D1D /* Growl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9D8238F10B3B6D600556D1D /* Growl.framework */; };
-		D9D8239A10B3B6EA00556D1D /* Growl.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = D9D8238F10B3B6D600556D1D /* Growl.framework */; };
 		D9F668DB102C560500A9449B /* GetFireFoxURL.applescript in Resources */ = {isa = PBXBuildFile; fileRef = D9F668BF102C53D700A9449B /* GetFireFoxURL.applescript */; };
 		D9F66955102C5D1200A9449B /* GetCaminoURL.applescript in Resources */ = {isa = PBXBuildFile; fileRef = D9F66954102C5D0D00A9449B /* GetCaminoURL.applescript */; };
 		D9F66963102C5DC500A9449B /* GetOperaURL.applescript in Resources */ = {isa = PBXBuildFile; fileRef = D9F66962102C5DB800A9449B /* GetOperaURL.applescript */; };
@@ -110,7 +108,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				D9D8239A10B3B6EA00556D1D /* Growl.framework in Copy Frameworks */,
 				D92BB4131025B4DD00B0BFEC /* Sparkle.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
@@ -212,7 +209,6 @@
 		D9CCF54B1025AAF9009205BE /* Growl Registration Ticket.growlRegDict */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "Growl Registration Ticket.growlRegDict"; sourceTree = "<group>"; };
 		D9D06C6D14BB91C200029340 /* ITVMediaFileEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ITVMediaFileEntry.h; sourceTree = "<group>"; };
 		D9D06C6E14BB91C200029340 /* ITVMediaFileEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ITVMediaFileEntry.m; sourceTree = "<group>"; };
-		D9D8238F10B3B6D600556D1D /* Growl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Growl.framework; sourceTree = "<group>"; };
 		D9F668BF102C53D700A9449B /* GetFireFoxURL.applescript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.applescript; path = GetFireFoxURL.applescript; sourceTree = "<group>"; };
 		D9F66954102C5D0D00A9449B /* GetCaminoURL.applescript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.applescript; path = GetCaminoURL.applescript; sourceTree = "<group>"; };
 		D9F66962102C5DB800A9449B /* GetOperaURL.applescript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.applescript; path = GetOperaURL.applescript; sourceTree = "<group>"; };
@@ -245,7 +241,6 @@
 				D92BB40A1025B4D600B0BFEC /* Sparkle.framework in Frameworks */,
 				D941D99C1025DDA90012A75F /* AddressBook.framework in Frameworks */,
 				D941D9A01025DDCF0012A75F /* SystemConfiguration.framework in Frameworks */,
-				D9D8239010B3B6D600556D1D /* Growl.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -282,7 +277,6 @@
 				DFC8D40115C970CA008E369F /* Python.framework */,
 				DFC8D3F315C58B3B008E369F /* IOKit.framework */,
 				D921C9C1149BBF51004CB558 /* CoreServices.framework */,
-				D9D8238F10B3B6D600556D1D /* Growl.framework */,
 				D941D99F1025DDCF0012A75F /* SystemConfiguration.framework */,
 				D941D99B1025DDA90012A75F /* AddressBook.framework */,
 				D92BB4091025B4D600B0BFEC /* Sparkle.framework */,
