@@ -2951,6 +2951,10 @@
         [request setProxyHost:proxy.host];
         if (proxy.port)
             [request setProxyPort:proxy.port];
+        if (proxy.user) {
+            [request setProxyUsername:proxy.user];
+            [request setProxyPassword:proxy.password];
+        }
         [self updateProxyLoadStatus:YES message:[NSString stringWithFormat:@"Testing proxy (may take up to %ld seconds)...", (NSInteger)[request timeOutSeconds]]];
         NSLog(@"INFO: Testing proxy (may take up to %ld seconds)...", (NSInteger)[request timeOutSeconds]);
         [self addToLog:[NSString stringWithFormat:@"INFO: Testing proxy (may take up to %ld seconds)...", (NSInteger)[request timeOutSeconds]]];

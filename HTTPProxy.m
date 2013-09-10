@@ -17,6 +17,8 @@
         type = (NSString *)kCFProxyTypeHTTP;
     host = [[url host] copy];
     port = [[url port] integerValue];
+    user = [[url user] copy];
+    password = [[url password] copy];
     return self;
 }
 
@@ -28,14 +30,11 @@
         return [self initWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://%@", aString]]];
 }
 
-- (id)initWithScheme:(NSString *)aScheme host:(NSString *)aHost port:(NSInteger)aPort
-{
-    return [self initWithString:[NSString stringWithFormat:(aPort ? @"%@://%@:%ld" : @"%@://%@"), aScheme, aHost, aPort]];
-}
-
 @synthesize url;
 @synthesize type;
 @synthesize host;
 @synthesize port;
+@synthesize user;
+@synthesize password;
 
 @end

@@ -11,14 +11,17 @@
     NSString *type;
     NSString *host;
     NSInteger port;
+    NSString *user;
+    NSString *password;
 }
 
 - (id)initWithURL:(NSURL *)aURL;
 - (id)initWithString:(NSString *)aString;
-- (id)initWithScheme:(NSString *)aScheme host:(NSString *)aHost port:(NSInteger)aPort;
 
 @property (readonly, copy) NSURL *url;
 @property (readonly, copy) NSString *type;
 @property (readonly, copy) NSString *host;
 @property (readonly, assign) NSInteger port;
+@property (readonly, copy) NSString *user;
+@property (readonly, copy) NSString *password;
 @end
