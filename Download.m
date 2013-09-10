@@ -644,7 +644,10 @@
     downloadPath = [[NSUserDefaults standardUserDefaults] valueForKey:@"DownloadPath"];
     downloadPath = [downloadPath stringByAppendingPathComponent:[[dirName stringByReplacingOccurrencesOfString:@"/" withString:@"-"] stringByReplacingOccurrencesOfString:@":" withString:@" -"]];
     [[NSFileManager defaultManager] createDirectoryAtPath:downloadPath withIntermediateDirectories:YES attributes:nil error:nil];
-    downloadPath = [downloadPath stringByAppendingPathComponent:[[[NSString stringWithFormat:@"%@.partial.flv",fileName] stringByReplacingOccurrencesOfString:@"/" withString:@"-"] stringByReplacingOccurrencesOfString:@":" withString:@" -"]];
+    NSString *filepart = [[[NSString stringWithFormat:@"%@.partial.flv",fileName] stringByReplacingOccurrencesOfString:@"/" withString:@"-"] stringByReplacingOccurrencesOfString:@":" withString:@" -"];
+    NSRegularExpression *dateRegex = [NSRegularExpression regularExpressionWithPattern:@"(\\d{2})[-_](\\d{2})[-_](\\d{4})" options:0 error:nil];
+    filepart = [dateRegex stringByReplacingMatchesInString:filepart options:0 range:NSMakeRange(0, [filepart length]) withTemplate:@"$3-$2-$1"];
+    downloadPath = [downloadPath stringByAppendingPathComponent:filepart];
 }
 - (void)cancelDownload:(id)sender
 {

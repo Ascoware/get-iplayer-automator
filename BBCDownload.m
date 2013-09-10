@@ -94,7 +94,7 @@
 	profileDirArg = [[NSString alloc] initWithFormat:@"--profile-dir=%@", appSupportFolder];
 	
     //Add Arguments that can't be NULL
-	NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:getiPlayerPath,profileDirArg,noWarningArg,noPurgeArg,mplayerArg,flvstreamerArg,lameArg,atomicParsleyArg,cacheExpiryArg,downloadPathArg,subDirArg,formatArg,getArg,searchArg,@"--attempts=5",@"--fatfilename",@"-w",@"--thumbsize=6",@"--tag-hdvideo",@"--tag-longdesc",versionArg,ffmpegArg,proxyArg,partialProxyArg,nil];
+	NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:getiPlayerPath,profileDirArg,noWarningArg,noPurgeArg,mplayerArg,flvstreamerArg,lameArg,atomicParsleyArg,cacheExpiryArg,downloadPathArg,subDirArg,formatArg,getArg,searchArg,@"--attempts=5",@"--fatfilename",@"-w",@"--thumbsize=6",@"--tag-hdvideo",@"--tag-longdesc",@"--isodate",versionArg,ffmpegArg,proxyArg,partialProxyArg,nil];
     //Verbose?
     if (verbose)
 		[args addObject:@"--verbose"];
