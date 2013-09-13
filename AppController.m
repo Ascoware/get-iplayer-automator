@@ -707,7 +707,7 @@
 							NSAlert *searchException = [[NSAlert alloc] init];
 							[searchException addButtonWithTitle:@"OK"];
 							[searchException setMessageText:[NSString stringWithFormat:@"Invalid Output!"]];
-							[searchException setInformativeText:@"Please check your query. Your query must not alter the output format of Get_iPlayer."];
+							[searchException setInformativeText:@"Please check your query. Your query must not alter the output format of Get_iPlayer. (getiPlayerUpdateFinished)"];
 							[searchException setAlertStyle:NSWarningAlertStyle];
 							[searchException runModal];
 							searchException = nil;
@@ -948,7 +948,7 @@
 				NSAlert *searchException = [[NSAlert alloc] init];
 				[searchException addButtonWithTitle:@"OK"];
 				[searchException setMessageText:[NSString stringWithFormat:@"Invalid Output!"]];
-				[searchException setInformativeText:@"Please check your query. Your query must not alter the output format of Get_iPlayer."];
+				[searchException setInformativeText:@"Please check your query. Your query must not alter the output format of Get_iPlayer. (searchFinished)"];
 				[searchException setAlertStyle:NSWarningAlertStyle];
 				[searchException runModal];
 				searchException = nil;
@@ -2057,7 +2057,7 @@
 				NSAlert *searchException = [[NSAlert alloc] init];
 				[searchException addButtonWithTitle:@"OK"];
 				[searchException setMessageText:[NSString stringWithFormat:@"Invalid Output!"]];
-				[searchException setInformativeText:@"Please check your query. You query must not alter the output format of Get_iPlayer."];
+				[searchException setInformativeText:@"Please check your query. You query must not alter the output format of Get_iPlayer. (pvrSearchFinished)"];
 				[searchException setAlertStyle:NSWarningAlertStyle];
 				[searchException runModal];
 				searchException = nil;
@@ -2284,7 +2284,7 @@
 				NSAlert *searchException = [[NSAlert alloc] init];
 				[searchException addButtonWithTitle:@"OK"];
 				[searchException setMessageText:[NSString stringWithFormat:@"Invalid Output!"]];
-				[searchException setInformativeText:@"Please check your query. Your query must not alter the output format of Get_iPlayer."];
+				[searchException setInformativeText:@"Please check your query. Your query must not alter the output format of Get_iPlayer. (processAutoRecordData)"];
 				[searchException setAlertStyle:NSWarningAlertStyle];
 				[searchException runModal];
 				searchException = nil;
