@@ -56,18 +56,6 @@ sub new {
 
 sub index_min { return 100001 }
 sub index_max { return 199999 }
-sub channels {
-	return {
-		'crime'					=> 'ITV Classics Crime Drama',
-		'perioddrama'				=> 'ITV Classics Period Drama',
-		'familydrama'				=> 'ITV Classics Family Drama',
-		'documentary'				=> 'ITV Classics Documentaries',
-		'comedy'				=> 'ITV Classics Comedy',
-		'kids'					=> 'ITV Classics Children\'s TV',
-		'soaps'					=> 'ITV Classics Soaps',
-		'/'					=> 'ITV Classics',
-	};
-}
 
 
 # Class cmdline Options
@@ -199,12 +187,11 @@ sub get_metadata {
 
 
 # Usage: Programme::itv->get_links( \%prog, 'itv' );
-# Uses: %{ channels() }, \%prog
+# Uses: \%prog
 sub get_links {
 	shift; # ignore obj ref
 	my $progref = shift;
 	my $prog_type = shift;
-	my %channels = %{ channels() };
 	my $itv_catchup_page_prefix = 'http://www.itv.com/CatchUp/Video/default.html?ViewType=5&amp;Filter='; # $pid
 
 	my $xml;
@@ -220,86 +207,7 @@ sub get_links {
 	#  =>
 	
 	# Download index feed
-	my $itv_index_shows_url = 'http://www.itv.com/ClassicTVshows/'; # $channel/default.html
 	my $itv_index_feed_url = 'http://www.itv.com/_data/xml/CatchUpData/CatchUp360/CatchUpMenu.xml';
-
-	# Sort feeds so that pages are done last - this makes sure that the channels get defined correctly if there are dups
-	my @channel_list;
-	push @channel_list, grep !/\//, keys %channels;
-	push @channel_list, grep  /\//, keys %channels;
-	# ITV ClassicShows parsing
-	for my $channel ( @channel_list ) {
-		# <li class="first-child"><a href="http://www.itv.com/ClassicTVshows/comedy/ABitofaDo/default.html">A Bit of a Do</a><br></li>
-		# <li><a href="http://www.itv.com/ClassicTVshows/familydrama/achristmascarol/default.html">A Christmas Carol</a><br></li>
-		# Get page, search for relevent lines which contain series links and loop through each matching line
-		for my $s_line ( grep /(<li><a\s+href=".+?"><img\s+src=".+?"\s+alt=".+?"><\/a><h4>|<li.*?><a href=".+?">.+?<\/a><br><\/li>)/, ( split /\n/, main::request_url_retry($ua, $itv_index_shows_url.${channel}.'/default.html', 3, '.', "WARNING: Failed to get itv ${channel} index from site\n") ) ) {
-			# Remove non utf8
-			$s_line =~ s/[^\x{21}-\x{7E}\s\t\n\r]//g;
-			my ($url, $name);
-			# Extract series url + series description
-			($url, $name) = ($1, $2) if $s_line =~ m{<li><a\s+href="\s*(.+?)\s*"><img\s+src=".+?"\s+alt="\s*(.+?)\s*"><\/a><h4>};
-			($url, $name) = ($1, $2) if $s_line =~ m{<li.*?><a href="\s*(.+?)\s*">\s*(.+?)\s*<\/a><br><\/li>};
-			chomp($url);
-			chomp($name);
-			next if ! ($url && $name);
-			# decode
-			decode_entities($name);
-			StringUtils::clean_utf8_and_whitespace($name);
-			main::logger "DEBUG: Channel: '$channel' Series: '$name' URL: '$url'\n" if $opt->{verbose};
-
-			# Get list of episodes for this series
-			# e.g. <li class="first-child"><a title="Play" href="?vodcrid=crid://itv.com/993&amp;DF=0">Episode one</a><br>The Sun in a Bottle</li>
-			#      <li><a title="Play" href="?vodcrid=crid://itv.com/994&amp;DF=0">Episode two</a><br>Castle Saburac</li>
-			#      <li class="first-child"><a class="nsat" title="This programme contains strong language and violence       " href="?vodcrid=crid://itv.com/588&amp;G=10&amp;DF=0">Episode one</a><br>The Dead of Jericho</li>
-			#
-			# e.g. <li><a class="playVideo" title="Play" href="?vodcrid=crid://itv.com/1232&amp;DF=0"><img src="img/60x45/Crossroads-Rosemary-shoots-David-efeef7cd-8d41-416c-9e30-26ce1b3d625c.jpg" alt="Crossroads: Rosemary shoots David"><span>Play</span></a><h4>
-			#      vodcrid=crid://itv.com/971&amp;DF=0"><img src="img/60x45/9d20fd47-5d4b-44f5-9188-856505de0d0f.jpg" alt="Emmerdale  2002 Louise kills Ray"
-			#
-			# e.g. <a class="playVideo" title="Play" href="?vodcrid=crid://itv.com/1854&amp;DF=1"><img src="img/157x104/140c456c-d8bd-49d5-90f8-f7cc6d86f132.jpg" alt="Soldier Soldier "><span>Play</span></a><h2>Soldier Soldier</h2>
-			#
-			for my $e_line ( grep /vodcrid=crid/, ( split /\n/, main::request_url_retry($ua, $url, 3, '.', "WARNING: Failed to get ${name} index from site\n") ) ) {
-				my ($guidance, $pid, $episode, $thumbnail);
-				main::logger "DEBUG: Match Line: $e_line\n" if $opt->{debug};
-				# Extract episode data
-				($guidance, $pid, $episode)  = ($2, $3, $4) if $e_line =~ m{<li.*?><a\s+(class="nsat"\s+)?title="\s*(.+?)\s*"\s+href="\?vodcrid=crid://itv.com/(\d+?)&.+?>\s*(.+?)\s*<};
-				($pid, $thumbnail, $episode) = ($1, $2, $3) if $e_line =~ m{vodcrid=crid://itv.com/(\d+?)&.+?><img\s+src="(.+?)"\s+alt="\s*(.+?)\s*"};
-				next if ! ($pid && $episode);
-				# Remove 'Play'
-				$guidance =~ s/^Play$//ig;
-				# decode
-				decode_entities($episode);
-				decode_entities($guidance);
-				StringUtils::clean_utf8_and_whitespace($guidance);
-				StringUtils::clean_utf8_and_whitespace($episode);
-				main::logger "DEBUG: PID: '$pid' Episode: '$episode' Guidance: '$guidance'\n" if $opt->{debug};
-
-				# Skip if this pid is a duplicate
-				if ( defined $progref->{$pid} ) {
-					main::logger "WARNING: '$pid, $progref->{$pid}->{name} - $progref->{$pid}->{episode}, $progref->{$pid}->{channel}' already exists (this channel = $channel)\n" if $opt->{verbose};
-					# Merge data (hack)
-					#$progref->{$pid}->{episode} .= ','.$episode;
-					my $oldname = $progref->{$pid}->{name};
-					$progref->{$pid}->{episode} = $episode if (! $progref->{$pid}->{episode}) || $progref->{$pid}->{episode} =~ /$oldname/i;
-					$progref->{$pid}->{thumbnail} = $thumbnail if ! $progref->{$pid}->{thumbnail};
-					$progref->{$pid}->{guidance} = $guidance if ! $progref->{$pid}->{guidance};
-					next;
-				}
-
-				# build data structure
-				$progref->{$pid} = Programme::itv->new(
-					'pid'		=> $pid,
-					'name'		=> $name,
-					'versions'	=> 'default',
-					'episode'	=> $episode,
-					'channel'	=> $channels{$channel},
-					'guidance'	=> $guidance,
-					'categories'	=> $channels{$channel},
-					'type'		=> $prog_type,
-					'web'		=> $url,
-				);
-			}
-		}
-	}
 
 	my $xmlindex = main::request_url_retry($ua, $itv_index_feed_url, 3, '.', "WARNING: Failed to get itv index from site\n");
 	$xmlindex =~ s/[\n\r]//g;
