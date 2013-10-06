@@ -1814,6 +1814,7 @@
 {
 	if (runDownloads)
 	{
+        previousDownload = currentDownload;
 		Programme *finishedShow = [note object];
 		if ([[finishedShow successful] boolValue])
 		{
