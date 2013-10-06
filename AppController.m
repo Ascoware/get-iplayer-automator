@@ -2803,7 +2803,7 @@
 {
     [self updateProxyLoadStatus:YES message:@"Loading proxy settings..."];
     NSLog(@"INFO: Loading proxy settings...");
-    [self addToLog:@"INFO: Loading proxy settings..."];
+    [self addToLog:@"\n\nINFO: Loading proxy settings..."];
     [proxyDict removeAllObjects];
     proxyDict[@"selector"] = [NSValue valueWithPointer:selector];
     if (object)
