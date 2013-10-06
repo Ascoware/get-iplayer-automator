@@ -14,7 +14,7 @@
     if (!(self = [super init])) return nil;
     
     //Prepare Time Remaining
-	rateEntries = [[NSMutableArray alloc] init];
+	rateEntries = [[NSMutableArray alloc] initWithCapacity:50];
 	lastDownloaded=0;
 	outOfRange=0;
     verbose = [[NSUserDefaults standardUserDefaults] boolForKey:@"Verbose"];
@@ -85,32 +85,41 @@
         [self setPercentage:percent];
         
         //Calculate Time Remaining
-        downloaded=downloaded/1024;
+        downloaded/=1024;
         if (total>0 && downloaded>0 && percent>0)
         {
             if ([rateEntries count] >= 50)
             {
+                double rateSum, rateAverage;
+                NSLog(@"Diff: %3.2f",downloaded-lastDownloaded);
+                NSLog(@"Time: %f",[lastDate timeIntervalSinceNow]);
+                NSLog(@"ORA: %f",oldRateAverage);
                 double rate = ((downloaded-lastDownloaded)/(-[lastDate timeIntervalSinceNow]));
+                NSLog(@"Rate: %f",rate);
                 double oldestRate = [rateEntries[0] doubleValue];
                 if (rate < (oldRateAverage*5) && rate > (oldRateAverage/5) && rate < 50)
                 {
                     [rateEntries removeObjectAtIndex:0];
                     [rateEntries addObject:@(rate)];
                     outOfRange=0;
+                    rateSum= (oldRateAverage*50)-oldestRate+rate;
+                    rateAverage = oldRateAverage = rateSum/50;
                 }
                 else 
                 {
                     outOfRange++;
+                    rateAverage = oldRateAverage;
                     if (outOfRange>10)
                     {
-                        rateEntries = [[NSMutableArray alloc] init];
+                        rateEntries = [[NSMutableArray alloc] initWithCapacity:50];
+                        NSLog(@"Resetting Rate Array");
                         outOfRange=0;
                     }
                 }
                 
                 
-                double rateSum= (oldRateAverage*50)-oldestRate+rate;
-                double rateAverage = oldRateAverage = rateSum/50;
+                
+                NSLog(@"RA: %f",rateAverage);
                 lastDownloaded=downloaded;
                 lastDate = [NSDate date];
                 NSDate *predictedFinished = [NSDate dateWithTimeIntervalSinceNow:(total-downloaded)/rateAverage];
@@ -124,6 +133,8 @@
             {
                 if (lastDownloaded>0 && lastDate)
                 {
+                    NSLog(@"%3.2f",downloaded-lastDownloaded);
+                    NSLog(@"%f",[lastDate timeIntervalSinceNow]);
                     double rate = ((downloaded-lastDownloaded)/(-[lastDate timeIntervalSinceNow]));
                     if (rate<50)
                     {
@@ -136,9 +147,10 @@
                         double rateSum=0;
                         for (NSNumber *entry in rateEntries)
                         {
-                            rateSum = rateSum+[entry doubleValue];
+                            rateSum+=[entry doubleValue];
                         }
                         oldRateAverage = rateSum/[rateEntries count];
+                        NSLog(@"ORA: %f",oldRateAverage);
                     }
                 }
                 else 
