@@ -95,7 +95,8 @@ bool runUpdate=NO;
     IBOutlet NSArrayController *itvFormatController;
     IBOutlet NSButton *itvTVCheckbox;
     IBOutlet NSPanel *prefsPanel;
-	
+    IBOutlet NSButton *ch4TVCheckbox;
+    
 	//Scheduling a Start
 	IBOutlet NSPanel *scheduleWindow;
 	IBOutlet NSDatePicker *datePicker;

@@ -7161,6 +7161,14 @@ IHdpbGwgc2hvdyB1cCBoZXJlLg</string>
 					<int key="connectionID">1520</int>
 				</object>
 				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">ch4TVCheckbox</string>
+						<reference key="source" ref="1023620516"/>
+						<reference key="destination" ref="628015395"/>
+					</object>
+					<int key="connectionID">1539</int>
+				</object>
+				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
 						<string key="label">contentArray: searchResultsArray</string>
 						<reference key="source" ref="437087201"/>
@@ -11244,7 +11252,7 @@ IHdpbGwgc2hvdyB1cCBoZXJlLg</string>
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">1538</int>
+			<int key="maxID">1539</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -11388,6 +11396,7 @@ IHdpbGwgc2hvdyB1cCBoZXJlLg</string>
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="addToQueue">NSButton</string>
 						<string key="application">NSApplication</string>
+						<string key="ch4TVCheckbox">NSButton</string>
 						<string key="currentIndicator">NSProgressIndicator</string>
 						<string key="currentProgress">NSTextField</string>
 						<string key="datePicker">NSDatePicker</string>
@@ -11434,6 +11443,10 @@ IHdpbGwgc2hvdyB1cCBoZXJlLg</string>
 						<object class="IBToOneOutletInfo" key="application">
 							<string key="name">application</string>
 							<string key="candidateClassName">NSApplication</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="ch4TVCheckbox">
+							<string key="name">ch4TVCheckbox</string>
+							<string key="candidateClassName">NSButton</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="currentIndicator">
 							<string key="name">currentIndicator</string>

@@ -74,7 +74,9 @@
     defaultValues[@"AudioDescribed"] = @NO;
     defaultValues[@"QuickCache"] = @YES;
     defaultValues[@"TagShows"] = @YES;
-    defaultValues[@"Cache4oD_TV"] = @YES;
+    // TODO: remove 4oD
+    // set 4oD off by default
+    defaultValues[@"Cache4oD_TV"] = @NO;
     defaultValues[@"TestProxy"] = @YES;
 	
 	[[NSUserDefaults standardUserDefaults] registerDefaults:defaultValues];
@@ -139,6 +141,14 @@
 	{
 		[fileManager createDirectoryAtPath:folder withIntermediateDirectories:NO attributes:nil error:nil];
 	}
+
+    // TODO: remove 4oD
+    // disable 4oD and delete CH4 cache
+    [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithBool:NO] forKey:@"Cache4oD_TV"];
+    [ch4TVCheckbox setState:NSOffState];
+    [ch4TVCheckbox setEnabled:NO];
+    [fileManager removeItemAtPath:[folder stringByAppendingPathComponent:@"ch4.cache"] error:nil];
+    
 	NSString *filename = @"Queue.automatorqueue";
 	NSString *filePath = [folder stringByAppendingPathComponent:filename];
 	
@@ -1464,70 +1474,75 @@
         [newProg setUrl:url];
 		[queueController addObject:newProg];
 	}
-	else if ([url hasPrefix:@"http://www.channel4.com/programmes/"])
-	{
-		NSString *pid = nil;
-		NSScanner *urlScanner = [NSScanner scannerWithString:url];
-		[urlScanner scanUpToString:@"#" intoString:nil];
-		[urlScanner scanString:@"#" intoString:nil];
-		[urlScanner scanCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:&pid];
-        if (!pid) {
-            NSScanner *scanner = [NSScanner scannerWithString:source];
-            [scanner scanUpToString:@"data-assetid=\"" intoString:nil];
-            [scanner scanString:@"data-assetid=\"" intoString:nil];
-            [scanner scanUpToString:@"\"" intoString:&pid];
-        }
-        if (!pid)
-        {
-            NSAlert *invalidPage = [[NSAlert alloc] init];
-            [invalidPage addButtonWithTitle:@"OK"];
-            [invalidPage setMessageText:[NSString stringWithFormat:@"Invalid Page: %@",url]];
-            [invalidPage setInformativeText:@"Please ensure the frontmost browser tab is open to a 4oD episode page."];
-            [invalidPage setAlertStyle:NSWarningAlertStyle];
-            [invalidPage runModal];
-            return;
-        }
- 		Programme *newProg = [[Programme alloc] init];
-        [newProg setPid:pid];
- 		[queueController addObject:newProg];
-        [self getNameForProgramme:newProg];
-    }
-    else if ([url hasPrefix:@"http://ps3.channel4.com"])
-    {
-        NSString *pid = nil, *seriesName = nil;
-    	NSScanner *ps3Scanner = [NSScanner scannerWithString:source];
-        [ps3Scanner scanUpToString:@"brandTitle=" intoString:nil];
-        [ps3Scanner scanString:@"brandTitle=" intoString:nil];
-        [ps3Scanner scanUpToString:@"&" intoString:&seriesName];
-        [ps3Scanner scanUpToString:@"preSelectAsset=" intoString:nil];
-        [ps3Scanner scanString:@"preSelectAsset=" intoString:nil];
-        [ps3Scanner scanCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:&pid];
-        if (!seriesName) seriesName = newShowName;
-        if (!pid || !seriesName)
-        {
-            NSAlert *invalidPage = [[NSAlert alloc] init];
-            [invalidPage addButtonWithTitle:@"OK"];
-            [invalidPage setMessageText:[NSString stringWithFormat:@"Invalid Page: %@",url]];
-            [invalidPage setInformativeText:@"Please ensure the frontmost browser tab is open to a 4oD PS3 episode page."];
-            [invalidPage setAlertStyle:NSWarningAlertStyle];
-            [invalidPage runModal];
-            return;
-        }
-        NSString *showName = [NSString stringWithFormat:@"%@ - %@", seriesName, pid];
-        Programme *newProg = [[Programme alloc] init];
-        [newProg setPid:pid];
-        [newProg setShowName:showName];
-        [newProg setTvNetwork:@"4oD C4"];
-        [newProg setUrl:url];
-        [newProg setProcessedPID:@YES];
-        [queueController addObject:newProg];
-    }
+// TODO: remove 4oD
+// disable 4oD
+//	else if ([url hasPrefix:@"http://www.channel4.com/programmes/"])
+//	{
+//		NSString *pid = nil;
+//		NSScanner *urlScanner = [NSScanner scannerWithString:url];
+//		[urlScanner scanUpToString:@"#" intoString:nil];
+//		[urlScanner scanString:@"#" intoString:nil];
+//		[urlScanner scanCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:&pid];
+//        if (!pid) {
+//            NSScanner *scanner = [NSScanner scannerWithString:source];
+//            [scanner scanUpToString:@"data-assetid=\"" intoString:nil];
+//            [scanner scanString:@"data-assetid=\"" intoString:nil];
+//            [scanner scanUpToString:@"\"" intoString:&pid];
+//        }
+//        if (!pid)
+//        {
+//            NSAlert *invalidPage = [[NSAlert alloc] init];
+//            [invalidPage addButtonWithTitle:@"OK"];
+//            [invalidPage setMessageText:[NSString stringWithFormat:@"Invalid Page: %@",url]];
+//            [invalidPage setInformativeText:@"Please ensure the frontmost browser tab is open to a 4oD episode page."];
+//            [invalidPage setAlertStyle:NSWarningAlertStyle];
+//            [invalidPage runModal];
+//            return;
+//        }
+// 		Programme *newProg = [[Programme alloc] init];
+//        [newProg setPid:pid];
+// 		[queueController addObject:newProg];
+//        [self getNameForProgramme:newProg];
+//    }
+//    else if ([url hasPrefix:@"http://ps3.channel4.com"])
+//    {
+//        NSString *pid = nil, *seriesName = nil;
+//    	NSScanner *ps3Scanner = [NSScanner scannerWithString:source];
+//        [ps3Scanner scanUpToString:@"brandTitle=" intoString:nil];
+//        [ps3Scanner scanString:@"brandTitle=" intoString:nil];
+//        [ps3Scanner scanUpToString:@"&" intoString:&seriesName];
+//        [ps3Scanner scanUpToString:@"preSelectAsset=" intoString:nil];
+//        [ps3Scanner scanString:@"preSelectAsset=" intoString:nil];
+//        [ps3Scanner scanCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:&pid];
+//        if (!seriesName) seriesName = newShowName;
+//        if (!pid || !seriesName)
+//        {
+//            NSAlert *invalidPage = [[NSAlert alloc] init];
+//            [invalidPage addButtonWithTitle:@"OK"];
+//            [invalidPage setMessageText:[NSString stringWithFormat:@"Invalid Page: %@",url]];
+//            [invalidPage setInformativeText:@"Please ensure the frontmost browser tab is open to a 4oD PS3 episode page."];
+//            [invalidPage setAlertStyle:NSWarningAlertStyle];
+//            [invalidPage runModal];
+//            return;
+//        }
+//        NSString *showName = [NSString stringWithFormat:@"%@ - %@", seriesName, pid];
+//        Programme *newProg = [[Programme alloc] init];
+//        [newProg setPid:pid];
+//        [newProg setShowName:showName];
+//        [newProg setTvNetwork:@"4oD C4"];
+//        [newProg setUrl:url];
+//        [newProg setProcessedPID:@YES];
+//        [queueController addObject:newProg];
+//    }
 	else
 	{
 		NSAlert *invalidPage = [[NSAlert alloc] init];
 		[invalidPage addButtonWithTitle:@"OK"];
 		[invalidPage setMessageText:[NSString stringWithFormat:@"Invalid Page: %@",url]];
-		[invalidPage setInformativeText:@"Please ensure the frontmost browser tab is open to an iPlayer episode page, ITV Player free catch-up episode page, 4oD episode page or 4oD PS3 episode page."];
+        // TODO: remove 4oD
+        // disable 4oD
+        // [invalidPage setInformativeText:@"Please ensure the frontmost browser tab is open to an iPlayer episode page, ITV Player free catch-up episode page, 4oD episode page or 4oD PS3 episode page."];
+		[invalidPage setInformativeText:@"Please ensure the frontmost browser tab is open to an iPlayer episode page or ITV Player free catch-up episode page. 4oD is no longer supported."];
 		[invalidPage setAlertStyle:NSWarningAlertStyle];
 		[invalidPage runModal];
 	}
