@@ -16,7 +16,6 @@
     
 	Programme *show;
     
-    //Estimated Time Remaining
     double lastDownloaded;
 	NSDate *lastDate;
 	NSMutableArray *rateEntries;

@@ -83,7 +83,6 @@ bool runUpdate=NO;
 	
 	//Download Controller
 	Download *currentDownload;
-    Download *previousDownload;
 	IBOutlet NSToolbarItem *stopButton;
 	IBOutlet NSToolbarItem *startButton;
 	
