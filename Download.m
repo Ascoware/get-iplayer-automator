@@ -248,6 +248,7 @@
             [show setSuccessful:@NO];
             [show setComplete:@YES];
             [show setReasonForFailure:@"Unknown"];
+            [nc removeObserver:self];
             [nc postNotificationName:@"DownloadFinished" object:show];
             [show setValue:@"Download Failed" forKey:@"status"];
         }
@@ -263,6 +264,7 @@
         [show setSuccessful:@NO];
         [show setComplete:@YES];
         [show setReasonForFailure:@"Unknown"];
+        [nc removeObserver:self];
         [nc postNotificationName:@"DownloadFinished" object:show];
         [show setValue:@"Download Failed" forKey:@"status"];
     }
@@ -307,7 +309,8 @@
         [self addToLog:[NSString stringWithFormat:@"INFO: Exit Code = %ld",(long)[[finishedNote object]terminationStatus]] noTag:YES];
         [show setValue:@"Download Complete" forKey:@"status"];
         [show setPath:downloadPath];
-        [nc postNotificationName:@"DownloadFinished" object:show]; 
+        [nc removeObserver:self];
+        [nc postNotificationName:@"DownloadFinished" object:show];
     }
 }
 - (void)thumbnailRequestFinished:(ASIHTTPRequest *)request
@@ -480,6 +483,7 @@
         }
     }
     [show setValue:@"Download Complete" forKey:@"status"];
+    [nc removeObserver:self];
     [nc postNotificationName:@"DownloadFinished" object:show];
 }
 - (void)DownloadDataReady:(NSNotification *)note
@@ -562,6 +566,7 @@
         [show setSuccessful:@NO];
         [show setValue:@"Download Failed" forKey:@"status"];
         [show setReasonForFailure:@"FileExists"];
+        [nc removeObserver:self];
         [nc postNotificationName:@"DownloadFinished" object:show];
         return;
     }

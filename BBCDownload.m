@@ -279,6 +279,7 @@
 					[self addToLog:[NSString stringWithFormat:@"%@ Failed",[show showName]]];
 				}
 			}
+            [nc removeObserver:self];
 			[nc postNotificationName:@"DownloadFinished" object:show];
 		}
 	}
