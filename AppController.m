@@ -1663,7 +1663,8 @@
         runScheduled=NO;
 		[mainWindow setDocumentEdited:YES];
 		[self addToLog:@"\rAppController: Starting Downloads" :nil];
-		//Clean-Up Queue
+		
+        //Clean-Up Queue
 		NSArray *tempQueue = [queueController arrangedObjects];
 		for (Programme *show in tempQueue)
 		{
@@ -2381,7 +2382,6 @@
 			{
 				if ([ext isEqualToString:@"mov"])
 				{
-					//[track setVideoKind:iTunesEVdKTVShow];
 					[track setName:[show episodeName]];
 					[track setEpisodeID:[show episodeName]];
 					[track setShow:[show seriesName]];
@@ -2394,18 +2394,8 @@
 			}
 			else if ([track exists] && ([ext isEqualToString:@"mp3"] || [ext isEqualToString:@"m4a"]))
 			{
-				//[self addToLog:@"Setting Podcast Metadata:" :self];
 				[track setBookmarkable:YES];
-				//[self addToLog:@"	Bookmarkable set" :self];
-				//[track setName:[show showName]];
-				//[self addToLog:@"	Name set" :self];
-				//[track setAlbum:[show seriesName]];
-				//[self addToLog:@"	Album set" :self];
 				[track setUnplayed:YES];
-				//[self addToLog:@"	Unplayed set" :self];
-				//[track setArtist:[show tvNetwork]];
-				//[self addToLog:@"	Artist set" :self];
-				//[self addToLog:@"All Metadata set." :self];
                 [show setValue:@"Complete & in iTunes" forKey:@"status"];
 			}
 			else
@@ -2449,71 +2439,6 @@
 	showName = [showName stringByReplacingOccurrencesOfString:@"/" withString:@"-"];
 	episodeName = [episodeName stringByReplacingOccurrencesOfString:@"/" withString:@"-"];
 	
-	/*if (![[show path] isEqualToString:@"Unknown"])
-	{
-		//Process Original Path into Parts
-		NSString *originalPath = [NSString stringWithString:[show path]];
-		NSString *originalFolder = [originalPath stringByDeletingLastPathComponent];
-		NSString *extension = [originalPath pathExtension];
-		
-		NSString *originalSubtitlePath = [show subtitlePath];
-		
-		//Retrieve Mode Used
-		NSString *originalFilename = [originalPath lastPathComponent];
-		NSScanner *originalFilenameScanner = [NSScanner scannerWithString:originalFilename];
-		[originalFilenameScanner scanUpToString:@"((" intoString:nil];
-		[originalFilenameScanner scanString:@"((" intoString:nil];
-		NSString *modeKey;
-		[originalFilenameScanner scanUpToString:@"))" intoString:&modeKey];
-		NSDictionary *modeLookup = [NSDictionary dictionaryWithObjectsAndKeys:@"Very High",@"flashvhigh1",@"Very High",@"flashvhigh2",@"HD",@"flashhd1",@"HD",@"flashhd2",@"High",@"flashhigh1",@"High",@"flashhigh2",@"Standard",@"flashstd1",@"Standard",@"flashstd2",nil];
-		NSString *modeUsed = [modeLookup objectForKey:modeKey];
-		
-		//Rename File and Directory if Neccessary
-		NSString *newFile;
-		if (![showName isEqualToString:originalShowName] || ![episodeName isEqualToString:originalEpisodeName])
-		{
-			//Generate New Paths
-			NSString *downloadDirectory = [[NSUserDefaults standardUserDefaults] objectForKey:@"DownloadPath"];
-			NSString *newFolder = [downloadDirectory stringByAppendingPathComponent:showName];
-			NSString *newFilename = [NSString stringWithFormat:@"%@ - %@", showName, episodeName];
-			newFile = [newFolder stringByAppendingPathComponent:newFilename];
-			newFile = [newFile stringByAppendingPathExtension:extension];
-			NSString *newSubtitlePath;
-			if (originalSubtitlePath)
-			{
-				NSString *newSubtitleFilename = [NSString stringWithFormat:@"%@ (Subtitles).srt", newFilename];
-				newSubtitlePath = [newFolder stringByAppendingPathComponent:newSubtitleFilename];
-			}
-			
-			//Perform File Operations
-			NSFileManager *fileManager = [NSFileManager defaultManager];
-			[fileManager createDirectoryAtPath:newFolder attributes:nil];
-			if ([fileManager fileExistsAtPath:newFile])
-			{
-				newFilename = [newFilename stringByAppendingFormat:@" (%@)", modeUsed];
-				newFile = [newFolder stringByAppendingPathComponent:newFilename];
-				newFile = [newFile stringByAppendingPathExtension:extension];
-				[show setValue:[[show showName] stringByAppendingFormat:@" (%@)", modeUsed] forKey:@"showName"];
-				
-			}
-			NSError *copyError;
-			if ([fileManager moveItemAtPath:[show path] toPath:newFile error:&copyError]) 
-			{
-				NSLog(@"Original: %@ \rNew: %@", originalSubtitlePath, newSubtitlePath);
-				if (originalSubtitlePath && newSubtitlePath)
-					[fileManager moveItemAtPath:originalSubtitlePath toPath:newSubtitlePath error:nil];
-				if (![newFolder isEqualToString:originalFolder])
-				{
-					[fileManager removeItemAtPath:originalFolder error:NULL];
-				}
-				[show setValue:newFile forKey:@"path"];
-			}
-			else NSLog(@"Clean Up Path Error: %@", copyError);
-		}
-		else 
-			newFile = originalPath;
-	}
-	*/
 	//Save Data to Programme for Later Use
 	[show setValue:showName forKey:@"seriesName"];
 	[show setValue:episodeName forKey:@"episodeName"];
@@ -2863,10 +2788,11 @@
         [request setDelegate:self];
         [request setDidFailSelector:@selector(providedProxyDidFinish:)];
         [request setDidFinishSelector:@selector(providedProxyDidFinish:)];
-        [request setTimeOutSeconds:30];
+        [request setTimeOutSeconds:10];
+        [request setNumberOfTimesToRetryOnTimeout:2];
         [self updateProxyLoadStatus:YES message:[NSString stringWithFormat:@"Loading provided proxy (may take up to %ld seconds)...", (NSInteger)[request timeOutSeconds]]];
         NSLog(@"INFO: Loading provided proxy (may take up to %ld seconds)...", (NSInteger)[request timeOutSeconds]);
-        [self addToLog:[NSString stringWithFormat:@"INFO: Loading provided proxy (may take up to %ld seconds)...", (NSInteger)[request timeOutSeconds]]];
+        [self addToLog:[NSString stringWithFormat:@"INFO: Loading provided proxy (may take up to %ld seconds)...", (NSInteger)[request timeOutSeconds]*2]];
         [request startAsynchronous];
 	}
     else
