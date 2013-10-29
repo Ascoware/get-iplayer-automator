@@ -53,6 +53,8 @@
 		D921C9ED149C4C6F004CB558 /* Body in Resources */ = {isa = PBXBuildFile; fileRef = D921C9EC149C4C6F004CB558 /* Body */; };
 		D92687C51087F81F000E8132 /* DownloadHistoryController.m in Sources */ = {isa = PBXBuildFile; fileRef = D92687C41087F81F000E8132 /* DownloadHistoryController.m */; };
 		D92687CA1087F836000E8132 /* DownloadHistoryEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = D92687C91087F836000E8132 /* DownloadHistoryEntry.m */; };
+		D9279DD3182044CE008DBB09 /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9279DD2182044CE008DBB09 /* Python.framework */; };
+		D9279DD5182044D4008DBB09 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9279DD4182044D4008DBB09 /* IOKit.framework */; };
 		D92BB40A1025B4D600B0BFEC /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D92BB4091025B4D600B0BFEC /* Sparkle.framework */; };
 		D92BB4131025B4DD00B0BFEC /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = D92BB4091025B4D600B0BFEC /* Sparkle.framework */; };
 		D93AD85417DC9D6E00458B1C /* Growl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D93AD85317DC9D6E00458B1C /* Growl.framework */; };
@@ -85,8 +87,6 @@
 		DF876E4013F0BCAD0097FD48 /* flvstreamer in Resources */ = {isa = PBXBuildFile; fileRef = DF876E3F13F0BCAC0097FD48 /* flvstreamer */; };
 		DFC865E213E96BE200606599 /* ReasonForFailure.m in Sources */ = {isa = PBXBuildFile; fileRef = DFC865E113E96BE200606599 /* ReasonForFailure.m */; };
 		DFC8D3F215C557E3008E369F /* FourODDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = DFC8D3F115C557E3008E369F /* FourODDownload.m */; };
-		DFC8D3F415C58B3B008E369F /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DFC8D3F315C58B3B008E369F /* IOKit.framework */; };
-		DFC8D40215C970CA008E369F /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DFC8D40115C970CA008E369F /* Python.framework */; };
 		DFC8D40415C97310008E369F /* fourOD_token_decoder.py in Resources */ = {isa = PBXBuildFile; fileRef = DFC8D40315C97310008E369F /* fourOD_token_decoder.py */; };
 		DFE5B67013E7062C0008571B /* librtmp.dylib in Resources */ = {isa = PBXBuildFile; fileRef = DF592B5313E70084000D0D11 /* librtmp.dylib */; };
 		DFE5B67413E70AC20008571B /* plugins in Resources */ = {isa = PBXBuildFile; fileRef = DFE5B67313E70AC20008571B /* plugins */; };
@@ -180,6 +180,8 @@
 		D92687C41087F81F000E8132 /* DownloadHistoryController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DownloadHistoryController.m; sourceTree = "<group>"; };
 		D92687C81087F836000E8132 /* DownloadHistoryEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DownloadHistoryEntry.h; sourceTree = "<group>"; };
 		D92687C91087F836000E8132 /* DownloadHistoryEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DownloadHistoryEntry.m; sourceTree = "<group>"; };
+		D9279DD2182044CE008DBB09 /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/Python.framework; sourceTree = DEVELOPER_DIR; };
+		D9279DD4182044D4008DBB09 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/IOKit.framework; sourceTree = DEVELOPER_DIR; };
 		D92BB4091025B4D600B0BFEC /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
 		D93AD85317DC9D6E00458B1C /* Growl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Growl.framework; sourceTree = "<group>"; };
 		D941D94E1025DB2B0012A75F /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/JRFeedbackProvider.strings; sourceTree = "<group>"; };
@@ -237,8 +239,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DFC8D40215C970CA008E369F /* Python.framework in Frameworks */,
-				DFC8D3F415C58B3B008E369F /* IOKit.framework in Frameworks */,
+				D9279DD5182044D4008DBB09 /* IOKit.framework in Frameworks */,
+				D9279DD3182044CE008DBB09 /* Python.framework in Frameworks */,
 				D921C9C0149BBF43004CB558 /* libz.dylib in Frameworks */,
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
 				D914BC59100C9F0100F7E68E /* ScriptingBridge.framework in Frameworks */,
@@ -359,6 +361,8 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D9279DD4182044D4008DBB09 /* IOKit.framework */,
+				D9279DD2182044CE008DBB09 /* Python.framework */,
 				D93AD85317DC9D6E00458B1C /* Growl.framework */,
 				1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */,
 				1058C7A2FEA54F0111CA2CBB /* Other Frameworks */,
@@ -498,6 +502,7 @@
 			buildConfigurationList = C01FCF4A08A954540054247B /* Build configuration list for PBXNativeTarget "Get iPlayer Automator" */;
 			buildPhases = (
 				D9CCF443102349ED009205BE /* Copy Frameworks */,
+				D9279DD6182045CA008DBB09 /* ShellScript */,
 				8D1107290486CEB800E47090 /* Resources */,
 				8D11072C0486CEB800E47090 /* Sources */,
 				8D11072E0486CEB800E47090 /* Frameworks */,
@@ -578,6 +583,19 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		D9279DD6182045CA008DBB09 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "LOCATION=\"${BUILT_PRODUCTS_DIR}\"/\"${FRAMEWORKS_FOLDER_PATH}\"\nIDENTITY=\"Developer ID Application: Thomas Willson\"\ncodesign --verbose --force --sign \"$IDENTITY\" \"$LOCATION/Sparkle.framework/Versions/A\"";
+		};
 		D939867A1363992F00ED0141 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -709,7 +727,7 @@
 				OTHER_LDFLAGS = "-licucore";
 				PRODUCT_NAME = "Get iPlayer Automator";
 				PROVISIONING_PROFILE = "";
-				SDKROOT = macosx;
+				SDKROOT = macosx10.8;
 				VALID_ARCHS = x86_64;
 			};
 			name = Debug;
@@ -743,7 +761,7 @@
 				OTHER_LDFLAGS = "-licucore";
 				PRODUCT_NAME = "Get iPlayer Automator";
 				PROVISIONING_PROFILE = "";
-				SDKROOT = macosx;
+				SDKROOT = macosx10.8;
 				VALID_ARCHS = x86_64;
 			};
 			name = Release;
@@ -767,6 +785,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 			};
@@ -790,6 +809,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = macosx;
 			};
@@ -805,7 +825,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				PRODUCT_NAME = Distribution;
 				PROVISIONING_PROFILE = "";
-				SDKROOT = macosx;
+				SDKROOT = macosx10.8;
 				VALID_ARCHS = x86_64;
 			};
 			name = Debug;
@@ -819,7 +839,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				PRODUCT_NAME = Distribution;
 				PROVISIONING_PROFILE = "";
-				SDKROOT = macosx;
+				SDKROOT = macosx10.8;
 				VALID_ARCHS = x86_64;
 				ZERO_LINK = YES;
 			};
