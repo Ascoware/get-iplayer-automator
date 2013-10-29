@@ -28,7 +28,7 @@
 	NSString *historyFilePath = @"~/Library/Application Support/Get iPlayer Automator/download_history";
 	NSFileHandle *historyFile = [NSFileHandle fileHandleForReadingAtPath:[historyFilePath stringByExpandingTildeInPath]];
 	NSData *historyFileData = [historyFile readDataToEndOfFile];
-	NSString *historyFileInfo = [[NSString alloc] initWithData:historyFileData encoding:NSASCIIStringEncoding];
+	NSString *historyFileInfo = [[NSString alloc] initWithData:historyFileData encoding:NSUTF8StringEncoding];
 	
 	if ([historyFileInfo length] > 0)
 	{
