@@ -680,4 +680,9 @@
     [processErrorCache invalidate];
     running=FALSE;
 }
+
+- (void)dealloc
+{
+    [nc removeObserver:self];
+}
 @end
