@@ -531,6 +531,9 @@
     ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:updateURLDic[type]]];
     [request setDelegate:self];
     [request setDidFinishSelector:@selector(indexRequestFinished:)];
+    [request setDidFailSelector:@selector(indexRequestFinished:)];
+    [request setTimeOutSeconds:10];
+    [request setNumberOfTimesToRetryOnTimeout:2];
     [request setDownloadDestinationPath:[[@"~/Library/Application Support/Get iPlayer Automator" stringByExpandingTildeInPath] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.cache",type]]];
     [request startAsynchronous];
 }
