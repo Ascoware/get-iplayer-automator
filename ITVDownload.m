@@ -502,7 +502,7 @@
     
     NSString *swfplayer = [[NSUserDefaults standardUserDefaults] valueForKey:[NSString stringWithFormat:@"%@SWFURL", defaultsPrefix]];
     if (!swfplayer) {
-        swfplayer = @"http://www.itv.com/mediaplayer/releases/2.8.5/ITVMediaPlayer.swf?v=2.8.5";
+        swfplayer = @"http://www.itv.com/mediaplayer/ITVMediaPlayer.swf?v=11.20.654";
     }
 
     NSArray *args = [NSMutableArray arrayWithObjects:
