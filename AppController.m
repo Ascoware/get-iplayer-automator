@@ -2230,7 +2230,7 @@
                     [series2 setAdded:@(timeadded)];
                 }
 				if (([[series2 added] integerValue] <= timeadded) &&
-                    ([temp_tvNetwork isEqualToString:[series2 tvNetwork]] || [[[series2 tvNetwork] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] isEqualToString:@"*"]))
+                    ([temp_tvNetwork isEqualToString:[series2 tvNetwork]] || [[[series2 tvNetwork] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] isEqualToString:@"*"] || ([temp_tvNetwork length] == 0)))
 				{
                     @try {
                         oneFound=YES;
