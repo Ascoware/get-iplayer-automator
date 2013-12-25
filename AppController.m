@@ -2225,12 +2225,13 @@
 					temp_showName = temp_showName2;
 					temp_showName = [temp_showName stringByAppendingFormat:@" - %@", temp_showName2];
 				}
-				if (([[series2 added] integerValue] > timeadded) && ([temp_tvNetwork isEqualToString:[series2 tvNetwork]]))
+				if (([[series2 added] integerValue] > timeadded) &&
+                    ([temp_tvNetwork isEqualToString:[series2 tvNetwork]] || [[[series2 tvNetwork] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] isEqualToString:@"*"] || [[series2 tvNetwork] length] == 0))
                 {
                     [series2 setAdded:@(timeadded)];
                 }
 				if (([[series2 added] integerValue] <= timeadded) &&
-                    ([temp_tvNetwork isEqualToString:[series2 tvNetwork]] || [[[series2 tvNetwork] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] isEqualToString:@"*"] || ([temp_tvNetwork length] == 0)))
+                    ([temp_tvNetwork isEqualToString:[series2 tvNetwork]] || [[[series2 tvNetwork] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] isEqualToString:@"*"] || [[series2 tvNetwork] length] == 0))
 				{
                     @try {
                         oneFound=YES;
