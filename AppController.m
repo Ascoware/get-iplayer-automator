@@ -324,50 +324,8 @@
 	//End Downloads if Running
 	if (runDownloads)
 		[currentDownload cancelDownload:nil];
-	
-	//Save Queue & Series-Link
-	NSMutableArray *tempQueue = [[NSMutableArray alloc] initWithArray:[queueController arrangedObjects]];
-	NSMutableArray *tempSeries = [[NSMutableArray alloc] initWithArray:[pvrQueueController arrangedObjects]];
-	NSMutableArray *temptempQueue = [[NSMutableArray alloc] initWithArray:tempQueue];
-	for (Programme *show in temptempQueue)
-	{
-		if (([[show complete] isEqualToNumber:@YES] && [[show successful] isEqualToNumber:@YES]) 
-			|| [[show status] isEqualToString:@"Added by Series-Link"]) [tempQueue removeObject:show];
-	}
-	NSFileManager *fileManager = [NSFileManager defaultManager];
     
-	NSString *folder = @"~/Library/Application Support/Get iPlayer Automator/";
-	folder = [folder stringByExpandingTildeInPath];
-	if ([fileManager fileExistsAtPath: folder] == NO)
-	{
-		[fileManager createDirectoryAtPath:folder withIntermediateDirectories:NO attributes:nil error:nil];
-	}
-	NSString *filename = @"Queue.automatorqueue";
-	NSString *filePath = [folder stringByAppendingPathComponent:filename];
-	
-	NSMutableDictionary * rootObject;
-	rootObject = [NSMutableDictionary dictionary];
-    
-	[rootObject setValue:tempQueue forKey:@"queue"];
-	[rootObject setValue:tempSeries forKey:@"serieslink"];
-    [rootObject setValue:lastUpdate forKey:@"lastUpdate"];
-	[NSKeyedArchiver archiveRootObject: rootObject toFile: filePath];
-	
-	filename = @"Formats.automatorqueue";
-	filePath = [folder stringByAppendingPathComponent:filename];
-	
-	rootObject = [NSMutableDictionary dictionary];
-	
-	[rootObject setValue:[tvFormatController arrangedObjects] forKey:@"tvFormats"];
-	[rootObject setValue:[radioFormatController arrangedObjects] forKey:@"radioFormats"];
-    [rootObject setValue:@YES forKey:@"hasUpdatedCacheFor4oD"];
-	[NSKeyedArchiver archiveRootObject:rootObject toFile:filePath];
-    
-    filename = @"ITVFormats.automator";
-    filePath = [folder stringByAppendingPathComponent:filename];
-    rootObject = [NSMutableDictionary dictionary];
-    [rootObject setValue:[itvFormatController arrangedObjects] forKey:@"itvFormats"];
-    [NSKeyedArchiver archiveRootObject:rootObject toFile:filePath];
+    [self saveAppData];
 }
 - (void)updater:(SUUpdater *)updater didFindValidUpdate:(SUAppcastItem *)update
 {
@@ -1633,6 +1591,7 @@
         NSLog(@"NO UI: startDownloads:");
     }
     [self loadProxyInBackgroundForSelector:@selector(startDownloads:proxyError:) withObject:sender];
+    [self saveAppData]; //Save data in case of crash.
 }
 
 - (void)startDownloads:(id)sender proxyError:(NSError *)proxyError
@@ -1877,6 +1836,9 @@
             NSLog(@"Added Solution");
             [solutionsTableView setRowHeight:68];
 		}
+        
+        [self saveAppData]; //Save app data in case of crash.
+        
 		NSArray *tempQueue = [queueController arrangedObjects];
 		Programme *nextShow=nil;
 		NSUInteger showNum=0;
@@ -2333,6 +2295,55 @@
 }
 
 #pragma mark Misc.
+- (void)saveAppData
+{
+    //Save Queue & Series-Link
+	NSMutableArray *tempQueue = [[NSMutableArray alloc] initWithArray:[queueController arrangedObjects]];
+	NSMutableArray *tempSeries = [[NSMutableArray alloc] initWithArray:[pvrQueueController arrangedObjects]];
+	NSMutableArray *temptempQueue = [[NSMutableArray alloc] initWithArray:tempQueue];
+	for (Programme *show in temptempQueue)
+	{
+		if (([[show complete] isEqualToNumber:@YES] && [[show successful] isEqualToNumber:@YES])
+			|| [[show status] isEqualToString:@"Added by Series-Link"]) [tempQueue removeObject:show];
+	}
+	NSFileManager *fileManager = [NSFileManager defaultManager];
+    
+	NSString *folder = @"~/Library/Application Support/Get iPlayer Automator/";
+	folder = [folder stringByExpandingTildeInPath];
+	if ([fileManager fileExistsAtPath: folder] == NO)
+	{
+		[fileManager createDirectoryAtPath:folder withIntermediateDirectories:NO attributes:nil error:nil];
+	}
+	NSString *filename = @"Queue.automatorqueue";
+	NSString *filePath = [folder stringByAppendingPathComponent:filename];
+	
+	NSMutableDictionary * rootObject;
+	rootObject = [NSMutableDictionary dictionary];
+    
+	[rootObject setValue:tempQueue forKey:@"queue"];
+	[rootObject setValue:tempSeries forKey:@"serieslink"];
+    [rootObject setValue:lastUpdate forKey:@"lastUpdate"];
+	[NSKeyedArchiver archiveRootObject: rootObject toFile: filePath];
+	
+	filename = @"Formats.automatorqueue";
+	filePath = [folder stringByAppendingPathComponent:filename];
+	
+	rootObject = [NSMutableDictionary dictionary];
+	
+	[rootObject setValue:[tvFormatController arrangedObjects] forKey:@"tvFormats"];
+	[rootObject setValue:[radioFormatController arrangedObjects] forKey:@"radioFormats"];
+    [rootObject setValue:@YES forKey:@"hasUpdatedCacheFor4oD"];
+	[NSKeyedArchiver archiveRootObject:rootObject toFile:filePath];
+    
+    filename = @"ITVFormats.automator";
+    filePath = [folder stringByAppendingPathComponent:filename];
+    rootObject = [NSMutableDictionary dictionary];
+    [rootObject setValue:[itvFormatController arrangedObjects] forKey:@"itvFormats"];
+    [NSKeyedArchiver archiveRootObject:rootObject toFile:filePath];
+    
+    //Store Preferences in case of crash
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
 - (IBAction)closeWindow:(id)sender
 {
     if ([logWindow isKeyWindow]) [logWindow performClose:self];
