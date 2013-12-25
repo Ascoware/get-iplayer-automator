@@ -2057,14 +2057,14 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                             <tabViewItem label="Other Formats" identifier="" id="1491">
                                 <view key="view" id="1492">
                                     <rect key="frame" x="10" y="33" width="454" height="506"/>
-                                    <autoresizingMask key="autoresizingMask"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <scrollView horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="1416">
                                             <rect key="frame" x="17" y="358" width="420" height="135"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <clipView key="contentView" id="eiD-ry-zkd">
                                                 <rect key="frame" x="1" y="17" width="403" height="102"/>
-                                                <autoresizingMask key="autoresizingMask"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="1426" id="1425">
                                                         <rect key="frame" x="0.0" y="0.0" width="403" height="102"/>
@@ -2149,7 +2149,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                             <tabViewItem label="Advanced" identifier="" id="1530">
                                 <view key="view" id="1531">
                                     <rect key="frame" x="10" y="33" width="454" height="506"/>
-                                    <autoresizingMask key="autoresizingMask"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <button id="1534">
                                             <rect key="frame" x="15" y="487" width="208" height="18"/>
@@ -2160,6 +2160,17 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                                             </buttonCell>
                                             <connections>
                                                 <binding destination="668" name="value" keyPath="values.TestProxy" id="1538"/>
+                                            </connections>
+                                        </button>
+                                        <button id="MJh-JP-hHq">
+                                            <rect key="frame" x="15" y="467" width="247" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Show Downloaded Shows in Search:" bezelStyle="regularSquare" imagePosition="right" state="on" inset="2" id="EFC-j7-DR2">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <binding destination="668" name="value" keyPath="values.ShowDownloadedInSearch" id="tZQ-Fk-pTQ"/>
                                             </connections>
                                         </button>
                                     </subviews>

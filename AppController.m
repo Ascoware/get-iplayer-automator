@@ -78,6 +78,7 @@
     // set 4oD off by default
     defaultValues[@"Cache4oD_TV"] = @NO;
     defaultValues[@"TestProxy"] = @YES;
+    defaultValues[@"ShowDownloadedInSearch"] = @YES;
 	
 	[[NSUserDefaults standardUserDefaults] registerDefaults:defaultValues];
 	defaultValues = nil;
@@ -817,7 +818,11 @@
 		NSString *searchArgument = [[NSString alloc] initWithString:searchTerms];
 		NSString *cacheExpiryArg = [self cacheExpiryArgument:nil];
 		NSString *typeArgument = [self typeArgument:nil];
-		NSArray *args = [[NSArray alloc] initWithObjects:getiPlayerPath,noWarningArg,cacheExpiryArg,typeArgument,listFormat,@"--long",@"--nopurge",searchArgument,profileDirArg,nil];
+		NSArray *args = @[getiPlayerPath,noWarningArg,cacheExpiryArg,typeArgument,listFormat,@"--long",@"--nopurge",searchArgument,profileDirArg];
+        
+        if (![[[NSUserDefaults standardUserDefaults] valueForKey:@"ShowDownloadedInSearch"] boolValue])
+            args=[args arrayByAddingObject:@"--hide"];
+        
 		[searchTask setArguments:args];
 		
 		[searchTask setStandardOutput:searchPipe];
