@@ -46,7 +46,7 @@
 	[nc addObserver:self selector:@selector(postLog:) name:@"NeedLog" object:nil];
     
     //Look for Start notifications for ASS
-    [nc addObserver:self selector:@selector(startDownloads:) name:@"StartDownloads" object:nil];
+    [nc addObserver:self selector:@selector(applescriptStartDownloads) name:@"StartDownloads" object:nil];
 	
 	
 	//Register Default Preferences
@@ -2548,7 +2548,11 @@
 	[sharedDefaults removeObjectForKey:@"AlwaysUseProxy"];
 	[sharedDefaults removeObjectForKey:@"XBMC_naming"];
 }
-	
+- (void)applescriptStartDownloads
+{
+    runScheduled=YES;
+    [self forceUpdate:self];
+}
 #pragma mark Argument Retrieval
 - (NSString *)typeArgument:(id)sender
 {
