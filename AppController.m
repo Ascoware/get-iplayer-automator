@@ -2229,7 +2229,8 @@
                 {
                     [series2 setAdded:@(timeadded)];
                 }
-				if (([[series2 added] integerValue] <= timeadded) && ([temp_tvNetwork isEqualToString:[series2 tvNetwork]]))
+				if (([[series2 added] integerValue] <= timeadded) &&
+                    ([temp_tvNetwork isEqualToString:[series2 tvNetwork]] || [[[series2 tvNetwork] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] isEqualToString:@"*"]))
 				{
                     @try {
                         oneFound=YES;
