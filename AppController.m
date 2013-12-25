@@ -2106,7 +2106,11 @@
 		[NSThread detachNewThreadSelector:@selector(seriesLinkToQueueTimerSelector) toTarget:self withObject:nil];
 		NSLog(@"Series-Link Thread Launched");
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(seriesLinkFinished:) name:@"NSThreadWillExitNotification" object:nil];
-	}	
+	}
+	else if (runScheduled && !scheduleTimer)
+	{
+		[self performSelectorOnMainThread:@selector(startDownloads:) withObject:self waitUntilDone:NO];
+	}
 }
 - (void)seriesLinkToQueueTimerSelector
 {
