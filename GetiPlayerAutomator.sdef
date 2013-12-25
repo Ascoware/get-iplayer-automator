@@ -1,0 +1,12 @@
+<dictionary xmlns:xi="http://www.w3.org/2003/XInclude">
+    <!-- use XInclude to include the standard suite -->
+	<xi:include href="file:///System/Library/ScriptingDefinitions/CocoaStandard.sdef" xpointer="xpointer(/dictionary/suite)"/>
+    
+    
+    <!-- specific suite(s) for the application follow... -->
+	<suite name="Get iPlayer Automator" code="GiPA" description="Terminology for Get iPlayer Automator">
+		<command name="download available shows" code="GiPaStar" description="Refreshes the cache, adds series-link items, them downloads everything in the queue.">
+			<cocoa class="ASDownloadShows"/>
+		</command>
+	</suite>
+</dictionary>

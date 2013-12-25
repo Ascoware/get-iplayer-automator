@@ -78,6 +78,8 @@
 		D9CC157B0FF9076F00D819E2 /* Stop.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D9CC157A0FF9076F00D819E2 /* Stop.tiff */; };
 		D9CCF3CC1023485A009205BE /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = D9CCF3CB1023485A009205BE /* dsa_pub.pem */; };
 		D9CCF54C1025AAF9009205BE /* Growl Registration Ticket.growlRegDict in Resources */ = {isa = PBXBuildFile; fileRef = D9CCF54B1025AAF9009205BE /* Growl Registration Ticket.growlRegDict */; };
+		D9CDC9E8186B8F2B0003A4E2 /* GetiPlayerAutomator.sdef in Resources */ = {isa = PBXBuildFile; fileRef = D9CDC9E7186B8F2B0003A4E2 /* GetiPlayerAutomator.sdef */; };
+		D9CDC9EC186B90A90003A4E2 /* ASDownloadShows.m in Sources */ = {isa = PBXBuildFile; fileRef = D9CDC9EB186B90A90003A4E2 /* ASDownloadShows.m */; };
 		D9D06C6F14BB91C200029340 /* ITVMediaFileEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = D9D06C6E14BB91C200029340 /* ITVMediaFileEntry.m */; };
 		D9F668DB102C560500A9449B /* GetFireFoxURL.applescript in Resources */ = {isa = PBXBuildFile; fileRef = D9F668BF102C53D700A9449B /* GetFireFoxURL.applescript */; };
 		D9F66955102C5D1200A9449B /* GetCaminoURL.applescript in Resources */ = {isa = PBXBuildFile; fileRef = D9F66954102C5D0D00A9449B /* GetCaminoURL.applescript */; };
@@ -213,6 +215,9 @@
 		D9CCF4C310256E82009205BE /* iTunes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iTunes.h; sourceTree = "<group>"; };
 		D9CCF52E10259DED009205BE /* Features.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = Features.rtf; sourceTree = "<group>"; };
 		D9CCF54B1025AAF9009205BE /* Growl Registration Ticket.growlRegDict */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "Growl Registration Ticket.growlRegDict"; sourceTree = "<group>"; };
+		D9CDC9E7186B8F2B0003A4E2 /* GetiPlayerAutomator.sdef */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = GetiPlayerAutomator.sdef; sourceTree = "<group>"; };
+		D9CDC9EA186B90A90003A4E2 /* ASDownloadShows.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASDownloadShows.h; sourceTree = "<group>"; };
+		D9CDC9EB186B90A90003A4E2 /* ASDownloadShows.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASDownloadShows.m; sourceTree = "<group>"; };
 		D9D06C6D14BB91C200029340 /* ITVMediaFileEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ITVMediaFileEntry.h; sourceTree = "<group>"; };
 		D9D06C6E14BB91C200029340 /* ITVMediaFileEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ITVMediaFileEntry.m; sourceTree = "<group>"; };
 		D9F668BF102C53D700A9449B /* GetFireFoxURL.applescript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.applescript; path = GetFireFoxURL.applescript; sourceTree = "<group>"; };
@@ -267,6 +272,7 @@
 				DFC8D3F115C557E3008E369F /* FourODDownload.m */,
 				D92687C31087F81F000E8132 /* DownloadHistoryController.h */,
 				D92687C41087F81F000E8132 /* DownloadHistoryController.m */,
+				D9CDC9E9186B906F0003A4E2 /* Applescript */,
 				D91787021013803000B82736 /* Models */,
 				D921C9A3149BBE77004CB558 /* ASIHTTPRequest */,
 				D941D9551025DB440012A75F /* JRFeedback */,
@@ -353,6 +359,7 @@
 				1DDD58140DA1D0A300B32029 /* MainMenu.xib */,
 				D9CCF54B1025AAF9009205BE /* Growl Registration Ticket.growlRegDict */,
 				DFFF196613E96288007B52AC /* ReasonsForFailure.plist */,
+				D9CDC9E7186B8F2B0003A4E2 /* GetiPlayerAutomator.sdef */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -490,6 +497,15 @@
 			name = Buttons;
 			sourceTree = "<group>";
 		};
+		D9CDC9E9186B906F0003A4E2 /* Applescript */ = {
+			isa = PBXGroup;
+			children = (
+				D9CDC9EA186B90A90003A4E2 /* ASDownloadShows.h */,
+				D9CDC9EB186B90A90003A4E2 /* ASDownloadShows.m */,
+			);
+			name = Applescript;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -569,6 +585,7 @@
 				DFE5B67413E70AC20008571B /* plugins in Resources */,
 				DFFF196713E96288007B52AC /* ReasonsForFailure.plist in Resources */,
 				DF876E4013F0BCAD0097FD48 /* flvstreamer in Resources */,
+				D9CDC9E8186B8F2B0003A4E2 /* GetiPlayerAutomator.sdef in Resources */,
 				D921C9ED149C4C6F004CB558 /* Body in Resources */,
 				DFC8D40415C97310008E369F /* fourOD_token_decoder.py in Resources */,
 				3975484D1622504F00470DD1 /* ttml2srt.py in Resources */,
@@ -621,6 +638,7 @@
 				D941D95F1025DB580012A75F /* JRFeedbackController.m in Sources */,
 				D97D9426106DBB68006ECD39 /* TVFormat.m in Sources */,
 				D97D9427106DBB68006ECD39 /* RadioFormat.m in Sources */,
+				D9CDC9EC186B90A90003A4E2 /* ASDownloadShows.m in Sources */,
 				D97D97741077EFDF006ECD39 /* LiveTVChannel.m in Sources */,
 				D92687C51087F81F000E8132 /* DownloadHistoryController.m in Sources */,
 				D92687CA1087F836000E8132 /* DownloadHistoryEntry.m in Sources */,

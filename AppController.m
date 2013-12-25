@@ -44,6 +44,9 @@
 	[self addToLog:@"" :nil];
 	[nc addObserver:self selector:@selector(addToLogNotification:) name:@"AddToLog" object:nil];
 	[nc addObserver:self selector:@selector(postLog:) name:@"NeedLog" object:nil];
+    
+    //Look for Start notifications for ASS
+    [nc addObserver:self selector:@selector(startDownloads:) name:@"StartDownloads" object:nil];
 	
 	
 	//Register Default Preferences
