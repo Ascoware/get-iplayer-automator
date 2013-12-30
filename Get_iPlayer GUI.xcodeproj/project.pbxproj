@@ -6,21 +6,6 @@
 	objectVersion = 46;
 	objects = {
 
-/* Begin PBXAggregateTarget section */
-		D93986701363991200ED0141 /* Distribution */ = {
-			isa = PBXAggregateTarget;
-			buildConfigurationList = D939867F1363995A00ED0141 /* Build configuration list for PBXAggregateTarget "Distribution" */;
-			buildPhases = (
-				D939867A1363992F00ED0141 /* ShellScript */,
-			);
-			dependencies = (
-				D93986781363991B00ED0141 /* PBXTargetDependency */,
-			);
-			name = Distribution;
-			productName = Distribution;
-		};
-/* End PBXAggregateTarget section */
-
 /* Begin PBXBuildFile section */
 		1DDD58160DA1D0A300B32029 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD58140DA1D0A300B32029 /* MainMenu.xib */; };
 		392A41A4169735340053DEA5 /* HTTPProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 392A41A3169735340053DEA5 /* HTTPProxy.m */; };
@@ -108,16 +93,6 @@
 		DFE5B67413E70AC20008571B /* plugins in Resources */ = {isa = PBXBuildFile; fileRef = DFE5B67313E70AC20008571B /* plugins */; };
 		DFFF196713E96288007B52AC /* ReasonsForFailure.plist in Resources */ = {isa = PBXBuildFile; fileRef = DFFF196613E96288007B52AC /* ReasonsForFailure.plist */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		D93986771363991B00ED0141 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 8D1107260486CEB800E47090;
-			remoteInfo = "Get iPlayer Automator";
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		D91F9D50187151D600D4388B /* CopyFiles */ = {
@@ -642,7 +617,6 @@
 			projectRoot = "";
 			targets = (
 				8D1107260486CEB800E47090 /* Get iPlayer Automator */,
-				D93986701363991200ED0141 /* Distribution */,
 				D91F9D51187151D600D4388B /* GetiPlayerProxyUpdater */,
 			);
 		};
@@ -703,19 +677,6 @@
 			shellPath = /bin/sh;
 			shellScript = "LOCATION=\"${BUILT_PRODUCTS_DIR}\"/\"${FRAMEWORKS_FOLDER_PATH}\"\nIDENTITY=\"Developer ID Application: Thomas Willson\"\ncodesign --verbose --force --sign \"$IDENTITY\" \"$LOCATION/Sparkle.framework/Versions/A\"";
 		};
-		D939867A1363992F00ED0141 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/bash;
-			shellScript = "set -o errexit\n\n#security find-generic-password -g -s \"$KEYCHAIN_PRIVKEY_NAME\" 2>&1 1>/dev/null\n\nVERSION=$(defaults read \"$BUILT_PRODUCTS_DIR/Get iPlayer Automator.app/Contents/Info\" CFBundleVersion)\nSHORTVERSION=$(defaults read \"$BUILT_PRODUCTS_DIR/Get iPlayer Automator.app/Contents/Info\" CFBundleShortVersionString)\nDOWNLOAD_BASE_URL=\"http://get-iplayer-automator.googlecode.com/files\"\nRELEASENOTES_URL=\"http://tom-tech.com/get_iplayer/releasenotes/$VERSION.html\"\n\nARCHIVE_FILENAME=\"GetiPlayerAutomator_$SHORTVERSION.zip\"\nDOWNLOAD_URL=\"$DOWNLOAD_BASE_URL/$ARCHIVE_FILENAME\"\nKEYCHAIN_PRIVKEY_NAME=\"Sparkle Private Key\"\n\nWD=$PWD\ncd \"$BUILT_PRODUCTS_DIR\"\nrm -f \"GetiPlayerAutomator\"*.zip\nditto -ck --keepParent \"Get iPlayer Automator.app\" \"$ARCHIVE_FILENAME\"\n\nSIZE=$(stat -f %z \"$ARCHIVE_FILENAME\")\nPUBDATE=$(date +\"%a, %d %b %G %T %z\")\nSIGNATURE=$(openssl dgst -sha1 -binary < \"$ARCHIVE_FILENAME\" | openssl dgst -dss1 -sign \"/Users/$USER/Code/Keys/Sparkle_Key.pem\" | openssl enc -base64)\n\n\n[ $SIGNATURE ] || { echo Unable to load signing private key with name \"'$KEYCHAIN_PRIVKEY_NAME'\" from keychain; false; }\n\ncat <<EOF\n<item>\n    <title>Version $SHORTVERSION</title>\n    <sparkle:releaseNotesLink>$RELEASENOTES_URL</sparkle:releaseNotesLink>\n    <sparkle:minimumSystemVersion>10.6.0</sparkle:minimumSystemVersion>\n    <pubDate>$PUBDATE</pubDate>\n    <enclosure\n        url=\"$DOWNLOAD_URL\"\n        sparkle:version=\"$VERSION\"\n        sparkle:shortVersionString=\"$SHORTVERSION\"\n        type=\"application/octet-stream\"\n        length=\"$SIZE\"\n        sparkle:dsaSignature=\"$SIGNATURE\"\n    />\n</item>\nEOF";
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -771,14 +732,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		D93986781363991B00ED0141 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 8D1107260486CEB800E47090 /* Get iPlayer Automator */;
-			targetProxy = D93986771363991B00ED0141 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		089C165CFE840E0CC02AAC07 /* InfoPlist.strings */ = {
@@ -995,36 +948,6 @@
 			};
 			name = Release;
 		};
-		D93986711363991300ED0141 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "Developer ID Application: Thomas Willson";
-				COMBINE_HIDPI_IMAGES = YES;
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				PRODUCT_NAME = Distribution;
-				PROVISIONING_PROFILE = "";
-				SDKROOT = macosx10.8;
-				VALID_ARCHS = x86_64;
-			};
-			name = Debug;
-		};
-		D93986721363991300ED0141 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "Developer ID Application: Thomas Willson";
-				COMBINE_HIDPI_IMAGES = YES;
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				PRODUCT_NAME = Distribution;
-				PROVISIONING_PROFILE = "";
-				SDKROOT = macosx10.8;
-				VALID_ARCHS = x86_64;
-				ZERO_LINK = YES;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1053,15 +976,6 @@
 				D91F9D5E187151D700D4388B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-		};
-		D939867F1363995A00ED0141 /* Build configuration list for PBXAggregateTarget "Distribution" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				D93986711363991300ED0141 /* Debug */,
-				D93986721363991300ED0141 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
