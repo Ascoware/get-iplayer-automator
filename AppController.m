@@ -207,9 +207,9 @@
 	if ([[tvFormatController arrangedObjects] count] == 0)
 	{
 		TVFormat *format1 = [[TVFormat alloc] init];
-		[format1 setFormat:@"Flash - High"];
+		[format1 setFormat:@"Flash - HD"];
 		TVFormat *format2 = [[TVFormat alloc] init];
-		[format2 setFormat:@"Flash - Standard"];
+		[format2 setFormat:@"Flash - Very High"];
 		[tvFormatController addObjects:@[format2,format1]];
 	}
 	if ([[radioFormatController arrangedObjects] count] == 0)
