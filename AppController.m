@@ -463,13 +463,13 @@
         if (!lastUpdate || ([[NSDate date] timeIntervalSinceDate:lastUpdate] > ([[defaults objectForKey:@"CacheExpiryTime"] intValue]*3600)) || [[sender class] isEqualTo:[@"" class]])
         {
             typesToCache = [[NSMutableArray alloc] initWithCapacity:5];
-            if ([[defaults objectForKey:@"CacheBBC_TV"] boolValue]) [typesToCache addObject:@"TV"];
-            if ([[defaults objectForKey:@"CacheITV_TV"] boolValue]) [typesToCache addObject:@"ITV"];
-            if ([[defaults objectForKey:@"CacheBBC_Radio"] boolValue]) [typesToCache addObject:@"Radio"];
+            if ([[defaults objectForKey:@"CacheBBC_TV"] boolValue]) [typesToCache addObject:@"tv"];
+            if ([[defaults objectForKey:@"CacheITV_TV"] boolValue]) [typesToCache addObject:@"itv"];
+            if ([[defaults objectForKey:@"CacheBBC_Radio"] boolValue]) [typesToCache addObject:@"radio"];
             if ([[defaults objectForKey:@"CacheBBC_Podcasts"] boolValue]) [typesToCache addObject:@"Podcast"];
-            if ([[defaults objectForKey:@"Cache4oD_TV"] boolValue]) [typesToCache addObject:@"CH4"];
+            if ([[defaults objectForKey:@"Cache4oD_TV"] boolValue]) [typesToCache addObject:@"ch4"];
             
-            NSArray *urlKeys = @[@"TV",@"ITV",@"Radio",@"Podcast",@"CH4"];
+            NSArray *urlKeys = @[@"tv",@"itv",@"radio",@"podcast",@"ch4"];
             NSArray *urlObjects = @[@"http://tom-tech.com/get_iplayer/cache/tv.cache",
                                    @"http://tom-tech.com/get_iplayer/cache/itv.cache",
                                    @"http://tom-tech.com/get_iplayer/cache/radio.cache",
