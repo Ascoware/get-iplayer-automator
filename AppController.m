@@ -1600,8 +1600,8 @@
     @catch (NSException *e) {
         NSLog(@"NO UI: startDownloads:");
     }
-    [self loadProxyInBackgroundForSelector:@selector(startDownloads:proxyError:) withObject:sender];
     [self saveAppData]; //Save data in case of crash.
+    [self loadProxyInBackgroundForSelector:@selector(startDownloads:proxyError:) withObject:sender];
 }
 
 - (void)startDownloads:(id)sender proxyError:(NSError *)proxyError
