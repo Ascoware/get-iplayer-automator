@@ -190,6 +190,7 @@
 		NSLog(@"Unable to load saved application data. Deleted the data file.");
 		rootObject=nil;
 	}
+    // TODO: Remove 4oD
     BOOL hasCached4oD = [[rootObject valueForKey:@"hasUpdatedCacheFor4oD"] boolValue];
     
     filename = @"ITVFormats.automator";
@@ -467,6 +468,7 @@
             if ([[defaults objectForKey:@"CacheITV_TV"] boolValue]) [typesToCache addObject:@"itv"];
             if ([[defaults objectForKey:@"CacheBBC_Radio"] boolValue]) [typesToCache addObject:@"radio"];
             if ([[defaults objectForKey:@"CacheBBC_Podcasts"] boolValue]) [typesToCache addObject:@"Podcast"];
+            // TODO: Remove 4oD
             if ([[defaults objectForKey:@"Cache4oD_TV"] boolValue]) [typesToCache addObject:@"ch4"];
             
             NSArray *urlKeys = @[@"tv",@"itv",@"radio",@"podcast",@"ch4"];
