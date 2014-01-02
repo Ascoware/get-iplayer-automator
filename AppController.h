@@ -13,6 +13,7 @@
 #import "Download.h"
 #import "FourODDownload.h"
 #import <IOKit/pwr_mgt/IOPMLib.h>
+#import "NilToStringTransformer.h"
 
 bool runDownloads=NO;
 bool runUpdate=NO;
@@ -129,6 +130,10 @@ bool runUpdate=NO;
         kProxyLoadFailed = 2,
         kProxyTestFailed = 3
     };
+    
+    //PVR list editing
+    NilToStringTransformer *nilToEmptyStringTransformer;
+    NilToStringTransformer *nilToAsteriskTransformer;
 }
 //Update
 - (void)getiPlayerUpdateFinished;

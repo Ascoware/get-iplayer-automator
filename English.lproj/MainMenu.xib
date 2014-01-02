@@ -963,10 +963,17 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                <connections>
+                                                    <outlet property="formatter" destination="S9t-eO-Bm7" id="UUM-0C-m6D"/>
+                                                </connections>
                                             </textFieldCell>
                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                             <connections>
-                                                <binding destination="952" name="value" keyPath="arrangedObjects.showName" id="962"/>
+                                                <binding destination="952" name="value" keyPath="arrangedObjects.showName" id="1gh-GT-QYV">
+                                                    <dictionary key="options">
+                                                        <string key="NSValueTransformerName">NilToEmptyStringTransformer</string>
+                                                    </dictionary>
+                                                </binding>
                                             </connections>
                                         </tableColumn>
                                         <tableColumn width="188" minWidth="10" maxWidth="3.4028234663852886e+38" id="6FY-yd-jEt">
@@ -979,10 +986,17 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                <connections>
+                                                    <outlet property="formatter" destination="S9t-eO-Bm7" id="owF-Rj-gxH"/>
+                                                </connections>
                                             </textFieldCell>
                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                             <connections>
-                                                <binding destination="952" name="value" keyPath="arrangedObjects.tvNetwork" id="SIq-Dk-acn"/>
+                                                <binding destination="952" name="value" keyPath="arrangedObjects.tvNetwork" id="vqv-Xt-aCX">
+                                                    <dictionary key="options">
+                                                        <string key="NSValueTransformerName">NilToAsteriskTransformer</string>
+                                                    </dictionary>
+                                                </binding>
                                             </connections>
                                         </tableColumn>
                                     </tableColumns>
@@ -2541,22 +2555,22 @@ Note: Only the types of shows you select in the preferences will show up here.</
         <window title="PVR Manager Help" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="1257" userLabel="Help Panel: PVR Manager" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" utility="YES" HUD="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="690" y="368" width="432" height="244"/>
+            <rect key="contentRect" x="690" y="368" width="432" height="295"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1178"/>
             <view key="contentView" id="1258">
-                <rect key="frame" x="0.0" y="0.0" width="432" height="244"/>
+                <rect key="frame" x="0.0" y="0.0" width="432" height="295"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <textField verticalHuggingPriority="750" id="1259">
-                        <rect key="frame" x="17" y="20" width="398" height="204"/>
+                        <rect key="frame" x="17" y="20" width="398" height="255"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" id="1260">
                             <font key="font" metaFont="system"/>
-                            <mutableString key="title">Please enter the name of the programme or series you would like to add to the series link. Select the program in the results and click Auto-Record. It will only record episodes that air on the same network as the reference program. 
+                            <string key="title">Please enter the name of the programme or series you would like to add to the series link. Select the program in the results and click Auto-Record. It will only record episodes that air on the same network as the reference program. 
 
-Custom series can be added. Use the + button in the lower left hand corner of the series link list. Text cells are editable. An asterisk can be used in the TV Network column if episodes from any network should be recorded.
+Custom series can be added. Use the + button in the lower left hand corner of the series link list. Text cells are editable. Leading and trailing whitespace will be removed from edited values.  An asterisk can be used in the TV Network column if episodes from any network should be recorded.  If you leave the TV Network column blank, an asterisk will be inserted automatically.
 
-Note: Only the types of shows you select in the preferences will show up here.</mutableString>
+Note: Only the types of shows you select in the preferences will show up here.</string>
                             <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                             <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.0" colorSpace="calibratedRGB"/>
                         </textFieldCell>
@@ -2698,6 +2712,7 @@ DQ
                 <string>format</string>
             </declaredKeys>
         </arrayController>
+        <customFormatter id="S9t-eO-Bm7" customClass="StringTrimFormatter"/>
     </objects>
     <resources>
         <image name="ActivityWindow" width="32" height="32"/>

@@ -16,6 +16,8 @@
 		39879DB016904B9F0050CA7D /* NSString+HTML.m in Sources */ = {isa = PBXBuildFile; fileRef = 39879DAE16904B9F0050CA7D /* NSString+HTML.m */; };
 		39ABB9C017FCCD9300B5D519 /* Growl.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = D93AD85317DC9D6E00458B1C /* Growl.framework */; };
 		39CD35FB1875FC7600BFE53A /* librtmp.1.dylib in Resources */ = {isa = PBXBuildFile; fileRef = 39CD35F91875FC5F00BFE53A /* librtmp.1.dylib */; };
+		39D7C1BD1874AD7400B78698 /* StringTrimFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 39D7C1BC1874AD7400B78698 /* StringTrimFormatter.m */; };
+		39D7C1C01874AD9D00B78698 /* NilToStringTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = 39D7C1BF1874AD9D00B78698 /* NilToStringTransformer.m */; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
@@ -139,6 +141,10 @@
 		39879DAD16904B9F0050CA7D /* NSString+HTML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+HTML.h"; sourceTree = "<group>"; };
 		39879DAE16904B9F0050CA7D /* NSString+HTML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+HTML.m"; sourceTree = "<group>"; };
 		39CD35F91875FC5F00BFE53A /* librtmp.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = librtmp.1.dylib; sourceTree = "<group>"; };
+		39D7C1BB1874AD7400B78698 /* StringTrimFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StringTrimFormatter.h; sourceTree = "<group>"; };
+		39D7C1BC1874AD7400B78698 /* StringTrimFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StringTrimFormatter.m; sourceTree = "<group>"; };
+		39D7C1BE1874AD9D00B78698 /* NilToStringTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NilToStringTransformer.h; sourceTree = "<group>"; };
+		39D7C1BF1874AD9D00B78698 /* NilToStringTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NilToStringTransformer.m; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* Get iPlayer Automator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Get iPlayer Automator.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D9041ABE16AC81A5000C3820 /* ActivityWindow@2X.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "ActivityWindow@2X.tiff"; sourceTree = "<group>"; };
@@ -295,6 +301,10 @@
 				DFC8D3F115C557E3008E369F /* FourODDownload.m */,
 				D92687C31087F81F000E8132 /* DownloadHistoryController.h */,
 				D92687C41087F81F000E8132 /* DownloadHistoryController.m */,
+				39D7C1BB1874AD7400B78698 /* StringTrimFormatter.h */,
+				39D7C1BC1874AD7400B78698 /* StringTrimFormatter.m */,
+				39D7C1BE1874AD9D00B78698 /* NilToStringTransformer.h */,
+				39D7C1BF1874AD9D00B78698 /* NilToStringTransformer.m */,
 				D9CDC9E9186B906F0003A4E2 /* Applescript */,
 				D91787021013803000B82736 /* Models */,
 				D921C9A3149BBE77004CB558 /* ASIHTTPRequest */,
@@ -699,11 +709,13 @@
 				D92687CA1087F836000E8132 /* DownloadHistoryEntry.m in Sources */,
 				DFC865E213E96BE200606599 /* ReasonForFailure.m in Sources */,
 				D921C9B6149BBE9F004CB558 /* ASIDataCompressor.m in Sources */,
+				39D7C1C01874AD9D00B78698 /* NilToStringTransformer.m in Sources */,
 				D921C9B7149BBE9F004CB558 /* ASIDataDecompressor.m in Sources */,
 				D921C9B8149BBE9F004CB558 /* ASIDownloadCache.m in Sources */,
 				D921C9B9149BBE9F004CB558 /* ASIFormDataRequest.m in Sources */,
 				D921C9BA149BBE9F004CB558 /* ASIHTTPRequest.m in Sources */,
 				D921C9BB149BBE9F004CB558 /* ASIInputStream.m in Sources */,
+				39D7C1BD1874AD7400B78698 /* StringTrimFormatter.m in Sources */,
 				D921C9BC149BBE9F004CB558 /* ASINetworkQueue.m in Sources */,
 				D921C9E8149BCB16004CB558 /* ITVDownload.m in Sources */,
 				D921C9EB149BCDEB004CB558 /* Download.m in Sources */,

@@ -118,7 +118,11 @@
 	runScheduled=NO;
     quickUpdateFailed=NO;
     proxyDict = [[NSMutableDictionary alloc] init];
-	return self;
+    nilToEmptyStringTransformer = [[NilToStringTransformer alloc] init];
+    nilToAsteriskTransformer = [[NilToStringTransformer alloc] initWithString:@"*"];
+    [NSValueTransformer setValueTransformer:nilToEmptyStringTransformer forName:@"NilToEmptyStringTransformer"];
+    [NSValueTransformer setValueTransformer:nilToAsteriskTransformer forName:@"NilToAsteriskTransformer"];
+    return self;
 }
 #pragma mark Delegate Methods
 - (void)awakeFromNib
@@ -2123,7 +2127,13 @@
 	for (Series *series in seriesLink)
 	{
 		if (!runDownloads)
-			[currentProgress performSelectorOnMainThread:@selector(setStringValue:) withObject:[NSString stringWithFormat:@"Updating Series Link - %lu/%lu - %@",(unsigned long)[seriesLink indexOfObject:series],(unsigned long)[seriesLink count],[series showName]] waitUntilDone:YES];
+			[currentProgress performSelectorOnMainThread:@selector(setStringValue:) withObject:[NSString stringWithFormat:@"Updating Series Link - %lu/%lu - %@",(unsigned long)[seriesLink indexOfObject:series]+1,(unsigned long)[seriesLink count],[series showName]] waitUntilDone:YES];
+        if ([[series showName] length] == 0) {
+            [seriesToBeRemoved addObject:series];
+            continue;
+        } else if ([[series tvNetwork] length] == 0) {
+            [series setTvNetwork:@"*"];
+        }
 		NSString *cacheExpiryArgument = [self cacheExpiryArgument:nil];
 		NSString *typeArgument = [self typeArgument:nil];
 		
@@ -2321,6 +2331,16 @@
 	{
 		if (([[show complete] isEqualToNumber:@YES] && [[show successful] isEqualToNumber:@YES])
 			|| [[show status] isEqualToString:@"Added by Series-Link"]) [tempQueue removeObject:show];
+	}
+	NSMutableArray *temptempSeries = [[NSMutableArray alloc] initWithArray:tempSeries];
+	for (Series *series in temptempSeries)
+	{
+        if ([[series showName] length] == 0) {
+            [tempSeries removeObject:series];
+        } else if ([[series tvNetwork] length] == 0) {
+            [series setTvNetwork:@"*"];
+        }
+
 	}
 	NSFileManager *fileManager = [NSFileManager defaultManager];
     
