@@ -89,7 +89,6 @@
 		D9F66963102C5DC500A9449B /* GetOperaURL.applescript in Resources */ = {isa = PBXBuildFile; fileRef = D9F66962102C5DB800A9449B /* GetOperaURL.applescript */; };
 		D9FEB87610077790003BADF8 /* AppController.m in Sources */ = {isa = PBXBuildFile; fileRef = D9FEB87510077790003BADF8 /* AppController.m */; };
 		DF3A234B13E5F59900B82C2E /* rtmpdump-2.4 in Resources */ = {isa = PBXBuildFile; fileRef = DF3A234A13E5F59900B82C2E /* rtmpdump-2.4 */; };
-		DF876E4013F0BCAD0097FD48 /* flvstreamer in Resources */ = {isa = PBXBuildFile; fileRef = DF876E3F13F0BCAC0097FD48 /* flvstreamer */; };
 		DFC865E213E96BE200606599 /* ReasonForFailure.m in Sources */ = {isa = PBXBuildFile; fileRef = DFC865E113E96BE200606599 /* ReasonForFailure.m */; };
 		DFC8D3F215C557E3008E369F /* FourODDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = DFC8D3F115C557E3008E369F /* FourODDownload.m */; };
 		DFC8D40415C97310008E369F /* fourOD_token_decoder.py in Resources */ = {isa = PBXBuildFile; fileRef = DFC8D40315C97310008E369F /* fourOD_token_decoder.py */; };
@@ -246,7 +245,6 @@
 		D9FEB87410077790003BADF8 /* AppController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppController.h; sourceTree = "<group>"; };
 		D9FEB87510077790003BADF8 /* AppController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppController.m; sourceTree = "<group>"; };
 		DF3A234A13E5F59900B82C2E /* rtmpdump-2.4 */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = "rtmpdump-2.4"; sourceTree = "<group>"; };
-		DF876E3F13F0BCAC0097FD48 /* flvstreamer */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = flvstreamer; sourceTree = "<group>"; };
 		DFC865E013E96BE200606599 /* ReasonForFailure.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReasonForFailure.h; sourceTree = "<group>"; };
 		DFC865E113E96BE200606599 /* ReasonForFailure.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReasonForFailure.m; sourceTree = "<group>"; };
 		DFC8D3F015C557E3008E369F /* FourODDownload.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FourODDownload.h; sourceTree = "<group>"; };
@@ -435,7 +433,6 @@
 			isa = PBXGroup;
 			children = (
 				39BCA3391877080F007115F2 /* id3v2 */,
-				DF876E3F13F0BCAC0097FD48 /* flvstreamer */,
 				39CD35F91875FC5F00BFE53A /* librtmp.1.dylib */,
 				D9CAE545133FF9BE003471DA /* ffmpeg */,
 				DF3A234A13E5F59900B82C2E /* rtmpdump-2.4 */,
@@ -666,7 +663,6 @@
 				DF3A234B13E5F59900B82C2E /* rtmpdump-2.4 in Resources */,
 				DFE5B67413E70AC20008571B /* plugins in Resources */,
 				DFFF196713E96288007B52AC /* ReasonsForFailure.plist in Resources */,
-				DF876E4013F0BCAD0097FD48 /* flvstreamer in Resources */,
 				D9CDC9E8186B8F2B0003A4E2 /* GetiPlayerAutomator.sdef in Resources */,
 				D921C9ED149C4C6F004CB558 /* Body in Resources */,
 				DFC8D40415C97310008E369F /* fourOD_token_decoder.py in Resources */,
