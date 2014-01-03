@@ -1667,7 +1667,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
                                                                 </tableHeaderCell>
-                                                                <comboBoxCell key="dataCell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" buttonBordered="NO" numberOfVisibleItems="8" id="1084">
+                                                                <comboBoxCell key="dataCell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" buttonBordered="NO" numberOfVisibleItems="5" id="1084">
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1919,11 +1919,11 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                                                                         <string>or_IN</string>
                                                                     </allowedInputSourceLocales>
                                                                     <objectValues>
-                                                                        <string>Flash - Low</string>
-                                                                        <string>Flash - Standard</string>
-                                                                        <string>Flash - High</string>
-                                                                        <string>Flash - Very High</string>
                                                                         <string>Flash - HD</string>
+                                                                        <string>Flash - Very High</string>
+                                                                        <string>Flash - High</string>
+                                                                        <string>Flash - Standard</string>
+                                                                        <string>Flash - Low</string>
                                                                     </objectValues>
                                                                 </comboBoxCell>
                                                                 <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
@@ -1974,11 +1974,9 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                                                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                     <objectValues>
-                                                                        <string>WMA</string>
-                                                                        <string>Flash AAC - Low</string>
-                                                                        <string>Flash AAC - Standard</string>
                                                                         <string>Flash AAC - High</string>
-                                                                        <string>Real Audio</string>
+                                                                        <string>Flash AAC - Standard</string>
+                                                                        <string>Flash AAC - Low</string>
                                                                         <string>Flash - MP3</string>
                                                                     </objectValues>
                                                                 </comboBoxCell>
@@ -2098,10 +2096,10 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                                                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                     <objectValues>
-                                                                        <string>Flash - Very Low</string>
-                                                                        <string>Flash - Low</string>
-                                                                        <string>Flash - Standard</string>
                                                                         <string>Flash - High</string>
+                                                                        <string>Flash - Standard</string>
+                                                                        <string>Flash - Low</string>
+                                                                        <string>Flash - Very Low</string>
                                                                     </objectValues>
                                                                 </comboBoxCell>
                                                                 <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>

@@ -194,6 +194,23 @@
 		NSLog(@"Unable to load saved application data. Deleted the data file.");
 		rootObject=nil;
 	}
+    if (!tvFormats || !radioFormats) {
+        [BBCDownload initFormats];
+    }
+    // clear obsolete formats
+    NSMutableArray *tempTVFormats = [[NSMutableArray alloc] initWithArray:[tvFormatController arrangedObjects]];
+    for (TVFormat *tvFormat in tempTVFormats) {
+        if (![tvFormats objectForKey:[tvFormat format]]) {
+            [tvFormatController removeObject:tvFormat];
+        }
+    }
+    NSMutableArray *tempRadioFormats = [[NSMutableArray alloc] initWithArray:[radioFormatController arrangedObjects]];
+    for (RadioFormat *radioFormat in tempRadioFormats) {
+        if (![radioFormats objectForKey:[radioFormat format]]) {
+            [radioFormatController removeObject:radioFormat];
+        }
+    }
+
     // TODO: Remove 4oD
     BOOL hasCached4oD = [[rootObject valueForKey:@"hasUpdatedCacheFor4oD"] boolValue];
     

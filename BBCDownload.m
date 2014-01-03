@@ -9,6 +9,15 @@
 #import "BBCDownload.h"
 
 @implementation BBCDownload
++ (void)initFormats
+{
+    NSArray *tvFormatKeys = @[@"Flash - HD",@"Flash - Very High",@"Flash - High",@"Flash - Standard",@"Flash - Low"];
+    NSArray *tvFormatObjects = @[@"flashhd2,flashhd1",@"flashvhigh2,flashvhigh1",@"flashhigh2,flashhigh1",@"flashstd2,flashstd1",@"flashlow2,flashlow1"];
+    NSArray *radioFormatKeys = @[@"Flash AAC - High",@"Flash AAC - Standard",@"Flash AAC - Low",@"Flash - MP3"];
+    NSArray *radioFormatObjects = @[@"flashaachigh",@"flashaacstd",@"flashaaclow",@"flashaudio"];
+	tvFormats = [[NSDictionary alloc] initWithObjects:tvFormatObjects forKeys:tvFormatKeys];
+	radioFormats = [[NSDictionary alloc] initWithObjects:radioFormatObjects forKeys:radioFormatKeys];
+}
 #pragma mark Overridden Methods
 - (id)initWithProgramme:(Programme *)tempShow tvFormats:(NSArray *)tvFormatList radioFormats:(NSArray *)radioFormatList proxy:(HTTPProxy *)aProxy
 {
@@ -34,12 +43,9 @@
 	downloadPath = [[NSString alloc] initWithString:[[NSUserDefaults standardUserDefaults] valueForKey:@"DownloadPath"]];
 		
     //Initialize Formats
-	NSArray *tvFormatKeys = @[@"iPhone",@"Flash - High",@"Flash - Low",@"Flash - HD",@"Flash - Standard",@"Flash - Normal",@"Flash - Very High"];
-	NSArray *tvFormatObjects = @[@"iphone",@"flashhigh2,flashhigh1",@"flashlow2,flashlow1",@"flashhd2,flashhd1",@"flashstd2,flashstd1",@"flashstd2,flashstd1",@"flashvhigh2,flashvhigh1"];
-	NSDictionary *tvFormats = [[NSDictionary alloc] initWithObjects:tvFormatObjects forKeys:tvFormatKeys];
-	NSArray *radioFormatKeys = @[@"iPhone",@"Flash - MP3",@"Flash - AAC",@"WMA",@"Real Audio",@"Flash",@"Flash AAC - High",@"Flash AAC - Standard",@"Flash AAC - Low"];
-	NSArray *radioFormatObjects = @[@"iphone", @"flashaudio",@"flashaac",@"wma",@"realaudio",@"flashaudio",@"flashaachigh",@"flashaacstd",@"flashaaclow"];
-	NSDictionary *radioFormats = [[NSDictionary alloc] initWithObjects:radioFormatObjects forKeys:radioFormatKeys];
+    if (!tvFormats || !radioFormats) {
+        [BBCDownload initFormats];
+    }
     NSMutableString *temp_Format;
     temp_Format = [[NSMutableString alloc] initWithString:@"--modes="];
     for (RadioFormat *format in radioFormatList)

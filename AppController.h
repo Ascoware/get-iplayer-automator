@@ -17,6 +17,8 @@
 
 bool runDownloads=NO;
 bool runUpdate=NO;
+NSDictionary *tvFormats;
+NSDictionary *radioFormats;
 
 @interface AppController : NSObject {
 	//General

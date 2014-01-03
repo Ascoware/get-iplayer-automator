@@ -12,6 +12,8 @@
 #import "RadioFormat.h"
 
 extern bool runDownloads;
+extern NSDictionary *tvFormats;
+extern NSDictionary *radioFormats;
 
 #import "Download.h"
 
@@ -25,6 +27,7 @@ extern bool runDownloads;
 	NSString *LastLine;
 	NSString *reasonForFailure;
 }
++ (void)initFormats;
 - (id)initWithProgramme:(Programme *)tempShow tvFormats:(NSArray *)tvFormatList radioFormats:(NSArray *)radioFormatList proxy:(HTTPProxy *)aProxy;
 - (void)processGetiPlayerOutput:(NSString *)outp;
 
