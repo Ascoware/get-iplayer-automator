@@ -15,6 +15,7 @@
 		39879DAF16904B9F0050CA7D /* GTMNSString+HTML.m in Sources */ = {isa = PBXBuildFile; fileRef = 39879DAC16904B9F0050CA7D /* GTMNSString+HTML.m */; };
 		39879DB016904B9F0050CA7D /* NSString+HTML.m in Sources */ = {isa = PBXBuildFile; fileRef = 39879DAE16904B9F0050CA7D /* NSString+HTML.m */; };
 		39ABB9C017FCCD9300B5D519 /* Growl.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = D93AD85317DC9D6E00458B1C /* Growl.framework */; };
+		39BCA33A1877080F007115F2 /* id3v2 in Resources */ = {isa = PBXBuildFile; fileRef = 39BCA3391877080F007115F2 /* id3v2 */; };
 		39CD35FB1875FC7600BFE53A /* librtmp.1.dylib in Resources */ = {isa = PBXBuildFile; fileRef = 39CD35F91875FC5F00BFE53A /* librtmp.1.dylib */; };
 		39D7C1BD1874AD7400B78698 /* StringTrimFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 39D7C1BC1874AD7400B78698 /* StringTrimFormatter.m */; };
 		39D7C1C01874AD9D00B78698 /* NilToStringTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = 39D7C1BF1874AD9D00B78698 /* NilToStringTransformer.m */; };
@@ -140,6 +141,7 @@
 		39879DAC16904B9F0050CA7D /* GTMNSString+HTML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "GTMNSString+HTML.m"; sourceTree = "<group>"; };
 		39879DAD16904B9F0050CA7D /* NSString+HTML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+HTML.h"; sourceTree = "<group>"; };
 		39879DAE16904B9F0050CA7D /* NSString+HTML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+HTML.m"; sourceTree = "<group>"; };
+		39BCA3391877080F007115F2 /* id3v2 */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = id3v2; sourceTree = "<group>"; };
 		39CD35F91875FC5F00BFE53A /* librtmp.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = librtmp.1.dylib; sourceTree = "<group>"; };
 		39D7C1BB1874AD7400B78698 /* StringTrimFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StringTrimFormatter.h; sourceTree = "<group>"; };
 		39D7C1BC1874AD7400B78698 /* StringTrimFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StringTrimFormatter.m; sourceTree = "<group>"; };
@@ -432,6 +434,7 @@
 		D904F04D1009F28400D60BBF /* Binaries */ = {
 			isa = PBXGroup;
 			children = (
+				39BCA3391877080F007115F2 /* id3v2 */,
 				DF876E3F13F0BCAC0097FD48 /* flvstreamer */,
 				39CD35F91875FC5F00BFE53A /* librtmp.1.dylib */,
 				D9CAE545133FF9BE003471DA /* ffmpeg */,
@@ -650,6 +653,7 @@
 				D904F04A1009F22E00D60BBF /* get_iplayer.pl in Resources */,
 				D91783F01013035B00B82736 /* camstudio_record_button.png in Resources */,
 				D9CCF3CC1023485A009205BE /* dsa_pub.pem in Resources */,
+				39BCA33A1877080F007115F2 /* id3v2 in Resources */,
 				D9CCF54C1025AAF9009205BE /* Growl Registration Ticket.growlRegDict in Resources */,
 				D941D9511025DB2B0012A75F /* JRFeedbackProvider.strings in Resources */,
 				D941D9521025DB2B0012A75F /* JRFeedbackProvider.xib in Resources */,

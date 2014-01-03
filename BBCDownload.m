@@ -62,6 +62,7 @@
     //Initialize the rest of the arguments
 	NSString *noWarningArg = @"--nocopyright";
 	NSString *noPurgeArg = @"--nopurge";
+	NSString *id3v2Arg = [[NSString alloc] initWithFormat:@"--id3v2=%@", [bundle pathForResource:@"id3v2" ofType:nil]];
 	NSString *mplayerArg = [[NSString alloc] initWithFormat:@"--mplayer=%@", [bundle pathForResource:@"mplayer" ofType:nil]];
     NSString *flvstreamerArg = [[NSString alloc] initWithFormat:@"--flvstreamer=%@", [bundle pathForResource:@"rtmpdump-2.4" ofType:nil]];
 	NSString *lameArg = [[NSString alloc] initWithFormat:@"--lame=%@", [bundle pathForResource:@"lame" ofType:nil]];
@@ -94,7 +95,7 @@
 	profileDirArg = [[NSString alloc] initWithFormat:@"--profile-dir=%@", appSupportFolder];
 	
     //Add Arguments that can't be NULL
-	NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:getiPlayerPath,profileDirArg,noWarningArg,noPurgeArg,mplayerArg,flvstreamerArg,lameArg,atomicParsleyArg,cacheExpiryArg,downloadPathArg,subDirArg,formatArg,getArg,searchArg,@"--attempts=5",@"--fatfilename",@"-w",@"--thumbsize=6",@"--tag-hdvideo",@"--tag-longdesc",@"--isodate",versionArg,ffmpegArg,proxyArg,partialProxyArg,nil];
+	NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:getiPlayerPath,profileDirArg,noWarningArg,noPurgeArg,id3v2Arg,mplayerArg,flvstreamerArg,lameArg,atomicParsleyArg,cacheExpiryArg,downloadPathArg,subDirArg,formatArg,getArg,searchArg,@"--attempts=5",@"--fatfilename",@"-w",@"--thumbsize=6",@"--tag-hdvideo",@"--tag-longdesc",@"--isodate",versionArg,ffmpegArg,proxyArg,partialProxyArg,nil];
     //Verbose?
     if (verbose)
 		[args addObject:@"--verbose"];
