@@ -153,8 +153,10 @@
                     [self setCurrentProgress:[NSString stringWithFormat:@"%.2f MB Downloaded -- %@",downloaded/1024,[show showName]]];
             }
         }
-        
-        
+        else
+        {
+            [self setCurrentProgress:[NSString stringWithFormat:@"%.2f MB Downloaded -- %@",downloaded,[show showName]]];
+        }
     }
 }
 - (void)rtmpdumpFinished:(NSNotification *)finishedNote
