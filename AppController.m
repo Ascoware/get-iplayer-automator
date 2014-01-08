@@ -908,7 +908,7 @@
 	}
 	for (NSString *string in array)
 	{
-		if (![string isEqualToString:@"Matches:"] && ![string hasPrefix:@"INFO:"] && ![string hasPrefix:@"WARNING:"]  && ![string hasPrefix:@"ERROR:"] && [string length]>0 && ![string hasPrefix:@"."])
+		if (![string isEqualToString:@"Matches:"] && ![string hasPrefix:@"INFO:"] && ![string hasPrefix:@"WARNING:"]  && ![string hasPrefix:@"ERROR:"] && [string length]>0 && ![string hasPrefix:@"."] && ![string hasPrefix:@"Added:"])
 		{
 			@try {
 				NSScanner *myScanner = [NSScanner scannerWithString:string];
@@ -2041,7 +2041,7 @@
 	}
 	for (NSString *string in array)
 	{
-		if (![string isEqualToString:@"Matches:"] && ![string hasPrefix:@"INFO:"] && ![string hasPrefix:@"WARNING:"] && [string length]>0)
+		if (![string isEqualToString:@"Matches:"] && ![string hasPrefix:@"INFO:"] && ![string hasPrefix:@"WARNING:"] && [string length]>0 && ![string hasPrefix:@"."] && ![string hasPrefix:@"Added:"])
 		{
 			@try {
 				NSScanner *myScanner = [NSScanner scannerWithString:string];
@@ -2231,7 +2231,7 @@
 	}
 	for (NSString *string in array)
 	{
-		if (![string isEqualToString:@"Matches:"] && ![string hasPrefix:@"INFO:"] && ![string hasPrefix:@"WARNING:"] && [string length]>0)
+		if (![string isEqualToString:@"Matches:"] && ![string hasPrefix:@"INFO:"] && ![string hasPrefix:@"WARNING:"] && [string length]>0 && ![string hasPrefix:@"."] && ![string hasPrefix:@"Added:"])
 		{
 			@try {
 				NSScanner *myScanner = [NSScanner scannerWithString:string];
