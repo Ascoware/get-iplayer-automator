@@ -73,6 +73,9 @@
     BOOL isFilm;
 
     ASIHTTPRequest *currentRequest;
+    
+    //Download Test
+    BOOL isTest;
 }
 - (void)setCurrentProgress:(NSString *)string;
 - (void)setPercentage:(double)d;

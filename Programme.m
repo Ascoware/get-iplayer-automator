@@ -152,6 +152,12 @@ extern BOOL runDownloads;
 {
     return pid;
 }
+-(void)printLongDescription
+{
+    NSLog(@"%@:\n   TV Network: %@\n   Processed PID: %@\n   Real PID: %@\n   Available Modes: %@\n   URL: %@\n",
+          showName,tvNetwork,processedPID,realPID,availableModes,url);
+}
+
 @synthesize showName;
 @synthesize tvNetwork;
 @synthesize status;

@@ -35,6 +35,7 @@
 }
 - (id)initWithInfo:(id)sender pid:(NSString *)PID programmeName:(NSString *)SHOWNAME network:(NSString *)TVNETWORK;
 - (id)initWithShow:(Programme *)show;
+- (void)printLongDescription;
 
 @property (readwrite) NSString *showName;
 @property (readwrite) NSString *tvNetwork;

@@ -23,6 +23,27 @@
 {
 	return [NSString stringWithFormat:@"ITV Download (ID=%@)", [show pid]];
 }
+- (id)initTest:(Programme *)tempShow proxy:(HTTPProxy *)aProxy
+{
+    if (!(self = [super init])) return nil;
+    proxy=aProxy;
+    show=tempShow;
+    attemptNumber=1;
+    nc = [NSNotificationCenter defaultCenter];
+    defaultsPrefix = @"ITV_";
+    running=TRUE;
+    
+    formatList = @[[[TVFormat alloc] init],[[TVFormat alloc] init]];
+    [formatList[0] setFormat:@"Flash - Standard"];
+    [formatList[1] setFormat:@"Flash - High"];
+    
+    isTest=true;
+    
+    [tempShow printLongDescription];
+    
+    [self launchMetaRequest];
+    return self;
+}
 - (id)initWithProgramme:(Programme *)tempShow itvFormats:(NSArray *)itvFormatList proxy:(HTTPProxy *)aProxy
 {
     if (!(self = [super init])) return nil;
@@ -42,6 +63,8 @@
     formatList = [itvFormatList copy];
     [self addToLog:[NSString stringWithFormat:@"Downloading %@",[show showName]]];
     [self addToLog:@"INFO: Preparing Request for Auth Info" noTag:YES];
+    
+    [tempShow printLongDescription];
     
     [self launchMetaRequest];
     return self;
@@ -79,9 +102,13 @@
         [show setRealPID:pid];
         soapBody = @"Body";
     }
-
-    NSString *body = [[NSString alloc] initWithData:[NSData dataWithContentsOfFile:[[NSBundle mainBundle] pathForResource:soapBody ofType:nil]]
-                                           encoding:NSUTF8StringEncoding];
+    NSString *body;
+    if (!isTest)
+        body = [[NSString alloc] initWithData:[NSData dataWithContentsOfFile:[[NSBundle mainBundle] pathForResource:soapBody ofType:nil]]
+                                               encoding:NSUTF8StringEncoding];
+    else
+        body = [[NSString alloc] initWithData:[NSData dataWithContentsOfFile:[[[NSProcessInfo processInfo] environment] objectForKey:@"REQUEST_LOC"]] encoding:NSUTF8StringEncoding];
+    
     body = [body stringByReplacingOccurrencesOfString:@"!!!ID!!!" withString:[show realPID]];
     
     NSURL *requestURL = [NSURL URLWithString:@"http://mercury.itv.com/PlaylistService.svc"];
@@ -399,7 +426,14 @@
     
     downloadParams[@"authURL"] = authURL;
     downloadParams[@"playPath"] = playPath;
-
+    
+    //Proxy Test Stuff
+    if (isTest)
+    {
+        [nc postNotificationName:@"MetadataSuccessful" object:nil];
+        return;
+    }
+    
     NSLog(@"INFO: Metadata processed.");
     [self addToLog:@"INFO: Metadata processed." noTag:YES];
     NSURL *dataURL = [NSURL URLWithString:[NSString stringWithFormat:@"http://www.itv.com/_app/Dynamic/CatchUpData.ashx?ViewType=5&Filter=%@",[show realPID]]];

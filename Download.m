@@ -19,6 +19,7 @@
 	outOfRange=0;
     verbose = [[NSUserDefaults standardUserDefaults] boolForKey:@"Verbose"];
     downloadParams = [[NSMutableDictionary alloc] init];
+    isTest=false;
     
     return self;
 }

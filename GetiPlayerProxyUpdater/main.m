@@ -9,13 +9,27 @@
 
 #import <Foundation/Foundation.h>
 #import "ASIHTTPRequest.h"
+#import "ITVDownload.h"
+#import "Programme.h"
+#import "HTTPProxy.h"
 
-#define ProxyFilePath @"/Users/thomaswillson/Documents/proxy.txt"
+
+@interface ITVDownloadTest : NSObject {
+    bool itvComplete;
+    bool itvSuccess;
+}
+- (bool)itvDownloadTest:(NSURL *)proxyURL;
+- (void)itvFinished:(NSNotification *)note;
+@end
+
+
 
 //Function Prototypes
 bool basicProxyTest(NSURL *proxyURL);
-bool itvDownloadTest(NSURL *proxyURL);
 bool bbcDownloadTest(NSURL *proxyURL);
+
+bool runDownloads=false;
+
 
 
 int main(int argc, const char * argv[])
@@ -24,6 +38,8 @@ int main(int argc, const char * argv[])
     @autoreleasepool {
         
         NSLog(@"Proxy Updater Started");
+        
+        NSString *ProxyFilePath = [[[NSProcessInfo processInfo] environment] objectForKey:@"PROXY_LOC"];
         
         NSString *proxyString = [@"http://" stringByAppendingString:[[NSString stringWithContentsOfFile:ProxyFilePath encoding:NSUTF8StringEncoding error:nil] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]];
         
@@ -37,7 +53,8 @@ int main(int argc, const char * argv[])
         proxyOK = basicProxyTest(proxyURL);
         
         //Test Download
-        if (proxyOK) proxyOK = itvDownloadTest(proxyURL);
+        ITVDownloadTest *itvDownloadTest = [[ITVDownloadTest alloc] init];
+        if (proxyOK) proxyOK = [itvDownloadTest itvDownloadTest:proxyURL];
         if (proxyOK) proxyOK = bbcDownloadTest(proxyURL);
         
         
@@ -78,6 +95,9 @@ int main(int argc, const char * argv[])
             [listScanner scanUpToString:@"proxy&host=" intoString:nil];
         }
         NSLog(@"Processed Page");
+        for (NSURL *proxy in proxyListArr)
+            NSLog(@"%@\n",proxy);
+        
         NSURL *workingProxy = nil;
         for (NSURL *proxy in proxyListArr)
         {
@@ -85,9 +105,10 @@ int main(int argc, const char * argv[])
             
             //Perform Basic Test on Proxy first
             proxyOK = basicProxyTest(proxy);
+            NSLog(@"Basic Proxy Test: %d",proxyOK);
             
             //Test Download
-            if (proxyOK) proxyOK = itvDownloadTest(proxy);
+            if (proxyOK) proxyOK = [itvDownloadTest itvDownloadTest:proxy];
             if (proxyOK) proxyOK = bbcDownloadTest(proxy);
             
             if (proxyOK)
@@ -117,14 +138,52 @@ bool basicProxyTest(NSURL *proxyURL)
     [request setProxyPort:[[proxyURL port] intValue]];
     
     [request startSynchronous];
-    
     return [request responseStatusCode] == 200;
 }
 
-bool itvDownloadTest(NSURL *proxyURL)
+@implementation ITVDownloadTest
+-(bool)itvDownloadTest:(NSURL *)proxyURL
 {
-    return true;
+    NSLog(@"Starting ITV Test with Proxy: %@",proxyURL);
+    itvComplete = false;
+    itvSuccess = false;
+    
+    NSString *itvCache = [NSString stringWithContentsOfFile:@"/Users/thomaswillson/Library/Application Support/Get iPlayer Automator/ITV.cache" encoding:NSUTF8StringEncoding error:nil];
+    
+    NSScanner *scanner = [NSScanner scannerWithString:itvCache];
+    
+    [scanner scanUpToString:@"|Coronation Street|" intoString:nil];
+    
+    if (![scanner scanString:@"|Coronation Street|" intoString:nil]) return true;
+    NSString *pid;
+    
+    [scanner scanUpToString:@"|" intoString:&pid];
+    NSString *url = [NSString stringWithFormat:@"http://www.itv.com/CatchUp/Video/default.html?ViewType=5&amp;Filter=%@",pid];
+    Programme *testShow = [[Programme alloc] init];
+    [testShow setUrl:url];
+    [testShow setPid:pid];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(itvFinished:) name:@"DownloadFinished" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(itvFinished:) name:@"MetadataSuccessful" object:nil];
+    
+    HTTPProxy *proxy = [[HTTPProxy alloc] initWithURL:proxyURL];
+    ITVDownload *download = [[ITVDownload alloc] initTest:testShow proxy:proxy];
+    
+    while (!itvComplete)
+        [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
+
+    NSLog(@"ITV Success: %d",itvSuccess);
+    return itvSuccess;
 }
+- (void)itvFinished:(NSNotification *)note
+{
+    if ([[note name] isEqualToString:@"DownloadFinished"])
+        itvSuccess=false;
+    else
+        itvSuccess=true;
+    itvComplete=true;
+}
+@end
 
 bool bbcDownloadTest(NSURL *proxyURL)
 {
