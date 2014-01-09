@@ -136,6 +136,9 @@ NSDictionary *radioFormats;
     //PVR list editing
     NilToStringTransformer *nilToEmptyStringTransformer;
     NilToStringTransformer *nilToAsteriskTransformer;
+    
+    //Verbose Logging
+    BOOL verbose;
 }
 //Update
 - (void)getiPlayerUpdateFinished;

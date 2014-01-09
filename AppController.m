@@ -122,6 +122,7 @@
     nilToAsteriskTransformer = [[NilToStringTransformer alloc] initWithString:@"*"];
     [NSValueTransformer setValueTransformer:nilToEmptyStringTransformer forName:@"NilToEmptyStringTransformer"];
     [NSValueTransformer setValueTransformer:nilToAsteriskTransformer forName:@"NilToAsteriskTransformer"];
+    verbose = [[NSUserDefaults standardUserDefaults] boolForKey:@"Verbose"];
     return self;
 }
 #pragma mark Delegate Methods
@@ -355,13 +356,22 @@
 }
 - (void)updater:(SUUpdater *)updater didFindValidUpdate:(SUAppcastItem *)update
 {
-	[GrowlApplicationBridge notifyWithTitle:@"Update Available!" 
-								description:[NSString stringWithFormat:@"Get iPlayer Automator %@ is available.",[update displayVersionString]]
-						   notificationName:@"New Version Available"
-								   iconData:nil
-								   priority:0
-								   isSticky:NO
-							   clickContext:nil];
+    @try
+    {
+        
+        [GrowlApplicationBridge notifyWithTitle:@"Update Available!"
+                                    description:[NSString stringWithFormat:@"Get iPlayer Automator %@ is available.",[update displayVersionString]]
+                               notificationName:@"New Version Available"
+                                       iconData:nil
+                                       priority:0
+                                       isSticky:NO
+                                   clickContext:nil];
+    }
+    @catch (NSException *e) {
+        NSLog(@"WARNING: Growl notification failed (updater)");
+        if (verbose)
+            [self addToLog:@"WARNING: Growl notification failed (updater)"];
+    }
 }
 #pragma mark Cache Update
 - (IBAction)updateCache:(id)sender
@@ -606,13 +616,21 @@
 	
 	if (didUpdate)
 	{
-		[GrowlApplicationBridge notifyWithTitle:@"Index Updated" 
-									description:@"The program index was updated."
-							   notificationName:@"Index Updating Completed"
-									   iconData:nil
-									   priority:0
-									   isSticky:NO
-								   clickContext:nil];
+       @try
+        {
+            [GrowlApplicationBridge notifyWithTitle:@"Index Updated"
+                                        description:@"The program index was updated."
+                                   notificationName:@"Index Updating Completed"
+                                           iconData:nil
+                                           priority:0
+                                           isSticky:NO
+                                       clickContext:nil];
+        }
+        @catch (NSException *e) {
+            NSLog(@"WARNING: Growl notification failed (getiPlayerUpdateFinished)");
+            if (verbose)
+                [self addToLog:@"WARNING: Growl notification failed (getiPlayerUpdateFinished)"];
+        }
 		[self addToLog:@"Index Updated." :self];
         lastUpdate=[NSDate date];
 	}
@@ -1837,24 +1855,40 @@
 			else
 				[finishedShow setValue:@"Download Complete" forKey:@"status"];
 			
-			[GrowlApplicationBridge notifyWithTitle:@"Download Finished" 
-										description:[NSString stringWithFormat:@"%@ Completed Successfully",[finishedShow showName]] 
-								   notificationName:@"Download Finished"
-										   iconData:nil
-										   priority:0
-										   isSticky:NO
-									   clickContext:nil];
-		}
+            @try
+            {
+                [GrowlApplicationBridge notifyWithTitle:@"Download Finished"
+                                            description:[NSString stringWithFormat:@"%@ Completed Successfully",[finishedShow showName]] 
+                                       notificationName:@"Download Finished"
+                                               iconData:nil
+                                               priority:0
+                                               isSticky:NO
+                                           clickContext:nil];
+            }
+            @catch (NSException *e) {
+                NSLog(@"WARNING: Growl notification failed (nextDownload - finished)");
+                if (verbose)
+                    [self addToLog:@"WARNING: Growl notification failed (nextDownload - finished)" :self];
+            }
+        }
 		else
 		{
-			[GrowlApplicationBridge notifyWithTitle:@"Download Failed" 
-										description:[NSString stringWithFormat:@"%@ failed. See log for details.",[finishedShow showName]] 
-								   notificationName:@"Download Failed"
-										   iconData:nil
-										   priority:0
-										   isSticky:NO
-									   clickContext:nil];
-            
+            @try
+            {
+                [GrowlApplicationBridge notifyWithTitle:@"Download Failed"
+                                            description:[NSString stringWithFormat:@"%@ failed. See log for details.",[finishedShow showName]] 
+                                       notificationName:@"Download Failed"
+                                               iconData:nil
+                                               priority:0
+                                               isSticky:NO
+                                           clickContext:nil];
+            }
+            @catch (NSException *e) {
+                NSLog(@"WARNING: Growl notification failed (nextDownload - failed)");
+                if (verbose)
+                    [self addToLog:@"WARNING: Growl notification failed (nextDownload - failed)" :self];
+            }
+        
             ReasonForFailure *showSolution = [[ReasonForFailure alloc] init];
             [showSolution setShowName:[finishedShow showName]];
             [showSolution setSolution:[solutionsDictionary valueForKey:[finishedShow reasonForFailure]]];
@@ -1941,14 +1975,22 @@
 				}
 			}
 			tempQueue=nil;
-			[GrowlApplicationBridge notifyWithTitle:@"Downloads Finished"
-										description:[NSString stringWithFormat:@"Downloads Successful = %lu\nDownload Failed = %lu",
-                                                     (unsigned long)downloadsSuccessful,(unsigned long)downloadsFailed]
-								   notificationName:@"Downloads Finished"
-										   iconData:nil
-										   priority:0
-										   isSticky:NO
-									   clickContext:nil];
+            @try
+            {
+                [GrowlApplicationBridge notifyWithTitle:@"Downloads Finished"
+                                            description:[NSString stringWithFormat:@"Downloads Successful = %lu\nDownload Failed = %lu",
+                                                         (unsigned long)downloadsSuccessful,(unsigned long)downloadsFailed]
+                                       notificationName:@"Downloads Finished"
+                                               iconData:nil
+                                               priority:0
+                                               isSticky:NO
+                                           clickContext:nil];
+            }
+            @catch (NSException *e) {
+                NSLog(@"WARNING: Growl notification failed (nextDownload - complete)");
+                if (verbose)
+                    [self addToLog:@"WARNING: Growl notification failed (nextDownload - complete)" :self];
+            }
 			[[SUUpdater sharedUpdater] checkForUpdatesInBackground];
 			
 			if (downloadsFailed>0)
