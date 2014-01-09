@@ -166,8 +166,7 @@ bool basicProxyTest(NSURL *proxyURL)
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(itvFinished:) name:@"DownloadFinished" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(itvFinished:) name:@"MetadataSuccessful" object:nil];
     
-    HTTPProxy *proxy = [[HTTPProxy alloc] initWithURL:proxyURL];
-    ITVDownload *download = [[ITVDownload alloc] initTest:testShow proxy:proxy];
+    [[ITVDownload alloc] initTest:testShow proxy:[[HTTPProxy alloc] initWithURL:proxyURL]];
     
     while (!itvComplete)
         [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
