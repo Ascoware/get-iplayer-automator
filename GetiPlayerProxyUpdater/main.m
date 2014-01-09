@@ -39,7 +39,8 @@ int main(int argc, const char * argv[])
         
         NSLog(@"Proxy Updater Started");
         
-        NSString *ProxyFilePath = [[[NSProcessInfo processInfo] environment] objectForKey:@"PROXY_LOC"];
+        //NSString *ProxyFilePath = [[[NSProcessInfo processInfo] environment] objectForKey:@"PROXY_LOC"];
+        NSString *ProxyFilePath = @"/Volumes/Server Storage/Web Root/get_iplayer/proxy.txt";
         
         NSString *proxyString = [@"http://" stringByAppendingString:[[NSString stringWithContentsOfFile:ProxyFilePath encoding:NSUTF8StringEncoding error:nil] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]];
         
@@ -148,7 +149,7 @@ bool basicProxyTest(NSURL *proxyURL)
     itvComplete = false;
     itvSuccess = false;
     
-    NSString *itvCache = [NSString stringWithContentsOfFile:@"/Users/thomaswillson/Library/Application Support/Get iPlayer Automator/ITV.cache" encoding:NSUTF8StringEncoding error:nil];
+    NSString *itvCache = [NSString stringWithContentsOfFile:@"/Volumes/Server Storage/Web Root/get_iplayer/cache/itv.cache" encoding:NSUTF8StringEncoding error:nil];
     
     NSScanner *scanner = [NSScanner scannerWithString:itvCache];
     

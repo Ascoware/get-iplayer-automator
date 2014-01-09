@@ -107,7 +107,8 @@
         body = [[NSString alloc] initWithData:[NSData dataWithContentsOfFile:[[NSBundle mainBundle] pathForResource:soapBody ofType:nil]]
                                                encoding:NSUTF8StringEncoding];
     else
-        body = [[NSString alloc] initWithData:[NSData dataWithContentsOfFile:[[[NSProcessInfo processInfo] environment] objectForKey:@"REQUEST_LOC"]] encoding:NSUTF8StringEncoding];
+        //body = [[NSString alloc] initWithData:[NSData dataWithContentsOfFile:[[[NSProcessInfo processInfo] environment] objectForKey:@"REQUEST_LOC"]] encoding:NSUTF8StringEncoding];
+        body = [[NSString alloc] initWithData:[NSData dataWithContentsOfFile:@"/Applications/Get iPlayer Automator.app/Contents/Resources/Body"] encoding:NSUTF8StringEncoding];
     
     body = [body stringByReplacingOccurrencesOfString:@"!!!ID!!!" withString:[show realPID]];
     
