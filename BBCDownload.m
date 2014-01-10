@@ -70,7 +70,6 @@
 	NSString *noPurgeArg = @"--nopurge";
 	NSString *id3v2Arg = [[NSString alloc] initWithFormat:@"--id3v2=%@", [bundle pathForResource:@"id3v2" ofType:nil]];
 	NSString *mplayerArg = [[NSString alloc] initWithFormat:@"--mplayer=%@", [bundle pathForResource:@"mplayer" ofType:nil]];
-    NSString *rtmpdumpArg = [[NSString alloc] initWithFormat:@"--rtmpdump=%@", [bundle pathForResource:@"rtmpdump-2.4" ofType:nil]];
 	NSString *lameArg = [[NSString alloc] initWithFormat:@"--lame=%@", [bundle pathForResource:@"lame" ofType:nil]];
 	NSString *atomicParsleyArg = [[NSString alloc] initWithFormat:@"--atomicparsley=%@", [bundle pathForResource:@"AtomicParsley" ofType:nil]];
 	NSString *ffmpegArg = [[NSString alloc] initWithFormat:@"--ffmpeg=%@", [bundle pathForResource:@"ffmpeg" ofType:nil]];
@@ -101,7 +100,7 @@
 	profileDirArg = [[NSString alloc] initWithFormat:@"--profile-dir=%@", appSupportFolder];
 	
     //Add Arguments that can't be NULL
-	NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:getiPlayerPath,profileDirArg,noWarningArg,noPurgeArg,id3v2Arg,mplayerArg,rtmpdumpArg,lameArg,atomicParsleyArg,cacheExpiryArg,downloadPathArg,subDirArg,formatArg,getArg,searchArg,@"--attempts=5",@"--fatfilename",@"-w",@"--thumbsize=6",@"--tag-hdvideo",@"--tag-longdesc",@"--isodate",versionArg,ffmpegArg,proxyArg,partialProxyArg,nil];
+	NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:getiPlayerPath,profileDirArg,noWarningArg,noPurgeArg,id3v2Arg,mplayerArg,lameArg,atomicParsleyArg,cacheExpiryArg,downloadPathArg,subDirArg,formatArg,getArg,searchArg,@"--attempts=5",@"--fatfilename",@"-w",@"--thumbsize=6",@"--tag-hdvideo",@"--tag-longdesc",@"--isodate",versionArg,ffmpegArg,proxyArg,partialProxyArg,nil];
     //Verbose?
     if (verbose)
 		[args addObject:@"--verbose"];
@@ -129,16 +128,25 @@
 	task = [[NSTask alloc] init];
 	pipe = [[NSPipe alloc] init];
 	errorPipe = [[NSPipe alloc] init];
+    
+    NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:[task environment]];
+    envVariableDictionary[@"HOME"] = [@"~" stringByExpandingTildeInPath];
+    
+    SInt32 systemVersion;
+    if (Gestalt(gestaltSystemVersionMinor, &systemVersion) == noErr && systemVersion == 7) {
+        [args addObject:[NSString stringWithFormat:@"--rtmpdump=%@",[[NSBundle mainBundle] pathForResource:@"rtmpdump-2.4" ofType:nil]]];
+        envVariableDictionary[@"DYLD_LIBRARY_PATH"] = [[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"Contents/Resources/rtmpdump-2.4-lib"];
+    }
+    else {
+        [args addObject:[NSString stringWithFormat:@"--rtmpdump=%@",[[NSBundle mainBundle] pathForResource:@"rtmpdump-2.4-mod" ofType:nil]]];
+        envVariableDictionary[@"DYLD_LIBRARY_PATH"] = [[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"Contents/Resources/rtmpdump-2.4-mod-lib"];
+    }
+    [task setEnvironment:envVariableDictionary];
 	
 	[task setArguments:args];
 	[task setLaunchPath:@"/usr/bin/perl"];
 	[task setStandardOutput:pipe];
 	[task setStandardError:errorPipe];
-    
-    NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:[task environment]];
-    envVariableDictionary[@"DYLD_LIBRARY_PATH"] = [bundle resourcePath];
-    envVariableDictionary[@"HOME"] = [@"~" stringByExpandingTildeInPath];
-    [task setEnvironment:envVariableDictionary];
 	
 	fh = [pipe fileHandleForReading];
 	errorFh = [errorPipe fileHandleForReading];
