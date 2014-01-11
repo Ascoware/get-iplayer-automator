@@ -16,6 +16,7 @@
 		39879DB016904B9F0050CA7D /* NSString+HTML.m in Sources */ = {isa = PBXBuildFile; fileRef = 39879DAE16904B9F0050CA7D /* NSString+HTML.m */; };
 		39ABB9C017FCCD9300B5D519 /* Growl.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = D93AD85317DC9D6E00458B1C /* Growl.framework */; };
 		39BCA33A1877080F007115F2 /* id3v2 in Resources */ = {isa = PBXBuildFile; fileRef = 39BCA3391877080F007115F2 /* id3v2 */; };
+		39CD35FB1875FC7600BFE53A /* librtmp.1.dylib in Resources */ = {isa = PBXBuildFile; fileRef = 39CD35F91875FC5F00BFE53A /* librtmp.1.dylib */; };
 		39D7C1BD1874AD7400B78698 /* StringTrimFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 39D7C1BC1874AD7400B78698 /* StringTrimFormatter.m */; };
 		39D7C1C01874AD9D00B78698 /* NilToStringTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = 39D7C1BF1874AD9D00B78698 /* NilToStringTransformer.m */; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
@@ -64,9 +65,6 @@
 		D93FD349187E761800C91E33 /* GTMNSString+HTML.m in Sources */ = {isa = PBXBuildFile; fileRef = 39879DAC16904B9F0050CA7D /* GTMNSString+HTML.m */; };
 		D93FD34A187E761B00C91E33 /* NSHost+ThreadedAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 39814022168E124B003FFF53 /* NSHost+ThreadedAdditions.m */; };
 		D93FD34B187E76AB00C91E33 /* TVFormat.m in Sources */ = {isa = PBXBuildFile; fileRef = D97D9423106DBB68006ECD39 /* TVFormat.m */; };
-		D93FD353187F768700C91E33 /* rtmpdump-2.4-lib in Resources */ = {isa = PBXBuildFile; fileRef = D93FD352187F768700C91E33 /* rtmpdump-2.4-lib */; };
-		D93FD355187F769300C91E33 /* rtmpdump-2.4-mod-lib in Resources */ = {isa = PBXBuildFile; fileRef = D93FD354187F769300C91E33 /* rtmpdump-2.4-mod-lib */; };
-		D93FD359187F786500C91E33 /* rtmpdump-2.4-mod in Resources */ = {isa = PBXBuildFile; fileRef = D93FD358187F786500C91E33 /* rtmpdump-2.4-mod */; };
 		D941D9511025DB2B0012A75F /* JRFeedbackProvider.strings in Resources */ = {isa = PBXBuildFile; fileRef = D941D94D1025DB2B0012A75F /* JRFeedbackProvider.strings */; };
 		D941D9521025DB2B0012A75F /* JRFeedbackProvider.xib in Resources */ = {isa = PBXBuildFile; fileRef = D941D94F1025DB2B0012A75F /* JRFeedbackProvider.xib */; };
 		D941D95E1025DB580012A75F /* NSURLRequest+postForm.m in Sources */ = {isa = PBXBuildFile; fileRef = D941D95B1025DB580012A75F /* NSURLRequest+postForm.m */; };
@@ -152,6 +150,7 @@
 		39879DAD16904B9F0050CA7D /* NSString+HTML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+HTML.h"; sourceTree = "<group>"; };
 		39879DAE16904B9F0050CA7D /* NSString+HTML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+HTML.m"; sourceTree = "<group>"; };
 		39BCA3391877080F007115F2 /* id3v2 */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = id3v2; sourceTree = "<group>"; };
+		39CD35F91875FC5F00BFE53A /* librtmp.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = librtmp.1.dylib; sourceTree = "<group>"; };
 		39D7C1BB1874AD7400B78698 /* StringTrimFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StringTrimFormatter.h; sourceTree = "<group>"; };
 		39D7C1BC1874AD7400B78698 /* StringTrimFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StringTrimFormatter.m; sourceTree = "<group>"; };
 		39D7C1BE1874AD9D00B78698 /* NilToStringTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NilToStringTransformer.h; sourceTree = "<group>"; };
@@ -215,9 +214,6 @@
 		D9279DD4182044D4008DBB09 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/IOKit.framework; sourceTree = DEVELOPER_DIR; };
 		D92BB4091025B4D600B0BFEC /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
 		D93AD85317DC9D6E00458B1C /* Growl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Growl.framework; sourceTree = "<group>"; };
-		D93FD352187F768700C91E33 /* rtmpdump-2.4-lib */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "rtmpdump-2.4-lib"; sourceTree = "<group>"; };
-		D93FD354187F769300C91E33 /* rtmpdump-2.4-mod-lib */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "rtmpdump-2.4-mod-lib"; sourceTree = "<group>"; };
-		D93FD358187F786500C91E33 /* rtmpdump-2.4-mod */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = "rtmpdump-2.4-mod"; sourceTree = "<group>"; };
 		D941D94E1025DB2B0012A75F /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/JRFeedbackProvider.strings; sourceTree = "<group>"; };
 		D941D9501025DB2B0012A75F /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/JRFeedbackProvider.xib; sourceTree = "<group>"; };
 		D941D95A1025DB580012A75F /* NSURLRequest+postForm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSURLRequest+postForm.h"; sourceTree = "<group>"; };
@@ -445,10 +441,8 @@
 		D904F04D1009F28400D60BBF /* Binaries */ = {
 			isa = PBXGroup;
 			children = (
-				D93FD358187F786500C91E33 /* rtmpdump-2.4-mod */,
-				D93FD354187F769300C91E33 /* rtmpdump-2.4-mod-lib */,
-				D93FD352187F768700C91E33 /* rtmpdump-2.4-lib */,
 				39BCA3391877080F007115F2 /* id3v2 */,
+				39CD35F91875FC5F00BFE53A /* librtmp.1.dylib */,
 				D9CAE545133FF9BE003471DA /* ffmpeg */,
 				DF3A234A13E5F59900B82C2E /* rtmpdump-2.4 */,
 				D904F0721009F6B800D60BBF /* mplayer */,
@@ -652,6 +646,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				39CD35FB1875FC7600BFE53A /* librtmp.1.dylib in Resources */,
 				D904F0731009F6B800D60BBF /* mplayer in Resources */,
 				D9F66963102C5DC500A9449B /* GetOperaURL.applescript in Resources */,
 				D9F668DB102C560500A9449B /* GetFireFoxURL.applescript in Resources */,
@@ -662,7 +657,6 @@
 				D9CC156A0FF9072F00D819E2 /* ActivityWindow.tiff in Resources */,
 				D9CC157B0FF9076F00D819E2 /* Stop.tiff in Resources */,
 				D904F04A1009F22E00D60BBF /* get_iplayer.pl in Resources */,
-				D93FD353187F768700C91E33 /* rtmpdump-2.4-lib in Resources */,
 				D91783F01013035B00B82736 /* camstudio_record_button.png in Resources */,
 				D9CCF3CC1023485A009205BE /* dsa_pub.pem in Resources */,
 				39BCA33A1877080F007115F2 /* id3v2 in Resources */,
@@ -673,7 +667,6 @@
 				D9A450A4102FFDC00011E175 /* LICENSE.txt in Resources */,
 				D948C40C103436DE000CF853 /* icon.icns in Resources */,
 				D97D96A610743860006ECD39 /* lame in Resources */,
-				D93FD359187F786500C91E33 /* rtmpdump-2.4-mod in Resources */,
 				D961247F10F12C9200046D31 /* AtomicParsley in Resources */,
 				D9CAE546133FF9BE003471DA /* ffmpeg in Resources */,
 				DF3A234B13E5F59900B82C2E /* rtmpdump-2.4 in Resources */,
@@ -684,7 +677,6 @@
 				DFC8D40415C97310008E369F /* fourOD_token_decoder.py in Resources */,
 				3975484D1622504F00470DD1 /* ttml2srt.py in Resources */,
 				398516A716D1A02500EBB4CE /* Body2 in Resources */,
-				D93FD355187F769300C91E33 /* rtmpdump-2.4-mod-lib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -833,8 +825,7 @@
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\\\"$(SRCROOT)/Binaries\\\"",
-					"/Users/thomaswillson/Code/get-iplayer-automator/Binaries",
+					"\"$(SRCROOT)/Binaries\"",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = NO;
@@ -868,8 +859,7 @@
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\\\"$(SRCROOT)/Binaries\\\"",
-					"/Users/thomaswillson/Code/get-iplayer-automator/Binaries",
+					"\"$(SRCROOT)/Binaries\"",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = NO;

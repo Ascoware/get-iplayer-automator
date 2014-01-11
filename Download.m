@@ -583,19 +583,7 @@
     task = [[NSTask alloc] init];
     pipe = [[NSPipe alloc] init];
     errorPipe = [[NSPipe alloc] init];
-    NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:[task environment]];
-    envVariableDictionary[@"HOME"] = [@"~" stringByExpandingTildeInPath];
-    
-    SInt32 systemVersion;
-    if (Gestalt(gestaltSystemVersionMinor, &systemVersion) == noErr && systemVersion == 7) {
-        [task setLaunchPath:[[NSBundle mainBundle] pathForResource:@"rtmpdump-2.4" ofType:nil]];
-        envVariableDictionary[@"DYLD_LIBRARY_PATH"] = [[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"Contents/Resources/rtmpdump-2.4-lib"];
-    }
-    else {
-        [task setLaunchPath:[[NSBundle mainBundle] pathForResource:@"rtmpdump-2.4-mod" ofType:nil]];
-        envVariableDictionary[@"DYLD_LIBRARY_PATH"] = [[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"Contents/Resources/rtmpdump-2.4-mod-lib"];
-    }
-    [task setEnvironment:envVariableDictionary];
+    [task setLaunchPath:[[NSBundle mainBundle] pathForResource:@"rtmpdump-2.4" ofType:nil]];
     
     /* rtmpdump -r "rtmpe://cp72511.edgefcs.net/ondemand?auth=eaEc.b4aodIcdbraJczd.aKchaza9cbdTc0cyaUc2aoblaLc3dsdkd5d9cBduczdLdn-bo64cN-eS-6ys1GDrlysDp&aifp=v002&slist=production/" -W http://www.itv.com/mediaplayer/ITVMediaPlayer.swf?v=11.20.654 -y "mp4:production/priority/CATCHUP/e48ab1e2/1a73/4620/adea/dda6f21f45ee/1-6178-0002-001_THE-ROYAL-VARIETY-PERFORMANCE-2011_TX141211_ITV1200_16X9.mp4" -o test2 */
     
@@ -607,6 +595,12 @@
     fh = [pipe fileHandleForReading];
 	errorFh = [errorPipe fileHandleForReading];
     
+    NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:[task environment]];
+    envVariableDictionary[@"DYLD_LIBRARY_PATH"] = [[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"Contents/Resources"];
+    envVariableDictionary[@"HOME"] = [@"~" stringByExpandingTildeInPath];
+    [task setEnvironment:envVariableDictionary];
+    
+	
 	[nc addObserver:self
 		   selector:@selector(DownloadDataReady:)
 			   name:NSFileHandleReadCompletionNotification
