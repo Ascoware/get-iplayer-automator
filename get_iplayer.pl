@@ -24,7 +24,7 @@
 #
 #
 package main;
-my $version = 2.84;
+my $version = 2.85;
 my $version_text;
 $version_text = sprintf("v%.2f", $version) unless $version_text;
 #
@@ -117,7 +117,7 @@ my %prog_types = (
 # Entries with keys starting with '_' are not parsed only displayed as help and in man pages.
 my $opt_format = {
 	# Recording
-	attempts	=> [ 1, "attempts=n", 'Recording', '--attempts <number>', "Number of attempts to make or resume a failed connection"],
+	attempts	=> [ 1, "attempts=n", 'Recording', '--attempts <number>', "Number of attempts to make or resume a failed connection.  --attempts is applied per-stream, per-mode.  TV modes typically have two streams available."],
 	force		=> [ 1, "force|force-download!", 'Recording', '--force', "Ignore programme history (unsets --hide option also). Forces a script update if used with -u"],
 	get		=> [ 2, "get|record|g!", 'Recording', '--get, -g', "Start recording matching programmes. Search terms required unless --pid specified. Use  --search=.* to force download of all available programmes."],
 	hash		=> [ 1, "hash!", 'Recording', '--hash', "Show recording progress as hashes"],
@@ -3183,7 +3183,7 @@ sub usage {
 	my @man;
 	my @dump;
 	push @man, 
-		'.TH GET_IPLAYER "1" "September 2013" "Phil Lewis" "get_iplayer Manual"',
+		'.TH GET_IPLAYER "1" "November 2013" "Phil Lewis" "get_iplayer Manual"',
 		'.SH NAME', 'get_iplayer - Stream Recording tool and PVR for BBC iPlayer, BBC Podcasts and more',
 		'.SH SYNOPSIS',
 		'\fBget_iplayer\fR [<options>] [<regex|index> ...]',
@@ -4265,6 +4265,7 @@ sub download_retry_loop {
 					$available_modes_short{$modename}++;
 				}
 				main::logger "INFO: No specified modes ($modelist) available for this programme with version '$version' (try using --modes=".(join ',', sort keys %available_modes_short).")\n";
+				main::logger "INFO: You may receive this message if you are using get_iplayer outside the UK\n" if ($#available_modes < 0);
 				next;
 			}
 			main::logger "INFO: ".join(',', @modes)." modes will be tried for version $version\n";
@@ -4272,10 +4273,15 @@ sub download_retry_loop {
 			# Expand the modes into a loop
 			for my $mode ( @modes ) {
 				chomp( $mode );
+				(my $modeshort = $mode) =~ s/\d+$//g;
+				# force regeneration of file name if mode changed
+				if ( $prog->{modeshort} ne $modeshort ) {
+					undef $prog->{filename};
+					main::logger "INFO: Regenerate filename for mode change: $prog->{modeshort} -> $modeshort\n" if ( $prog->{modeshort} && $opt->{verbose} );
+				}
 				$prog->{mode} = $mode;
 				# Keep short mode name for substitutions
-				$prog->{modeshort} = $mode;
-				$prog->{modeshort} =~ s/\d+$//g;
+				$prog->{modeshort} = $modeshort;
 
 				# If multimode is used, skip only modes which are in the history
 				next if $opt->{multimode} && $hist->check( $prog->{pid}, $mode );
@@ -6524,7 +6530,7 @@ sub channels_schedule {
 sub opt_format {
 	return {
 		tvmode		=> [ 1, "tvmode|vmode=s", 'Recording', '--tvmode <mode>,<mode>,...', "TV recording modes: flashhd,flashvhigh,flashhigh,flashstd,flashnormal,flashlow. Shortcuts: default,good,better(=default),best,rtmp,flash. (Use 'best' for HD TV. 'default'=flashvhigh,flashhigh,flashstd,flashnormal,flashlow)"],
-		outputtv	=> [ 1, "outputtv=s", 'Output', '--outputtv <dir>', "Output directory for tv recordings"],
+		outputtv	=> [ 1, "outputtv=s", 'Output', '--outputtv <dir>', "Output directory for tv recordings (overrides --output)"],
 		vlc		=> [ 1, "vlc=s", 'External Program', '--vlc <path>', "Location of vlc or cvlc binary"],
 		rtmptvopts	=> [ 1, "rtmp-tv-opts|rtmptvopts=s", 'Recording', '--rtmp-tv-opts <options>', "Add custom options to rtmpdump for tv"],
 		ffmpegtvopts	=> [ 1, "ffmpeg-tv-opts|ffmpegtvopts=s", 'Recording', '--ffmpeg-tv-opts <options>', "Add custom options to ffmpeg re-muxing for tv"],
@@ -7461,7 +7467,7 @@ sub opt_format {
 		radiomode	=> [ 1, "radiomode|amode=s", 'Recording', '--radiomode <mode>,<mode>,...', "Radio recording modes: flashaachigh,flashaacstd,flashaudio,flashaaclow,wma. Shortcuts: default,good,better(=default),best,rtmp,flash,flashaac. ('default'=flashaachigh,flashaacstd,flashaudio,flashaaclow)"],
 		bandwidth 	=> [ 1, "bandwidth=n", 'Recording', '--bandwidth', "In radio realaudio mode specify the link bandwidth in bps for rtsp streaming (default 512000)"],
 		lame		=> [ 0, "lame=s", 'External Program', '--lame <path>', "Location of lame binary"],
-		outputradio	=> [ 1, "outputradio=s", 'Output', '--outputradio <dir>', "Output directory for radio recordings"],
+		outputradio	=> [ 1, "outputradio=s", 'Output', '--outputradio <dir>', "Output directory for radio recordings (overrides --output)"],
 		wav		=> [ 1, "wav!", 'Recording', '--wav', "In radio realaudio mode output as wav and don't transcode to mp3"],
 		rtmpradioopts	=> [ 1, "rtmp-radio-opts|rtmpradioopts=s", 'Recording', '--rtmp-radio-opts <options>', "Add custom options to rtmpdump for radio"],
 		ffmpegradioopts	=> [ 1, "ffmpeg-radio-opts|ffmpegradioopts=s", 'Recording', '--ffmpeg-radio-opts <options>', "Add custom options to ffmpeg re-muxing for radio"],
@@ -7731,7 +7737,7 @@ sub channels {
 sub opt_format {
 	return {
 		livetvmode	=> [ 1, "livetvmode=s", 'Recording', '--livetvmode <mode>,<mode>,...', "Live TV recording modes: flashhd,flashvhigh,flashhigh,flashstd,flashnormal,flashlow. Shortcuts: default,good,better(=default),best,rtmp,flash. ('default'=flashvhigh,flashhigh,flashstd,flashnormal,flashlow)"],
-		outputlivetv	=> [ 1, "outputlivetv=s", 'Output', '--outputlivetv <dir>', "Output directory for live tv recordings"],
+		outputlivetv	=> [ 1, "outputlivetv=s", 'Output', '--outputlivetv <dir>', "Output directory for live tv recordings (overrides --output)"],
 		rtmplivetvopts	=> [ 1, "rtmp-livetv-opts|rtmplivetvopts=s", 'Recording', '--rtmp-livetv-opts <options>', "Add custom options to rtmpdump for livetv"],
 		ffmpeglivetvopts	=> [ 1, "ffmpeg-livetv-opts|ffmpeglivetvopts=s", 'Recording', '--ffmpeg-livetv-opts <options>', "Add custom options to ffmpeg re-muxing for livetv"],
 	};
@@ -7878,7 +7884,7 @@ sub channels {
 sub opt_format {
 	return {
 		liveradiomode	=> [ 1, "liveradiomode=s", 'Recording', '--liveradiomode <mode>,<mode>,..', "Live Radio recording modes: flashaachigh,flashaacstd,flashaudio,flashaaclow,wma. Shortcuts: default,good,better(=default),best,rtmp,flash,flashaac. ('default'=flashaachigh,flashaacstd,flashaaclow)"],
-		outputliveradio	=> [ 1, "outputliveradio=s", 'Output', '--outputliveradio <dir>', "Output directory for live radio recordings"],
+		outputliveradio	=> [ 1, "outputliveradio=s", 'Output', '--outputliveradio <dir>', "Output directory for live radio recordings (overrides --output)"],
 		rtmpliveradioopts => [ 1, "rtmp-liveradio-opts|rtmpliveradioopts=s", 'Recording', '--rtmp-liveradio-opts <options>', "Add custom options to rtmpdump for liveradio"],
 		ffmpegliveradioopts => [ 1, "ffmpeg-liveradio-opts|ffmpegliveradioopts=s", 'Recording', '--ffmpeg-liveradio-opts <options>', "Add custom options to ffmpeg re-muxing for liveradio"],
 	};
@@ -8261,10 +8267,16 @@ sub get {
 
 	# rtmpdump version detection e.g. 'RTMPDump v2.4'
 	my $rtmpver = `"$bin->{rtmpdump}" --help 2>&1`;
+	if ( $opt->{verbose} ) {
+		(my $rtmpver2 = $rtmpver) =~ s/^/INFO: /gm;
+		main::logger "INFO: rtmpver: \n$rtmpver2";
+	}
 	if ( $rtmpver =~ /swfVfy/ ) {
 		$swfarg = "--swfVfy";
 	} else {
 		main::logger "WARNING: Your version of rtmpdump/flvstreamer does not support SWF Verification\n";
+		main::logger "WARNING: You may see this warning if rtmpdump has malfunctioned\n";
+		main::logger "WARNING: Use --verbose to print the output from rtmpdump\n" unless $opt->{verbose};
 	}
 	$rtmpver =~ s/^\w+\s+v?([\.\d]+)(.*\n)*$/$1/g;
 	main::logger "INFO: $bin->{rtmpdump} version $rtmpver\n" if $opt->{verbose};
@@ -8273,6 +8285,8 @@ sub get {
 	# Save the effort and don't support < v1.8
 	if ( $rtmpver < 1.8 ) {
 		main::logger "WARNING: rtmpdump/flvstreamer 1.8 or later is required - please upgrade\n";
+		main::logger "WARNING: You may see this warning if rtmpdump has malfunctioned\n";
+		main::logger "WARNING: Use --verbose to print the output from rtmpdump\n" unless $opt->{verbose};
 		return 'next';
 	}
 
