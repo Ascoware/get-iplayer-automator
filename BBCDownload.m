@@ -335,7 +335,19 @@
                 else if ([message hasPrefix:@" Progress"]) shortStatus= @"Processing Download..."; //Download Artwork
                 else if ([message hasPrefix:@"ERROR:"] || [message hasPrefix:@"\rERROR:"] || [message hasPrefix:@"\nERROR:"]) //Could be unresumable.
                 {
+                    BOOL isUnresumable = NO;
                     if ([scanner scanUpToString:@"corrupt file!" intoString:nil] && [scanner scanString:@"corrupt file!" intoString:nil])
+                    {
+                        isUnresumable = YES;
+                    }
+                    if (!isUnresumable) {
+                        [scanner setScanLocation:0];
+                        if ([scanner scanUpToString:@"Couldn't find the seeked keyframe in this chunk!" intoString:nil] && [scanner scanString:@"Couldn't find the seeked keyframe in this chunk!" intoString:nil])
+                        {
+                            isUnresumable = YES;
+                        }
+                    }
+                    if (isUnresumable)
                     {
                         [self addToLog:@"Unresumable file, please delete the partial file and try again." noTag:NO];
                         [task interrupt];
