@@ -311,18 +311,31 @@
     
     //Retrieve PlayPath
     NSString *playPath = nil;
-    NSArray *formatKeys = @[@"Flash - Very Low",@"Flash - Low",@"Flash - Standard",@"Flash - High"];
-    NSArray *itvRateObjects = @[@"400",@"600",@"800",@"1200"];
-    NSArray *bitrateObjects = @[@"400000",@"600000",@"800000",@"1200000"];
-    NSDictionary *itvRateDic = [NSDictionary dictionaryWithObjects:itvRateObjects forKeys:formatKeys];
-    NSDictionary *bitrateDic = [NSDictionary dictionaryWithObjects:bitrateObjects forKeys:formatKeys];
-    
-    NSMutableArray *itvRateArray = [[NSMutableArray alloc] init];
-    NSMutableArray *bitrateArray = [[NSMutableArray alloc] init];
-    
-    for (TVFormat *format in formatList) [itvRateArray addObject:itvRateDic[[format format]]];
-    for (TVFormat *format in formatList) [bitrateArray addObject:bitrateDic[[format format]]];
-    
+    NSMutableArray *itvRateArray = nil;
+    NSMutableArray *bitrateArray = nil;
+    @try {
+        NSArray *formatKeys = @[@"Flash - Very Low",@"Flash - Low",@"Flash - Standard",@"Flash - High"];
+        NSArray *itvRateObjects = @[@"400",@"600",@"800",@"1200"];
+        NSArray *bitrateObjects = @[@"400000",@"600000",@"800000",@"1200000"];
+        NSDictionary *itvRateDic = [NSDictionary dictionaryWithObjects:itvRateObjects forKeys:formatKeys];
+        NSDictionary *bitrateDic = [NSDictionary dictionaryWithObjects:bitrateObjects forKeys:formatKeys];
+        
+        itvRateArray = [[NSMutableArray alloc] init];
+        bitrateArray = [[NSMutableArray alloc] init];
+        
+        for (TVFormat *format in formatList) [itvRateArray addObject:itvRateDic[[format format]]];
+        for (TVFormat *format in formatList) [bitrateArray addObject:bitrateDic[[format format]]];
+    }
+    @catch (NSException *exception)
+    {
+        NSLog(@"ERROR: %@: %@", [exception name], [exception description]);
+        [self addToLog:[NSString stringWithFormat:@"ERROR: %@: %@", [exception name], [exception description]]];
+        [show setComplete:@YES];
+        [show setSuccessful:@NO];
+        [show setValue:@"Download Failed" forKey:@"status"];
+        [nc postNotificationName:@"DownloadFinished" object:show];
+        return;
+    }
     NSLog(@"DEBUG: Parsing MediaFile entries");
     if (verbose)
         [self addToLog:@"DEBUG: Parsing MediaFile entries" noTag:YES];
