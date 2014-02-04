@@ -259,8 +259,14 @@
     }
 		
 	//Growl Initialization
-	[GrowlApplicationBridge setGrowlDelegate:@""];
-	
+    @try {
+        [GrowlApplicationBridge setGrowlDelegate:@""];
+    }
+    @catch (NSException *e) {
+        NSLog(@"ERROR: Growl initialisation failed: %@: %@", [e name], [e description]);
+        [self addToLog:[NSString stringWithFormat:@"ERROR: Growl initialisation failed: %@: %@", [e name], [e description]]];
+    }
+
 	//Populate Live TV Channel List
 	LiveTVChannel *bbcOne = [[LiveTVChannel alloc] initWithChannelName:@"BBC One"];
 	LiveTVChannel *bbcTwo = [[LiveTVChannel alloc] initWithChannelName:@"BBC Two"];
@@ -368,9 +374,8 @@
                                    clickContext:nil];
     }
     @catch (NSException *e) {
-        NSLog(@"WARNING: Growl notification failed (updater)");
-        if (verbose)
-            [self addToLog:@"WARNING: Growl notification failed (updater)"];
+        NSLog(@"ERROR: Growl notification failed (updater): %@: %@", [e name], [e description]);
+        [self addToLog:[NSString stringWithFormat:@"ERROR: Growl notification failed (updater): %@: %@", [e name], [e description]]];
     }
 }
 #pragma mark Cache Update
@@ -627,9 +632,8 @@
                                        clickContext:nil];
         }
         @catch (NSException *e) {
-            NSLog(@"WARNING: Growl notification failed (getiPlayerUpdateFinished)");
-            if (verbose)
-                [self addToLog:@"WARNING: Growl notification failed (getiPlayerUpdateFinished)"];
+            NSLog(@"ERROR: Growl notification failed (getiPlayerUpdateFinished): %@: %@", [e name], [e description]);
+            [self addToLog:[NSString stringWithFormat:@"ERROR: Growl notification failed (getiPlayerUpdateFinished): %@: %@", [e name], [e description]]];
         }
 		[self addToLog:@"Index Updated." :self];
         lastUpdate=[NSDate date];
@@ -1866,9 +1870,8 @@
                                            clickContext:nil];
             }
             @catch (NSException *e) {
-                NSLog(@"WARNING: Growl notification failed (nextDownload - finished)");
-                if (verbose)
-                    [self addToLog:@"WARNING: Growl notification failed (nextDownload - finished)" :self];
+                NSLog(@"ERROR: Growl notification failed (nextDownload - finished): %@: %@", [e name], [e description]);
+                [self addToLog:[NSString stringWithFormat:@"ERROR: Growl notification failed (nextDownload - finished): %@: %@", [e name], [e description]]];
             }
         }
 		else
@@ -1884,9 +1887,8 @@
                                            clickContext:nil];
             }
             @catch (NSException *e) {
-                NSLog(@"WARNING: Growl notification failed (nextDownload - failed)");
-                if (verbose)
-                    [self addToLog:@"WARNING: Growl notification failed (nextDownload - failed)" :self];
+                NSLog(@"ERROR: Growl notification failed (nextDownload - failed): %@: %@", [e name], [e description]);
+                [self addToLog:[NSString stringWithFormat:@"ERROR: Growl notification failed (nextDownload - failed): %@: %@", [e name], [e description]]];
             }
         
             ReasonForFailure *showSolution = [[ReasonForFailure alloc] init];
@@ -1987,9 +1989,8 @@
                                            clickContext:nil];
             }
             @catch (NSException *e) {
-                NSLog(@"WARNING: Growl notification failed (nextDownload - complete)");
-                if (verbose)
-                    [self addToLog:@"WARNING: Growl notification failed (nextDownload - complete)" :self];
+                NSLog(@"ERROR: Growl notification failed (nextDownload - complete): %@: %@", [e name], [e description]);
+                [self addToLog:[NSString stringWithFormat:@"ERROR: Growl notification failed (nextDownload - complete): %@: %@", [e name], [e description]]];
             }
 			[[SUUpdater sharedUpdater] checkForUpdatesInBackground];
 			
