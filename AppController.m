@@ -851,6 +851,10 @@
 	[pb setString:unattributedLog forType:NSStringPboardType];
 }
 #pragma mark Search
+- (IBAction)goToSearch:(id)sender {
+    [mainWindow makeKeyAndOrderFront:self];
+    [mainWindow makeFirstResponder:searchField];
+}
 - (IBAction)mainSearch:(id)sender
 {
     [searchField setEnabled:NO];

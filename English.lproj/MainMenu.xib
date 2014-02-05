@@ -44,7 +44,7 @@
                 <outlet property="radioFormatController" destination="1134" id="1144"/>
                 <outlet property="resultsController" destination="683" id="688"/>
                 <outlet property="scheduleWindow" destination="1148" id="1158"/>
-                <outlet property="searchField" destination="689" id="691"/>
+                <outlet property="searchField" destination="689" id="GPC-bQ-Zy7"/>
                 <outlet property="searchIndicator" destination="489" id="687"/>
                 <outlet property="solutionsArrayController" destination="1402" id="1403"/>
                 <outlet property="solutionsTableView" destination="1389" id="1400"/>
@@ -335,6 +335,13 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="1163"/>
+                            <menuItem title="Go to Search" keyEquivalent="f" id="FR6-VK-LxP">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                <connections>
+                                    <action selector="goToSearch:" target="621" id="NDp-NM-a7h"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="Y7z-vW-u5M"/>
                             <menuItem title="Schedule Start..." id="1162">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
