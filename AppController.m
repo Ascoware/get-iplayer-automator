@@ -139,8 +139,6 @@
     [[mainWindow windowController] setShouldCascadeWindows:NO];      // Tell the controller to not cascade its windows.
     [mainWindow setFrameAutosaveName:@"mainWindow"];  // Specify the autosave name for the window.
 	
-	[queueTableView registerForDraggedTypes:@[@"com.thomaswillson.programme"]];
-	
 	//Read Queue & Series-Link from File
 	NSFileManager *fileManager = [NSFileManager defaultManager];
     
@@ -1613,29 +1611,6 @@
 		}
 	}
 }
-/*
-- (BOOL)tableView:(NSTableView *)tv writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pboard
-{
-	NSData *data = [NSKeyedArchiver archivedDataWithRootObject:rowIndexes];
-	[pboard declareTypes:[NSArray arrayWithObject:@"com.thomaswillson.programme.dragdrop"] owner:self];
-	[pboard setData:data forType:@"com.thomaswillson.programme.dragdrop"];
-	return YES;
-}
-- (NSDragOperation)tableView:(NSTableView*)tv validateDrop:(id <NSDraggingInfo>)info proposedRow:(int)row proposedDragOperation:(NSTableViewDropOperation)op
-{
-	return NSDragOperationEvery;
-}
-- (BOOL)tableView:(NSTableView *)aTableView acceptDrop:(id <NSDraggingInfo>)info
-			  row:(int)row dropOperation:(NSTableViewDropOperation)operation
-{
-    NSPasteboard* pboard = [info draggingPasteboard];
-    NSData* rowData = [pboard dataForType:MyPrivateTableViewDataType];
-    NSIndexSet* rowIndexes = [NSKeyedUnarchiver unarchiveObjectWithData:rowData];
-    int dragRow = [rowIndexes firstIndex];
-	
-    // Move the specified row to its new location...
-}
- */
 #pragma mark Download Controller
 - (IBAction)startDownloads:(id)sender
 {

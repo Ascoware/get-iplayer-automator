@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		1DDD58160DA1D0A300B32029 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD58140DA1D0A300B32029 /* MainMenu.xib */; };
 		392A41A4169735340053DEA5 /* HTTPProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 392A41A3169735340053DEA5 /* HTTPProxy.m */; };
+		393D1DEE18A5BBB500F27880 /* RSRTVArrayController.m in Sources */ = {isa = PBXBuildFile; fileRef = 393D1DED18A5BBB500F27880 /* RSRTVArrayController.m */; };
 		3975484D1622504F00470DD1 /* ttml2srt.py in Resources */ = {isa = PBXBuildFile; fileRef = 3975484C1622504F00470DD1 /* ttml2srt.py */; };
 		39814023168E124C003FFF53 /* NSHost+ThreadedAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 39814022168E124B003FFF53 /* NSHost+ThreadedAdditions.m */; };
 		398516A716D1A02500EBB4CE /* Body2 in Resources */ = {isa = PBXBuildFile; fileRef = 398516A616D1A02500EBB4CE /* Body2 */; };
@@ -141,6 +142,8 @@
 		32CA4F630368D1EE00C91783 /* Get_iPlayer GUI_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Get_iPlayer GUI_Prefix.pch"; sourceTree = "<group>"; };
 		392A41A2169735340053DEA5 /* HTTPProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HTTPProxy.h; sourceTree = "<group>"; };
 		392A41A3169735340053DEA5 /* HTTPProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HTTPProxy.m; sourceTree = "<group>"; };
+		393D1DEC18A5BBB500F27880 /* RSRTVArrayController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSRTVArrayController.h; sourceTree = "<group>"; };
+		393D1DED18A5BBB500F27880 /* RSRTVArrayController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSRTVArrayController.m; sourceTree = "<group>"; };
 		3975484C1622504F00470DD1 /* ttml2srt.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = ttml2srt.py; sourceTree = "<group>"; };
 		39814021168E124B003FFF53 /* NSHost+ThreadedAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSHost+ThreadedAdditions.h"; sourceTree = "<group>"; };
 		39814022168E124B003FFF53 /* NSHost+ThreadedAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSHost+ThreadedAdditions.m"; sourceTree = "<group>"; };
@@ -434,6 +437,8 @@
 				39879DAE16904B9F0050CA7D /* NSString+HTML.m */,
 				39814021168E124B003FFF53 /* NSHost+ThreadedAdditions.h */,
 				39814022168E124B003FFF53 /* NSHost+ThreadedAdditions.m */,
+				393D1DEC18A5BBB500F27880 /* RSRTVArrayController.h */,
+				393D1DED18A5BBB500F27880 /* RSRTVArrayController.m */,
 			);
 			name = Other;
 			sourceTree = "<group>";
@@ -724,6 +729,7 @@
 				D921C9B9149BBE9F004CB558 /* ASIFormDataRequest.m in Sources */,
 				D921C9BA149BBE9F004CB558 /* ASIHTTPRequest.m in Sources */,
 				D921C9BB149BBE9F004CB558 /* ASIInputStream.m in Sources */,
+				393D1DEE18A5BBB500F27880 /* RSRTVArrayController.m in Sources */,
 				39D7C1BD1874AD7400B78698 /* StringTrimFormatter.m in Sources */,
 				D921C9BC149BBE9F004CB558 /* ASINetworkQueue.m in Sources */,
 				D921C9E8149BCB16004CB558 /* ITVDownload.m in Sources */,

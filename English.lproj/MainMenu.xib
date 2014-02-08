@@ -100,7 +100,7 @@
                 <binding destination="621" name="contentArray" keyPath="searchResultsArray" id="695"/>
             </connections>
         </arrayController>
-        <arrayController objectClassName="Programme" id="700" userLabel="Queue Controller">
+        <arrayController objectClassName="Programme" id="700" userLabel="Queue Controller" customClass="RSRTVArrayController">
             <declaredKeys>
                 <string>pid</string>
                 <string>showName</string>
@@ -112,6 +112,7 @@
             </declaredKeys>
             <connections>
                 <binding destination="621" name="contentArray" keyPath="queueArray" id="712"/>
+                <outlet property="oTableView" destination="469" id="GLB-ew-7sa"/>
             </connections>
         </arrayController>
         <arrayController objectClassName="Programme" id="942" userLabel="PVR Results Controller">
@@ -127,12 +128,13 @@
                 <binding destination="621" name="contentArray" keyPath="pvrSearchResultsArray" id="975"/>
             </connections>
         </arrayController>
-        <arrayController objectClassName="Series" id="952" userLabel="PVR Queue Controller">
+        <arrayController objectClassName="Series" id="952" userLabel="PVR Queue Controller" customClass="RSRTVArrayController">
             <declaredKeys>
                 <string>showName</string>
             </declaredKeys>
             <connections>
                 <binding destination="621" name="contentArray" keyPath="pvrQueueArray" id="974"/>
+                <outlet property="oTableView" destination="536" id="xIF-Yg-nEy"/>
             </connections>
         </arrayController>
         <arrayController objectClassName="TVFormat" id="1106" userLabel="TV Format Array Controller">
@@ -577,7 +579,8 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                                         </tableColumn>
                                     </tableColumns>
                                     <connections>
-                                        <outlet property="dataSource" destination="621" id="1299"/>
+                                        <outlet property="dataSource" destination="700" id="Ove-Ks-uXA"/>
+                                        <outlet property="delegate" destination="700" id="2fu-Tb-zvq"/>
                                     </connections>
                                 </tableView>
                             </subviews>
@@ -1007,6 +1010,10 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                                             </connections>
                                         </tableColumn>
                                     </tableColumns>
+                                    <connections>
+                                        <outlet property="dataSource" destination="952" id="7mc-5c-G3N"/>
+                                        <outlet property="delegate" destination="952" id="wPg-dn-2gS"/>
+                                    </connections>
                                 </tableView>
                             </subviews>
                             <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
