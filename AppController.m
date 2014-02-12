@@ -1185,6 +1185,15 @@
                             [nameScanner scanUpToString:@"kjklgfdjfgkdlj" intoString:&newShowName];
                             foundURL=YES;
                         }
+                        else if ([[tab URL] hasPrefix:@"http://www.bbc.co.uk/programmes/"]) {
+                            url = [NSString stringWithString:[tab URL]];
+                            NSScanner *nameScanner = [NSScanner scannerWithString:[tab name]];
+                            [nameScanner scanUpToString:@" - " intoString:nil];
+                            [nameScanner scanString:@" - " intoString:nil];
+                            [nameScanner scanUpToString:@"kjklgfdjfgkdlj" intoString:&newShowName];
+                            foundURL=YES;
+                            source = [Safari doJavaScript:@"document.documentElement.outerHTML" in:tab];
+                        }
                         else if ([[tab URL] hasPrefix:@"https://www.itv.com/itvplayer/"] ||
                                  [[tab URL] hasPrefix:@"http://www.channel4.com/programmes/"] ||
                                  [[tab URL] hasPrefix:@"http://ps3.channel4.com"])
@@ -1245,6 +1254,15 @@
                             [nameScanner scanString:@"BBC Sport - " intoString:nil];
                             [nameScanner scanUpToString:@"kjklgfdjfgkdlj" intoString:&newShowName];
                             foundURL=YES;
+                        }
+                        else if ([[tab URL] hasPrefix:@"http://www.bbc.co.uk/programmes/"]) {
+                            url = [NSString stringWithString:[tab URL]];
+                            NSScanner *nameScanner = [NSScanner scannerWithString:[tab title]];
+                            [nameScanner scanUpToString:@" - " intoString:nil];
+                            [nameScanner scanString:@" - " intoString:nil];
+                            [nameScanner scanUpToString:@"kjklgfdjfgkdlj" intoString:&newShowName];
+                            foundURL=YES;
+                            source = [tab executeJavascript:@"document.documentElement.outerHTML"];
                         }
                         else if ([[tab URL] hasPrefix:@"https://www.itv.com/itvplayer/"] ||
                                  [[tab URL] hasPrefix:@"http://www.channel4.com/programmes/"] ||
@@ -1447,6 +1465,32 @@
 		[queueController addObject:newProg];
 		[self getNameForProgramme:newProg];
 	}
+	else if([url hasPrefix:@"http://www.bbc.co.uk/programmes/"])
+	{
+		NSString *pid = nil;
+		NSScanner *urlScanner = [[NSScanner alloc] initWithString:url];
+		[urlScanner scanUpToString:@"/programmes/" intoString:nil];
+		[urlScanner scanString:@"/" intoString:nil];
+		[urlScanner scanUpToString:@"/" intoString:nil];
+		[urlScanner scanString:@"/" intoString:nil];
+		[urlScanner scanUpToString:@"/" intoString:&pid];
+		NSScanner *scanner = [NSScanner scannerWithString:source];
+        [scanner scanUpToString:[NSString stringWithFormat:@"emp.load(\"http://www.bbc.co.uk/iplayer/playlist/%@\")", pid] intoString:nil];
+		if ([scanner isAtEnd]) {
+            NSAlert *invalidPage = [[NSAlert alloc] init];
+            [invalidPage addButtonWithTitle:@"OK"];
+            [invalidPage setMessageText:[NSString stringWithFormat:@"Invalid Page: %@",url]];
+            [invalidPage setInformativeText:@"Please ensure the frontmost browser tab is open to an iPlayer episode page."];
+            [invalidPage setAlertStyle:NSWarningAlertStyle];
+            [invalidPage runModal];
+            return;
+        }
+		Programme *newProg = [[Programme alloc] init];
+		[newProg setValue:pid forKey:@"pid"];
+        if (newShowName) [newProg setShowName:newShowName];
+		[queueController addObject:newProg];
+		[self getNameForProgramme:newProg];
+    }
     else if ([url hasPrefix:@"http://www.bbc.co.uk/sport/olympics/2012/live-video/"])
     {
         NSString *pid = nil;
