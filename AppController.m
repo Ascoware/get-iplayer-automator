@@ -1501,12 +1501,15 @@
     }
 	else if ([url hasPrefix:@"https://www.itv.com/itvplayer/"])
 	{
-        NSString *progname = nil, *productionId = nil, *pay_rights = nil, *title = nil;
+        NSString *progname = nil, *productionId = nil, *pay_rights = nil, *title = nil, *action_type = nil;
         progname = newShowName;
 		NSScanner *scanner = [NSScanner scannerWithString:source];
         [scanner scanUpToString:@"\"productionId\":" intoString:nil];
         [scanner scanString:@"\"productionId\":\"" intoString:nil];
         [scanner scanUpToString:@"\"" intoString:&productionId];
+        [scanner scanUpToString:@"\"action_type\":" intoString:nil];
+        [scanner scanString:@"\"action_type\":\"" intoString:nil];
+        [scanner scanUpToString:@"\"" intoString:&action_type];
         [scanner scanUpToString:@"\"pay_rights\":" intoString:nil];
         [scanner scanString:@"\"pay_rights\":\"" intoString:nil];
         [scanner scanUpToString:@"\"" intoString:&pay_rights];
@@ -1515,7 +1518,7 @@
         [scanner scanString:@">" intoString:nil];
         [scanner scanUpToString:@"<" intoString:&title];
         if (title) progname = title;        
-        if (!progname || !productionId || ![pay_rights isEqualToString:@"free"]) {
+        if (!progname || !productionId || (![pay_rights isEqualToString:@"free"] && ![action_type isEqualToString:@"free_taster"])) {
             NSAlert *invalidPage = [[NSAlert alloc] init];
             [invalidPage addButtonWithTitle:@"OK"];
             [invalidPage setMessageText:[NSString stringWithFormat:@"Invalid Page: %@",url]];
