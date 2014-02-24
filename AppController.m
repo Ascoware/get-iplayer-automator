@@ -281,6 +281,8 @@
         [self updateCache:nil];
     else
         [self updateCache:@""];
+    // ensure get_iplayer encodes output as UTF-8
+    setenv("PERL_UNICODE", "S", 1);
 }
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)application
 {
