@@ -146,8 +146,6 @@ my $opt_format = {
 	test		=> [ 1, "test|t!", 'Recording', '--test, -t', "Test only - no recording (will show programme type)"],
 	thumb		=> [ 1, "thumb|thumbnail!", 'Recording', '--thumb', "Download Thumbnail image if available"],
 	thumbonly	=> [ 1, "thumbonly|thumbnailonly|thumbnail-only|thumb-only!", 'Recording', '--thumbnail-only', "Only Download Thumbnail image if available, not the programme"],
-	aactomp3	=> [ 1, "aactomp3", 'Recording', '--aactomp3', "Transcode AAC audio to MP3 with ffmpeg/avconv (CBR 128k unless --mp3vbr is specified)"],
-	mp3vbr		=> [ 1, "mp3vbr=n", 'Recording', '--mp3vbr', "Set LAME VBR mode to N (0 to 9) for AAC transcoding. 0 = target bitrate 245 Kbit/s, 9 = target bitrate 65 Kbit/s (requires --aactomp3)"],
 
 	# Search
 	before		=> [ 1, "before=n", 'Search', '--before', "Limit search to programmes added to the cache before N hours ago"],
@@ -166,6 +164,9 @@ my $opt_format = {
 	versionlist	=> [ 1, "versionlist|versions|version-list=s", 'Search', '--versions <versions>', "Version of programme to search or record.  List is processed from left to right and first version found is downloaded.  Example: '--versions signed,audiodescribed,default' will prefer signed and audiodescribed programmes if available.  Default: 'default'"],
 
 	# Output
+	aactomp3	=> [ 1, "aactomp3|mp3", 'Output', '--aactomp3', "Transcode AAC audio to MP3 with ffmpeg/avconv (CBR 128k unless --mp3vbr is specified).  Applied only to radio programmes. (Synonyms: --mp3)"],
+	mp3vbr		=> [ 1, "mp3vbr=n", 'Output', '--mp3vbr', "Set LAME VBR mode to N (0 to 9) for AAC transcoding. 0 = target bitrate 245 Kbit/s, 9 = target bitrate 65 Kbit/s (requires --aactomp3). Applied only to radio programmes."],
+	avi			=> [ 1, "avi", 'Output', '--avi', "Output video in AVI container instead of MP4. There is no metadata tagging support for AVI output."],
 	command		=> [ 1, "c|command=s", 'Output', '--command, -c <command>', "Run user command after successful recording using args such as <pid>, <name> etc"],
 	email		=> [ 1, "email=s", 'Output', '--email <address>', "Email HTML index of matching programmes to specified address"],
 	emailsmtp	=> [ 1, "emailsmtpserver|email-smtp=s", 'Output', '--email-smtp <hostname>', "SMTP server IP address to use to send email (default: localhost)"],
@@ -174,13 +175,14 @@ my $opt_format = {
 	emailpassword	=> [ 1, "emailpassword|email-password=s", 'Output', '--email-password <password>', "Email password"],
 	emailport       => [ 1, "emailport|email-port=s", 'Output', '--email-port <port number>', "Email port number (default: appropriate port for --email-security)"],
 	emailuser	=> [ 1, "emailuser|email-user=s", 'Output', '--email-user <username>', "Email username"],
-	fatfilename	=> [ 1, "fatfilenames|fatfilename!", 'Output', '--fatfilename', "Omit characters forbidden by FAT filesystems from file and directory names.  Removes non-ASCII (accented) characters.  Set by default on Windows."],
+	fatfilename	=> [ 1, "fatfilenames|fatfilename!", 'Output', '--fatfilename', "Omit characters forbidden by FAT filesystems from file and directory names.  Removes non-ASCII (accented) characters. Ignored unless --whitespace also specified. Set by default on Windows."],
 	fileprefix	=> [ 1, "file-prefix|fileprefix=s", 'Output', '--file-prefix <format>', "The filename prefix (excluding dir and extension) using formatting fields. e.g. '<name>-<episode>-<pid>'"],
 	fxd		=> [ 1, "fxd=s", 'Output', '--fxd <file>', "Create Freevo FXD XML of matching programmes in specified file"],
+	hfsfilename	=> [ 1, "hfsfilenames|hfsfilename!", 'Output', '--hfsfilename', "Remove colons in file and directory names. Useful ONLY to prevent OS X Finder displaying colon as forward slash. Ignored unless --whitespace also specified."],
 	html		=> [ 1, "html=s", 'Output', '--html <file>', "Create basic HTML index of matching programmes in specified file"],
-	isodate		=> [ 1, "isodate!",  'Output', '--isodate', "Use ISO8601 dates (YYYY-MM-DD) in filenames"],
+	isodate		=> [ 1, "isodate!",  'Output', '--isodate', "Use ISO8601 dates (YYYY-MM-DD) in filenames and subdirectory paths"],
 	metadata	=> [ 1, "metadata=s", 'Output', '--metadata <type>', "Create metadata info file after recording. Valid types are: xbmc, xbmc_movie, freevo, generic"],
-	mkv			=> [ 1, "mkv", 'Output', '--mkv', "Output video in MKV container instead of MP4. Currently no tagging supported from get_iplayer for MKV output"],
+	mkv			=> [ 1, "mkv", 'Output', '--mkv', "Output video in MKV container instead of MP4. There is no metadata tagging support for MKV output."],
 	mythtv		=> [ 1, "mythtv=s", 'Output', '--mythtv <file>', "Create Mythtv streams XML of matching programmes in specified file"],
 	nowrite		=> [ 1, "no-write|nowrite|n!", 'Output', '--nowrite, -n', "No writing of file to disk (use with -x to prevent a copy being stored on disk)"],
 	output		=> [ 2, "output|o=s", 'Output', '--output, -o <dir>', "Recording output directory"],
@@ -193,7 +195,7 @@ my $opt_format = {
 	thumbext	=> [ 1, "thumbext|thumb-ext=s", 'Output', '--thumb-ext <ext>', "Thumbnail filename extension to use"],
 	thumbsizecache	=> [ 1, "thumbsizecache=n", 'Output', '--thumbsizecache <index|width>', "Default thumbnail size/index to use when building cache and index (see --info for thumbnailN: to get size/index)"],
 	thumbsize	=> [ 1, "thumbsize|thumbsizemeta=n", 'Output', '--thumbsize <index|width>', "Default thumbnail size/index to use for the current recording and metadata (see --info for thumbnailN: to get size/index)"],
-	whitespace	=> [ 1, "whitespace|ws|w!", 'Output', '--whitespace, -w', "Keep whitespace in file and directory names"],
+	whitespace	=> [ 1, "whitespace|ws|w!", 'Output', '--whitespace, -w', "Keep whitespace, punctuation chars and non-ASCII chars in filenames. Without --whitespace most punctuation chars and all non-ASCII chars are removed and all whitespace is converted to underscores."],
 	xmlchannels	=> [ 1, "xml-channels|fxd-channels!", 'Output', '--xml-channels', "Create freevo/Mythtv menu of channels -> programme names -> episodes"],
 	xmlnames	=> [ 1, "xml-names|fxd-names!", 'Output', '--xml-names', "Create freevo/Mythtv menu of programme names -> episodes"],
 	xmlalpha	=> [ 1, "xml-alpha|fxd-alpha!", 'Output', '--xml-alpha', "Create freevo/Mythtv menu sorted alphabetically by programme name"],
@@ -893,7 +895,7 @@ sub download_pid_not_in_cache {
 
 	# Force prog type and create new prog instance if it doesn't exist
 	my $this;
-	logger "INFO Trying to stream pid using type $prog_type\n";
+	logger "INFO: Trying to stream pid using type $prog_type\n";
 	logger "INFO: pid not found in $prog_type cache\n";
 	$this = progclass($prog_type)->new( 'pid' => $pid, 'type' => $prog_type );
 	# if only one type is specified then we can clean up the pid which might actually be a url
@@ -2871,6 +2873,8 @@ sub cleanup {
 sub StringUtils::sanitize_path {
 	my $string = shift;
 	my $is_path = shift || 0;
+	# Replace leading ellipsis with _
+	$string =~ s/^\.+/_/;
 	# Replace forward slashes with _ if not path
 	$string =~ s/\//_/g unless $is_path;
 	# Replace backslashes with _ if not Windows path
@@ -2878,13 +2882,18 @@ sub StringUtils::sanitize_path {
 	# Remove extra/leading/trailing whitespace
 	$string =~ s/\s+/ /g;
 	$string =~ s/(^\s+|\s+$)//g;
-	# Replace whitespace with _ if required
+	# Replace whitespace with _ unless --whitespace
 	$string =~ s/\s+/_/g unless $opt->{whitespace};
 	# Truncate multiple replacement chars
 	$string =~ s/_+/_/g;
-	# Remove non-ASCII and forbidden chars if required
-	$string =~ s/[^\x{20}-\x{7E}]//g if $opt->{fatfilename};
-	$string =~ s/[\|\?\*\+\"\:\<\>\[\]]//g if $opt->{fatfilename};
+	# Remove non-ASCII and most punctuation unless --whitespace
+	$string =~ s/[^a-zA-Z0-9_\-\.\/\s]//gi unless $opt->{whitespace};
+	# Remove FAT forbidden chars if --fatfilename and --whitespace
+	$string =~ s/[\|\?\*\+\"\:\<\>\[\]]//g if ($opt->{fatfilename} && $opt->{whitespace});
+	# Remove non-ASCII if --fatfilename and --whitespace
+	$string =~ s/[^\x{20}-\x{7E}]//g if ($opt->{fatfilename} && $opt->{whitespace});
+	# Remove colon if --hfsfilename and --whitespace
+	$string =~ s/://g if ($opt->{hfsfilename} && $opt->{whitespace});
 	return $string;
 }
 
@@ -4299,7 +4308,7 @@ sub download_retry_loop {
 				# quit if successful or skip (unless --multimode selected)
 				last if ( $retcode == 0 || $retcode == 2 ) && ! $opt->{multimode};
 			}
-			if ( $retcode && ! $opt->{multimode} ) {
+			if ( $retcode && ! $opt->{multimode} && ! $opt->{test} ) {
 				if ( $prog->{type} eq 'radio' || $prog->{type} eq 'liveradio' ) {
 					if ( grep(/wma/, @available_modes) && ! grep(/wma/, @modes) ) {
 						main::logger "INFO: You may wish to try --modes=wma for version $version\n";
@@ -4334,6 +4343,13 @@ sub mode_ver_download_retry_loop {
 	for ($count = 1; $count <= $retries; $count++) {
 		main::logger "INFO: Attempt number: $count / $retries\n" if $opt->{verbose};
 
+		# for live streams update <dldate> and <dltime> for each download attempt
+		# creates new output file if <dldate> or <dltime> in <fileprefix>
+		if ( $prog->{type} =~ /live/ ) {
+			my @t = localtime();
+			$prog->{dldate} = sprintf "%02s-%02s-%02s", $t[5] + 1900, $t[4] + 1, $t[3];
+			$prog->{dltime} = sprintf "%02s:%02s:%02s", $t[2], $t[1], $t[0];					
+		}
 		$retcode = $prog->download( $ua, $mode, $version, $version_pid );
 		main::logger "DEBUG: Record using $mode mode return code: '$retcode'\n" if $opt->{verbose};
 
@@ -4606,10 +4622,6 @@ sub substitute {
 		# Remove unused tags
 		my $key = $tag_begin.'.*?'.$tag_end;
 		$string =~ s|$key||mg;
-		# Strip whitespace if required
-		$string =~ s/[\s_]+/_/g if ! $opt->{whitespace};
-		# Strip leading ellipsis
-		$string =~ s/^\.+/_/;
 		# Remove/replace all non-nice-filename chars if required
 		# Keep '/' (and '\' on Windows) if $sanitize_mode == 1
 		return StringUtils::sanitize_path( $string, $sanitize_mode );
@@ -4700,6 +4712,11 @@ sub generate_filenames {
 	# Create a subdir for programme sorting option
 	if ( $opt->{subdir} ) {
 		my $subdir = $prog->substitute( $opt->{subdirformat} || '<longname>', 1 );
+		if ( $opt->{isodate} ) {
+			$subdir =~ s|(\d\d)[/_](\d\d)[/_](20\d\d)|$3-$2-$1|g;
+		} else {
+			$subdir =~ s|(\d\d)[/](\d\d)[/](20\d\d)|$1_$2_$3|g;
+		}
 		$prog->{dir} = File::Spec->catdir($prog->{dir}, $subdir);
 		main::logger("INFO: Creating subdirectory $prog->{dir} for programme\n") if $opt->{verbose};
 	}
@@ -5038,6 +5055,9 @@ sub get_verpids {
 	# EMP URL
 	} elsif ( $prog->{pid} =~ /^http/i ) {
 		$url = $prog->{pid};
+		if ( $HTML::Parser::VERSION < 3.71 ) {
+			main::logger "WARNING: Page parsing may fail with HTML::Parser versions before 3.71. You have version $HTML::Parser::VERSION.\n";
+		}
 		# May aswell set the web page metadata here if not set
 		$prog->{web} = $prog->{pid} if ! $prog->{web};
 		# Scrape the EMP web page and get playlist URL
@@ -5060,12 +5080,23 @@ sub get_verpids {
 			$url = $1;
 		# iplayer Programmes page format (also rewrite the pid)
 		# href="http://www.bbc.co.uk/iplayer/episode/b00ldhj2"
-		} elsif ( $xml =~ m{href="http://www.bbc.co.uk/iplayer/episode/(b0[a-z0-9]{6})"} ) {
+		} elsif ( $xml =~ m{href="http://www.bbc.co.uk/iplayer/episode/([bp]0[a-z0-9]{6})"} ) {
 			$prog->{pid} = $1;
 			$url = 'http://www.bbc.co.uk/iplayer/playlist/'.$1;
+		# live streams (e.g., olympics)
+		} elsif ( $xml =~ m{"href":\s*"(http:\\/\\/playlists.bbc.co.uk\\/.+?\\/playlist.sxml)"[^\}]+?"live":\s*true} ) {
+			($url = $1) =~ s/\\//g;
+			$prog->{pid} = $url;
+		} elsif ( $xml =~ m{live-experience\/services.+?pid=([bp]0[a-z0-9]{6})} ) {
+			$url = 'http://www.bbc.co.uk/iplayer/playlist/'.$1;
+			$prog->{pid} = $url;
 		# playlist embedded in JSON
 		} elsif ( $xml =~ m{"href":"(http:\\/\\/playlists.bbc.co.uk\\/.+?\\/playlist.sxml)"} ) {
  			($url = $1) =~ s/\\//g;
+ 		# embedded player
+		} elsif ( $xml =~ m{emp\.load\("(http://www.bbc.co.uk/iplayer/playlist/([bp]0[a-z0-9]{6}))"\)} ) {
+ 			$url = $1;
+ 			$prog->{pid} = $2;
 		} elsif ( $url =~ m{^http.+.xml$} ) {
 			# Just keep the url as it is probably already an xml playlist
 		## playlist: "http://www.bbc.co.uk/iplayer/playlist/bbc_radio_one",
@@ -5170,6 +5201,12 @@ sub get_verpids {
 			$version = 'default';
 			$verpid = $url;
 			main::logger "INFO: Using Live/Non-live EMP tv/radio XML URL: $verpid\n" if $opt->{verbose} && $verpid;
+
+		# Live/Non-live EMP tv/radio URL
+		} elsif ( $prog->{pid} =~ /^http/i && $url =~ /^http/ ) {
+			$version = 'default';
+			$verpid = $url;
+			main::logger "INFO: Using Live/Non-live EMP tv/radio URL: $verpid\n" if $opt->{verbose} && $verpid;
 
 		# Live/Non-live EMP tv/radio
 		} elsif ( $prog->{pid} =~ /^http/i ) {
@@ -7106,6 +7143,8 @@ sub download {
 			$prog->{ext} = 'm4a';
 		}
 	}
+	# Override ext based on  avi option
+	$prog->{ext} = 'avi' if ! $opt->{raw} && $opt->{avi} && $prog->{type} eq 'tv';
 	# Override ext based on mkv option
 	$prog->{ext} = 'mkv' if ! $opt->{raw} && $opt->{mkv} && $prog->{type} eq 'tv';
 
@@ -8419,7 +8458,7 @@ sub get {
 				'-y', $prog->{filepart},
 			);
 		}
-	# Convert video flv to mp4/mkv if required
+	# Convert video flv to mp4/mkv/avi if required
 	} else {
 		@cmd = (
 			$bin->{ffmpeg},
