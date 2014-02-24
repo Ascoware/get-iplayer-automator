@@ -206,8 +206,8 @@
 					if ([proxyOption isEqualToString:@"None"])
 					{
 						[show setValue:@"Failed: See Log" forKey:@"status"];
-						[self addToLog:@"REASON FOR FAILURE: Proxy failed. If in the UK, please submit a bug report." noTag:TRUE];
-						[self addToLog:@"If outside the UK, please enable the provided proxy." noTag:TRUE];
+						[self addToLog:@"REASON FOR FAILURE: VPN or System Proxy failed. If you are using a VPN or a proxy configured in System Preferences, contact the VPN or proxy provider for assistance." noTag:TRUE];
+						[self addToLog:@"If outside the UK, you may also disconnect your VPN and enable the provided proxy in Preferences." noTag:TRUE];
                         [show setReasonForFailure:@"ShowNotFound"];
 					}
 					else if ([proxyOption isEqualToString:@"Provided"])
