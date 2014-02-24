@@ -27,20 +27,25 @@
 //Function Prototypes
 bool basicProxyTest(NSURL *proxyURL);
 bool bbcDownloadTest(NSURL *proxyURL);
+int processProxyList(NSArray *proxyListArr);
 
+
+//Global
 bool runDownloads=false;
+
+//Constant
+NSString *ProxyFilePath = @"/Volumes/Server Storage/Web Root/get_iplayer/proxy.txt";
+//NSString *ProxyFilePath = @"/Users/thomaswillson/proxy.txt";
 
 
 
 int main(int argc, const char * argv[])
 {
-
     @autoreleasepool {
         
         NSLog(@"Proxy Updater Started");
         
         //NSString *ProxyFilePath = [[[NSProcessInfo processInfo] environment] objectForKey:@"PROXY_LOC"];
-        NSString *ProxyFilePath = @"/Volumes/Server Storage/Web Root/get_iplayer/proxy.txt";
         
         NSString *proxyString = [@"http://" stringByAppendingString:[[NSString stringWithContentsOfFile:ProxyFilePath encoding:NSUTF8StringEncoding error:nil] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]];
         
@@ -86,7 +91,8 @@ int main(int argc, const char * argv[])
         
         while ([listScanner scanString:@"proxy&host=" intoString:nil])
         {
-            NSString *host, *port;
+           NSString *host = [[NSString alloc] init];
+           NSString *port = [[NSString alloc] init];
             [listScanner scanUpToString:@"&port=" intoString:&host];
             [listScanner scanString:@"&port=" intoString:nil];
             [listScanner scanUpToString:@"&notes" intoString:&port];
@@ -98,38 +104,56 @@ int main(int argc, const char * argv[])
         NSLog(@"Processed Page");
         for (NSURL *proxy in proxyListArr)
             NSLog(@"%@\n",proxy);
+       
+       int returnCode;
+       if ((returnCode = processProxyList(proxyListArr))) {
+          NSLog(@"XRoxy Failed Me: %d",returnCode);
+          
+          proxyListArr = [NSMutableArray array];
+          
+          NSPipe *output = [[NSPipe alloc] init];
+          NSTask *phantomBrowser = [[NSTask alloc] init];
+          
+          [phantomBrowser setLaunchPath:@"/opt/local/bin/phantomjs"];
+          [phantomBrowser setArguments:@[@"/opt/local/open_page.js"]];
+          [phantomBrowser setStandardOutput:output];
+          
+          [phantomBrowser launch];
+          [phantomBrowser waitUntilExit];
+          
+          NSLog(@"Retrieved Proxy Solutions List\n");
+          
+          NSString *webpage  = [[NSString alloc] initWithData:[[output fileHandleForReading] readDataToEndOfFile] encoding:NSUTF8StringEncoding];
+          
+          if ([webpage hasPrefix:@"<!-- <!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\""]) {
+             NSString *host = [[NSString alloc] init];
+             NSString *port = [[NSString alloc] init];
+             NSScanner *scanner = [NSScanner scannerWithString:webpage];
+             
+             [scanner scanUpToString:@"<a href=\"http://www.proxysolutions.net/ref/35791/6ea52832/ban.html\" target=\"_top\"><img src=\"http://www.proxysolutions.net/affiliates/accounts/default1/banners/pslogo4682.jpg\"" intoString:nil];
+             while ([scanner scanUpToString:@"unescape(" intoString:nil]) {
+                [scanner scanUpToString:@"</script>" intoString:nil];
+                [scanner scanString:@"</script>" intoString:nil];
+                [scanner scanUpToString:@"<" intoString:&host];
+                [scanner scanUpToString:@"</td><td>" intoString:nil];
+                [scanner scanString:@"</td><td>" intoString:nil];
+                [scanner scanUpToString:@"</" intoString:&port];
+                
+                host = [host stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+                NSString *proxy = [NSString stringWithFormat:@"http://%@:%@",host,port];
+                [proxyListArr addObject:[NSURL URLWithString:proxy]];
+             }
+             
+             return processProxyList(proxyListArr);
+             
+          }
+          else return 500; //Processing Proxy page failed.
+          
+       }
         
-        NSURL *workingProxy = nil;
-        for (NSURL *proxy in proxyListArr)
-        {
-            proxyOK = TRUE;
-            
-            //Perform Basic Test on Proxy first
-            proxyOK = basicProxyTest(proxy);
-            NSLog(@"Basic Proxy Test: %d",proxyOK);
-            
-            //Test Download
-            if (proxyOK) proxyOK = [itvDownloadTest itvDownloadTest:proxy];
-            if (proxyOK) proxyOK = bbcDownloadTest(proxy);
-            
-            if (proxyOK)
-            {
-                workingProxy = proxy;
-                break;
-            }
-        }
-        NSLog(@"Processed Array");
-        
-        if (!workingProxy) return 30; //Could not find working proxy.
-        
-        NSString *newProxy = [NSString stringWithFormat:@"%@:%@",[workingProxy host],[workingProxy port]];
-        NSLog(@"New Proxy: %@",newProxy);
-        [newProxy writeToFile:ProxyFilePath atomically:YES encoding:NSUTF8StringEncoding error:nil];
-        NSLog(@"New Proxy saved");
-    }
-    return 0;
+       
 }
-
+}
 bool basicProxyTest(NSURL *proxyURL)
 {
     ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:@"http://www.google.com"]];
@@ -140,6 +164,38 @@ bool basicProxyTest(NSURL *proxyURL)
     
     [request startSynchronous];
     return [request responseStatusCode] == 200;
+}
+   
+int processProxyList(NSArray *proxyListArr)
+{
+   NSURL *workingProxy = nil;
+   for (NSURL *proxy in proxyListArr)
+   {
+      bool proxyOK;
+      ITVDownloadTest *itvDownloadTest = [[ITVDownloadTest alloc] init];
+      
+      //Perform Basic Test on Proxy first
+      proxyOK = basicProxyTest(proxy);
+      NSLog(@"Basic Proxy Test: %d",proxyOK);
+      
+      //Test Download
+      if (proxyOK) proxyOK = [itvDownloadTest itvDownloadTest:proxy];
+      
+      if (proxyOK)
+      {
+         workingProxy = proxy;
+         break;
+      }
+   }
+   NSLog(@"Processed Array");
+   
+   if (!workingProxy) return 30; //Could not find working proxy.
+   
+   NSString *newProxy = [NSString stringWithFormat:@"%@:%@",[workingProxy host],[workingProxy port]];
+   NSLog(@"New Proxy: %@",newProxy);
+   [newProxy writeToFile:ProxyFilePath atomically:YES encoding:NSUTF8StringEncoding error:nil];
+   NSLog(@"New Proxy saved");
+   return 0;
 }
 
 @implementation ITVDownloadTest
