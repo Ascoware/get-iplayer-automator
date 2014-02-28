@@ -553,12 +553,14 @@
         swfplayer = @"http://www.itv.com/mediaplayer/ITVMediaPlayer.swf?v=11.20.654";
     }
 
-    NSArray *args = [NSMutableArray arrayWithObjects:
+    NSMutableArray *args = [NSMutableArray arrayWithObjects:
                     @"-r",downloadParams[@"authURL"],
                     @"-W",swfplayer,
                     @"-y",downloadParams[@"playPath"],
                     @"-o",downloadPath,
                     nil];
+    if (verbose)
+		[args addObject:@"--verbose"];
     NSLog(@"DEBUG: RTMPDump args: %@",args);
     if (verbose)
         [self addToLog:[NSString stringWithFormat:@"DEBUG: RTMPDump args: %@", args] noTag:YES];
