@@ -569,14 +569,14 @@
     }
 
     NSMutableString *cmd = [NSMutableString stringWithCapacity:0];
-    [cmd appendString:@"rtmpdump"];
+    [cmd appendString:[NSString stringWithFormat:@"\"%@\"", [[NSBundle mainBundle] pathForResource:@"rtmpdump-2.4" ofType:nil]]];
     for (NSString *arg in args) {
         if ([arg hasPrefix:@"-"] || [arg hasPrefix:@"\""])
             [cmd appendString:[NSString stringWithFormat:@" %@", arg]];
         else
             [cmd appendString:[NSString stringWithFormat:@" \"%@\"", arg]];
     }
-    NSLog(@"%@",cmd);
+    NSLog(@"DEBUG: RTMPDump command: %@", cmd);
     if (verbose)
         [self addToLog:[NSString stringWithFormat:@"DEBUG: RTMPDump command: %@", cmd] noTag:YES];
     
