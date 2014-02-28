@@ -62,14 +62,13 @@ int main(int argc, const char * argv[])
         ITVDownloadTest *itvDownloadTest = [[ITVDownloadTest alloc] init];
         if (proxyOK) proxyOK = [itvDownloadTest itvDownloadTest:proxyURL];
         if (proxyOK) proxyOK = bbcDownloadTest(proxyURL);
-        
-        
+       
         if (proxyOK)
         {
             NSLog(@"Existing Proxy Works");
             return 0;
         }
-        
+       
         //If program reaches this point, a new proxy needs to be found.
         NSLog(@"Need to find new proxy");
         
@@ -143,7 +142,10 @@ int main(int argc, const char * argv[])
                 NSString *proxy = [NSString stringWithFormat:@"http://%@:%@",host,port];
                 [proxyListArr addObject:[NSURL URLWithString:proxy]];
              }
-             
+             NSLog(@"Proxy Solutions List:");
+             for (NSURL *proxy in proxyListArr) {
+                NSLog(@"%@",proxy);
+             }
              return processProxyList(proxyListArr);
              
           }
@@ -204,8 +206,9 @@ int processProxyList(NSArray *proxyListArr)
     NSLog(@"Starting ITV Test with Proxy: %@",proxyURL);
     itvComplete = false;
     itvSuccess = false;
-    
+   
     NSString *itvCache = [NSString stringWithContentsOfFile:@"/Volumes/Server Storage/Web Root/get_iplayer/cache/itv.cache" encoding:NSUTF8StringEncoding error:nil];
+    //NSString *itvCache = [NSString stringWithContentsOfFile:@"/Users/thomaswillson/Library/Application Support/Get iPlayer Automator/tv.cache" encoding:NSUTF8StringEncoding error:nil];
     
     NSScanner *scanner = [NSScanner scannerWithString:itvCache];
     
