@@ -262,6 +262,7 @@ my $opt_format = {
 	tag_cnid => [ 1, "tagcnid|tag-cnid!", 'Tagging', '--tag-cnid', "Use AtomicParsley --cnID argument (if supported) to add catalog ID used for combining HD and SD versions in iTunes"],
 	tag_fulltitle => [ 1, "tagfulltitle|tag-fulltitle!", 'Tagging', '--tag-fulltitle', "Use complete title (including series) instead of shorter episode title"],
 	tag_hdvideo => [ 1, "taghdvideo|tag-hdvideo!", 'Tagging', '--tag-hdvideo', "AtomicParsley supports --hdvideo argument for HD video flag"],
+	tag_id3sync => [ 1, "tagid3sync|tag-id3sync!", 'Tagging', '--tag-id3sync', "Save ID3 tags for MP3 files in synchronised form. Provides workaround for corruption of thumbnail images in Windows. Has no effect unless using MP3::Tag Perl module."],
 	tag_longdesc => [ 1, "taglongdesc|tag-longdesc!", 'Tagging', '--tag-longdesc', "AtomicParsley supports --longdesc argument for long description text"],
 	tag_longdescription => [ 1, "taglongdescription|tag-longdescription!", 'Tagging', '--tag-longdescription', "AtomicParsley supports --longDescription argument for long description text"],
 	tag_podcast => [ 1, "tagpodcast|tag-podcast!", 'Tagging', '--tag-podcast', "Tag downloaded radio and tv programmes as iTunes podcasts (requires MP3::Tag module for AAC/MP3 files)"],
@@ -269,7 +270,8 @@ my $opt_format = {
 	tag_podcast_tv => [ 1, "tagpodcasttv|tag-podcast-tv!", 'Tagging', '--tag-podcast-tv', "Tag only downloaded tv programmes as iTunes podcasts"],
 	tag_utf8 => [ 1, "tagutf8|tag-utf8!", 'Tagging', '--tag-utf8', "AtomicParsley accepts UTF-8 input"],
 
-	# Deprecated
+	# Misc
+	trimhistory	=> [ 1, "trimhistory|trim-history=s", 'Misc', '--trim-history <# days to retain>', "Remove download history entries older than number of days specified in option value.  Cannot specify 0 - use 'all' to completely delete download history"],
 
 };
 
@@ -561,6 +563,9 @@ foreach ('start', 'stop') {
 	}
 }
 
+# set default thumbnail size in case thumbnail in cache is bad
+$opt->{thumbsize} = $opt->{thumbsize} || $opt->{thumbsizecache} || 150;
+
 # Add --search option to @search_args if specified
 if ( defined $opt->{search} ) {
 	push @search_args, $opt->{search};
@@ -593,8 +598,12 @@ my $pvr = Pvr->new();
 # Set some class-wide values
 $pvr->setvar('pvr_dir', "${profile_dir}/pvr/" );
 
+# Trim history
+if ( defined($opt->{trimhistory}) ) {
+	my $hist = History->new();
+	$hist->trim();
 # PVR functions
-if ( $opt->{pvradd} ) {
+} elsif ( $opt->{pvradd} ) {
 	if ( ! $opt->{pid} && $no_search_args ) {
 		main::logger "ERROR: Search term(s) or PID required for recording\n";
 		exit 1;
@@ -1434,14 +1443,16 @@ sub user_agent {
 		update		=> [ "get_iplayer updater (v${version} - $^O - $^V)" ],
 		get_iplayer	=> [ "get_iplayer/$version $^O/$^V" ],
 		desktop		=> [
-				'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 2.0.50<RAND>; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30<RAND>; InfoPath.1)',
-				'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; YPC 3.2.0; SLCC1; .NET CLR 2.0.50<RAND>; .NET CLR 3.0.04<RAND>)',
-				'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; WOW64; Trident/4.0; SLCC2; .NET CLR 2.0.50<RAND>; .NET CLR 3.5.30<RAND>; .NET CLR 3.0.30<RAND>; Media Center PC 6.0; InfoPath.2; MS-RTC LM 8)',
-				'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) AppleWebKit/<RAND>.8 (KHTML, like Gecko) Chrome/2.0.178.0 Safari/<RAND>.8',
-				'Mozilla/5.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50<RAND>; Media Center PC 5.0; c .NET CLR 3.0.0<RAND>6; .NET CLR 3.5.30<RAND>; InfoPath.1; el-GR)',
-				'Mozilla/5.0 (Macintosh; U; PPC Mac OS X 10_4_11; tr) AppleWebKit/<RAND>.4+ (KHTML, like Gecko) Version/4.0dp1 Safari/<RAND>.11.2',
-				'Mozilla/6.0 (Windows; U; Windows NT 7.0; en-US; rv:1.9.0.8) Gecko/2009032609 Firefox/3.0.9 (.NET CLR 3.5.30<RAND>)',
-				'Opera/9.64 (X11; Linux i686; U; en) Presto/2.1.1',
+				'Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17',
+				'Mozilla/5.0 (Windows NT 6.1; rv:12.0) Gecko/20100101 Firefox/12.0',
+				'Opera/9.80 (Windows NT 5.1) Presto/2.12.388 Version/12.12',
+				'Mozilla/5.0 (Windows NT 7.1; rv:2.0) Gecko/20100101 Firefox/4.0 Opera 12.12',
+				'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.0) Opera 12.12',
+				'Mozilla/5.0 (Windows NT 5.1; rv:18.0) Gecko/20100101 Firefox/18.0',
+				'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/537.13+ (KHTML, like Gecko) Version/5.1.7 Safari/534.57.2',
+				'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)',
+				'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 7.1; Trident/5.0)',
+				'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/5.0; .NET CLR 3.5.30729; .NET CLR 3.0.30729; .NET CLR 2.0.50727; Media Center PC 6.0)',
 				],
 		safari		=> [
 				'Mozilla/5.0 (iPhone; U; CPU iPhone OS 2_0 like Mac OS X; en-us) AppleWebKit/525.18.1 (KHTML, like Gecko) Version/3.1.1 Mobile/5A345 Safari/525.20',
@@ -2873,8 +2884,8 @@ sub cleanup {
 sub StringUtils::sanitize_path {
 	my $string = shift;
 	my $is_path = shift || 0;
-	# Replace leading ellipsis with _
-	$string =~ s/^\.+/_/;
+	# Replace leading/trailing ellipsis with _
+	$string =~ s/(^\.+|\.+$)/_/g;
 	# Replace forward slashes with _ if not path
 	$string =~ s/\//_/g unless $is_path;
 	# Replace backslashes with _ if not Windows path
@@ -3627,6 +3638,55 @@ sub add_opt_object {
 	$History::optref = shift;
 }
 
+
+sub trim {
+	my $oldhistoryfile = "$historyfile.old";
+	my $newhistoryfile = "$historyfile.new";
+	if ( $opt->{trimhistory} =~ /^all$/i ) {
+		if ( ! copy($historyfile, $oldhistoryfile) ) {
+			die "ERROR: Cannot copy $historyfile to $oldhistoryfile: $!\n";
+		}
+		if ( ! unlink($historyfile) ) {
+			die "ERROR: Cannot delete $historyfile: $! \n";
+		}
+		main::logger "INFO: Deleted all entries from download history\n";
+		return;
+	}
+	if ( $opt->{trimhistory} !~ /^\d+$/ ) {
+		die "ERROR: --trim-history option must have a positive integer value, or use 'all' to completely delete download history.\n";
+	}
+	if ( $opt->{trimhistory} =~ /^0+$/ ) {
+		die "ERROR: Cannot specify 0 for --trim-history option.  Use 'all' to completely delete download history.\n";
+	}
+	if ( ! open(HIST, "< $historyfile") ) {
+		die "ERROR: Cannot read from $historyfile\n";
+	}
+	if ( ! open(NEWHIST, "> $newhistoryfile") ) {
+		die "ERROR: Cannot write to $newhistoryfile\n";
+	}
+	my $trim_limit = time() - ($opt->{trimhistory} * 86400);
+	my $deleted_count = 0;
+	while (<HIST>) {
+		chomp();
+		next if /^[\#\s]/;
+		my @record = split /\|/;
+		my $timeadded = $record[4];
+		if ( $timeadded >= $trim_limit ) {
+			print NEWHIST "$_\n";
+		} else {
+			$deleted_count++;
+		}
+	}
+	close HIST;
+	close NEWHIST;
+	if ( ! copy($historyfile, $oldhistoryfile) ) {
+		die "ERROR: Cannot copy $historyfile to $oldhistoryfile: $!\n";
+	}
+	if ( ! move($newhistoryfile, $historyfile) ) {
+		die "ERROR: Cannot move $newhistoryfile to $historyfile: $!\n";
+	}
+	main::logger "INFO: Deleted $deleted_count entries from download history\n";
+}
 
 # Uses global @history_format
 # Adds prog to history file (with a timestamp) so that it is not rerecorded after deletion
@@ -4611,9 +4671,12 @@ sub substitute {
 		# special handling for <episode*>
 		$replace = '' if $replace eq '-' && $key =~ /episode/i;
 		# look for prefix in tag
-		my $pfx_key = $tag_begin.'([^A-Za-z0-9'.$tag_end.']*?)'.$key.$tag_end;
-		(my $prefix = $1) if $string =~ m/$pfx_key/;
-		$pfx_key = $tag_begin."\Q$prefix\E".$key.$tag_end;
+		my $pfx_key = $tag_begin.'([^A-Za-z1-9'.$tag_end.']*?)(0*?)'.$key.$tag_end;
+		my ($prefix, $pad) = $string =~ m/$pfx_key/;
+		if ( $replace =~ m/^\d+$/ && length($pad) > length($replace) ) {
+			$replace = substr($pad.$replace, -length($pad))
+		}
+		$pfx_key = $tag_begin."\Q$prefix$pad\E".$key.$tag_end;
 		$prefix = '' if ! $replace;
 		$string =~ s|$pfx_key|$prefix$replace|gi;
 	}
@@ -4996,8 +5059,7 @@ sub download_thumbnail {
 
 	# Write to file
 	unlink($file);
-	open( my $fh, "> $file" );
-	binmode $fh;
+	open( my $fh, ">:raw", $file );
 	print $fh $image;
 	close $fh;
 
@@ -5614,7 +5676,7 @@ sub get_metadata {
 	$prog->{episodeshort} =~ s/:?\s*Series\s+.+?(:\s*|$)//i;
 	$prog->{episodeshort} = $prog->{episode} if $prog->{episodeshort} eq '';
 	$prog->{nameshort} = $prog->{name};
-	$prog->{nameshort} =~ s/:?\s*Series\s+.+?(:\s*|$)//i;
+	$prog->{nameshort} =~ s/:?\s*Series\s+\d.*?(:\s*|$)//i; 
 
 	# Conditionally set the senum
 	$prog->{senum} = sprintf "s%02se%02s", $seriesnum, $episodenum if $seriesnum != 0 || $episodenum != 0;
@@ -6887,7 +6949,11 @@ sub get_links {
 
 			# Default to 150px width thumbnail;
 			my $thumbsize = $opt->{thumbsizecache} || 150;
-
+			my $thumbnail = $1 if $entry =~ m{<media:thumbnail.*?url="(.*?)"};
+			my $suffix = Programme::bbciplayer->thumb_url_suffixes->{ $thumbsize };
+			if ( $thumbnail !~ /$suffix/ ) {
+				$thumbnail =~ s/_\d+_\d+\.jpg/$suffix/;
+			}
 			# build data structure
 			$prog->{$pid} = main::progclass($prog_type)->new(
 				'pid'		=> $pid,
@@ -6900,7 +6966,7 @@ sub get_links {
 				'guidance'	=> $guidance,
 				'available'	=> 'Unknown',
 				'duration'	=> 'Unknown',
-				'thumbnail'	=> "${thumbnail_prefix}/${pid}".Programme::bbciplayer->thumb_url_suffixes->{ $thumbsize },
+				'thumbnail'	=> $thumbnail,
 				'channel'	=> $channel,
 				'categories'	=> join(',', sort @category),
 				'type'		=> $prog_type,
@@ -7058,6 +7124,13 @@ sub get_links {
 
 					# Default to 150px width thumbnail;
 					my $thumbsize = $opt->{thumbsizecache} || 150;
+					my $thumbnail = $1 if $entry =~ m{<media:thumbnail.*?url="(.*?)"};
+					if ( $thumbnail ) {
+						my $suffix = Programme::bbciplayer->thumb_url_suffixes->{ $thumbsize };
+						if ( $thumbnail !~ /$suffix/ ) {
+							$thumbnail =~ s/_\d+_\d+\.jpg/$suffix/;
+						}
+					}
 
 					# Don't create this prog instance if the availablity is in the past 
 					# this prevents programmes which never appear in iPlayer from being indexed
@@ -7074,7 +7147,7 @@ sub get_links {
 						'desc'		=> $desc,
 						'available'	=> $available,
 						'duration'	=> $duration,
-						'thumbnail'	=> "${thumbnail_prefix}/${pid}".Programme::bbciplayer->thumb_url_suffixes->{ $thumbsize },
+						'thumbnail'	=> $thumbnail,
 						'channel'	=> $channel,
 						'type'		=> $prog_type,
 						'web'		=> "${bbc_prog_page_prefix}/${pid}.html",
@@ -7251,7 +7324,6 @@ sub download_subtitles {
 			unlink("$prog->{dir}/$prog->{fileprefix}.ttxt");
 			main::logger "INFO: 'Downloading Raw Subtitles to $prog->{dir}/$prog->{fileprefix}.ttxt'\n";
 			open( my $fhraw, "> $prog->{dir}/$prog->{fileprefix}.ttxt");
-			binmode $fhraw;
 			print $fhraw $subs;
 			close $fhraw;
 		}
@@ -9811,6 +9883,9 @@ sub tag_file_id3 {
 		$mp3->{ID3v2}->remove_tag() if exists $mp3->{ID3v2};
 		$mp3->close();
 		# add metadata
+		if ( $opt->{tag_id3sync} ) {
+			MP3::Tag->config(id3v23_unsync => 0);
+		}
 		$mp3 = MP3::Tag->new($meta->{filename});
 		$mp3->select_id3v2_frame_by_descr('TCOP', $tags->{copyright});
 		$mp3->select_id3v2_frame_by_descr('TIT2', $tags->{title});
@@ -9843,8 +9918,7 @@ sub tag_file_id3 {
 		# add artwork if available
 		if ( -f $meta->{thumbfile}  && ! $opt->{noartwork} ) {
 			my $data;
-			open(THUMB, $meta->{thumbfile});
-			binmode(THUMB);
+			open(THUMB, "<:raw", $meta->{thumbfile});
 			read(THUMB, $data, stat($meta->{thumbfile})->size());
 			close(THUMB);
 			$mp3->select_id3v2_frame_by_descr('APIC', $data);
