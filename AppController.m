@@ -3029,8 +3029,15 @@
         [request setTimeOutSeconds:30];
         [request setProxyType:proxy.type];
         [request setProxyHost:proxy.host];
-        if (proxy.port)
+        if (proxy.port) {
             [request setProxyPort:proxy.port];
+        } else {
+            if ([proxy.type isEqualToString:(NSString *)kCFProxyTypeHTTPS]) {
+                [request setProxyPort:443];
+            } else  {
+                [request setProxyPort:80];
+            }
+        }
         if (proxy.user) {
             [request setProxyUsername:proxy.user];
             [request setProxyPassword:proxy.password];
