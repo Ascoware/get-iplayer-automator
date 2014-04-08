@@ -10,7 +10,7 @@
 #import "ASIHTTPRequest.h"
 #import "NSHost+ThreadedAdditions.h"
 #import "NSString+HTML.h"
-#import <Python/Python.h>
+//#import <Python/Python.h>
 
 @implementation FourODDownload
 - (id)description

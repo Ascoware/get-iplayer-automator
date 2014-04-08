@@ -1760,8 +1760,8 @@
 				{
                     if ([[show tvNetwork] hasPrefix:@"ITV"])
                         currentDownload = [[ITVDownload alloc] initWithProgramme:show itvFormats:[itvFormatController arrangedObjects] proxy:proxy];
-                    else if ([[show tvNetwork] hasPrefix:@"4oD"])
-                        currentDownload = [[FourODDownload alloc] initWithProgramme:show proxy:proxy];
+                    /*else if ([[show tvNetwork] hasPrefix:@"4oD"])
+                        currentDownload = [[FourODDownload alloc] initWithProgramme:show proxy:proxy];*/
                     else
                         currentDownload = [[BBCDownload alloc] initWithProgramme:show 
                                                                        tvFormats:[tvFormatController arrangedObjects] 
@@ -1958,8 +1958,8 @@
             {
                 if ([[nextShow tvNetwork] hasPrefix:@"ITV"])
                     currentDownload = [[ITVDownload alloc] initWithProgramme:nextShow itvFormats:[itvFormatController arrangedObjects] proxy:proxy];
-                else if ([[nextShow tvNetwork] hasPrefix:@"4oD"])
-                    currentDownload = [[FourODDownload alloc] initWithProgramme:nextShow proxy:proxy];
+                /*else if ([[nextShow tvNetwork] hasPrefix:@"4oD"])
+                    currentDownload = [[FourODDownload alloc] initWithProgramme:nextShow proxy:proxy];*/
                 else
                     currentDownload = [[BBCDownload alloc] initWithProgramme:nextShow 
                                                                    tvFormats:[tvFormatController arrangedObjects] 

@@ -11,7 +11,6 @@
 #import "Series.h"
 #import "ITVDownload.h"
 #import "Download.h"
-#import "FourODDownload.h"
 #import <IOKit/pwr_mgt/IOPMLib.h>
 #import "NilToStringTransformer.h"
 

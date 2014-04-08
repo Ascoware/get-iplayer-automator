@@ -57,7 +57,6 @@
 		D921C9ED149C4C6F004CB558 /* Body in Resources */ = {isa = PBXBuildFile; fileRef = D921C9EC149C4C6F004CB558 /* Body */; };
 		D92687C51087F81F000E8132 /* DownloadHistoryController.m in Sources */ = {isa = PBXBuildFile; fileRef = D92687C41087F81F000E8132 /* DownloadHistoryController.m */; };
 		D92687CA1087F836000E8132 /* DownloadHistoryEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = D92687C91087F836000E8132 /* DownloadHistoryEntry.m */; };
-		D9279DD3182044CE008DBB09 /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9279DD2182044CE008DBB09 /* Python.framework */; };
 		D9279DD5182044D4008DBB09 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9279DD4182044D4008DBB09 /* IOKit.framework */; };
 		D92BB40A1025B4D600B0BFEC /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D92BB4091025B4D600B0BFEC /* Sparkle.framework */; };
 		D92BB4131025B4DD00B0BFEC /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = D92BB4091025B4D600B0BFEC /* Sparkle.framework */; };
@@ -100,7 +99,6 @@
 		D9FEB87610077790003BADF8 /* AppController.m in Sources */ = {isa = PBXBuildFile; fileRef = D9FEB87510077790003BADF8 /* AppController.m */; };
 		DF3A234B13E5F59900B82C2E /* rtmpdump-2.4 in Resources */ = {isa = PBXBuildFile; fileRef = DF3A234A13E5F59900B82C2E /* rtmpdump-2.4 */; };
 		DFC865E213E96BE200606599 /* ReasonForFailure.m in Sources */ = {isa = PBXBuildFile; fileRef = DFC865E113E96BE200606599 /* ReasonForFailure.m */; };
-		DFC8D3F215C557E3008E369F /* FourODDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = DFC8D3F115C557E3008E369F /* FourODDownload.m */; };
 		DFC8D40415C97310008E369F /* fourOD_token_decoder.py in Resources */ = {isa = PBXBuildFile; fileRef = DFC8D40315C97310008E369F /* fourOD_token_decoder.py */; };
 		DFE5B67413E70AC20008571B /* plugins in Resources */ = {isa = PBXBuildFile; fileRef = DFE5B67313E70AC20008571B /* plugins */; };
 		DFFF196713E96288007B52AC /* ReasonsForFailure.plist in Resources */ = {isa = PBXBuildFile; fileRef = DFFF196613E96288007B52AC /* ReasonsForFailure.plist */; };
@@ -272,7 +270,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				D9279DD5182044D4008DBB09 /* IOKit.framework in Frameworks */,
-				D9279DD3182044CE008DBB09 /* Python.framework in Frameworks */,
 				D921C9C0149BBF43004CB558 /* libz.dylib in Frameworks */,
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
 				D914BC59100C9F0100F7E68E /* ScriptingBridge.framework in Frameworks */,
@@ -735,7 +732,6 @@
 				D921C9E8149BCB16004CB558 /* ITVDownload.m in Sources */,
 				D921C9EB149BCDEB004CB558 /* Download.m in Sources */,
 				D9D06C6F14BB91C200029340 /* ITVMediaFileEntry.m in Sources */,
-				DFC8D3F215C557E3008E369F /* FourODDownload.m in Sources */,
 				39814023168E124C003FFF53 /* NSHost+ThreadedAdditions.m in Sources */,
 				39879DAF16904B9F0050CA7D /* GTMNSString+HTML.m in Sources */,
 				39879DB016904B9F0050CA7D /* NSString+HTML.m in Sources */,
