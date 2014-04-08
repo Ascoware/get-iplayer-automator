@@ -2891,7 +2891,13 @@
     NSString *proxyOption = [[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"];
 	if ([proxyOption isEqualToString:@"Custom"])
 	{
-        NSString *proxyValue = [[[[NSUserDefaults standardUserDefaults] valueForKey:@"CustomProxy"] lowercaseString] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        NSString *customProxy = [[NSUserDefaults standardUserDefaults] valueForKey:@"CustomProxy"];
+        NSLog(@"INFO: Custom Proxy: address=[%@] length=%ld data=%@", customProxy, [customProxy length],  [customProxy dataUsingEncoding:NSUTF8StringEncoding]);
+        [self addToLog:[NSString stringWithFormat:@"INFO: Custom Proxy: address=[%@] length=%ld data=%@", customProxy, [customProxy length], [customProxy dataUsingEncoding:NSUTF8StringEncoding]]];
+        NSMutableCharacterSet *mcs = [[NSMutableCharacterSet alloc] init];
+        [mcs formUnionWithCharacterSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        [mcs formUnionWithCharacterSet:[NSCharacterSet controlCharacterSet]];
+        NSString *proxyValue = [[customProxy lowercaseString] stringByTrimmingCharactersInSet:mcs];
         if ([proxyValue length] == 0)
         {
             NSLog(@"WARNING: Custom proxy setting was blank. No proxy will be used.");
@@ -3019,6 +3025,25 @@
 {
     if (proxy)
     {
+        if (!proxy.host || [proxy.host length] == 0 || [proxy.host rangeOfString:@"(null)"].location != NSNotFound)
+        {
+            NSLog(@"WARNING: Invalid proxy host: address=%@ length=%ld", proxy.host, [proxy.host length]);
+            [self addToLog:[NSString stringWithFormat:@"WARNING: Invalid proxy host: address=%@ length=%ld", proxy.host, [proxy.host length]]];
+            if (!runScheduled)
+            {
+                NSAlert *alert = [NSAlert alertWithMessageText:@"Invalid proxy host.\nDownloads may fail.\nDo you wish to continue?"
+                                                 defaultButton:@"No"
+                                               alternateButton:@"Yes"
+                                                   otherButton:nil
+                                     informativeTextWithFormat:@"Invalid proxy host: address=[%@] length=%ld", proxy.host, [proxy.host length]];
+                [alert setAlertStyle:NSCriticalAlertStyle];
+                if ([alert runModal] == NSAlertDefaultReturn)
+                    [self cancelProxyLoad];
+                else
+                    [self failProxyTest];
+            }
+            return;
+        }
         NSString *testURL = [[NSUserDefaults standardUserDefaults] stringForKey:@"ProxyTestURL"];
         if (!testURL)
             testURL = @"http://www.google.com";
