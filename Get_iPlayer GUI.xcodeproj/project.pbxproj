@@ -33,13 +33,13 @@
 		D91F9D54187151D600D4388B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D91F9D53187151D600D4388B /* Foundation.framework */; };
 		D91F9D57187151D700D4388B /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D91F9D56187151D700D4388B /* main.m */; };
 		D91F9D5B187151D700D4388B /* GetiPlayerProxyUpdater.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = D91F9D5A187151D700D4388B /* GetiPlayerProxyUpdater.1 */; };
-		D91F9D65187162A800D4388B /* ASIDataCompressor.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9A6149BBE9F004CB558 /* ASIDataCompressor.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		D91F9D67187162A800D4388B /* ASIDataDecompressor.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9A8149BBE9F004CB558 /* ASIDataDecompressor.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		D91F9D69187162A800D4388B /* ASIDownloadCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9AA149BBE9F004CB558 /* ASIDownloadCache.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		D91F9D6B187162A800D4388B /* ASIFormDataRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9AC149BBE9F004CB558 /* ASIFormDataRequest.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		D91F9D6D187162A800D4388B /* ASIHTTPRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9AE149BBE9F004CB558 /* ASIHTTPRequest.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		D91F9D71187162A800D4388B /* ASIInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9B2149BBE9F004CB558 /* ASIInputStream.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		D91F9D73187162A800D4388B /* ASINetworkQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9B4149BBE9F004CB558 /* ASINetworkQueue.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		D91F9D65187162A800D4388B /* ASIDataCompressor.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9A6149BBE9F004CB558 /* ASIDataCompressor.m */; };
+		D91F9D67187162A800D4388B /* ASIDataDecompressor.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9A8149BBE9F004CB558 /* ASIDataDecompressor.m */; };
+		D91F9D69187162A800D4388B /* ASIDownloadCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9AA149BBE9F004CB558 /* ASIDownloadCache.m */; };
+		D91F9D6B187162A800D4388B /* ASIFormDataRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9AC149BBE9F004CB558 /* ASIFormDataRequest.m */; };
+		D91F9D6D187162A800D4388B /* ASIHTTPRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9AE149BBE9F004CB558 /* ASIHTTPRequest.m */; };
+		D91F9D71187162A800D4388B /* ASIInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9B2149BBE9F004CB558 /* ASIInputStream.m */; };
+		D91F9D73187162A800D4388B /* ASINetworkQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9B4149BBE9F004CB558 /* ASINetworkQueue.m */; };
 		D91F9D771871635400D4388B /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D91F9D761871635400D4388B /* libz.dylib */; };
 		D91F9D791871657600D4388B /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D91F9D781871657600D4388B /* SystemConfiguration.framework */; };
 		D91F9D7F187165A900D4388B /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D91F9D7E187165A900D4388B /* libxml2.dylib */; };
@@ -839,7 +839,7 @@
 				OTHER_LDFLAGS = "-licucore";
 				PRODUCT_NAME = "Get iPlayer Automator";
 				PROVISIONING_PROFILE = "";
-				SDKROOT = macosx10.8;
+				SDKROOT = macosx;
 				VALID_ARCHS = x86_64;
 			};
 			name = Debug;
@@ -873,7 +873,7 @@
 				OTHER_LDFLAGS = "-licucore";
 				PRODUCT_NAME = "Get iPlayer Automator";
 				PROVISIONING_PROFILE = "";
-				SDKROOT = macosx10.8;
+				SDKROOT = macosx;
 				VALID_ARCHS = x86_64;
 			};
 			name = Release;
@@ -953,7 +953,7 @@
 				MACH_O_TYPE = mh_execute;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx10.8;
+				SDKROOT = macosx;
 				VALID_ARCHS = x86_64;
 			};
 			name = Debug;
@@ -979,7 +979,7 @@
 				MACH_O_TYPE = mh_execute;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx10.8;
+				SDKROOT = macosx;
 				VALID_ARCHS = x86_64;
 			};
 			name = Release;
