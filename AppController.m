@@ -2892,12 +2892,9 @@
 	if ([proxyOption isEqualToString:@"Custom"])
 	{
         NSString *customProxy = [[NSUserDefaults standardUserDefaults] valueForKey:@"CustomProxy"];
-        NSLog(@"INFO: Custom Proxy: address=[%@] length=%ld data=%@", customProxy, [customProxy length],  [customProxy dataUsingEncoding:NSUTF8StringEncoding]);
-        [self addToLog:[NSString stringWithFormat:@"INFO: Custom Proxy: address=[%@] length=%ld data=%@", customProxy, [customProxy length], [customProxy dataUsingEncoding:NSUTF8StringEncoding]]];
-        NSMutableCharacterSet *mcs = [[NSMutableCharacterSet alloc] init];
-        [mcs formUnionWithCharacterSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-        [mcs formUnionWithCharacterSet:[NSCharacterSet controlCharacterSet]];
-        NSString *proxyValue = [[customProxy lowercaseString] stringByTrimmingCharactersInSet:mcs];
+        NSLog(@"INFO: Custom Proxy: address=[%@] length=%ld", customProxy, [customProxy length]);
+        [self addToLog:[NSString stringWithFormat:@"INFO: Custom Proxy: address=[%@] length=%ld", customProxy, [customProxy length]]];
+        NSString *proxyValue = [[customProxy lowercaseString] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
         if ([proxyValue length] == 0)
         {
             NSLog(@"WARNING: Custom proxy setting was blank. No proxy will be used.");
