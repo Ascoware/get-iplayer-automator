@@ -13,6 +13,8 @@
 #import "Programme.h"
 #import "HTTPProxy.h"
 
+#define LOCAL_DEBUG
+
 
 @interface ITVDownloadTest : NSObject {
     bool itvComplete;
@@ -34,8 +36,11 @@ int processProxyList(NSArray *proxyListArr);
 bool runDownloads=false;
 
 //Constant
+#ifndef LOCAL_DEBUG
 NSString *ProxyFilePath = @"/Volumes/Server Storage/Web Root/get_iplayer/proxy.txt";
-//NSString *ProxyFilePath = @"/Users/thomaswillson/proxy.txt";
+#else
+NSString *ProxyFilePath = @"/Users/thomaswillson/proxy.txt";
+#endif
 
 
 
@@ -152,8 +157,6 @@ int main(int argc, const char * argv[])
           else return 500; //Processing Proxy page failed.
           
        }
-        
-       
 }
 }
 bool basicProxyTest(NSURL *proxyURL)
@@ -207,8 +210,11 @@ int processProxyList(NSArray *proxyListArr)
     itvComplete = false;
     itvSuccess = false;
    
+#ifndef LOCAL_DEBUG
     NSString *itvCache = [NSString stringWithContentsOfFile:@"/Volumes/Server Storage/Web Root/get_iplayer/cache/itv.cache" encoding:NSUTF8StringEncoding error:nil];
-    //NSString *itvCache = [NSString stringWithContentsOfFile:@"/Users/thomaswillson/Library/Application Support/Get iPlayer Automator/tv.cache" encoding:NSUTF8StringEncoding error:nil];
+#else
+    NSString *itvCache = [NSString stringWithContentsOfFile:@"/Users/thomaswillson/Library/Application Support/Get iPlayer Automator/tv.cache" encoding:NSUTF8StringEncoding error:nil];
+#endif
     
     NSScanner *scanner = [NSScanner scannerWithString:itvCache];
     
