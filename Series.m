@@ -16,7 +16,7 @@
 	showName = [[NSString alloc] init];
 	tvNetwork = [[NSString alloc] init];
 	lastFound = [[NSDate alloc] init];
-    added = [NSNumber numberWithDouble:[[[NSDate alloc] init] timeIntervalSince1970]];
+    added = @([[[NSDate alloc] init] timeIntervalSince1970]);
 	return self;
 }
 - (id)initWithShowname:(NSString *)SHOWNAME

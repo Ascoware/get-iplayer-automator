@@ -26,12 +26,16 @@
 	NSNumber *radio;
 	NSString *realPID;
 	NSString *subtitlePath;
-    NSString *reasonForFailure;
-    NSString *availableModes;
-    NSString *url;
-    NSDate *__strong dateAired;
-    NSString *desc;
-    NSNumber *podcast;
+   NSString *reasonForFailure;
+   NSString *availableModes;
+   NSString *url;
+   NSDate *__strong dateAired;
+   NSString *desc;
+   NSNumber *podcast;
+   
+   //Extended Metadata
+   NSNumber *duration;
+   
 }
 - (id)initWithInfo:(id)sender pid:(NSString *)PID programmeName:(NSString *)SHOWNAME network:(NSString *)TVNETWORK;
 - (id)initWithShow:(Programme *)show;

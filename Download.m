@@ -50,7 +50,7 @@
 {
 	if (d<=100.0)
 	{
-		NSNumber *value = [[NSNumber alloc] initWithDouble:d];
+		NSNumber *value = @(d);
 		[nc postNotificationName:@"setPercentage" object:self userInfo:@{@"nsDouble": value}];
 	}
 	else

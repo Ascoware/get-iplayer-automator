@@ -422,7 +422,7 @@ static int EscapeMapCompare(const void *ucharVoid, const void *mapVoid) {
 				buffer2Length = 0;
 			}
 			if (val) {
-				[finalString appendString:[NSString stringWithCString:val->escapeSequence encoding:NSUTF8StringEncoding]];
+				[finalString appendString:@(val->escapeSequence)];
 			}
 			else {
 //				_GTMDevAssert(escapeUnicode && buffer[i] > 127, @"Illegal Character");
@@ -506,7 +506,7 @@ static int EscapeMapCompare(const void *ucharVoid, const void *mapVoid) {
 			} else {
 				// "standard" sequences
 				for (unsigned i = 0; i < sizeof(gAsciiHTMLEscapeMap) / sizeof(HTMLEscapeMap); ++i) {
-					if ([escapeString isEqualToString:[NSString stringWithCString:gAsciiHTMLEscapeMap[i].escapeSequence encoding:NSUTF8StringEncoding]]) {
+					if ([escapeString isEqualToString:@(gAsciiHTMLEscapeMap[i].escapeSequence)]) {
 						[finalString replaceCharactersInRange:escapeRange withString:[NSString stringWithCharacters:&gAsciiHTMLEscapeMap[i].uchar length:1]];
 						break;
 					}

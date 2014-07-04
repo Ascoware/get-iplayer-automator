@@ -148,7 +148,7 @@
 
     // TODO: remove 4oD
     // disable 4oD and delete CH4 cache
-    [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithBool:NO] forKey:@"Cache4oD_TV"];
+    [[NSUserDefaults standardUserDefaults] setValue:@NO forKey:@"Cache4oD_TV"];
     [ch4TVCheckbox setState:NSOffState];
     [ch4TVCheckbox setEnabled:NO];
     [fileManager removeItemAtPath:[folder stringByAppendingPathComponent:@"ch4.cache"] error:nil];
@@ -196,13 +196,13 @@
     // clear obsolete formats
     NSMutableArray *tempTVFormats = [[NSMutableArray alloc] initWithArray:[tvFormatController arrangedObjects]];
     for (TVFormat *tvFormat in tempTVFormats) {
-        if (![tvFormats objectForKey:[tvFormat format]]) {
+        if (!tvFormats[[tvFormat format]]) {
             [tvFormatController removeObject:tvFormat];
         }
     }
     NSMutableArray *tempRadioFormats = [[NSMutableArray alloc] initWithArray:[radioFormatController arrangedObjects]];
     for (RadioFormat *radioFormat in tempRadioFormats) {
-        if (![radioFormats objectForKey:[radioFormat format]]) {
+        if (!radioFormats[[radioFormat format]]) {
             [radioFormatController removeObject:radioFormat];
         }
     }
@@ -468,7 +468,7 @@
         
         [self addToLog:@"Updating Program Index Feeds...\r" :self];
         
-        getiPlayerUpdateArgs = [[NSArray alloc] initWithObjects:getiPlayerPath,cacheExpiryArg,typeArgument,@"--nopurge",profileDirArg,proxyArg,nil];
+        getiPlayerUpdateArgs = @[getiPlayerPath,cacheExpiryArg,typeArgument,@"--nopurge",profileDirArg,proxyArg];
         getiPlayerUpdateTask = [[NSTask alloc] init];
         [getiPlayerUpdateTask setLaunchPath:@"/usr/bin/perl"];
         [getiPlayerUpdateTask setArguments:getiPlayerUpdateArgs];
@@ -843,7 +843,7 @@
 {
 	NSString *unattributedLog = [log string];
 	NSPasteboard *pb = [NSPasteboard generalPasteboard];
-	NSArray *types = [[NSArray alloc] initWithObjects:NSStringPboardType,nil];
+	NSArray *types = @[NSStringPboardType];
 	[pb declareTypes:types owner:self];
 	[pb setString:unattributedLog forType:NSStringPboardType];
 }
@@ -1045,7 +1045,7 @@
 	NSString *fieldsArgument = @"--fields=index,pid";
 	NSString *wantedID = [pro valueForKey:@"pid"];
 	NSString *cacheExpiryArg = [self cacheExpiryArgument:nil];
-	NSArray *args = [[NSArray alloc] initWithObjects:getiPlayerPath,noWarningArg,@"--nopurge",cacheExpiryArg,[self typeArgument:nil],listArgument,profileDirArg,fieldsArgument,wantedID,nil];
+	NSArray *args = @[getiPlayerPath,noWarningArg,@"--nopurge",cacheExpiryArg,[self typeArgument:nil],listArgument,profileDirArg,fieldsArgument,wantedID];
 	[getNameTask setArguments:args];
 	[getNameTask setLaunchPath:@"/usr/bin/perl"];
 	
@@ -1133,7 +1133,7 @@
     {
         if ([[p showName] isEqualToString:@""] || [[p showName] isEqualToString:@"Unknown: Not in Cache"])
             [p setValue:@"Unknown: Not in Cache" forKey:@"showName"];
-        [p setProcessedPID:[[NSNumber alloc] initWithBool:NO]];
+        [p setProcessedPID:@NO];
     }
 	else
 		[p setProcessedPID:@YES];
@@ -2048,8 +2048,8 @@
 		NSString *searchArgument = [[NSString alloc] initWithString:searchTerms];
 		NSString *cacheExpiryArg = [self cacheExpiryArgument:nil];
 		NSString *typeArgument = [self typeArgument:nil];
-		NSArray *args = [[NSArray alloc] initWithObjects:getiPlayerPath,noWarningArg,cacheExpiryArg,typeArgument,@"--nopurge",
-						  @"--listformat=<index>: <type>, ~<name> - <episode>~, <channel>, <timeadded>",searchArgument,profileDirArg,nil];
+		NSArray *args = @[getiPlayerPath,noWarningArg,cacheExpiryArg,typeArgument,@"--nopurge",
+						  @"--listformat=<index>: <type>, ~<name> - <episode>~, <channel>, <timeadded>",searchArgument,profileDirArg];
 		[pvrSearchTask setArguments:args];
 		
 		[pvrSearchTask setStandardOutput:pvrSearchPipe];
