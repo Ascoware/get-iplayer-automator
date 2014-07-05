@@ -14,11 +14,6 @@
 #import <IOKit/pwr_mgt/IOPMLib.h>
 #import "NilToStringTransformer.h"
 
-bool runDownloads=NO;
-bool runUpdate=NO;
-NSDictionary *tvFormats;
-NSDictionary *radioFormats;
-
 @interface AppController : NSObject {
 	//General
 	NSString *getiPlayerPath;
@@ -28,8 +23,8 @@ NSDictionary *radioFormats;
 	NSString *currentTypeArgument;
 	IBOutlet NSWindow *mainWindow;
 	IBOutlet NSApplication *application;
-    IBOutlet NSWindow *historyWindow;
-    IOPMAssertionID powerAssertionID;
+   IBOutlet NSWindow *historyWindow;
+   IOPMAssertionID powerAssertionID;
 	
 	//Log Components
 	IBOutlet NSTextView *log;
@@ -41,18 +36,19 @@ NSDictionary *radioFormats;
 	NSTask *getiPlayerUpdateTask;
 	NSPipe *getiPlayerUpdatePipe;
 	NSArray *getiPlayerUpdateArgs;
-    NSMutableArray *typesToCache;
+   NSMutableArray *typesToCache;
 	BOOL didUpdate;
 	BOOL runSinceChange;
-    BOOL quickUpdateFailed;
-    NSUInteger nextToCache;
-    NSDictionary *updateURLDic;
-    NSDate *lastUpdate;
+   BOOL quickUpdateFailed;
+   NSUInteger nextToCache;
+   NSDictionary *updateURLDic;
+   NSDate *lastUpdate;
 	
 	//Main Window: Search
 	IBOutlet NSTextField *searchField;
 	IBOutlet NSProgressIndicator *searchIndicator;
 	IBOutlet NSArrayController *resultsController;
+   IBOutlet NSTableView *searchResultsTable;
 	NSMutableArray *searchResultsArray;
 	NSTask *searchTask;
 	NSPipe *searchPipe;
@@ -63,7 +59,7 @@ NSDictionary *radioFormats;
 	IBOutlet NSProgressIndicator *pvrSearchIndicator;
 	IBOutlet NSArrayController *pvrResultsController;
 	IBOutlet NSArrayController *pvrQueueController;
-    IBOutlet NSPanel *pvrPanel;
+   IBOutlet NSPanel *pvrPanel;
 	NSMutableArray *pvrSearchResultsArray;
 	NSTask *pvrSearchTask;
 	NSPipe *pvrSearchPipe;
@@ -91,14 +87,14 @@ NSDictionary *radioFormats;
 	//Preferences
 	NSMutableArray *tvFormatList;
 	NSMutableArray *radioFormatList;
-    NSMutableArray *itvFormatList;
+   NSMutableArray *itvFormatList;
 	IBOutlet NSArrayController *tvFormatController;
 	IBOutlet NSArrayController *radioFormatController;
-    IBOutlet NSArrayController *itvFormatController;
-    IBOutlet NSButton *itvTVCheckbox;
-    IBOutlet NSPanel *prefsPanel;
-    IBOutlet NSButton *ch4TVCheckbox;
-    
+   IBOutlet NSArrayController *itvFormatController;
+   IBOutlet NSButton *itvTVCheckbox;
+   IBOutlet NSPanel *prefsPanel;
+   IBOutlet NSButton *ch4TVCheckbox;
+   
 	//Scheduling a Start
 	IBOutlet NSPanel *scheduleWindow;
 	IBOutlet NSDatePicker *datePicker;
@@ -116,29 +112,51 @@ NSDictionary *radioFormats;
 	NSTask *mplayerStreamer;
 	NSPipe *liveTVPipe;
 	NSPipe *liveTVError;
-    
-    //Download Solutions
-    IBOutlet NSWindow *solutionsWindow;
-    IBOutlet NSArrayController *solutionsArrayController;
-    IBOutlet NSTableView *solutionsTableView;
-    NSDictionary *solutionsDictionary;
-    
-    //Proxy
-    HTTPProxy *proxy;
-    NSMutableDictionary *proxyDict;
-    enum {
-        kProxyLoadCancelled = 1,
-        kProxyLoadFailed = 2,
-        kProxyTestFailed = 3
-    };
-    
-    //PVR list editing
-    NilToStringTransformer *nilToEmptyStringTransformer;
-    NilToStringTransformer *nilToAsteriskTransformer;
-    
-    //Verbose Logging
-    BOOL verbose;
+   
+   //Download Solutions
+   IBOutlet NSWindow *solutionsWindow;
+   IBOutlet NSArrayController *solutionsArrayController;
+   IBOutlet NSTableView *solutionsTableView;
+   NSDictionary *solutionsDictionary;
+   
+   //Proxy
+   HTTPProxy *proxy;
+   NSMutableDictionary *proxyDict;
+   enum {
+      kProxyLoadCancelled = 1,
+      kProxyLoadFailed = 2,
+      kProxyTestFailed = 3
+   };
+   
+   
+   //PVR list editing
+   NilToStringTransformer *nilToEmptyStringTransformer;
+   NilToStringTransformer *nilToAsteriskTransformer;
+   
+   //Verbose Logging
+   BOOL verbose;
+   
+   //Extended Show Information
+   IBOutlet NSProgressIndicator *retrievingInfoIndicator;
+   IBOutlet NSTextField *loadingLabel;
+   IBOutlet NSView *loadingView;
+   IBOutlet NSView *infoView;
+   IBOutlet NSPopover *popover;
+   IBOutlet NSImageView *imageView;
+   IBOutlet NSTextField *seriesName;
+   IBOutlet NSTextField *episodeName;
+   IBOutlet NSTextField *numbersField;
+   IBOutlet NSTextField *durationField;
+   IBOutlet NSTextField *categoriesField;
+   IBOutlet NSTextField *firstBroadcastField;
+   IBOutlet NSTextField *lastBroadcastField;
+   IBOutlet NSTextView *descriptionView;
+   IBOutlet NSDictionaryController *modeSizeController;
 }
+
+//Proxy
+- (void)loadProxyInBackgroundForSelector:(SEL)selector withObject:(id)object;
+
 //Update
 - (void)getiPlayerUpdateFinished;
 - (IBAction)updateCache:(id)sender;
@@ -165,6 +183,7 @@ NSDictionary *radioFormats;
 - (IBAction)restoreDefaults:(id)sender;
 - (IBAction)showFeedback:(id)sender;
 - (IBAction)closeWindow:(id)sender;
++ (AppController*)sharedController;
 
 //Queue
 - (IBAction)addToQueue:(id)sender;
@@ -200,11 +219,17 @@ NSDictionary *radioFormats;
 - (IBAction)startLiveTV:(id)sender;
 - (IBAction)stopLiveTV:(id)sender;
 
+//Extended Show Information
+- (IBAction)showExtendedInformationForSelectedProgramme:(id)sender;
+- (void)loadProxyInBackgroundForSelector:(SEL)selector withObject:(id)object onTarget:(id)target;
+
+
 //Download Solutions
 //- (IBAction)saveSolutionsAsText:(id)sender;
 
 //Key-Value Coding
 @property (readwrite) NSMutableAttributedString *log_value;
 @property (readonly) NSString *getiPlayerPath;
+@property (readonly) HTTPProxy *proxy;
 
 @end

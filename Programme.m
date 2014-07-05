@@ -8,7 +8,10 @@
 
 #import "Programme.h"
 #import "NSString+HTML.h"
-extern BOOL runDownloads;
+#import "AppController.h"
+#import "HTTPProxy.h"
+#import "ASIHTTPRequest.h"
+//extern bool runDownloads;
 
 
 @implementation Programme
@@ -29,10 +32,11 @@ extern BOOL runDownloads;
 	radio = @NO;
 	subtitlePath=[[NSString alloc] init];
 	realPID=[[NSString alloc] init];
-    reasonForFailure=[[NSString alloc] init];
-    availableModes=[[NSString alloc] init];
-    desc=[[NSString alloc] init];
-    podcast=@NO;
+   reasonForFailure=[[NSString alloc] init];
+   availableModes=[[NSString alloc] init];
+   desc=[[NSString alloc] init];
+   podcast=@NO;
+   extendedMetadataRetrieved=@NO;
 	return self;
 }
 - (id)initWithShow:(Programme *)show
@@ -51,10 +55,11 @@ extern BOOL runDownloads;
 	radio = [show radio];
 	realPID = [show realPID];
 	subtitlePath = [show subtitlePath];
-    reasonForFailure=[show reasonForFailure];
-    availableModes=[[NSString alloc] init];
-    desc=[[NSString alloc] init];
-    podcast = [show podcast];
+   reasonForFailure=[show reasonForFailure];
+   availableModes=[[NSString alloc] init];
+   desc=[[NSString alloc] init];
+   podcast = [show podcast];
+   extendedMetadataRetrieved=@NO;
 	return self;
 }
 - (id)init
@@ -78,13 +83,14 @@ extern BOOL runDownloads;
 	path = @"Unknown";
 	processedPID = @NO;
 	radio = @NO;
-    url = [[NSString alloc] init];
+   url = [[NSString alloc] init];
 	realPID=[[NSString alloc] init];
 	subtitlePath=[[NSString alloc] init];
-    reasonForFailure=[[NSString alloc] init];
-    availableModes=[[NSString alloc] init];
-    desc=[[NSString alloc] init];
-    podcast=@NO;
+   reasonForFailure=[[NSString alloc] init];
+   availableModes=[[NSString alloc] init];
+   desc=[[NSString alloc] init];
+   podcast=@NO;
+   extendedMetadataRetrieved=@NO;
 	return self;
 }
 - (id)description
@@ -104,8 +110,8 @@ extern BOOL runDownloads;
 	[coder encodeObject:processedPID forKey:@"processedPID"];
 	[coder encodeObject:radio forKey:@"radio"];
 	[coder encodeObject:realPID forKey:@"realPID"];
-    [coder encodeObject:url forKey:@"url"];
-    [coder encodeObject:podcast forKey:@"podcast"];
+   [coder encodeObject:url forKey:@"url"];
+   [coder encodeObject:podcast forKey:@"podcast"];
 }
 - (id) initWithCoder: (NSCoder *)coder
 {
@@ -123,39 +129,221 @@ extern BOOL runDownloads;
 	processedPID = [coder decodeObjectForKey:@"processedPID"];
 	radio = [coder decodeObjectForKey:@"radio"];
 	realPID = [coder decodeObjectForKey:@"realPID"];
-    url = [coder decodeObjectForKey:@"url"];
+   url = [coder decodeObjectForKey:@"url"];
 	subtitlePath=[[NSString alloc] init];
-    reasonForFailure=[[NSString alloc] init];
-    availableModes=[[NSString alloc] init];
-    desc=[[NSString alloc] init];
-    podcast = [coder decodeObjectForKey:@"podcast"];
+   reasonForFailure=[[NSString alloc] init];
+   availableModes=[[NSString alloc] init];
+   desc=[[NSString alloc] init];
+   podcast = [coder decodeObjectForKey:@"podcast"];
+   extendedMetadataRetrieved=@NO;
 	return self;
 }
 /*
-- (id)pasteboardPropertyListForType:(NSString *)type
-{
-	if ([type isEqualToString:@"com.thomaswillson.programme"])
-	{
-		return [NSKeyedArchiver archivedDataWithRootObject:self];
-	}
-}
-- (NSArray *)writableTypesForPasteboard:(NSPasteboard *)pasteboard
-{
-	return [NSArray arrayWithObject:@"com.thomaswillson.programme"];
-}
+ - (id)pasteboardPropertyListForType:(NSString *)type
+ {
+ if ([type isEqualToString:@"com.thomaswillson.programme"])
+ {
+ return [NSKeyedArchiver archivedDataWithRootObject:self];
+ }
+ }
+ - (NSArray *)writableTypesForPasteboard:(NSPasteboard *)pasteboard
+ {
+ return [NSArray arrayWithObject:@"com.thomaswillson.programme"];
+ }
  */
 -(void)setPid:(NSString *)newPID
 {
-    self->pid = [newPID stringByReplacingOccurrencesOfString:@"amp;" withString:@""];
+   self->pid = [newPID stringByReplacingOccurrencesOfString:@"amp;" withString:@""];
 }
 -(NSString *)pid
 {
-    return pid;
+   return pid;
 }
 -(void)printLongDescription
 {
-    NSLog(@"%@:\n   TV Network: %@\n   Processed PID: %@\n   Real PID: %@\n   Available Modes: %@\n   URL: %@\n",
-          showName,tvNetwork,processedPID,realPID,availableModes,url);
+   NSLog(@"%@:\n   TV Network: %@\n   Processed PID: %@\n   Real PID: %@\n   Available Modes: %@\n   URL: %@\n",
+         showName,tvNetwork,processedPID,realPID,availableModes,url);
+}
+
+-(void)retrieveExtendedMetadata
+{
+   [[AppController sharedController] addToLog:@"Retrieving Extended Metadata" :self];
+   [[AppController sharedController] loadProxyInBackgroundForSelector:@selector(proxyRetrievalFinished:proxyError:) withObject:nil onTarget:self];
+}
+
+-(void)proxyRetrievalFinished:(id)sender proxyError:(NSError *)proxyError
+{
+   taskOutput = [[NSMutableString alloc] init];
+   NSTask *task = [[NSTask alloc] init];
+   pipe = [[NSPipe alloc] init];   
+   
+   [task setLaunchPath:@"/usr/bin/perl"];
+   NSMutableArray *args = [NSMutableArray arrayWithArray:@[[[NSBundle mainBundle] pathForResource:@"get_iplayer" ofType:@"pl"],
+                                                           @"--nopurge",
+                                                           @"--nocopyright",
+                                                           @"-e60480000000000000",
+                                                           @"-i",
+                                                           [NSString stringWithFormat:@"--profile-dir=%@",[@"~/Library/Application Support/Get iPlayer Automator/" stringByExpandingTildeInPath]],pid]];
+   if ([AppController sharedController].proxy) {
+      [args addObject:[AppController sharedController].proxy.url];
+      
+      if (![[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])
+      {
+         [args addObject:@"--partial-proxy"];
+      }
+      
+   }
+   
+   [task setArguments:args];
+   
+   [task setStandardOutput:pipe];
+   NSFileHandle *fh = [pipe fileHandleForReading];
+   
+   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(metadataRetrievalDataReady:) name:NSFileHandleReadCompletionNotification object:fh];
+   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(metadataRetrievalFinished:) name:NSTaskDidTerminateNotification object:task];
+   
+   [task launch];
+   [fh readInBackgroundAndNotify];
+}
+
+-(void)metadataRetrievalDataReady:(NSNotification *)n
+{
+   NSData *d = [[n userInfo] valueForKey:NSFileHandleNotificationDataItem];
+	
+   if ([d length] > 0) {
+		NSString *s = [[NSString alloc] initWithData:d
+                                          encoding:NSUTF8StringEncoding];
+		
+		[taskOutput appendString:s];
+      [[AppController sharedController] addToLog:s :self];
+      [[pipe fileHandleForReading] readInBackgroundAndNotify];
+	}
+   else {
+      [self metadataRetrievalFinished:nil];
+   }
+}
+
+-(void)metadataRetrievalFinished:(NSNotification *)n
+{
+   taskRunning=NO;
+   categories = [self scanField:@"categories" fromList:taskOutput];
+   
+   NSString *descTemp = [self scanField:@"desc" fromList:taskOutput];
+   if (descTemp) {
+      desc = descTemp;
+   }
+   
+   NSString *durationTemp = [self scanField:@"duration" fromList:taskOutput];
+   if (durationTemp) {
+      if ([durationTemp hasSuffix:@"min"])
+         duration = [NSNumber numberWithInteger:[durationTemp integerValue]];
+      else
+         duration = [NSNumber numberWithInteger:[durationTemp integerValue]/60];
+   }
+   
+   firstBroadcast = [self processDate:[self scanField:@"firstbcast" fromList:taskOutput]];
+   lastBroadcast = [self processDate:[self scanField:@"lastbcast" fromList:taskOutput]];
+   
+   seriesName = [self scanField:@"longname" fromList:taskOutput];
+
+   episodeName = [self scanField:@"episode" fromList:taskOutput];
+   
+   NSString *seasonNumber = [self scanField:@"seriesnum" fromList:taskOutput];
+   if (seasonNumber) {
+      season = [seasonNumber integerValue];
+   }
+   
+   NSString *episodeNumber = [self scanField:@"episodenum" fromList:taskOutput];
+   if (episodeNumber) {
+      episode = [episodeNumber integerValue];
+   }
+   NSString *modeSizesString = [self scanField:@"modesizes" fromList:taskOutput];
+   if (modeSizesString) {
+      NSScanner *sizeScanner = [NSScanner scannerWithString:modeSizesString];
+      [sizeScanner scanString:@"default:" intoString:nil];
+      NSString *newSizesString;
+      [sizeScanner scanUpToString:@":" intoString:&newSizesString];
+      
+      NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"[a-z]*[0-2]=[0-9]*MB" options:0 error:nil];
+      NSArray *matches = [regex matchesInString:newSizesString options:0 range:NSMakeRange(0, [newSizesString length])];
+      if ([matches count] > 0) {
+         NSMutableDictionary *dictionary = [NSMutableDictionary dictionary];
+         for (NSTextCheckingResult *modesizeResult in matches) {
+            NSString *modesize = [newSizesString substringWithRange:modesizeResult.range];
+            if ([modesize hasPrefix:@"rtsp"] || [modesize hasPrefix:@"wma"]) {
+               continue;
+            }
+            NSArray *comps = [modesize componentsSeparatedByString:@"="];
+            if ([comps count] == 2) {
+               [dictionary setObject:comps[1] forKey:comps[0]];
+            }
+         }
+         modeSizes = dictionary;
+      }
+   }
+   NSString *thumbURL = [self scanField:@"thumbnail4" fromList:taskOutput];
+   if (!thumbURL) {
+      thumbURL = [self scanField:@"thumbnail" fromList:taskOutput];
+   }
+   if (thumbURL) {
+      NSLog(@"URL: %@", thumbURL);
+      ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:thumbURL]];
+      [request setDelegate:self];
+      [request setDidFinishSelector:@selector(thumbnailRequestFinished:)];
+      [request setDidFailSelector:@selector(thumbnailRequestFinished:)];
+      [request setTimeOutSeconds:3];
+      [request setNumberOfTimesToRetryOnTimeout:3];
+      [request startAsynchronous];
+   }
+}
+
+- (void)thumbnailRequestFinished:(ASIHTTPRequest *)request
+{
+   if (request.responseStatusCode == 200) {
+      thumbnail = [[NSImage alloc] initWithData:request.responseData];
+   }
+   successfulRetrieval = @YES;
+   extendedMetadataRetrieved = @YES;
+   [[NSNotificationCenter defaultCenter] postNotificationName:@"ExtendedInfoRetrieved" object:self];
+   
+}
+
+-(NSString *)scanField:(NSString *)field fromList:(NSString *)list
+{
+   NSString __autoreleasing *buffer;
+   
+   NSScanner *scanner = [NSScanner scannerWithString:list];
+   [scanner scanUpToString:[NSString stringWithFormat:@"%@:",field] intoString:nil];
+   [scanner scanString:[NSString stringWithFormat:@"%@:",field] intoString:nil];
+   [scanner scanCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:nil];
+   [scanner scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet] intoString:&buffer];
+   
+   return [buffer copy];
+}
+
+-(NSDate *)processDate:(NSString *)date
+{
+   NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+   if (NSAppKitVersionNumber >= NSAppKitVersionNumber10_8) //10.8, 10.9
+      [dateFormatter setDateFormat:@"yyyy'-'MM'-'dd'T'HH':'mm':'ssZZZZZ"];
+   else //10.7
+      [dateFormatter setDateFormat:@"yyyy'-'MM'-'dd'T'HH':'mm':'ssZZ"];
+   
+   if (date) {
+      date = [self scanField:@"default" fromList:date];
+      if (date) {
+         if (NSAppKitVersionNumber <= NSAppKitVersionNumber10_8) { //Before 10.8 doesn't recognize the Z
+            if ([date hasSuffix:@"Z"]) {
+               date = [date stringByReplacingOccurrencesOfString:@"Z" withString:@"+00:00"];
+            }
+         }
+         if (NSAppKitVersionNumber < NSAppKitVersionNumber10_8) {
+            date = [date stringByReplacingCharactersInRange:NSMakeRange(date.length - 3, 1) withString:@""];
+         }
+         return [dateFormatter dateFromString:date];
+      }
+   }
+   return nil;
 }
 
 @synthesize showName;
@@ -179,4 +367,13 @@ extern BOOL runDownloads;
 @synthesize dateAired;
 @synthesize desc;
 @synthesize podcast;
+
+@synthesize extendedMetadataRetrieved;
+@synthesize successfulRetrieval;
+@synthesize duration;
+@synthesize categories;
+@synthesize firstBroadcast;
+@synthesize lastBroadcast;
+@synthesize modeSizes;
+@synthesize thumbnail;
 @end

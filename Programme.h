@@ -6,7 +6,7 @@
 //  Copyright 2009 __MyCompanyName__. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
+#import <Cocoa/Cocoa.h>
 
 
 @interface Programme : NSObject <NSCoding> {
@@ -34,12 +34,25 @@
    NSNumber *podcast;
    
    //Extended Metadata
+   NSNumber *extendedMetadataRetrieved;
+   NSNumber *successfulRetrieval;
    NSNumber *duration;
+   NSString *categories;
+   NSDate *__strong firstBroadcast;
+   NSDate *__strong lastBroadcast;
+   NSDictionary *modeSizes;
+   NSImage *thumbnail;
+   
+   NSMutableString *taskOutput;
+   NSPipe *pipe;
+   volatile bool taskRunning;
+   
    
 }
 - (id)initWithInfo:(id)sender pid:(NSString *)PID programmeName:(NSString *)SHOWNAME network:(NSString *)TVNETWORK;
 - (id)initWithShow:(Programme *)show;
 - (void)printLongDescription;
+- (void)retrieveExtendedMetadata;
 
 @property (readwrite) NSString *showName;
 @property (readwrite) NSString *tvNetwork;
@@ -63,4 +76,13 @@
 @property (readwrite, strong) NSDate *dateAired;
 @property (readwrite) NSString *desc;
 @property (readwrite) NSNumber *podcast;
+
+@property (readwrite) NSNumber *extendedMetadataRetrieved;
+@property (readwrite) NSNumber *successfulRetrieval;
+@property (readwrite) NSNumber *duration;
+@property (readwrite) NSString *categories;
+@property (readwrite) NSDate *firstBroadcast;
+@property (readwrite) NSDate *lastBroadcast;
+@property (readwrite) NSDictionary *modeSizes;
+@property (readwrite) NSImage *thumbnail;
 @end
