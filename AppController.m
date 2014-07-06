@@ -2949,8 +2949,13 @@ NSDictionary *radioFormats;
 	}
 	else if ([proxyOption isEqualToString:@"Provided"])
 	{
+      NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithObjectsAndKeys:[NSValue valueWithPointer:selector],@"selector",target,@"target", nil];
+      if (object){
+         [userInfo addEntriesFromDictionary:@{@"object": object}];
+      }
+      
       ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:@"http://tom-tech.com/get_iplayer/proxy.txt"]];
-      [request setUserInfo:@{@"selector": [NSValue valueWithPointer:selector], @"object": object}];
+      [request setUserInfo:userInfo];
       [request setDelegate:self];
       [request setDidFailSelector:@selector(providedProxyDidFinish:)];
       [request setDidFinishSelector:@selector(providedProxyDidFinish:)];

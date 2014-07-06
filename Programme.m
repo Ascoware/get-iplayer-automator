@@ -185,7 +185,7 @@
                                                            @"-i",
                                                            [NSString stringWithFormat:@"--profile-dir=%@",[@"~/Library/Application Support/Get iPlayer Automator/" stringByExpandingTildeInPath]],pid]];
    if ([AppController sharedController].proxy) {
-      [args addObject:[AppController sharedController].proxy.url];
+      [args addObject:[NSString stringWithFormat:@"-p%@",[AppController sharedController].proxy.url]];
       
       if (![[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])
       {
