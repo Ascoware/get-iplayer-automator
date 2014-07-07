@@ -3216,6 +3216,8 @@ NSDictionary *radioFormats;
    if (programme.successfulRetrieval.boolValue) {
       if (programme.thumbnail)
          imageView.image = programme.thumbnail;
+      else
+         imageView.image = nil;
       
       if (programme.seriesName)
          seriesName.stringValue = programme.seriesName;
