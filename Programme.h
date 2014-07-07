@@ -46,6 +46,7 @@
    NSMutableString *taskOutput;
    NSPipe *pipe;
    volatile bool taskRunning;
+   NSTask *metadataTask;
    
    
 }
@@ -53,6 +54,7 @@
 - (id)initWithShow:(Programme *)show;
 - (void)printLongDescription;
 - (void)retrieveExtendedMetadata;
+-(void)cancelMetadataRetrieval;
 
 @property (readwrite) NSString *showName;
 @property (readwrite) NSString *tvNetwork;

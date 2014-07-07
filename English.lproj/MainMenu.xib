@@ -717,7 +717,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="491">
-                            <rect key="frame" x="754" y="17" width="15" height="129"/>
+                            <rect key="frame" x="753" y="17" width="16" height="129"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <tableHeaderView key="headerView" id="494">
@@ -2772,15 +2772,15 @@ DQ
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <customView wantsLayer="YES" id="ryX-Qd-Wi8" userLabel="Loading Info View">
-                    <rect key="frame" x="184" y="141" width="246" height="40"/>
+                    <rect key="frame" x="78" y="141" width="352" height="40"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <subviews>
                         <progressIndicator horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" id="lwa-7m-lrw">
-                            <rect key="frame" x="213" y="13" width="16" height="16"/>
+                            <rect key="frame" x="319" y="13" width="16" height="16"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         </progressIndicator>
                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="cAi-OW-zbo">
-                            <rect key="frame" x="18" y="13" width="189" height="17"/>
+                            <rect key="frame" x="18" y="13" width="295" height="17"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Loading Episode Info:" id="XLQ-Se-5nS">
                                 <font key="font" metaFont="system"/>

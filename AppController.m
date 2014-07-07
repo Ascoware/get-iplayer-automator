@@ -3204,10 +3204,20 @@ NSDictionary *radioFormats;
       if (!programme.extendedMetadataRetrieved.boolValue) {
          [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(informationRetrieved:) name:@"ExtendedInfoRetrieved" object:programme];
          [programme retrieveExtendedMetadata];
+         [NSTimer scheduledTimerWithTimeInterval:60 target:self selector:@selector(timeoutTimer:) userInfo:nil repeats:NO];
       }
       else {
          [self informationRetrieved:[NSNotification notificationWithName:@"" object:programme]];
       }
+   }
+}
+- (void)timeoutTimer:(NSTimer *)timer
+{
+   Programme *programme = searchResultsArray[[searchResultsTable selectedRow]];
+   if (!programme.extendedMetadataRetrieved.boolValue) {
+      [self addToLog:@"Metadata Retrieval timed out" :self];
+      [programme cancelMetadataRetrieval];
+      loadingLabel.stringValue = @"Programme Information Retrieval Timed Out";
    }
 }
 - (void)informationRetrieved:(NSNotification *)note {

@@ -174,10 +174,10 @@
 -(void)proxyRetrievalFinished:(id)sender proxyError:(NSError *)proxyError
 {
    taskOutput = [[NSMutableString alloc] init];
-   NSTask *task = [[NSTask alloc] init];
+   metadataTask = [[NSTask alloc] init];
    pipe = [[NSPipe alloc] init];   
    
-   [task setLaunchPath:@"/usr/bin/perl"];
+   [metadataTask setLaunchPath:@"/usr/bin/perl"];
    NSMutableArray *args = [NSMutableArray arrayWithArray:@[[[NSBundle mainBundle] pathForResource:@"get_iplayer" ofType:@"pl"],
                                                            @"--nopurge",
                                                            @"--nocopyright",
@@ -194,15 +194,15 @@
       
    }
    
-   [task setArguments:args];
+   [metadataTask setArguments:args];
    
-   [task setStandardOutput:pipe];
+   [metadataTask setStandardOutput:pipe];
    NSFileHandle *fh = [pipe fileHandleForReading];
    
    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(metadataRetrievalDataReady:) name:NSFileHandleReadCompletionNotification object:fh];
-   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(metadataRetrievalFinished:) name:NSTaskDidTerminateNotification object:task];
+   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(metadataRetrievalFinished:) name:NSTaskDidTerminateNotification object:metadataTask];
    
-   [task launch];
+   [metadataTask launch];
    [fh readInBackgroundAndNotify];
 }
 
@@ -344,6 +344,14 @@
       }
    }
    return nil;
+}
+
+-(void)cancelMetadataRetrieval
+{
+   if ([metadataTask isRunning]) {
+      [metadataTask interrupt];
+   }
+   [[AppController sharedController] addToLog:@"Metadata Retrieval Cancelled" :self];
 }
 
 @synthesize showName;
