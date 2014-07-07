@@ -152,6 +152,7 @@
    IBOutlet NSTextField *lastBroadcastField;
    IBOutlet NSTextView *descriptionView;
    IBOutlet NSDictionaryController *modeSizeController;
+   IBOutlet NSTextField *typeField;
 }
 
 //Proxy

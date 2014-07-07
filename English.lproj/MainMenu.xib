@@ -68,6 +68,7 @@
                 <outlet property="startButton" destination="481" id="930"/>
                 <outlet property="stopButton" destination="482" id="931"/>
                 <outlet property="tvFormatController" destination="1106" id="1145"/>
+                <outlet property="typeField" destination="IDs-bQ-KLx" id="sw3-S5-Iyo"/>
             </connections>
         </customObject>
         <arrayController objectClassName="ReasonForFailure" id="1402" userLabel="SolutionsArrayController">
@@ -2968,6 +2969,15 @@ DQ
                             <rect key="frame" x="198" y="196" width="447" height="17"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Categories:" id="MRu-D3-RJ5">
+                                <font key="font" metaFont="smallSystem"/>
+                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                            </textFieldCell>
+                        </textField>
+                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="IDs-bQ-KLx">
+                            <rect key="frame" x="198" y="176" width="447" height="17"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Type:" id="fdr-26-thU">
                                 <font key="font" metaFont="smallSystem"/>
                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>

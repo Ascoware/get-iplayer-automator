@@ -8,6 +8,13 @@
 
 #import <Cocoa/Cocoa.h>
 
+typedef NS_ENUM(NSInteger, GIA_ProgrammeType) {
+   GiA_ProgrammeTypeBBC_TV,
+   GiA_ProgrammeTypeBBC_Radio,
+   GiA_ProgrammeTypeBBC_Podcast,
+   GIA_ProgrammeTypeITV
+};
+
 
 @interface Programme : NSObject <NSCoding> {
 	NSString *tvNetwork;
@@ -54,7 +61,9 @@
 - (id)initWithShow:(Programme *)show;
 - (void)printLongDescription;
 - (void)retrieveExtendedMetadata;
--(void)cancelMetadataRetrieval;
+- (void)cancelMetadataRetrieval;
+- (GIA_ProgrammeType)type;
+- (NSString *)typeDescription;
 
 @property (readwrite) NSString *showName;
 @property (readwrite) NSString *tvNetwork;

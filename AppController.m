@@ -3274,6 +3274,11 @@ NSDictionary *radioFormats;
       else
          modeSizeController.content = [NSDictionary dictionary];
       
+      if ([programme typeDescription])
+            typeField.stringValue = [NSString stringWithFormat:@"Type: %@",[programme typeDescription]];
+      else
+         typeField.stringValue = @"";
+      
       [retrievingInfoIndicator stopAnimation:self];
       infoView.alphaValue = 1.0;
       loadingView.alphaValue = 0.0;

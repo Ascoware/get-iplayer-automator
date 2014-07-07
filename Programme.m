@@ -354,6 +354,28 @@
    [[AppController sharedController] addToLog:@"Metadata Retrieval Cancelled" :self];
 }
 
+- (GIA_ProgrammeType)type
+{
+   if (radio.boolValue)
+      return GiA_ProgrammeTypeBBC_Radio;
+   else if (podcast.boolValue)
+      return GiA_ProgrammeTypeBBC_Podcast;
+   else if ([tvNetwork hasPrefix:@"ITV"])
+      return GIA_ProgrammeTypeITV;
+   else
+      return GiA_ProgrammeTypeBBC_TV;   
+}
+
+- (NSString *)typeDescription
+{
+   NSDictionary *dic = @{@(GiA_ProgrammeTypeBBC_TV): @"BBC TV",
+                         @(GiA_ProgrammeTypeBBC_Radio): @"BBC Radio",
+                         @(GiA_ProgrammeTypeBBC_Podcast): @"BBC Podcast",
+                         @(GIA_ProgrammeTypeITV): @"ITV"};
+   
+   return [dic objectForKey:@([self type])];
+}
+
 @synthesize showName;
 @synthesize tvNetwork;
 @synthesize status;
