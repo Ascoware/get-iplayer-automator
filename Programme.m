@@ -332,12 +332,12 @@
    if (date) {
       date = [self scanField:@"default" fromList:date];
       if (date) {
-         if (NSAppKitVersionNumber <= NSAppKitVersionNumber10_8) { //Before 10.8 doesn't recognize the Z
+         if (floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_8) { //Before 10.9 doesn't recognize the Z
             if ([date hasSuffix:@"Z"]) {
                date = [date stringByReplacingOccurrencesOfString:@"Z" withString:@"+00:00"];
             }
          }
-         if (NSAppKitVersionNumber < NSAppKitVersionNumber10_8) {
+         if (floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_7) {
             date = [date stringByReplacingCharactersInRange:NSMakeRange(date.length - 3, 1) withString:@""];
          }
          return [dateFormatter dateFromString:date];
