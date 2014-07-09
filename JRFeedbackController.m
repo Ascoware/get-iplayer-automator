@@ -145,7 +145,7 @@ NSString *JRFeedbackType[JRFeedbackController_SectionCount] = {
 
 - (IBAction)submitAction:(id)sender 
 {
-    if (!([[emailAddressComboBox stringValue] isEqualToString:@""] && includeContactInfo))
+    if (!(([emailAddressComboBox.stringValue isEqualToString:@""] || [emailAddressComboBox.stringValue isEqualToString:@"user@user.com"]) && includeContactInfo))
 	{
 		[sendButton setEnabled:NO];
 		[cancelButton setEnabled:NO];
