@@ -147,7 +147,7 @@ NSDictionary *radioFormats;
    //Initialize Search Results Click Actions
    [searchResultsTable setTarget:self];
    [searchResultsTable setDoubleAction:@selector(addToQueue:)];
-
+   
    
 	//Read Queue & Series-Link from File
 	NSFileManager *fileManager = [NSFileManager defaultManager];
@@ -474,7 +474,7 @@ NSDictionary *radioFormats;
       NSString *typeArgument = [self typeArgument:nil];
       
       getiPlayerUpdateArgs = @[getiPlayerPath,cacheExpiryArg,typeArgument,@"--nopurge",profileDirArg];
-
+      
       if (proxy && [[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])
       {
          getiPlayerUpdateArgs = [getiPlayerUpdateArgs arrayByAddingObject:[[NSString alloc] initWithFormat:@"-p%@", [proxy url]]];
@@ -482,7 +482,7 @@ NSDictionary *radioFormats;
       
       [self addToLog:@"Updating Program Index Feeds...\r" :self];
       
-
+      
       getiPlayerUpdateTask = [[NSTask alloc] init];
       [getiPlayerUpdateTask setLaunchPath:@"/usr/bin/perl"];
       [getiPlayerUpdateTask setArguments:getiPlayerUpdateArgs];
@@ -1893,7 +1893,7 @@ NSDictionary *radioFormats;
 				[self seasonEpisodeInfo:finishedShow];
 			}
 			if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"AddCompletedToiTunes"] isEqualTo:@YES])
-				[NSThread detachNewThreadSelector:@selector(addToiTunes:) toTarget:self withObject:finishedShow];
+				[NSThread detachNewThreadSelector:@selector(addToiTunesThread:) toTarget:self withObject:finishedShow];
 			else
 				[finishedShow setValue:@"Download Complete" forKey:@"status"];
 			
@@ -2196,8 +2196,6 @@ NSDictionary *radioFormats;
 }
 - (IBAction)addSeriesLinkToQueue:(id)sender
 {
-	//[NSTimer scheduledTimerWithTimeInterval:.1 target:self selector:@selector(seriesLinkToQueueTimerSelector:) userInfo:nil repeats:NO];
-	//NSThreadWillExitNotification
 	if ([[pvrQueueController arrangedObjects] count] > 0 && !runUpdate)
 	{
 		if (!runDownloads)
@@ -2206,58 +2204,60 @@ NSDictionary *radioFormats;
 			[currentIndicator startAnimation:self];
 			[startButton setEnabled:NO];
 		}
+      [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(seriesLinkFinished:) name:@"NSThreadWillExitNotification" object:nil];
 		NSLog(@"About to launch Series-Link Thread");
-		[NSThread detachNewThreadSelector:@selector(seriesLinkToQueueTimerSelector) toTarget:self withObject:nil];
+		[NSThread detachNewThreadSelector:@selector(seriesLinkToQueueThread) toTarget:self withObject:nil];
 		NSLog(@"Series-Link Thread Launched");
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(seriesLinkFinished:) name:@"NSThreadWillExitNotification" object:nil];
 	}
 	else if (runScheduled && !scheduleTimer)
 	{
 		[self performSelectorOnMainThread:@selector(startDownloads:) withObject:self waitUntilDone:NO];
 	}
 }
-- (void)seriesLinkToQueueTimerSelector
+- (void)seriesLinkToQueueThread
 {
-	NSArray *seriesLink = [pvrQueueController arrangedObjects];
-	if (!runDownloads)
-		[currentProgress performSelectorOnMainThread:@selector(setStringValue:) withObject:@"Updating Series Link..." waitUntilDone:YES];
-	NSMutableArray *seriesToBeRemoved = [[NSMutableArray alloc] init];
-	for (Series *series in seriesLink)
-	{
-		if (!runDownloads)
-			[currentProgress performSelectorOnMainThread:@selector(setStringValue:) withObject:[NSString stringWithFormat:@"Updating Series Link - %lu/%lu - %@",(unsigned long)[seriesLink indexOfObject:series]+1,(unsigned long)[seriesLink count],[series showName]] waitUntilDone:YES];
-      if ([[series showName] length] == 0) {
-         [seriesToBeRemoved addObject:series];
-         continue;
-      } else if ([[series tvNetwork] length] == 0) {
-         [series setTvNetwork:@"*"];
+   @autoreleasepool {
+      NSArray *seriesLink = [pvrQueueController arrangedObjects];
+      if (!runDownloads)
+         [currentProgress performSelectorOnMainThread:@selector(setStringValue:) withObject:@"Updating Series Link..." waitUntilDone:YES];
+      NSMutableArray *seriesToBeRemoved = [[NSMutableArray alloc] init];
+      for (Series *series in seriesLink)
+      {
+         if (!runDownloads)
+            [currentProgress performSelectorOnMainThread:@selector(setStringValue:) withObject:[NSString stringWithFormat:@"Updating Series Link - %lu/%lu - %@",(unsigned long)[seriesLink indexOfObject:series]+1,(unsigned long)[seriesLink count],[series showName]] waitUntilDone:YES];
+         if ([[series showName] length] == 0) {
+            [seriesToBeRemoved addObject:series];
+            continue;
+         } else if ([[series tvNetwork] length] == 0) {
+            [series setTvNetwork:@"*"];
+         }
+         NSString *cacheExpiryArgument = [self cacheExpiryArgument:nil];
+         NSString *typeArgument = [self typeArgument:nil];
+         
+         NSMutableArray *autoRecordArgs = [[NSMutableArray alloc] initWithObjects:getiPlayerPath, noWarningArg,@"--nopurge",
+                                           @"--listformat=<index>: <type>, ~<name> - <episode>~, <channel>, <timeadded>, <pid>,<web>", cacheExpiryArgument,
+                                           typeArgument, profileDirArg,@"--hide",[self escapeSpecialCharactersInString:[series showName]],nil];
+         
+         NSTask *autoRecordTask = [[NSTask alloc] init];
+         NSPipe *autoRecordPipe = [[NSPipe alloc] init];
+         NSMutableString *autoRecordData = [[NSMutableString alloc] initWithString:@""];
+         NSFileHandle *readHandle = [autoRecordPipe fileHandleForReading];
+         NSData *inData = nil;
+         
+         [autoRecordTask setLaunchPath:@"/usr/bin/perl"];
+         [autoRecordTask setArguments:autoRecordArgs];
+         [autoRecordTask setStandardOutput:autoRecordPipe];
+         [autoRecordTask launch];
+         
+         while ((inData = [readHandle availableData]) && [inData length]) {
+            NSString *tempData = [[NSString alloc] initWithData:inData encoding:NSUTF8StringEncoding];
+            [autoRecordData appendString:tempData];
+         }
+         if (![self processAutoRecordData:[autoRecordData copy] forSeries:series])
+            [seriesToBeRemoved addObject:series];
       }
-		NSString *cacheExpiryArgument = [self cacheExpiryArgument:nil];
-		NSString *typeArgument = [self typeArgument:nil];
-		
-		NSMutableArray *autoRecordArgs = [[NSMutableArray alloc] initWithObjects:getiPlayerPath, noWarningArg,@"--nopurge",
-                                        @"--listformat=<index>: <type>, ~<name> - <episode>~, <channel>, <timeadded>, <pid>,<web>", cacheExpiryArgument,
-                                        typeArgument, profileDirArg,@"--hide",[self escapeSpecialCharactersInString:[series showName]],nil];
-		
-		NSTask *autoRecordTask = [[NSTask alloc] init];
-		NSPipe *autoRecordPipe = [[NSPipe alloc] init];
-		NSMutableString *autoRecordData = [[NSMutableString alloc] initWithString:@""];
-		NSFileHandle *readHandle = [autoRecordPipe fileHandleForReading];
-		NSData *inData = nil;
-		
-		[autoRecordTask setLaunchPath:@"/usr/bin/perl"];
-		[autoRecordTask setArguments:autoRecordArgs];
-		[autoRecordTask setStandardOutput:autoRecordPipe];
-		[autoRecordTask launch];
-		
-		while ((inData = [readHandle availableData]) && [inData length]) {
-			NSString *tempData = [[NSString alloc] initWithData:inData encoding:NSUTF8StringEncoding];
-			[autoRecordData appendString:tempData];
-		}
-		if (![self processAutoRecordData:[autoRecordData copy] forSeries:series])
-			[seriesToBeRemoved addObject:series];
-	}
-	[pvrQueueController performSelectorOnMainThread:@selector(removeObjects:) withObject:seriesToBeRemoved waitUntilDone:NO];
+      [pvrQueueController performSelectorOnMainThread:@selector(removeObjects:) withObject:seriesToBeRemoved waitUntilDone:NO];
+   }
 }
 - (void)seriesLinkFinished:(NSNotification *)note
 {
@@ -2509,69 +2509,71 @@ NSDictionary *radioFormats;
    if ([[NSAlert alertWithMessageText:@"File could not be added to iTunes," defaultButton:@"Help Me!" alternateButton:@"Do nothing" otherButton:nil informativeTextWithFormat:@"This is usually fixed by running iTunes in 32-bit mode. Would you like instructions to do this?"] runModal] == NSAlertDefaultReturn)
       [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"http://support.apple.com/kb/TS3771"]];
 }
-- (void)addToiTunes:(Programme *)show
+- (void)addToiTunesThread:(Programme *)show
 {
-	NSString *path = [[NSString alloc] initWithString:[show path]];
-	NSString *ext = [path pathExtension];
-	
-	[self performSelectorOnMainThread:@selector(addToLog:) withObject:[NSString stringWithFormat:@"Adding %@ to iTunes",[show showName]] waitUntilDone:NO];
-	
-	iTunesApplication *iTunes = [SBApplication applicationWithBundleIdentifier:@"com.apple.iTunes"];
-	
-	NSArray *fileToAdd = @[[NSURL fileURLWithPath:path]];
-	if (![iTunes isRunning]) [iTunes activate];
-	@try
-	{
-		if ([ext isEqualToString:@"mov"] || [ext isEqualToString:@"mp4"] || [ext isEqualToString:@"mp3"] || [ext isEqualToString:@"m4a"])
-		{
-			iTunesTrack *track = [iTunes add:fileToAdd to:nil];
-         NSLog(@"Track exists = %@", ([track exists] ? @"YES" : @"NO"));
-			if ([track exists] && ([ext isEqualToString:@"mov"] || [ext isEqualToString:@"mp4"]))
-			{
-				if ([ext isEqualToString:@"mov"])
-				{
-					[track setName:[show episodeName]];
-					[track setEpisodeID:[show episodeName]];
-					[track setShow:[show seriesName]];
-					[track setArtist:[show tvNetwork]];
-					if ([show season]>0) [track setSeasonNumber:[show season]];
-					if ([show episode]>0) [track setEpisodeNumber:[show episode]];
-				}
-				[track setUnplayed:YES];
-            [show setValue:@"Complete & in iTunes" forKey:@"status"];
-			}
-			else if ([track exists] && ([ext isEqualToString:@"mp3"] || [ext isEqualToString:@"m4a"]))
-			{
-				[track setBookmarkable:YES];
-				[track setUnplayed:YES];
-            [show setValue:@"Complete & in iTunes" forKey:@"status"];
-			}
-			else
+   @autoreleasepool {
+      NSString *path = [[NSString alloc] initWithString:[show path]];
+      NSString *ext = [path pathExtension];
+      
+      [self performSelectorOnMainThread:@selector(addToLog:) withObject:[NSString stringWithFormat:@"Adding %@ to iTunes",[show showName]] waitUntilDone:NO];
+      
+      iTunesApplication *iTunes = [SBApplication applicationWithBundleIdentifier:@"com.apple.iTunes"];
+      
+      NSArray *fileToAdd = @[[NSURL fileURLWithPath:path]];
+      if (![iTunes isRunning]) [iTunes activate];
+      @try
+      {
+         if ([ext isEqualToString:@"mov"] || [ext isEqualToString:@"mp4"] || [ext isEqualToString:@"mp3"] || [ext isEqualToString:@"m4a"])
          {
-            [self performSelectorOnMainThread:@selector(addToLog:) withObject:@"iTunes did not accept file." waitUntilDone:YES];
-            if (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_8) { //10.8 or older
-               [self performSelectorOnMainThread:@selector(addToLog:) withObject:@"Try setting iTunes to open in 32-bit mode." waitUntilDone:YES];
-               [self performSelectorOnMainThread:@selector(thirtyTwoBitModeAlert) withObject:nil waitUntilDone:NO];
+            iTunesTrack *track = [iTunes add:fileToAdd to:nil];
+            NSLog(@"Track exists = %@", ([track exists] ? @"YES" : @"NO"));
+            if ([track exists] && ([ext isEqualToString:@"mov"] || [ext isEqualToString:@"mp4"]))
+            {
+               if ([ext isEqualToString:@"mov"])
+               {
+                  [track setName:[show episodeName]];
+                  [track setEpisodeID:[show episodeName]];
+                  [track setShow:[show seriesName]];
+                  [track setArtist:[show tvNetwork]];
+                  if ([show season]>0) [track setSeasonNumber:[show season]];
+                  if ([show episode]>0) [track setEpisodeNumber:[show episode]];
+               }
+               [track setUnplayed:YES];
+               [show setValue:@"Complete & in iTunes" forKey:@"status"];
             }
-            else { //Newer than 10.8. iTunes can no longer be run in 32-bit mode.
-               [self performSelectorOnMainThread:@selector(addToLog:) withObject:@"Unfortunately new versions of iTunes cannot accept this file." waitUntilDone:YES];
+            else if ([track exists] && ([ext isEqualToString:@"mp3"] || [ext isEqualToString:@"m4a"]))
+            {
+               [track setBookmarkable:YES];
+               [track setUnplayed:YES];
+               [show setValue:@"Complete & in iTunes" forKey:@"status"];
             }
-            [show setValue:@"Complete: Not in iTunes" forKey:@"status"];
+            else
+            {
+               [self performSelectorOnMainThread:@selector(addToLog:) withObject:@"iTunes did not accept file." waitUntilDone:YES];
+               if (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_8) { //10.8 or older
+                  [self performSelectorOnMainThread:@selector(addToLog:) withObject:@"Try setting iTunes to open in 32-bit mode." waitUntilDone:YES];
+                  [self performSelectorOnMainThread:@selector(thirtyTwoBitModeAlert) withObject:nil waitUntilDone:NO];
+               }
+               else { //Newer than 10.8. iTunes can no longer be run in 32-bit mode.
+                  [self performSelectorOnMainThread:@selector(addToLog:) withObject:@"Unfortunately new versions of iTunes cannot accept this file." waitUntilDone:YES];
+               }
+               [show setValue:@"Complete: Not in iTunes" forKey:@"status"];
+            }
          }
-		}
-		else
-		{
-			[self performSelectorOnMainThread:@selector(addToLog:) withObject:@"Can't add to iTunes; incompatible format." waitUntilDone:YES];
-			[self performSelectorOnMainThread:@selector(addToLog:) withObject:@"			iTunes Compatible Modes: Flash - High, Flash - Standard, Flash - HD, iPhone, Radio - MP3, Podcast" waitUntilDone:YES];
-			[show setValue:@"Download Complete" forKey:@"status"];
-		}
-	}
-	@catch (NSException *e)
-	{
-		[self performSelectorOnMainThread:@selector(addToLog:) withObject:@"Unable to Add to iTunes" waitUntilDone:YES];
-      NSLog(@"Unable %@ to iTunes",show);
-		[show setValue:@"Complete, Could not add to iTunes." forKey:@"status"];
-	}
+         else
+         {
+            [self performSelectorOnMainThread:@selector(addToLog:) withObject:@"Can't add to iTunes; incompatible format." waitUntilDone:YES];
+            [self performSelectorOnMainThread:@selector(addToLog:) withObject:@"			iTunes Compatible Modes: Flash - High, Flash - Standard, Flash - HD, iPhone, Radio - MP3, Podcast" waitUntilDone:YES];
+            [show setValue:@"Download Complete" forKey:@"status"];
+         }
+      }
+      @catch (NSException *e)
+      {
+         [self performSelectorOnMainThread:@selector(addToLog:) withObject:@"Unable to Add to iTunes" waitUntilDone:YES];
+         NSLog(@"Unable %@ to iTunes",show);
+         [show setValue:@"Complete, Could not add to iTunes." forKey:@"status"];
+      }
+   }
 }
 - (void)cleanUpPath:(Programme *)show
 {
@@ -3263,7 +3265,7 @@ NSDictionary *radioFormats;
          firstBroadcastField.stringValue = [NSString stringWithFormat:@"First Broadcast: %@",[programme.firstBroadcast description]];
       else
          firstBroadcastField.stringValue = @"";
-         
+      
       if (programme.lastBroadcast)
          lastBroadcastField.stringValue = [NSString stringWithFormat:@"Last Broadcast: %@", [programme.lastBroadcast description]];
       else
@@ -3280,7 +3282,7 @@ NSDictionary *radioFormats;
          modeSizeController.content = [NSDictionary dictionary];
       
       if ([programme typeDescription])
-            typeField.stringValue = [NSString stringWithFormat:@"Type: %@",[programme typeDescription]];
+         typeField.stringValue = [NSString stringWithFormat:@"Type: %@",[programme typeDescription]];
       else
          typeField.stringValue = @"";
       

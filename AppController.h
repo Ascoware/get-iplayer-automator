@@ -177,7 +177,7 @@
 - (IBAction)addToAutoRecord:(id)sender;
 
 //Misc.
-- (void)addToiTunes:(Programme *)show;
+- (void)addToiTunesThread:(Programme *)show;
 - (void)cleanUpPath:(Programme *)show;
 - (void)seasonEpisodeInfo:(Programme *)show;
 - (IBAction)chooseDownloadPath:(id)sender;
