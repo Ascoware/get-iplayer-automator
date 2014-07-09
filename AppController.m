@@ -3190,14 +3190,14 @@ NSDictionary *radioFormats;
          imageView.image = nil;
       
       if (programme.seriesName)
-         seriesName.stringValue = programme.seriesName;
+         seriesNameField.stringValue = programme.seriesName;
       else
-         seriesName.stringValue = @"Unable to Retrieve";
+         seriesNameField.stringValue = @"Unable to Retrieve";
       
       if (programme.episodeName)
-         episodeName.stringValue = programme.episodeName;
+         episodeNameField.stringValue = programme.episodeName;
       else
-         seriesName.stringValue = @"";
+         seriesNameField.stringValue = @"";
       
       if (programme.season && programme.episode)
          numbersField.stringValue = [NSString stringWithFormat:@"Series: %ld Episode: %ld",(long)programme.season,(long)programme.episode];

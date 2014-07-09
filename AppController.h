@@ -143,8 +143,8 @@
    IBOutlet NSView *infoView;
    IBOutlet NSPopover *popover;
    IBOutlet NSImageView *imageView;
-   IBOutlet NSTextField *seriesName;
-   IBOutlet NSTextField *episodeName;
+   IBOutlet NSTextField *seriesNameField;
+   IBOutlet NSTextField *episodeNameField;
    IBOutlet NSTextField *numbersField;
    IBOutlet NSTextField *durationField;
    IBOutlet NSTextField *categoriesField;
