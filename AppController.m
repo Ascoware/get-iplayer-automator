@@ -2549,8 +2549,13 @@ NSDictionary *radioFormats;
 			else
          {
             [self performSelectorOnMainThread:@selector(addToLog:) withObject:@"iTunes did not accept file." waitUntilDone:YES];
-            [self performSelectorOnMainThread:@selector(addToLog:) withObject:@"Try setting iTunes to open in 32-bit mode." waitUntilDone:YES];
-            [self performSelectorOnMainThread:@selector(thirtyTwoBitModeAlert) withObject:nil waitUntilDone:NO];
+            if (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_8) { //10.8 or older
+               [self performSelectorOnMainThread:@selector(addToLog:) withObject:@"Try setting iTunes to open in 32-bit mode." waitUntilDone:YES];
+               [self performSelectorOnMainThread:@selector(thirtyTwoBitModeAlert) withObject:nil waitUntilDone:NO];
+            }
+            else { //Newer than 10.8. iTunes can no longer be run in 32-bit mode.
+               [self performSelectorOnMainThread:@selector(addToLog:) withObject:@"Unfortunately new versions of iTunes cannot accept this file." waitUntilDone:YES];
+            }
             [show setValue:@"Complete: Not in iTunes" forKey:@"status"];
          }
 		}
