@@ -686,16 +686,7 @@ NSDictionary *radioFormats;
                                                          encoding:NSUTF8StringEncoding]];
          }
          NSString *string = [NSString stringWithString:taskData];
-         NSUInteger length = [string length];
-         NSUInteger paraStart = 0, paraEnd = 0, contentsEnd = 0;
-         NSMutableArray *array = [NSMutableArray array];
-         NSRange currentRange;
-         while (paraEnd < length) {
-            [string getParagraphStart:&paraStart end:&paraEnd
-								  contentsEnd:&contentsEnd forRange:NSMakeRange(paraEnd, 0)];
-            currentRange = NSMakeRange(paraStart, contentsEnd - paraStart);
-            [array addObject:[string substringWithRange:currentRange]];
-         }
+         NSArray *array = [string componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
          for (NSString *string in array)
          {
             if (![string isEqualToString:@"Matches:"] && ![string hasPrefix:@"INFO:"] && ![string hasPrefix:@"WARNING:"] && [string length]>0)
@@ -932,17 +923,7 @@ NSDictionary *radioFormats;
    [searchField setEnabled:YES];
 	BOOL foundShow=NO;
 	[resultsController removeObjectsAtArrangedObjectIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, [[resultsController arrangedObjects] count])]];
-	NSString *string = [NSString stringWithString:searchData];
-	NSUInteger length = [string length];
-	NSUInteger paraStart = 0, paraEnd = 0, contentsEnd = 0;
-	NSMutableArray *array = [NSMutableArray array];
-	NSRange currentRange;
-	while (paraEnd < length) {
-		[string getParagraphStart:&paraStart end:&paraEnd
-                    contentsEnd:&contentsEnd forRange:NSMakeRange(paraEnd, 0)];
-		currentRange = NSMakeRange(paraStart, contentsEnd - paraStart);
-		[array addObject:[string substringWithRange:currentRange]];
-	}
+	NSArray *array = [searchData componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
 	for (NSString *string in array)
 	{
 		if (![string isEqualToString:@"Matches:"] && ![string hasPrefix:@"INFO:"] && ![string hasPrefix:@"WARNING:"]  && ![string hasPrefix:@"ERROR:"] && [string length]>0 && ![string hasPrefix:@"."] && ![string hasPrefix:@"Added:"])
@@ -1077,17 +1058,8 @@ NSDictionary *radioFormats;
 }
 - (void)processGetNameData:(NSString *)getNameData forProgramme:(Programme *)p
 {
-	NSString *string = getNameData;
-	NSUInteger length = [string length];
-	NSUInteger paraStart = 0, paraEnd = 0, contentsEnd = 0;
-	NSMutableArray *array = [NSMutableArray array];
-	NSRange currentRange;
-	while (paraEnd < length) {
-		[string getParagraphStart:&paraStart end:&paraEnd
-                    contentsEnd:&contentsEnd forRange:NSMakeRange(paraEnd, 0)];
-		currentRange = NSMakeRange(paraStart, contentsEnd - paraStart);
-		[array addObject:[string substringWithRange:currentRange]];
-	}
+	NSArray *array = [getNameData componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+   
 	int i = 0;
 	NSString *wantedID = [p valueForKey:@"pid"];
 	BOOL found=NO;
@@ -2108,18 +2080,9 @@ NSDictionary *radioFormats;
 }
 - (void)pvrSearchFinished:(NSNotification *)n
 {
+   //TODO: Switch to new method
 	[pvrResultsController removeObjectsAtArrangedObjectIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, [[pvrResultsController arrangedObjects] count])]];
-	NSString *string = [NSString stringWithString:pvrSearchData];
-	NSUInteger length = [string length];
-	NSUInteger paraStart = 0, paraEnd = 0, contentsEnd = 0;
-	NSMutableArray *array = [NSMutableArray array];
-	NSRange currentRange;
-	while (paraEnd < length) {
-		[string getParagraphStart:&paraStart end:&paraEnd
-                    contentsEnd:&contentsEnd forRange:NSMakeRange(paraEnd, 0)];
-		currentRange = NSMakeRange(paraStart, contentsEnd - paraStart);
-		[array addObject:[string substringWithRange:currentRange]];
-	}
+	NSArray *array = [pvrSearchData componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
 	for (NSString *string in array)
 	{
 		if (![string isEqualToString:@"Matches:"] && ![string hasPrefix:@"INFO:"] && ![string hasPrefix:@"WARNING:"] && [string length]>0 && ![string hasPrefix:@"."] && ![string hasPrefix:@"Added:"])
@@ -2299,17 +2262,7 @@ NSDictionary *radioFormats;
 - (BOOL)processAutoRecordData:(NSString *)autoRecordData2 forSeries:(Series *)series2
 {
 	BOOL oneFound=NO;
-	NSString *string = [NSString stringWithString:autoRecordData2];
-	NSUInteger length = [string length];
-	NSUInteger paraStart = 0, paraEnd = 0, contentsEnd = 0;
-	NSMutableArray *array = [NSMutableArray array];
-	NSRange currentRange;
-	while (paraEnd < length) {
-		[string getParagraphStart:&paraStart end:&paraEnd
-                    contentsEnd:&contentsEnd forRange:NSMakeRange(paraEnd, 0)];
-		currentRange = NSMakeRange(paraStart, contentsEnd - paraStart);
-		[array addObject:[string substringWithRange:currentRange]];
-	}
+	NSArray *array = [autoRecordData2 componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
 	for (NSString *string in array)
 	{
 		if (![string isEqualToString:@"Matches:"] && ![string hasPrefix:@"INFO:"] && ![string hasPrefix:@"WARNING:"] && [string length]>0 && ![string hasPrefix:@"."] && ![string hasPrefix:@"Added:"])

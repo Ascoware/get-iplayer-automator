@@ -500,26 +500,13 @@
 		[errorCache appendString:[[NSString alloc] initWithData:d encoding:NSUTF8StringEncoding]];
 	}
 }
-- (void)processGetiPlayerOutput:(NSString *)outp
+- (void)processGetiPlayerOutput:(NSString *)output
 {
-	//Separate the output by line.
-	NSString *outpt = [[NSString alloc] initWithString:outp];
-	NSString *string = [NSString stringWithString:outpt];
-	NSUInteger length = [string length];
-	NSUInteger paraStart = 0, paraEnd = 0, contentsEnd = 0;
-	NSMutableArray *array = [NSMutableArray array];
-	NSRange currentRange;
-	while (paraEnd < length) {
-		[string getParagraphStart:&paraStart end:&paraEnd
-					  contentsEnd:&contentsEnd forRange:NSMakeRange(paraEnd, 0)];
-		currentRange = NSMakeRange(paraStart, contentsEnd - paraStart);
-		[array addObject:[string substringWithRange:currentRange]];
-	}
-	//Parse each line individually.
-	for (NSString *output in array)
+	NSArray *array = [output componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+	for (NSString *outputLine in array)
 	{
-        if (![output hasPrefix:@"frame="])
-            [self addToLog:output noTag:YES];
+        if (![outputLine hasPrefix:@"frame="])
+            [self addToLog:outputLine noTag:YES];
     }
 }
 - (void)processError
@@ -527,16 +514,7 @@
 	//Separate the output by line.
 	NSString *string = [[NSString alloc] initWithString:errorCache];
     errorCache = [NSMutableString stringWithString:@""];
-	NSUInteger length = [string length];
-	NSUInteger paraStart = 0, paraEnd = 0, contentsEnd = 0;
-	NSMutableArray *array = [NSMutableArray array];
-	NSRange currentRange;
-	while (paraEnd < length) {
-		[string getParagraphStart:&paraStart end:&paraEnd
-					  contentsEnd:&contentsEnd forRange:NSMakeRange(paraEnd, 0)];
-		currentRange = NSMakeRange(paraStart, contentsEnd - paraStart);
-		[array addObject:[string substringWithRange:currentRange]];
-	}
+	NSArray *array = [string componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
 	//Parse each line individually.
 	for (NSString *output in array)
 	{
