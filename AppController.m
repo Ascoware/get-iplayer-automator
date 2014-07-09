@@ -268,7 +268,7 @@ NSDictionary *radioFormats;
    
 	//Growl Initialization
    @try {
-      [GrowlApplicationBridge setGrowlDelegate:@""];
+      [GrowlApplicationBridge setGrowlDelegate:(id<GrowlApplicationBridgeDelegate>)@""];
    }
    @catch (NSException *e) {
       NSLog(@"ERROR: Growl initialisation failed: %@: %@", [e name], [e description]);

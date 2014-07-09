@@ -134,7 +134,7 @@
         [currentRequest setProxyType:proxy.type];
         [currentRequest setProxyHost:proxy.host];
         if (proxy.port)
-            [currentRequest setProxyPort:proxy.port];
+            [currentRequest setProxyPort:(int)proxy.port];
         if (proxy.user) {
             [currentRequest setProxyUsername:proxy.user];
             [currentRequest setProxyPassword:proxy.password];

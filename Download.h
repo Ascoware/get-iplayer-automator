@@ -88,6 +88,7 @@
 - (void)launchRTMPDumpWithArgs:(NSArray *)args;
 - (void)processGetiPlayerOutput:(NSString *)outp;
 - (void)createDownloadPath;
+- (void)processError;
 
 @property (readonly) Programme *show;
 @end
