@@ -2497,8 +2497,8 @@ NSDictionary *radioFormats;
 }
 - (NSString *)escapeSpecialCharactersInString:(NSString *)string
 {
-   NSArray *characters = @[@"+",@"-",@"&",@"!",@"(",@")",@"{",@"}",
-                           @"[",@"]"@"^",@"~",@"*",@"?",@":",@"\""];
+   NSArray *characters = @[@"+", @"-", @"&", @"!", @"(", @")", @"{" ,@"}",
+                           @"[", @"]", @"^", @"~", @"*", @"?", @":", @"\""];
    for (NSString *character in characters)
       string = [string stringByReplacingOccurrencesOfString:character withString:[NSString stringWithFormat:@"\\%@",character]];
    
