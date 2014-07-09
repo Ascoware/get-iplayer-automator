@@ -41,7 +41,7 @@
                 <outlet property="loadingLabel" destination="cAi-OW-zbo" id="7BJ-dy-HBc"/>
                 <outlet property="loadingView" destination="ryX-Qd-Wi8" id="iNJ-wU-9EU"/>
                 <outlet property="log" destination="616" id="677"/>
-                <outlet property="logWindow" destination="611" id="676"/>
+                <outlet property="logger" destination="BZI-HO-NFo" id="LLH-v9-nI4"/>
                 <outlet property="mainWindow" destination="371" id="1066"/>
                 <outlet property="modeSizeController" destination="fAe-Gc-WEJ" id="eWI-zV-CwY"/>
                 <outlet property="numbersField" destination="McO-fX-SaA" id="K0F-zH-qB9"/>
@@ -77,13 +77,6 @@
                 <string>solution</string>
             </declaredKeys>
         </arrayController>
-        <customObject id="844" customClass="BBCDownload">
-            <connections>
-                <outlet property="currentIndicator" destination="505" id="845"/>
-                <outlet property="currentProgress" destination="508" id="846"/>
-                <outlet property="queueController" destination="700" id="849"/>
-            </connections>
-        </customObject>
         <customObject id="987" customClass="SUUpdater">
             <connections>
                 <outlet property="delegate" destination="621" id="1009"/>
@@ -522,11 +515,11 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                         <rect key="frame" x="21" y="84" width="770" height="187"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES" flexibleMaxY="YES"/>
                         <clipView key="contentView" copiesOnScroll="NO" id="qBj-Iv-0lY">
-                            <rect key="frame" x="0.0" y="17" width="754" height="170"/>
+                            <rect key="frame" x="0.0" y="17" width="770" height="170"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" autosaveColumns="NO" headerView="470" id="469">
-                                    <rect key="frame" x="0.0" y="0.0" width="754" height="170"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="770" height="170"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <size key="intercellSpacing" width="3" height="2"/>
                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -575,7 +568,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                                                 </binding>
                                             </connections>
                                         </tableColumn>
-                                        <tableColumn width="473" minWidth="10" maxWidth="3.4028229999999999e+38" id="503">
+                                        <tableColumn width="489" minWidth="10" maxWidth="3.4028229999999999e+38" id="503">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Show Name - Episode Name">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -613,7 +606,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <tableHeaderView key="headerView" id="470">
-                            <rect key="frame" x="0.0" y="0.0" width="754" height="17"/>
+                            <rect key="frame" x="0.0" y="0.0" width="770" height="17"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </tableHeaderView>
                     </scrollView>
@@ -648,11 +641,11 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                         <rect key="frame" x="19" y="338" width="770" height="147"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
                         <clipView key="contentView" id="EvP-AM-m82">
-                            <rect key="frame" x="1" y="17" width="753" height="113"/>
+                            <rect key="frame" x="1" y="17" width="768" height="129"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" autosaveColumns="NO" headerView="494" id="493">
-                                    <rect key="frame" x="0.0" y="0.0" width="753" height="113"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="768" height="129"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <size key="intercellSpacing" width="3" height="2"/>
                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -692,7 +685,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                                             </buttonCell>
                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                         </tableColumn>
-                                        <tableColumn editable="NO" width="295" minWidth="40" maxWidth="1000" id="496">
+                                        <tableColumn editable="NO" width="310" minWidth="40" maxWidth="1000" id="496">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Network">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -714,15 +707,15 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                             <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </clipView>
                         <scroller key="horizontalScroller" verticalHuggingPriority="750" horizontal="YES" id="492">
-                            <rect key="frame" x="1" y="130" width="753" height="16"/>
+                            <rect key="frame" x="1" y="130" width="768" height="16"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="491">
-                            <rect key="frame" x="754" y="17" width="15" height="113"/>
+                            <rect key="frame" x="753" y="17" width="16" height="129"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <tableHeaderView key="headerView" id="494">
-                            <rect key="frame" x="0.0" y="0.0" width="753" height="17"/>
+                            <rect key="frame" x="0.0" y="0.0" width="768" height="17"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </tableHeaderView>
                     </scrollView>
@@ -843,7 +836,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="3588F9B5-EB47-4A3A-8EB1-C433EE59A501" label="Show Log" paletteLabel="Show Log" toolTip="Show the Log" tag="-1" image="ActivityWindow" id="483">
                         <connections>
-                            <action selector="showLog:" target="621" id="625"/>
+                            <action selector="showLog:" target="BZI-HO-NFo" id="7aP-yb-C2L"/>
                         </connections>
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="AE92BE9D-F881-4573-98F1-DC4B86D73B09" label="Preferences" paletteLabel="Preferences" toolTip="Display the Preferences Panel." tag="-1" image="NSPreferencesGeneral" id="484">
@@ -2499,7 +2492,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                                     <size key="minSize" width="469" height="380"/>
                                     <size key="maxSize" width="989" height="10000000"/>
                                     <connections>
-                                        <binding destination="621" name="attributedString" keyPath="log_value" id="675"/>
+                                        <binding destination="BZI-HO-NFo" name="attributedString" keyPath="log_value" id="Ms5-D1-1F0"/>
                                     </connections>
                                 </textView>
                             </subviews>
@@ -2510,7 +2503,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <scroller key="verticalScroller" verticalHuggingPriority="750" horizontal="NO" id="614">
-                            <rect key="frame" x="455" y="1" width="15" height="380"/>
+                            <rect key="frame" x="454" y="1" width="16" height="380"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                     </scrollView>
@@ -2522,7 +2515,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                             <font key="font" metaFont="system"/>
                         </buttonCell>
                         <connections>
-                            <action selector="copyLog:" target="621" id="1047"/>
+                            <action selector="copyLog:" target="BZI-HO-NFo" id="8Ui-29-8Ec"/>
                         </connections>
                     </button>
                 </subviews>
@@ -2987,6 +2980,12 @@ DQ
                 </customView>
             </subviews>
         </customView>
+        <customObject id="BZI-HO-NFo" customClass="LogController">
+            <connections>
+                <outlet property="log" destination="616" id="Vk4-UR-zGl"/>
+                <outlet property="window" destination="611" id="eFL-bH-0H9"/>
+            </connections>
+        </customObject>
     </objects>
     <resources>
         <image name="ActivityWindow" width="32" height="32"/>

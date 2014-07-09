@@ -7,6 +7,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "LogController.h"
 
 typedef NS_ENUM(NSInteger, GIA_ProgrammeType) {
    GiA_ProgrammeTypeBBC_TV,
@@ -17,6 +18,8 @@ typedef NS_ENUM(NSInteger, GIA_ProgrammeType) {
 
 
 @interface Programme : NSObject <NSCoding> {
+   LogController *logger;
+   
 	NSString *tvNetwork;
 	NSString *showName;
 	NSString *pid;
@@ -57,8 +60,9 @@ typedef NS_ENUM(NSInteger, GIA_ProgrammeType) {
    
    
 }
-- (id)initWithInfo:(id)sender pid:(NSString *)PID programmeName:(NSString *)SHOWNAME network:(NSString *)TVNETWORK;
+- (id)initWithInfo:(id)sender pid:(NSString *)PID programmeName:(NSString *)SHOWNAME network:(NSString *)TVNETWORK logController:(LogController *)logger;
 - (id)initWithShow:(Programme *)show;
+- (id)initWithLogController:(LogController *)logger;
 - (void)printLongDescription;
 - (void)retrieveExtendedMetadata;
 - (void)cancelMetadataRetrieval;

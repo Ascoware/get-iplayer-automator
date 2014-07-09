@@ -44,18 +44,9 @@ NSDictionary *radioFormats;
 	pvrSearchResultsArray = [NSMutableArray array];
 	pvrQueueArray = [NSMutableArray array];
 	queueArray = [NSMutableArray array];
-	
-	//Initialize Log
-   NSString *version = [NSString stringWithFormat:@"%@", [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"]];
-   NSLog(@"Get iPlayer Automator %@ Initialized.", version);
-	log_value = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Get iPlayer Automator %@ Initialized.", version]];
-	[self addToLog:@"" :nil];
-	[nc addObserver:self selector:@selector(addToLogNotification:) name:@"AddToLog" object:nil];
-	[nc addObserver:self selector:@selector(postLog:) name:@"NeedLog" object:nil];
    
    //Look for Start notifications for ASS
    [nc addObserver:self selector:@selector(applescriptStartDownloads) name:@"StartDownloads" object:nil];
-	
 	
 	//Register Default Preferences
 	NSMutableDictionary *defaultValues = [[NSMutableDictionary alloc] init];
@@ -108,7 +99,7 @@ NSDictionary *radioFormats;
 	NSString *pluginPath = [folder stringByAppendingPathComponent:@"plugins"];
 	if (/*![fileManager fileExistsAtPath:pluginPath]*/TRUE)
 	{
-		[self addToLog:@"Installing/Updating Get_iPlayer Plugins..." :self];
+		[logger addToLog:@"Installing/Updating Get_iPlayer Plugins..." :self];
 		NSString *providedPath = [[NSBundle mainBundle] bundlePath];
 		if ([fileManager fileExistsAtPath:pluginPath]) [fileManager removeItemAtPath:pluginPath error:NULL];
 		providedPath = [providedPath stringByAppendingPathComponent:@"/Contents/Resources/plugins"];
@@ -272,7 +263,7 @@ NSDictionary *radioFormats;
    }
    @catch (NSException *e) {
       NSLog(@"ERROR: Growl initialisation failed: %@: %@", [e name], [e description]);
-      [self addToLog:[NSString stringWithFormat:@"ERROR: Growl initialisation failed: %@: %@", [e name], [e description]]];
+      [logger addToLog:[NSString stringWithFormat:@"ERROR: Growl initialisation failed: %@: %@", [e name], [e description]]];
    }
    
 	//Populate Live TV Channel List
@@ -385,7 +376,7 @@ NSDictionary *radioFormats;
    }
    @catch (NSException *e) {
       NSLog(@"ERROR: Growl notification failed (updater): %@: %@", [e name], [e description]);
-      [self addToLog:[NSString stringWithFormat:@"ERROR: Growl notification failed (updater): %@: %@", [e name], [e description]]];
+      [logger addToLog:[NSString stringWithFormat:@"ERROR: Growl notification failed (updater): %@: %@", [e name], [e description]]];
    }
 }
 #pragma mark Cache Update
@@ -480,7 +471,7 @@ NSDictionary *radioFormats;
          getiPlayerUpdateArgs = [getiPlayerUpdateArgs arrayByAddingObject:[[NSString alloc] initWithFormat:@"-p%@", [proxy url]]];
       }
       
-      [self addToLog:@"Updating Program Index Feeds...\r" :self];
+      [logger addToLog:@"Updating Program Index Feeds...\r" :self];
       
       
       getiPlayerUpdateTask = [[NSTask alloc] init];
@@ -503,7 +494,7 @@ NSDictionary *radioFormats;
    }
    else
    {
-      [self addToLog:@"Updating Program Index Feeds from Server..." :nil];
+      [logger addToLog:@"Updating Program Index Feeds from Server..." :nil];
       
       NSLog(@"DEBUG: Last cache update: %@",lastUpdate);
       
@@ -536,7 +527,7 @@ NSDictionary *radioFormats;
 }
 - (void)updateCacheForType:(NSString *)type
 {
-   [self addToLog:[NSString stringWithFormat:@"    Retrieving %@ index feeds.",type] :nil];
+   [logger addToLog:[NSString stringWithFormat:@"    Retrieving %@ index feeds.",type] :nil];
    [currentProgress setStringValue:[NSString stringWithFormat:@"Updating Program Indexes: Getting %@ index feeds from server...",type]];
    
    ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:updateURLDic[type]]];
@@ -577,7 +568,7 @@ NSDictionary *radioFormats;
                                           encoding:NSUTF8StringEncoding];
 		if ([s hasPrefix:@"INFO:"])
 		{
-			[self addToLog:[NSString stringWithString:s] :nil];
+			[logger addToLog:[NSString stringWithString:s] :nil];
 			NSScanner *scanner = [NSScanner scannerWithString:s];
 			NSString *r;
 			[scanner scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet] intoString:&r];
@@ -588,7 +579,7 @@ NSDictionary *radioFormats;
 		}
       else if ([s hasPrefix:@"WARNING:"] || [s hasPrefix:@"ERROR:"])
       {
-         [self addToLog:s :nil];
+         [logger addToLog:s :nil];
       }
 		else if ([s isEqualToString:@"."])
 		{
@@ -644,15 +635,15 @@ NSDictionary *radioFormats;
       }
       @catch (NSException *e) {
          NSLog(@"ERROR: Growl notification failed (getiPlayerUpdateFinished): %@: %@", [e name], [e description]);
-         [self addToLog:[NSString stringWithFormat:@"ERROR: Growl notification failed (getiPlayerUpdateFinished): %@: %@", [e name], [e description]]];
+         [logger addToLog:[NSString stringWithFormat:@"ERROR: Growl notification failed (getiPlayerUpdateFinished): %@: %@", [e name], [e description]]];
       }
-		[self addToLog:@"Index Updated." :self];
+		[logger addToLog:@"Index Updated." :self];
       lastUpdate=[NSDate date];
 	}
 	else
 	{
 		runSinceChange=NO;
-		[self addToLog:@"Index was Up-To-Date." :self];
+		[logger addToLog:@"Index was Up-To-Date." :self];
 	}
 	
 	
@@ -773,85 +764,14 @@ NSDictionary *radioFormats;
 	
 	if (runDownloads)
 	{
-		[self addToLog:@"Download(s) are still running." :self];
+		[logger addToLog:@"Download(s) are still running." :self];
 	}
 }
 - (IBAction)forceUpdate:(id)sender
 {
 	[self updateCache:@"force"];
 }
-#pragma mark Log
-- (void)showLog:(id)sender
-{
-	[logWindow makeKeyAndOrderFront:self];
-	
-	//Make sure the log scrolled to the bottom. It might not have if the Log window was not open.
-	NSAttributedString *temp_log = [[NSAttributedString alloc] initWithAttributedString:[self valueForKey:@"log_value"]];
-	[log scrollRangeToVisible:NSMakeRange([temp_log length], [temp_log length])];
-}
-- (void)postLog:(NSNotification *)note
-{
-	NSString *tempLog = [log string];
-	
-	NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-	[nc postNotification:[NSNotification notificationWithName:@"Log" object:tempLog]];
-}
--(void)addToLog:(NSString *)string
-{
-   [self addToLog:string :nil];
-}
--(void)addToLog:(NSString *)string :(id)sender {
-	//Get Current Log
-	NSMutableAttributedString *current_log = [[NSMutableAttributedString alloc] initWithAttributedString:log_value];
-	
-	//Define Return Character for Easy Use
-	NSAttributedString *return_character = [[NSAttributedString alloc] initWithString:@"\r"];
-	
-	//Initialize Sender Prefix
-	NSAttributedString *from_string;
-	if (sender != nil)
-	{
-		from_string = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@: ", [sender description]]];
-	}
-	else
-	{
-		from_string = [[NSAttributedString alloc] initWithString:@""];
-	}
-	
-	//Convert String to Attributed String
-	NSAttributedString *converted_string = [[NSAttributedString alloc] initWithString:string];
-	
-	//Append the new items to the log.
-	[current_log appendAttributedString:return_character];
-	[current_log appendAttributedString:from_string];
-	[current_log appendAttributedString:converted_string];
-	
-	//Make the Text White.
-	[current_log addAttribute:NSForegroundColorAttributeName
-                       value:[NSColor whiteColor]
-                       range:NSMakeRange(0, [current_log length])];
-	
-	//Update the log.
-	[self setValue:current_log forKey:@"log_value"];
-	
-	//Scroll log to bottom only if it is visible.
-	if ([logWindow isVisible]) {
-		[log scrollRangeToVisible:NSMakeRange([current_log length], [current_log length])];
-	}
-}
-- (void)addToLogNotification:(NSNotification *)note
-{
-	NSString *logMessage = [note userInfo][@"message"];
-	[self addToLog:logMessage :[note object]];
-}
-- (IBAction)copyLog:(id)sender
-{
-	NSString *unattributedLog = [log string];
-	NSPasteboard *pb = [NSPasteboard generalPasteboard];
-	NSArray *types = @[NSStringPboardType];
-	[pb declareTypes:types owner:self];
-	[pb setString:unattributedLog forType:NSStringPboardType];
-}
+
 #pragma mark Search
 - (IBAction)goToSearch:(id)sender {
    [mainWindow makeKeyAndOrderFront:self];
@@ -941,7 +861,7 @@ NSDictionary *radioFormats;
             [myScanner scanUpToCharactersFromSet:[NSCharacterSet alphanumericCharacterSet] intoString:NULL];
             [myScanner scanUpToString:@"kjkjkj" intoString:&url];
             if (temp_pid == nil || temp_showName == nil || temp_tvNetwork == nil || temp_type == nil || url == nil) {
-               [self addToLog: [NSString stringWithFormat:@"WARNING: Skipped invalid search result: %@", string]];
+               [logger addToLog: [NSString stringWithFormat:@"WARNING: Skipped invalid search result: %@", string]];
                continue;
             }
 				if ([temp_showName hasSuffix:@" - -"])
@@ -952,7 +872,7 @@ NSDictionary *radioFormats;
 					temp_showName = temp_showName2;
 					temp_showName = [temp_showName stringByAppendingFormat:@" - %@", temp_showName2];
 				}
-				Programme *p = [[Programme alloc] initWithInfo:nil pid:temp_pid programmeName:temp_showName network:temp_tvNetwork];
+				Programme *p = [[Programme alloc] initWithInfo:nil pid:temp_pid programmeName:temp_showName network:temp_tvNetwork logController:logger];
             [p setUrl:url];
 				if ([temp_type isEqualToString:@"radio"])
 				{
@@ -1444,7 +1364,7 @@ NSDictionary *radioFormats;
 		[urlScanner scanUpToString:@"/" intoString:nil];
 		[urlScanner scanString:@"/" intoString:nil];
 		[urlScanner scanUpToString:@"/" intoString:&pid];
-		Programme *newProg = [[Programme alloc] init];
+		Programme *newProg = [[Programme alloc] initWithLogController:logger];
 		[newProg setValue:pid forKey:@"pid"];
       if (newShowName) [newProg setShowName:newShowName];
 		[queueController addObject:newProg];
@@ -1482,7 +1402,7 @@ NSDictionary *radioFormats;
       NSScanner *urlScanner = [NSScanner scannerWithString:url];
       [urlScanner scanString:@"http://www.bbc.co.uk/sport/olympics/2012/live-video/" intoString:nil];
       [urlScanner scanUpToString:@"kfejklfjklj" intoString:&pid];
-      [queueController addObject:[[Programme alloc] initWithInfo:nil pid:pid programmeName:newShowName network:@"BBC Sport"]];
+      [queueController addObject:[[Programme alloc] initWithInfo:nil pid:pid programmeName:newShowName network:@"BBC Sport" logController:logger]];
    }
 	else if ([url hasPrefix:@"https://www.itv.com/itvplayer/"])
 	{
@@ -1687,7 +1607,7 @@ NSDictionary *radioFormats;
 		runDownloads=YES;
       runScheduled=NO;
 		[mainWindow setDocumentEdited:YES];
-		[self addToLog:@"\rAppController: Starting Downloads" :nil];
+		[logger addToLog:@"\rAppController: Starting Downloads" :nil];
 		
       //Clean-Up Queue
 		NSArray *tempQueue = [queueController arrangedObjects];
@@ -1709,7 +1629,7 @@ NSDictionary *radioFormats;
 						[show setComplete:@YES];
 						[show setSuccessful:@NO];
 						[show setStatus:@"Failed: Please set the show name"];
-						[self addToLog:@"Could not download. Please set a show name first." :self];
+						[logger addToLog:@"Could not download. Please set a show name first." :self];
 					}
 					else
 					{
@@ -1735,7 +1655,7 @@ NSDictionary *radioFormats;
 			[nc addObserver:self selector:@selector(nextDownload:) name:@"DownloadFinished" object:nil];
          
 			tempQueue = [queueController arrangedObjects];
-			[self addToLog:[NSString stringWithFormat:@"\rDownloading Show %lu/%lu:\r",
+			[logger addToLog:[NSString stringWithFormat:@"\rDownloading Show %lu/%lu:\r",
                          (unsigned long)1,
                          (unsigned long)[tempQueue count]]
                        :nil];
@@ -1744,14 +1664,15 @@ NSDictionary *radioFormats;
 				if ([[show complete] isEqualToNumber:@NO])
 				{
                if ([[show tvNetwork] hasPrefix:@"ITV"])
-                  currentDownload = [[ITVDownload alloc] initWithProgramme:show itvFormats:[itvFormatController arrangedObjects] proxy:proxy];
+                  currentDownload = [[ITVDownload alloc] initWithProgramme:show itvFormats:[itvFormatController arrangedObjects] proxy:proxy logController:logger];
                /*else if ([[show tvNetwork] hasPrefix:@"4oD"])
                 currentDownload = [[FourODDownload alloc] initWithProgramme:show proxy:proxy];*/
                else
                   currentDownload = [[BBCDownload alloc] initWithProgramme:show
                                                                  tvFormats:[tvFormatController arrangedObjects]
                                                               radioFormats:[radioFormatController arrangedObjects]
-                                                                     proxy:proxy];
+                                                                     proxy:proxy
+                                                             logController:logger];
 					break;
 				}
 			}
@@ -1881,7 +1802,7 @@ NSDictionary *radioFormats;
          }
          @catch (NSException *e) {
             NSLog(@"ERROR: Growl notification failed (nextDownload - finished): %@: %@", [e name], [e description]);
-            [self addToLog:[NSString stringWithFormat:@"ERROR: Growl notification failed (nextDownload - finished): %@: %@", [e name], [e description]]];
+            [logger addToLog:[NSString stringWithFormat:@"ERROR: Growl notification failed (nextDownload - finished): %@: %@", [e name], [e description]]];
          }
       }
 		else
@@ -1898,7 +1819,7 @@ NSDictionary *radioFormats;
          }
          @catch (NSException *e) {
             NSLog(@"ERROR: Growl notification failed (nextDownload - failed): %@: %@", [e name], [e description]);
-            [self addToLog:[NSString stringWithFormat:@"ERROR: Growl notification failed (nextDownload - failed): %@: %@", [e name], [e description]]];
+            [logger addToLog:[NSString stringWithFormat:@"ERROR: Growl notification failed (nextDownload - failed): %@: %@", [e name], [e description]]];
          }
          
          ReasonForFailure *showSolution = [[ReasonForFailure alloc] init];
@@ -1935,21 +1856,22 @@ NSDictionary *radioFormats;
 				NSException *noneLeft = [NSException exceptionWithName:@"EndOfDownloads" reason:@"Done" userInfo:nil];
 				[noneLeft raise];
 			}
-			[self addToLog:[NSString stringWithFormat:@"\rDownloading Show %lu/%lu:\r",
+			[logger addToLog:[NSString stringWithFormat:@"\rDownloading Show %lu/%lu:\r",
                          (unsigned long)([tempQueue indexOfObject:nextShow]+1),
                          (unsigned long)[tempQueue count]]
                        :nil];
 			if ([[nextShow complete] isEqualToNumber:@NO])
          {
             if ([[nextShow tvNetwork] hasPrefix:@"ITV"])
-               currentDownload = [[ITVDownload alloc] initWithProgramme:nextShow itvFormats:[itvFormatController arrangedObjects] proxy:proxy];
+               currentDownload = [[ITVDownload alloc] initWithProgramme:nextShow itvFormats:[itvFormatController arrangedObjects] proxy:proxy logController:logger];
             /*else if ([[nextShow tvNetwork] hasPrefix:@"4oD"])
              currentDownload = [[FourODDownload alloc] initWithProgramme:nextShow proxy:proxy];*/
             else
                currentDownload = [[BBCDownload alloc] initWithProgramme:nextShow
                                                               tvFormats:[tvFormatController arrangedObjects]
                                                            radioFormats:[radioFormatController arrangedObjects]
-                                                                  proxy:proxy];
+                                                                  proxy:proxy
+                                                          logController:logger];
          }
 		}
 		@catch (NSException *e)
@@ -1964,7 +1886,7 @@ NSDictionary *radioFormats;
 			@try {[currentIndicator stopAnimation:nil];}
 			@catch (NSException *exception) {NSLog(@"Unable to stop Animation.");}
 			[currentIndicator setIndeterminate:NO];
-			[self addToLog:@"\rAppController: Downloads Finished" :nil];
+			[logger addToLog:@"\rAppController: Downloads Finished" :nil];
 			NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
 			[nc removeObserver:self name:@"setPercentage" object:nil];
 			[nc removeObserver:self name:@"setCurrentProgress" object:nil];
@@ -2000,7 +1922,7 @@ NSDictionary *radioFormats;
          }
          @catch (NSException *e) {
             NSLog(@"ERROR: Growl notification failed (nextDownload - complete): %@: %@", [e name], [e description]);
-            [self addToLog:[NSString stringWithFormat:@"ERROR: Growl notification failed (nextDownload - complete): %@: %@", [e name], [e description]]];
+            [logger addToLog:[NSString stringWithFormat:@"ERROR: Growl notification failed (nextDownload - complete): %@: %@", [e name], [e description]]];
          }
 			[[SUUpdater sharedUpdater] checkForUpdatesInBackground];
 			
@@ -2310,7 +2232,7 @@ NSDictionary *radioFormats;
 				{
                @try {
                   oneFound=YES;
-                  Programme *p = [[Programme alloc] initWithInfo:nil pid:temp_pid programmeName:temp_showName network:temp_tvNetwork];
+                  Programme *p = [[Programme alloc] initWithInfo:nil pid:temp_pid programmeName:temp_showName network:temp_tvNetwork logController:logger];
                   [p setRealPID:temp_realPID];
                   [p setSeriesName:series_Name];
                   [p setEpisodeName:episode_Name];
@@ -2433,7 +2355,7 @@ NSDictionary *radioFormats;
 }
 - (IBAction)closeWindow:(id)sender
 {
-   if ([logWindow isKeyWindow]) [logWindow performClose:self];
+   if ([logger.window isKeyWindow]) [logger.window performClose:self];
    else if ([historyWindow isKeyWindow]) [historyWindow performClose:self];
    else if ([pvrPanel isKeyWindow]) [pvrPanel performClose:self];
    else if ([prefsPanel isKeyWindow]) [prefsPanel performClose:self];
@@ -2865,7 +2787,7 @@ NSDictionary *radioFormats;
 {
    [self updateProxyLoadStatus:YES message:@"Loading proxy settings..."];
    NSLog(@"INFO: Loading proxy settings...");
-   [self addToLog:@"\n\nINFO: Loading proxy settings..."];
+   [logger addToLog:@"\n\nINFO: Loading proxy settings..."];
    [proxyDict removeAllObjects];
    proxyDict[@"selector"] = [NSValue valueWithPointer:selector];
    proxyDict[@"target"] = target;
@@ -2877,12 +2799,12 @@ NSDictionary *radioFormats;
 	{
       NSString *customProxy = [[NSUserDefaults standardUserDefaults] valueForKey:@"CustomProxy"];
       NSLog(@"INFO: Custom Proxy: address=[%@] length=%ld", customProxy, [customProxy length]);
-      [self addToLog:[NSString stringWithFormat:@"INFO: Custom Proxy: address=[%@] length=%ld", customProxy, [customProxy length]]];
+      [logger addToLog:[NSString stringWithFormat:@"INFO: Custom Proxy: address=[%@] length=%ld", customProxy, [customProxy length]]];
       NSString *proxyValue = [[customProxy lowercaseString] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
       if ([proxyValue length] == 0)
       {
          NSLog(@"WARNING: Custom proxy setting was blank. No proxy will be used.");
-         [self addToLog:@"WARNING: Custom proxy setting was blank. No proxy will be used."];
+         [logger addToLog:@"WARNING: Custom proxy setting was blank. No proxy will be used."];
          if (!runScheduled)
          {
             NSAlert *alert = [NSAlert alertWithMessageText:@"Custom proxy setting was blank.\nDownloads may fail.\nDo you wish to continue?"
@@ -2923,13 +2845,13 @@ NSDictionary *radioFormats;
       [request setNumberOfTimesToRetryOnTimeout:2];
       [self updateProxyLoadStatus:YES message:[NSString stringWithFormat:@"Loading provided proxy (may take up to %ld seconds)...", (NSInteger)[request timeOutSeconds]]];
       NSLog(@"INFO: Loading provided proxy (may take up to %ld seconds)...", (NSInteger)[request timeOutSeconds]);
-      [self addToLog:[NSString stringWithFormat:@"INFO: Loading provided proxy (may take up to %ld seconds)...", (NSInteger)[request timeOutSeconds]*2]];
+      [logger addToLog:[NSString stringWithFormat:@"INFO: Loading provided proxy (may take up to %ld seconds)...", (NSInteger)[request timeOutSeconds]*2]];
       [request startAsynchronous];
 	}
    else
    {
       NSLog(@"INFO: No proxy to load");
-      [self addToLog:@"INFO: No proxy to load"];
+      [logger addToLog:@"INFO: No proxy to load"];
       [self finishProxyLoad];
    }
 }
@@ -2940,7 +2862,7 @@ NSDictionary *radioFormats;
    if ([request responseStatusCode] != 200 || !urlData)
    {
       NSLog(@"WARNING: Provided proxy could not be retrieved. No proxy will be used.");
-      [self addToLog:@"WARNING: Provided proxy could not be retrieved. No proxy will be used."];
+      [logger addToLog:@"WARNING: Provided proxy could not be retrieved. No proxy will be used."];
       if (!runScheduled)
       {
          NSError *error = [request error];
@@ -2962,7 +2884,7 @@ NSDictionary *radioFormats;
       if ([proxyValue length] == 0)
       {
          NSLog(@"WARNING: Provided proxy value was blank. No proxy will be used.");
-         [self addToLog:@"WARNING: Provided proxy value was blank. No proxy will be used."];
+         [logger addToLog:@"WARNING: Provided proxy value was blank. No proxy will be used."];
          if (!runScheduled)
          {
             NSAlert *alert = [NSAlert alertWithMessageText:@"Provided proxy value was blank.\nDownloads may fail.\nDo you wish to continue?"
@@ -2998,7 +2920,7 @@ NSDictionary *radioFormats;
 - (void)finishProxyLoad
 {
    NSLog(@"INFO: Proxy load complete.");
-   [self addToLog:@"INFO: Proxy load complete."];
+   [logger addToLog:@"INFO: Proxy load complete."];
    if (proxy && [[NSUserDefaults standardUserDefaults] boolForKey:@"TestProxy"])
    {
       [self testProxyOnLoad];
@@ -3014,7 +2936,7 @@ NSDictionary *radioFormats;
       if (!proxy.host || [proxy.host length] == 0 || [proxy.host rangeOfString:@"(null)"].location != NSNotFound)
       {
          NSLog(@"WARNING: Invalid proxy host: address=%@ length=%ld", proxy.host, [proxy.host length]);
-         [self addToLog:[NSString stringWithFormat:@"WARNING: Invalid proxy host: address=%@ length=%ld", proxy.host, [proxy.host length]]];
+         [logger addToLog:[NSString stringWithFormat:@"WARNING: Invalid proxy host: address=%@ length=%ld", proxy.host, [proxy.host length]]];
          if (!runScheduled)
          {
             NSAlert *alert = [NSAlert alertWithMessageText:@"Invalid proxy host.\nDownloads may fail.\nDo you wish to continue?"
@@ -3055,13 +2977,13 @@ NSDictionary *radioFormats;
       }
       [self updateProxyLoadStatus:YES message:[NSString stringWithFormat:@"Testing proxy (may take up to %ld seconds)...", (NSInteger)[request timeOutSeconds]]];
       NSLog(@"INFO: Testing proxy (may take up to %ld seconds)...", (NSInteger)[request timeOutSeconds]);
-      [self addToLog:[NSString stringWithFormat:@"INFO: Testing proxy (may take up to %ld seconds)...", (NSInteger)[request timeOutSeconds]]];
+      [logger addToLog:[NSString stringWithFormat:@"INFO: Testing proxy (may take up to %ld seconds)...", (NSInteger)[request timeOutSeconds]]];
       [request startAsynchronous];
    }
    else
    {
       NSLog(@"INFO: No proxy to test");
-      [self addToLog:@"INFO: No proxy to test"];
+      [logger addToLog:@"INFO: No proxy to test"];
       [self finishProxyTest];
    }
 }
@@ -3071,7 +2993,7 @@ NSDictionary *radioFormats;
    if ([request responseStatusCode] != 200)
    {
       NSLog(@"WARNING: Proxy failed to load test page: %@", [request url]);
-      [self addToLog:[NSString stringWithFormat:@"WARNING: Proxy failed to load test page: %@", [request url]]];
+      [logger addToLog:[NSString stringWithFormat:@"WARNING: Proxy failed to load test page: %@", [request url]]];
       if (!runScheduled)
       {
          NSError *error = [request error];
@@ -3101,7 +3023,7 @@ NSDictionary *radioFormats;
 - (void)finishProxyTest
 {
    NSLog(@"INFO: Proxy test complete.");
-   [self addToLog:@"INFO: Proxy test complete."];
+   [logger addToLog:@"INFO: Proxy test complete."];
    [self returnFromProxyLoadWithError:nil];
 }
 
@@ -3110,12 +3032,12 @@ NSDictionary *radioFormats;
    if (proxy)
    {
       NSLog(@"INFO: Using proxy: %@", proxy.url);
-      [self addToLog:[NSString stringWithFormat:@"INFO: Using proxy: %@", proxy.url]];
+      [logger addToLog:[NSString stringWithFormat:@"INFO: Using proxy: %@", proxy.url]];
    }
    else
    {
       NSLog(@"INFO: No proxy will be used");
-      [self addToLog:@"INFO: No proxy will be used"];
+      [logger addToLog:@"INFO: No proxy will be used"];
    }
    [self updateProxyLoadStatus:NO message:nil];
    [proxyDict[@"target"] performSelector:[proxyDict[@"selector"] pointerValue] withObject:proxyDict[@"object"] withObject:error];
@@ -3146,7 +3068,7 @@ NSDictionary *radioFormats;
 #pragma mark Extended Show Information
 - (IBAction)showExtendedInformationForSelectedProgramme:(id)sender {
    popover.behavior = NSPopoverBehaviorTransient;
-   [self addToLog:@"Retrieving Information." :self];
+   [logger addToLog:@"Retrieving Information." :self];
    Programme *programme = searchResultsArray[[searchResultsTable selectedRow]];
    if (programme) {
       infoView.alphaValue = 0.1;
@@ -3175,7 +3097,7 @@ NSDictionary *radioFormats;
 {
    Programme *programme = searchResultsArray[[searchResultsTable selectedRow]];
    if (!programme.extendedMetadataRetrieved.boolValue) {
-      [self addToLog:@"Metadata Retrieval timed out" :self];
+      [logger addToLog:@"Metadata Retrieval timed out" :self];
       [programme cancelMetadataRetrieval];
       loadingLabel.stringValue = @"Programme Information Retrieval Timed Out";
    }
@@ -3242,16 +3164,15 @@ NSDictionary *radioFormats;
       [retrievingInfoIndicator stopAnimation:self];
       infoView.alphaValue = 1.0;
       loadingView.alphaValue = 0.0;
-      [self addToLog:@"Info Retrieved" :self];
+      [logger addToLog:@"Info Retrieved" :self];
    }
    else {
       [retrievingInfoIndicator stopAnimation:self];
       loadingLabel.stringValue = @"Info could not be retrieved.";
-      [self addToLog:@"Info could not be retrieved" :self];
+      [logger addToLog:@"Info could not be retrieved" :self];
    }
 }
 
-@synthesize log_value;
 @synthesize getiPlayerPath;
 @synthesize proxy;
 @end

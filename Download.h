@@ -10,9 +10,12 @@
 #import "HTTPProxy.h"
 #import "Programme.h"
 #import "ASIHTTPRequest.h"
+#import "LogController.h"
 
 @interface Download : NSObject {
     NSNotificationCenter *nc;
+    LogController *logger;
+    
     
 	Programme *show;
     
@@ -77,6 +80,7 @@
     //Download Test
     BOOL isTest;
 }
+- (id)initWithLogController:(LogController *)logger;
 - (void)setCurrentProgress:(NSString *)string;
 - (void)setPercentage:(double)d;
 - (void)cancelDownload:(id)sender;

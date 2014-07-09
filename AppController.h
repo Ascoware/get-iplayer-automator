@@ -13,6 +13,7 @@
 #import "Download.h"
 #import <IOKit/pwr_mgt/IOPMLib.h>
 #import "NilToStringTransformer.h"
+#import "LogController.h"
 
 @interface AppController : NSObject {
 	//General
@@ -25,12 +26,6 @@
 	IBOutlet NSApplication *application;
    IBOutlet NSWindow *historyWindow;
    IOPMAssertionID powerAssertionID;
-	
-	//Log Components
-	IBOutlet NSTextView *log;
-	IBOutlet NSWindow *logWindow;
-	IBOutlet NSScrollView *logScroll;
-	NSMutableAttributedString *log_value;
 	
 	//Update Components
 	NSTask *getiPlayerUpdateTask;
@@ -135,6 +130,7 @@
    
    //Verbose Logging
    BOOL verbose;
+   IBOutlet LogController *logger;
    
    //Extended Show Information
    IBOutlet NSProgressIndicator *retrievingInfoIndicator;
@@ -163,11 +159,6 @@
 - (IBAction)updateCache:(id)sender;
 - (IBAction)forceUpdate:(id)sender;
 - (void)updateCacheForType:(NSString *)type;
-//Log Components
-- (IBAction)showLog:(id)sender;
-- (IBAction)copyLog:(id)sender;
-- (void)addToLog:(NSString *)string :(id)sender;
-- (void)addToLog:(NSString *)string;
 
 //Search
 - (IBAction)pvrSearch:(id)sender;
@@ -225,11 +216,11 @@
 - (void)loadProxyInBackgroundForSelector:(SEL)selector withObject:(id)object onTarget:(id)target;
 
 
+
 //Download Solutions
 //- (IBAction)saveSolutionsAsText:(id)sender;
 
 //Key-Value Coding
-@property (readwrite) NSMutableAttributedString *log_value;
 @property (readonly) NSString *getiPlayerPath;
 @property (readonly) HTTPProxy *proxy;
 

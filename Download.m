@@ -23,6 +23,14 @@
     
     return self;
 }
+- (id)initWithLogController:(LogController *)logger {
+    if ([self init]) {
+        self->logger = logger;
+        return self;
+    }
+    return nil;
+}
+
 @synthesize show;
 #pragma mark Notification Posters
 - (void)addToLog:(NSString *)logMessage noTag:(BOOL)b

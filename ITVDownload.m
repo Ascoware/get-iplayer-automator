@@ -44,9 +44,9 @@
     [self launchMetaRequest];
     return self;
 }
-- (id)initWithProgramme:(Programme *)tempShow itvFormats:(NSArray *)itvFormatList proxy:(HTTPProxy *)aProxy
+- (id)initWithProgramme:(Programme *)tempShow itvFormats:(NSArray *)itvFormatList proxy:(HTTPProxy *)aProxy logController:(LogController *)logger
 {
-    if (!(self = [super init])) return nil;
+    if (!(self = [super initWithLogController:logger])) return nil;
     
     proxy = aProxy;
     show = tempShow;

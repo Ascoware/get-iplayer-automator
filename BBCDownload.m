@@ -19,9 +19,9 @@
 	radioFormats = [[NSDictionary alloc] initWithObjects:radioFormatObjects forKeys:radioFormatKeys];
 }
 #pragma mark Overridden Methods
-- (id)initWithProgramme:(Programme *)tempShow tvFormats:(NSArray *)tvFormatList radioFormats:(NSArray *)radioFormatList proxy:(HTTPProxy *)aProxy
+- (id)initWithProgramme:(Programme *)tempShow tvFormats:(NSArray *)tvFormatList radioFormats:(NSArray *)radioFormatList proxy:(HTTPProxy *)aProxy logController:(LogController *)logger
 {
-	if (!(self = [super init])) return nil;
+	if (!(self = [super initWithLogController:logger])) return nil;
 	runAgain = NO;
 	running=YES;
 	foundLastLine=NO;

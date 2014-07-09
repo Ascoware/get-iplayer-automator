@@ -15,9 +15,16 @@
 
 
 @implementation Programme
-- (id)initWithInfo:(id)sender pid:(NSString *)PID programmeName:(NSString *)SHOWNAME network:(NSString *)TVNETWORK
+- (id)initWithLogController:(LogController *)logger
+{
+   if (!(self = [super init])) return nil;
+   self->logger = logger;
+   return self;
+}
+- (id)initWithInfo:(id)sender pid:(NSString *)PID programmeName:(NSString *)SHOWNAME network:(NSString *)TVNETWORK logController:(LogController *)logger
 {
 	if (!(self = [super init])) return nil;
+   self->logger = logger;
 	pid = [PID stringByReplacingOccurrencesOfString:@";amp" withString:@""];
 	showName = [[[NSString alloc] initWithString:SHOWNAME] stringByDecodingHTMLEntities];
 	tvNetwork = [[NSString alloc] initWithString:TVNETWORK];
@@ -167,7 +174,7 @@
 
 -(void)retrieveExtendedMetadata
 {
-   [[AppController sharedController] addToLog:@"Retrieving Extended Metadata" :self];
+   [logger addToLog:@"Retrieving Extended Metadata" :self];
    [[AppController sharedController] loadProxyInBackgroundForSelector:@selector(proxyRetrievalFinished:proxyError:) withObject:nil onTarget:self];
 }
 
@@ -215,7 +222,7 @@
                                           encoding:NSUTF8StringEncoding];
 		
 		[taskOutput appendString:s];
-      [[AppController sharedController] addToLog:s :self];
+      [logger addToLog:s :self];
       [[pipe fileHandleForReading] readInBackgroundAndNotify];
 	}
    else {
@@ -351,7 +358,7 @@
    if ([metadataTask isRunning]) {
       [metadataTask interrupt];
    }
-   [[AppController sharedController] addToLog:@"Metadata Retrieval Cancelled" :self];
+   [logger addToLog:@"Metadata Retrieval Cancelled" :self];
 }
 
 - (GIA_ProgrammeType)type
