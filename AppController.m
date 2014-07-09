@@ -310,7 +310,7 @@ NSDictionary *radioFormats;
       NSInteger response = [downloadAlert runModal];
       if (response == NSAlertDefaultReturn) return NSTerminateCancel;
    }
-   else if (runUpdate)
+   else if (runUpdate && ![[[NSUserDefaults standardUserDefaults] objectForKey:@"QuickCache"] boolValue])
    {
       NSAlert *updateAlert = [NSAlert alertWithMessageText:@"Are you sure?"
                                              defaultButton:@"No"
@@ -329,7 +329,7 @@ NSDictionary *radioFormats;
 {
 	if ([sender isEqualTo:mainWindow])
 	{
-		if (runUpdate)
+		if (runUpdate && ![[[NSUserDefaults standardUserDefaults] objectForKey:@"QuickCache"] boolValue])
 		{
 			NSAlert *updateAlert = [NSAlert alertWithMessageText:@"Are you sure?"
                                                 defaultButton:@"No"
