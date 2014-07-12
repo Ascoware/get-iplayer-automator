@@ -334,8 +334,16 @@
         itvRateArray = [[NSMutableArray alloc] init];
         bitrateArray = [[NSMutableArray alloc] init];
         
-        for (TVFormat *format in formatList) [itvRateArray addObject:itvRateDic[[format format]]];
-        for (TVFormat *format in formatList) [bitrateArray addObject:bitrateDic[[format format]]];
+       for (TVFormat *format in formatList)  {
+          NSString *mode;
+          if ((mode = itvRateDic[format.format]))
+             [itvRateArray addObject:mode];
+       }
+       for (TVFormat *format in formatList) {
+          NSString *mode;
+          if ((mode = bitrateDic[format.format]))
+             [bitrateArray addObject:mode];
+       }
     }
     @catch (NSException *exception)
     {
