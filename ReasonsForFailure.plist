@@ -47,5 +47,7 @@ Unfortunately, this show is one of them.</string>
 Unfortunately, this programme is one of them.</string>
 	<key>ITVFormatListEmpty</key>
 	<string>Please go to Preferences -&gt; Other Formats and add at least one download format to the list.</string>
+	<key>NoSpecifiedFormatAvailableITV</key>
+	<string>None of the specified formats were available. Please go to Preferences -&gt; Other Formats and add at least one download format to the list.</string>
 </dict>
 </plist>
