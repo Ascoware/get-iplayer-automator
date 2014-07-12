@@ -55,7 +55,18 @@
     defaultsPrefix = @"ITV_";
 
     running=TRUE;
-    
+   
+   if (![itvFormatList count]) {
+      NSLog(@"ERROR: ITV Format List is empty");
+      [self addToLog:@"ERROR: ITV Format List is empty"];
+      [show setReasonForFailure:@"ITVFormatListEmpty"];
+      [show setComplete:@YES];
+      [show setSuccessful:@NO];
+      [show setValue:@"Download Failed" forKey:@"status"];
+      [nc postNotificationName:@"DownloadFinished" object:show];
+      return self;
+   }
+   
     [self setCurrentProgress:[NSString stringWithFormat:@"Retrieving Programme Metadata... -- %@",[show showName]]];
     [self setPercentage:102];
     [tempShow setValue:@"Initialising..." forKey:@"status"];

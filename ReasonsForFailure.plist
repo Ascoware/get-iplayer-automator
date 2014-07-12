@@ -45,5 +45,7 @@ Unfortunately, this show is one of them.</string>
 	<key>4oDUnavailable</key>
 	<string>Many 4oD programmes are unavailable to GiA.
 Unfortunately, this programme is one of them.</string>
+	<key>ITVFormatListEmpty</key>
+	<string>Please go to Preferences -&gt; Other Formats and add at least one download format to the list.</string>
 </dict>
 </plist>
