@@ -17,7 +17,7 @@
 @implementation Programme
 - (id)initWithLogController:(LogController *)logger
 {
-   if (!(self = [super init])) return nil;
+   if (![self init]) return nil;
    self->logger = logger;
    return self;
 }
@@ -71,6 +71,7 @@
 }
 - (id)init
 {
+   if (!(self = [super init])) return nil;
 	pid = [[NSString alloc] init];
 	showName = [[NSString alloc] init];
 	tvNetwork = [[NSString alloc] init];

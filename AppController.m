@@ -779,133 +779,21 @@ NSDictionary *radioFormats;
 }
 - (IBAction)mainSearch:(id)sender
 {
-   [searchField setEnabled:NO];
-   
-	NSString *searchTerms = [searchField stringValue];
-	
-	if([searchTerms length] > 0)
+	if([searchField.stringValue length] > 0)
 	{
-		searchTask = [[NSTask alloc] init];
-		searchPipe = [[NSPipe alloc] init];
-		
-		[searchTask setLaunchPath:@"/usr/bin/perl"];
-		NSString *searchArgument = [[NSString alloc] initWithString:searchTerms];
-		NSString *cacheExpiryArg = [self cacheExpiryArgument:nil];
-		NSString *typeArgument = [self typeArgument:nil];
-		NSArray *args = @[getiPlayerPath,noWarningArg,cacheExpiryArg,typeArgument,listFormat,@"--long",@"--nopurge",searchArgument,profileDirArg];
-      
-      if (![[[NSUserDefaults standardUserDefaults] valueForKey:@"ShowDownloadedInSearch"] boolValue])
-         args=[args arrayByAddingObject:@"--hide"];
-      
-		[searchTask setArguments:args];
-		
-		[searchTask setStandardOutput:searchPipe];
-		NSFileHandle *fh = [searchPipe fileHandleForReading];
-		
-		NSNotificationCenter *nc;
-		nc = [NSNotificationCenter defaultCenter];
-		[nc addObserver:self
-             selector:@selector(searchDataReady:)
-                 name:NSFileHandleReadCompletionNotification
-               object:fh];
-		[nc addObserver:self
-             selector:@selector(searchFinished:)
-                 name:NSTaskDidTerminateNotification
-               object:searchTask];
-		searchData = [[NSMutableString alloc] init];
-		[searchTask launch];
+      [searchField setEnabled:NO];
 		[searchIndicator startAnimation:nil];
-		[fh readInBackgroundAndNotify];
+      [resultsController removeObjectsAtArrangedObjectIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, [resultsController.arrangedObjects count])]];
+		currentSearch = [[GiASearch alloc] initWithSearchTerms:searchField.stringValue logController:logger typeArgument:[self typeArgument:nil] profileDirArg:profileDirArg selector:@selector(searchFinished:) withTarget:self];
 	}
 }
-
-- (void)searchDataReady:(NSNotification *)n
-{
-   NSData *d;
-   d = [[n userInfo] valueForKey:NSFileHandleNotificationDataItem];
-	
-   if ([d length] > 0) {
-		NSString *s = [[NSString alloc] initWithData:d
-                                          encoding:NSUTF8StringEncoding];
-		[searchData appendString:s];
-	}
-	else
-	{
-		searchTask = nil;
-	}
-	
-   // If the task is running, start reading again
-   if (searchTask)
-      [[searchPipe fileHandleForReading] readInBackgroundAndNotify];
-}
-- (void)searchFinished:(NSNotification *)n
+- (void)searchFinished:(NSArray *)results
 {
    [searchField setEnabled:YES];
-	BOOL foundShow=NO;
-	[resultsController removeObjectsAtArrangedObjectIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, [[resultsController arrangedObjects] count])]];
-	NSArray *array = [searchData componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
-	for (NSString *string in array)
-	{
-		if (![string isEqualToString:@"Matches:"] && ![string hasPrefix:@"INFO:"] && ![string hasPrefix:@"WARNING:"]  && ![string hasPrefix:@"ERROR:"] && [string length]>0 && ![string hasPrefix:@"."] && ![string hasPrefix:@"Added:"])
-		{
-			@try {
-				NSScanner *myScanner = [NSScanner scannerWithString:string];
-				NSString *temp_pid = nil, *temp_showName = nil, *temp_tvNetwork = nil, *temp_type = nil, *url = nil;
-				[myScanner scanUpToString:@":" intoString:&temp_pid];
-				[myScanner scanUpToCharactersFromSet:[NSCharacterSet alphanumericCharacterSet] intoString:NULL];
-				[myScanner scanUpToString:@", ~" intoString:&temp_type];
-				[myScanner scanString:@", ~" intoString:NULL];
-				[myScanner scanUpToString:@"~," intoString:&temp_showName];
-				[myScanner scanUpToCharactersFromSet:[NSCharacterSet alphanumericCharacterSet] intoString:NULL];
-				[myScanner scanUpToString:@"," intoString:&temp_tvNetwork];
-            [myScanner scanUpToCharactersFromSet:[NSCharacterSet alphanumericCharacterSet] intoString:NULL];
-            [myScanner scanUpToString:@"kjkjkj" intoString:&url];
-            if (temp_pid == nil || temp_showName == nil || temp_tvNetwork == nil || temp_type == nil || url == nil) {
-               [logger addToLog: [NSString stringWithFormat:@"WARNING: Skipped invalid search result: %@", string]];
-               continue;
-            }
-				if ([temp_showName hasSuffix:@" - -"])
-				{
-					NSString *temp_showName2;
-					NSScanner *dashScanner = [NSScanner scannerWithString:temp_showName];
-					[dashScanner scanUpToString:@" - -" intoString:&temp_showName2];
-					temp_showName = temp_showName2;
-					temp_showName = [temp_showName stringByAppendingFormat:@" - %@", temp_showName2];
-				}
-				Programme *p = [[Programme alloc] initWithInfo:nil pid:temp_pid programmeName:temp_showName network:temp_tvNetwork logController:logger];
-            [p setUrl:url];
-				if ([temp_type isEqualToString:@"radio"])
-				{
-					[p setValue:@YES forKey:@"radio"];
-				}
-            else if ([temp_type isEqualToString:@"podcast"])
-               [p setPodcast:@YES];
-            
-				[resultsController addObject:p];
-				foundShow=YES;
-			}
-			@catch (NSException *e) {
-				NSAlert *searchException = [[NSAlert alloc] init];
-				[searchException addButtonWithTitle:@"OK"];
-				[searchException setMessageText:[NSString stringWithFormat:@"Invalid Output!"]];
-				[searchException setInformativeText:@"Please check your query. Your query must not alter the output format of Get_iPlayer. (searchFinished)"];
-				[searchException setAlertStyle:NSWarningAlertStyle];
-				[searchException runModal];
-				searchException = nil;
-			}
-		}
-		else
-		{
-			if ([string hasPrefix:@"Unknown option:"] || [string hasPrefix:@"Option"] || [string hasPrefix:@"Usage"])
-			{
-				NSLog(@"Unknown Option");
-				[searchIndicator stopAnimation:nil];
-				return;
-			}
-		}
-	}
+   [resultsController addObjects:results];
+   [resultsController setSelectionIndexes:[NSIndexSet indexSet]];
 	[searchIndicator stopAnimation:nil];
-	if (!foundShow)
+	if (![results count])
 	{
 		NSAlert *noneFound = [NSAlert alertWithMessageText:@"No Shows Found"
                                            defaultButton:@"OK"
@@ -914,6 +802,7 @@ NSDictionary *radioFormats;
                                informativeTextWithFormat:@"0 shows were found for your search terms. Please check your spelling!"];
 		[noneFound runModal];
 	}
+   currentSearch = nil;
 }
 #pragma mark Queue
 - (NSArray *)queueArray
@@ -1944,114 +1833,31 @@ NSDictionary *radioFormats;
 #pragma mark PVR
 - (IBAction)pvrSearch:(id)sender
 {
-	NSString *searchTerms = [pvrSearchField stringValue];
-	
-	if([searchTerms length] > 0)
+	if([pvrSearchField.stringValue length])
 	{
-		pvrSearchTask = [[NSTask alloc] init];
-		pvrSearchPipe = [[NSPipe alloc] init];
-		
-		[pvrSearchTask setLaunchPath:@"/usr/bin/perl"];
-		NSString *searchArgument = [[NSString alloc] initWithString:searchTerms];
-		NSString *cacheExpiryArg = [self cacheExpiryArgument:nil];
-		NSString *typeArgument = [self typeArgument:nil];
-		NSArray *args = @[getiPlayerPath,noWarningArg,cacheExpiryArg,typeArgument,@"--nopurge",
-                        @"--listformat=<index>: <type>, ~<name> - <episode>~, <channel>, <timeadded>",searchArgument,profileDirArg];
-		[pvrSearchTask setArguments:args];
-		
-		[pvrSearchTask setStandardOutput:pvrSearchPipe];
-		NSFileHandle *fh = [pvrSearchPipe fileHandleForReading];
-		
-		NSNotificationCenter *nc;
-		nc = [NSNotificationCenter defaultCenter];
-		[nc addObserver:self
-             selector:@selector(pvrSearchDataReady:)
-                 name:NSFileHandleReadCompletionNotification
-               object:fh];
-		[nc addObserver:self
-             selector:@selector(pvrSearchFinished:)
-                 name:NSTaskDidTerminateNotification
-               object:pvrSearchTask];
-		pvrSearchData = [[NSMutableString alloc] init];
-		[pvrSearchTask launch];
+      [pvrSearchField setEnabled:NO];
+      [pvrResultsController removeObjectsAtArrangedObjectIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, [pvrResultsController.arrangedObjects count])]];
+		currentPVRSearch = [[GiASearch alloc] initWithSearchTerms:pvrSearchField.stringValue logController:logger typeArgument:[self typeArgument:self] profileDirArg:profileDirArg selector:@selector(pvrSearchFinished:) withTarget:self];
 		[pvrSearchIndicator startAnimation:nil];
-		[fh readInBackgroundAndNotify];
 	}
 }
 
-- (void)pvrSearchDataReady:(NSNotification *)n
+- (void)pvrSearchFinished:(NSArray *)results
 {
-   NSData *d;
-   d = [[n userInfo] valueForKey:NSFileHandleNotificationDataItem];
-	
-   if ([d length] > 0) {
-		NSString *s = [[NSString alloc] initWithData:d
-                                          encoding:NSUTF8StringEncoding];
-		
-		[pvrSearchData appendString:s];
-		
-	}
-	else
-	{
-		pvrSearchTask = nil;
-	}
-	
-   // If the task is running, start reading again
-   if (pvrSearchTask)
-      [[pvrSearchPipe fileHandleForReading] readInBackgroundAndNotify];
-}
-- (void)pvrSearchFinished:(NSNotification *)n
-{
-   //TODO: Switch to new method
-	[pvrResultsController removeObjectsAtArrangedObjectIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, [[pvrResultsController arrangedObjects] count])]];
-	NSArray *array = [pvrSearchData componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
-	for (NSString *string in array)
-	{
-		if (![string isEqualToString:@"Matches:"] && ![string hasPrefix:@"INFO:"] && ![string hasPrefix:@"WARNING:"] && [string length]>0 && ![string hasPrefix:@"."] && ![string hasPrefix:@"Added:"])
-		{
-			@try {
-				NSScanner *myScanner = [NSScanner scannerWithString:string];
-				Programme *p = [pvrResultsController newObject];
-				NSString *temp_pid, *temp_showName, *temp_tvNetwork;
-				NSInteger timeadded;
-				[myScanner scanUpToString:@":" intoString:&temp_pid];
-				[myScanner scanUpToCharactersFromSet:[NSCharacterSet alphanumericCharacterSet] intoString:NULL];
-				[myScanner scanUpToString:@", ~" intoString:NULL];
-				[myScanner scanString:@", ~" intoString:nil];
-				[myScanner scanUpToString:@"~," intoString:&temp_showName];
-				[myScanner scanUpToCharactersFromSet:[NSCharacterSet alphanumericCharacterSet] intoString:NULL];
-				[myScanner scanUpToString:@"," intoString:&temp_tvNetwork];
-				[myScanner scanString:@", " intoString:nil];
-				[myScanner scanInteger:&timeadded];
-				
-				[p setValue:temp_pid forKey:@"pid"];
-				[p setValue:temp_showName forKey:@"showName"];
-				[p setValue:temp_tvNetwork forKey:@"tvNetwork"];
-				NSNumber *added = @(timeadded);
-				[p setValue:added forKey:@"timeadded"];
-				[pvrResultsController addObject:p];
-			}
-			@catch (NSException *e) {
-				NSAlert *searchException = [[NSAlert alloc] init];
-				[searchException addButtonWithTitle:@"OK"];
-				[searchException setMessageText:[NSString stringWithFormat:@"Invalid Output!"]];
-				[searchException setInformativeText:@"Please check your query. You query must not alter the output format of Get_iPlayer. (pvrSearchFinished)"];
-				[searchException setAlertStyle:NSWarningAlertStyle];
-				[searchException runModal];
-				searchException = nil;
-			}
-		}
-		else
-		{
-			if ([string hasPrefix:@"Unknown option:"] || [string hasPrefix:@"Option"] || [string hasPrefix:@"Usage"])
-			{
-				NSLog(@"Unknown Option");
-				[pvrSearchIndicator stopAnimation:nil];
-				return;
-			}
-		}
-	}
+	[pvrResultsController addObjects:results];
+   [pvrResultsController setSelectionIndexes:[NSIndexSet indexSet]];
 	[pvrSearchIndicator stopAnimation:nil];
+   [pvrSearchField setEnabled:YES];
+   if (![results count])
+	{
+		NSAlert *noneFound = [NSAlert alertWithMessageText:@"No Shows Found"
+                                           defaultButton:@"OK"
+                                         alternateButton:nil
+                                             otherButton:nil
+                               informativeTextWithFormat:@"0 shows were found for your search terms. Please check your spelling!"];
+		[noneFound runModal];
+	}
+   currentPVRSearch = nil;
 }
 - (IBAction)addToAutoRecord:(id)sender
 {
@@ -2063,15 +1869,17 @@ NSDictionary *radioFormats;
 		NSString *tempName;
 		[scanner scanUpToString:@" - " intoString:&tempName];
 		Series *show = [[Series alloc] initWithShowname:tempName];
-		[show setValue:[programme timeadded] forKey:@"added"];
-		[show setValue:[programme tvNetwork] forKey:@"tvNetwork"];
-		[show setValue:[NSDate date] forKey:@"lastFound"];
+		show.added = programme.timeadded;
+		show.tvNetwork = programme.tvNetwork;
+		show.lastFound = [NSDate date];
+      
       //Check to make sure the programme isn't already in the queue before adding it.
       NSArray *queuedObjects = [pvrQueueController arrangedObjects];
       BOOL add=YES;
       for (Programme *queuedShow in queuedObjects)
       {
-         if ([[show showName] isEqualToString:[queuedShow showName]] && [show tvNetwork] == [queuedShow tvNetwork]) add=NO;
+         if ([[show showName] isEqualToString:[queuedShow showName]] && [show tvNetwork] == [queuedShow tvNetwork])
+            add=NO;
       }
       if (add)
       {

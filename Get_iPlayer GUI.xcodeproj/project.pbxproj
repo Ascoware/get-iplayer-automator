@@ -85,6 +85,7 @@
 		D9A4509D102FF8090011E175 /* Credits.html in Resources */ = {isa = PBXBuildFile; fileRef = D9A4509C102FF8090011E175 /* Credits.html */; };
 		D9A450A4102FFDC00011E175 /* LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = D9A450A3102FFDC00011E175 /* LICENSE.txt */; };
 		D9B6DB9A196D9AEC00161ECB /* LogController.m in Sources */ = {isa = PBXBuildFile; fileRef = D9B6DB99196D9AEC00161ECB /* LogController.m */; };
+		D9B6DB9E196DBD4600161ECB /* GiASearch.m in Sources */ = {isa = PBXBuildFile; fileRef = D9B6DB9D196DBD4600161ECB /* GiASearch.m */; };
 		D9CAE546133FF9BE003471DA /* ffmpeg in Resources */ = {isa = PBXBuildFile; fileRef = D9CAE545133FF9BE003471DA /* ffmpeg */; };
 		D9CC15680FF9071700D819E2 /* Play.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D9CC15670FF9071700D819E2 /* Play.tiff */; };
 		D9CC156A0FF9072F00D819E2 /* ActivityWindow.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D9CC15690FF9072F00D819E2 /* ActivityWindow.tiff */; };
@@ -239,6 +240,8 @@
 		D9B6DB97196D938300161ECB /* Interface2.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Interface2.xib; sourceTree = "<group>"; };
 		D9B6DB98196D9AEC00161ECB /* LogController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LogController.h; sourceTree = "<group>"; };
 		D9B6DB99196D9AEC00161ECB /* LogController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LogController.m; sourceTree = "<group>"; };
+		D9B6DB9C196DBD4600161ECB /* GiASearch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GiASearch.h; sourceTree = "<group>"; };
+		D9B6DB9D196DBD4600161ECB /* GiASearch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GiASearch.m; sourceTree = "<group>"; };
 		D9BE0870103563530011CF40 /* Camino.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Camino.h; sourceTree = "<group>"; };
 		D9CAE545133FF9BE003471DA /* ffmpeg */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = ffmpeg; sourceTree = "<group>"; };
 		D9CC15670FF9071700D819E2 /* Play.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = Play.tiff; sourceTree = "<group>"; };
@@ -312,8 +315,6 @@
 				D921C9E7149BCB16004CB558 /* ITVDownload.m */,
 				DFC8D3F015C557E3008E369F /* FourODDownload.h */,
 				DFC8D3F115C557E3008E369F /* FourODDownload.m */,
-				D92687C31087F81F000E8132 /* DownloadHistoryController.h */,
-				D92687C41087F81F000E8132 /* DownloadHistoryController.m */,
 				39D7C1BB1874AD7400B78698 /* StringTrimFormatter.h */,
 				39D7C1BC1874AD7400B78698 /* StringTrimFormatter.m */,
 				39D7C1BE1874AD9D00B78698 /* NilToStringTransformer.h */,
@@ -503,6 +504,8 @@
 				D9D06C6E14BB91C200029340 /* ITVMediaFileEntry.m */,
 				392A41A2169735340053DEA5 /* HTTPProxy.h */,
 				392A41A3169735340053DEA5 /* HTTPProxy.m */,
+				D9B6DB9C196DBD4600161ECB /* GiASearch.h */,
+				D9B6DB9D196DBD4600161ECB /* GiASearch.m */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -566,6 +569,8 @@
 		D9B6DB9B196D9BE600161ECB /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				D92687C31087F81F000E8132 /* DownloadHistoryController.h */,
+				D92687C41087F81F000E8132 /* DownloadHistoryController.m */,
 				D9B6DB98196D9AEC00161ECB /* LogController.h */,
 				D9B6DB99196D9AEC00161ECB /* LogController.m */,
 			);
@@ -721,6 +726,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8D11072D0486CEB800E47090 /* main.m in Sources */,
+				D9B6DB9E196DBD4600161ECB /* GiASearch.m in Sources */,
 				D9FEB87610077790003BADF8 /* AppController.m in Sources */,
 				D904F424100B077600D60BBF /* Programme.m in Sources */,
 				D914BD29100CBFA900F7E68E /* BBCDownload.m in Sources */,

@@ -14,6 +14,7 @@
 #import <IOKit/pwr_mgt/IOPMLib.h>
 #import "NilToStringTransformer.h"
 #import "LogController.h"
+#import "GiASearch.h"
 
 @interface AppController : NSObject {
 	//General
@@ -48,6 +49,7 @@
 	NSTask *searchTask;
 	NSPipe *searchPipe;
 	NSMutableString *searchData;
+   GiASearch *currentSearch;
 	
 	//PVR
 	IBOutlet NSTextField *pvrSearchField;
@@ -60,6 +62,7 @@
 	NSPipe *pvrSearchPipe;
 	NSMutableString *pvrSearchData;
 	NSMutableArray *pvrQueueArray;
+   GiASearch *currentPVRSearch;
 	
 	//Queue
 	IBOutlet NSButton *addToQueue;
