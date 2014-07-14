@@ -1713,7 +1713,7 @@ NSDictionary *radioFormats;
          
          ReasonForFailure *showSolution = [[ReasonForFailure alloc] init];
          [showSolution setShowName:[finishedShow showName]];
-         [showSolution setSolution:[solutionsDictionary valueForKey:[finishedShow reasonForFailure]]];
+         [showSolution setSolution:solutionsDictionary[finishedShow.reasonForFailure]];
          if (![showSolution solution])
             [showSolution setSolution:@"Problem Unknown.\nPlease submit a bug report from the application menu."];
          NSLog(@"Reason for Failure: %@", [finishedShow reasonForFailure]);

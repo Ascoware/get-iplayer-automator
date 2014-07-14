@@ -11,10 +11,10 @@
 @implementation BBCDownload
 + (void)initFormats
 {
-    NSArray *tvFormatKeys = @[@"Flash - HD",@"Flash - Very High",@"Flash - High",@"Flash - Standard",@"Flash - Low"];
-    NSArray *tvFormatObjects = @[@"flashhd2,flashhd1",@"flashvhigh2,flashvhigh1",@"flashhigh2,flashhigh1",@"flashstd2,flashstd1",@"flashlow2,flashlow1"];
-    NSArray *radioFormatKeys = @[@"Flash AAC - High",@"Flash AAC - Standard",@"Flash AAC - Low",@"Flash - MP3"];
-    NSArray *radioFormatObjects = @[@"flashaachigh",@"flashaacstd",@"flashaaclow",@"flashaudio"];
+   NSArray *tvFormatKeys = @[@"Flash - HD",@"Flash - Very High",@"Flash - High",@"Flash - Standard",@"Flash - Low"];
+   NSArray *tvFormatObjects = @[@"flashhd2,flashhd1",@"flashvhigh2,flashvhigh1",@"flashhigh2,flashhigh1",@"flashstd2,flashstd1",@"flashlow2,flashlow1"];
+   NSArray *radioFormatKeys = @[@"Flash AAC - High",@"Flash AAC - Standard",@"Flash AAC - Low",@"Flash - MP3"];
+   NSArray *radioFormatObjects = @[@"flashaachigh",@"flashaacstd",@"flashaaclow",@"flashaudio"];
 	tvFormats = [[NSDictionary alloc] initWithObjects:tvFormatObjects forKeys:tvFormatKeys];
 	radioFormats = [[NSDictionary alloc] initWithObjects:radioFormatObjects forKeys:radioFormatKeys];
 }
@@ -27,50 +27,50 @@
 	foundLastLine=NO;
 	errorCache = [[NSMutableString alloc] init];
 	processErrorCache = [NSTimer scheduledTimerWithTimeInterval:.25 target:self selector:@selector(processError) userInfo:nil repeats:YES];
-    reasonForFailure = @"None";
-    defaultsPrefix = @"BBC_";
-    proxy = aProxy;
-    
+   reasonForFailure = @"None";
+   defaultsPrefix = @"BBC_";
+   proxy = aProxy;
+   
 	log = [[NSMutableString alloc] initWithString:@""];
 	nc = [NSNotificationCenter defaultCenter];
 	show = tempShow;
 	[self addToLog:[NSString stringWithFormat:@"Downloading %@", [show showName]]];
 	noDataCount=0;
-		
-    //Initialize Paths
-    NSBundle *bundle = [NSBundle mainBundle];
+   
+   //Initialize Paths
+   NSBundle *bundle = [NSBundle mainBundle];
 	NSString *getiPlayerPath = [bundle pathForResource:@"get_iplayer" ofType:@"pl"];
 	downloadPath = [[NSString alloc] initWithString:[[NSUserDefaults standardUserDefaults] valueForKey:@"DownloadPath"]];
-		
-    //Initialize Formats
-    if (!tvFormats || !radioFormats) {
-        [BBCDownload initFormats];
-    }
-    NSMutableString *temp_Format;
-    temp_Format = [[NSMutableString alloc] initWithString:@"--modes="];
-    for (RadioFormat *format in radioFormatList)
-        [temp_Format appendFormat:@"%@,", [radioFormats valueForKey:[format format]]];
-    for (TVFormat *format in tvFormatList)
-        [temp_Format appendFormat:@"%@,",[tvFormats valueForKey:[format format]]];
-    NSString *formatArg = [NSString stringWithString:temp_Format];
-
-    //Set Proxy Arguments
-    NSString *proxyArg = nil;
+   
+   //Initialize Formats
+   if (!tvFormats || !radioFormats) {
+      [BBCDownload initFormats];
+   }
+   NSMutableString *temp_Format;
+   temp_Format = [[NSMutableString alloc] initWithString:@"--modes="];
+   for (RadioFormat *format in radioFormatList)
+      [temp_Format appendFormat:@"%@,", [radioFormats valueForKey:[format format]]];
+   for (TVFormat *format in tvFormatList)
+      [temp_Format appendFormat:@"%@,",[tvFormats valueForKey:[format format]]];
+   NSString *formatArg = [NSString stringWithString:temp_Format];
+   
+   //Set Proxy Arguments
+   NSString *proxyArg = nil;
 	NSString *partialProxyArg = nil;
-    if (proxy)
-    {
-        proxyArg = [[NSString alloc] initWithFormat:@"-p%@", [proxy url]];
-        if (![[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])
-        {
-            partialProxyArg = @"--partial-proxy";
-        }
-    }
-    //Initialize the rest of the arguments
+   if (proxy)
+   {
+      proxyArg = [[NSString alloc] initWithFormat:@"-p%@", [proxy url]];
+      if (![[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])
+      {
+         partialProxyArg = @"--partial-proxy";
+      }
+   }
+   //Initialize the rest of the arguments
 	NSString *noWarningArg = @"--nocopyright";
 	NSString *noPurgeArg = @"--nopurge";
 	NSString *id3v2Arg = [[NSString alloc] initWithFormat:@"--id3v2=%@", [bundle pathForResource:@"id3v2" ofType:nil]];
 	NSString *mplayerArg = [[NSString alloc] initWithFormat:@"--mplayer=%@", [bundle pathForResource:@"mplayer" ofType:nil]];
-    NSString *rtmpdumpArg = [[NSString alloc] initWithFormat:@"--rtmpdump=%@", [bundle pathForResource:@"rtmpdump-2.4" ofType:nil]];
+   NSString *rtmpdumpArg = [[NSString alloc] initWithFormat:@"--rtmpdump=%@", [bundle pathForResource:@"rtmpdump-2.4" ofType:nil]];
 	NSString *lameArg = [[NSString alloc] initWithFormat:@"--lame=%@", [bundle pathForResource:@"lame" ofType:nil]];
 	NSString *atomicParsleyArg = [[NSString alloc] initWithFormat:@"--atomicparsley=%@", [bundle pathForResource:@"AtomicParsley" ofType:nil]];
 	NSString *ffmpegArg = [[NSString alloc] initWithFormat:@"--ffmpeg=%@", [bundle pathForResource:@"ffmpeg" ofType:nil]];
@@ -82,14 +82,14 @@
 	else
 		getArg = @"--pid";
 	NSString *searchArg = [[NSString alloc] initWithFormat:@"%@", [show pid]];
-    
-    //AudioDescribed
-    NSString *versionArg;
-    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"AudioDescribed"] boolValue])
-        versionArg = @"--versions=audiodescribed,signed,default";
-    else
-        versionArg = @"--versions=default";
-    
+   
+   //AudioDescribed
+   NSString *versionArg;
+   if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"AudioDescribed"] boolValue])
+      versionArg = @"--versions=audiodescribed,signed,default";
+   else
+      versionArg = @"--versions=default";
+   
 	//We don't want this to refresh now!
 	NSString *cacheExpiryArg = @"-e604800000000";
 	NSString *appSupportFolder = [@"~/Library/Application Support/Get iPlayer Automator/" stringByExpandingTildeInPath];
@@ -100,32 +100,32 @@
 	}
 	profileDirArg = [[NSString alloc] initWithFormat:@"--profile-dir=%@", appSupportFolder];
 	
-    //Add Arguments that can't be NULL
+   //Add Arguments that can't be NULL
 	NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:getiPlayerPath,profileDirArg,noWarningArg,noPurgeArg,id3v2Arg,mplayerArg,rtmpdumpArg,lameArg,atomicParsleyArg,cacheExpiryArg,downloadPathArg,subDirArg,formatArg,getArg,searchArg,@"--attempts=5",@"--fatfilename",@"-w",@"--thumbsize=6",@"--tag-hdvideo",@"--tag-longdesc",@"--isodate",versionArg,ffmpegArg,proxyArg,partialProxyArg,nil];
-    //Verbose?
-    if (verbose)
+   //Verbose?
+   if (verbose)
 		[args addObject:@"--verbose"];
 	if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"DownloadSubtitles"] isEqualTo:@YES])
 		[args addObject:@"--subtitles"];
 	
-    //Naming Convention
+   //Naming Convention
 	if (![[[NSUserDefaults standardUserDefaults] valueForKey:@"XBMC_naming"] boolValue])
 	{
 		[args addObject:@"--file-prefix=<name> - <episode> ((<modeshort>))"];
 	}
-	else 
+	else
 	{
 		[args addObject:@"--file-prefix=<nameshort><.senum><.episodeshort>"];
 		[args addObject:@"--subdir-format=<nameshort>"];
 	}
-    //Tagging
-    if (![[[NSUserDefaults standardUserDefaults] objectForKey:@"TagShows"] boolValue])
-        [args addObject:@"--no-tag"];
-
-    if ([[NSUserDefaults standardUserDefaults] boolForKey:[NSString stringWithFormat:@"%@TagCNID", defaultsPrefix]]) {
+   //Tagging
+   if (![[[NSUserDefaults standardUserDefaults] objectForKey:@"TagShows"] boolValue])
+      [args addObject:@"--no-tag"];
+   
+   if ([[NSUserDefaults standardUserDefaults] boolForKey:[NSString stringWithFormat:@"%@TagCNID", defaultsPrefix]]) {
 		[args addObject:@"--tag-cnid"];
-    }
-
+   }
+   
 	task = [[NSTask alloc] init];
 	pipe = [[NSPipe alloc] init];
 	errorPipe = [[NSPipe alloc] init];
@@ -134,31 +134,31 @@
 	[task setLaunchPath:@"/usr/bin/perl"];
 	[task setStandardOutput:pipe];
 	[task setStandardError:errorPipe];
-    
-    NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:[task environment]];
-    envVariableDictionary[@"DYLD_LIBRARY_PATH"] = [bundle resourcePath];
-    envVariableDictionary[@"HOME"] = [@"~" stringByExpandingTildeInPath];
-    [task setEnvironment:envVariableDictionary];
+   
+   NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:[task environment]];
+   envVariableDictionary[@"DYLD_LIBRARY_PATH"] = [bundle resourcePath];
+   envVariableDictionary[@"HOME"] = [@"~" stringByExpandingTildeInPath];
+   [task setEnvironment:envVariableDictionary];
 	
 	fh = [pipe fileHandleForReading];
 	errorFh = [errorPipe fileHandleForReading];
 	
 	[nc addObserver:self
-		   selector:@selector(DownloadDataReady:)
-			   name:NSFileHandleReadCompletionNotification
-			 object:fh];
+          selector:@selector(DownloadDataReady:)
+              name:NSFileHandleReadCompletionNotification
+            object:fh];
 	[nc addObserver:self
-		   selector:@selector(ErrorDataReady:)
-			   name:NSFileHandleReadCompletionNotification
-			 object:errorFh];
+          selector:@selector(ErrorDataReady:)
+              name:NSFileHandleReadCompletionNotification
+            object:errorFh];
 	[task launch];
 	[fh readInBackgroundAndNotify];
 	[errorFh readInBackgroundAndNotify];
 	
 	//Prepare UI
 	[self setCurrentProgress:@"Beginning..."];
-    [show setValue:@"Starting..." forKey:@"status"];
-    
+   [show setValue:@"Starting..." forKey:@"status"];
+   
 	return self;
 }
 - (id)description
@@ -169,11 +169,11 @@
 - (void)DownloadDataReady:(NSNotification *)note
 {
 	[[pipe fileHandleForReading] readInBackgroundAndNotify];
-    NSData *d = [[note userInfo] valueForKey:NSFileHandleNotificationDataItem];
+   NSData *d = [[note userInfo] valueForKey:NSFileHandleNotificationDataItem];
 	
-    if ([d length] > 0) {
+   if ([d length] > 0) {
 		NSString *s = [[NSString alloc] initWithData:d
-											encoding:NSUTF8StringEncoding];
+                                          encoding:NSUTF8StringEncoding];
 		[self processGetiPlayerOutput:s];
 	}
 	else
@@ -189,15 +189,22 @@
 			{
 				if (!foundLastLine)
 					LastLine = [[log componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]] lastObject];
-
+            
 				NSScanner *scn = [NSScanner scannerWithString:LastLine];
 				if ([reasonForFailure isEqualToString:@"unresumable"])
 				{
 					[show setValue:@YES forKey:@"complete"];
 					[show setValue:@NO forKey:@"successful"];
 					[show setValue:@"Failed: Unresumable File" forKey:@"status"];
-                    [show setReasonForFailure:@"Unresumable_File"];
+               [show setReasonForFailure:@"Unresumable_File"];
 				}
+            else if ([reasonForFailure isEqualToString:@"FileExists"])
+            {
+               show.complete = @YES;
+               show.successful = @NO;
+               show.status = @"Failed: File Exists";
+               show.reasonForFailure = reasonForFailure;
+            }
 				else if ([reasonForFailure isEqualToString:@"proxy"])
 				{
 					[show setValue:@YES forKey:@"complete"];
@@ -208,39 +215,39 @@
 						[show setValue:@"Failed: See Log" forKey:@"status"];
 						[self addToLog:@"REASON FOR FAILURE: VPN or System Proxy failed. If you are using a VPN or a proxy configured in System Preferences, contact the VPN or proxy provider for assistance." noTag:TRUE];
 						[self addToLog:@"If outside the UK, you may also disconnect your VPN and enable the provided proxy in Preferences." noTag:TRUE];
-                        [show setReasonForFailure:@"ShowNotFound"];
+                  [show setReasonForFailure:@"ShowNotFound"];
 					}
 					else if ([proxyOption isEqualToString:@"Provided"])
 					{
 						[show setValue:@"Failed: Bad Proxy" forKey:@"status"];
 						[self addToLog:@"REASON FOR FAILURE: Proxy failed. If in the UK, please disable the proxy in the preferences." noTag:TRUE];
 						[self addToLog:@"If outside the UK, please submit a bug report so that the proxy can be updated." noTag:TRUE];
-                        [show setReasonForFailure:@"Provided_Proxy"];
+                  [show setReasonForFailure:@"Provided_Proxy"];
 					}
 					else if ([proxyOption isEqualToString:@"Custom"])
 					{
 						[show setValue:@"Failed: Bad Proxy" forKey:@"status"];
 						[self addToLog:@"REASON FOR FAILURE: Proxy failed. If in the UK, please disable the proxy in the preferences." noTag:TRUE];
 						[self addToLog:@"If outside the UK, please use a different proxy." noTag:TRUE];
-                        [show setReasonForFailure:@"Custom_Proxy"];
+                  [show setReasonForFailure:@"Custom_Proxy"];
 					}
 					[self addToLog:[NSString stringWithFormat:@"%@ Failed",[show showName]]];
 				}
-                else if ([reasonForFailure isEqualToString:@"modes"])
-                {
-                    [show setValue:@YES forKey:@"complete"];
+            else if ([reasonForFailure isEqualToString:@"modes"])
+            {
+               [show setValue:@YES forKey:@"complete"];
 					[show setValue:@NO forKey:@"successful"];
-                    [show setValue:@"Failed: No Specified Modes" forKey:@"status"];
-                    [self addToLog:@"REASON FOR FAILURE: None of the modes in your download format list are available for this show." noTag:YES];
-                    [self addToLog:@"Try adding more modes." noTag:YES];
-                    [self addToLog:[NSString stringWithFormat:@"%@ Failed",[show showName]]];
-                    [show setReasonForFailure:@"Specified_Modes"];
-                    NSLog(@"Set Modes");
-                }
-                else if ([[show reasonForFailure] isEqualToString:@"InHistory"])
-                {
-                    NSLog(@"InHistory");
-                }
+               [show setValue:@"Failed: No Specified Modes" forKey:@"status"];
+               [self addToLog:@"REASON FOR FAILURE: None of the modes in your download format list are available for this show." noTag:YES];
+               [self addToLog:@"Try adding more modes." noTag:YES];
+               [self addToLog:[NSString stringWithFormat:@"%@ Failed",[show showName]]];
+               [show setReasonForFailure:@"Specified_Modes"];
+               NSLog(@"Set Modes");
+            }
+            else if ([[show reasonForFailure] isEqualToString:@"InHistory"])
+            {
+               NSLog(@"InHistory");
+            }
 				else if ([LastLine hasPrefix:@"INFO: Recorded"])
 				{
 					[show setValue:@YES forKey:@"complete"];
@@ -269,14 +276,14 @@
 					[show setValue:@"Download Complete" forKey:@"status"];
 					[show setPath:@"Unknown"];
 				}
-				else if ([scn scanUpToString:@"Already in history" intoString:nil] && 
-						 [scn scanString:@"Already in" intoString:nil])
+				else if ([scn scanUpToString:@"Already in history" intoString:nil] &&
+                     [scn scanString:@"Already in" intoString:nil])
 				{
 					[show setValue:@YES forKey:@"complete"];
 					[show setValue:@NO forKey:@"successful"];
 					[show setValue:@"Failed: Download in History" forKey:@"status"];
 					[self addToLog:[NSString stringWithFormat:@"%@ Failed",[show showName]]];
-                    [show setReasonForFailure:@"InHistory"];
+               [show setReasonForFailure:@"InHistory"];
 				}
 				else
 				{
@@ -286,7 +293,7 @@
 					[self addToLog:[NSString stringWithFormat:@"%@ Failed",[show showName]]];
 				}
 			}
-            [nc removeObserver:self];
+         [nc removeObserver:self];
 			[nc postNotificationName:@"DownloadFinished" object:show];
 		}
 	}
@@ -294,8 +301,8 @@
 - (void)ErrorDataReady:(NSNotification *)note
 {
 	[[errorPipe fileHandleForReading] readInBackgroundAndNotify];
-    NSData *d = [[note userInfo] valueForKey:NSFileHandleNotificationDataItem];
-    if ([d length] > 0)
+   NSData *d = [[note userInfo] valueForKey:NSFileHandleNotificationDataItem];
+   if ([d length] > 0)
 	{
 		[errorCache appendString:[[NSString alloc] initWithData:d encoding:NSUTF8StringEncoding]];
 	}
@@ -306,7 +313,7 @@
 		{
 			//Close the error pipe when it is empty.
 			errorPipe = nil;
-            [processErrorCache invalidate];
+         [processErrorCache invalidate];
 		}
 	}
 }
@@ -316,48 +323,48 @@
 	{
 		NSString *outp = [errorCache copy];
 		errorCache = [NSMutableString stringWithString:@""];
-		if ([outp length] > 0) {          
-            NSArray *array = [outp componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
-            
+		if ([outp length] > 0) {
+         NSArray *array = [outp componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+         
 			for (NSString *message in array)
 			{
-                NSString *shortStatus=nil;
-                NSScanner *scanner = [NSScanner scannerWithString:message];
-                if ([message length] == 0){
-                    continue;
-                }
-                else if ([scanner scanFloat:nil]) //RTMPDump
-                {
-                    [self processFLVStreamerMessage:message];
-                    continue;
-                }
+            NSString *shortStatus=nil;
+            NSScanner *scanner = [NSScanner scannerWithString:message];
+            if ([message length] == 0){
+               continue;
+            }
+            else if ([scanner scanFloat:nil]) //RTMPDump
+            {
+               [self processFLVStreamerMessage:message];
+               continue;
+            }
 				else if ([message hasPrefix:@"frame="]) shortStatus= @"Converting..."; //FFMpeg
-                else if ([message hasPrefix:@" Progress"]) shortStatus= @"Processing Download..."; //Download Artwork
-                else if ([message hasPrefix:@"ERROR:"] || [message hasPrefix:@"\rERROR:"] || [message hasPrefix:@"\nERROR:"]) //Could be unresumable.
-                {
-                    BOOL isUnresumable = NO;
-                    if ([scanner scanUpToString:@"corrupt file!" intoString:nil] && [scanner scanString:@"corrupt file!" intoString:nil])
-                    {
-                        isUnresumable = YES;
-                    }
-                    if (!isUnresumable) {
-                        [scanner setScanLocation:0];
-                        if ([scanner scanUpToString:@"Couldn't find the seeked keyframe in this chunk!" intoString:nil] && [scanner scanString:@"Couldn't find the seeked keyframe in this chunk!" intoString:nil])
-                        {
-                            isUnresumable = YES;
-                        }
-                    }
-                    if (isUnresumable)
-                    {
-                        [self addToLog:@"Unresumable file, please delete the partial file and try again." noTag:NO];
-                        [task interrupt];
-                        reasonForFailure=@"unresumable";
-                        [show setReasonForFailure:@"Unresumable_File"];
-                    }
-                }
+            else if ([message hasPrefix:@" Progress"]) shortStatus= @"Processing Download..."; //Download Artwork
+            else if ([message hasPrefix:@"ERROR:"] || [message hasPrefix:@"\rERROR:"] || [message hasPrefix:@"\nERROR:"]) //Could be unresumable.
+            {
+               BOOL isUnresumable = NO;
+               if ([scanner scanUpToString:@"corrupt file!" intoString:nil] && [scanner scanString:@"corrupt file!" intoString:nil])
+               {
+                  isUnresumable = YES;
+               }
+               if (!isUnresumable) {
+                  [scanner setScanLocation:0];
+                  if ([scanner scanUpToString:@"Couldn't find the seeked keyframe in this chunk!" intoString:nil] && [scanner scanString:@"Couldn't find the seeked keyframe in this chunk!" intoString:nil])
+                  {
+                     isUnresumable = YES;
+                  }
+               }
+               if (isUnresumable)
+               {
+                  [self addToLog:@"Unresumable file, please delete the partial file and try again." noTag:NO];
+                  [task interrupt];
+                  reasonForFailure=@"unresumable";
+                  [show setReasonForFailure:@"Unresumable_File"];
+               }
+            }
 				else if ([message hasPrefix:@"A:"]) //MPlayer
 				{
-                    double downloaded, percent, total;
+               double downloaded, percent, total;
 					NSString *downloadedString, *totalString;
 					[scanner setScanLocation:0];
 					[scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:nil];
@@ -374,24 +381,24 @@
 					[self setCurrentProgress:[NSString stringWithFormat:@"%.1f%% - (%@/%@) -- %@",percent,downloadedString,totalString,[show valueForKey:@"showName"]]];
 					[self setPercentage:percent];
 					[show setValue:[NSString stringWithFormat:@"Downloading: %.1f%%", percent] forKey:@"status"];
-                    continue;
+               continue;
 				}
-                else //Other
-                {
-                    shortStatus = [NSString stringWithFormat:@"Initialising... -- %@", [show valueForKey:@"showName"]];
-                    [self addToLog:message noTag:YES];
-                } 
-                if (shortStatus != nil)
-                {
-                    [self setCurrentProgress:[NSString stringWithFormat:@"%@ -- %@",shortStatus,[show valueForKey:@"showName"]]];
-                    [self setPercentage:102];
-                    [show setValue:shortStatus forKey:@"status"];
-                }
+            else //Other
+            {
+               shortStatus = [NSString stringWithFormat:@"Initialising... -- %@", [show valueForKey:@"showName"]];
+               [self addToLog:message noTag:YES];
+            }
+            if (shortStatus != nil)
+            {
+               [self setCurrentProgress:[NSString stringWithFormat:@"%@ -- %@",shortStatus,[show valueForKey:@"showName"]]];
+               [self setPercentage:102];
+               [show setValue:shortStatus forKey:@"status"];
+            }
 			}
 			
 		}
 	}
-}	
+}
 - (void)cancelDownload:(id)sender
 {
 	//Some basic cleanup.
@@ -400,7 +407,7 @@
 	[nc removeObserver:self name:NSFileHandleReadCompletionNotification object:errorFh];
 	[show setValue:@"Cancelled" forKey:@"status"];
 	[self addToLog:@"Download Cancelled"];
-    [processErrorCache invalidate];
+   [processErrorCache invalidate];
 }
 - (void)processGetiPlayerOutput:(NSString *)outp
 {
@@ -417,44 +424,49 @@
 			srtPath = [srtPath stringByAppendingPathExtension:@"srt"];
 			[show setSubtitlePath:srtPath];
 		}
-		if ([output hasPrefix:@"INFO: Recorded"])
+      else if ([output hasSuffix:@"already exists"])
+      {
+         reasonForFailure=@"FileExists";
+         [self addToLog:output noTag:YES];
+      }
+		else if ([output hasPrefix:@"INFO: Recorded"])
 		{
 			LastLine = [NSString stringWithString:output];
 			foundLastLine=YES;
 		}
-		if ([output hasPrefix:@"INFO: No specified modes"] && [output hasSuffix:@"--modes=)"])
+		else if ([output hasPrefix:@"INFO: No specified modes"] && [output hasSuffix:@"--modes=)"])
 		{
 			reasonForFailure=@"proxy";
 			[self addToLog:output noTag:YES];
 		}
-        else if ([output hasPrefix:@"INFO: No specified modes"])
-        {
-            reasonForFailure=@"modes";
-            [show setReasonForFailure:@"Specified_Modes"];
-            [self addToLog:output noTag:YES];
-            NSScanner *modeScanner = [NSScanner scannerWithString:output];
-            [modeScanner scanUpToString:@"--modes=" intoString:nil];
-            [modeScanner scanString:@"--modes=" intoString:nil];
-            NSString *availableModes;
-            [modeScanner scanUpToString:@")" intoString:&availableModes];
-            [show setAvailableModes:availableModes];
-        }
-        else if ([output hasSuffix:@"use --force to override"])
-        {
-            [show setValue:@YES forKey:@"complete"];
-            [show setValue:@NO forKey:@"successful"];
-            [show setValue:@"Failed: Download in History" forKey:@"status"];
-            [self addToLog:[NSString stringWithFormat:@"%@ Failed",[show showName]]];
-            [show setReasonForFailure:@"InHistory"];
-            foundLastLine=YES;
-        }
-        else if ([output hasPrefix:@"ERROR: Failed to get version pid"])
-        {
-            [show setReasonForFailure:@"ShowNotFound"];
-            [self addToLog:output noTag:YES];
-        }
-		else if ([output hasPrefix:@"INFO:"] || [output hasPrefix:@"WARNING:"] || [output hasPrefix:@"ERROR:"] || 
-			[output hasSuffix:@"default"] || [output hasPrefix:[show pid]])
+      else if ([output hasPrefix:@"INFO: No specified modes"])
+      {
+         reasonForFailure=@"modes";
+         [show setReasonForFailure:@"Specified_Modes"];
+         [self addToLog:output noTag:YES];
+         NSScanner *modeScanner = [NSScanner scannerWithString:output];
+         [modeScanner scanUpToString:@"--modes=" intoString:nil];
+         [modeScanner scanString:@"--modes=" intoString:nil];
+         NSString *availableModes;
+         [modeScanner scanUpToString:@")" intoString:&availableModes];
+         [show setAvailableModes:availableModes];
+      }
+      else if ([output hasSuffix:@"use --force to override"])
+      {
+         [show setValue:@YES forKey:@"complete"];
+         [show setValue:@NO forKey:@"successful"];
+         [show setValue:@"Failed: Download in History" forKey:@"status"];
+         [self addToLog:[NSString stringWithFormat:@"%@ Failed",[show showName]]];
+         [show setReasonForFailure:@"InHistory"];
+         foundLastLine=YES;
+      }
+      else if ([output hasPrefix:@"ERROR: Failed to get version pid"])
+      {
+         [show setReasonForFailure:@"ShowNotFound"];
+         [self addToLog:output noTag:YES];
+      }
+		else if ([output hasPrefix:@"INFO:"] || [output hasPrefix:@"WARNING:"] || [output hasPrefix:@"ERROR:"] ||
+               [output hasSuffix:@"default"] || [output hasPrefix:[show pid]])
 		{
 			//Add Status Message to Log
 			[self addToLog:output noTag:YES];
@@ -475,7 +487,7 @@
 			
 			NSScanner *threadRecievedScanner = [NSScanner scannerWithString:threadRecieved];
 			double downloaded=0;
-			while ([threadRecievedScanner scanUpToString:@")" intoString:nil]) 
+			while ([threadRecievedScanner scanUpToString:@")" intoString:nil])
 			{
 				[threadRecievedScanner scanString:@") " intoString:nil];
 				double thread;
@@ -488,12 +500,12 @@
 			[scanner scanInteger:&speed];
 			
 			[self setCurrentProgress:[NSString stringWithFormat:@"Unknown%% (%3.2fMB/Unknown) - %5.1fKB/s -- %@",
-									  downloaded,
-									  [[NSDecimalNumber numberWithInteger:speed] doubleValue]/8,
-									  [show showName]]];
+                                   downloaded,
+                                   [[NSDecimalNumber numberWithInteger:speed] doubleValue]/8,
+                                   [show showName]]];
 			[show setValue:@"Downloading..." forKey:@"status"];
 			[self setPercentage:102];
-
+         
 		}
 		else if ([output hasPrefix:@" Progress"])
 		{
@@ -509,52 +521,52 @@
 			NSInteger speed=0;
 			NSString *timeRemaining;
 			if(![scanner scanDecimal:&recieved]) recieved = [@0 decimalValue];
-			[scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] 
-									intoString:nil];
+			[scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet]
+                                 intoString:nil];
 			if(![scanner scanDecimal:&total]) total = [@0 decimalValue];
-			[scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] 
-									intoString:nil];
+			[scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet]
+                                 intoString:nil];
 			if(![scanner scanInteger:&speed]) speed = [@0 integerValue];
-			[scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] 
-									intoString:nil];
+			[scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet]
+                                 intoString:nil];
 			if(![scanner scanDecimal:&percentage]) percentage = [@0 decimalValue];
-			[scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] 
-									intoString:nil];
+			[scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet]
+                                 intoString:nil];
 			if(![scanner scanUpToString:@"rem" intoString:&timeRemaining]) timeRemaining=@"Unknown";
 			double adjustedSpeed = [@(speed) doubleValue]/8;
 			[self setPercentage:[[NSDecimalNumber decimalNumberWithDecimal:percentage] doubleValue]];
 			if ([[NSDecimalNumber decimalNumberWithDecimal:total] doubleValue] < 5.00 && [[NSDecimalNumber decimalNumberWithDecimal:recieved] doubleValue] > 0)
 			{
 				[self setCurrentProgress:[NSString stringWithFormat:@"%3.1f%% (%3.2fMB/%3.2fMB) - %5.1fKB/s -- Getting MOV atom.",
-										  [[NSDecimalNumber decimalNumberWithDecimal:percentage] doubleValue],
-										  [[NSDecimalNumber decimalNumberWithDecimal:recieved] doubleValue],
-										  [[NSDecimalNumber decimalNumberWithDecimal:total] doubleValue],
-										  adjustedSpeed]];
+                                      [[NSDecimalNumber decimalNumberWithDecimal:percentage] doubleValue],
+                                      [[NSDecimalNumber decimalNumberWithDecimal:recieved] doubleValue],
+                                      [[NSDecimalNumber decimalNumberWithDecimal:total] doubleValue],
+                                      adjustedSpeed]];
 				[show setValue:[NSString stringWithFormat:@"Getting MOV atom: %3.1f%%",
-								[[NSDecimalNumber decimalNumberWithDecimal:percentage] doubleValue]]
-						forKey:@"status"];
+                            [[NSDecimalNumber decimalNumberWithDecimal:percentage] doubleValue]]
+                    forKey:@"status"];
 			}
 			else if ([[NSDecimalNumber decimalNumberWithDecimal:total] doubleValue] == 0)
 			{
 				[self setCurrentProgress:[NSString stringWithFormat:@"%3.1f%% (%3.2fMB/%3.2fMB) - %5.1fKB/s -- Initializing...",
-										  [[NSDecimalNumber decimalNumberWithDecimal:percentage] doubleValue],
-										  [[NSDecimalNumber decimalNumberWithDecimal:recieved] doubleValue],
-										  [[NSDecimalNumber decimalNumberWithDecimal:total] doubleValue],
-										  adjustedSpeed]];
+                                      [[NSDecimalNumber decimalNumberWithDecimal:percentage] doubleValue],
+                                      [[NSDecimalNumber decimalNumberWithDecimal:recieved] doubleValue],
+                                      [[NSDecimalNumber decimalNumberWithDecimal:total] doubleValue],
+                                      adjustedSpeed]];
 				[show setValue:[NSString stringWithFormat:@"Initializing: %3.1f%%",
-								[[NSDecimalNumber decimalNumberWithDecimal:percentage] doubleValue]]
-						forKey:@"status"];		
+                            [[NSDecimalNumber decimalNumberWithDecimal:percentage] doubleValue]]
+                    forKey:@"status"];
 			}
 			else
 			{
 				[self setCurrentProgress:[NSString stringWithFormat:@"%3.1f%% (%3.2fMB/%3.2fMB) - %.1fKB/s - %@ Remaining -- %@",
-				 [[NSDecimalNumber decimalNumberWithDecimal:percentage] doubleValue],
-				 [[NSDecimalNumber decimalNumberWithDecimal:recieved] doubleValue],
-				 [[NSDecimalNumber decimalNumberWithDecimal:total] doubleValue],
-										  adjustedSpeed,timeRemaining,[show showName]]];
+                                      [[NSDecimalNumber decimalNumberWithDecimal:percentage] doubleValue],
+                                      [[NSDecimalNumber decimalNumberWithDecimal:recieved] doubleValue],
+                                      [[NSDecimalNumber decimalNumberWithDecimal:total] doubleValue],
+                                      adjustedSpeed,timeRemaining,[show showName]]];
 				[show setValue:[NSString stringWithFormat:@"Downloading: %3.1f%%",
-								[[NSDecimalNumber decimalNumberWithDecimal:percentage] doubleValue]]
-						forKey:@"status"];
+                            [[NSDecimalNumber decimalNumberWithDecimal:percentage] doubleValue]]
+                    forKey:@"status"];
 			}
 		}
 	}
