@@ -384,6 +384,113 @@
    return [dic objectForKey:@([self type])];
 }
 
+- (BOOL)isEqual:(id)object
+{
+   if ([object isKindOfClass:[self class]]) {
+      Programme *otherP = (Programme *)object;
+      return [otherP.showName isEqual:showName] && [otherP.pid isEqual:pid];
+   }
+   else {
+      return false;
+   }
+}
+
+- (void)getName
+{
+	NSTask *getNameTask = [[NSTask alloc] init];
+	NSPipe *getNamePipe = [[NSPipe alloc] init];
+	NSMutableString *getNameData = [[NSMutableString alloc] initWithString:@""];
+	NSString *listArgument = @"--listformat=<index> <pid> <type> <name> - <episode>,<channel>|<web>|";
+	NSString *fieldsArgument = @"--fields=index,pid";
+	NSString *wantedID = pid;
+	NSString *cacheExpiryArg = [[GetiPlayerArgumentsController sharedController] cacheExpiryArgument:nil];
+	NSArray *args = @[[[NSBundle mainBundle] pathForResource:@"get_iplayer" ofType:@"pl"],@"--nowarning",@"--nopurge",cacheExpiryArg,[[GetiPlayerArgumentsController sharedController] typeArgumentForCacheUpdate:NO],listArgument,[GetiPlayerArgumentsController sharedController].profileDirArg,fieldsArgument,wantedID];
+	[getNameTask setArguments:args];
+	[getNameTask setLaunchPath:@"/usr/bin/perl"];
+	
+	[getNameTask setStandardOutput:getNamePipe];
+	NSFileHandle *getNameFh = [getNamePipe fileHandleForReading];
+	NSData *inData;
+	
+	[getNameTask launch];
+	
+	while ((inData = [getNameFh availableData]) && [inData length]) {
+		NSString *tempData = [[NSString alloc] initWithData:inData encoding:NSUTF8StringEncoding];
+		[getNameData appendString:tempData];
+	}
+	[self processGetNameData:getNameData];
+}
+
+- (void)processGetNameData:(NSString *)getNameData
+{
+	NSArray *array = [getNameData componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+   Programme *p = self;
+	int i = 0;
+	NSString *wantedID = [p valueForKey:@"pid"];
+	BOOL found=NO;
+	for (NSString *string in array)
+	{
+		i++;
+		if (i>1 && i<[array count]-1)
+		{
+			NSString *pid, *showName, *index, *type, *tvNetwork, *url;
+			@try{
+				NSScanner *scanner = [NSScanner scannerWithString:string];
+				[scanner scanUpToCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:&index];
+				[scanner scanUpToCharactersFromSet:[NSCharacterSet alphanumericCharacterSet] intoString:NULL];
+				[scanner scanUpToCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:&pid];
+				[scanner scanUpToCharactersFromSet:[NSCharacterSet alphanumericCharacterSet] intoString:NULL];
+				[scanner scanUpToCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:&type];
+				[scanner scanUpToCharactersFromSet:[NSCharacterSet alphanumericCharacterSet] intoString:NULL];
+				[scanner scanUpToString:@","  intoString:&showName];
+            [scanner scanString:@"," intoString:nil];
+            [scanner scanUpToString:@"|" intoString:&tvNetwork];
+            [scanner scanString:@"|" intoString:nil];
+            [scanner scanUpToString:@"|" intoString:&url];
+				scanner = nil;
+			}
+			@catch (NSException *e) {
+				NSAlert *getNameException = [[NSAlert alloc] init];
+				[getNameException addButtonWithTitle:@"OK"];
+				[getNameException setMessageText:[NSString stringWithFormat:@"Unknown Error!"]];
+				[getNameException setInformativeText:@"An unknown error occured whilst trying to parse Get_iPlayer output."];
+				[getNameException setAlertStyle:NSWarningAlertStyle];
+				[getNameException runModal];
+				getNameException = nil;
+			}
+			if ([wantedID isEqualToString:pid])
+			{
+				found=YES;
+				[p setValue:showName forKey:@"showName"];
+				[p setValue:index forKey:@"pid"];
+            [p setValue:tvNetwork forKey:@"tvNetwork"];
+            [p setUrl:url];
+				if ([type isEqualToString:@"radio"]) [p setValue:@YES forKey:@"radio"];
+            else if ([type isEqualToString:@"podcast"]) [p setPodcast:@YES];
+			}
+			else if ([wantedID isEqualToString:index])
+			{
+				found=YES;
+				[p setValue:showName forKey:@"showName"];
+            [p setValue:tvNetwork forKey:@"tvNetwork"];
+            [p setUrl:url];
+				if ([type isEqualToString:@"radio"]) [p setValue:@YES forKey:@"radio"];
+            else if ([type isEqualToString:@"podcast"]) [p setPodcast:@YES];
+			}
+		}
+      
+	}
+	if (!found)
+   {
+      if ([[p showName] isEqualToString:@""] || [[p showName] isEqualToString:@"Unknown: Not in Cache"])
+         [p setValue:@"Unknown: Not in Cache" forKey:@"showName"];
+      [p setProcessedPID:@NO];
+   }
+	else
+		[p setProcessedPID:@YES];
+	
+}
+
 @synthesize showName;
 @synthesize tvNetwork;
 @synthesize status;

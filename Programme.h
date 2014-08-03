@@ -7,6 +7,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "GetiPlayerArgumentsController.h"
 #import "LogController.h"
 
 typedef NS_ENUM(NSInteger, GIA_ProgrammeType) {
@@ -68,6 +69,8 @@ typedef NS_ENUM(NSInteger, GIA_ProgrammeType) {
 - (void)cancelMetadataRetrieval;
 - (GIA_ProgrammeType)type;
 - (NSString *)typeDescription;
+- (void)getName;
+- (void)processGetNameData:(NSString *)getNameData;
 
 @property (readwrite) NSString *showName;
 @property (readwrite) NSString *tvNetwork;

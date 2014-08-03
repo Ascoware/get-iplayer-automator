@@ -19,7 +19,7 @@
    LogController *logger;
 }
 
-- (id)initWithSearchTerms:(NSString *)searchTerms logController:(LogController *)logger typeArgument:(NSString *)typeArgument profileDirArg:(NSString *)profileDirArg selector:(SEL)selector withTarget:(id)target;
+- (id)initWithSearchTerms:(NSString *)searchTerms logController:(LogController *)logger selector:(SEL)selector withTarget:(id)target;
 
 @property (readwrite) bool allowHide;
 

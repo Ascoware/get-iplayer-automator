@@ -108,10 +108,6 @@ NSDictionary *radioFormats;
 	
 	
 	//Initialize Arguments
-	noWarningArg = @"--nocopyright";
-	listFormat = @"--listformat=<index>: <type>, ~<name> - <episode>~, <channel>, <web>";
-	profileDirArg = [[NSString alloc] initWithFormat:@"--profile-dir=%@", folder];
-	
 	getiPlayerPath = [[NSString alloc] initWithString:[[NSBundle mainBundle] bundlePath]];
 	getiPlayerPath = [getiPlayerPath stringByAppendingString:@"/Contents/Resources/get_iplayer.pl"];
 	runScheduled=NO;
@@ -462,9 +458,9 @@ NSDictionary *radioFormats;
          cacheExpiryArg = [[NSString alloc] initWithFormat:@"-e%d", ([[[NSUserDefaults standardUserDefaults] objectForKey:@"CacheExpiryTime"] intValue]*3600)];
       }
       
-      NSString *typeArgument = [self typeArgument:nil];
+      NSString *typeArgument = [[GetiPlayerArgumentsController sharedController] typeArgumentForCacheUpdate:YES];
       
-      getiPlayerUpdateArgs = @[getiPlayerPath,cacheExpiryArg,typeArgument,@"--nopurge",profileDirArg];
+      getiPlayerUpdateArgs = @[getiPlayerPath,cacheExpiryArg,typeArgument,@"--nopurge",[GetiPlayerArgumentsController sharedController].profileDirArg];
       
       if (proxy && [[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])
       {
@@ -668,7 +664,7 @@ NSDictionary *radioFormats;
          [pipeTask setStandardOutput:newPipe];
          [pipeTask setStandardError:newPipe];
          [pipeTask setLaunchPath:@"/usr/bin/perl"];
-         [pipeTask setArguments:@[getiPlayerPath,profileDirArg,@"--nopurge",noWarningArg,[self typeArgument:nil],[self cacheExpiryArgument:nil],listFormat,
+         [pipeTask setArguments:@[getiPlayerPath,[GetiPlayerArgumentsController sharedController].profileDirArg,@"--nopurge",[GetiPlayerArgumentsController sharedController].noWarningArg,[[GetiPlayerArgumentsController sharedController] typeArgumentForCacheUpdate:NO],[[GetiPlayerArgumentsController sharedController] cacheExpiryArgument:nil],[GetiPlayerArgumentsController sharedController].standardListFormat,
                                   searchArgument]];
          NSMutableString *taskData = [[NSMutableString alloc] initWithString:@""];
          [pipeTask launch];
@@ -784,7 +780,7 @@ NSDictionary *radioFormats;
       [searchField setEnabled:NO];
 		[searchIndicator startAnimation:nil];
       [resultsController removeObjectsAtArrangedObjectIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, [resultsController.arrangedObjects count])]];
-		currentSearch = [[GiASearch alloc] initWithSearchTerms:searchField.stringValue logController:logger typeArgument:[self typeArgument:nil] profileDirArg:profileDirArg selector:@selector(searchFinished:) withTarget:self];
+		currentSearch = [[GiASearch alloc] initWithSearchTerms:searchField.stringValue logController:logger selector:@selector(searchFinished:) withTarget:self];
 	}
 }
 - (void)searchFinished:(NSArray *)results
@@ -815,595 +811,27 @@ NSDictionary *radioFormats;
 }
 - (IBAction)addToQueue:(id)sender
 {
-	//Check to make sure the programme isn't already in the queue before adding it.
-	NSMutableArray *selectedObjects = [NSMutableArray arrayWithArray:[resultsController selectedObjects]];
-	NSArray *queuedObjects = [queueController arrangedObjects];
-	for (Programme *show in selectedObjects)
+	for (Programme *show in resultsController.selectedObjects)
 	{
-		BOOL add=YES;
-		for (Programme *queuedShow in queuedObjects)
+		if (![queueController.arrangedObjects containsObject:show])
 		{
-			if ([[show showName] isEqualToString:[queuedShow showName]] && [show pid] == [queuedShow pid]) add=NO;
-		}
-		if (add)
-		{
-			if (runDownloads) [show setValue:@"Waiting..." forKey:@"status"];
+			if (runDownloads) show.status = @"Waiting...";
 			[queueController addObject:show];
 		}
 	}
 }
 - (IBAction)getName:(id)sender
 {
-	NSArray *selectedObjects = [queueController selectedObjects];
-	for (Programme *pro in selectedObjects)
+	for (Programme *p in queueController.selectedObjects)
 	{
-		[self getNameForProgramme:pro];
+		[p getName];
 	}
 }
-- (void)getNameForProgramme:(Programme *)pro
-{
-	NSTask *getNameTask = [[NSTask alloc] init];
-	NSPipe *getNamePipe = [[NSPipe alloc] init];
-	NSMutableString *getNameData = [[NSMutableString alloc] initWithString:@""];
-	NSString *listArgument = @"--listformat=<index> <pid> <type> <name> - <episode>,<channel>|<web>|";
-	NSString *fieldsArgument = @"--fields=index,pid";
-	NSString *wantedID = [pro valueForKey:@"pid"];
-	NSString *cacheExpiryArg = [self cacheExpiryArgument:nil];
-	NSArray *args = @[getiPlayerPath,noWarningArg,@"--nopurge",cacheExpiryArg,[self typeArgument:nil],listArgument,profileDirArg,fieldsArgument,wantedID];
-	[getNameTask setArguments:args];
-	[getNameTask setLaunchPath:@"/usr/bin/perl"];
-	
-	[getNameTask setStandardOutput:getNamePipe];
-	NSFileHandle *getNameFh = [getNamePipe fileHandleForReading];
-	NSData *inData;
-	
-	[getNameTask launch];
-	
-	while ((inData = [getNameFh availableData]) && [inData length]) {
-		NSString *tempData = [[NSString alloc] initWithData:inData encoding:NSUTF8StringEncoding];
-		[getNameData appendString:tempData];
-	}
-	[self processGetNameData:getNameData forProgramme:pro];
-}
-- (void)processGetNameData:(NSString *)getNameData forProgramme:(Programme *)p
-{
-	NSArray *array = [getNameData componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
-   
-	int i = 0;
-	NSString *wantedID = [p valueForKey:@"pid"];
-	BOOL found=NO;
-	for (NSString *string in array)
-	{
-		i++;
-		if (i>1 && i<[array count]-1)
-		{
-			NSString *pid, *showName, *index, *type, *tvNetwork, *url;
-			@try{
-				NSScanner *scanner = [NSScanner scannerWithString:string];
-				[scanner scanUpToCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:&index];
-				[scanner scanUpToCharactersFromSet:[NSCharacterSet alphanumericCharacterSet] intoString:NULL];
-				[scanner scanUpToCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:&pid];
-				[scanner scanUpToCharactersFromSet:[NSCharacterSet alphanumericCharacterSet] intoString:NULL];
-				[scanner scanUpToCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:&type];
-				[scanner scanUpToCharactersFromSet:[NSCharacterSet alphanumericCharacterSet] intoString:NULL];
-				[scanner scanUpToString:@","  intoString:&showName];
-            [scanner scanString:@"," intoString:nil];
-            [scanner scanUpToString:@"|" intoString:&tvNetwork];
-            [scanner scanString:@"|" intoString:nil];
-            [scanner scanUpToString:@"|" intoString:&url];
-				scanner = nil;
-			}
-			@catch (NSException *e) {
-				NSAlert *getNameException = [[NSAlert alloc] init];
-				[getNameException addButtonWithTitle:@"OK"];
-				[getNameException setMessageText:[NSString stringWithFormat:@"Unknown Error!"]];
-				[getNameException setInformativeText:@"An unknown error occured whilst trying to parse Get_iPlayer output."];
-				[getNameException setAlertStyle:NSWarningAlertStyle];
-				[getNameException runModal];
-				getNameException = nil;
-			}
-			if ([wantedID isEqualToString:pid])
-			{
-				found=YES;
-				[p setValue:showName forKey:@"showName"];
-				[p setValue:index forKey:@"pid"];
-            [p setValue:tvNetwork forKey:@"tvNetwork"];
-            [p setUrl:url];
-				if ([type isEqualToString:@"radio"]) [p setValue:@YES forKey:@"radio"];
-            else if ([type isEqualToString:@"podcast"]) [p setPodcast:@YES];
-			}
-			else if ([wantedID isEqualToString:index])
-			{
-				found=YES;
-				[p setValue:showName forKey:@"showName"];
-            [p setValue:tvNetwork forKey:@"tvNetwork"];
-            [p setUrl:url];
-				if ([type isEqualToString:@"radio"]) [p setValue:@YES forKey:@"radio"];
-            else if ([type isEqualToString:@"podcast"]) [p setPodcast:@YES];
-			}
-		}
-      
-	}
-	if (!found)
-   {
-      if ([[p showName] isEqualToString:@""] || [[p showName] isEqualToString:@"Unknown: Not in Cache"])
-         [p setValue:@"Unknown: Not in Cache" forKey:@"showName"];
-      [p setProcessedPID:@NO];
-   }
-	else
-		[p setProcessedPID:@YES];
-	
-}
+
 - (IBAction)getCurrentWebpage:(id)sender
 {
-   NSString *newShowName=nil;
-	//Get Default Browser
-	NSString *browser = [[NSUserDefaults standardUserDefaults] objectForKey:@"DefaultBrowser"];
-	
-	//Prepare Pointer for URL
-	NSString *url = nil;
-   NSString *source = nil;
-	
-	//Prepare Alert in Case the Browser isn't Open
-	NSAlert *browserNotOpen = [[NSAlert alloc] init];
-	[browserNotOpen addButtonWithTitle:@"OK"];
-	[browserNotOpen setMessageText:[NSString stringWithFormat:@"%@ is not open.", browser]];
-	[browserNotOpen setInformativeText:@"Please ensure your browser is running and has at least one window open."];
-	[browserNotOpen setAlertStyle:NSWarningAlertStyle];
-	
-	//Get URL
-	if ([browser isEqualToString:@"Safari"])
-	{
-		BOOL foundURL=NO;
-		SafariApplication *Safari = [SBApplication applicationWithBundleIdentifier:@"com.apple.Safari"];
-		if ([Safari isRunning])
-		{
-			@try
-			{
-				SBElementArray *windows = [Safari windows];
-				if ([@([windows count]) intValue])
-				{
-					for (SafariWindow *window in windows)
- 					{
-                  SafariTab *tab = [window currentTab];
-                  if ([[tab URL] hasPrefix:@"http://www.bbc.co.uk/iplayer/episode/"] ||
-                      [[tab URL] hasPrefix:@"http://bbc.co.uk/iplayer/episode/"] ||
-                      [[tab URL] hasPrefix:@"http://bbc.co.uk/iplayer/console/"] ||
-                      [[tab URL] hasPrefix:@"http://www.bbc.co.uk/iplayer/console/"] ||
-                      [[tab URL] hasPrefix:@"http://bbc.co.uk/sport"])
-                  {
-                     url = [NSString stringWithString:[tab URL]];
-                     NSScanner *nameScanner = [NSScanner scannerWithString:[tab name]];
-                     [nameScanner scanString:@"BBC iPlayer - " intoString:nil];
-                     [nameScanner scanString:@"BBC Sport - " intoString:nil];
-                     [nameScanner scanUpToString:@"kjklgfdjfgkdlj" intoString:&newShowName];
-                     foundURL=YES;
-                  }
-                  else if ([[tab URL] hasPrefix:@"http://www.bbc.co.uk/programmes/"]) {
-                     url = [NSString stringWithString:[tab URL]];
-                     NSScanner *nameScanner = [NSScanner scannerWithString:[tab name]];
-                     [nameScanner scanUpToString:@" - " intoString:nil];
-                     [nameScanner scanString:@" - " intoString:nil];
-                     [nameScanner scanUpToString:@"kjklgfdjfgkdlj" intoString:&newShowName];
-                     foundURL=YES;
-                     source = [Safari doJavaScript:@"document.documentElement.outerHTML" in:tab];
-                  }
-                  else if ([[tab URL] hasPrefix:@"https://www.itv.com/itvplayer/"] ||
-                           [[tab URL] hasPrefix:@"http://www.channel4.com/programmes/"] ||
-                           [[tab URL] hasPrefix:@"http://ps3.channel4.com"])
-                  {
-                     url = [NSString stringWithString:[tab URL]];
-                     source = [Safari doJavaScript:@"document.documentElement.outerHTML" in:tab];
-                     newShowName = [[[tab name] stringByReplacingOccurrencesOfString:@" | itvplayer" withString:@""] stringByReplacingOccurrencesOfString:@" - 4oD - Channel 4" withString:@""];
-                     foundURL=YES;
-                  }
-					}
-					if (foundURL==NO)
-					{
-						url = [NSString stringWithString:[[windows[0] currentTab] URL]];
-                  //Might be incorrect
-					}
-				}
-				else
-				{
-					[browserNotOpen runModal];
-					return;
-				}
-			}
-			@catch (NSException *e)
-			{
-				[browserNotOpen runModal];
-				return;
-			}
-		}
-		else
-		{
-			[browserNotOpen runModal];
-			return;
-		}
-	}
-   else if ([browser isEqualToString:@"Chrome"])
-	{
-		BOOL foundURL=NO;
-		ChromeApplication *Chrome = [SBApplication applicationWithBundleIdentifier:@"com.google.Chrome"];
-		if ([Chrome isRunning])
-		{
-			@try
-			{
-				SBElementArray *windows = [Chrome windows];
-				if ([@([windows count]) intValue])
-				{
-					for (ChromeWindow *window in windows)
- 					{
-                  ChromeTab *tab = [window activeTab];
-                  if ([[tab URL] hasPrefix:@"http://www.bbc.co.uk/iplayer/episode/"] ||
-                      [[tab URL] hasPrefix:@"http://bbc.co.uk/iplayer/episode/"] ||
-                      [[tab URL] hasPrefix:@"http://bbc.co.uk/iplayer/console/"] ||
-                      [[tab URL] hasPrefix:@"http://www.bbc.co.uk/iplayer/console/"] ||
-                      [[tab URL] hasPrefix:@"http://bbc.co.uk/sport"])
-                  {
-                     url = [NSString stringWithString:[tab URL]];
-                     NSScanner *nameScanner = [NSScanner scannerWithString:[tab title]];
-                     [nameScanner scanString:@"BBC iPlayer - " intoString:nil];
-                     [nameScanner scanString:@"BBC Sport - " intoString:nil];
-                     [nameScanner scanUpToString:@"kjklgfdjfgkdlj" intoString:&newShowName];
-                     foundURL=YES;
-                  }
-                  else if ([[tab URL] hasPrefix:@"http://www.bbc.co.uk/programmes/"]) {
-                     url = [NSString stringWithString:[tab URL]];
-                     NSScanner *nameScanner = [NSScanner scannerWithString:[tab title]];
-                     [nameScanner scanUpToString:@" - " intoString:nil];
-                     [nameScanner scanString:@" - " intoString:nil];
-                     [nameScanner scanUpToString:@"kjklgfdjfgkdlj" intoString:&newShowName];
-                     foundURL=YES;
-                     source = [tab executeJavascript:@"document.documentElement.outerHTML"];
-                  }
-                  else if ([[tab URL] hasPrefix:@"https://www.itv.com/itvplayer/"] ||
-                           [[tab URL] hasPrefix:@"http://www.channel4.com/programmes/"] ||
-                           [[tab URL] hasPrefix:@"http://ps3.channel4.com"])
-                  {
-                     url = [NSString stringWithString:[tab URL]];
-                     source = [tab executeJavascript:@"document.documentElement.outerHTML"];
-                     newShowName = [[[tab title] stringByReplacingOccurrencesOfString:@" | itvplayer" withString:@""] stringByReplacingOccurrencesOfString:@" - 4oD - Channel 4" withString:@""];
-                     foundURL=YES;
-                  }
-					}
-					if (foundURL==NO)
-					{
-						url = [NSString stringWithString:[[windows[0] activeTab] URL]];
-                  //Might be incorrect
-					}
-				}
-				else
-				{
-					[browserNotOpen runModal];
-					return;
-				}
-			}
-			@catch (NSException *e)
-			{
-				[browserNotOpen runModal];
-				return;
-			}
-		}
-		else
-		{
-			[browserNotOpen runModal];
-			return;
-		}
-		
-	}
-   else
-   {
-      [[NSAlert alertWithMessageText:@"Get iPlayer Automator currently only supports Safari and Chrome." defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Please change your preferred browser in the preferences and try again."] runModal];
-      return;
-   }
-	/*else if ([browser isEqualToString:@"Firefox"])
-    {
-    NSString *scriptPath = [[NSBundle mainBundle] pathForResource:@"GetFireFoxURL" ofType:@"applescript"];
-    NSURL *scriptLocation = [[NSURL alloc] initFileURLWithPath:scriptPath];
-    if (scriptLocation)
-    {
-    NSDictionary *errorDic;
-    NSAppleScript *getFirefoxURL = [[NSAppleScript alloc] initWithContentsOfURL:scriptLocation error:&errorDic];
-    if (getFirefoxURL)
-    {
-    NSDictionary *executionError;
-    NSAppleEventDescriptor *result = [getFirefoxURL executeAndReturnError:&executionError];
-    if (result)
-    {
-    url = [[NSString alloc] initWithString:[result stringValue]];
-    if ([url isEqualToString:@"Error"])
-    {
-    [browserNotOpen runModal];
-    return;
-    }
-    }
-    }
-    }
-    }
-    else if ([browser isEqualToString:@"Camino"])
-    {
-    //Scripting Bridge Version
-    CaminoApplication *camino = [SBApplication applicationWithBundleIdentifier:@"org.mozilla.camino"];
-    if ([camino isRunning])
-    {
-    BOOL foundURL=NO;
-    NSMutableArray *tabsArray = [[NSMutableArray alloc] init];
-    SBElementArray *windows = [camino browserWindows];
-    if ([[NSNumber numberWithUnsignedInteger:[windows count]] intValue])
-    {
-    for (CaminoBrowserWindow *window in windows)
-    {
-    SBElementArray *tabs = [window tabs];
-    if ([[NSNumber numberWithUnsignedInteger:[tabs count]] intValue])
-    {
-    [tabsArray addObjectsFromArray:tabs];
-    }
-    }
-    }
-    else [browserNotOpen runModal];
-    if ([[NSNumber numberWithUnsignedInteger:[tabsArray count]] intValue])
-    {
-    for (CaminoTab *tab in tabsArray)
-    {
-    if ([[tab URL] hasPrefix:@"http://bbc.co.uk/iplayer/episode/"] || [[tab URL] hasPrefix:@"http://bbc.co.uk/iplayer/console/"] || [[tab URL] hasPrefix:@"http://www.itv.com/ITVPlayer/Video/default.html?ViewType"])
-    {
-    url = [[NSString alloc] initWithString:[tab URL]];
-    foundURL=YES;
-    break;
-    }
-    }
-    if (foundURL==NO)
-    {
-    url = [[NSString alloc] initWithString:[[[tabsArray objectAtIndex:0] URL] path]];
-    }
-    }
-    else
-    {
-    [browserNotOpen runModal];
-    return;
-    }
-    }
-    else
-    {
-    [browserNotOpen runModal];
-    return;
-    }
-    }
-    else if ([browser isEqualToString:@"Chrome"])
-    {
-    NSLog(@"Beginning Chrome");
-    BOOL foundURL=NO;
-    ChromeApplication *Chrome = [SBApplication applicationWithBundleIdentifier:@"com.google.Chrome"];
-    if ([Chrome isRunning])
-    {
-    NSLog(@"Chrome is running.");
-    @try
-    {
-    SBElementArray *windows = [Chrome windows];
-    SBElementArray *tabs;
-    for (ChromeWindow *chromeWindow1 in windows)
-    {
-    [tabs addObject:[chromeWindow1 activeTab]];
-    NSLog(@"Adding tab.");
-    }
-    if ([tabs count]>0)
-    {
-    NSLog(@"Have tabs");
-    for (ChromeTab *document in tabs)
-    {
-    NSLog(@"Looking at tab");
-    if ([[document URL] hasPrefix:@"http://www.bbc.co.uk/iplayer/episode/"] || [[document URL] hasPrefix:@"http://bbc.co.uk/iplayer/console/"] || [[document URL] hasPrefix:@"http://www.itv.com/ITVPlayer/Video/default.html?ViewType"])
-    {
-    url = [NSString stringWithString:[document URL]];
-    NSScanner *nameScanner = [NSScanner scannerWithString:[document title]];
-    [nameScanner scanString:@"BBC iPlayer - " intoString:nil];
-    [nameScanner scanUpToString:@"kjklgfdjfgkdlj" intoString:&newShowName];
-    foundURL=YES;
-    }
-    }
-    if (foundURL==NO)
-    {
-    NSLog(@"Didn't Find URL");
-    url = [NSString stringWithString:[[tabs objectAtIndex:0] URL]];
-    //Might be incorrect
-    NSLog(@"%@", url);
-    }
-    else
-    {
-    NSLog(@"%@", url);
-    }
-    }
-    else
-    {
-    NSLog(@"Tab count is 0");
-    for (ChromeWindow *chromeWindow in windows)
-    {
-    url=[[chromeWindow activeTab] URL];
-    }
-    [browserNotOpen runModal];
-    return;
-    }
-    }
-    @catch (NSException *e)
-    {
-    [browserNotOpen runModal];
-    return;
-    }
-    }
-    else
-    {
-    [browserNotOpen runModal];
-    return;
-    }
-    NSLog(@"%d", foundURL);
-    }*/
-	//Process URL
-	if([url hasPrefix:@"http://www.bbc.co.uk/iplayer/episode/"] || [url hasPrefix:@"http://beta.bbc.co.uk/iplayer/episode"])
-	{
-		NSString *pid = nil;
-		NSScanner *urlScanner = [[NSScanner alloc] initWithString:url];
-		[urlScanner scanUpToString:@"/episode/" intoString:nil];
-		if ([urlScanner isAtEnd]) {
-			[urlScanner setScanLocation:0];
-			[urlScanner scanUpToString:@"/console/" intoString:nil];
-		}
-		[urlScanner scanString:@"/" intoString:nil];
-		[urlScanner scanUpToString:@"/" intoString:nil];
-		[urlScanner scanString:@"/" intoString:nil];
-		[urlScanner scanUpToString:@"/" intoString:&pid];
-		Programme *newProg = [[Programme alloc] initWithLogController:logger];
-		[newProg setValue:pid forKey:@"pid"];
-      if (newShowName) [newProg setShowName:newShowName];
-		[queueController addObject:newProg];
-		[self getNameForProgramme:newProg];
-	}
-	else if([url hasPrefix:@"http://www.bbc.co.uk/programmes/"])
-	{
-		NSString *pid = nil;
-		NSScanner *urlScanner = [[NSScanner alloc] initWithString:url];
-		[urlScanner scanUpToString:@"/programmes/" intoString:nil];
-		[urlScanner scanString:@"/" intoString:nil];
-		[urlScanner scanUpToString:@"/" intoString:nil];
-		[urlScanner scanString:@"/" intoString:nil];
-		[urlScanner scanUpToString:@"/" intoString:&pid];
-		NSScanner *scanner = [NSScanner scannerWithString:source];
-      [scanner scanUpToString:[NSString stringWithFormat:@"emp.load(\"http://www.bbc.co.uk/iplayer/playlist/%@\")", pid] intoString:nil];
-		if ([scanner isAtEnd]) {
-         NSAlert *invalidPage = [[NSAlert alloc] init];
-         [invalidPage addButtonWithTitle:@"OK"];
-         [invalidPage setMessageText:[NSString stringWithFormat:@"Invalid Page: %@",url]];
-         [invalidPage setInformativeText:@"Please ensure the frontmost browser tab is open to an iPlayer episode page."];
-         [invalidPage setAlertStyle:NSWarningAlertStyle];
-         [invalidPage runModal];
-         return;
-      }
-		Programme *newProg = [[Programme alloc] init];
-		[newProg setValue:pid forKey:@"pid"];
-      if (newShowName) [newProg setShowName:newShowName];
-		[queueController addObject:newProg];
-		[self getNameForProgramme:newProg];
-   }
-   else if ([url hasPrefix:@"http://www.bbc.co.uk/sport/olympics/2012/live-video/"])
-   {
-      NSString *pid = nil;
-      NSScanner *urlScanner = [NSScanner scannerWithString:url];
-      [urlScanner scanString:@"http://www.bbc.co.uk/sport/olympics/2012/live-video/" intoString:nil];
-      [urlScanner scanUpToString:@"kfejklfjklj" intoString:&pid];
-      [queueController addObject:[[Programme alloc] initWithInfo:nil pid:pid programmeName:newShowName network:@"BBC Sport" logController:logger]];
-   }
-	else if ([url hasPrefix:@"https://www.itv.com/itvplayer/"])
-	{
-      NSString *progname = nil, *productionId = nil, *pay_rights = nil, *title = nil, *action_type = nil;
-      progname = newShowName;
-		NSScanner *scanner = [NSScanner scannerWithString:source];
-      [scanner scanUpToString:@"\"productionId\":" intoString:nil];
-      [scanner scanString:@"\"productionId\":\"" intoString:nil];
-      [scanner scanUpToString:@"\"" intoString:&productionId];
-      [scanner scanUpToString:@"\"action_type\":" intoString:nil];
-      [scanner scanString:@"\"action_type\":\"" intoString:nil];
-      [scanner scanUpToString:@"\"" intoString:&action_type];
-      [scanner scanUpToString:@"\"pay_rights\":" intoString:nil];
-      [scanner scanString:@"\"pay_rights\":\"" intoString:nil];
-      [scanner scanUpToString:@"\"" intoString:&pay_rights];
-      [scanner scanUpToString:@"<h1 class=\"title episode-title\"" intoString:nil];
-      [scanner scanUpToString:@">" intoString:nil];
-      [scanner scanString:@">" intoString:nil];
-      [scanner scanUpToString:@"<" intoString:&title];
-      if (title) progname = title;
-      if (!progname || !productionId || (![pay_rights isEqualToString:@"free"] && ![action_type isEqualToString:@"free_taster"])) {
-         NSAlert *invalidPage = [[NSAlert alloc] init];
-         [invalidPage addButtonWithTitle:@"OK"];
-         [invalidPage setMessageText:[NSString stringWithFormat:@"Invalid Page: %@",url]];
-         [invalidPage setInformativeText:@"Please ensure the frontmost browser tab is open to an ITV Player free catch-up episode page."];
-         [invalidPage setAlertStyle:NSWarningAlertStyle];
-         [invalidPage runModal];
-         return;
-      }
-      NSString *pid = [productionId stringByReplacingOccurrencesOfString:@"\\" withString:@""];
-      NSString *showName = [NSString stringWithFormat:@"%@ - %@", progname, pid];
-		Programme *newProg = [[Programme alloc] init];
-      [newProg setPid:pid];
-      [newProg setShowName:showName];
-      [newProg setTvNetwork:@"ITV"];
-      [newProg setProcessedPID:@YES];
-      [newProg setUrl:url];
-		[queueController addObject:newProg];
-	}
-   // TODO: remove 4oD
-   // disable 4oD
-   //	else if ([url hasPrefix:@"http://www.channel4.com/programmes/"])
-   //	{
-   //		NSString *pid = nil;
-   //		NSScanner *urlScanner = [NSScanner scannerWithString:url];
-   //		[urlScanner scanUpToString:@"#" intoString:nil];
-   //		[urlScanner scanString:@"#" intoString:nil];
-   //		[urlScanner scanCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:&pid];
-   //        if (!pid) {
-   //            NSScanner *scanner = [NSScanner scannerWithString:source];
-   //            [scanner scanUpToString:@"data-assetid=\"" intoString:nil];
-   //            [scanner scanString:@"data-assetid=\"" intoString:nil];
-   //            [scanner scanUpToString:@"\"" intoString:&pid];
-   //        }
-   //        if (!pid)
-   //        {
-   //            NSAlert *invalidPage = [[NSAlert alloc] init];
-   //            [invalidPage addButtonWithTitle:@"OK"];
-   //            [invalidPage setMessageText:[NSString stringWithFormat:@"Invalid Page: %@",url]];
-   //            [invalidPage setInformativeText:@"Please ensure the frontmost browser tab is open to a 4oD episode page."];
-   //            [invalidPage setAlertStyle:NSWarningAlertStyle];
-   //            [invalidPage runModal];
-   //            return;
-   //        }
-   // 		Programme *newProg = [[Programme alloc] init];
-   //        [newProg setPid:pid];
-   // 		[queueController addObject:newProg];
-   //        [self getNameForProgramme:newProg];
-   //    }
-   //    else if ([url hasPrefix:@"http://ps3.channel4.com"])
-   //    {
-   //        NSString *pid = nil, *seriesName = nil;
-   //    	NSScanner *ps3Scanner = [NSScanner scannerWithString:source];
-   //        [ps3Scanner scanUpToString:@"brandTitle=" intoString:nil];
-   //        [ps3Scanner scanString:@"brandTitle=" intoString:nil];
-   //        [ps3Scanner scanUpToString:@"&" intoString:&seriesName];
-   //        [ps3Scanner scanUpToString:@"preSelectAsset=" intoString:nil];
-   //        [ps3Scanner scanString:@"preSelectAsset=" intoString:nil];
-   //        [ps3Scanner scanCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:&pid];
-   //        if (!seriesName) seriesName = newShowName;
-   //        if (!pid || !seriesName)
-   //        {
-   //            NSAlert *invalidPage = [[NSAlert alloc] init];
-   //            [invalidPage addButtonWithTitle:@"OK"];
-   //            [invalidPage setMessageText:[NSString stringWithFormat:@"Invalid Page: %@",url]];
-   //            [invalidPage setInformativeText:@"Please ensure the frontmost browser tab is open to a 4oD PS3 episode page."];
-   //            [invalidPage setAlertStyle:NSWarningAlertStyle];
-   //            [invalidPage runModal];
-   //            return;
-   //        }
-   //        NSString *showName = [NSString stringWithFormat:@"%@ - %@", seriesName, pid];
-   //        Programme *newProg = [[Programme alloc] init];
-   //        [newProg setPid:pid];
-   //        [newProg setShowName:showName];
-   //        [newProg setTvNetwork:@"4oD C4"];
-   //        [newProg setUrl:url];
-   //        [newProg setProcessedPID:@YES];
-   //        [queueController addObject:newProg];
-   //    }
-	else
-	{
-		NSAlert *invalidPage = [[NSAlert alloc] init];
-		[invalidPage addButtonWithTitle:@"OK"];
-		[invalidPage setMessageText:[NSString stringWithFormat:@"Invalid Page: %@",url]];
-      // TODO: remove 4oD
-      // disable 4oD
-      // [invalidPage setInformativeText:@"Please ensure the frontmost browser tab is open to an iPlayer episode page, ITV Player free catch-up episode page, 4oD episode page or 4oD PS3 episode page."];
-		[invalidPage setInformativeText:@"Please ensure the frontmost browser tab is open to an iPlayer episode page or ITV Player free catch-up episode page. 4oD is no longer supported."];
-		[invalidPage setAlertStyle:NSWarningAlertStyle];
-		[invalidPage runModal];
-	}
-   
+   Programme *p = [GetCurrentWebpageController getCurrentWebpage:logger];
+   if (p) [queueController addObject:p];
 }
 - (IBAction)removeFromQueue:(id)sender
 {
@@ -1512,7 +940,7 @@ NSDictionary *radioFormats;
 				}
 				else
 				{
-					[self getNameForProgramme:show];
+					[show getName];
 					if ([[show showName] isEqualToString:@"Unknown - Not in Cache"])
 					{
 						[show setComplete:@YES];
@@ -1837,7 +1265,7 @@ NSDictionary *radioFormats;
 	{
       [pvrSearchField setEnabled:NO];
       [pvrResultsController removeObjectsAtArrangedObjectIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, [pvrResultsController.arrangedObjects count])]];
-		currentPVRSearch = [[GiASearch alloc] initWithSearchTerms:pvrSearchField.stringValue logController:logger typeArgument:[self typeArgument:self] profileDirArg:profileDirArg selector:@selector(pvrSearchFinished:) withTarget:self];
+		currentPVRSearch = [[GiASearch alloc] initWithSearchTerms:pvrSearchField.stringValue logController:logger selector:@selector(pvrSearchFinished:) withTarget:self];
 		[pvrSearchIndicator startAnimation:nil];
 	}
 }
@@ -1924,12 +1352,18 @@ NSDictionary *radioFormats;
          } else if ([[series tvNetwork] length] == 0) {
             [series setTvNetwork:@"*"];
          }
-         NSString *cacheExpiryArgument = [self cacheExpiryArgument:nil];
-         NSString *typeArgument = [self typeArgument:nil];
+         NSString *cacheExpiryArgument = [[GetiPlayerArgumentsController sharedController] cacheExpiryArgument:nil];
+         NSString *typeArgument = [[GetiPlayerArgumentsController sharedController] typeArgumentForCacheUpdate:NO];
          
-         NSMutableArray *autoRecordArgs = [[NSMutableArray alloc] initWithObjects:getiPlayerPath, noWarningArg,@"--nopurge",
-                                           @"--listformat=<index>: <type>, ~<name> - <episode>~, <channel>, <timeadded>, <pid>,<web>", cacheExpiryArgument,
-                                           typeArgument, profileDirArg,@"--hide",[self escapeSpecialCharactersInString:[series showName]],nil];
+         NSMutableArray *autoRecordArgs = [[NSMutableArray alloc] initWithObjects:getiPlayerPath,
+                                           [GetiPlayerArgumentsController sharedController].noWarningArg,@"--nopurge",
+                                           @"--listformat=<index>: <type>, ~<name> - <episode>~, <channel>, <timeadded>, <pid>,<web>",
+                                           cacheExpiryArgument,
+                                           typeArgument,
+                                           [GetiPlayerArgumentsController sharedController].profileDirArg,
+                                           @"--hide",
+                                           [self escapeSpecialCharactersInString:[series showName]],
+                                           nil];
          
          NSTask *autoRecordTask = [[NSTask alloc] init];
          NSPipe *autoRecordPipe = [[NSPipe alloc] init];
@@ -2102,6 +1536,8 @@ NSDictionary *radioFormats;
 }
 
 #pragma mark Misc.
+
+
 - (void)saveAppData
 {
    //Save Queue & Series-Link
@@ -2372,40 +1808,6 @@ NSDictionary *radioFormats;
 {
    return sharedController;
 }
-#pragma mark Argument Retrieval
-- (NSString *)typeArgument:(id)sender
-{
-	if (runSinceChange || !currentTypeArgument)
-	{
-		NSMutableString *typeArgument = [[NSMutableString alloc] initWithString:@"--type="];
-		if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheBBC_TV"] isEqualTo:@YES])
-         [typeArgument appendString:@"tv,"];
-		if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheITV_TV"] isEqualTo:@YES])
-         [typeArgument appendString:@"itv,"];
-		if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheBBC_Radio"] isEqualTo:@YES])
-         [typeArgument appendString:@"radio,"];
-		if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheBBC_Podcasts"] isEqualTo:@YES])
-         [typeArgument appendString:@"podcast,"];
-      if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"Cache4oD_TV"] isEqualTo:@YES])
-         [typeArgument appendString:@"ch4,"];
-		[typeArgument deleteCharactersInRange:NSMakeRange([typeArgument length]-1,1)];
-		currentTypeArgument = [typeArgument copy];
-		return [NSString stringWithString:typeArgument];
-	}
-	else
-		return currentTypeArgument;
-}
-- (IBAction)typeChanged:(id)sender
-{
-	if ([sender state] == NSOffState)
-		runSinceChange=NO;
-}
-- (NSString *)cacheExpiryArgument:(id)sender
-{
-	//NSString *cacheExpiryArg = [[NSString alloc] initWithFormat:@"-e%d", ([[[NSUserDefaults standardUserDefaults] objectForKey:@"CacheExpiryTime"] intValue]*3600)];
-	//return cacheExpiryArg;
-	return @"-e60480000000000000";
-}
 
 #pragma mark Scheduler
 - (IBAction)showScheduleWindow:(id)sender
@@ -2557,7 +1959,7 @@ NSDictionary *radioFormats;
 	
 	//Prepare Arguments
 	NSArray *args = @[[[NSBundle mainBundle] pathForResource:@"get_iplayer" ofType:@"pl"],
-                     profileDirArg,
+                     [GetiPlayerArgumentsController sharedController].profileDirArg,
                      @"--stream",
                      @"--modes=flashnormal",
                      @"--type=livetv",

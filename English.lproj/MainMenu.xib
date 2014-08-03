@@ -711,7 +711,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="491">
-                            <rect key="frame" x="753" y="17" width="16" height="129"/>
+                            <rect key="frame" x="754" y="17" width="15" height="129"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <tableHeaderView key="headerView" id="494">
@@ -1259,7 +1259,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="typeChanged:" target="621" id="1019"/>
+                                                <action selector="typeChanged:" target="EFr-RW-vJP" id="L6x-iD-FP7"/>
                                                 <binding destination="668" name="value" keyPath="values.CacheBBC_TV" id="867"/>
                                             </connections>
                                         </button>
@@ -1354,7 +1354,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="typeChanged:" target="621" id="1022"/>
+                                                <action selector="typeChanged:" target="EFr-RW-vJP" id="mNn-Fm-h28"/>
                                                 <binding destination="668" name="value" keyPath="values.CacheBBC_Podcasts" id="1013">
                                                     <dictionary key="options">
                                                         <integer key="NSConditionallySetsEnabled" value="0"/>
@@ -1417,7 +1417,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="typeChanged:" target="621" id="1021"/>
+                                                <action selector="typeChanged:" target="EFr-RW-vJP" id="sI1-bt-xmp"/>
                                                 <binding destination="668" name="value" keyPath="values.CacheBBC_Radio" id="1012">
                                                     <dictionary key="options">
                                                         <integer key="NSConditionallySetsEnabled" value="0"/>
@@ -1433,7 +1433,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="typeChanged:" target="621" id="1020"/>
+                                                <action selector="typeChanged:" target="EFr-RW-vJP" id="TFg-4x-8S3"/>
                                                 <binding destination="668" name="value" keyPath="values.CacheITV_TV" id="1068">
                                                     <dictionary key="options">
                                                         <integer key="NSConditionallySetsEnabled" value="0"/>
@@ -1449,7 +1449,6 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="typeChanged:" target="621" id="1520"/>
                                                 <binding destination="668" name="value" keyPath="values.Cache4oD_TV" id="1528"/>
                                             </connections>
                                         </button>
@@ -2986,6 +2985,7 @@ DQ
                 <outlet property="window" destination="611" id="eFL-bH-0H9"/>
             </connections>
         </customObject>
+        <customObject id="EFr-RW-vJP" customClass="GetiPlayerArgumentsController"/>
     </objects>
     <resources>
         <image name="ActivityWindow" width="32" height="32"/>

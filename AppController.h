@@ -15,14 +15,12 @@
 #import "NilToStringTransformer.h"
 #import "LogController.h"
 #import "GiASearch.h"
+#import "GetCurrentWebpageController.h"
+#import "GetiPlayerArgumentsController.h"
 
 @interface AppController : NSObject {
 	//General
 	NSString *getiPlayerPath;
-	NSString *noWarningArg;
-	NSString *profileDirArg;
-	NSString *listFormat;
-	NSString *currentTypeArgument;
 	IBOutlet NSWindow *mainWindow;
 	IBOutlet NSApplication *application;
    IBOutlet NSWindow *historyWindow;
@@ -46,9 +44,6 @@
 	IBOutlet NSArrayController *resultsController;
    IBOutlet NSTableView *searchResultsTable;
 	NSMutableArray *searchResultsArray;
-	NSTask *searchTask;
-	NSPipe *searchPipe;
-	NSMutableString *searchData;
    GiASearch *currentSearch;
 	
 	//PVR
@@ -58,9 +53,6 @@
 	IBOutlet NSArrayController *pvrQueueController;
    IBOutlet NSPanel *pvrPanel;
 	NSMutableArray *pvrSearchResultsArray;
-	NSTask *pvrSearchTask;
-	NSPipe *pvrSearchPipe;
-	NSMutableString *pvrSearchData;
 	NSMutableArray *pvrQueueArray;
    GiASearch *currentPVRSearch;
 	
@@ -182,18 +174,10 @@
 
 //Queue
 - (IBAction)addToQueue:(id)sender;
-- (IBAction)getName:(id)sender;
-- (void)getNameForProgramme:(Programme *)pro;
-- (void)processGetNameData:(NSString *)getNameData forProgramme:(Programme *)p;
 - (IBAction)getCurrentWebpage:(id)sender;
 - (void)setQueueArray:(NSArray *)queue;
 - (NSArray *)queueArray;
 - (IBAction)removeFromQueue:(id)sender;
-
-//Arguments
-- (NSString *)typeArgument:(id)sender;
-- (NSString *)cacheExpiryArgument:(id)sender;
-- (IBAction)typeChanged:(id)sender;
 
 //Download Controller
 - (IBAction)startDownloads:(id)sender;
