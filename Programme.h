@@ -6,9 +6,10 @@
 //  Copyright 2009 __MyCompanyName__. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 #import "GetiPlayerArguments.h"
 #import "LogController.h"
+#import "GetiPlayerProxy.h"
 
 typedef NS_ENUM(NSInteger, GIA_ProgrammeType) {
    GiA_ProgrammeTypeBBC_TV,
@@ -58,7 +59,7 @@ typedef NS_ENUM(NSInteger, GIA_ProgrammeType) {
    NSPipe *pipe;
    volatile bool taskRunning;
    NSTask *metadataTask;
-   
+   GetiPlayerProxy *getiPlayerProxy;
    
 }
 - (id)initWithInfo:(id)sender pid:(NSString *)PID programmeName:(NSString *)SHOWNAME network:(NSString *)TVNETWORK logController:(LogController *)logger;

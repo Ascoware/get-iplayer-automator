@@ -176,11 +176,14 @@
 -(void)retrieveExtendedMetadata
 {
    [logger addToLog:@"Retrieving Extended Metadata" :self];
-   [[AppController sharedController] loadProxyInBackgroundForSelector:@selector(proxyRetrievalFinished:proxyError:) withObject:nil onTarget:self];
+   getiPlayerProxy = [[GetiPlayerProxy alloc] initWithLogger:logger];
+   [getiPlayerProxy loadProxyInBackgroundForSelector:@selector(proxyRetrievalFinished:proxyDict:) withObject:nil onTarget:self silently:NO];
 }
 
--(void)proxyRetrievalFinished:(id)sender proxyError:(NSError *)proxyError
+-(void)proxyRetrievalFinished:(id)sender proxyDict:(NSDictionary *)proxyDict
 {
+   getiPlayerProxy = nil;
+   
    taskOutput = [[NSMutableString alloc] init];
    metadataTask = [[NSTask alloc] init];
    pipe = [[NSPipe alloc] init];   
@@ -192,8 +195,8 @@
                                                            @"-e60480000000000000",
                                                            @"-i",
                                                            [NSString stringWithFormat:@"--profile-dir=%@",[@"~/Library/Application Support/Get iPlayer Automator/" stringByExpandingTildeInPath]],pid]];
-   if ([AppController sharedController].proxy) {
-      [args addObject:[NSString stringWithFormat:@"-p%@",[AppController sharedController].proxy.url]];
+   if (proxyDict[@"proxy"]) {
+      [args addObject:[NSString stringWithFormat:@"-p%@",[proxyDict[@"proxy"] url]]];
       
       if (![[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])
       {

@@ -17,6 +17,7 @@
 #import "GiASearch.h"
 #import "GetCurrentWebpage.h"
 #import "GetiPlayerArguments.h"
+#import "GetiPlayerProxy.h"
 
 @interface AppController : NSObject {
 	//General
@@ -109,15 +110,6 @@
    IBOutlet NSTableView *solutionsTableView;
    NSDictionary *solutionsDictionary;
    
-   //Proxy
-   HTTPProxy *proxy;
-   NSMutableDictionary *proxyDict;
-   enum {
-      kProxyLoadCancelled = 1,
-      kProxyLoadFailed = 2,
-      kProxyTestFailed = 3
-   };
-   
    
    //PVR list editing
    NilToStringTransformer *nilToEmptyStringTransformer;
@@ -127,27 +119,11 @@
    BOOL verbose;
    IBOutlet LogController *logger;
    
-   //Extended Show Information
-   IBOutlet NSProgressIndicator *retrievingInfoIndicator;
-   IBOutlet NSTextField *loadingLabel;
-   IBOutlet NSView *loadingView;
-   IBOutlet NSView *infoView;
-   IBOutlet NSPopover *popover;
-   IBOutlet NSImageView *imageView;
-   IBOutlet NSTextField *seriesNameField;
-   IBOutlet NSTextField *episodeNameField;
-   IBOutlet NSTextField *numbersField;
-   IBOutlet NSTextField *durationField;
-   IBOutlet NSTextField *categoriesField;
-   IBOutlet NSTextField *firstBroadcastField;
-   IBOutlet NSTextField *lastBroadcastField;
-   IBOutlet NSTextView *descriptionView;
-   IBOutlet NSDictionaryController *modeSizeController;
-   IBOutlet NSTextField *typeField;
+   //Proxy
+   GetiPlayerProxy *getiPlayerProxy;
+   HTTPProxy *proxy;
 }
 
-//Proxy
-- (void)loadProxyInBackgroundForSelector:(SEL)selector withObject:(id)object;
 
 //Update
 - (void)getiPlayerUpdateFinished;
@@ -198,17 +174,11 @@
 - (IBAction)startLiveTV:(id)sender;
 - (IBAction)stopLiveTV:(id)sender;
 
-//Extended Show Information
-- (IBAction)showExtendedInformationForSelectedProgramme:(id)sender;
-- (void)loadProxyInBackgroundForSelector:(SEL)selector withObject:(id)object onTarget:(id)target;
-
-
 
 //Download Solutions
 //- (IBAction)saveSolutionsAsText:(id)sender;
 
 //Key-Value Coding
 @property (readonly) NSString *getiPlayerPath;
-@property (readonly) HTTPProxy *proxy;
 
 @end
