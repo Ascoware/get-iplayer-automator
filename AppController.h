@@ -15,8 +15,8 @@
 #import "NilToStringTransformer.h"
 #import "LogController.h"
 #import "GiASearch.h"
-#import "GetCurrentWebpageController.h"
-#import "GetiPlayerArgumentsController.h"
+#import "GetCurrentWebpage.h"
+#import "GetiPlayerArguments.h"
 
 @interface AppController : NSObject {
 	//General

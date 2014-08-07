@@ -8,13 +8,13 @@
 
 #import <Foundation/Foundation.h>
 
-@interface GetiPlayerArgumentsController : NSObject {
+@interface GetiPlayerArguments : NSObject {
    //Types
    BOOL runCacheUpdateSinceChange;
    NSString *currentTypeArgument;
 }
 
-+ (GetiPlayerArgumentsController *)sharedController;
++ (GetiPlayerArguments *)sharedController;
 
 - (NSString *)typeArgumentForCacheUpdate:(BOOL)forCacheUpdate;
 - (IBAction)typeChanged:(id)sender;

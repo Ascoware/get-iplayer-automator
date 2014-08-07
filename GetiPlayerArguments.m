@@ -6,12 +6,12 @@
 //
 //
 
-#import "GetiPlayerArgumentsController.h"
+#import "GetiPlayerArguments.h"
 #import "NSFileManager+DirectoryLocations.h"
 
-static GetiPlayerArgumentsController *sharedController = nil;
+static GetiPlayerArguments *sharedController = nil;
 
-@implementation GetiPlayerArgumentsController
+@implementation GetiPlayerArguments
 - (id)init
 {
    self = [super init];
@@ -24,7 +24,7 @@ static GetiPlayerArgumentsController *sharedController = nil;
    }
    return self;
 }
-+ (GetiPlayerArgumentsController *)sharedController {
++ (GetiPlayerArguments *)sharedController {
    if (!sharedController) {
       sharedController = [[self alloc] init];
    }

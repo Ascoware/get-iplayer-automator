@@ -7,7 +7,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "GetiPlayerArgumentsController.h"
+#import "GetiPlayerArguments.h"
 #import "LogController.h"
 
 typedef NS_ENUM(NSInteger, GIA_ProgrammeType) {

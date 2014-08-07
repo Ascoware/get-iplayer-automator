@@ -6,9 +6,9 @@
 //
 //
 
-#import "GetCurrentWebpageController.h"
+#import "GetCurrentWebpage.h"
 
-@implementation GetCurrentWebpageController
+@implementation GetCurrentWebpage
 + (Programme *)getCurrentWebpage:(LogController *)logger
 {
    NSString *newShowName=nil;

@@ -98,8 +98,8 @@
 		D9F668DB102C560500A9449B /* GetFireFoxURL.applescript in Resources */ = {isa = PBXBuildFile; fileRef = D9F668BF102C53D700A9449B /* GetFireFoxURL.applescript */; };
 		D9F66955102C5D1200A9449B /* GetCaminoURL.applescript in Resources */ = {isa = PBXBuildFile; fileRef = D9F66954102C5D0D00A9449B /* GetCaminoURL.applescript */; };
 		D9F66963102C5DC500A9449B /* GetOperaURL.applescript in Resources */ = {isa = PBXBuildFile; fileRef = D9F66962102C5DB800A9449B /* GetOperaURL.applescript */; };
-		D9F97FE5198E9043006494A3 /* GetCurrentWebpageController.m in Sources */ = {isa = PBXBuildFile; fileRef = D9F97FE4198E9043006494A3 /* GetCurrentWebpageController.m */; };
-		D9F97FE8198EAEA6006494A3 /* GetiPlayerArgumentsController.m in Sources */ = {isa = PBXBuildFile; fileRef = D9F97FE7198EAEA6006494A3 /* GetiPlayerArgumentsController.m */; };
+		D9F97FE5198E9043006494A3 /* GetCurrentWebpage.m in Sources */ = {isa = PBXBuildFile; fileRef = D9F97FE4198E9043006494A3 /* GetCurrentWebpage.m */; };
+		D9F97FE8198EAEA6006494A3 /* GetiPlayerArguments.m in Sources */ = {isa = PBXBuildFile; fileRef = D9F97FE7198EAEA6006494A3 /* GetiPlayerArguments.m */; };
 		D9F97FEC198EBA94006494A3 /* NSFileManager+DirectoryLocations.m in Sources */ = {isa = PBXBuildFile; fileRef = D9F97FEB198EBA94006494A3 /* NSFileManager+DirectoryLocations.m */; };
 		D9FEB87610077790003BADF8 /* AppController.m in Sources */ = {isa = PBXBuildFile; fileRef = D9FEB87510077790003BADF8 /* AppController.m */; };
 		DF3A234B13E5F59900B82C2E /* rtmpdump-2.4 in Resources */ = {isa = PBXBuildFile; fileRef = DF3A234A13E5F59900B82C2E /* rtmpdump-2.4 */; };
@@ -262,10 +262,10 @@
 		D9F668BF102C53D700A9449B /* GetFireFoxURL.applescript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.applescript; path = GetFireFoxURL.applescript; sourceTree = "<group>"; };
 		D9F66954102C5D0D00A9449B /* GetCaminoURL.applescript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.applescript; path = GetCaminoURL.applescript; sourceTree = "<group>"; };
 		D9F66962102C5DB800A9449B /* GetOperaURL.applescript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.applescript; path = GetOperaURL.applescript; sourceTree = "<group>"; };
-		D9F97FE3198E9043006494A3 /* GetCurrentWebpageController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GetCurrentWebpageController.h; sourceTree = "<group>"; };
-		D9F97FE4198E9043006494A3 /* GetCurrentWebpageController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GetCurrentWebpageController.m; sourceTree = "<group>"; };
-		D9F97FE6198EAEA6006494A3 /* GetiPlayerArgumentsController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GetiPlayerArgumentsController.h; sourceTree = "<group>"; };
-		D9F97FE7198EAEA6006494A3 /* GetiPlayerArgumentsController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GetiPlayerArgumentsController.m; sourceTree = "<group>"; };
+		D9F97FE3198E9043006494A3 /* GetCurrentWebpage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GetCurrentWebpage.h; sourceTree = "<group>"; };
+		D9F97FE4198E9043006494A3 /* GetCurrentWebpage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GetCurrentWebpage.m; sourceTree = "<group>"; };
+		D9F97FE6198EAEA6006494A3 /* GetiPlayerArguments.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GetiPlayerArguments.h; sourceTree = "<group>"; };
+		D9F97FE7198EAEA6006494A3 /* GetiPlayerArguments.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GetiPlayerArguments.m; sourceTree = "<group>"; };
 		D9F97FEA198EBA94006494A3 /* NSFileManager+DirectoryLocations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSFileManager+DirectoryLocations.h"; sourceTree = "<group>"; };
 		D9F97FEB198EBA94006494A3 /* NSFileManager+DirectoryLocations.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSFileManager+DirectoryLocations.m"; sourceTree = "<group>"; };
 		D9FEB87410077790003BADF8 /* AppController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppController.h; sourceTree = "<group>"; };
@@ -314,20 +314,6 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				D9FEB87410077790003BADF8 /* AppController.h */,
-				D9FEB87510077790003BADF8 /* AppController.m */,
-				D921C9E9149BCDEA004CB558 /* Download.h */,
-				D921C9EA149BCDEA004CB558 /* Download.m */,
-				D914BD27100CBFA900F7E68E /* BBCDownload.h */,
-				D914BD28100CBFA900F7E68E /* BBCDownload.m */,
-				D921C9E6149BCB16004CB558 /* ITVDownload.h */,
-				D921C9E7149BCB16004CB558 /* ITVDownload.m */,
-				DFC8D3F015C557E3008E369F /* FourODDownload.h */,
-				DFC8D3F115C557E3008E369F /* FourODDownload.m */,
-				39D7C1BB1874AD7400B78698 /* StringTrimFormatter.h */,
-				39D7C1BC1874AD7400B78698 /* StringTrimFormatter.m */,
-				39D7C1BE1874AD9D00B78698 /* NilToStringTransformer.h */,
-				39D7C1BF1874AD9D00B78698 /* NilToStringTransformer.m */,
 				D9B6DB9B196D9BE600161ECB /* Controllers */,
 				D9CDC9E9186B906F0003A4E2 /* Applescript */,
 				D91787021013803000B82736 /* Models */,
@@ -496,6 +482,22 @@
 		D91787021013803000B82736 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				39D7C1BB1874AD7400B78698 /* StringTrimFormatter.h */,
+				39D7C1BC1874AD7400B78698 /* StringTrimFormatter.m */,
+				39D7C1BE1874AD9D00B78698 /* NilToStringTransformer.h */,
+				39D7C1BF1874AD9D00B78698 /* NilToStringTransformer.m */,
+				D921C9E9149BCDEA004CB558 /* Download.h */,
+				D921C9EA149BCDEA004CB558 /* Download.m */,
+				D914BD27100CBFA900F7E68E /* BBCDownload.h */,
+				D914BD28100CBFA900F7E68E /* BBCDownload.m */,
+				D921C9E6149BCB16004CB558 /* ITVDownload.h */,
+				D921C9E7149BCB16004CB558 /* ITVDownload.m */,
+				DFC8D3F015C557E3008E369F /* FourODDownload.h */,
+				DFC8D3F115C557E3008E369F /* FourODDownload.m */,
+				D9F97FE3198E9043006494A3 /* GetCurrentWebpage.h */,
+				D9F97FE4198E9043006494A3 /* GetCurrentWebpage.m */,
+				D9F97FE6198EAEA6006494A3 /* GetiPlayerArguments.h */,
+				D9F97FE7198EAEA6006494A3 /* GetiPlayerArguments.m */,
 				D904F422100B077600D60BBF /* Programme.h */,
 				D904F423100B077600D60BBF /* Programme.m */,
 				D9178593101345D700B82736 /* Series.h */,
@@ -579,14 +581,12 @@
 		D9B6DB9B196D9BE600161ECB /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				D9FEB87410077790003BADF8 /* AppController.h */,
+				D9FEB87510077790003BADF8 /* AppController.m */,
 				D92687C31087F81F000E8132 /* DownloadHistoryController.h */,
 				D92687C41087F81F000E8132 /* DownloadHistoryController.m */,
 				D9B6DB98196D9AEC00161ECB /* LogController.h */,
 				D9B6DB99196D9AEC00161ECB /* LogController.m */,
-				D9F97FE3198E9043006494A3 /* GetCurrentWebpageController.h */,
-				D9F97FE4198E9043006494A3 /* GetCurrentWebpageController.m */,
-				D9F97FE6198EAEA6006494A3 /* GetiPlayerArgumentsController.h */,
-				D9F97FE7198EAEA6006494A3 /* GetiPlayerArgumentsController.m */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -752,14 +752,14 @@
 				D9B6DB9E196DBD4600161ECB /* GiASearch.m in Sources */,
 				D9FEB87610077790003BADF8 /* AppController.m in Sources */,
 				D904F424100B077600D60BBF /* Programme.m in Sources */,
-				D9F97FE8198EAEA6006494A3 /* GetiPlayerArgumentsController.m in Sources */,
+				D9F97FE8198EAEA6006494A3 /* GetiPlayerArguments.m in Sources */,
 				D914BD29100CBFA900F7E68E /* BBCDownload.m in Sources */,
 				D9178595101345D700B82736 /* Series.m in Sources */,
 				D941D95E1025DB580012A75F /* NSURLRequest+postForm.m in Sources */,
 				D941D95F1025DB580012A75F /* JRFeedbackController.m in Sources */,
 				D97D9426106DBB68006ECD39 /* TVFormat.m in Sources */,
 				D97D9427106DBB68006ECD39 /* RadioFormat.m in Sources */,
-				D9F97FE5198E9043006494A3 /* GetCurrentWebpageController.m in Sources */,
+				D9F97FE5198E9043006494A3 /* GetCurrentWebpage.m in Sources */,
 				D9CDC9EC186B90A90003A4E2 /* ASDownloadShows.m in Sources */,
 				D97D97741077EFDF006ECD39 /* LiveTVChannel.m in Sources */,
 				D92687C51087F81F000E8132 /* DownloadHistoryController.m in Sources */,

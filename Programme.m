@@ -403,8 +403,8 @@
 	NSString *listArgument = @"--listformat=<index> <pid> <type> <name> - <episode>,<channel>|<web>|";
 	NSString *fieldsArgument = @"--fields=index,pid";
 	NSString *wantedID = pid;
-	NSString *cacheExpiryArg = [[GetiPlayerArgumentsController sharedController] cacheExpiryArgument:nil];
-	NSArray *args = @[[[NSBundle mainBundle] pathForResource:@"get_iplayer" ofType:@"pl"],@"--nowarning",@"--nopurge",cacheExpiryArg,[[GetiPlayerArgumentsController sharedController] typeArgumentForCacheUpdate:NO],listArgument,[GetiPlayerArgumentsController sharedController].profileDirArg,fieldsArgument,wantedID];
+	NSString *cacheExpiryArg = [[GetiPlayerArguments sharedController] cacheExpiryArgument:nil];
+	NSArray *args = @[[[NSBundle mainBundle] pathForResource:@"get_iplayer" ofType:@"pl"],@"--nowarning",@"--nopurge",cacheExpiryArg,[[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO],listArgument,[GetiPlayerArguments sharedController].profileDirArg,fieldsArgument,wantedID];
 	[getNameTask setArguments:args];
 	[getNameTask setLaunchPath:@"/usr/bin/perl"];
 	

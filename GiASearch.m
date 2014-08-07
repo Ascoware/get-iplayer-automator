@@ -24,7 +24,7 @@
 		[task setLaunchPath:@"/usr/bin/perl"];
 		NSString *searchArgument = [[NSString alloc] initWithString:searchTerms];
       NSString *getiPlayerPath = [[NSBundle mainBundle] pathForResource:@"get_iplayer" ofType:@"pl"];
-		NSArray *args = @[getiPlayerPath,@"--nocopyright",@"-e60480000000000000",[[GetiPlayerArgumentsController sharedController] typeArgumentForCacheUpdate:NO],@"--listformat=SearchResult|<index>|<timeadded>|<type>|<name>|<episode>|<channel>|<seriesnum>|<episodenum>|<desc>|<thumbnail>|<web>",@"--long",@"--nopurge",searchArgument,[GetiPlayerArgumentsController sharedController].profileDirArg];
+		NSArray *args = @[getiPlayerPath,@"--nocopyright",@"-e60480000000000000",[[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO],@"--listformat=SearchResult|<index>|<timeadded>|<type>|<name>|<episode>|<channel>|<seriesnum>|<episodenum>|<desc>|<thumbnail>|<web>",@"--long",@"--nopurge",searchArgument,[GetiPlayerArguments sharedController].profileDirArg];
       
       if (![[[NSUserDefaults standardUserDefaults] valueForKey:@"ShowDownloadedInSearch"] boolValue] && _allowHide)
          args=[args arrayByAddingObject:@"--hide"];

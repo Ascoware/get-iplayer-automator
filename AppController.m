@@ -458,9 +458,9 @@ NSDictionary *radioFormats;
          cacheExpiryArg = [[NSString alloc] initWithFormat:@"-e%d", ([[[NSUserDefaults standardUserDefaults] objectForKey:@"CacheExpiryTime"] intValue]*3600)];
       }
       
-      NSString *typeArgument = [[GetiPlayerArgumentsController sharedController] typeArgumentForCacheUpdate:YES];
+      NSString *typeArgument = [[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:YES];
       
-      getiPlayerUpdateArgs = @[getiPlayerPath,cacheExpiryArg,typeArgument,@"--nopurge",[GetiPlayerArgumentsController sharedController].profileDirArg];
+      getiPlayerUpdateArgs = @[getiPlayerPath,cacheExpiryArg,typeArgument,@"--nopurge",[GetiPlayerArguments sharedController].profileDirArg];
       
       if (proxy && [[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])
       {
@@ -664,7 +664,7 @@ NSDictionary *radioFormats;
          [pipeTask setStandardOutput:newPipe];
          [pipeTask setStandardError:newPipe];
          [pipeTask setLaunchPath:@"/usr/bin/perl"];
-         [pipeTask setArguments:@[getiPlayerPath,[GetiPlayerArgumentsController sharedController].profileDirArg,@"--nopurge",[GetiPlayerArgumentsController sharedController].noWarningArg,[[GetiPlayerArgumentsController sharedController] typeArgumentForCacheUpdate:NO],[[GetiPlayerArgumentsController sharedController] cacheExpiryArgument:nil],[GetiPlayerArgumentsController sharedController].standardListFormat,
+         [pipeTask setArguments:@[getiPlayerPath,[GetiPlayerArguments sharedController].profileDirArg,@"--nopurge",[GetiPlayerArguments sharedController].noWarningArg,[[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO],[[GetiPlayerArguments sharedController] cacheExpiryArgument:nil],[GetiPlayerArguments sharedController].standardListFormat,
                                   searchArgument]];
          NSMutableString *taskData = [[NSMutableString alloc] initWithString:@""];
          [pipeTask launch];
@@ -830,7 +830,7 @@ NSDictionary *radioFormats;
 
 - (IBAction)getCurrentWebpage:(id)sender
 {
-   Programme *p = [GetCurrentWebpageController getCurrentWebpage:logger];
+   Programme *p = [GetCurrentWebpage getCurrentWebpage:logger];
    if (p) [queueController addObject:p];
 }
 - (IBAction)removeFromQueue:(id)sender
@@ -1352,15 +1352,15 @@ NSDictionary *radioFormats;
          } else if ([[series tvNetwork] length] == 0) {
             [series setTvNetwork:@"*"];
          }
-         NSString *cacheExpiryArgument = [[GetiPlayerArgumentsController sharedController] cacheExpiryArgument:nil];
-         NSString *typeArgument = [[GetiPlayerArgumentsController sharedController] typeArgumentForCacheUpdate:NO];
+         NSString *cacheExpiryArgument = [[GetiPlayerArguments sharedController] cacheExpiryArgument:nil];
+         NSString *typeArgument = [[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO];
          
          NSMutableArray *autoRecordArgs = [[NSMutableArray alloc] initWithObjects:getiPlayerPath,
-                                           [GetiPlayerArgumentsController sharedController].noWarningArg,@"--nopurge",
+                                           [GetiPlayerArguments sharedController].noWarningArg,@"--nopurge",
                                            @"--listformat=<index>: <type>, ~<name> - <episode>~, <channel>, <timeadded>, <pid>,<web>",
                                            cacheExpiryArgument,
                                            typeArgument,
-                                           [GetiPlayerArgumentsController sharedController].profileDirArg,
+                                           [GetiPlayerArguments sharedController].profileDirArg,
                                            @"--hide",
                                            [self escapeSpecialCharactersInString:[series showName]],
                                            nil];
@@ -1959,7 +1959,7 @@ NSDictionary *radioFormats;
 	
 	//Prepare Arguments
 	NSArray *args = @[[[NSBundle mainBundle] pathForResource:@"get_iplayer" ofType:@"pl"],
-                     [GetiPlayerArgumentsController sharedController].profileDirArg,
+                     [GetiPlayerArguments sharedController].profileDirArg,
                      @"--stream",
                      @"--modes=flashnormal",
                      @"--type=livetv",

@@ -12,6 +12,6 @@
 #import "Programme.h"
 #import "LogController.h"
 
-@interface GetCurrentWebpageController : NSObject
+@interface GetCurrentWebpage : NSObject
 + (Programme *)getCurrentWebpage:(LogController *)logger;
 @end
