@@ -122,7 +122,7 @@ xcuserdata/**/*
 
 #     (requires option 2 above): Personal Schemes
 #
-!xcuserdata/**/xcschemes/*
+#!xcuserdata/**/xcschemes/*
 
 ####
 # XCode 4 workspaces - more detailed
