@@ -176,3 +176,9 @@ xcuserdata/**/*
 #Emacs Temporary Files
 #
 .*~
+
+
+####
+#BBEdit Temporary Files
+#
+\#*\#
