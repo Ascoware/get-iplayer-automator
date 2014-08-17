@@ -165,3 +165,8 @@ xcuserdata/**/*
 # pull your cahnges to other's repo
 #
 *.xccheckout
+
+####
+#Emacs Temporary Files
+#
+.*~
