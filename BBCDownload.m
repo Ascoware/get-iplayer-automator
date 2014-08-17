@@ -465,6 +465,11 @@
          [show setReasonForFailure:@"ShowNotFound"];
          [self addToLog:output noTag:YES];
       }
+      else if ([output hasPrefix:@"WARNING: No programmes are available for this pid with version(s): default (available versions: audiodescribed,signed)"])
+      {
+         [show setReasonForFailure:@"AudioDescribedOnly"];
+         [self addToLog:output noTag:YES];
+      }
 		else if ([output hasPrefix:@"INFO:"] || [output hasPrefix:@"WARNING:"] || [output hasPrefix:@"ERROR:"] ||
                [output hasSuffix:@"default"] || [output hasPrefix:[show pid]])
 		{
