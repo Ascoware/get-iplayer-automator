@@ -167,6 +167,12 @@ xcuserdata/**/*
 *.xccheckout
 
 ####
+# Xcode xcuserstate
+#
+# Even with above it still seems to want to save it so adding it explicitly.
+*.xcuserstate
+
+####
 #Emacs Temporary Files
 #
 .*~

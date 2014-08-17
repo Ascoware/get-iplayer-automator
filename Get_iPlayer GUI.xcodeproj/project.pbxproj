@@ -232,6 +232,7 @@
 		D941D99F1025DDCF0012A75F /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = /System/Library/Frameworks/SystemConfiguration.framework; sourceTree = "<absolute>"; };
 		D948C40B103436DE000CF853 /* icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = icon.icns; sourceTree = "<group>"; };
 		D961247E10F12C9200046D31 /* AtomicParsley */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = AtomicParsley; sourceTree = "<group>"; };
+		D975D7EA19A11D9E00EEF909 /* UpdateBuildNumber.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; name = UpdateBuildNumber.sh; path = scripts/UpdateBuildNumber.sh; sourceTree = "<group>"; };
 		D97D9422106DBB68006ECD39 /* TVFormat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TVFormat.h; sourceTree = "<group>"; };
 		D97D9423106DBB68006ECD39 /* TVFormat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TVFormat.m; sourceTree = "<group>"; };
 		D97D9424106DBB68006ECD39 /* RadioFormat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RadioFormat.m; sourceTree = "<group>"; };
@@ -389,6 +390,7 @@
 				D90EF1361029CB3100290A67 /* Scripting Headers */,
 				32CA4F630368D1EE00C91783 /* Get_iPlayer GUI_Prefix.pch */,
 				29B97316FDCFA39411CA2CEA /* main.m */,
+				D975D7EA19A11D9E00EEF909 /* UpdateBuildNumber.sh */,
 			);
 			name = "Other Sources";
 			sourceTree = "<group>";
@@ -635,6 +637,7 @@
 				8D1107290486CEB800E47090 /* Resources */,
 				8D11072C0486CEB800E47090 /* Sources */,
 				8D11072E0486CEB800E47090 /* Frameworks */,
+				D975D7EB19A11DC400EEF909 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -742,6 +745,19 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "LOCATION=\"${BUILT_PRODUCTS_DIR}\"/\"${FRAMEWORKS_FOLDER_PATH}\"\nIDENTITY=\"Developer ID Application: Thomas Willson\"\ncodesign --verbose --force --sign \"$IDENTITY\" \"$LOCATION/Sparkle.framework/Versions/A\"";
+		};
+		D975D7EB19A11DC400EEF909 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "/Users/thomaswillson/Code/get-iplayer-automator-git/scripts/UpdateBuildNumber.sh";
 		};
 /* End PBXShellScriptBuildPhase section */
 
