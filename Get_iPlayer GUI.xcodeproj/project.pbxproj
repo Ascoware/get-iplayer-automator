@@ -757,7 +757,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "/Users/thomaswillson/Code/get-iplayer-automator-git/scripts/UpdateBuildNumber.sh";
+			shellScript = "${PROJECT_DIR}/scripts/UpdateBuildNumber.sh";
 		};
 /* End PBXShellScriptBuildPhase section */
 
