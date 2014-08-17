@@ -83,12 +83,13 @@
 		getArg = @"--pid";
 	NSString *searchArg = [[NSString alloc] initWithFormat:@"%@", [show pid]];
    
-   //AudioDescribed
-   NSString *versionArg;
-   if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"AudioDescribed"] boolValue])
-      versionArg = @"--versions=audiodescribed,signed,default";
-   else
-      versionArg = @"--versions=default";
+   //AudioDescribed & Signed
+   NSMutableString *versionArg = [NSMutableString stringWithString:@"--versions="];
+   if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"AudioDescribedNew"] boolValue])
+      [versionArg appendString:@"audiodescribed,"];
+   if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"SignedNew"] boolValue])
+      [versionArg appendString:@"signed,"];
+   [versionArg  appendString:@"default"];
    
 	//We don't want this to refresh now!
 	NSString *cacheExpiryArg = @"-e604800000000";

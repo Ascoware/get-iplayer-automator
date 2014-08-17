@@ -73,7 +73,6 @@ NSDictionary *radioFormats;
 	defaultValues[@"XBMC_naming"] = @NO;
 	defaultValues[@"KeepSeriesFor"] = @"30";
 	defaultValues[@"RemoveOldSeries"] = @NO;
-   defaultValues[@"AudioDescribed"] = @NO;
    defaultValues[@"QuickCache"] = @YES;
    defaultValues[@"TagShows"] = @YES;
    // TODO: remove 4oD
@@ -81,9 +80,19 @@ NSDictionary *radioFormats;
    defaultValues[@"Cache4oD_TV"] = @NO;
    defaultValues[@"TestProxy"] = @YES;
    defaultValues[@"ShowDownloadedInSearch"] = @YES;
+   
+   defaultValues[@"AudioDescribedNew"] = @NO;
+   defaultValues[@"SignedNew"] = @NO;
 	
 	[[NSUserDefaults standardUserDefaults] registerDefaults:defaultValues];
 	defaultValues = nil;
+   
+   //Migrate old AudioDescribed option
+   if ([[NSUserDefaults standardUserDefaults] objectForKey:@"AudioDescribed"]) {
+      [[NSUserDefaults standardUserDefaults] setObject:@YES forKey:@"AudioDescribedNew"];
+      [[NSUserDefaults standardUserDefaults] setObject:@YES forKey:@"SignedNew"];
+      [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"AudioDescribed"];
+   }
 	
 	//Make sure Application Support folder exists
 	NSString *folder = @"~/Library/Application Support/Get iPlayer Automator/";
