@@ -228,42 +228,9 @@
  *   plugins to skip a notification, while still allowing Growl
  *   actions to run on them.
  *
- *	 Optional. Used by Growl internally.
+ *	 Optional. Not supported by all display plugins.
  */
 #define GROWL_NOTIFICATION_ALREADY_SHOWN		XSTR("AlreadyShown")
-
-/*!	@defined GROWL_NOTIFICATION_BUTTONTITLE_ACTION
- *	@abstract If this key is set, it should contain a string to
- *   be used as the title for an 'action' button in displays
- *   that support such.  This is also used as the title
- *   for the action button in Notification Center
- *   integration.
- *
- *	 Optional. Not supported by all display plugins.
- */
-#define GROWL_NOTIFICATION_BUTTONTITLE_ACTION		XSTR("ButtonAction")
-
-/*!	@defined GROWL_NOTIFICATION_BUTTONTITLE_CANCEL
- *	@abstract If this key is set, it should contain a string to
- *   be used as the title for a 'cancel' button in displays
- *   that support such.  This is also used as the title
- *   for the cancel button in Notification Center
- *   integration.  If this is not set, but an Action button
- *   is, the title will use 'Cancel' as a default.
- *
- *	 Optional. Not supported by all display plugins.
- */
-#define GROWL_NOTIFICATION_BUTTONTITLE_CANCEL		XSTR("ButtonCancel")
-
-/*!	@defined GROWL_NOTIFICATION_CLICK_BUTTONUSED
- *	@abstract If this key is set, it should contain a bool value
- *   wrapped in an NSNumber which determines whether or not the 
- *   action button was clicked by the user when this notification
- *   was fired.
- *
- *	 Optional. Not supported by all display plugins.
- */
-#define GROWL_NOTIFICATION_CLICK_BUTTONUSED		XSTR("ActionButtonClicked")
 
 
 // Notifications
@@ -391,59 +358,6 @@
  */
 #define GROWL_DISTRIBUTED_NOTIFICATION_NOTIFICATIONCENTER_QUERY		XSTR("GrowlNotificationCenterYN?")
 
-#pragma mark -
-#pragma mark Growl.framework 3 notifications
-
-/*!	@defined GROWL3_NOTIFICATION_CLICK
- *	@abstract The distributed notification sent by Growl to let an application know a note UUID was clicked.
- *	@discussion This distributed notification allows click feedback to occur at anytime, but one time only for click/close/timeout
- */
-#define GROWL3_NOTIFICATION_CLICK                     @"GROWL3_NOTIFICATION_CLICK"
-
-/*!	@defined GROWL3_NOTIFICATION_TIMEOUT
- *	@abstract The distributed notification sent by Growl to let an application know a note UUID was timedout.
- *	@discussion This distributed notification allows timeout feedback to occur at anytime, but one time only for click/close/timeout
- */
-#define GROWL3_NOTIFICATION_TIMEOUT                   @"GROWL3_NOTIFICATION_TIMEOUT"
-
-/*!	@defined GROWL3_NOTIFICATION_CLOSED
- *	@abstract The distributed notification sent by Growl to let an application know a note UUID was closed.
- *	@discussion This distributed notification allows timeout feedback to occur at anytime, but one time only for click/close/timeout
- */
-#define GROWL3_NOTIFICATION_CLOSED                    @"GROWL3_NOTIFICATION_CLOSED"
-
-/*!	@defined GROWL3_NOTIFICATION_DISPLAYED
- *	@abstract The distributed notification sent by Growl to let an application know a note UUID was not displayed.
- *	@discussion This distributed notification allows click feedback to occur at anytime, but one time only for click/close/timeout
- */
-#define GROWL3_NOTIFICATION_NOT_DISPLAYED             @"GROWL3_NOTIFICATION_NOT_DISPLAYED"
-
-/*!	@defined GROWL3_NOTIFICATION_CLICK
- *	@abstract The distributed notification sent by Growl to let an application know a note UUID should be displayed by NC.
- *	@discussion This distributed notification allows for per application/note NC configuration
- */
-#define GROWL3_NOTIFICATION_SHOW_NOTIFICATION_CENTER  @"GROWL3_NOTIFICATION_SHOW_NOTIFICATION_CENTER"
-
-/*!	@defined GROWL3_FRAMEWORK_SUPPORT_PING
- *	@abstract The distributed notification sent by an application to ask Growl if it supports Growl 3 framework features.
- *	@discussion This notification is sent on launch of any application, and causes Growl which supports it to send back GROWL3_FRAMEWORK_SUPPORT
- */
-#define GROWL3_FRAMEWORK_SUPPORT_PING                 @"GROWL3_FRAMEWORK_SUPPORT_PING"
-
-/*!	@defined GROWL3_FRAMEWORK_SUPPORT
- *	@abstract The distributed notification sent by Growl in reply to GROWL3_FRAMEWORK_SUPPORT_PING and whenever Growl starts up.
- *	@discussion This notification is sent on launch of Growl, and allows the framework to know how to handle lifecycle of GrowlNote
- */
-#define GROWL3_FRAMEWORK_SUPPORT                      @"GROWL3_FRAMEWORK_SUPPORT"
-
-/*!	@defined GROWL3_NOTIFICATION_CANCEL_REQUESTED
- *	@abstract The distributed notification sent by an application to cause Growl to pull down the notification UUID.
- *	@discussion Growl which supports this will support cancelation of a note if it's still being displayed
- */
-#define GROWL3_NOTIFICATION_CANCEL_REQUESTED          @"GROWL3_NOTIFICATION_CANCEL_REQUESTED"
-
-#pragma mark -
-#pragma mark other symbols
 
 /*!	@group Other symbols */
 /* Symbols which don't fit into any of the other categories. */
