@@ -9,7 +9,7 @@
 #import "GiASearch.h"
 
 @implementation GiASearch
-- (id)initWithSearchTerms:(NSString *)searchTerms logController:(LogController *)logger selector:(SEL)selector withTarget:(id)target
+- (id)initWithSearchTerms:(NSString *)searchTerms allowHidingOfDownloadedItems:(BOOL)allowHidingOfDownloadedItems logController:(LogController *)logger selector:(SEL)selector withTarget:(id)target
 {
    if (!(self = [super init])) return nil;
    
@@ -26,7 +26,7 @@
       NSString *getiPlayerPath = [[NSBundle mainBundle] pathForResource:@"get_iplayer" ofType:@"pl"];
 		NSArray *args = @[getiPlayerPath,@"--nocopyright",@"-e60480000000000000",[[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO],@"--listformat=SearchResult|<index>|<timeadded>|<type>|<name>|<episode>|<channel>|<seriesnum>|<episodenum>|<desc>|<thumbnail>|<web>",@"--long",@"--nopurge",searchArgument,[GetiPlayerArguments sharedController].profileDirArg];
       
-      if (![[[NSUserDefaults standardUserDefaults] valueForKey:@"ShowDownloadedInSearch"] boolValue] && _allowHide)
+      if (![[[NSUserDefaults standardUserDefaults] valueForKey:@"ShowDownloadedInSearch"] boolValue] && allowHidingOfDownloadedItems)
          args=[args arrayByAddingObject:@"--hide"];
       
 		[task setArguments:args];

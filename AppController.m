@@ -795,7 +795,11 @@ NSDictionary *radioFormats;
       [searchField setEnabled:NO];
 		[searchIndicator startAnimation:nil];
       [resultsController removeObjectsAtArrangedObjectIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, [resultsController.arrangedObjects count])]];
-		currentSearch = [[GiASearch alloc] initWithSearchTerms:searchField.stringValue logController:logger selector:@selector(searchFinished:) withTarget:self];
+		currentSearch = [[GiASearch alloc] initWithSearchTerms:searchField.stringValue
+                                     allowHidingOfDownloadedItems:YES
+                                               logController:logger
+                                                    selector:@selector(searchFinished:)
+                                                  withTarget:self];
 	}
 }
 - (void)searchFinished:(NSArray *)results
@@ -1300,7 +1304,10 @@ NSDictionary *radioFormats;
 	{
       [pvrSearchField setEnabled:NO];
       [pvrResultsController removeObjectsAtArrangedObjectIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, [pvrResultsController.arrangedObjects count])]];
-		currentPVRSearch = [[GiASearch alloc] initWithSearchTerms:pvrSearchField.stringValue logController:logger selector:@selector(pvrSearchFinished:) withTarget:self];
+		currentPVRSearch = [[GiASearch alloc] initWithSearchTerms:pvrSearchField.stringValue
+                                        allowHidingOfDownloadedItems:NO logController:logger
+                                                       selector:@selector(pvrSearchFinished:)
+                                                     withTarget:self];
 		[pvrSearchIndicator startAnimation:nil];
 	}
 }

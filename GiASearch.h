@@ -19,8 +19,10 @@
    LogController *logger;
 }
 
-- (id)initWithSearchTerms:(NSString *)searchTerms logController:(LogController *)logger selector:(SEL)selector withTarget:(id)target;
-
-@property (readwrite) bool allowHide;
+- (id)initWithSearchTerms:(NSString *)searchTerms
+  allowHidingOfDownloadedItems:(BOOL)allowHidingOfDownloadedItems
+            logController:(LogController *)logger
+                 selector:(SEL)selector
+               withTarget:(id)target;
 
 @end
