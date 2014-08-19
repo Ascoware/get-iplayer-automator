@@ -66,6 +66,10 @@
                [self failProxyLoad];
             }
          }
+         else
+         {
+             [self failProxyLoad];
+         }
       }
       else
       {
@@ -121,6 +125,10 @@
          else
             [self failProxyLoad];
       }
+      else
+      {
+          [self failProxyLoad];
+      }
    }
    else
    {
@@ -141,6 +149,10 @@
                [self cancelProxyLoad];
             else
                [self failProxyLoad];
+         }
+         else
+         {
+             [self failProxyLoad];
          }
       }
       else
@@ -195,6 +207,10 @@
                [self cancelProxyLoad];
             else
                [self failProxyTest];
+         }
+         else
+         {
+             [self failProxyLoad];
          }
          return;
       }
@@ -253,6 +269,10 @@
             [self cancelProxyLoad];
          else
             [self failProxyTest];
+      }
+      else
+      {
+          [self failProxyTest];
       }
    }
    else
