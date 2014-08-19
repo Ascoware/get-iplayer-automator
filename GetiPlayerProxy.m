@@ -35,6 +35,7 @@
    [proxyDict removeAllObjects];
    proxyDict[@"selector"] = [NSValue valueWithPointer:selector];
    proxyDict[@"target"] = target;
+   currentIsSilent = silent;
    if (object)
       proxyDict[@"object"] = object;
    NSString *proxyOption = [[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"];
@@ -48,7 +49,7 @@
       {
          NSLog(@"WARNING: Custom proxy setting was blank. No proxy will be used.");
          [logger addToLog:@"WARNING: Custom proxy setting was blank. No proxy will be used."];
-         if (!silent)
+         if (!currentIsSilent)
          {
             NSAlert *alert = [NSAlert alertWithMessageText:@"Custom proxy setting was blank.\nDownloads may fail.\nDo you wish to continue?"
                                              defaultButton:@"No"
