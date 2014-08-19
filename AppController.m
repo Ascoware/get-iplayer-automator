@@ -421,7 +421,7 @@ NSDictionary *radioFormats;
    @catch (NSException *e) {
       NSLog(@"NO UI: updateCache:proxyError:");
    }
-   if ([proxyDict[@"erorr"] code] == kProxyLoadCancelled)
+   if ([proxyDict[@"error"] code] == kProxyLoadCancelled)
       return;
 	runSinceChange=YES;
 	runUpdate=YES;
