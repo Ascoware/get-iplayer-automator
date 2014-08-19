@@ -183,6 +183,8 @@
 -(void)proxyRetrievalFinished:(id)sender proxyDict:(NSDictionary *)proxyDict
 {
    getiPlayerProxy = nil;
+    if (proxyDict && [proxyDict[@"error"] code] == kProxyLoadCancelled)
+        return;
    
    taskOutput = [[NSMutableString alloc] init];
    metadataTask = [[NSTask alloc] init];
