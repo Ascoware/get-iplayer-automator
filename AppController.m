@@ -421,8 +421,10 @@ NSDictionary *radioFormats;
    @catch (NSException *e) {
       NSLog(@"NO UI: updateCache:proxyError:");
    }
-   if ([proxyDict[@"erorr"] code] == kProxyLoadCancelled)
-      return;
+    if (proxyDict && [proxyDict[@"error"] code] == kProxyLoadCancelled) {
+        [stopButton setEnabled:NO];
+        return;
+    }
 	runSinceChange=YES;
 	runUpdate=YES;
    didUpdate=NO;
@@ -926,8 +928,11 @@ NSDictionary *radioFormats;
    @catch (NSException *e) {
       NSLog(@"NO UI: startDownloads:proxyError:");
    }
-   if (proxyDict && [proxyDict[@"error"] code] == kProxyLoadCancelled)
-      return;
+    if (proxyDict && [proxyDict[@"error"] code] == kProxyLoadCancelled) {
+        [startButton setEnabled:YES];
+        [stopButton setEnabled:NO];
+        return;
+    }
    
    if (proxyDict) {
       proxy = proxyDict[@"proxy"];
