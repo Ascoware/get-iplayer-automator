@@ -6,8 +6,6 @@
 	<string>English</string>
 	<key>CFBundleExecutable</key>
 	<string>${EXECUTABLE_NAME}</string>
-	<key>CFBundleIconFile</key>
-	<string>icon.icns</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.thomaswillson.getiPlayerAutomator</string>
 	<key>CFBundleInfoDictionaryVersion</key>
@@ -16,29 +14,29 @@
 	<string>Get iPlayer Automator</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.7.2</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
-	<key>CFBundleShortVersionString</key>
-	<string>1.7.2</string>
+	<key>JRFeedbackURL</key>
+	<string>http://tom-tech.com/get_iplayer/feedback.php</string>
+	<key>NSAppleScriptEnabled</key>
+	<true/>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>OSAScriptingDefinition</key>
+	<string>GetiPlayerAutomator.sdef</string>
 	<key>SUAllowsAutomaticUpdates</key>
+	<string>NO</string>
+	<key>SUEnableAutomaticChecks</key>
 	<string>NO</string>
 	<key>SUFeedURL</key>
 	<string>http://tom-tech.com/get_iplayer/updates.xml</string>
 	<key>SUPublicDSAKeyFile</key>
 	<string>dsa_pub.pem</string>
-	<key>SUEnableAutomaticChecks</key>
-	<string>NO</string>
-	<key>NSAppleScriptEnabled</key>
-	<true/>
-	<key>OSAScriptingDefinition</key>
-	<string>GetiPlayerAutomator.sdef</string>
-	<key>JRFeedbackURL</key>
-	<string>http://tom-tech.com/get_iplayer/feedback.php</string>
 </dict>
 </plist>

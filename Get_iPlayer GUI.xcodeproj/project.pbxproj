@@ -20,6 +20,7 @@
 		39CD35FB1875FC7600BFE53A /* librtmp.1.dylib in Resources */ = {isa = PBXBuildFile; fileRef = 39CD35F91875FC5F00BFE53A /* librtmp.1.dylib */; };
 		39D7C1BD1874AD7400B78698 /* StringTrimFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 39D7C1BC1874AD7400B78698 /* StringTrimFormatter.m */; };
 		39D7C1C01874AD9D00B78698 /* NilToStringTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = 39D7C1BF1874AD9D00B78698 /* NilToStringTransformer.m */; };
+		39FD5E9619D370BD006BC47B /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 39FD5E9519D370BD006BC47B /* Images.xcassets */; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
@@ -28,7 +29,6 @@
 		D904F424100B077600D60BBF /* Programme.m in Sources */ = {isa = PBXBuildFile; fileRef = D904F423100B077600D60BBF /* Programme.m */; };
 		D914BC59100C9F0100F7E68E /* ScriptingBridge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D914BC58100C9F0100F7E68E /* ScriptingBridge.framework */; };
 		D914BD29100CBFA900F7E68E /* BBCDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = D914BD28100CBFA900F7E68E /* BBCDownload.m */; };
-		D91783F01013035B00B82736 /* camstudio_record_button.png in Resources */ = {isa = PBXBuildFile; fileRef = D91783EF1013035B00B82736 /* camstudio_record_button.png */; };
 		D9178595101345D700B82736 /* Series.m in Sources */ = {isa = PBXBuildFile; fileRef = D9178594101345D700B82736 /* Series.m */; };
 		D91F9D54187151D600D4388B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D91F9D53187151D600D4388B /* Foundation.framework */; };
 		D91F9D57187151D700D4388B /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D91F9D56187151D700D4388B /* main.m */; };
@@ -71,7 +71,6 @@
 		D941D95F1025DB580012A75F /* JRFeedbackController.m in Sources */ = {isa = PBXBuildFile; fileRef = D941D95C1025DB580012A75F /* JRFeedbackController.m */; };
 		D941D99C1025DDA90012A75F /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D941D99B1025DDA90012A75F /* AddressBook.framework */; };
 		D941D9A01025DDCF0012A75F /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D941D99F1025DDCF0012A75F /* SystemConfiguration.framework */; };
-		D948C40C103436DE000CF853 /* icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = D948C40B103436DE000CF853 /* icon.icns */; };
 		D961247F10F12C9200046D31 /* AtomicParsley in Resources */ = {isa = PBXBuildFile; fileRef = D961247E10F12C9200046D31 /* AtomicParsley */; };
 		D97D9426106DBB68006ECD39 /* TVFormat.m in Sources */ = {isa = PBXBuildFile; fileRef = D97D9423106DBB68006ECD39 /* TVFormat.m */; };
 		D97D9427106DBB68006ECD39 /* RadioFormat.m in Sources */ = {isa = PBXBuildFile; fileRef = D97D9424106DBB68006ECD39 /* RadioFormat.m */; };
@@ -89,9 +88,6 @@
 		D9C1D0ED1993B4B30034465E /* ExtendedShowInformationController.m in Sources */ = {isa = PBXBuildFile; fileRef = D9C1D0EC1993B4B30034465E /* ExtendedShowInformationController.m */; };
 		D9C1D0F01993BBE00034465E /* GetiPlayerProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = D9C1D0EF1993BBE00034465E /* GetiPlayerProxy.m */; };
 		D9CAE546133FF9BE003471DA /* ffmpeg in Resources */ = {isa = PBXBuildFile; fileRef = D9CAE545133FF9BE003471DA /* ffmpeg */; };
-		D9CC15680FF9071700D819E2 /* Play.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D9CC15670FF9071700D819E2 /* Play.tiff */; };
-		D9CC156A0FF9072F00D819E2 /* ActivityWindow.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D9CC15690FF9072F00D819E2 /* ActivityWindow.tiff */; };
-		D9CC157B0FF9076F00D819E2 /* Stop.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D9CC157A0FF9076F00D819E2 /* Stop.tiff */; };
 		D9CCF3CC1023485A009205BE /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = D9CCF3CB1023485A009205BE /* dsa_pub.pem */; };
 		D9CCF54C1025AAF9009205BE /* Growl Registration Ticket.growlRegDict in Resources */ = {isa = PBXBuildFile; fileRef = D9CCF54B1025AAF9009205BE /* Growl Registration Ticket.growlRegDict */; };
 		D9CDC9E8186B8F2B0003A4E2 /* GetiPlayerAutomator.sdef in Resources */ = {isa = PBXBuildFile; fileRef = D9CDC9E7186B8F2B0003A4E2 /* GetiPlayerAutomator.sdef */; };
@@ -163,9 +159,9 @@
 		39D7C1BC1874AD7400B78698 /* StringTrimFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StringTrimFormatter.m; sourceTree = "<group>"; };
 		39D7C1BE1874AD9D00B78698 /* NilToStringTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NilToStringTransformer.h; sourceTree = "<group>"; };
 		39D7C1BF1874AD9D00B78698 /* NilToStringTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NilToStringTransformer.m; sourceTree = "<group>"; };
+		39FD5E9519D370BD006BC47B /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = "Get iPlayer Automator/Images.xcassets"; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* Get iPlayer Automator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Get iPlayer Automator.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		D9041ABE16AC81A5000C3820 /* ActivityWindow@2X.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "ActivityWindow@2X.tiff"; sourceTree = "<group>"; };
 		D904F0491009F22E00D60BBF /* get_iplayer.pl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.perl; name = get_iplayer.pl; path = ../get_iplayer.pl; sourceTree = "<group>"; };
 		D904F0721009F6B800D60BBF /* mplayer */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = mplayer; sourceTree = "<group>"; };
 		D904F422100B077600D60BBF /* Programme.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Programme.h; sourceTree = "<group>"; };
@@ -175,7 +171,6 @@
 		D914BD27100CBFA900F7E68E /* BBCDownload.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BBCDownload.h; sourceTree = "<group>"; };
 		D914BD28100CBFA900F7E68E /* BBCDownload.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BBCDownload.m; sourceTree = "<group>"; };
 		D9158E06187150B000FBA515 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
-		D91783EF1013035B00B82736 /* camstudio_record_button.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = camstudio_record_button.png; sourceTree = "<group>"; };
 		D9178593101345D700B82736 /* Series.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Series.h; sourceTree = "<group>"; };
 		D9178594101345D700B82736 /* Series.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Series.m; sourceTree = "<group>"; };
 		D91F9D52187151D600D4388B /* GetiPlayerProxyUpdater */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = GetiPlayerProxyUpdater; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -230,7 +225,6 @@
 		D941D95D1025DB580012A75F /* JRFeedbackController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JRFeedbackController.h; sourceTree = "<group>"; };
 		D941D99B1025DDA90012A75F /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = /System/Library/Frameworks/AddressBook.framework; sourceTree = "<absolute>"; };
 		D941D99F1025DDCF0012A75F /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = /System/Library/Frameworks/SystemConfiguration.framework; sourceTree = "<absolute>"; };
-		D948C40B103436DE000CF853 /* icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = icon.icns; sourceTree = "<group>"; };
 		D961247E10F12C9200046D31 /* AtomicParsley */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = AtomicParsley; sourceTree = "<group>"; };
 		D975D7EA19A11D9E00EEF909 /* UpdateBuildNumber.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; name = UpdateBuildNumber.sh; path = scripts/UpdateBuildNumber.sh; sourceTree = "<group>"; };
 		D97D9422106DBB68006ECD39 /* TVFormat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TVFormat.h; sourceTree = "<group>"; };
@@ -254,9 +248,6 @@
 		D9C1D0EE1993BBE00034465E /* GetiPlayerProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GetiPlayerProxy.h; sourceTree = "<group>"; };
 		D9C1D0EF1993BBE00034465E /* GetiPlayerProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GetiPlayerProxy.m; sourceTree = "<group>"; };
 		D9CAE545133FF9BE003471DA /* ffmpeg */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = ffmpeg; sourceTree = "<group>"; };
-		D9CC15670FF9071700D819E2 /* Play.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = Play.tiff; sourceTree = "<group>"; };
-		D9CC15690FF9072F00D819E2 /* ActivityWindow.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = ActivityWindow.tiff; sourceTree = "<group>"; };
-		D9CC157A0FF9076F00D819E2 /* Stop.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = Stop.tiff; sourceTree = "<group>"; };
 		D9CCF3CB1023485A009205BE /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
 		D9CCF4C310256E82009205BE /* iTunes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iTunes.h; sourceTree = "<group>"; };
 		D9CCF52E10259DED009205BE /* Features.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = Features.rtf; sourceTree = "<group>"; };
@@ -398,15 +389,14 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				39FD5E9519D370BD006BC47B /* Images.xcassets */,
 				398516A616D1A02500EBB4CE /* Body2 */,
 				D921C9EC149C4C6F004CB558 /* Body */,
 				DFE5B67313E70AC20008571B /* plugins */,
-				D948C40B103436DE000CF853 /* icon.icns */,
 				D9A450A3102FFDC00011E175 /* LICENSE.txt */,
 				D9A4509C102FF8090011E175 /* Credits.html */,
 				D90EF2A7102B5D6300290A67 /* Scripts */,
 				D904F04D1009F28400D60BBF /* Binaries */,
-				D9CC156B0FF9073D00D819E2 /* Buttons */,
 				8D1107310486CEB800E47090 /* Info.plist */,
 				D9CCF3CB1023485A009205BE /* dsa_pub.pem */,
 				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
@@ -589,18 +579,6 @@
 			name = Controllers;
 			sourceTree = "<group>";
 		};
-		D9CC156B0FF9073D00D819E2 /* Buttons */ = {
-			isa = PBXGroup;
-			children = (
-				D9041ABE16AC81A5000C3820 /* ActivityWindow@2X.tiff */,
-				D91783EF1013035B00B82736 /* camstudio_record_button.png */,
-				D9CC157A0FF9076F00D819E2 /* Stop.tiff */,
-				D9CC15670FF9071700D819E2 /* Play.tiff */,
-				D9CC15690FF9072F00D819E2 /* ActivityWindow.tiff */,
-			);
-			name = Buttons;
-			sourceTree = "<group>";
-		};
 		D9CDC9E9186B906F0003A4E2 /* Applescript */ = {
 			isa = PBXGroup;
 			children = (
@@ -697,17 +675,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				39CD35FB1875FC7600BFE53A /* librtmp.1.dylib in Resources */,
+				39FD5E9619D370BD006BC47B /* Images.xcassets in Resources */,
 				D904F0731009F6B800D60BBF /* mplayer in Resources */,
 				D9F66963102C5DC500A9449B /* GetOperaURL.applescript in Resources */,
 				D9F668DB102C560500A9449B /* GetFireFoxURL.applescript in Resources */,
 				D9F66955102C5D1200A9449B /* GetCaminoURL.applescript in Resources */,
 				8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */,
 				1DDD58160DA1D0A300B32029 /* MainMenu.xib in Resources */,
-				D9CC15680FF9071700D819E2 /* Play.tiff in Resources */,
-				D9CC156A0FF9072F00D819E2 /* ActivityWindow.tiff in Resources */,
-				D9CC157B0FF9076F00D819E2 /* Stop.tiff in Resources */,
 				D904F04A1009F22E00D60BBF /* get_iplayer.pl in Resources */,
-				D91783F01013035B00B82736 /* camstudio_record_button.png in Resources */,
 				D9CCF3CC1023485A009205BE /* dsa_pub.pem in Resources */,
 				39BCA33A1877080F007115F2 /* id3v2 in Resources */,
 				D9CCF54C1025AAF9009205BE /* Growl Registration Ticket.growlRegDict in Resources */,
@@ -715,7 +690,6 @@
 				D941D9521025DB2B0012A75F /* JRFeedbackProvider.xib in Resources */,
 				D9A4509D102FF8090011E175 /* Credits.html in Resources */,
 				D9A450A4102FFDC00011E175 /* LICENSE.txt in Resources */,
-				D948C40C103436DE000CF853 /* icon.icns in Resources */,
 				D97D96A610743860006ECD39 /* lame in Resources */,
 				D961247F10F12C9200046D31 /* AtomicParsley in Resources */,
 				D9CAE546133FF9BE003471DA /* ffmpeg in Resources */,
@@ -873,6 +847,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_IDENTITY = "Developer ID Application: Thomas Willson";
 				COMBINE_HIDPI_IMAGES = YES;
@@ -912,6 +887,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_IDENTITY = "Developer ID Application: Thomas Willson";
 				COMBINE_HIDPI_IMAGES = YES;
