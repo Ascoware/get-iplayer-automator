@@ -236,7 +236,9 @@ NSDictionary *radioFormats;
 		[format1 setFormat:@"Flash - HD"];
 		TVFormat *format2 = [[TVFormat alloc] init];
 		[format2 setFormat:@"Flash - Very High"];
-		[tvFormatController addObjects:@[format2,format1]];
+        TVFormat *format3 = [[TVFormat alloc] init];
+        [format3 setFormat:@"Flash - High"];
+		[tvFormatController addObjects:@[format1,format2,format3]];
 	}
 	if ([[radioFormatController arrangedObjects] count] == 0)
 	{
