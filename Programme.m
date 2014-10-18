@@ -409,7 +409,7 @@
 	NSString *fieldsArgument = @"--fields=index,pid";
 	NSString *wantedID = pid;
 	NSString *cacheExpiryArg = [[GetiPlayerArguments sharedController] cacheExpiryArgument:nil];
-	NSArray *args = @[[[NSBundle mainBundle] pathForResource:@"get_iplayer" ofType:@"pl"],@"--nowarning",@"--nopurge",cacheExpiryArg,[[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO],listArgument,[GetiPlayerArguments sharedController].profileDirArg,fieldsArgument,wantedID];
+	NSArray *args = @[[[NSBundle mainBundle] pathForResource:@"get_iplayer" ofType:@"pl"],@"--nocopyright",@"--nopurge",cacheExpiryArg,[[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO],listArgument,[GetiPlayerArguments sharedController].profileDirArg,fieldsArgument,wantedID];
 	[getNameTask setArguments:args];
 	[getNameTask setLaunchPath:@"/usr/bin/perl"];
 	
