@@ -215,6 +215,10 @@
    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(metadataRetrievalDataReady:) name:NSFileHandleReadCompletionNotification object:fh];
    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(metadataRetrievalFinished:) name:NSTaskDidTerminateNotification object:metadataTask];
    
+   NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:[metadataTask environment]];
+   envVariableDictionary[@"HOME"] = [@"~" stringByExpandingTildeInPath];
+   envVariableDictionary[@"PERL_UNICODE"] = @"AS";
+   [metadataTask setEnvironment:envVariableDictionary];
    [metadataTask launch];
    [fh readInBackgroundAndNotify];
 }
@@ -417,6 +421,10 @@
 	NSFileHandle *getNameFh = [getNamePipe fileHandleForReading];
 	NSData *inData;
 	
+    NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:[getNameTask environment]];
+    envVariableDictionary[@"HOME"] = [@"~" stringByExpandingTildeInPath];
+    envVariableDictionary[@"PERL_UNICODE"] = @"AS";
+    [getNameTask setEnvironment:envVariableDictionary];
 	[getNameTask launch];
 	
 	while ((inData = [getNameFh availableData]) && [inData length]) {

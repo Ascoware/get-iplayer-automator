@@ -288,8 +288,6 @@ NSDictionary *radioFormats;
       [self updateCache:nil];
    else
       [self updateCache:@""];
-   // ensure get_iplayer encodes output as UTF-8
-   setenv("PERL_UNICODE", "S", 1);
 }
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)application
 {
@@ -503,6 +501,10 @@ NSDictionary *radioFormats;
              selector:@selector(dataReady:)
                  name:NSFileHandleReadCompletionNotification
                object:fh];
+      NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:[getiPlayerUpdateTask environment]];
+      envVariableDictionary[@"HOME"] = [@"~" stringByExpandingTildeInPath];
+      envVariableDictionary[@"PERL_UNICODE"] = @"AS";
+      [getiPlayerUpdateTask setEnvironment:envVariableDictionary];
       [getiPlayerUpdateTask launch];
       
       [fh readInBackgroundAndNotify];
@@ -686,6 +688,10 @@ NSDictionary *radioFormats;
          [pipeTask setArguments:@[getiPlayerPath,[GetiPlayerArguments sharedController].profileDirArg,@"--nopurge",[GetiPlayerArguments sharedController].noWarningArg,[[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO],[[GetiPlayerArguments sharedController] cacheExpiryArgument:nil],[GetiPlayerArguments sharedController].standardListFormat,
                                   searchArgument]];
          NSMutableString *taskData = [[NSMutableString alloc] initWithString:@""];
+         NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:[pipeTask environment]];
+         envVariableDictionary[@"HOME"] = [@"~" stringByExpandingTildeInPath];
+         envVariableDictionary[@"PERL_UNICODE"] = @"AS";
+         [pipeTask setEnvironment:envVariableDictionary];
          [pipeTask launch];
          while ((someData = [readHandle2 availableData]) && [someData length]) {
             [taskData appendString:[[NSString alloc] initWithData:someData
@@ -1423,6 +1429,10 @@ NSDictionary *radioFormats;
          [autoRecordTask setLaunchPath:@"/usr/bin/perl"];
          [autoRecordTask setArguments:autoRecordArgs];
          [autoRecordTask setStandardOutput:autoRecordPipe];
+         NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:[autoRecordTask environment]];
+         envVariableDictionary[@"HOME"] = [@"~" stringByExpandingTildeInPath];
+         envVariableDictionary[@"PERL_UNICODE"] = @"AS";
+         [autoRecordTask setEnvironment:envVariableDictionary];
          [autoRecordTask launch];
          
          while ((inData = [readHandle availableData]) && [inData length]) {

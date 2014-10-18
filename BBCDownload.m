@@ -139,6 +139,7 @@
    NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:[task environment]];
    envVariableDictionary[@"DYLD_LIBRARY_PATH"] = [bundle resourcePath];
    envVariableDictionary[@"HOME"] = [@"~" stringByExpandingTildeInPath];
+   envVariableDictionary[@"PERL_UNICODE"] = @"AS";
    [task setEnvironment:envVariableDictionary];
 	
 	fh = [pipe fileHandleForReading];
