@@ -757,7 +757,7 @@ NSDictionary *radioFormats;
          }
          if (!foundMatch)
          {
-            [show setValue:@"Not Currently Available" forKey:@"status"];
+            [show setValue:@"Not Found In Cache" forKey:@"status"];
             [show setValue:@YES forKey:@"complete"];
             [show setValue:@NO forKey:@"successful"];
          }

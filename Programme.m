@@ -466,7 +466,7 @@
 				NSAlert *getNameException = [[NSAlert alloc] init];
 				[getNameException addButtonWithTitle:@"OK"];
 				[getNameException setMessageText:[NSString stringWithFormat:@"Unknown Error!"]];
-				[getNameException setInformativeText:@"An unknown error occured whilst trying to parse Get_iPlayer output."];
+				[getNameException setInformativeText:@"An unknown error occured whilst trying to parse Get_iPlayer output (processGetNameData)."];
 				[getNameException setAlertStyle:NSWarningAlertStyle];
 				[getNameException runModal];
 				getNameException = nil;
@@ -498,10 +498,130 @@
       if ([[p showName] isEqualToString:@""] || [[p showName] isEqualToString:@"Unknown: Not in Cache"])
          [p setValue:@"Unknown: Not in Cache" forKey:@"showName"];
       [p setProcessedPID:@NO];
+      [p getNameFromPID];
    }
 	else
 		[p setProcessedPID:@YES];
 	
+}
+
+- (void)getNameFromPID
+{
+    [logger addToLog:@"Retrieving Metadata For PID" :self];
+    getiPlayerProxy = [[GetiPlayerProxy alloc] initWithLogger:logger];
+    [getiPlayerProxy loadProxyInBackgroundForSelector:@selector(getNameFromPIDProxyLoadFinished:proxyDict:) withObject:nil onTarget:self silently:NO];
+}
+
+-(void)getNameFromPIDProxyLoadFinished:(id)sender proxyDict:(NSDictionary *)proxyDict
+{
+    getiPlayerProxy = nil;
+    if (proxyDict && [proxyDict[@"error"] code] == kProxyLoadCancelled)
+        return;
+    NSTask *getNameTask = [[NSTask alloc] init];
+    NSPipe *getNamePipe = [[NSPipe alloc] init];
+    NSMutableString *getNameData = [[NSMutableString alloc] initWithString:@""];
+    NSMutableString *versionArg = [NSMutableString stringWithString:@"--versions="];
+    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"AudioDescribedNew"] boolValue])
+        [versionArg appendString:@"audiodescribed,"];
+    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"SignedNew"] boolValue])
+        [versionArg appendString:@"signed,"];
+    [versionArg  appendString:@"default"];
+    NSString *infoArgument = @"--info";
+    NSString *pidArgument = [NSString stringWithFormat:@"--pid=%@", pid];
+    NSString *cacheExpiryArg = [[GetiPlayerArguments sharedController] cacheExpiryArgument:nil];
+    NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:[[NSBundle mainBundle] pathForResource:@"get_iplayer" ofType:@"pl"],@"--nocopyright",@"--nopurge",versionArg,cacheExpiryArg,[GetiPlayerArguments sharedController].profileDirArg,infoArgument,pidArgument,nil];
+    if (proxyDict[@"proxy"]) {
+        [args addObject:[NSString stringWithFormat:@"-p%@",[proxyDict[@"proxy"] url]]];
+        if (![[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])
+        {
+            [args addObject:@"--partial-proxy"];
+        }
+        
+    }
+    [getNameTask setArguments:args];
+    [getNameTask setLaunchPath:@"/usr/bin/perl"];
+    
+    [getNameTask setStandardOutput:getNamePipe];
+    NSFileHandle *getNameFh = [getNamePipe fileHandleForReading];
+    NSData *inData;
+    
+    NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:[getNameTask environment]];
+    envVariableDictionary[@"HOME"] = [@"~" stringByExpandingTildeInPath];
+    envVariableDictionary[@"PERL_UNICODE"] = @"AS";
+    [getNameTask setEnvironment:envVariableDictionary];
+    [getNameTask launch];
+    
+    while ((inData = [getNameFh availableData]) && [inData length]) {
+        NSString *tempData = [[NSString alloc] initWithData:inData encoding:NSUTF8StringEncoding];
+        [getNameData appendString:tempData];
+    }
+    [self processGetNameDataFromPID:getNameData];
+}
+
+- (void)processGetNameDataFromPID:(NSString *)getNameData
+{
+    NSArray *array = [getNameData componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+    Programme *p = self;
+    int i = 0;
+    NSString *available = nil, *versions = nil, *title = nil;
+    for (NSString *string in array)
+    {
+        i++;
+        if (i>1 && i<[array count]-1)
+        {
+            NSString *tmp_info = nil, *tmp_title = nil;
+            @try{
+                NSScanner *scanner = [NSScanner scannerWithString:string];
+                [scanner scanString:@"INFO:" intoString:&tmp_info];
+                if (tmp_info) {
+                    if (!available) {
+                        [scanner scanUpToString:@"(available versions:" intoString:nil];
+                        [scanner scanString:@"(available versions:" intoString:&available];
+                        if (available) {
+                            [scanner scanUpToString:@")" intoString:&versions];
+                        }
+                    }
+                } else {
+                    [scanner setScanLocation:0];
+                    if (!title) {
+                        [scanner scanString:@"title:" intoString:&tmp_title];
+                        if (tmp_title) {
+                            [scanner scanUpToString:@"asdfasdf" intoString:&title];
+                        }
+                    }
+                    scanner = nil;
+                    if (title) {
+                        break;
+                    }
+                }
+            }
+            @catch (NSException *e) {
+                NSAlert *getNameException = [[NSAlert alloc] init];
+                [getNameException addButtonWithTitle:@"OK"];
+                [getNameException setMessageText:[NSString stringWithFormat:@"Unknown Error!"]];
+                [getNameException setInformativeText:@"An unknown error occured whilst trying to parse Get_iPlayer output (processGetNameDataFromPID)."];
+                [getNameException setAlertStyle:NSWarningAlertStyle];
+                [getNameException runModal];
+                getNameException = nil;
+            }
+        }
+        
+    }
+    if (available) {
+        if (versions) {
+            [p setValue:[NSString stringWithFormat:@"Available: %@", versions] forKey:@"status"];
+        } else {
+            [p setValue:@"Not Available" forKey:@"status"];
+        }
+    } else {
+        [p setValue:@"Available" forKey:@"status"];
+    }
+    if (title) {
+        [p setValue:title forKey:@"showName"];
+    } else {
+        [p setValue:@"Unknown: PID Not Found" forKey:@"showName"];
+    }
+    [p setProcessedPID:@NO];
 }
 
 @synthesize showName;
