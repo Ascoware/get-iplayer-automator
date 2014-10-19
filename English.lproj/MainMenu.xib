@@ -171,16 +171,16 @@
         <window title="Pick a time..." allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="ScheduleStartWindow" animationBehavior="default" id="1148" userLabel="Delayed Start" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" utility="YES" HUD="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="196" y="146" width="420" height="364"/>
+            <rect key="contentRect" x="196" y="146" width="420" height="225"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1178"/>
             <view key="contentView" id="1149">
-                <rect key="frame" x="0.0" y="0.0" width="420" height="364"/>
+                <rect key="frame" x="0.0" y="5" width="420" height="225"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <datePicker verticalHuggingPriority="750" id="1150">
-                        <rect key="frame" x="38" y="69" width="278" height="148"/>
+                        <rect key="frame" x="92" y="72" width="277" height="27"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <datePickerCell key="cell" borderStyle="bezel" alignment="left" datePickerStyle="clockAndCalendar" id="1151">
+                        <datePickerCell key="cell" borderStyle="bezel" alignment="left" id="1151">
                             <font key="font" metaFont="system"/>
                             <calendarDate key="date" timeIntervalSinceReferenceDate="-595929600" calendarFormat="%Y-%m-%d %H:%M:%S %z">
                                 <!--1982-02-12 16:00:00 +0000-->
@@ -188,22 +188,11 @@
                             </calendarDate>
                             <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                            <datePickerElements key="datePickerElements" year="YES" month="YES" day="YES" hour="YES" minute="YES" second="YES"/>
+                            <datePickerElements key="datePickerElements" year="YES" month="YES" day="YES" hour="YES" minute="YES"/>
                         </datePickerCell>
                     </datePicker>
-                    <button verticalHuggingPriority="750" id="1154">
-                        <rect key="frame" x="282" y="12" width="130" height="32"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="push" title="Schedule Start" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1155">
-                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="system"/>
-                        </buttonCell>
-                        <connections>
-                            <action selector="scheduleStart:" target="621" id="1159"/>
-                        </connections>
-                    </button>
                     <button verticalHuggingPriority="750" id="1156">
-                        <rect key="frame" x="181" y="12" width="96" height="32"/>
+                        <rect key="frame" x="176" y="8" width="96" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1157">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -214,7 +203,7 @@
                         </connections>
                     </button>
                     <textField verticalHuggingPriority="750" id="1282">
-                        <rect key="frame" x="29" y="242" width="374" height="102"/>
+                        <rect key="frame" x="29" y="103" width="374" height="102"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" id="1283">
                             <font key="font" metaFont="system"/>
@@ -223,8 +212,20 @@
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
+                    <button verticalHuggingPriority="750" id="1154">
+                        <rect key="frame" x="272" y="8" width="130" height="32"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="push" title="Schedule Start" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1155">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="scheduleStart:" target="621" id="1159"/>
+                        </connections>
+                    </button>
                 </subviews>
             </view>
+            <point key="canvasLocation" x="860" y="682.5"/>
         </window>
         <dictionaryController objectClassName="_NSControllerKeyValuePair" id="fAe-Gc-WEJ" userLabel="modeSizeController"/>
         <menu title="AMainMenu" systemMenu="main" id="29" userLabel="MainMenu">
