@@ -483,7 +483,7 @@
                     <textField verticalHuggingPriority="750" id="689">
                         <rect key="frame" x="19" y="518" width="737" height="22"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" state="on" borderStyle="bezel" placeholderString="Search for Shows...  (Last 7 days only)" bezelStyle="round" id="690">
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" state="on" borderStyle="bezel" placeholderString="Search for Shows...  (Last 7 days only for BBC)" bezelStyle="round" id="690">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -2580,7 +2580,7 @@ Please Note: The searchable/downloadable types will not be updated until the cac
 
 Note: Only the types of shows you select in the preferences will show up here. 
 
-Note 2: Due to the way search is currently implemented, shows older than 7 days will not show up even though they may still be available. To download shows which are older, either manually paste in their PID or open them in your browser and press 'Use Current Webpage'.</string>
+Note 2: Due to the way search is currently implemented, BBC shows older than 7 days will not show up even though they may still be available. To download shows which are older, either manually paste in their PID or open them in your browser and press 'Use Current Webpage'.</string>
                             <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                             <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.0" colorSpace="calibratedRGB"/>
                         </textFieldCell>
