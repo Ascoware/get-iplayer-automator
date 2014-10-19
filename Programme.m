@@ -406,103 +406,105 @@
 
 - (void)getName
 {
-	NSTask *getNameTask = [[NSTask alloc] init];
-	NSPipe *getNamePipe = [[NSPipe alloc] init];
-	NSMutableString *getNameData = [[NSMutableString alloc] initWithString:@""];
-	NSString *listArgument = @"--listformat=<index> <pid> <type> <name> - <episode>,<channel>|<web>|";
-	NSString *fieldsArgument = @"--fields=index,pid";
-	NSString *wantedID = pid;
-	NSString *cacheExpiryArg = [[GetiPlayerArguments sharedController] cacheExpiryArgument:nil];
-	NSArray *args = @[[[NSBundle mainBundle] pathForResource:@"get_iplayer" ofType:@"pl"],@"--nocopyright",@"--nopurge",cacheExpiryArg,[[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO],listArgument,[GetiPlayerArguments sharedController].profileDirArg,fieldsArgument,wantedID];
-	[getNameTask setArguments:args];
-	[getNameTask setLaunchPath:@"/usr/bin/perl"];
-	
-	[getNameTask setStandardOutput:getNamePipe];
-	NSFileHandle *getNameFh = [getNamePipe fileHandleForReading];
-	NSData *inData;
-	
-    NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:[getNameTask environment]];
-    envVariableDictionary[@"HOME"] = [@"~" stringByExpandingTildeInPath];
-    envVariableDictionary[@"PERL_UNICODE"] = @"AS";
-    [getNameTask setEnvironment:envVariableDictionary];
-	[getNameTask launch];
-	
-	while ((inData = [getNameFh availableData]) && [inData length]) {
-		NSString *tempData = [[NSString alloc] initWithData:inData encoding:NSUTF8StringEncoding];
-		[getNameData appendString:tempData];
-	}
-	[self processGetNameData:getNameData];
+    @autoreleasepool {
+        NSTask *getNameTask = [[NSTask alloc] init];
+        NSPipe *getNamePipe = [[NSPipe alloc] init];
+        NSMutableString *getNameData = [[NSMutableString alloc] initWithString:@""];
+        NSString *listArgument = @"--listformat=<index> <pid> <type> <name> - <episode>,<channel>|<web>|";
+        NSString *fieldsArgument = @"--fields=index,pid";
+        NSString *wantedID = pid;
+        NSString *cacheExpiryArg = [[GetiPlayerArguments sharedController] cacheExpiryArgument:nil];
+        NSArray *args = @[[[NSBundle mainBundle] pathForResource:@"get_iplayer" ofType:@"pl"],@"--nocopyright",@"--nopurge",cacheExpiryArg,[[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO],listArgument,[GetiPlayerArguments sharedController].profileDirArg,fieldsArgument,wantedID];
+        [getNameTask setArguments:args];
+        [getNameTask setLaunchPath:@"/usr/bin/perl"];
+        
+        [getNameTask setStandardOutput:getNamePipe];
+        NSFileHandle *getNameFh = [getNamePipe fileHandleForReading];
+        NSData *inData;
+        
+        NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:[getNameTask environment]];
+        envVariableDictionary[@"HOME"] = [@"~" stringByExpandingTildeInPath];
+        envVariableDictionary[@"PERL_UNICODE"] = @"AS";
+        [getNameTask setEnvironment:envVariableDictionary];
+        [getNameTask launch];
+        
+        while ((inData = [getNameFh availableData]) && [inData length]) {
+            NSString *tempData = [[NSString alloc] initWithData:inData encoding:NSUTF8StringEncoding];
+            [getNameData appendString:tempData];
+        }
+        [self performSelectorOnMainThread:@selector(processGetNameData:) withObject:getNameData waitUntilDone:NO];
+    }
 }
 
 - (void)processGetNameData:(NSString *)getNameData
 {
-	NSArray *array = [getNameData componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
-   Programme *p = self;
-	int i = 0;
-	NSString *wantedID = [p valueForKey:@"pid"];
-	BOOL found=NO;
-	for (NSString *string in array)
-	{
-		i++;
-		if (i>1 && i<[array count]-1)
-		{
-			NSString *pid, *showName, *index, *type, *tvNetwork, *url;
-			@try{
-				NSScanner *scanner = [NSScanner scannerWithString:string];
-				[scanner scanUpToCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:&index];
-				[scanner scanUpToCharactersFromSet:[NSCharacterSet alphanumericCharacterSet] intoString:NULL];
-				[scanner scanUpToCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:&pid];
-				[scanner scanUpToCharactersFromSet:[NSCharacterSet alphanumericCharacterSet] intoString:NULL];
-				[scanner scanUpToCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:&type];
-				[scanner scanUpToCharactersFromSet:[NSCharacterSet alphanumericCharacterSet] intoString:NULL];
-				[scanner scanUpToString:@","  intoString:&showName];
-            [scanner scanString:@"," intoString:nil];
-            [scanner scanUpToString:@"|" intoString:&tvNetwork];
-            [scanner scanString:@"|" intoString:nil];
-            [scanner scanUpToString:@"|" intoString:&url];
-				scanner = nil;
-			}
-			@catch (NSException *e) {
-				NSAlert *getNameException = [[NSAlert alloc] init];
-				[getNameException addButtonWithTitle:@"OK"];
-				[getNameException setMessageText:[NSString stringWithFormat:@"Unknown Error!"]];
-				[getNameException setInformativeText:@"An unknown error occured whilst trying to parse Get_iPlayer output (processGetNameData)."];
-				[getNameException setAlertStyle:NSWarningAlertStyle];
-				[getNameException runModal];
-				getNameException = nil;
-			}
-			if ([wantedID isEqualToString:pid])
-			{
-				found=YES;
-				[p setValue:showName forKey:@"showName"];
-				[p setValue:index forKey:@"pid"];
-            [p setValue:tvNetwork forKey:@"tvNetwork"];
-            [p setUrl:url];
-				if ([type isEqualToString:@"radio"]) [p setValue:@YES forKey:@"radio"];
-            else if ([type isEqualToString:@"podcast"]) [p setPodcast:@YES];
-			}
-			else if ([wantedID isEqualToString:index])
-			{
-				found=YES;
-				[p setValue:showName forKey:@"showName"];
-            [p setValue:tvNetwork forKey:@"tvNetwork"];
-            [p setUrl:url];
-				if ([type isEqualToString:@"radio"]) [p setValue:@YES forKey:@"radio"];
-            else if ([type isEqualToString:@"podcast"]) [p setPodcast:@YES];
-			}
-		}
-      
-	}
-	if (!found)
-   {
-      if ([[p showName] isEqualToString:@""] || [[p showName] isEqualToString:@"Unknown: Not in Cache"])
-         [p setValue:@"Unknown: Not in Cache" forKey:@"showName"];
-      [p setProcessedPID:@NO];
-      [p getNameFromPID];
-   }
-	else
-		[p setProcessedPID:@YES];
-	
+    NSArray *array = [getNameData componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+    Programme *p = self;
+    int i = 0;
+    NSString *wantedID = [p valueForKey:@"pid"];
+    BOOL found=NO;
+    for (NSString *string in array)
+    {
+        i++;
+        if (i>1 && i<[array count]-1)
+        {
+            NSString *pid, *showName, *index, *type, *tvNetwork, *url;
+            @try{
+                NSScanner *scanner = [NSScanner scannerWithString:string];
+                [scanner scanUpToCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:&index];
+                [scanner scanUpToCharactersFromSet:[NSCharacterSet alphanumericCharacterSet] intoString:NULL];
+                [scanner scanUpToCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:&pid];
+                [scanner scanUpToCharactersFromSet:[NSCharacterSet alphanumericCharacterSet] intoString:NULL];
+                [scanner scanUpToCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:&type];
+                [scanner scanUpToCharactersFromSet:[NSCharacterSet alphanumericCharacterSet] intoString:NULL];
+                [scanner scanUpToString:@","  intoString:&showName];
+                [scanner scanString:@"," intoString:nil];
+                [scanner scanUpToString:@"|" intoString:&tvNetwork];
+                [scanner scanString:@"|" intoString:nil];
+                [scanner scanUpToString:@"|" intoString:&url];
+                scanner = nil;
+            }
+            @catch (NSException *e) {
+                NSAlert *getNameException = [[NSAlert alloc] init];
+                [getNameException addButtonWithTitle:@"OK"];
+                [getNameException setMessageText:[NSString stringWithFormat:@"Unknown Error!"]];
+                [getNameException setInformativeText:@"An unknown error occured whilst trying to parse Get_iPlayer output (processGetNameData)."];
+                [getNameException setAlertStyle:NSWarningAlertStyle];
+                [getNameException runModal];
+                getNameException = nil;
+            }
+            if ([wantedID isEqualToString:pid])
+            {
+                found=YES;
+                [p setValue:showName forKey:@"showName"];
+                [p setValue:index forKey:@"pid"];
+                [p setValue:tvNetwork forKey:@"tvNetwork"];
+                [p setUrl:url];
+                if ([type isEqualToString:@"radio"]) [p setValue:@YES forKey:@"radio"];
+                else if ([type isEqualToString:@"podcast"]) [p setPodcast:@YES];
+            }
+            else if ([wantedID isEqualToString:index])
+            {
+                found=YES;
+                [p setValue:showName forKey:@"showName"];
+                [p setValue:tvNetwork forKey:@"tvNetwork"];
+                [p setUrl:url];
+                if ([type isEqualToString:@"radio"]) [p setValue:@YES forKey:@"radio"];
+                else if ([type isEqualToString:@"podcast"]) [p setPodcast:@YES];
+            }
+        }
+        
+    }
+    if (!found)
+    {
+        if ([[p showName] isEqualToString:@""] || [[p showName] isEqualToString:@"Unknown: Not in Cache"])
+            [p setValue:@"Unknown: Not in Cache" forKey:@"showName"];
+        [p setProcessedPID:@NO];
+        [p getNameFromPID];
+    }
+    else
+        [p setProcessedPID:@YES];
+    
 }
 
 - (void)getNameFromPID
@@ -514,47 +516,54 @@
 
 -(void)getNameFromPIDProxyLoadFinished:(id)sender proxyDict:(NSDictionary *)proxyDict
 {
-    getiPlayerProxy = nil;
-    if (proxyDict && [proxyDict[@"error"] code] == kProxyLoadCancelled)
-        return;
-    NSTask *getNameTask = [[NSTask alloc] init];
-    NSPipe *getNamePipe = [[NSPipe alloc] init];
-    NSMutableString *getNameData = [[NSMutableString alloc] initWithString:@""];
-    NSMutableString *versionArg = [NSMutableString stringWithString:@"--versions="];
-    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"AudioDescribedNew"] boolValue])
-        [versionArg appendString:@"audiodescribed,"];
-    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"SignedNew"] boolValue])
-        [versionArg appendString:@"signed,"];
-    [versionArg  appendString:@"default"];
-    NSString *infoArgument = @"--info";
-    NSString *pidArgument = [NSString stringWithFormat:@"--pid=%@", pid];
-    NSString *cacheExpiryArg = [[GetiPlayerArguments sharedController] cacheExpiryArgument:nil];
-    NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:[[NSBundle mainBundle] pathForResource:@"get_iplayer" ofType:@"pl"],@"--nocopyright",@"--nopurge",versionArg,cacheExpiryArg,[GetiPlayerArguments sharedController].profileDirArg,infoArgument,pidArgument,nil];
-    if (proxyDict[@"proxy"]) {
-        if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue]) //Don't need proxy
-        {
-            [args addObject:[NSString stringWithFormat:@"-p%@",[proxyDict[@"proxy"] url]]];
+    [self performSelectorInBackground:@selector(spawnGetNameFromPIDThreadWitProxyDict:) withObject:proxyDict];
+}
+
+-(void)spawnGetNameFromPIDThreadWitProxyDict:(NSDictionary *)proxyDict
+{
+    @autoreleasepool {
+        getiPlayerProxy = nil;
+        if (proxyDict && [proxyDict[@"error"] code] == kProxyLoadCancelled)
+            return;
+        NSTask *getNameTask = [[NSTask alloc] init];
+        NSPipe *getNamePipe = [[NSPipe alloc] init];
+        NSMutableString *getNameData = [[NSMutableString alloc] initWithString:@""];
+        NSMutableString *versionArg = [NSMutableString stringWithString:@"--versions="];
+        if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"AudioDescribedNew"] boolValue])
+            [versionArg appendString:@"audiodescribed,"];
+        if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"SignedNew"] boolValue])
+            [versionArg appendString:@"signed,"];
+        [versionArg  appendString:@"default"];
+        NSString *infoArgument = @"--info";
+        NSString *pidArgument = [NSString stringWithFormat:@"--pid=%@", pid];
+        NSString *cacheExpiryArg = [[GetiPlayerArguments sharedController] cacheExpiryArgument:nil];
+        NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:[[NSBundle mainBundle] pathForResource:@"get_iplayer" ofType:@"pl"],@"--nocopyright",@"--nopurge",versionArg,cacheExpiryArg,[GetiPlayerArguments sharedController].profileDirArg,infoArgument,pidArgument,nil];
+        if (proxyDict[@"proxy"]) {
+            if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue]) //Don't need proxy
+            {
+                [args addObject:[NSString stringWithFormat:@"-p%@",[proxyDict[@"proxy"] url]]];
+            }
+            
         }
+        [getNameTask setArguments:args];
+        [getNameTask setLaunchPath:@"/usr/bin/perl"];
         
+        [getNameTask setStandardOutput:getNamePipe];
+        NSFileHandle *getNameFh = [getNamePipe fileHandleForReading];
+        NSData *inData;
+        
+        NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:[getNameTask environment]];
+        envVariableDictionary[@"HOME"] = [@"~" stringByExpandingTildeInPath];
+        envVariableDictionary[@"PERL_UNICODE"] = @"AS";
+        [getNameTask setEnvironment:envVariableDictionary];
+        [getNameTask launch];
+        
+        while ((inData = [getNameFh availableData]) && [inData length]) {
+            NSString *tempData = [[NSString alloc] initWithData:inData encoding:NSUTF8StringEncoding];
+            [getNameData appendString:tempData];
+        }
+        [self performSelectorOnMainThread:@selector(processGetNameDataFromPID:) withObject:getNameData waitUntilDone:NO];
     }
-    [getNameTask setArguments:args];
-    [getNameTask setLaunchPath:@"/usr/bin/perl"];
-    
-    [getNameTask setStandardOutput:getNamePipe];
-    NSFileHandle *getNameFh = [getNamePipe fileHandleForReading];
-    NSData *inData;
-    
-    NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:[getNameTask environment]];
-    envVariableDictionary[@"HOME"] = [@"~" stringByExpandingTildeInPath];
-    envVariableDictionary[@"PERL_UNICODE"] = @"AS";
-    [getNameTask setEnvironment:envVariableDictionary];
-    [getNameTask launch];
-    
-    while ((inData = [getNameFh availableData]) && [inData length]) {
-        NSString *tempData = [[NSString alloc] initWithData:inData encoding:NSUTF8StringEncoding];
-        [getNameData appendString:tempData];
-    }
-    [self processGetNameDataFromPID:getNameData];
 }
 
 - (void)processGetNameDataFromPID:(NSString *)getNameData

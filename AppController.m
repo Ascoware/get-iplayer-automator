@@ -853,7 +853,8 @@ NSDictionary *radioFormats;
 {
 	for (Programme *p in queueController.selectedObjects)
 	{
-		[p getName];
+        p.status = @"Processing...";
+		[p performSelectorInBackground:@selector(getName) withObject:nil];
 	}
 }
 
