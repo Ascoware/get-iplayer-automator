@@ -448,7 +448,8 @@
             NSString *tempData = [[NSString alloc] initWithData:inData encoding:NSUTF8StringEncoding];
             [getNameData appendString:tempData];
         }
-        [self performSelectorOnMainThread:@selector(processGetNameData:) withObject:getNameData waitUntilDone:NO];
+        [self performSelectorOnMainThread:@selector(processGetNameData:) withObject:getNameData waitUntilDone:YES];
+        getNameRunning = false;
     }
 }
 
@@ -522,7 +523,6 @@
     else
     {
         [p setProcessedPID:@YES];
-        getNameRunning = false;
     }
     
 }
@@ -582,7 +582,8 @@
             NSString *tempData = [[NSString alloc] initWithData:inData encoding:NSUTF8StringEncoding];
             [getNameData appendString:tempData];
         }
-        [self performSelectorOnMainThread:@selector(processGetNameDataFromPID:) withObject:getNameData waitUntilDone:NO];
+        [self performSelectorOnMainThread:@selector(processGetNameDataFromPID:) withObject:getNameData waitUntilDone:YES];
+        getNameRunning = false;
     }
 }
 
@@ -650,7 +651,6 @@
         [p setValue:@"Unknown: PID Not Found" forKey:@"showName"];
     }
     [p setProcessedPID:@NO];
-    getNameRunning = false;
 }
 
 @synthesize showName;
