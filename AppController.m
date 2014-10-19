@@ -1549,7 +1549,6 @@ NSDictionary *radioFormats;
                         if (!inQueue)
                         {
                             if (runDownloads) [p setValue:@"Waiting..." forKey:@"status"];
-                            else p.status = @"Available";
                             [queueController performSelectorOnMainThread:@selector(addObject:) withObject:p waitUntilDone:NO];
                         }
                     }
