@@ -191,8 +191,8 @@
 		Programme *newProg = [[Programme alloc] initWithLogController:logger];
 		[newProg setValue:pid forKey:@"pid"];
       if (newShowName) [newProg setShowName:newShowName];
-        newProg.status = @"Processing...";
-        [newProg performSelectorInBackground:@selector(getName) withObject:nil];
+//        newProg.status = @"Processing...";
+//        [newProg performSelectorInBackground:@selector(getName) withObject:nil];
       return newProg;
 	}
 	else if([url hasPrefix:@"http://www.bbc.co.uk/programmes/"])
@@ -218,8 +218,8 @@
 		Programme *newProg = [[Programme alloc] init];
 		[newProg setValue:pid forKey:@"pid"];
       if (newShowName) [newProg setShowName:newShowName];
-        newProg.status = @"Processing...";
-        [newProg performSelectorInBackground:@selector(getName) withObject:nil];
+//        newProg.status = @"Processing...";
+//        [newProg performSelectorInBackground:@selector(getName) withObject:nil];
         return newProg;
    }
    else if ([url hasPrefix:@"http://www.bbc.co.uk/sport/olympics/2012/live-video/"])
