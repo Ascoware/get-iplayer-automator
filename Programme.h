@@ -72,6 +72,7 @@ typedef NS_ENUM(NSInteger, GIA_ProgrammeType) {
 - (NSString *)typeDescription;
 - (void)getName;
 - (void)processGetNameData:(NSString *)getNameData;
+- (void)getNameSynchronous;
 
 @property (readwrite) NSString *showName;
 @property (readwrite) NSString *tvNetwork;
