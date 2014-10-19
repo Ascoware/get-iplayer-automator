@@ -903,7 +903,7 @@ NSDictionary *radioFormats;
     NSArray *temp_queue = [queueController selectedObjects];
     for (Programme *show in temp_queue)
     {
-        if ([show realPID] && [[show status] isEqualToString:@"Added by Series-Link"])
+        if ([show realPID] && show.addedByPVR)
         {
             NSDictionary *info = @{@"Programme": show};
             [[NSNotificationCenter defaultCenter] postNotificationName:@"AddProgToHistory" object:self userInfo:info];
@@ -1543,6 +1543,7 @@ NSDictionary *radioFormats;
                         if ([temp_type isEqualToString:@"radio"]) [p setValue:@YES forKey:@"radio"];
                         else if ([temp_type isEqualToString:@"podcast"]) [p setPodcast:@YES];
                         [p setValue:@"Added by Series-Link" forKey:@"status"];
+                        p.addedByPVR = true;
                         BOOL inQueue=NO;
                         for (Programme *show in currentQueue)
                             if ([[show showName] isEqualToString:[p showName]] && [[show pid] isEqualToString:[p pid]]) inQueue=YES;

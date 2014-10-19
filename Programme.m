@@ -48,6 +48,7 @@
     podcast=@NO;
     extendedMetadataRetrieved=@NO;
     getNameRunning = false;
+    addedByPVR = false;
     return self;
 }
 - (id)initWithShow:(Programme *)show
@@ -72,6 +73,7 @@
     podcast = [show podcast];
     extendedMetadataRetrieved=@NO;
     getNameRunning = false;
+    addedByPVR = false;
     return self;
 }
 - (id)init
@@ -105,6 +107,7 @@
     podcast=@NO;
     extendedMetadataRetrieved=@NO;
     getNameRunning = false;
+    addedByPVR = false;
     return self;
 }
 - (id)description
@@ -150,6 +153,8 @@
     desc=[[NSString alloc] init];
     podcast = [coder decodeObjectForKey:@"podcast"];
     extendedMetadataRetrieved=@NO;
+    getNameRunning = false;
+    addedByPVR = false;
     return self;
 }
 /*
@@ -683,4 +688,5 @@
 @synthesize lastBroadcast;
 @synthesize modeSizes;
 @synthesize thumbnail;
+@synthesize addedByPVR;
 @end
