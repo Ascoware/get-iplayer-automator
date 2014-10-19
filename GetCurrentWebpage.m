@@ -191,7 +191,6 @@
 		Programme *newProg = [[Programme alloc] initWithLogController:logger];
 		[newProg setValue:pid forKey:@"pid"];
       if (newShowName) [newProg setShowName:newShowName];
-		[newProg getName];
         newProg.status = @"Processing...";
         [newProg performSelectorInBackground:@selector(getName) withObject:nil];
       return newProg;
