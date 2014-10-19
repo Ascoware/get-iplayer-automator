@@ -531,10 +531,9 @@
     NSString *cacheExpiryArg = [[GetiPlayerArguments sharedController] cacheExpiryArgument:nil];
     NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:[[NSBundle mainBundle] pathForResource:@"get_iplayer" ofType:@"pl"],@"--nocopyright",@"--nopurge",versionArg,cacheExpiryArg,[GetiPlayerArguments sharedController].profileDirArg,infoArgument,pidArgument,nil];
     if (proxyDict[@"proxy"]) {
-        [args addObject:[NSString stringWithFormat:@"-p%@",[proxyDict[@"proxy"] url]]];
-        if (![[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])
+        if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue]) //Don't need proxy
         {
-            [args addObject:@"--partial-proxy"];
+            [args addObject:[NSString stringWithFormat:@"-p%@",[proxyDict[@"proxy"] url]]];
         }
         
     }
