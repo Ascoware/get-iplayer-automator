@@ -499,7 +499,7 @@
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" autosaveColumns="NO" headerView="470" id="469">
-                                    <rect key="frame" x="0.0" y="0.0" width="755" height="19"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="754" height="19"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <size key="intercellSpacing" width="3" height="2"/>
                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -891,7 +891,7 @@
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" autosaveColumns="NO" headerView="526" id="525">
-                                    <rect key="frame" x="0.0" y="0.0" width="566" height="19"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="581" height="19"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <size key="intercellSpacing" width="3" height="2"/>
                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -2151,7 +2151,7 @@
                                                 <rect key="frame" x="1" y="119" width="403" height="15"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
-                                            <scroller key="verticalScroller" verticalHuggingPriority="750" horizontal="NO" id="1423">
+                                            <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="1423">
                                                 <rect key="frame" x="404" y="17" width="15" height="102"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
@@ -2246,7 +2246,7 @@
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnSelection="YES" autosaveColumns="NO" headerView="1218" id="1217">
-                                    <rect key="frame" x="0.0" y="0.0" width="534" height="19"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="533" height="19"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <size key="intercellSpacing" width="3" height="2"/>
                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -2564,26 +2564,27 @@ Please Note: The searchable/downloadable types will not be updated until the cac
         <window title="Search Help" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="SearchHelpWindow" animationBehavior="default" id="782" userLabel="Help Panel: Search" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" utility="YES" HUD="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="690" y="385" width="432" height="142"/>
+            <rect key="contentRect" x="690" y="385" width="432" height="176"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1178"/>
             <view key="contentView" id="783">
-                <rect key="frame" x="0.0" y="0.0" width="432" height="142"/>
+                <rect key="frame" x="0.0" y="5" width="432" height="176"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <textField verticalHuggingPriority="750" id="785">
-                        <rect key="frame" x="17" y="20" width="398" height="102"/>
+                        <rect key="frame" x="17" y="20" width="398" height="136"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" id="786">
                             <font key="font" metaFont="system"/>
                             <string key="title">Please enter the name of the programme or series you would like to download. After you find what you want, select it, then click "Add to Queue". 
 
-Note: Only the types of shows you select in the preferences will show up here.</string>
+Note: Only the types of shows you select in the preferences will show up here. Also, due to the way search is currently implemented, shows older than 7 days will not show up even though they may still be available.</string>
                             <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                             <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.0" colorSpace="calibratedRGB"/>
                         </textFieldCell>
                     </textField>
                 </subviews>
             </view>
+            <point key="canvasLocation" x="767" y="318"/>
         </window>
         <window title="PVR Manager Help" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="PVRManagerHelpWindow" animationBehavior="default" id="1257" userLabel="Help Panel: PVR Manager" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" utility="YES" HUD="YES"/>
