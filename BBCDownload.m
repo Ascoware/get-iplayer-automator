@@ -262,6 +262,32 @@
             {
                NSLog(@"InHistory");
             }
+            else if ([LastLine containsString:@"Permission denied"])
+            {
+               if ([LastLine containsString:@"/Volumes"]) //Most likely disconnected external HDD
+               {
+                  show.complete = @YES;
+                  show.successful = @NO;
+                  show.status = @"Failed: HDD not Accessible";
+                  [self addToLog:@"REASON FOR FAILURE: The specified download directory could not be written to." noTag:YES];
+                  [self addToLog:@"Most likely this is because your external hard drive is disconnected but it could also be a permission issue"
+                           noTag:YES];
+                  [self addToLog:[NSString stringWithFormat:@"%@ Failed",[show showName]]];
+                  [show setReasonForFailure:@"External_Disconnected"];
+               
+               }
+               else
+               {
+                  show.complete = @YES;
+                  show.successful = @NO;
+                  show.status = @"Failed: Download Directory Unwriteable";
+                  [self addToLog:@"REASON FOR FAILURE: The specified download directory could not be written to." noTag:YES];
+                  [self addToLog:@"Please check the permissions on your download directory."
+                           noTag:YES];
+                  [self addToLog:[NSString stringWithFormat:@"%@ Failed",[show showName]]];
+                  [show setReasonForFailure:@"Download_Directory_Permissions"];
+               }
+            }
 				else if ([LastLine hasPrefix:@"INFO: Recorded"])
 				{
 					[show setValue:@YES forKey:@"complete"];
