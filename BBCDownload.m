@@ -102,7 +102,7 @@
 	profileDirArg = [[NSString alloc] initWithFormat:@"--profile-dir=%@", appSupportFolder];
 	
    //Add Arguments that can't be NULL
-	NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:getiPlayerPath,profileDirArg,noWarningArg,noPurgeArg,id3v2Arg,mplayerArg,rtmpdumpArg,lameArg,atomicParsleyArg,cacheExpiryArg,downloadPathArg,subDirArg,formatArg,getArg,searchArg,@"--attempts=5",@"--fatfilename",@"-w",@"--thumbsize=6",@"--tag-hdvideo",@"--tag-longdesc",@"--isodate",versionArg,ffmpegArg,proxyArg,partialProxyArg,nil];
+	NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:getiPlayerPath,profileDirArg,noWarningArg,noPurgeArg,id3v2Arg,mplayerArg,rtmpdumpArg,lameArg,atomicParsleyArg,cacheExpiryArg,downloadPathArg,subDirArg,formatArg,getArg,searchArg,@"--attempts=5",@"-w",@"--thumbsize=6",@"--tag-hdvideo",@"--tag-longdesc",@"--isodate",versionArg,ffmpegArg,proxyArg,partialProxyArg,nil];
    //Verbose?
    if (verbose)
 		[args addObject:@"--verbose"];
@@ -139,6 +139,7 @@
    NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:[task environment]];
    envVariableDictionary[@"DYLD_LIBRARY_PATH"] = [bundle resourcePath];
    envVariableDictionary[@"HOME"] = [@"~" stringByExpandingTildeInPath];
+   envVariableDictionary[@"PERL_UNICODE"] = @"AS";
    [task setEnvironment:envVariableDictionary];
 	
 	fh = [pipe fileHandleForReading];

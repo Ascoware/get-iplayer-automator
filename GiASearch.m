@@ -45,6 +45,10 @@
                  name:NSTaskDidTerminateNotification
                object:task];
 		data = [[NSMutableString alloc] init];
+        NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:[task environment]];
+        envVariableDictionary[@"HOME"] = [@"~" stringByExpandingTildeInPath];
+        envVariableDictionary[@"PERL_UNICODE"] = @"AS";
+        [task setEnvironment:envVariableDictionary];
 		[task launch];
 		[fh readInBackgroundAndNotify];
 	}

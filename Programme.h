@@ -12,55 +12,56 @@
 #import "GetiPlayerProxy.h"
 
 typedef NS_ENUM(NSInteger, GIA_ProgrammeType) {
-   GiA_ProgrammeTypeBBC_TV,
-   GiA_ProgrammeTypeBBC_Radio,
-   GiA_ProgrammeTypeBBC_Podcast,
-   GIA_ProgrammeTypeITV
+    GiA_ProgrammeTypeBBC_TV,
+    GiA_ProgrammeTypeBBC_Radio,
+    GiA_ProgrammeTypeBBC_Podcast,
+    GIA_ProgrammeTypeITV
 };
 
 
 @interface Programme : NSObject <NSCoding> {
-   LogController *logger;
-   
-	NSString *tvNetwork;
-	NSString *showName;
-	NSString *pid;
-	NSString *status;
-	NSString *seriesName;
-	NSString *episodeName;
-	NSNumber *complete;
-	NSNumber *successful;
-	NSNumber *timeadded;
-	NSString *path;
-	NSInteger season;
-	NSInteger episode;
-	NSNumber *processedPID;
-	NSNumber *radio;
-	NSString *realPID;
-	NSString *subtitlePath;
-   NSString *reasonForFailure;
-   NSString *availableModes;
-   NSString *url;
-   NSDate *__strong dateAired;
-   NSString *desc;
-   NSNumber *podcast;
-   
-   //Extended Metadata
-   NSNumber *extendedMetadataRetrieved;
-   NSNumber *successfulRetrieval;
-   NSNumber *duration;
-   NSString *categories;
-   NSDate *__strong firstBroadcast;
-   NSDate *__strong lastBroadcast;
-   NSDictionary *modeSizes;
-   NSImage *thumbnail;
-   
-   NSMutableString *taskOutput;
-   NSPipe *pipe;
-   volatile bool taskRunning;
-   NSTask *metadataTask;
-   GetiPlayerProxy *getiPlayerProxy;
-   
+    LogController *logger;
+    
+    NSString *tvNetwork;
+    NSString *showName;
+    NSString *pid;
+    NSString *status;
+    NSString *seriesName;
+    NSString *episodeName;
+    NSNumber *complete;
+    NSNumber *successful;
+    NSNumber *timeadded;
+    NSString *path;
+    NSInteger season;
+    NSInteger episode;
+    NSNumber *processedPID;
+    NSNumber *radio;
+    NSString *realPID;
+    NSString *subtitlePath;
+    NSString *reasonForFailure;
+    NSString *availableModes;
+    NSString *url;
+    NSDate *__strong dateAired;
+    NSString *desc;
+    NSNumber *podcast;
+    
+    //Extended Metadata
+    NSNumber *extendedMetadataRetrieved;
+    NSNumber *successfulRetrieval;
+    NSNumber *duration;
+    NSString *categories;
+    NSDate *__strong firstBroadcast;
+    NSDate *__strong lastBroadcast;
+    NSDictionary *modeSizes;
+    NSImage *thumbnail;
+    
+    NSMutableString *taskOutput;
+    NSPipe *pipe;
+    volatile bool taskRunning;
+    NSTask *metadataTask;
+    GetiPlayerProxy *getiPlayerProxy;
+    bool addedByPVR;
+    
 }
 - (id)initWithInfo:(id)sender pid:(NSString *)PID programmeName:(NSString *)SHOWNAME network:(NSString *)TVNETWORK logController:(LogController *)logger;
 - (id)initWithShow:(Programme *)show;
@@ -72,6 +73,7 @@ typedef NS_ENUM(NSInteger, GIA_ProgrammeType) {
 - (NSString *)typeDescription;
 - (void)getName;
 - (void)processGetNameData:(NSString *)getNameData;
+- (void)getNameSynchronous;
 
 @property (readwrite) NSString *showName;
 @property (readwrite) NSString *tvNetwork;
@@ -104,4 +106,5 @@ typedef NS_ENUM(NSInteger, GIA_ProgrammeType) {
 @property (readwrite) NSDate *lastBroadcast;
 @property (readwrite) NSDictionary *modeSizes;
 @property (readwrite) NSImage *thumbnail;
+@property (readwrite) bool addedByPVR;
 @end

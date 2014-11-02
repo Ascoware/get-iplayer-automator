@@ -57,8 +57,8 @@
                   else if ([[tab URL] hasPrefix:@"http://www.bbc.co.uk/programmes/"]) {
                      url = [NSString stringWithString:[tab URL]];
                      NSScanner *nameScanner = [NSScanner scannerWithString:[tab name]];
-                     [nameScanner scanUpToString:@" - " intoString:nil];
-                     [nameScanner scanString:@" - " intoString:nil];
+                     [nameScanner scanUpToString:@"- " intoString:nil];
+                     [nameScanner scanString:@"- " intoString:nil];
                      [nameScanner scanUpToString:@"kjklgfdjfgkdlj" intoString:&newShowName];
                      foundURL=YES;
                      source = [Safari doJavaScript:@"document.documentElement.outerHTML" in:tab];
@@ -127,8 +127,8 @@
                   else if ([[tab URL] hasPrefix:@"http://www.bbc.co.uk/programmes/"]) {
                      url = [NSString stringWithString:[tab URL]];
                      NSScanner *nameScanner = [NSScanner scannerWithString:[tab title]];
-                     [nameScanner scanUpToString:@" - " intoString:nil];
-                     [nameScanner scanString:@" - " intoString:nil];
+                     [nameScanner scanUpToString:@"- " intoString:nil];
+                     [nameScanner scanString:@"- " intoString:nil];
                      [nameScanner scanUpToString:@"kjklgfdjfgkdlj" intoString:&newShowName];
                      foundURL=YES;
                      source = [tab executeJavascript:@"document.documentElement.outerHTML"];
@@ -191,7 +191,8 @@
 		Programme *newProg = [[Programme alloc] initWithLogController:logger];
 		[newProg setValue:pid forKey:@"pid"];
       if (newShowName) [newProg setShowName:newShowName];
-		[newProg getName];
+//        newProg.status = @"Processing...";
+//        [newProg performSelectorInBackground:@selector(getName) withObject:nil];
       return newProg;
 	}
 	else if([url hasPrefix:@"http://www.bbc.co.uk/programmes/"])
@@ -204,7 +205,7 @@
 		[urlScanner scanString:@"/" intoString:nil];
 		[urlScanner scanUpToString:@"/" intoString:&pid];
 		NSScanner *scanner = [NSScanner scannerWithString:source];
-      [scanner scanUpToString:[NSString stringWithFormat:@"emp.load(\"http://www.bbc.co.uk/iplayer/playlist/%@\")", pid] intoString:nil];
+      [scanner scanUpToString:[NSString stringWithFormat:@"bbcProgrammes.programme = { pid : '%@', type : 'episode' }", pid] intoString:nil];
 		if ([scanner isAtEnd]) {
          NSAlert *invalidPage = [[NSAlert alloc] init];
          [invalidPage addButtonWithTitle:@"OK"];
@@ -217,8 +218,9 @@
 		Programme *newProg = [[Programme alloc] init];
 		[newProg setValue:pid forKey:@"pid"];
       if (newShowName) [newProg setShowName:newShowName];
-		return newProg;
-		[newProg getName];
+//        newProg.status = @"Processing...";
+//        [newProg performSelectorInBackground:@selector(getName) withObject:nil];
+        return newProg;
    }
    else if ([url hasPrefix:@"http://www.bbc.co.uk/sport/olympics/2012/live-video/"])
    {
