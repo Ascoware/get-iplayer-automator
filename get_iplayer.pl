@@ -24,7 +24,7 @@
 #
 #
 package main;
-my $version = 2.87;
+my $version = 2.88;
 my $version_text;
 $version_text = sprintf("v%.2f", $version) unless $version_text;
 #
@@ -51,7 +51,6 @@ $version_text = sprintf("v%.2f", $version) unless $version_text;
 # Known Issues:
 # * CAVEAT: The filenames and modes in the history are comma-separated if there was a multimode download. For now it just uses the first one.
 #
-use utf8;
 use Env qw[@PATH];
 use Fcntl;
 use File::Copy;
@@ -74,7 +73,7 @@ use Time::Local;
 use Unicode::Normalize;
 use URI;
 use open qw(:utf8);
-use Encode qw(:default :fallback_all);
+use Encode qw(:DEFAULT :fallback_all);
 use PerlIO::encoding;
 $PerlIO::encoding::fallback = XMLCREF;
 use constant FB_EMPTY => sub { '' };
@@ -137,7 +136,7 @@ my $opt_format = {
 	overwrite	=> [ 1, "overwrite|over-write!", 'Recording', '--overwrite', "Overwrite recordings if they already exist"],
 	partialproxy	=> [ 1, "partial-proxy!", 'Recording', '--partial-proxy', "Only uses web proxy where absolutely required (try this extra option if your proxy fails)"],
 	_url		=> [ 2, "", 'Recording', '--url "<url>"', "Record the embedded media player in the specified URL. Use with --type=<type>."],
-	pid		=> [ 2, "pid|url=s", 'Recording', '--pid <pid>', "Record an arbitrary pid that does not necessarily appear in the index."],
+	pid		=> [ 2, "pid|url=s@", 'Recording', '--pid <pid>', "Record an arbitrary pid that does not necessarily appear in the index."],
 	pidrecursive	=> [ 1, "pidrecursive|pid-recursive!", 'Recording', '--pid-recursive', "When used with --pid record all the embedded pids if the pid is a series or brand pid."],
 	proxy		=> [ 0, "proxy|p=s", 'Recording', '--proxy, -p <url>', "Web proxy URL e.g. 'http://USERNAME:PASSWORD\@SERVER:PORT' or 'http://SERVER:PORT'"],
 	raw		=> [ 0, "raw!", 'Recording', '--raw', "Don't transcode or change the recording/stream in any way (i.e. radio/realaudio, rtmp/flv)"],
@@ -227,6 +226,12 @@ my $opt_format = {
 	refreshinclude	=> [ 1, "refreshinclude|refresh-include=s", 'Config', '--refresh-include <string>', "Include matched channel(s) when refreshing cache (regex or comma separated values)"],
 	refreshexclude	=> [ 1, "refreshexclude|refresh-exclude|ignorechannels=s", 'Config', '--refresh-exclude <string>', "Exclude matched channel(s) when refreshing cache (regex or comma separated values)"],
 	refreshfuture	=> [ 1, "refreshfuture|refresh-future!", 'Config', '--refresh-future', "Obtain future programme schedule when refreshing cache (between 7-14 days)"],
+	refreshfeeds	=> [ 1, "refreshfeeds|refresh-feeds=s", 'Config', '--refresh-feeds <string>', "Alternate source for programme data.  Valid values: 'schedule'"],
+	refreshfeedsradio	=> [ 1, "refreshfeedsradio|refresh-feeds-radio=s", 'Config', '--refresh-feeds-radio <string>', "Alternate source for radio programme data.  Valid values: 'schedule'"],
+	refreshfeedstv	=> [ 1, "refreshfeedstv|refresh-feeds-tv=s", 'Config', '--refresh-feeds-tv <string>', "Alternate source for TV programme data.  Valid values: 'schedule'"],
+	refreshlimit	=> [ 1, "refreshlimit|refresh-limit=n", 'Config', '--refresh-limit <integer>', "Number of days of programmes to cache. Only applied with --refresh-feeds=schedule. Makes cache updates VERY slow. Default: 7 Min: 1 Max: 30"],
+	refreshlimitradio	=> [ 1, "refreshlimitradio|refresh-limit-radio=n", 'Config', '--refresh-limit-radio <integer>', "Number of days of radio programmes to cache. Only applied with --refresh-feeds=schedule. Makes cache updates VERY slow. Default: 7 Min: 1 Max: 30"],
+	refreshlimittv	=> [ 1, "refreshlimittv|refresh-limit-tv=n", 'Config', '--refresh-limit-tv <integer>', "Number of days of TV programmes to cache. Only applied with --refresh-feeds=schedule. Makes cache updates VERY slow. Default: 7 Min: 1 Max: 30"],
 	skipdeleted	=> [ 1, "skipdeleted!", 'Config', "--skipdeleted", "Skip the download of metadata/thumbs/subs if the media file no longer exists. Use with --history & --metadataonly/subsonly/thumbonly."],
 	update		=> [ 2, "update|u!", 'Config', '--update, -u', "Update get_iplayer if a newer one exists"],
 	webrequest	=> [ 1, "webrequest=s", 'Config', '--webrequest <urlencoded string>', 'Specify all options as a urlencoded string of "name=val&name=val&..."' ],
@@ -711,7 +716,17 @@ if ( defined($opt->{trimhistory}) ) {
 # Record prog specified by --pid option
 } elsif ( $opt->{pid} ) {
 	my $hist = History->new();
-	$retcode = find_pid_matches( $hist );
+	my @pids;
+	if ( ref($opt->{pid}) eq 'ARRAY' ) {
+		push @pids, @{$opt->{pid}};
+	} else {
+		push @pids, $opt->{pid};
+	}
+	@pids = split( /,/, join( ',', @pids ) );	
+	for ( @pids ) {
+		$opt->{pid} = $_;
+		$retcode += find_pid_matches( $hist );
+	}
 
 # Show history
 } elsif ( $opt->{history} ) {
@@ -2110,7 +2125,7 @@ sub open_file_append {
 	local *FH;
 	my $file = shift;
 	# Just in case we actually write to the file - make this /dev/null
-	$file = '/dev/null' if $opt->{nowrite};
+	$file = File::Spec->devnull() if $opt->{nowrite};
 	if ($file) {
 		if ( ! open(FH, ">>:raw", $file) ) {
 			logger "ERROR: Cannot write or append to $file\n\n";
@@ -2982,7 +2997,7 @@ sub StringUtils::sanitize_path {
 	my $force_default = shift || 0;
 	my $default_bad = '[^a-zA-Z0-9_\-\.\/\s]';
 	my $punct_bad = '[!"#$%&\'()*+,:;<=>?@[\]^`{|}~]';
-	my $fat_bad = '["\'*+,:;<=>?[\]^`|]';
+	my $fat_bad = '["*:<>?|]';
 	my $hfs_bad = '[:]';
 	# Replace forward slashes with _ if not path
 	$string =~ s/\//_/g unless $is_path;
@@ -3352,7 +3367,7 @@ sub usage {
 	my @man;
 	my @dump;
 	push @man, 
-		'.TH GET_IPLAYER "1" "October 2014" "Phil Lewis" "get_iplayer Manual"',
+		'.TH GET_IPLAYER "1" "November 2014" "Phil Lewis" "get_iplayer Manual"',
 		'.SH NAME', 'get_iplayer - Stream Recording tool and PVR for BBC iPlayer, BBC Podcasts and more',
 		'.SH SYNOPSIS',
 		'\fBget_iplayer\fR [<options>] [<regex|index> ...]',
@@ -3734,7 +3749,13 @@ sub display {
 	my $regex = $this->excludeopts;
 	main::logger "$title:\n";
 	for ( sort keys %{$this} ) {
-		main::logger "\t$_ = $this->{$_}\n" if defined $this->{$_} && $this->{$_};
+		if ( defined $this->{$_} && $this->{$_} ) {
+			if ( ref($this->{$_}) eq 'ARRAY' ) {
+				main::logger "\t$_ = ".(join(',', @{$this->{$_}}))."\n";
+			} else {
+				main::logger "\t$_ = $this->{$_}\n";
+			}
+		}
 	}
 	main::logger "\n";
 	return 0;
@@ -4520,14 +4541,6 @@ sub download_retry_loop {
 
 				# quit if successful or skip (unless --multimode selected)
 				last if ( $retcode == 0 || $retcode == 2 ) && ! $opt->{multimode};
-			}
-			if ( $retcode && ! $opt->{multimode} && ! $opt->{test} ) {
-				if ( $prog->{type} eq 'radio' || $prog->{type} eq 'liveradio' ) {
-					if ( grep(/wma/, @available_modes) && ! grep(/wma/, @modes) ) {
-						main::logger "INFO: You may wish to try --modes=wma for version $version\n";
-						main::logger "INFO: Note that wma mode is real-time only, and thus is generally only suitable for recording live radio.\n";
-					}
-				}
 			}
 		}
 		# Break out of loop if we have a successful recording for this version and mode
@@ -5421,27 +5434,28 @@ sub get_verpids {
 	# flatten
 	$xml =~ s/\n/ /g;
 
+	# set title here - broken in JSON playlists
+	$prog->{title} = decode_entities($1) if $xml =~ m{<title>\s*(.+?)\s*<\/title>};
+	$prog->{thumbnail} = $1 if $xml =~ m{<link rel="holding" href="(.*?)"};
+	$prog->{guidance} = $1 if $xml =~ m{<guidance.*?>(.*?)</guidance>};
+	$prog->{descshort} = $1 if $xml =~ m{<summary>(.*?)</summary>};
+	$prog->{type} = 'tv' if grep /kind="programme"/, $xml;
+	$prog->{type} = 'radio' if grep /kind="radioProgramme"/, $xml;
+
 	# Detect noItems or no programmes
 	if ( $xml =~ m{<noItems\s+reason="(\w+)"} || $xml !~ m{kind="(programme|radioProgramme)"} ) {
-		# set title here - broken in JSON playlists
-		$prog->{title} = decode_entities($1) if $xml =~ m{<title>\s*(.+?)\s*<\/title>};
-		my $rc_verpids = $prog->get_verpids_json( $ua );
-		if ( $rc_verpids ) {
-			$rc_verpids = $prog->get_verpids_html( $ua )
+		my $rc_json = $prog->get_verpids_json( $ua );
+		my $rc_html = 1;
+		if ( ! $prog->{type} || $prog->{type} eq 'tv' ) {
+			$rc_html = $prog->get_verpids_html( $ua );
 		}
-		return 0 if ! $rc_verpids;
-		main::logger "\rWARNING: No programmes are available for this pid with version(s): ".($opt->{versionlist} ? $opt->{versionlist} : 'default').($prog->{versions} ? " (available versions: $prog->{versions})\n" : "\n");
+		return 0 if ! $rc_json || ! $rc_html;
+		main::logger "\nWARNING: No programmes are available for this pid with version(s): ".($opt->{versionlist} ? $opt->{versionlist} : 'default').($prog->{versions} ? " (available versions: $prog->{versions})\n" : "\n");
 		return 1;
 	}
 
-	# Get title
-	# <title>Amazon with Bruce Parry: Episode 1</title>
-	my ( $title, $prog_type );
-	$title = $1 if $xml =~ m{<title>\s*(.+?)\s*<\/title>};
-
-	# Get type
-	$prog_type = 'tv' if grep /kind="programme"/, $xml;
-	$prog_type = 'radio' if grep /kind="radioProgramme"/, $xml;
+	# try json playlist for channel and any missing fields
+	$prog->get_verpids_json( $ua );
 
 	# Split into <item kind="programme"> sections
 	my $prev_version = '';
@@ -5454,7 +5468,8 @@ sub get_verpids {
 		if ( m{\s+simulcast="true"} ) {
 			$version = 'default';
 			# <item kind="programme" live="true" liverewind="true" identifier="bbc_two_england" group="bbc_two_england" simulcast="true" availability_class="liverewind">
-			$verpid = "http://www.bbc.co.uk/emp/simulcast/".$2.".xml" if m{\s+live="true"\s+(liverewind="true"\s+)?identifier="(.+?)"};
+			# $verpid = "http://www.bbc.co.uk/emp/simulcast/".$2.".xml" if m{\s+live="true"\s+(liverewind="true"\s+)?identifier="(.+?)"};
+			$verpid = $2 if m{\s+live="true"\s+(liverewind="true"\s+)?identifier="(.+?)"};
 			main::logger "INFO: Using Live TV: $verpid\n" if $opt->{verbose} && $verpid;
 
 		# Live/Non-live EMP tv/radio XML URL
@@ -5529,7 +5544,6 @@ sub get_verpids {
 
 	# Add to prog hash
 	$prog->{versions} = join ',', keys %{ $prog->{verpids} };
-	$prog->{title} = decode_entities($title);
 	return 0;
 }
 
@@ -5555,30 +5569,37 @@ sub get_verpids_json {
 		return 1;
 	}
 	my ( $default, $versions ) = split /"allAvailableVersions"/, $json;
-	my $channel = $1 if $default =~ /"masterBrandName":"(.*?)"/;
-	$prog->{channel} = $channel if $channel;
-	my $descshort = $1 if $default =~ /"summary":"(.*?)"/;
-	$prog->{descshort} = $descshort if $descshort;
-	my $guidance = $2 if $default =~ /"guidance":(null|"(.*?)")/;
-	$prog->{guidance} = "Yes" if $guidance;
-	my $thumbnail = $1 if $default =~ /"holdingImageURL":"(.*?)"/;
-	$thumbnail =~ s/\\\//\//g;
-	my $thumbsize = $opt->{thumbsize} || $opt->{thumbsizecache} || 150;
-	my $recipe = Programme::bbciplayer->thumb_url_recipes->{ $thumbsize };
-	if ( ! $recipe ) {
-		main::logger "WARNING: Invalid thumbnail size: $thumbsize - using default (JSON)\n";
-		$recipe = Programme::bbciplayer->thumb_url_recipes->{ 150 };
+	unless ( $prog->{channel} ) {
+		$prog->{channel} = $1 if $default =~ /"masterBrandName":"(.*?)"/;
 	}
-	$thumbnail =~ s/\$recipe/$recipe/;
-	$prog->{thumbnail} = $thumbnail if $thumbnail;
-	if ( ! $prog->{title} ) {
+	unless ( $prog->{descshort} ) {
+		$prog->{descshort} = $1 if $default =~ /"summary":"(.*?)"/;
+	}
+	unless ( $prog->{guidance} ) {
+		my $guidance = $2 if $default =~ /"guidance":(null|"(.*?)")/;
+		$prog->{guidance} = "Yes" if $guidance;
+	}
+	unless ( $prog->{thumbnail} ) {
+		my $thumbnail = $1 if $default =~ /"holdingImageURL":"(.*?)"/;
+		$thumbnail =~ s/\\\//\//g;
+		my $thumbsize = $opt->{thumbsize} || $opt->{thumbsizecache} || 150;
+		my $recipe = Programme::bbciplayer->thumb_url_recipes->{ $thumbsize };
+		if ( ! $recipe ) {
+			main::logger "WARNING: Invalid thumbnail size: $thumbsize - using default (JSON)\n";
+			$recipe = Programme::bbciplayer->thumb_url_recipes->{ 150 };
+		}
+		$thumbnail =~ s/\$recipe/$recipe/;
+		$prog->{thumbnail} = $thumbnail if $thumbnail;
+	}
+	unless ( $prog->{title} ) {
 		my $title = $1 if $default =~ /"title":"(.*?)"/;
 		$title =~ s/\\\//\//g;
 		$prog->{title} = decode_entities($title) if $title;
 	}
-	my $prog_type = 'tv' if $default =~ /"kind":"video"/;
-	$prog_type = 'radio' if $default =~ /"kind":"audio"/;
-	$prog->{type} = $prog_type if $prog_type;
+	unless ( $prog->{type} ) {
+		$prog->{type} = 'tv' if $default =~ /"kind":"video"/;
+		$prog->{type} = 'radio' if $default =~ /"kind":"audio"/;
+	}
 	my $version_json = {
 		'DubbedAudioDescribed' => 'audiodescribed', 
 		'Signed' => 'signed'
@@ -5608,6 +5629,7 @@ sub get_verpids_json {
 			}
 			unless ( $prog->{player} ) {
 				$prog->{player} = $episode_url if $episode_url;
+				last;
 			}
 		}
 	}
@@ -5635,8 +5657,10 @@ sub get_verpids_html {
 		main::logger "INFO: pid changed from $prog->{pid} to $pid (HTML)\n" if $opt->{verbose};
 		$prog->{pid} = $pid;
 	}
+	my $version_list = $opt->{versionlist} || 'default';
 	my $version_map = { "default" => "", "audiodescribed" => "ad", "signed" => "sign"};
 	for my $version ( "default", "audiodescribed", "signed" ) {
+		next if $version_list !~ /$version/ || $prog->{verpids}->{$version};
 		my $url = 'http://www.bbc.co.uk/iplayer/episode/'.$pid."/$version_map->{$version}";
 		main::logger "INFO: iPlayer metadata URL (HTML) [$version] = $url\n" if $opt->{verbose};
 		my $html = main::request_url_retry( $ua, $url, 3 );
@@ -5652,12 +5676,10 @@ sub get_verpids_html {
 			next;
 		}
 		unless ( $prog->{channel} ) {
-			my $channel = $1 if $config =~ /"masterBrandTitle":"(.*?)"/;
-			$prog->{channel} = $channel if $channel;
+			$prog->{channel} = $1 if $config =~ /"masterBrandTitle":"(.*?)"/;
 		}
 		unless ( $prog->{descshort} ) {
-			my $descshort = $1 if $config =~ /"summary":"(.*?)"/;
-			$prog->{descshort} = $descshort if $descshort;
+			$prog->{descshort} = $1 if $config =~ /"summary":"(.*?)"/;
 		}
 		unless ( $prog->{guidance} ) {
 			my $guidance = $2 if $config =~ /"guidance":(null|"(.*?)")/;
@@ -5690,7 +5712,6 @@ sub get_verpids_html {
 		$prog->{durations}->{$version} = $1 if $config =~ /"duration":(\d+)/;
 	}
 	$prog->{versions} = join ',', keys %{ $prog->{verpids} };
-	my $version_list = $opt->{versionlist} || 'default';
 	for ( split /,/, $version_list ) {
 		if ( $prog->{verpids}->{$_} ) {
 			my $episode_url;
@@ -5701,6 +5722,7 @@ sub get_verpids_html {
 			}
 			unless ( $prog->{player} ) {
 				$prog->{player} = $episode_url if $episode_url;
+				last;
 			}
 		}
 	}
@@ -5805,7 +5827,8 @@ sub get_metadata {
 	#</feed>
 
 	# Don't get metadata from this URL if the pid contains a full url (problem: this still tries for BBC iPlayer live channels)
-	if ( $prog->{pid} !~ m{^http}i ) {
+	# skip this section since BBC killed feeds, but keep code for reference
+	if ( $prog->{pid} !~ m{^http}i && 0) {
 		$entry = main::request_url_retry($ua, $prog_feed_url.$prog->{pid}, 3, '', '');
 		decode_entities($entry);
 		main::logger "DEBUG: $prog_feed_url.$prog->{pid}:\n$entry\n\n" if $opt->{debug};
@@ -5869,6 +5892,21 @@ sub get_metadata {
 		}
 	}
 
+	# Get list of available modes for each version available
+	# populate version pid metadata if we don't have it already
+	if ( keys %{ $prog->{verpids} } == 0 ) {
+		if ( $prog->get_verpids( $ua ) ) {
+			main::logger "ERROR: Could not get version pid metadata\n" if $opt->{verbose};
+			# Only return at this stage unless we want metadata/tags only for various reasons
+			return 1 if ! ( $opt->{info} || $opt->{metadataonly} || $opt->{thumbonly} || $opt->{tagonly} )
+		}
+	}
+	# Re-split title if changed in get_verpids()
+	#if ( $prog->{title} && $prog->{title} ne $title ) {
+	#	$title = $prog->{title};
+	#	( $name, $episode ) = Programme::bbciplayer::split_title( $title );
+	#}
+	$versions = join ',', sort keys %{ $prog->{verpids} };
 
 	# Even more info...
 	#<?xml version="1.0" encoding="utf-8"?>                                  
@@ -5956,21 +5994,6 @@ sub get_metadata {
 	$categories ||= "get_iplayer";
 	$category ||= "get_iplayer";
 
-	# Get list of available modes for each version available
-	# populate version pid metadata if we don't have it already
-	if ( keys %{ $prog->{verpids} } == 0 ) {
-		if ( $prog->get_verpids( $ua ) ) {
-			main::logger "ERROR: Could not get version pid metadata\n" if $opt->{verbose};
-			# Only return at this stage unless we want metadata/tags only for various reasons
-			return 1 if ! ( $opt->{info} || $opt->{metadataonly} || $opt->{thumbonly} || $opt->{tagonly} )
-		}
-	}
-	# Re-split title if changed in get_verpids()
-	if ( $prog->{title} && $prog->{title} ne $title ) {
-		$title = $prog->{title};
-		( $name, $episode ) = Programme::bbciplayer::split_title( $title );
-	}
-	$versions = join ',', sort keys %{ $prog->{verpids} };
 	my $modes;
 	my $mode_sizes;
 	my $first_broadcast;
@@ -6064,6 +6087,19 @@ sub get_metadata {
 		$episodenum = main::convert_words_to_number( $1 );
 	} elsif ( $episodetitle =~ m{$regex_2}i ) {
 		$episodenum = main::convert_words_to_number( $1 );
+	}
+
+	# last ditch web page scrap for radio programme series/episode numbers
+	if ( $prog->{type} eq "radio" && ( ! $seriesnum || ! $episodenum ) ) {
+		my $html = main::request_url_retry($ua, "http://www.bbc.co.uk/programmes/".$prog->{pid}, 3, '', '');
+		if ( $html ) {
+			if ( ! $seriesnum ) {
+				$seriesnum = $1 if $html =~ m{<span property="name">Series\s+(\d+)</span>}s;
+			}
+			if ( ! $episodenum ) {
+				$episodenum = $1 if $html =~ m{<span property="episodeNumber">(\d+)</span>}s;
+			}
+		}
 	}
 
 	# minimum episode number = 1 if not a film and series number == 0
@@ -6513,7 +6549,7 @@ sub get_stream_data_cdn {
 		# Common attributes
 		# swfurl = Default iPlayer swf version
 		my $conn = {
-			swfurl		=> $opt->{swfurl} || "http://emp.bbci.co.uk/emp/SMPf/1.9.39/StandardMediaPlayerChromelessFlash.swf",
+			swfurl		=> $opt->{swfurl} || "http://emp.bbci.co.uk/emp/SMPf/1.9.41/StandardMediaPlayerChromelessFlash.swf",
 			ext		=> $ext,
 			streamer	=> $streamer,
 			bitrate		=> $mattribs->{bitrate},
@@ -6989,7 +7025,7 @@ use IO::Seekable;
 use IO::Socket;
 use LWP::ConnCache;
 use LWP::UserAgent;
-use POSIX qw(mkfifo);
+use POSIX qw(mkfifo strftime);
 use strict;
 use Time::Local;
 use URI;
@@ -7002,24 +7038,16 @@ sub index_min { return 1 }
 sub index_max { return 9999 }
 sub channels {
 	return {
-		'bbcone'			=> 'BBC One',
-		'bbctwo'			=> 'BBC Two',
-		'bbcthree'			=> 'BBC Three',
-		'bbcfour'			=> 'BBC Four',
-		'bbcnews'			=> 'BBC News',
-		'bbcnews24'			=> 'BBC News',
+		'bbc_one'			=> 'BBC One',
+		'bbc_two'			=> 'BBC Two',
+		'bbc_three'			=> 'BBC Three',
+		'bbc_four'			=> 'BBC Four',
 		'cbbc'				=> 'CBBC',
 		'cbeebies'			=> 'CBeebies',
-		'parliament'			=> 'BBC Parliament',
-		'bbcwebonly'			=> 'BBC Web Only',
-		'bbchd'				=> 'BBC HD',
-		'bbcalba'			=> 'BBC Alba',
-		'categories/news/tv'		=> 'BBC News',
-		'categories/sport/tv'		=> 'BBC Sport',
-		'categories/signed'		=> 'Signed',
-		'categories/audiodescribed'	=> 'Audio Described',
-		'popular/tv'			=> 'Popular',
-		'highlights/tv'			=> 'Highlights',
+		'bbc_news24'		=> 'BBC News',
+		'bbc_parliament'	=> 'BBC Parliament',
+		'bbc_alba'			=> 'BBC Alba',
+		'bbc_webonly'		=> 'BBC Web Only',
 	};
 }
 
@@ -7169,143 +7197,72 @@ sub clean_pid {
 	}
 }
 
-
-
-# Usage: Programme::tv->get_links( \%prog, 'tv' );
-# Uses: %{ channels() }, \%prog
-sub get_links {
-	shift; # ignore obj ref
+sub get_links_aod {
+	my $self = shift;
 	my $prog = shift;
 	my $prog_type = shift;
+	return 1 if $prog_type ne "radio";
+	my %channel_map = (
+		'1xtra'			=> 'bbc_1xtra',
+		'radio1'		=> 'bbc_radio_one',
+		'radio2'		=> 'bbc_radio_two',
+		'radio3'		=> 'bbc_radio_three',
+		'radio4'		=> 'bbc_radio_four',
+		'radio4extra'	=> 'bbc_radio_four_extra',
+		'fivelive'		=> 'bbc_radio_five_live',
+		'sportsextra'	=> 'bbc_radio_five_live_sports_extra',
+		'6music'		=> 'bbc_6music',
+		'asiannetwork'	=> 'bbc_asian_network',
+		'radiofoyle'	=> 'bbc_radio_foyle',
+		'radioscotland'	=> 'bbc_radio_scotland',
+		'alba'			=> 'bbc_radio_nan_gaidheal',
+		'radioulster'	=> 'bbc_radio_ulster',
+		'radiowales'	=> 'bbc_radio_wales',
+		'radiocymru'	=> 'bbc_radio_cymru',
+		'worldservice'	=> 'bbc_world_service'
+	);
 	# Hack to get correct 'channels' method because this methods is being shared with Programme::radio
-	my %channels = %{ main::progclass($prog_type)->channels_filtered( main::progclass($prog_type)->channels() ) };
-	my $channel_feed_url = 'http://feeds.bbc.co.uk/iplayer'; # /$channel/list
+	my %channels = %{ main::progclass($prog_type)->channels_filtered( main::progclass($prog_type)->channels_aod() ) };
 	my $bbc_prog_page_prefix = 'http://www.bbc.co.uk/programmes'; # /$pid
-	my $thumbnail_prefix = 'http://www.bbc.co.uk/iplayer/images/episode';
-	my $xml;
-	my $feed_data;
-	my $res;
-	main::logger "INFO: Getting $prog_type Index Feeds\n";
 	# Setup User agent
 	my $ua = main::create_ua( 'desktop', 1 );
-
 	# Download index feed
-	# Sort feeds so that category based feeds are done last - this makes sure that the channels get defined correctly if there are dups
-	my @channel_list;
-	push @channel_list, grep !/(categor|popular|highlights|bbchd)/, keys %channels;
-	push @channel_list, grep  /categor/, keys %channels;
-	push @channel_list, grep  /popular/, keys %channels;
-	push @channel_list, grep  /highlights/, keys %channels;
-	push @channel_list, grep  /bbchd/, keys %channels;
-	for ( @channel_list ) {
-
-		my $url = "${channel_feed_url}/$_/list/limit/400";
-		main::logger "DEBUG: Getting feed $url\n" if $opt->{verbose};
-		$xml = main::request_url_retry($ua, $url, 3, '.', "WARNING: Failed to get programme index feed for $_ from iplayer site\n");
+	my @channel_list = keys %channels;
+ 	for my $channel_id ( @channel_list ) {
+		my $url = "http://www.bbc.co.uk/radio/aod/availability/${channel_id}.xml";
+		main::logger "\nDEBUG: Getting feed $url\n" if $opt->{verbose};
+		my $xml = main::request_url_retry($ua, $url, 3, '.', "\nWARNING: Failed to get programme index feed for $channels{$channel_id}\n");
 		decode_entities($xml);
-		
-		# Feed as of August 2008
-		#	 <entry>
-		#	   <title type="text">Bargain Hunt: Series 18: Oswestry</title>
-		#	   <id>tag:feeds.bbc.co.uk,2008:PIPS:b0088jgs</id>
-		#	   <updated>2008-07-22T00:23:50Z</updated>
-		#	   <content type="html">
-		#	     &lt;p&gt;
-		#	       &lt;a href=&quot;http://www.bbc.co.uk/iplayer/episode/b0088jgs?src=a_syn30&quot;&gt;
-		#		 &lt;img src=&quot;http://www.bbc.co.uk/iplayer/images/episode/b0088jgs_150_84.jpg&quot; alt=&quot;Bargain Hunt: Series 18: Oswestry&quot; /&gt;
-		#	       &lt;/a&gt;
-		#	     &lt;/p&gt;
-		#	     &lt;p&gt;
-		#	       The teams are at an antiques fair in Oswestry showground. Hosted by Tim Wonnacott.
-		#	     &lt;/p&gt;
-		#	   </content>
-		#	   <category term="Factual" />
-		#          <category term="Guidance" />
-		#	   <category term="TV" />
-		#	   <link rel="via" href="http://www.bbc.co.uk/iplayer/episode/b0088jgs?src=a_syn30" type="text/html" title="Bargain Hunt: Series 18: Oswestry" />
-		#       </entry>
-		#
-
-		### New Feed
-		#  <entry>
-		#    <title type="text">House of Lords: 02/07/2008</title>
-		#    <id>tag:bbc.co.uk,2008:PIPS:b00cd5p7</id>
-		#    <updated>2008-06-24T00:15:11Z</updated>
-		#    <content type="html">
-		#      <p>
-		#	<a href="http://www.bbc.co.uk/iplayer/episode/b00cd5p7?src=a_syn30">
-		#	  <img src="http://www.bbc.co.uk/iplayer/images/episode/b00cd5p7_150_84.jpg" alt="House of Lords: 02/07/2008" />
-		#	</a>
-		#      </p>
-		#      <p>
-		#	House of Lords, including the third reading of the Health and Social Care Bill. 1 July.
-		#      </p>
-		#    </content>
-		#    <category term="Factual" scheme="urn:bbciplayer:category" />
-		#    <link rel="via" href="http://www.bbc.co.uk/iplayer/episode/b00cd5p7?src=a_syn30" type="application/atom+xml" title="House of Lords: 02/07/2008">
-		#    </link>
-		#  </entry>
-
-		### Newer feed (Sept 2009)
-		#  <entry>
-		#    <title type="text">BBC Proms: 2009: Prom 65: Gustav Mahler Jugend Orchester</title>
-		#    <id>tag:feeds.bbc.co.uk,2008:PIPS:b00mgw03</id>
-		#    <updated>2009-09-05T03:29:07Z</updated>
-		#    <content type="html">
-		#      &lt;p&gt;
-		#        &lt;a href=&quot;http://www.bbc.co.uk/iplayer/episode/b00mgw03/BBC_Proms_2009_Prom_65_Gustav_Mahler_Jugend_Orchester/&quot;&gt;
-		#          &lt;img src=&quot;http://node1.bbcimg.co.uk/iplayer/images/episode/b00mgw03_150_84.jpg&quot; alt=&quot;BBC Proms: 2009: Prom 65: Gustav Mahler Jugend Orchester&quot; /&gt;
-		#        &lt;/a&gt;
-		#      &lt;/p&gt;
-		#      &lt;p&gt;
-		#        The Gustav Mahler Youth Orchestra perform works by Mahler, Richard Strauss and Ligeti.
-		#      &lt;/p&gt;
-		#    </content>
-		#    <category term="Music" />
-		#    <category term="Classical" />
-		#    <category term="TV" />
-		#    <link rel="alternate" href="http://www.bbc.co.uk/iplayer/episode/b00mgw03/BBC_Proms_2009_Prom_65_Gustav_Mahler_Jugend_Orchester/" type="text/html" title="BBC Proms: 2009: Prom 65: Gustav Mahler Jugend Orchester">
-		#      <media:content>
-		#        <media:thumbnail url="http://node1.bbcimg.co.uk/iplayer/images/episode/b00mgw03_150_84.jpg" width="150" height="84" />
-		#      </media:content>
-		#    </link>
-		#    <link rel="self" href="http://feeds.bbc.co.uk/iplayer/episode/b00mgw03" type="application/atom+xml" title="Prom 65: Gustav Mahler Jugend Orchester" />
-		#    <link rel="related" href="http://www.bbc.co.uk/programmes/b007v097/microsite" type="text/html" title="BBC Proms" />
-		#  </entry>
-
-
 		# Parse XML
-
 		# get list of entries within <entry> </entry> tags
-		my @entries = split /<entry>/, $xml;
+		my @entries = split /<entry/, $xml;
 		# Discard first element == header
 		shift @entries;
-
-		main::logger "INFO: Got ".($#entries + 1)." programmes\n" if $opt->{verbose};
+		main::logger "\nINFO: Got ".($#entries + 1)." programmes for $channels{$channel_id}\n" if $opt->{verbose};
+		my $now = time();
 		foreach my $entry (@entries) {
 			my ( $title, $name, $episode, $episodetitle, $nametitle, $episodenum, $seriesnum, $desc, $pid, $available, $channel, $duration, $thumbnail, $version, $guidance );
-			
-			my $entry_flat = $entry;
-			$entry_flat =~ s/\n/ /g;
-
-			# <id>tag:bbc.co.uk,2008:PIPS:b008pj3w</id>
-			$pid = $1 if $entry =~ m{<id>.*PIPS:(.+?)</id>};
-
-			# <title type="text">Richard Hammond's Blast Lab: Series Two: Episode 11</title>
-			# <title type="text">Skate Nation: Pro-Skate Camp</title>
-			$title = $1 if $entry =~ m{<title\s*.*?>\s*(.*?)\s*</title>};
-
+			my ($start, $available) = ($1, $2) if $entry =~ m{<availability\s+start="(.*?)"\s+end="(.*?)"};
+			next if ! ( $start || $available );
+			if ( $start ) {
+				my $xstart = Programme::get_time_string( $start );
+				next if $xstart > $now;
+			}
+			if ( $available ) {
+				my $xavailable = Programme::get_time_string( $available );
+				next if $xavailable < $now;
+			}
+			my $vpid = $1 if $entry =~ m{pid="(.+?)">};
+			$pid = $1 if $entry =~ m{<pid>(.+?)</pid>};
+			$duration = $1 if $entry =~ m{duration="(.*?)"};
+			$title = $1 if $entry =~ m{<title>(.*?)</title>};
 			# determine name and episode from title
 			( $name, $episode ) = Programme::bbciplayer::split_title( $title );
-
-			# Get the title from the atom link refs only to determine the longer episode name
-			$episodetitle = $1 if $entry =~ m{<link\s+rel="self"\s+href="http.+?/episode/.+?"\s+type="application/atom\+xml"\s+title="(.+?)"};
-			$nametitle = $1 if $entry =~ m{<link\s+rel="related"\s+href="http.+?/programmes/.+?"\s+type="text/html"\s+title="(.+?)"};
-
+			$episodetitle = $episode;
+			$nametitle = $name;
 			# Extract the seriesnum
 			my $regex = 'Series\s+'.main::regex_numbers();
 			$seriesnum = main::convert_words_to_number( $1 ) if "$name $episode" =~ m{$regex}i;
-
 			# Extract the episode num
 			my $regex_1 = 'Episode\s+'.main::regex_numbers();
 			my $regex_2 = '^'.main::regex_numbers().'\.\s+';
@@ -7316,79 +7273,22 @@ sub get_links {
 			} elsif ( $episodetitle =~ m{$regex_2}i ) {
 				$episodenum = main::convert_words_to_number( $1 );
 			}
-
 			# Re-insert the episode number if the episode text doesn't have it
 			if ( $episodenum && $episodetitle =~ /^\d+\./ && $episode !~ /^(.+:\s+)?\d+\./ ) {
 				$episode =~ s/^(.+:\s+)?(.*)$/$1$episodenum. $2/;
 			}
-
-			#<p>    House of Lords, including the third reading of the Health and Social Care Bill. 1 July.   </p>    </content>
-			$desc = $1 if $entry =~ m{<p>\s*(.*?)\s*</p>\s*</content>};
-			$desc =~ s|[\n\r]| |g;
-			# Remove unwanted html tags
-			$desc =~ s!</?(br|b|i|p|strong)\s*/?>!!gi;
-
-			# Parse the categories into hash
-			# <category term="Factual" />
-			my @category;
-			for my $line ( grep /<category/, (split /\n/, $entry) ) {
-				push @category, $1 if $line =~ m{<category\s+term="(.+?)"};
-			}
-			# strip commas - they confuse sorting and spliting later
-			s/,//g for @category;
-
+			$desc = $1 if $entry =~ m{<synopsis>(.*?)</synopsis>};
 			# Extract channel
-			$channel = $channels{$_};
-			# Add HD as category
-			push @category, 'HD' if $channel eq 'BBC HD';
-
+			$channel = $channels{$channel_id};
 			main::logger "DEBUG: '$pid, $name - $episode, $channel'\n" if $opt->{debug};
-
 			# Merge and Skip if this pid is a duplicate
 			if ( defined $prog->{$pid} ) {
-				main::logger "WARNING: '$pid, $prog->{$pid}->{name} - $prog->{$pid}->{episode}, $prog->{$pid}->{channel}' already exists (this channel = $channel)\n" if $opt->{verbose};
-				# Since we use the 'Signed' (or 'Audio Described') channel to get sign zone/audio described data, merge the categories from this entry to the existing entry
-				if ( $prog->{$pid}->{categories} ne join(',', sort @category) ) {
-					my %cats;
-					$cats{$_} = 1 for ( @category, split /,/, $prog->{$pid}->{categories} );
-					main::logger "INFO: Merged categories for $pid from $prog->{$pid}->{categories} to ".join(',', sort keys %cats)."\n" if $opt->{verbose};
-					$prog->{$pid}->{categories} = join(',', sort keys %cats);
-				}
-
-				# If this a popular or highlights programme then add these tags to categories
-				my %cats;
-				$cats{$_} = 1 for ( @category, split /,/, $prog->{$pid}->{categories} );
-				$cats{Popular} = 1 if $channel eq 'Popular';
-				$cats{Highlights} = 1 if $channel eq 'Highlights';
-				$prog->{$pid}->{categories} = join(',', sort keys %cats);
-
-				# If this is a dupicate pid and the channel is now Signed then both versions are available
-				$version = 'signed' if $channel eq 'Signed';
-				$version = 'audiodescribed' if $channel eq 'Audio Described';
-				# Add version to versions for existing prog
-				$prog->{$pid}->{versions} = join ',', main::make_array_unique_ordered( (split /,/, $prog->{$pid}->{versions}), $version );
 				next;
 			}
-
-			# Set guidance based on category
-			$guidance = 'Yes' if grep /guidance/i, @category;
-
-			# Check for signed-only or audiodescribed-only version from Channel
-			if ( $channel eq 'Signed' ) {
-				$version = 'signed';
-			} elsif ( $channel eq 'Audio Described' ) {
-				$version = 'audiodescribed';
-			} else {
-				$version = 'default';
-			}
-
-			# Default to 150px width thumbnail;
-			my $thumbsize = $opt->{thumbsizecache} || 150;
-			my $thumbnail = $1 if $entry =~ m{<media:thumbnail.*?url="(.*?)"};
-			my $suffix = Programme::bbciplayer->thumb_url_suffixes->{ $thumbsize };
-			if ( $thumbnail !~ /$suffix/ ) {
-				$thumbnail =~ s/_\d+_\d+\.jpg/$suffix/;
-			}
+			$version = 'default';
+			my @category;
+			my $thumb_pid = $channel_map{$channel_id} || $channel_id;
+			my $thumbnail = "http://www.bbc.co.uk/iplayer/images/radio/${thumb_pid}_640_360.jpg";
 			# build data structure
 			$prog->{$pid} = main::progclass($prog_type)->new(
 				'pid'		=> $pid,
@@ -7400,202 +7300,407 @@ sub get_links {
 				'desc'		=> $desc,
 				'guidance'	=> $guidance,
 				'available'	=> 'Unknown',
-				'duration'	=> 'Unknown',
+				'duration'	=> $duration || 'Unknown',
 				'thumbnail'	=> $thumbnail,
 				'channel'	=> $channel,
 				'categories'	=> join(',', sort @category),
 				'type'		=> $prog_type,
-				'web'		=> "${bbc_prog_page_prefix}/${pid}.html",
+				'web'		=> "${bbc_prog_page_prefix}/${pid}",
 			);
-
 		}
 	}
+}
 
-	# Get future schedules if required
-	# http://www.bbc.co.uk/cbbc/programmes/schedules/this_week.xml
-	# http://www.bbc.co.uk/cbbc/programmes/schedules/next_week.xml
-	if ( $opt->{refreshfuture} ) {
-		# Hack to get correct 'channels' method because this methods is being shared with Programme::radio
-		my %channels = %{ main::progclass($prog_type)->channels_filtered( main::progclass($prog_type)->channels_schedule() ) };
-		# Only get schedules for real channels
-		@channel_list = keys %channels;
-		for my $channel_id ( @channel_list ) {
-			my @schedule_feeds = (
-				"http://www.bbc.co.uk/${channel_id}/this_week.xml",
-				"http://www.bbc.co.uk/${channel_id}/next_week.xml",
-			);
-			for my $url ( @schedule_feeds ) {
-				main::logger "DEBUG: Getting feed $url\n" if $opt->{verbose};
-				$xml = main::request_url_retry($ua, $url, 3, '.', "WARNING: Failed to get programme schedule feed for $channel_id from iplayer site\n");
-				decode_entities($xml);
-		
-				# <broadcast is_repeat="1" is_blanked="0">
-				#   <pid>p00l44r8</pid>
-				#   <start>2011-10-24T00:45:00+01:00</start>
-				#   <end>2011-10-24T01:15:00+01:00</end>
-				#   <duration>1800</duration>
-				#   <programme type="episode">
-				#     <pid>b016c73c</pid>
-				#     <position>3</position>
-				#     <title>Episode 3</title>
-				#     <short_synopsis>With team captains Noel Fielding and Phill Jupitus, and a surprise special guest host.</short_synopsis>
-				#     <media_type>audio_video</media_type>
-				#     <duration>2100</duration>
-				#     <display_titles>
-				#       <title>Never Mind the Buzzcocks</title>
-				#       <subtitle>Series 25, Episode 3</subtitle>
-				#     </display_titles>
-				#     <first_broadcast_date>2011-10-17T22:00:00+01:00</first_broadcast_date>
-				#     <ownership>
-				#       <service type="tv" id="bbc_two" key="bbctwo">
-				#         <title>BBC Two</title>
-				#       </service>
-				#     </ownership>
-				#     <programme type="series">
-				#       <pid>b015skhy</pid>
-				#       <title>Series 25</title>
-				#       <position>25</position>
-				#       <expected_child_count>12</expected_child_count>
-				#       <first_broadcast_date>2011-10-03T22:00:00+01:00</first_broadcast_date>
-				#       <programme type="brand">
-				#         <pid>b006v0dz</pid>
-				#         <title>Never Mind the Buzzcocks</title>
-				#         <position />
-				#         <expected_child_count />
-				#         <first_broadcast_date>2007-06-20T22:00:00+01:00</first_broadcast_date>
-				#         <ownership>
-				#           <service type="tv" id="bbc_two" key="bbctwo">
-				#             <title>BBC Two</title>
-				#           </service>
-				#         </ownership>
-				#       </programme>
-				#     </programme>
-				#     <available_until>2011-10-30T23:29:00Z</available_until>
-				#     <actual_start>2011-10-17T22:30:00+01:00</actual_start>
-				#     <is_available_mediaset_pc_sd>1</is_available_mediaset_pc_sd>
-				#     <is_legacy_media>0</is_legacy_media>
-				#     <media format="video">
-				#       <expires>2011-10-30T23:29:00Z</expires>
-				#       <availability>11 days left to watch</availability>
-				#     </media>
-				#   </programme>
-				# </broadcast>
 
-				# get list of entries within <broadcast> </broadcast> tags
-				my @entries = split /<broadcast[^s]/, $xml;
-				# Discard first element == header
-				shift @entries;
-				main::logger "INFO: Got ".($#entries + 1)." programmes\n" if $opt->{verbose};
-				my $now = time();
-				foreach my $entry (@entries) {
-					my ( $title, $channel, $name, $episode, $episodetitle, $nametitle, $seriestitle, $episodenum, $seriesnum, $desc, $pid, $available, $duration, $thumbnail, $version, $guidance );
-
-					my $entry_flat = $entry;
-					$entry_flat =~ s/\n/ /g;
-
-					$pid = $1 if $entry =~ m{<programme\s+type="episode">.*?<pid>\s*(.+?)\s*</pid>};
-
-					$episode = $1 if $entry =~ m{<programme\s+type="episode">.*?<title>\s*(.*?)\s*</title>};
-					$nametitle = $1 if $entry =~ m{<programme\s+type="brand">.*?<title>\s*(.*?)\s*</title>.*?</programme>};
-					$seriestitle = $1 if $entry =~ m{<programme\s+type="series">.*?<title>\s*(.*?)\s*</title>.*?</programme>};
-
-					# Set name
-					if ( $nametitle && $seriestitle ) {
-						$name = "$nametitle: $seriestitle";
-					} elsif ( $seriestitle && ! $nametitle ) {
-						$name = $seriestitle;
-					# Fallback to episade name if the BBC missed out both Series and Name
-					} elsif ( ( ! $seriestitle ) && ! $nametitle ) {
-						$name = $episode;
-					} else {
-						$name = $nametitle;
-					}
-
-					# Extract the seriesnum
-					my $regex = 'Series\s+'.main::regex_numbers();
-					$seriesnum = main::convert_words_to_number( $1 ) if $seriestitle =~ m{$regex}i;
-
-					# Extract the episode num
-					my $regex_1 = 'Episode\s+'.main::regex_numbers();
-					my $regex_2 = '^'.main::regex_numbers().'\.\s+';
-					if ( $episode =~ m{$regex_1}i ) { 
-						$episodenum = main::convert_words_to_number( $1 );
-					} elsif ( $episode =~ m{$regex_2}i ) {
-						$episodenum = main::convert_words_to_number( $1 );
-					}
-
-					# extract desc
-					if ( $entry =~ m{<long_synopsis>\s*(.+?)\s*</long_synopsis>} ) {
-						$desc = $1;
-					} elsif ( $entry =~ m{<medium_synopsis>\s*(.+?)\s*</medium_synopsis>} ) {
-						$desc = $1;
-					} elsif ( $entry =~ m{<short_synopsis>\s*(.+?)\s*</short_synopsis>} ) {
-						$desc = $1;
-					};
-					# Remove unwanted html tags
-					$desc =~ s!</?(br|b|i|p|strong)\s*/?>!!gi;
-
-					$duration = $1 if $entry =~ m{<duration>\s*(.+?)\s*</duration>};
-					$available = $1 if $entry =~ m{<start>\s*(.+?)\s*</start>};
-
-					# Extract channel nice name
-					$channel = $channels{$channel_id};
-
-					main::logger "DEBUG: '$pid, $name - $episode, $channel'\n" if $opt->{debug};
-
-					# Merge and Skip if this pid is a duplicate
-					if ( defined $prog->{$pid} ) {
-						main::logger "WARNING: '$pid, $prog->{$pid}->{name} - $prog->{$pid}->{episode}, $prog->{$pid}->{channel}' already exists (this channel = $channel)\n" if $opt->{verbose};
-						# Update this info from schedule (not available in the usual iplayer channels feeds)
-						$prog->{$pid}->{duration} = $duration;
-						$prog->{$pid}->{episodenum} = $episodenum if ! $prog->{$pid}->{episodenum};
-						$prog->{$pid}->{seriesnum} = $seriesnum if ! $prog->{$pid}->{seriesnum};
-						# don't add this as some progs are already available
-						#$prog->{$pid}->{available} = $available;
-						next;
-					}
-
-					$version = 'default';
-
-					# Default to 150px width thumbnail;
-					my $thumbsize = $opt->{thumbsizecache} || 150;
-					my $thumbnail = $1 if $entry =~ m{<media:thumbnail.*?url="(.*?)"};
-					if ( $thumbnail ) {
-						my $suffix = Programme::bbciplayer->thumb_url_suffixes->{ $thumbsize };
-						if ( $thumbnail !~ /$suffix/ ) {
-							$thumbnail =~ s/_\d+_\d+\.jpg/$suffix/;
-						}
-					}
-
-					# Don't create this prog instance if the availablity is in the past 
-					# this prevents programmes which never appear in iPlayer from being indexed
-					next if Programme::get_time_string( $available ) < $now;
-
-					# build data structure
-					$prog->{$pid} = main::progclass($prog_type)->new(
-						'pid'		=> $pid,
-						'name'		=> $name,
-						'versions'	=> $version,
-						'episode'	=> $episode,
-						'seriesnum'	=> $seriesnum,
-						'episodenum'	=> $episodenum,
-						'desc'		=> $desc,
-						'available'	=> $available,
-						'duration'	=> $duration,
-						'thumbnail'	=> $thumbnail,
-						'channel'	=> $channel,
-						'type'		=> $prog_type,
-						'web'		=> "${bbc_prog_page_prefix}/${pid}.html",
-					);
+sub get_links_ion {
+	my $self = shift;
+	my $prog = shift;
+	my $prog_type = shift;
+	# Hack to get correct 'channels' method because this methods is being shared with Programme::radio
+	my %channels = %{ main::progclass($prog_type)->channels_filtered( main::progclass($prog_type)->channels() ) };
+	my $bbc_prog_page_prefix = 'http://www.bbc.co.uk/programmes'; # /$pid
+	# Setup User agent
+	my $ua = main::create_ua( 'desktop', 1 );
+	# Download index feed
+	my @channel_list;
+	@channel_list = sort keys %channels;
+ 	for my $channel_id ( @channel_list ) {
+		my @ranges;
+		push @ranges, ('a-z', '0-9');
+		if ( $prog_type eq 'tv' ) {
+			push @ranges, ('signed_a-z', 'signed_0-9');
+		}
+		for my $range ( @ranges ) {
+			my $cond = $range;
+			my $op = "letters";
+			my $cat;
+			if ( $cond =~ /signed_/ ) {
+				$cond =~ s/signed_//;
+				$cat = "category/signed";
+			}
+			my $url = "http://www.bbc.co.uk/iplayer/ion/atoz/format/xml/service_type/${prog_type}/masterbrand/$channel_id/$op/$cond/$cat";
+			main::logger "\nDEBUG: Getting feed $url\n" if $opt->{verbose};
+			my $xml = main::request_url_retry($ua, $url, 3, '.', "\nWARNING: Failed to get programme index feed for $channels{$channel_id} - $cond $cat\n");
+			decode_entities($xml);
+			# Parse XML
+			# get list of entries within <entry> </entry> tags
+			my @entries = split /<episode>/, $xml;
+			# Discard first element == header
+			shift @entries;
+			main::logger "\nINFO: Got ".($#entries + 1)." programmes for $channels{$channel_id} - $cond $cat\n" if $opt->{verbose};
+			foreach my $entry (@entries) {
+				my ( $title, $name, $episode, $episodetitle, $nametitle, $episodenum, $seriesnum, $desc, $pid, $available, $channel, $duration, $thumbnail, $version, $guidance );
+				$pid = $1 if $entry =~ m{</passionsite_title>.*?<id>(.+?)</id>}s;
+				$duration = $1 if $entry =~ m{<duration>(.*?)</duration>};
+				$title = $1 if $entry =~ m{<complete_title>(.*?)</complete_title>};
+				# determine name and episode from title
+				( $name, $episode ) = Programme::bbciplayer::split_title( $title );
+				$episodetitle = $1 if $entry =~ m{<short_synopsis>.*?<title>(.*?)</title>}s;
+				$nametitle = $name;
+				# Extract the seriesnum
+				my $regex = 'Series\s+'.main::regex_numbers();
+				$seriesnum = main::convert_words_to_number( $1 ) if "$name $episode" =~ m{$regex}i;
+				# Extract the episode num
+				my $regex_1 = 'Episode\s+'.main::regex_numbers();
+				my $regex_2 = '^'.main::regex_numbers().'\.\s+';
+				if ( "$name $episode" =~ m{$regex_1}i ) { 
+					$episodenum = main::convert_words_to_number( $1 );
+				} elsif ( $episode =~ m{$regex_2}i ) {
+					$episodenum = main::convert_words_to_number( $1 );
+				} elsif ( $episodetitle =~ m{$regex_2}i ) {
+					$episodenum = main::convert_words_to_number( $1 );
 				}
-			}		
-
+				# Re-insert the episode number if the episode text doesn't have it
+				if ( $episodenum && $episodetitle =~ /^\d+\./ && $episode !~ /^(.+:\s+)?\d+\./ ) {
+					$episode =~ s/^(.+:\s+)?(.*)$/$1$episodenum. $2/;
+				}
+				$desc = $1 if $entry =~ m{<short_synopsis>(.*?)</short_synopsis>};
+				my @category;
+				my @lines = split /<category>/, $entry;
+				shift @lines;
+				for my $line ( @lines ) {
+					push @category, $1 if $line =~ m{<title>(.*?)</title>};
+				}
+				# strip commas - they confuse sorting and spliting later
+				s/,//g for @category;
+				# Extract channel
+				$channel = $1 if $entry =~ m{<masterbrand_title>(.*?)</masterbrand_title>};
+				main::logger "DEBUG: '$pid, $name - $episode, $channel'\n" if $opt->{debug};
+				# Merge and Skip if this pid is a duplicate
+				if ( defined $prog->{$pid} ) {
+					main::logger "WARNING: '$pid, $prog->{$pid}->{name} - $prog->{$pid}->{episode}, $prog->{$pid}->{channel}' already exists (this channel = $channel)\n" if $opt->{verbose};
+					# Since we use the 'Signed' (or 'Audio Described') channel to get sign zone/audio described data, merge the categories from this entry to the existing entry
+					if ( $prog->{$pid}->{categories} ne join(',', sort @category) ) {
+						my %cats;
+						$cats{$_} = 1 for ( @category, split /,/, $prog->{$pid}->{categories} );
+						main::logger "INFO: Merged categories for $pid from $prog->{$pid}->{categories} to ".join(',', sort keys %cats)."\n" if $opt->{verbose};
+						$prog->{$pid}->{categories} = join(',', sort keys %cats);
+					}
+					# If this is a duplicate pid and the channel is now Signed then both versions are available
+					$version = 'signed' if grep /Sign Zone/, @category;
+					$version = 'audiodescribed' if grep /Audio Described/, @category;
+					# Add version to versions for existing prog
+					$prog->{$pid}->{versions} = join ',', main::make_array_unique_ordered( (split /,/, $prog->{$pid}->{versions}), $version );
+					next;
+				}
+				$guidance = $1 if $entry =~ m{<has_guidance>(.*?)</has_guidance>};
+				if ( $guidance ) {
+					$guidance = "Yes";
+				} else {
+					$guidance = undef;
+				}
+				# Check for signed-only or audiodescribed-only version from category
+				if ( grep /Sign Zone/, @category ) {
+					$version = 'signed';
+				} elsif ( grep /Audio Described/, @category ) {
+					$version = 'audiodescribed';
+				} else {
+					$version = 'default';
+				}
+				# Default to 150px width thumbnail;
+				my $thumbsize = $opt->{thumbsizecache} || 150;
+				my $image_template_url = $1 if $entry =~ m{<image_template_url>(.*?)</image_template_url>};
+				my $recipe = Programme::bbciplayer->thumb_url_recipes->{ $thumbsize };
+				my $thumbnail = $image_template_url;
+				$thumbnail =~ s/\$recipe/$recipe/;
+				# build data structure
+				$prog->{$pid} = main::progclass($prog_type)->new(
+					'pid'		=> $pid,
+					'name'		=> $name,
+					'versions'	=> $version,
+					'episode'	=> $episode,
+					'seriesnum'	=> $seriesnum,
+					'episodenum'	=> $episodenum,
+					'desc'		=> $desc,
+					'guidance'	=> $guidance,
+					'available'	=> 'Unknown',
+					'duration'	=> $duration || 'Unknown',
+					'thumbnail'	=> $thumbnail,
+					'channel'	=> $channel,
+					'categories'	=> join(',', sort @category),
+					'type'		=> $prog_type,
+					'web'		=> "${bbc_prog_page_prefix}/${pid}",
+				);
+			}
 		}
 	}
+}
+
+
+# Usage: Programme::tv->get_links( \%prog, 'tv' );
+# Uses: %{ channels() }, \%prog
+sub get_links {
+	my $self = shift; # ignore obj ref
+	my $prog = shift;
+	my $prog_type = shift;
+ 	my $feeds = lc($opt->{"refreshfeeds".${prog_type}} || $opt->{"refreshfeeds"});
+	main::logger "INFO: Getting $prog_type Index Feeds (this may take a few minutes)\n";
+	if ( $feeds eq 'schedule' ) {
+		return $self->get_links_schedule($prog, $prog_type, 0);
+	} else {
+		if ( $prog_type eq 'radio' ) {
+			return $self->get_links_aod($prog, $prog_type);
+		}
+		elsif ( $prog_type eq 'tv' ) {
+			return $self->get_links_ion($prog, $prog_type);
+		}
+	}
+
+	if ( $opt->{refreshfuture} ) {
+		$self->get_links_schedule($prog, $prog_type, 1);
+	}
+	
 	main::logger "\n";
 	return 0;
 }
 
+
+# get cache info for programmes from schedule
+sub get_links_schedule {
+	my $self = shift;
+	my $prog = shift;
+	my $prog_type = shift;
+	my $future = shift;
+	my %channels = %{ main::progclass($prog_type)->channels_filtered( main::progclass($prog_type)->channels_schedule() ) };
+	my @channel_list = sort keys %channels;
+	my @schedule_dates;
+	my $limit = 0;
+	my $limit_days = $opt->{"refreshlimit".${prog_type}} || $opt->{"refreshlimit"};
+	$limit_days = 30 if $limit_days > 30;
+	if ( $limit_days ) {
+		my $now = time();
+		$limit = $now - $limit_days * 86400;
+		my ($limit_weeks, $rem) = (int $limit_days / 7, $limit_days % 7);
+		$limit_weeks++ if $rem && $limit_weeks;
+		for (my $i = $limit_weeks; $i >= 0; $i -= 1) {
+			my $then = $now - ($i * 7) * 86400;
+			my $year = (gmtime($then))[5];
+			my $week = strftime( "%W", gmtime($then) );
+			push @schedule_dates, sprintf("%04d/w%02d", $year+1900, ++$week);
+		}
+	} else {
+		if ( $future ) {
+			@schedule_dates = ( "this_week", "next_week" );
+		} else {
+			@schedule_dates = ( "last_week", "this_week" );
+		}
+	}
+	for my $channel_id ( @channel_list ) {
+		for my $schedule_date ( @schedule_dates ) {
+			my $url = "http://www.bbc.co.uk/${channel_id}/${schedule_date}.xml";
+			my $rc = $self->get_links_schedule_page($prog, $prog_type, $channels{$channel_id}, $future, $url, $limit);
+			if ( $rc ) {
+				main::logger("\nWARNING: Failed to get programme schedule feed for $channel_id from iplayer site\n");
+			}
+		}
+	}
+}
+
+# get cache info from schedule page
+sub get_links_schedule_page {
+	my $self = shift;
+	my $prog = shift;
+	my $prog_type = shift;
+	my $channel = shift;
+	my $future = shift;
+	my $url = shift;
+	my $limit = shift;
+	my $bbc_prog_page_prefix = 'http://www.bbc.co.uk/programmes'; # /$pid
+	my $ua = main::create_ua( 'desktop', 1 );
+	main::logger "DEBUG: Getting feed $url\n" if $opt->{debug};
+	my $xml = main::request_url_retry($ua, $url, 3, '.', "\nWARNING: Failed to download programme schedule $url\n");
+	return 1 if ! $xml;
+	decode_entities($xml);
+		
+	# <broadcast is_repeat="0" is_blanked="0">
+	# 	<pid>p0290kxs</pid>
+	# 	<start>2014-10-31T11:00:00Z</start>
+	# 	<end>2014-10-31T11:45:00Z</end>
+	# 	<duration>2700</duration>
+	# 	<programme type="episode">
+	# 		<pid>b04n8rx0</pid>
+	# 		<position>10</position>
+	# 		<title>Episode 10</title>
+	# 		<short_synopsis>Council officers deal with home owners living on top of deadly waste.</short_synopsis>
+	# 		<media_type>audio_video</media_type>
+	# 		<duration>2700</duration>
+	# 		<image>
+	# 			<pid>p028r5jx</pid>
+	# 		</image>
+	# 		<display_titles>
+	# 			<title>Call the Council</title>
+	# 			<subtitle>Series 2, Episode 10</subtitle>
+	# 		</display_titles>
+	# 		<first_broadcast_date>2014-10-31T11:00:00Z</first_broadcast_date>
+	# 		<ownership>
+	# 			<service type="tv" id="bbc_one" key="bbcone">
+	# 				<title>BBC One</title>
+	# 			</service>
+	# 		</ownership>
+	# 		<programme type="series">
+	# 			<pid>b04mlq1k</pid>
+	# 			<title>Series 2</title>
+	# 			<position>2</position>
+	# 			<image>
+	# 				<pid>p028r5jx</pid>
+	# 			</image>
+	# 			<expected_child_count>10</expected_child_count>
+	# 			<first_broadcast_date>2014-10-20T11:00:00+01:00</first_broadcast_date>
+	# 			<ownership>
+	# 				<service type="tv" id="bbc_one" key="bbcone">
+	# 					<title>BBC One</title>
+	# 				</service>
+	# 			</ownership>
+	# 			<programme type="brand">
+	# 				<pid>b04mlpdd</pid>
+	# 				<title>Call the Council</title>
+	# 				<position/>
+	# 				<image>
+	# 					<pid>p028r5jx</pid>
+	# 				</image>
+	# 				<expected_child_count/>
+	# 				<first_broadcast_date>2014-05-19T11:30:00+01:00</first_broadcast_date>
+	# 				<ownership>
+	# 					<service type="tv" id="bbc_one" key="bbcone">
+	# 						<title>BBC One</title>
+	# 					</service>
+	# 				</ownership>
+	# 			</programme>
+	# 		</programme>
+	# 		<available_until>2014-12-03T07:45:00Z</available_until>
+	# 		<actual_start>2014-10-31T11:45:00Z</actual_start>
+	# 		<is_available_mediaset_pc_sd>1</is_available_mediaset_pc_sd>
+	# 		<is_legacy_media>0</is_legacy_media>
+	# 		<media format="video">
+	# 			<expires>2014-12-03T07:45:00Z</expires>
+	# 			<availability>1 month left to watch</availability>
+	# 		</media>
+	# 	</programme>
+	# </broadcast>	
+
+	# get list of entries within <broadcast> </broadcast> tags
+	my @entries = split /<broadcast[^s]/, $xml;
+	# Discard first element == header
+	shift @entries;
+	main::logger "\nINFO: Got ".($#entries + 1)." programmes for $channel\n" if $opt->{verbose};
+	my $now = time();
+	foreach my $entry (@entries) {
+		my ( $title, $name, $episode, $episodetitle, $nametitle, $seriestitle, $episodenum, $seriesnum, $desc, $pid, $available, $duration, $thumbnail, $version, $guidance, $descshort, $start );
+		$start = $1 if $entry =~ m{<start>\s*(.+?)\s*</start>};
+		next if ! $start;
+		my $xstart = Programme::get_time_string( $start );
+		next if $future &&  $xstart < $now;
+		next if ! $future && $xstart >= $now;
+		next if ! $future && $limit && $xstart < $limit;
+		$available = $1 if $entry =~ m{<available_until>\s*(.+?)\s*</available_until>};
+		my $availability = $1 if $entry =~ m{<availability>.*?(Available).*?</availability>}i;
+		next if ! ( $available || $availability );
+		if ( $available ) {
+			my $xavailable = Programme::get_time_string( $available );
+			next if $xavailable < $now;
+		}
+		$pid = $1 if $entry =~ m{<programme\s+type="episode">.*?<pid>\s*(.+?)\s*</pid>};
+		$episode = $1 if $entry =~ m{<programme\s+type="episode">.*?<title>\s*(.*?)\s*</title>};
+		$nametitle = $1 if $entry =~ m{<programme\s+type="brand">.*?<title>\s*(.*?)\s*</title>.*?</programme>};
+		$seriestitle = $1 if $entry =~ m{<programme\s+type="series">.*?<title>\s*(.*?)\s*</title>.*?</programme>};
+		# Set name
+		if ( $nametitle && $seriestitle ) {
+			$name = "$nametitle: $seriestitle";
+		} elsif ( $seriestitle && ! $nametitle ) {
+			$name = $seriestitle;
+		# Fallback to episode name if the BBC missed out both Series and Name
+		} elsif ( ( ! $seriestitle ) && ! $nametitle ) {
+			$name = $episode;
+		} else {
+			$name = $nametitle;
+		}
+		# Extract the seriesnum
+		my $regex = 'Series\s+'.main::regex_numbers();
+		$seriesnum = main::convert_words_to_number( $1 ) if $seriestitle =~ m{$regex}i;
+		my $series_position = $1 if $entry =~ m{<programme\s+type="series">.*?<position>\s*(.+?)\s*</position>};
+		$seriesnum ||= $series_position;
+		# Extract the episode num
+		my $regex_1 = 'Episode\s+'.main::regex_numbers();
+		my $regex_2 = '^'.main::regex_numbers().'\.\s+';
+		if ( $episode =~ m{$regex_1}i ) { 
+			$episodenum = main::convert_words_to_number( $1 );
+		} elsif ( $episode =~ m{$regex_2}i ) {
+			$episodenum = main::convert_words_to_number( $1 );
+		}
+		my $episode_position = $1 if $entry =~ m{<programme\s+type="episode">.*?<position>\s*(.+?)\s*</position>};
+		$episodenum ||= $episode_position;
+		# extract desc
+		if ( $entry =~ m{<long_synopsis>\s*(.+?)\s*</long_synopsis>} ) {
+			$desc = $1;
+		} elsif ( $entry =~ m{<medium_synopsis>\s*(.+?)\s*</medium_synopsis>} ) {
+			$desc = $1;
+		} elsif ( $entry =~ m{<short_synopsis>\s*(.+?)\s*</short_synopsis>} ) {
+			$desc = $1;
+		};
+		# Remove unwanted html tags
+		$desc =~ s!</?(br|b|i|p|strong)\s*/?>!!gi;
+		$duration = $1 if $entry =~ m{<duration>\s*(.+?)\s*</duration>};
+		# Extract channel nice name
+		# $channel = $channels{$channel_id};
+		main::logger "DEBUG: '$pid, $name - $episode, $channel'\n" if $opt->{debug};
+		# Merge and Skip if this pid is a duplicate
+		if ( defined $prog->{$pid} ) {
+			main::logger "WARNING: '$pid, $prog->{$pid}->{name} - $prog->{$pid}->{episode}, $prog->{$pid}->{channel}' already exists (this channel = $channel)\n" if $opt->{verbose};
+			# Update this info from schedule (not available in the usual iplayer channels feeds)
+			$prog->{$pid}->{duration} = $duration;
+			$prog->{$pid}->{episodenum} = $episodenum if ! $prog->{$pid}->{episodenum};
+			$prog->{$pid}->{seriesnum} = $seriesnum if ! $prog->{$pid}->{seriesnum};
+			# don't add this as some progs are already available
+			#$prog->{$pid}->{available} = $available;
+			next;
+		}
+		$version = 'default';
+		# thumbnail options
+		# http://ichef.bbci.co.uk/programmeimages/p01m1x5p/b04l8sml_640_360.jpg
+		# http://ichef.bbci.co.uk/images/ic/640x360/p01m1x5p.jpg
+		# Default to 150px width thumbnail;
+		my $thumbsize = $opt->{thumbsizecache} || 150;
+		my $image_pid = $1 if $entry =~ m{<image><pid>(.*?)</pid>}s;
+		my $suffix = Programme::bbciplayer->thumb_url_suffixes->{ $thumbsize };
+		my $thumbnail = "http://ichef.bbci.co.uk/programmeimages/${image_pid}/${pid}${suffix}";
+		# build data structure
+		$prog->{$pid} = main::progclass($prog_type)->new(
+			'pid'		=> $pid,
+			'name'		=> $name,
+			'versions'	=> $version,
+			'episode'	=> $episode,
+			'seriesnum'	=> $seriesnum,
+			'episodenum'	=> $episodenum,
+			'desc'		=> $desc,
+			'available'	=> $start,
+			'duration'	=> $duration,
+			'thumbnail'	=> $thumbnail,
+			'channel'	=> $channel,
+			'type'		=> $prog_type,
+			'web'		=> "${bbc_prog_page_prefix}/${pid}",
+		);
+	}
+}
 
 
 # Usage: download (<prog>, <ua>, <mode>, <version>, <version_pid>)
@@ -7879,6 +7984,72 @@ use base 'Programme::bbciplayer';
 # Class vars
 sub index_min { return 10001 }
 sub index_max { return 19999 };
+sub channels_aod {
+	return {
+		# national stations
+		'1xtra'			=> 'BBC Radio 1Xtra',
+		'radio1'		=> 'BBC Radio 1',
+		'radio2'		=> 'BBC Radio 2',
+		'radio3'		=> 'BBC Radio 3',
+		'radio4'		=> 'BBC Radio 4',
+		'radio4extra'	=> 'BBC Radio 4 Extra',
+		'fivelive'		=> 'BBC Radio 5 live',
+		'sportsextra'	=> 'BBC 5 live sports extra',
+		'6music'		=> 'BBC 6 Music',
+		'asiannetwork'	=> 'BBC Asian Network',
+		# nations
+		'radiofoyle'	=> 'BBC Radio Foyle',
+		'radioscotland'	=> 'BBC Radio Scotland',
+		'alba'			=> 'BBC Radio Nan Gaidheal',
+		'radioulster'	=> 'BBC Radio Ulster',
+		'radiowales'	=> 'BBC Radio Wales',
+		'radiocymru'	=> 'BBC Radio Cymru',
+		'worldservice'	=> 'BBC World Service',
+		# local
+		'bbc_radio_cumbria'			=> 'BBC Radio Cumbria',
+		'bbc_radio_newcastle'			=> 'BBC Newcastle',
+		'bbc_tees'				=> 'BBC Tees',
+		'bbc_radio_lancashire'			=> 'BBC Radio Lancashire',
+		'bbc_radio_merseyside'			=> 'BBC Radio Merseyside',
+		'bbc_radio_manchester'			=> 'BBC Radio Manchester',
+		'bbc_radio_leeds'			=> 'BBC Radio Leeds',
+		'bbc_radio_sheffield'			=> 'BBC Radio Sheffield',
+		'bbc_radio_york'			=> 'BBC Radio York',
+		'bbc_radio_humberside'			=> 'BBC Radio Humberside',
+		'bbc_radio_lincolnshire'		=> 'BBC Radio Lincolnshire',
+		'bbc_radio_nottingham'			=> 'BBC Radio Nottingham',
+		'bbc_radio_leicester'			=> 'BBC Radio Leicester',
+		'bbc_radio_derby'			=> 'BBC Radio Derby',
+		'bbc_radio_stoke'			=> 'BBC Radio Stoke',
+		'bbc_radio_shropshire'			=> 'BBC Radio Shropshire',
+		'bbc_wm'				=> 'BBC WM 95.6',
+		'bbc_radio_coventry_warwickshire'	=> 'BBC Coventry & Warwickshire',
+		'bbc_radio_hereford_worcester'		=> 'BBC Hereford & Worcester',
+		'bbc_radio_northampton'			=> 'BBC Radio Northampton',
+		'bbc_three_counties_radio'		=> 'BBC Three Counties Radio',
+		'bbc_radio_cambridge'			=> 'BBC Radio Cambridgeshire',
+		'bbc_radio_norfolk'			=> 'BBC Radio Norfolk',
+		'bbc_radio_suffolk'			=> 'BBC Radio Suffolk',
+		'bbc_radio_essex'			=> 'BBC Essex',
+		'bbc_london'				=> 'BBC London 94.9',
+		'bbc_radio_kent'			=> 'BBC Radio Kent',
+		'bbc_radio_surrey'			=> 'BBC Surrey',
+		'bbc_radio_sussex'			=> 'BBC Sussex',
+		'bbc_radio_oxford'			=> 'BBC Radio Oxford',
+		'bbc_radio_berkshire'			=> 'BBC Radio Berkshire',
+		'bbc_radio_solent'			=> 'BBC Radio Solent',
+		'bbc_radio_gloucestershire'		=> 'BBC Radio Gloucestershire',
+		'bbc_radio_wiltshire'			=> 'BBC Wiltshire',
+		'bbc_radio_bristol'			=> 'BBC Radio Bristol',
+		'bbc_radio_somerset_sound'		=> 'BBC Somerset',
+		'bbc_radio_devon'			=> 'BBC Radio Devon',
+		'bbc_radio_cornwall'			=> 'BBC Radio Cornwall',
+		'bbc_radio_guernsey'			=> 'BBC Radio Guernsey',
+		'bbc_radio_jersey'			=> 'BBC Radio Jersey',
+		'bbc_radio_jersey'			=> 'BBC Radio Jersey',
+	};
+}
+
 sub channels {
 	return {
 		'bbc_1xtra'				=> 'BBC Radio 1Xtra',
@@ -7890,7 +8061,7 @@ sub channels {
 		'bbc_radio_five_live'			=> 'BBC Radio 5 live',
 		'bbc_radio_five_live_sports_extra'	=> 'BBC 5 live sports extra',
 		'bbc_6music'				=> 'BBC 6 Music',
-		'bbc_7'					=> 'BBC 7',
+		#'bbc_7'					=> 'BBC 7',
 		'bbc_asian_network'			=> 'BBC Asian Network',
 		'bbc_radio_foyle'			=> 'BBC Radio Foyle',
 		'bbc_radio_scotland'			=> 'BBC Radio Scotland',
@@ -7939,8 +8110,6 @@ sub channels {
 		'bbc_radio_cornwall'			=> 'BBC Radio Cornwall',
 		'bbc_radio_guernsey'			=> 'BBC Radio Guernsey',
 		'bbc_radio_jersey'			=> 'BBC Radio Jersey',
-		'popular/radio'				=> 'Popular',
-		'highlights/radio'			=> 'Highlights',
 	};
 }
 
@@ -8220,6 +8389,11 @@ sub get_links {
 			my $episode = 'live';
 			main::logger "DEBUG: '$pid, $name - $episode, $channel'\n" if $opt->{debug};
 
+			(my $thumb_prog_type = $prog_type) =~ s/live//i;
+			my $thumb_pid = $pid;
+			$thumb_pid =~ s/^(bbc_one)$/${1}_london/;
+			$thumb_pid =~ s/^(bbc_two)$/${1}_england/;
+
 			# build data structure
 			$prog->{$pid} = main::progclass($prog_type)->new(
 				'pid'		=> $pid,
@@ -8229,7 +8403,8 @@ sub get_links {
 				'desc'		=> "Live stream of $name",
 				'guidance'	=> '',
 				#'thumbnail'	=> "http://static.bbc.co.uk/mobile/iplayer_widget/img/ident_${pid}.png",
-				'thumbnail'	=> "http://www.bbc.co.uk/iplayer/img/station_logos/${pid}.png",
+				#'thumbnail'	=> "http://www.bbc.co.uk/iplayer/img/station_logos/${pid}.png",
+				'thumbnail'	=> "http://www.bbc.co.uk/iplayer/images/${thumb_prog_type}/${thumb_pid}_640_360.jpg",
 				'channel'	=> $channel,
 				#'categories'	=> join(',', @category),
 				'type'		=> $prog_type,
@@ -10480,8 +10655,6 @@ sub tag_file_mp4 {
 	# Only tag if the required tool exists
 	if ( main::exists_in_path( 'atomicparsley' ) ) {
 		main::logger "INFO: MP4 tagging \U$meta->{ext}\E file\n";
-		# pretty copyright for MP4
-		$tags->{copyright} = "© $tags->{copyright}" if $opt->{tag_utf8};
 		# handle embedded quotes
 		tags_escape_quotes($tags);
 		# encode metadata for atomicparsley
