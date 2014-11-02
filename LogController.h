@@ -12,6 +12,7 @@
    IBOutlet NSTextView *log;
    IBOutlet NSWindow *window;
    NSMutableAttributedString *log_value;
+   NSFileHandle *fh;
 }
 
 @property (readonly) NSWindow *window;

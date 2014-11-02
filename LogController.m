@@ -20,6 +20,13 @@
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(addToLogNotification:) name:@"AddToLog" object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(postLog:) name:@"NeedLog" object:nil];
    
+   NSString *filePath = [@"~/Library/Application Support/Get iPlayer Automator/log.txt" stringByExpandingTildeInPath];
+   [[NSFileManager defaultManager] createFileAtPath:filePath
+                                           contents:nil
+                                         attributes:nil];
+   fh = [NSFileHandle fileHandleForWritingAtPath:filePath];
+   [fh seekToEndOfFile];
+   
    return self;
 }
 - (void)showLog:(id)sender
@@ -79,6 +86,11 @@
 	if ([window isVisible]) {
 		[log scrollRangeToVisible:NSMakeRange([current_log length], [current_log length])];
 	}
+   
+   //Write log out to file.
+   [fh writeData:[[return_character string] dataUsingEncoding:NSUTF8StringEncoding]];
+   [fh writeData:[[from_string string] dataUsingEncoding:NSUTF8StringEncoding]];
+   [fh writeData:[[converted_string string] dataUsingEncoding:NSUTF8StringEncoding]];
 }
 - (void)addToLogNotification:(NSNotification *)note
 {
@@ -93,6 +105,13 @@
 	[pb declareTypes:types owner:self];
 	[pb setString:unattributedLog forType:NSStringPboardType];
 }
+
+- (void)dealloc
+{
+   [fh closeFile];
+}
+
+
 @synthesize window;
 @synthesize log_value;
 @end
