@@ -189,8 +189,20 @@
 			pipe = nil;
 			if (runDownloads)
 			{
-				if (!foundLastLine)
-					LastLine = [[log componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]] lastObject];
+            if (!foundLastLine) {
+               NSLog(@"Setting Last Line Here...");
+               NSArray *logComponents =[ log componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+               LastLine = [logComponents lastObject];
+               unsigned int offsetFromEnd=1;
+               while (!LastLine.length) {
+                  LastLine = [logComponents objectAtIndex:(logComponents.count - offsetFromEnd)];
+                  ++offsetFromEnd;
+               }
+            }
+					
+            
+            NSLog(@"Last Line: %@", LastLine);
+            NSLog(@"Length of Last Line: %lu", (unsigned long)[LastLine length]);
             
 				NSScanner *scn = [NSScanner scannerWithString:LastLine];
 				if ([reasonForFailure isEqualToString:@"unresumable"])
