@@ -24,7 +24,7 @@
 #
 #
 package main;
-my $version = 2.89;
+my $version = 2.90;
 my $version_text;
 $version_text = sprintf("v%.2f", $version) unless $version_text;
 #
@@ -6083,6 +6083,8 @@ sub get_metadata {
 		$episodenum = main::convert_words_to_number( $1 );
 	} elsif ( "$name $episode" =~ m{$regex_1}i ) {
 		$episodenum = main::convert_words_to_number( $1 );
+	} elsif ( $prog->{episode} =~ m{$regex_2}i ) {
+		$episodenum = main::convert_words_to_number( $1 );
 	} elsif ( $episode =~ m{$regex_2}i ) {
 		$episodenum = main::convert_words_to_number( $1 );
 	} elsif ( $episodetitle =~ m{$regex_2}i ) {
@@ -7042,6 +7044,7 @@ sub channels {
 		'bbc_two'			=> 'BBC Two',
 		'bbc_three'			=> 'BBC Three',
 		'bbc_four'			=> 'BBC Four',
+		'bbc_sport'                     => 'BBC Sport',
 		'cbbc'				=> 'CBBC',
 		'cbeebies'			=> 'CBeebies',
 		'bbc_news24'		=> 'BBC News',
