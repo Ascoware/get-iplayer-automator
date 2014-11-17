@@ -644,6 +644,17 @@ if ( $search_args[0] =~ m{^(\w+:)?http://} && ( ! $opt->{pid} ) && ( ! $opt->{fi
 	$opt->{pid} = $search_args[0];
 }
 
+if ( $opt->{pid} ) {
+	my @search_pids;
+	if ( ref($opt->{pid}) eq 'ARRAY' ) {
+		push @search_pids, @{$opt->{pid}};
+	} else {
+		push @search_pids, $opt->{pid};
+	}
+	$opt->{pid} = join( ',', @search_pids );
+	$opt_cmdline->{pid} = $opt->{pid};
+}
+
 # PVR Lockfile location (keep global so that cleanup sub can unlink it)
 my $lockfile;
 $lockfile = $profile_dir.'/pvr_lock' if $opt->{pvr} || $opt->{pvrsingle} || $opt->{pvrscheduler};
@@ -716,13 +727,7 @@ if ( defined($opt->{trimhistory}) ) {
 # Record prog specified by --pid option
 } elsif ( $opt->{pid} ) {
 	my $hist = History->new();
-	my @pids;
-	if ( ref($opt->{pid}) eq 'ARRAY' ) {
-		push @pids, @{$opt->{pid}};
-	} else {
-		push @pids, $opt->{pid};
-	}
-	@pids = split( /,/, join( ',', @pids ) );	
+	my @pids = split( /,/, $opt->{pid} );	
 	for ( @pids ) {
 		$opt->{pid} = $_;
 		$retcode += find_pid_matches( $hist );
@@ -959,7 +964,7 @@ sub find_pid_matches {
 		return download_pid_in_cache( $hist, $prog->{$pid} );
 	}
 
-	my $totalretcode = 1;
+	my $totalretcode = 0;
 	my $quit_attempt = 0;
 	my %done_pids;
 	for my $prog_type ( @try_types ) {
@@ -1205,7 +1210,7 @@ sub download_matches {
 	my @match_list = @_;
 
 	# Do the recordings based on list of index numbers if required
-	my $failcount;
+	my $failcount = 0;
 	if ( $opt->{get} || $opt->{stdout} ) {
 		for my $this (@match_list) {
 			$failcount += $this->download_retry_loop( $hist );
@@ -4823,8 +4828,9 @@ sub substitute {
 		$value = '' if not defined $value;
 		main::logger "DEBUG: Substitute ($version): '$key' => '$value'\n" if $opt->{debug};
 		# Remove/replace all non-nice-filename chars if required
-		if ($sanitize_mode == 0) {
-			$replace = StringUtils::sanitize_path( $value );
+		# Keep '/' (and '\' on Windows) if $sanitize_mode == 1
+		if ($sanitize_mode == 0 || $sanitize_mode == 1) {
+			$replace = StringUtils::sanitize_path( $value, $sanitize_mode );
 		# html entity encode
 		} elsif ($sanitize_mode == 3) {
 			$replace = encode_entities( $value, '&<>"\'' );
@@ -4855,12 +4861,8 @@ sub substitute {
 		# Remove unused tags
 		my $key = $tag_begin.'.*?'.$tag_end;
 		$string =~ s|$key||mg;
-		# Remove/replace all non-nice-filename chars if required
-		# Keep '/' (and '\' on Windows) if $sanitize_mode == 1
-		return StringUtils::sanitize_path( $string, $sanitize_mode );
-	} else {
-		return $string;
 	}
+	return $string;
 }
 
 	
@@ -5454,9 +5456,6 @@ sub get_verpids {
 		return 1;
 	}
 
-	# try json playlist for channel and any missing fields
-	$prog->get_verpids_json( $ua );
-
 	# Split into <item kind="programme"> sections
 	my $prev_version = '';
 	for ( split /<item\s+kind="(radioProgramme|programme)"/, $xml ) {
@@ -5542,6 +5541,9 @@ sub get_verpids {
 		main::logger "INFO: Version: $version, VersionPid: $verpid, Duration: $prog->{durations}->{$version}\n" if $opt->{verbose};  
 	}
 
+	# try json playlist for channel and any missing fields
+	$prog->get_verpids_json( $ua );
+
 	# Add to prog hash
 	$prog->{versions} = join ',', keys %{ $prog->{verpids} };
 	return 0;
@@ -5611,7 +5613,8 @@ sub get_verpids_json {
 		my ($verpid, $version);
 		$version = $version_json->{$1} if /"types":\["(.*?)"/;
 		$version = "default" unless $version;
-		$verpid = $1 if /"vpid":"(.+?)"/;
+		next if $prog->{verpids}->{$version};
+		$verpid = $1 if /{"vpid":"(\w+)","kind":"(programme|radioProgramme)"/i;
 		next if ! ($verpid && $version);
 		$prog->{verpids}->{$version} = $verpid;
 		$prog->{durations}->{$version} = $1 if /"duration":(\d+)/;
@@ -5744,7 +5747,10 @@ sub get_metadata {
 	my $entry;
 	my $prog_feed_url = 'http://feeds.bbc.co.uk/iplayer/episode/'; # $pid
 	my @ignore_categories = ("Films", "Sign Zone", "Audio Described", "Northern Ireland", "Scotland", "Wales", "England");
-
+	my $genres = genres();
+	my $subgenres = subgenres();
+	my $formats = formats();
+	
 	my ($title, $name, $episode, $desc, $available, $channel, $expiry, $meddesc, $longdesc, $summary, $versions, $guidance, $prog_type, $categories, $category, $player, $thumbnail, $seriestitle, $episodetitle, $nametitle, $seriesnum, $episodenum );
 
 	# This URL works for all prog types:
@@ -5968,16 +5974,29 @@ sub get_metadata {
 		# Detect if this is just a series pid and report other episodes in the
 		# form of <po:episode rdf:resource="/programmes/b00fyl5z#programme" />
 		my $rdftitle = $1 if $entry =~ m{<dc:title>(.+?)<};
-		# extract categories (first level only) from RDF if necessary
+		# extract categories from RDF
 		if ( ! $category ) {
 			my @cats;
-			for (split /<po:genre/, $entry) {
-				my $genre = $1 if /\/programmes\/genres\/(\w+)/;
+			for my $po_genre (split /<po:genre/, $entry) {
+				my ($genre, $subgenre) = ($1, $3) if $po_genre =~ m{/programmes/genres/(\w+)(/(\w+))?};				
 				next unless $genre;
-				$genre =~ s/northernireland/northern ireland/;
-				$genre =~ s/(\w)and(\w)/$1 & $2/;
-				$genre =~ s/\b(\w)/\U$1/g;
-				push @cats, $genre unless grep(/$genre/i, @cats);
+				my $format = $1 if $po_genre =~ m{/programmes/formats/(\w+)};				
+				my $genre_title = $genres->{$genre};
+				if ( $genre_title ) {
+					push @cats, $genre_title unless grep(/$genre_title/i, @cats);
+				}
+				if ( $subgenre ) {
+					my $subgenre_title = $subgenres->{$genre}->{$subgenre};				
+					if ( $subgenre_title ) {
+						push @cats, $subgenre_title unless grep(/$subgenre_title/i, @cats);
+					}
+				}
+				if ( $format ) {
+					my $format_title = $formats->{$format};
+					if ( $format_title ) {
+						push @cats, $format_title unless grep(/$format_title/i, @cats);
+					}
+				}
 			}
 			$categories = join ',', @cats;
 			# capture first category, skip generic values
@@ -6160,7 +6179,206 @@ sub get_metadata {
 	return 0;
 }
 
+sub genres {
+	return {
+		childrens => "Children's", 
+		comedy => "Comedy", 
+		drama => "Drama", 
+		entertainment => "Entertainment", 
+		factual => "Factual", 
+		learning => "Learning", 
+		weather => "Weather",
+		music => "Music", 
+		news => "News",
+		religionandethics => "Religion & Ethics",
+		sport => "Sport", 
+		weather => "Weather",
+	};
+}
 
+sub subgenres {
+	return {
+		childrens => {
+			activities => "Activities",
+			drama => "Drama",
+			entertainmentandcomedy => "Entertainment & Comedy",
+			factual => "Factual",
+			music => "Music",
+			news => "News",
+			sport => "Sport",
+		},
+		comedy => {
+			character => "Character",
+			impressionists => "Impressionists",
+			music => "Music",
+			satire => "Satire",
+			sitcoms => "Sitcoms",
+			sketch => "Sketch",
+			spoof => "Spoof",
+			standup => "Standup",
+			stunt => "Stunt",
+		},
+		drama => {
+			actionandadventure => "Action & Adventure",
+			biographical => "Biographical",
+			classicandperiod => "Classic & Period",
+			crime => "Crime",
+			historical => "Historical",
+			horrorandsupernatural => "Horror & Supernatural",
+			legalandcourtroom => "Legal & Courtroom",
+			medical => "Medical",
+			musical => "Musical",
+			political => "Political",
+			psychological => "Psychological",
+			relationshipsandromance => "Relationships & Romance",
+			scifiandfantasy => "SciFi & Fantasy",
+			soaps => "Soaps",
+			spiritual => "Spiritual",
+			thriller => "Thriller",
+			waranddisaster => "War & Disaster",
+			western => "Western",
+		},
+		entertainment => {
+			varietyshows => "Variety Shows",
+		},
+		factual => {
+			antiques => "Antiques",
+			artscultureandthemedia => "Arts Culture & the Media",
+			beautyandstyle => "Beauty & Style",
+			carsandmotors => "Cars & Motors",
+			consumer => "Consumer",
+			crimeandjustice => "Crime & Justice",
+			disability => "Disability",
+			familiesandrelationships => "Families & Relationships",
+			foodanddrink => "Food & Drink",
+			healthandwellbeing => "Health & Wellbeing",
+			history => "History",
+			homesandgardens => "Homes & Gardens",
+			lifestories => "Life Stories",
+			money => "Money",
+			petsandanimals => "Pets & Animals",
+			politics => "Politics",
+			scienceandnature => "Science & Nature",
+			travel => "Travel",
+		},
+		learning => {
+			adults => "Adults",
+			preschool => "Pre-School",
+			primary => "Primary",
+			secondary => "Secondary",
+		},
+		music => {
+			classicpopandrock => "Classic Pop & Rock",
+			classical => "Classical",
+			country => "Country",
+			danceandelectronica => "Dance & Electronica",
+			desi => "Desi",
+			easylisteningsoundtracksandmusicals => "Easy Listening Soundtracks & Musicals",
+			folk => "Folk",
+			hiphoprnbanddancehall => "Hip Hop RnB & Dancehall",
+			jazzandblues => "Jazz & Blues",
+			popandchart => "Pop & Chart",
+			rockandindie => "Rock & Indie",
+			soulandreggae => "Soul & Reggae",
+			world => "World",
+		},
+		news => {
+		},
+		religionandethics => {
+		},
+		sport => {
+			alpineskiing => "Alpine Skiing",
+			americanfootball => "American Football",
+			archery => "Archery",
+			athletics => "Athletics",
+			badminton => "Badminton",
+			baseball => "Baseball",
+			basketball => "Basketball",
+			beachvolleyball => "Beach Volleyball",
+			biathlon => "Biathlon",
+			bobsleigh => "Bobsleigh",
+			bowls => "Bowls",
+			boxing => "Boxing",
+			canoeing => "Canoeing",
+			commonwealthgames => "Commonwealth Games",
+			cricket => "Cricket",
+			crosscountryskiing => "Cross Country Skiing",
+			curling => "Curling",
+			cycling => "Cycling",
+			darts => "Darts",
+			disabilitysport => "Disability Sport",
+			diving => "Diving",
+			equestrian => "Equestrian",
+			fencing => "Fencing",
+			figureskating => "Figure Skating",
+			football => "Football",
+			formulaone => "Formula One",
+			freestyleskiing => "Freestyle Skiing",
+			gaelicgames => "Gaelic Games",
+			golf => "Golf",
+			gymnastics => "Gymnastics",
+			handball => "Handball",
+			hockey => "Hockey",
+			horseracing => "Horse Racing",
+			icehockey => "Ice Hockey",
+			judo => "Judo",
+			luge => "Luge",
+			modernpentathlon => "Modern Pentathlon",
+			motorsport => "Motorsport",
+			netball => "Netball",
+			nordiccombined => "Nordic Combined",
+			olympics => "Olympics",
+			rowing => "Rowing",
+			rugbyleague => "Rugby League",
+			rugbyunion => "Rugby Union",
+			sailing => "Sailing",
+			shinty => "Shinty",
+			shooting => "Shooting",
+			shorttrackskating => "Short Track Skating",
+			skeleton => "Skeleton",
+			skijumping => "Ski Jumping",
+			snooker => "Snooker",
+			snowboarding => "Snowboarding",
+			softball => "Softball",
+			speedskating => "Speed Skating",
+			squash => "Squash",
+			swimming => "Swimming",
+			synchronisedswimming => "Synchronised Swimming",
+			tabletennis => "Table Tennis",
+			taekwondo => "Taekwondo",
+			tennis => "Tennis",
+			triathlon => "Triathlon",
+			volleyball => "Volleyball",
+			waterpolo => "Water Polo",
+			weightlifting => "Weightlifting",
+			winterolympics => "Winter Olympics",
+			wintersports => "Winter Sports",
+			wrestling => "Wrestling",
+		},
+		weather => {
+		}
+	};
+}
+
+sub formats {
+	return {
+		animation => "Animation",
+		appeals => "Appeals",
+		bulletins => "Bulletins",
+		discussionandtalk => "Discussion & Talk",
+		docudramas => "Docudramas",
+		documentaries => "Documentaries",
+		films => "Films",
+		gamesandquizzes => "Games & Quizzes",
+		magazinesandreviews => "Magazines & Reviews",
+		makeovers => "Makeovers",
+		performancesandevents => "Performances & Events",
+		phoneins => "Phone-ins",
+		readings => "Readings",
+		reality => "Reality",
+		talentshows => "Talent Shows",
+	};
+}
 
 sub get_pids_recursive {
 	my $prog = shift;
@@ -7290,8 +7508,17 @@ sub get_links_aod {
 			}
 			$version = 'default';
 			my @category;
-			my $thumb_pid = $channel_map{$channel_id} || $channel_id;
-			my $thumbnail = "http://www.bbc.co.uk/iplayer/images/radio/${thumb_pid}_640_360.jpg";
+			my ($thumb_pid, $thumb_type, $thumbnail);
+			($thumb_pid, $thumb_type) = ($1, lc($2)) if $entry =~ m{<parent\s+pid="(.*?)"\s+type="(Brand)">}i;
+			if ( ! ( $thumb_pid && $thumb_type ) ) {
+				($thumb_pid, $thumb_type) = ($1, lc($2)) if $entry =~ m{<parent\s+pid="(.*?)"\s+type="(Series)">}i;
+			}
+			if ( $thumb_pid && $thumb_type) {
+				$thumbnail = "http://ichef.bbci.co.uk/images/ic/640x360/legacy/${thumb_type}/${thumb_pid}.jpg";
+			} else {
+				$thumb_pid = $channel_map{$channel_id} || $channel_id;
+				$thumbnail = "http://www.bbc.co.uk/iplayer/images/radio/${thumb_pid}_640_360.jpg";
+			}
 			# build data structure
 			$prog->{$pid} = main::progclass($prog_type)->new(
 				'pid'		=> $pid,
@@ -10055,7 +10282,11 @@ sub run {
 		my $failcount = 0;
 		# If this is a one-off queue pid entry then delete the PVR entry upon successful recording(s)
 		if ( $pvr->{$name}->{pid} && $name =~ /^ONCE_/ ) {
-			$failcount = main::find_pid_matches( $hist );
+			my @pids = split( /,/, $pvr->{$name}->{pid}  );	
+			for ( @pids ) {
+				$opt->{pid} = $_;
+				$failcount += main::find_pid_matches( $hist );
+			}
 			$pvr->del( $name ) if not $failcount;
 
 		# Just make recordings of matching progs
