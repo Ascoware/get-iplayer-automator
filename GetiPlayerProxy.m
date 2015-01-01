@@ -44,7 +44,7 @@
       NSString *customProxy = [[NSUserDefaults standardUserDefaults] valueForKey:@"CustomProxy"];
       NSLog(@"INFO: Custom Proxy: address=[%@] length=%ld", customProxy, [customProxy length]);
       [logger addToLog:[NSString stringWithFormat:@"INFO: Custom Proxy: address=[%@] length=%ld", customProxy, [customProxy length]]];
-      NSString *proxyValue = [[customProxy lowercaseString] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+      NSString *proxyValue = [customProxy stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
       if ([proxyValue length] == 0)
       {
          NSLog(@"WARNING: Custom proxy setting was blank. No proxy will be used.");
