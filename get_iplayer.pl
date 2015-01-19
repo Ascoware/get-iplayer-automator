@@ -24,8 +24,8 @@
 #
 #
 package main;
-my $version = 2.90;
-my $version_text;
+my $version = 2.91;
+my $version_text = "2.92-dev";
 $version_text = sprintf("v%.2f", $version) unless $version_text;
 #
 # Help:
@@ -168,7 +168,7 @@ my $opt_format = {
 	history		=> [ 1, "history!", 'Search', '--history', "Search/show recordings history"],
 	since		=> [ 0, "since=n", 'Search', '--since', "Limit search to programmes added to the cache in the last N hours"],
 	type		=> [ 2, "type=s", 'Search', '--type <type>', "Only search in these types of programmes: ".join(',', keys %prog_types).",all (tv is default)"],
-	versionlist	=> [ 1, "versionlist|versions|version-list=s", 'Search', '--versions <versions>', "Version of programme to search or record.  List is processed from left to right and first version found is downloaded.  Example: '--versions signed,audiodescribed,default' will prefer signed and audiodescribed programmes if available.  Default: 'default'"],
+	versionlist	=> [ 1, "versionlist|versions|version-list=s", 'Search', '--versions <versions>', "Version of programme to search or record.  List is processed from left to right and first version found is downloaded.  Example: '--versions signed,audiodescribed,default' will prefer signed and audiodescribed programmes if available.  Default: 'default,signed,audiodescribed'"],
 
 	# Output
 	aactomp3	=> [ 1, "aactomp3|mp3", 'Output', '--aactomp3', "Transcode AAC audio to MP3 with ffmpeg/avconv (CBR 128k unless --mp3vbr is specified).  Applied only to radio programmes. (Synonyms: --mp3)"],
@@ -3385,7 +3385,7 @@ sub usage {
 	my @man;
 	my @dump;
 	push @man, 
-		'.TH GET_IPLAYER "1" "November 2014" "Phil Lewis" "get_iplayer Manual"',
+		'.TH GET_IPLAYER "1" "December 2014" "Phil Lewis" "get_iplayer Manual"',
 		'.SH NAME', 'get_iplayer - Stream Recording tool and PVR for BBC iPlayer, BBC Podcasts and more',
 		'.SH SYNOPSIS',
 		'\fBget_iplayer\fR [<options>] [<regex|index> ...]',
@@ -3461,7 +3461,7 @@ sub usage {
 			push @manlines, '.TP'."\n".'\fB'.$name_syntax{$name}."\n".$name_desc{$name} if $manpage;
 			my $dumpname = $name;
 			$dumpname =~ s/^_//g;
-			push @dumplines, sprintf(" %-20s %-32s %s", $dumpname, $name_syntax{$name}, $name_desc{$name} ) if $dumpopts;
+			push @dumplines, sprintf(" %-30s %-32s %s", $dumpname, $name_syntax{$name}, $name_desc{$name} ) if $dumpopts;
 			push @lines, sprintf(" %-32s %s", $name_syntax{$name}, $name_desc{$name} );
 		}
 		push @usage, sort @lines;
@@ -4427,7 +4427,7 @@ sub generate_version_list {
 	my $prog = shift;
 	
 	# Default Order with which to search for programme versions (can be overridden by --versionlist option)
-	my @version_search_order = qw/ default original signed audiodescribed opensubtitled shortened lengthened other /;
+	my @version_search_order = qw/ default original iplayer technical editorial opensubtitled shortened lengthened other signed audiodescribed /;
 	@version_search_order = split /,/, $opt->{versionlist} if $opt->{versionlist};
 
 	# check here for no matching verpids for specified version search list???
@@ -4720,7 +4720,7 @@ sub create_metadata_file {
 		<outline>[desc]</outline>
 		<plot>[desclong]</plot>
 		<tagline>[descshort]</tagline>
-		<runtime>[duration]</runtime>
+		<runtime>[runtime]</runtime>
 		<thumb>[thumbnail]</thumb>
 		<id>[pid]</id>
 		<filenameandpath>[dir]/[fileprefix].[ext]</filenameandpath>
@@ -4764,7 +4764,7 @@ sub create_metadata_file {
 				<tagline>[episode]</tagline>
 				<year>[firstbcast]</year>
 				<genre>[categories]</genre>
-				<runtime>[duration]</runtime>
+				<runtime>[runtime] minutes</runtime>
 				<channel>[channel]</channel>
 			</info>
 		</FREEVOTYPE>
@@ -4827,6 +4827,7 @@ sub substitute {
 
 	# Make 'duration' == 'length' for the selected version
 	$self->{duration} = $self->{durations}->{$version} if $self->{durations}->{$version};
+	$self->{runtime} = int($self->{duration} / 60);
 
 	# Tokenize and substitute $format
 	for my $key ( keys %{$self} ) {
@@ -5185,6 +5186,10 @@ sub get_time_string {
 	$_ = shift;
 	my $diff = shift;
 
+	# suppress warnings for > 32-bit dates in obsolete Perl versions
+	local $SIG{__WARN__} = sub {
+			warn @_ unless $_[0] =~ m(^.* too (?:big|small));
+	};
 	# extract $year $mon $mday $hour $min $sec $tzhour $tzmin
 	my ($year, $mon, $mday, $hour, $min, $sec, $tzhour, $tzmin);
 	if ( m{(\d\d\d\d)\-(\d\d)\-(\d\d)T(\d\d):(\d\d):(\d\d)} ) {
@@ -5478,6 +5483,7 @@ sub get_verpids {
 		}
 		return 0 if ! $rc_json || ! $rc_html;
 		main::logger "\nWARNING: No programmes are available for this pid with version(s): ".($opt->{versionlist} ? $opt->{versionlist} : 'default').($prog->{versions} ? " (available versions: $prog->{versions})\n" : "\n");
+		main::logger "WARNING: You may receive this message if you are using get_iplayer outside the UK\n";
 		return 1;
 	}
 
@@ -5496,7 +5502,8 @@ sub get_verpids {
 			if ( $opt->{hdslivetv} ) {
 				my $hds_pid_map = Programme::livetv->hds_pid_map();
 				my $hds_pid = $hds_pid_map->{$prog->{pid}};
-				$verpid = "http://www.bbc.co.uk/mediaselector/playlists/hds/pc/ak/${hds_pid}.f4m";
+				#$verpid = "http://www.bbc.co.uk/mediaselector/playlists/hds/pc/ak/${hds_pid}.f4m";
+				$verpid = "http://a.files.bbci.co.uk/media/live/manifests/hds/pc/llnw/${hds_pid}.f4m";
 			} else {
 				$verpid = $2 if m{\s+live="true"\s+(liverewind="true"\s+)?identifier="(.+?)"};
 			}
@@ -5648,10 +5655,8 @@ sub get_verpids_json {
 			$version = "audiodescribed";
 		} elsif ($type =~ /sign/i ) {
 			$version = "signed";
-		} elsif ($type =~ /original/i ) {
-			$version = "default";
 		} else {
-			($version = lc($type)) =~ s/\s+.*$//;
+			$version = "default";
 		}
 		next if $prog->{verpids}->{$version};
 		$verpid = $1 if /{"vpid":"(\w+)","kind":"(programme|radioProgramme)"/i;
@@ -5915,22 +5920,22 @@ sub get_metadata {
 					# minimum series number = 1 if episode number != 0
 					$seriesnum = 1 if ( $seriesnum == 0 && $episodenum != 0 );
 					# programme versions
+					my %found;
 					for my $ver ( @{$doc->{versions}->[0]->{version}} ) {
-						for my $type ( @{$ver->{types}->[0]->{type}} ) {
-							my $version;
-							if ( $type =~ /describe/i ) {
-								$version = "audiodescribed";
-							} elsif ($type =~ /sign/i ) {
-								$version = "signed";
-							} elsif ($type =~ /original/i ) {
-								$version = "default";
-							} else {
-								($version = lc($type)) =~ s/\s+.*$//;
-							}
-							unless ( $prog->{verpids}->{$version} ) {
-								$prog->{verpids}->{$version} = $ver->{pid}->[0];
-								$prog->{durations}->{$version} = $ver->{duration}->[0];
-							}
+						my $type;
+						# check for audiodescribed and signed first
+						if ( grep /describe/i, @{$ver->{types}->[0]->{type}} ) {
+							$type = "audiodescribed";
+						} elsif ( grep /sign/i, @{$ver->{types}->[0]->{type}} ) {
+							$type = "signed";
+						} else {
+							($type = lc($ver->{types}->[0]->{type}->[0])) =~ s/\s+.*$//;
+						}
+						if ( $type ) {
+							my $version = $type;
+							$version .= $found{$type} if ++$found{$type} > 1;
+							$prog->{verpids}->{$version} = $ver->{pid}->[0];
+							$prog->{durations}->{$version} = $ver->{duration}->[0];
 						}
 					}
 					$got_metadata = 1;
@@ -5972,7 +5977,7 @@ sub get_metadata {
 			$prog->{streams}->{$version} = get_stream_data($prog, $prog->{verpids}->{$version} );
 		}
 		if ( keys %{ $prog->{streams}->{$version} } == 0 ) {
-			main::logger "INFO: No modes available for $version version - skipping\n" if $opt->{verbose};
+			main::logger "INFO: No streams available for '$version' version ($prog->{verpids}->{$version}) - skipping\n" if $opt->{verbose};
 			next;
 		}
 		$modes->{$version} = join ',', sort keys %{ $prog->{streams}->{$version} };
@@ -6040,48 +6045,68 @@ sub get_metadata {
 		}
 	}
 
-	# remove versions with no modes
+	my @fields1 = qw(verpids streams durations);
+	my @fields2 = qw(firstbcast lastbcast firstbcastrel lastbcastrel firstbcastdate lastbcastdate);
+	
+	# remove versions with no streams
 	for my $version ( sort keys %{ $prog->{verpids} } ) {
 		if ( ! $modes->{$version} ) {
-			main::logger "INFO: No modes available for $version version - deleting\n" if $opt->{verbose};
-			delete $prog->{verpids}->{$version};
-			delete $prog->{streams}->{$version};
-			delete $prog->{durations}->{$version};
+			main::logger "INFO: No streams available for '$version' version ($prog->{verpids}->{$version}) - deleting\n" if $opt->{verbose};
 			delete $modes->{$version};
 			delete $mode_sizes->{$version};
-			delete $prog->{firstbcast}->{$version};
-			delete $prog->{lastbcast}->{$version};
-			delete $prog->{firstbcastrel}->{$version};
-			delete $prog->{lastbcastrel}->{$version};
-			delete $prog->{firstbcastdate}->{$version};
-			delete $prog->{lastbcastdate}->{$version};
+			for my $key ( @fields1, @fields2 ) {
+	 			delete $prog->{$key}->{$version};
+			}
 		}
 	}
 
-	# use alternate version if default missing
+	# collapse alternate versions with same base name
 	for my $version ( sort keys %{ $prog->{verpids} } ) {
-		if ( ! $modes->{default} && $version !~ /(audiodescribed|signed)/i && $modes->{$version} ) {
-			main::logger "INFO: Using '$version' version as default\n";
-			$prog->{verpids}->{default} = $prog->{verpids}->{$version};
-			$prog->{streams}->{default} = $prog->{streams}->{$version};
-			$prog->{durations}->{default} = $prog->{durations}->{$version};
-			$modes->{default} = $modes->{$version};
-			$mode_sizes->{default} = $mode_sizes->{$version};
-			if ( $prog->{firstbcast}->{$version} ) {
-				$prog->{firstbcast}->{default} = $prog->{firstbcast}->{$version};
-				$prog->{lastbcast}->{default} = $prog->{lastbcast}->{$version};
-				$prog->{firstbcastrel}->{default} = $prog->{firstbcastrel}->{$version};
-				$prog->{lastbcastrel}->{default} = $prog->{lastbcastrel}->{$version};
-				$prog->{firstbcastdate}->{default} = $prog->{firstbcastdate}->{$version};
-				$prog->{lastbcastdate}->{default} = $prog->{lastbcastdate}->{$version};
+		next if $version !~ /\d+$/;
+		(my $base_version = $version) =~ s/\d+$//;
+		if ( ( ! $modes->{$base_version} || $prog->{durations}->{$base_version} < $prog->{durations}->{$version} ) && $modes->{$version} ) {
+			main::logger "INFO: Using '$version' version ($prog->{verpids}->{$version}) as $base_version\n";
+			$modes->{$base_version} = $modes->{$version};
+			$mode_sizes->{$base_version} = $mode_sizes->{$version};
+			for my $key ( @fields1 ) {
+				$prog->{$key}->{$base_version} = $prog->{$key}->{$version};
 			}
-			last;
+			if ( $prog->{firstbcast}->{$version} ) {
+				for my $key ( @fields2 ) {
+					$prog->{$key}->{$base_version} = $prog->{$key}->{$version};
+				}
+			}
+			delete $modes->{$version};
+			delete $mode_sizes->{$version};
+			for my $key ( @fields1, @fields2 ) {
+	 			delete $prog->{$key}->{$version};
+			}
+		}
+	}
+
+	# use first/longest available variants, ensure default version if possible
+	for my $version ( sort keys %{ $prog->{verpids} } ) {
+		next if $version =~ /(audiodescribed|signed)/;
+		my $base_version = "default";
+		if ( ( ! $modes->{$base_version} || $prog->{durations}->{$base_version} < $prog->{durations}->{$version} ) && $modes->{$version} ) {
+			main::logger "INFO: Using '$version' version ($prog->{verpids}->{$version}) as $base_version\n" if $version ne "default";
+			$modes->{$base_version} = $modes->{$version};
+			$mode_sizes->{$base_version} = $mode_sizes->{$version};
+			for my $key ( @fields1 ) {
+				$prog->{$key}->{$base_version} = $prog->{$key}->{$version};
+			}
+			if ( $prog->{firstbcast}->{$version} ) {
+				for my $key ( @fields2 ) {
+					$prog->{$key}->{$base_version} = $prog->{$key}->{$version};
+				}
+			}
 		}
 	}
 
 	# check at least one version available
 	if ( keys %{ $prog->{verpids} } == 0 ) {
 		main::logger "WARNING: No programme versions found\n";
+		main::logger "WARNING: You may receive this message if you are using get_iplayer outside the UK\n";
 		# Return at this stage unless we want metadata/tags only for various reasons
 		return 1 if ! ( $opt->{info} || $opt->{metadataonly} || $opt->{thumbonly} || $opt->{tagonly} )
 	}
@@ -7104,7 +7129,7 @@ sub get_stream_data_cdn {
 		# Common attributes
 		# swfurl = Default iPlayer swf version
 		my $conn = {
-			swfurl		=> $opt->{swfurl} || "http://emp.bbci.co.uk/emp/SMPf/1.10.2/StandardMediaPlayerChromelessFlash.swf",
+			swfurl		=> $opt->{swfurl} || "http://emp.bbci.co.uk/emp/SMPf/1.10.8/StandardMediaPlayerChromelessFlash.swf",
 			ext		=> $ext,
 			streamer	=> $streamer,
 			bitrate		=> $mattribs->{bitrate},
@@ -8060,6 +8085,7 @@ sub get_links_ion {
 			@filters = ('');
 			if ( $prog_type eq 'tv' ) {
 				push @filters, '/category/signed';
+				push @filters, '/category/dubbedaudiodescribed';
 			}
 	}
 	my @channel_list = sort keys %channels;
@@ -9167,11 +9193,14 @@ sub get_links {
 			my $thumb_pid = $pid;
 			$thumb_pid =~ s/^(bbc_one).*$/${1}_london/;
 			$thumb_pid =~ s/^(bbc_two).*$/${1}_england/;
+			my $thumbnail = "http://www.bbc.co.uk/iplayer/images/${thumb_prog_type}/${thumb_pid}_640_360.jpg";
+			if ( $channel =~ /s4c/i ) {
+				$thumbnail = "http://www.s4c.co.uk/static/img/s4c.png";
+			}
 			my $web_pid = $pid;
 			if ( $prog_type eq 'livetv' ) {
 				($web_pid = lc($channel)) =~ s/ //g;
 			}
-
 			# build data structure
 			$prog->{$pid} = main::progclass($prog_type)->new(
 				'pid'		=> $pid,
@@ -9182,7 +9211,7 @@ sub get_links {
 				'guidance'	=> '',
 				#'thumbnail'	=> "http://static.bbc.co.uk/mobile/iplayer_widget/img/ident_${pid}.png",
 				#'thumbnail'	=> "http://www.bbc.co.uk/iplayer/img/station_logos/${pid}.png",
-				'thumbnail'	=> "http://www.bbc.co.uk/iplayer/images/${thumb_prog_type}/${thumb_pid}_640_360.jpg",
+				'thumbnail'	=> $thumbnail,
 				'channel'	=> $channel,
 				#'categories'	=> join(',', @category),
 				'type'		=> $prog_type,
@@ -9240,6 +9269,7 @@ sub channels {
 			'bbc_news24'	=> 'BBC News',
 			'bbc_parliament'	=> 'BBC Parliament',
 			'bbc_alba'		=> 'BBC Alba',
+			's4cpbs'		=> 'S4C',
 		}
 	};
 }
@@ -9249,12 +9279,13 @@ sub hds_pid_map {
 		'bbc_one_hd'	=> 'bbc_one_hd',
 		'bbc_two_hd'	=> 'bbc_two_hd',
 		'bbc_three'		=> 'bbc_three_hd',
-		'bbc_four'		=> 'bbc4',
-		'cbbc'				=> 'cbbc',
-		'cbeebies'		=> 'cbeebies',
-		'bbc_news24'	=> 'news_ch',
-		'bbc_parliament'	=> 'parliament',
-		'bbc_alba'		=> 'alba',
+		'bbc_four'		=> 'bbc_four_hd',
+		'cbbc'				=> 'cbbc_hd',
+		'cbeebies'		=> 'cbeebies_hd',
+		'bbc_news24'	=> 'bbc_news_channel_hd',
+		'bbc_parliament'	=> 'bbc_parliament',
+		'bbc_alba'		=> 'bbc_alba',
+		's4cpbs'		=> 's4cpbs',
 	}
 }
 
@@ -9264,11 +9295,12 @@ sub hls_pid_map {
 		'bbc_two_hd'	=> 'bbc_two_hd',
 		'bbc_three'		=> 'bbc_three_hd',
 		'bbc_four'		=> 'bbc_four_hd',
-		'cbbc'				=> 'cbbc',
-		'cbeebies'		=> 'cbeebies',
+		'cbbc'				=> 'cbbc_hd',
+		'cbeebies'		=> 'cbeebies_hd',
 		'bbc_news24'	=> 'bbc_news_channel_hd',
 		'bbc_parliament'	=> 'bbc_parliament',
 		'bbc_alba'		=> 'bbc_alba',
+		's4cpbs'		=> 's4cpbs',
 	}
 }
 
