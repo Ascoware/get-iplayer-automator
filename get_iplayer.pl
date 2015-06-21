@@ -24,8 +24,8 @@
 #
 #
 package main;
-my $version = 2.91;
-my $version_text = "2.92-dev";
+my $version = 2.94;
+my $version_text;
 $version_text = sprintf("v%.2f", $version) unless $version_text;
 #
 # Help:
@@ -82,6 +82,8 @@ my %SIGORIG;
 # Save default SIG actions
 $SIGORIG{$_} = $SIG{$_} for keys %SIG;
 $|=1;
+# Save proxy env var
+my $ENV_HTTP_PROXY = $ENV{HTTP_PROXY} || $ENV{http_proxy};
 
 # Hash of where plugin files were found so that the correct ones can be updated
 my %plugin_files;
@@ -126,6 +128,7 @@ my $opt_format = {
 	# Recording
 	attempts	=> [ 1, "attempts=n", 'Recording', '--attempts <number>', "Number of attempts to make or resume a failed connection.  --attempts is applied per-stream, per-mode.  TV modes typically have two streams available."],
 	checkduration		=> [ 1, "checkduration|check-duration!", 'Recording', '--check-duration', "Print message showing recorded duration, expected duration and difference between them."],
+	excludesupplier	=> [ 1, "excludesupplier|exclude-supplier=s", 'Recording', '--exclude-supplier <suppliers>', "Comma-delimited list of media stream suppliers to skip.  Possible values: akamai,limelight,level3,bidi"],
 	force		=> [ 1, "force|force-download!", 'Recording', '--force', "Ignore programme history (unsets --hide option also). Forces a script update if used with -u"],
 	get		=> [ 2, "get|record|g!", 'Recording', '--get, -g', "Start recording matching programmes. Search terms required unless --pid specified. Use  --search=.* to force download of all available programmes."],
 	hash		=> [ 1, "hash!", 'Recording', '--hash', "Show recording progress as hashes"],
@@ -134,12 +137,13 @@ my $opt_format = {
 	mmsnothread	=> [ 1, "mmsnothread!", 'Recording', '--mmsnothread', "Disable parallel threaded recording for mms"],
 	modes		=> [ 0, "modes=s", 'Recording', '--modes <mode>,<mode>,...', "Recording modes.  See --tvmode and --radiomode for available modes and defaults. Shortcuts: default,good,better(=default),best. Use --modes=best to select highest quality available (incl. HD TV)."],
 	multimode	=> [ 1, "multimode!", 'Recording', '--multimode', "Allow the recording of more than one mode for the same programme - WARNING: will record all specified/default modes!!"],
+	noproxy	=> [ 1, "noproxy|no-proxy!", 'Recording', '--no-proxy', "Ignore --proxy setting in preferences"],
 	overwrite	=> [ 1, "overwrite|over-write!", 'Recording', '--overwrite', "Overwrite recordings if they already exist"],
-	partialproxy	=> [ 1, "partial-proxy!", 'Recording', '--partial-proxy', "Only uses web proxy where absolutely required (try this extra option if your proxy fails)"],
+	partialproxy	=> [ 1, "partial-proxy!", 'Recording', '--partial-proxy', "Only uses web proxy where absolutely required (try this extra option if your proxy fails). If specified, value of http_proxy environment variable (if any) in parent process is retained and passed to child processes."],
 	_url		=> [ 2, "", 'Recording', '--url "<url>"', "Record the embedded media player in the specified URL. Use with --type=<type>."],
 	pid		=> [ 2, "pid|url=s@", 'Recording', '--pid <pid>', "Record an arbitrary pid that does not necessarily appear in the index."],
 	pidrecursive	=> [ 1, "pidrecursive|pid-recursive!", 'Recording', '--pid-recursive', "When used with --pid record all the embedded pids if the pid is a series or brand pid."],
-	proxy		=> [ 0, "proxy|p=s", 'Recording', '--proxy, -p <url>', "Web proxy URL e.g. 'http://USERNAME:PASSWORD\@SERVER:PORT' or 'http://SERVER:PORT'. Sets http_proxy environment variable for child processes, e.g., ffmpeg."],
+	proxy		=> [ 0, "proxy|p=s", 'Recording', '--proxy, -p <url>', "Web proxy URL e.g. 'http://USERNAME:PASSWORD\@SERVER:PORT' or 'http://SERVER:PORT'. Sets http_proxy environment variable for child processes (e.g., ffmpeg) unless --partial-proxy is specified."],
 	raw		=> [ 0, "raw!", 'Recording', '--raw', "Don't transcode or change the recording/stream in any way (i.e. radio/realaudio, rtmp/flv)"],
 	start		=> [ 1, "start=s", 'Recording', '--start <secs|hh:mm:ss>', "Recording/streaming start offset (rtmp and realaudio only)"],
 	stop		=> [ 1, "stop=s", 'Recording', '--stop <secs|hh:mm:ss>', "Recording/streaming stop offset (can be used to limit live rtmp recording length) rtmp and realaudio only"],
@@ -156,10 +160,10 @@ my $opt_format = {
 
 	# Search
 	before		=> [ 1, "before=n", 'Search', '--before', "Limit search to programmes added to the cache before N hours ago"],
-	category 	=> [ 0, "category=s", 'Search', '--category <string>', "Narrow search to matched categories (regex or comma separated values)"],
+	category 	=> [ 0, "category=s", 'Search', '--category <string>', "Narrow search to matched categories (regex or comma separated values). Supported only for podcasts (not tv or radio programmes)."],
 	channel		=> [ 0, "channel=s", 'Search', '--channel <string>', "Narrow search to matched channel(s) (regex or comma separated values)"],
 	exclude		=> [ 0, "exclude=s", 'Search', '--exclude <string>', "Narrow search to exclude matched programme names (regex or comma separated values)"],
-	excludecategory	=> [ 0, "xcat|exclude-category=s", 'Search', '--exclude-category <string>', "Narrow search to exclude matched categories (regex or comma separated values)"],
+	excludecategory	=> [ 0, "xcat|exclude-category=s", 'Search', '--exclude-category <string>', "Narrow search to exclude matched categories (regex or comma separated values). Supported only for podcasts (not tv or radio programmes)."],
 	excludechannel	=> [ 0, "xchan|exclude-channel=s", 'Search', '--exclude-channel <string>', "Narrow search to exclude matched channel(s) (regex or comma separated values)"],
 	fields		=> [ 0, "fields=s", 'Search', '--fields <field1>,<field2>,..', "Searches only in the specified comma separated fields"],
 	future		=> [ 1, "future!", 'Search', '--future', "Additionally search future programme schedule if it has been indexed (refresh cache with: --refresh --refresh-future)."],
@@ -167,7 +171,7 @@ my $opt_format = {
 	search		=> [ 1, "search=s", 'Search', '--search <search term>', "GetOpt compliant way of specifying search args"],
 	history		=> [ 1, "history!", 'Search', '--history', "Search/show recordings history"],
 	since		=> [ 0, "since=n", 'Search', '--since', "Limit search to programmes added to the cache in the last N hours"],
-	type		=> [ 2, "type=s", 'Search', '--type <type>', "Only search in these types of programmes: ".join(',', keys %prog_types).",all (tv is default)"],
+	type		=> [ 2, "type=s", 'Search', '--type <type>', "Only search in these types of programmes: ".join(',', sort keys %prog_types).",all (tv is default)"],
 	versionlist	=> [ 1, "versionlist|versions|version-list=s", 'Search', '--versions <versions>', "Version of programme to search or record.  List is processed from left to right and first version found is downloaded.  Example: '--versions signed,audiodescribed,default' will prefer signed and audiodescribed programmes if available.  Default: 'default,signed,audiodescribed'"],
 
 	# Output
@@ -216,7 +220,7 @@ my $opt_format = {
 	limitmatches	=> [ 1, "limitmatches|limit-matches=n", 'Config', '--limit-matches <number>', "Limits the number of matching results for any search (and for every PVR search)"],
 	nopurge		=> [ 1, "no-purge|nopurge!", 'Config', '--nopurge', "Don't ask to delete programmes recorded over 30 days ago"],	
 	packagemanager	=> [ 1, "packagemanager=s", 'Config', '--packagemanager <string>', "Tell the updater that we were installed using a package manager and don't update (use either: apt,rpm,deb,yum,disable)"],
-	pluginsupdate	=> [ 1, "pluginsupdate|plugins-update!", 'Config', '--plugins-update', "Update get_iplayer plugins to the latest"],
+	pluginsupdate	=> [ 1, "pluginsupdate|plugins-update!", 'Config', '--plugins-update', "Update get_iplayer plugins to the latest versions. get_iplayer main script also will be updated if a newer version is available.)"],
 	prefsadd	=> [ 0, "addprefs|add-prefs|prefsadd|prefs-add!", 'Config', '--prefs-add', "Add/Change specified saved user or preset options"],
 	prefsdel	=> [ 0, "del-prefs|delprefs|prefsdel|prefs-del!", 'Config', '--prefs-del', "Remove specified saved user or preset options"],
 	prefsclear	=> [ 0, "clear-prefs|clearprefs|prefsclear|prefs-clear!", 'Config', '--prefs-clear', "Remove *ALL* saved user or preset options"],
@@ -238,13 +242,13 @@ my $opt_format = {
 	refreshlimitradio	=> [ 1, "refreshlimitradio|refresh-limit-radio=n", 'Config', '--refresh-limit-radio <integer>', "Number of days of radio programmes to cache. Only applied with --refresh-feeds=schedule. Makes cache updates VERY slow. Default: 7 Min: 1 Max: 30"],
 	refreshlimittv	=> [ 1, "refreshlimittv|refresh-limit-tv=n", 'Config', '--refresh-limit-tv <integer>', "Number of days of TV programmes to cache. Only applied with --refresh-feeds=schedule. Makes cache updates VERY slow. Default: 7 Min: 1 Max: 30"],
 	skipdeleted	=> [ 1, "skipdeleted!", 'Config', "--skipdeleted", "Skip the download of metadata/thumbs/subs if the media file no longer exists. Use with --history & --metadataonly/subsonly/thumbonly."],
-	update		=> [ 2, "update|u!", 'Config', '--update, -u', "Update get_iplayer if a newer one exists"],
+	update		=> [ 2, "update|u!", 'Config', '--update, -u', "Update get_iplayer if a newer version is available. If so, plugins also will be updated if newer versions available."],
 	webrequest	=> [ 1, "webrequest=s", 'Config', '--webrequest <urlencoded string>', 'Specify all options as a urlencoded string of "name=val&name=val&..."' ],
 
 	# Display
 	conditions	=> [ 1, "conditions!", 'Display', '--conditions', 'Shows GPLv3 conditions'],
 	debug		=> [ 1, "debug!", 'Display', '--debug', "Debug output"],
-	dumpoptions	=> [ 1, "dumpoptions|dumpopts|dump-options!", 'Display', '--dump-options', 'Dumps all options with their internal option key names'],
+	dumpoptions	=> [ 1, "dumpoptions|dumpopts|dump-options|dump-opts!", 'Display', '--dump-options', 'Dumps all options with their internal option key names'],
 	helpbasic	=> [ 2, "help-basic|usage|bh|hb|helpbasic|basichelp|basic-help!", 'Display', '--helpbasic, --usage', "Basic help text"],
 	help		=> [ 2, "help|h!", 'Display', '--help, -h', "Intermediate help text"],
 	helplong	=> [ 2, "help-long|advanced|long-help|longhelp|lh|hl|helplong!", 'Display', '--helplong', "Advanced help text"],
@@ -287,7 +291,7 @@ my $opt_format = {
 	tag_isodate		=> [ 1, "tagisodate|tag-isodate!",  'Tagging', '--tag-isodate', "Use ISO8601 dates (YYYY-MM-DD) in album/show names and track titles"],
 	tag_longdesc => [ 1, "taglongdesc|tag-longdesc!", 'Tagging', '--tag-longdesc', "AtomicParsley accepts --longdesc argument for long description text"],
 	tag_longdescription => [ 1, "taglongdescription|tag-longdescription!", 'Tagging', '--tag-longdescription', "AtomicParsley accepts --longDescription argument for long description text"],
-	tag_longepisode => [ 1, "taglongepisode|tag-longepisode!", 'Tagging', '--tag-longepisode', "Use <episode> instead of <episodeshort> for track title"],
+	tag_longepisode => [ 1, "taglongepisode|tag-longepisode!", 'Tagging', '--tag-longepisode', "Use <episode> (incl. episode number) instead of <episodeshort> for track title"],
 	tag_longtitle => [ 1, "taglongtitle|tag-longtitle!", 'Tagging', '--tag-longtitle', "Prepend <series> (if available) to track title. Ignored with --tag-fulltitle."],
 	tag_podcast => [ 1, "tagpodcast|tag-podcast!", 'Tagging', '--tag-podcast', "Tag downloaded radio and tv programmes as iTunes podcasts (requires MP3::Tag module for AAC/MP3 files)"],
 	tag_podcast_radio => [ 1, "tagpodcastradio|tag-podcast-radio!", 'Tagging', '--tag-podcast-radio', "Tag only downloaded radio programmes as iTunes podcasts (requires MP3::Tag module for AAC/MP3 files)"],
@@ -301,7 +305,7 @@ my $opt_format = {
 	encodinglocale	=> [ 1, "encodinglocale|encoding-locale=s", 'Misc', '--encoding-locale <name>', "Character encoding used to decode command-line arguments. Encoding name must be known to Perl Encode module. Default (only if auto-detect fails): Linux/Unix/OSX = UTF-8, Windows = cp1252"],
 	encodinglocalefs	=> [ 1, "encodinglocalefs|encoding-locale-fs=s", 'Misc', '--encoding-locale-fs <name>', "Character encoding used to encode file and directory names. Encoding name must be known to Perl Encode module. Default (only if auto-detect fails): Linux/Unix/OSX = UTF-8, Windows = cp1252"],
 	noscrapeversions	=> [ 1, "noscrapeversions|no-scrape-versions!", 'Misc', '--no-scrape-versions', "Do not scrape episode web pages as extra measure to find audiodescribed/signed versions (only applies with --playlist-metadata)."],
-	playlistmetadata	=> [ 1, "playlistmetadata|playlist-metadata!", 'Misc', '--playlist-metadata', "Force use of playlists (XML and JSON) for programme metadata instead of /programmes data endpoints."],
+	playlistmetadata	=> [ 1, "playlistmetadata|playlist-metadata!", 'Misc', '--playlist-metadata (IGNORED)', "Force use of playlists (XML and JSON) for programme metadata instead of /programmes data endpoints."],
 	trimhistory	=> [ 1, "trimhistory|trim-history=s", 'Misc', '--trim-history <# days to retain>', "Remove download history entries older than number of days specified in option value.  Cannot specify 0 - use 'all' to completely delete download history"],
 
 };
@@ -483,7 +487,7 @@ logger "DEBUG: User Preset Options File: $optfile_preset\n" if defined $optfile_
 # Parse cmdline opts definitions from each Programme class/subclass
 Options->get_class_options( $_ ) for qw( Streamer Programme Pvr );
 Options->get_class_options( progclass($_) ) for progclass();
-Options->get_class_options( "Streamer::$_" ) for qw( rtmp hls rtsp iphone mms 3gp http );
+Options->get_class_options( "Streamer::$_" ) for qw( rtmp hls shoutcast rtsp iphone mms 3gp http ddl );
 
 
 # Parse the cmdline using the opt_format hash
@@ -655,6 +659,17 @@ if ( $search_args[0] =~ m{^(\w+:)?http://} && ( ! $opt->{pid} ) && ( ! $opt->{fi
 	$opt->{pid} = $search_args[0];
 }
 
+if ( ! $opt->{pid} ) {
+	# default live streams are BBC One London and BBC Two England
+	if ( $opt->{type} =~ "livetv" ) {
+		@search_args = map { /(One|Two)$/i ? "$_\$" : $_ } @search_args;
+		if ( $opt->{channel} ) {
+			$opt->{channel} =~ s/(One|Two)$/$1\$/i;
+			$opt_cmdline->{channel} = $opt->{channel} if $opt_cmdline->{channel};
+		}
+	}
+}
+
 if ( $opt->{pid} ) {
 	my @search_pids;
 	if ( ref($opt->{pid}) eq 'ARRAY' ) {
@@ -807,10 +822,18 @@ sub init_search {
 	}
 
 	# Web proxy
-	(my $proxy = $opt->{proxy}) =~ s/^prepend://i;
-	$opt->{proxy} = $ENV{HTTP_PROXY} || $ENV{http_proxy} if not $opt->{proxy};
-	logger "INFO: Using Proxy $opt->{proxy}\n" if $opt->{proxy};
-	$ENV{http_proxy} = $proxy if $proxy;
+	if ( $opt->{noproxy} ) {
+		delete $opt->{proxy};
+		$ENV{http_proxy} = $ENV_HTTP_PROXY;
+	} else {
+		(my $proxy = $opt->{proxy}) =~ s/^prepend://i;
+		$opt->{proxy} = $ENV_HTTP_PROXY if not $opt->{proxy};
+		# set proxy env var for child processes unless --partial-proxy
+		$ENV{http_proxy} = $proxy if $proxy && ! $opt->{partialproxy};
+		logger "INFO: Using Proxy $opt->{proxy}\n" if $opt->{proxy};
+		logger "INFO: \$ENV{http_proxy} = $ENV{http_proxy}\n" if $ENV{http_proxy} && $opt->{verbose};
+	}
+
 
 	# Set --get && --nowrite if --metadataonly is used
 	if ( $opt->{metadataonly} ) {
@@ -2192,12 +2215,6 @@ sub update_script {
 		exit 1;
 	} 
 
-	# If the get_iplayer script is unwritable then quit - makes it harder for deb/rpm installed scripts to be overwritten
-	if ( ! -w $script_file ) {
-		logger "ERROR: $script_file is not writable - aborting update (maybe a package manager was used to install get_iplayer?)\n";
-		exit 1;
-	}
-
 	# Force update if no plugins dir
 	if ( ! -d "$profile_dir/plugins" ) {
 		mkpath "$profile_dir/plugins";
@@ -2264,6 +2281,11 @@ sub update_script {
 			# All available plugins in all plugin dirs are writable:
 			# update script if required
 			if ( $latest_ver > $version || $opt->{force} ) {
+				# If the get_iplayer script is unwritable then quit - makes it harder for deb/rpm installed scripts to be overwritten
+				if ( ! -w $script_file ) {
+					logger "ERROR: $script_file is not writable - aborting update (maybe a package manager was used to install get_iplayer?)\n";
+					exit 1;
+				}
 				logger "INFO: Updating $script_file (from $version to $latest_ver)\n";
 				update_file( $ua, $script_url, $script_file ) if ! $opt->{test};
 			}
@@ -3385,7 +3407,7 @@ sub usage {
 	my @man;
 	my @dump;
 	push @man, 
-		'.TH GET_IPLAYER "1" "December 2014" "Phil Lewis" "get_iplayer Manual"',
+		'.TH GET_IPLAYER "1" "June 2015" "Phil Lewis" "get_iplayer Manual"',
 		'.SH NAME', 'get_iplayer - Stream Recording tool and PVR for BBC iPlayer, BBC Podcasts and more',
 		'.SH SYNOPSIS',
 		'\fBget_iplayer\fR [<options>] [<regex|index> ...]',
@@ -4194,6 +4216,9 @@ sub channels_filtered {
 	# assume class method call
 	(my $prog_type = $prog) =~ s/Programme:://;
 	my $exclude = $opt->{'refreshexcludegroups'.$prog_type} || $opt->{'refreshexcludegroups'};
+	if ( $prog_type eq "tv" ) {
+		$exclude = "local" unless $exclude;
+	}
 	my %channels;
 	for my $x ( qw(national regional local) ) {
 		@channels{ keys %{$channelsref->{$x}} } = values %{$channelsref->{$x}} unless $exclude =~ /\b$x\b/;
@@ -4420,6 +4445,10 @@ sub download_subtitles {
 }
 
 
+sub default_version_list {
+	return qw/ default original iplayer technical editorial lengthened shortened opensubtitles other signed audiodescribed /;
+}
+
 
 # Usage: generate_version_list ($prog)
 # Returns sorted array of versions
@@ -4427,7 +4456,7 @@ sub generate_version_list {
 	my $prog = shift;
 	
 	# Default Order with which to search for programme versions (can be overridden by --versionlist option)
-	my @version_search_order = qw/ default original iplayer technical editorial opensubtitled shortened lengthened other signed audiodescribed /;
+	my @version_search_order = default_version_list();
 	@version_search_order = split /,/, $opt->{versionlist} if $opt->{versionlist};
 
 	# check here for no matching verpids for specified version search list???
@@ -4538,8 +4567,9 @@ sub download_retry_loop {
 					$modename =~ s/\d+$//g;
 					$available_modes_short{$modename}++;
 				}
-				main::logger "INFO: No specified modes ($modelist) available for this programme with version '$version' (try using --modes=".(join ',', sort keys %available_modes_short).")\n";
-				main::logger "INFO: You may receive this message if you are using get_iplayer outside the UK\n" if ($#available_modes < 0);
+				main::logger "INFO: No specified modes ($modelist) available for this programme with version '$version'\n";
+				main::logger "INFO: Try using --modes=".(join ',', sort keys %available_modes_short)."\n";
+				main::logger "INFO: You may receive this message if you are using get_iplayer outside the UK\n" if $#available_modes < 0;
 				next;
 			}
 			main::logger "INFO: ".join(',', @modes)." modes will be tried for version $version\n";
@@ -4642,7 +4672,7 @@ sub mode_ver_download_retry_loop {
 				}
 				if ( ! $opt->{nowrite} ) {
 					$hist->add( $prog );
-					$prog->tag_file if ! $opt->{notag};
+					$prog->tag_file if ! $opt->{notag} && ! $opt->{raw};
 				} elsif ( $opt->{tagonly} ) {
 					$prog->tag_file;
 				}
@@ -4714,38 +4744,37 @@ sub create_metadata_file {
 
 	# XML template for XBMC/Kodi movies - Ref: http://xbmc.org/wiki/?title=Import_-_Export_Library#Movies
 	$filename->{xbmc_movie} = "$prog->{dir}/$prog->{fileprefix}.nfo";
-	$template->{xbmc_movie} = '
-	<movie>
-		<title>[name] - [episode]</title>
-		<outline>[desc]</outline>
-		<plot>[desclong]</plot>
-		<tagline>[descshort]</tagline>
-		<runtime>[runtime]</runtime>
-		<thumb>[thumbnail]</thumb>
-		<id>[pid]</id>
-		<filenameandpath>[dir]/[fileprefix].[ext]</filenameandpath>
-		<trailer></trailer>
-		<genre>[categories]</genre>
-		<year>[firstbcast]</year>
-		<credits>[channel]</credits>
-    </movie>
-	';
+	($template->{xbmc_movie} = <<'	XBMC_MOVIE') =~ s/^\s{2}//gm;
+		<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+		<movie>
+			<title>[name]</title>
+			<plot>[desclong]</plot>
+			<outline>[descmedium]</outline>
+			<tagline>[descshort]</tagline>
+			<thumb>[thumbnail]</thumb>
+			<genre>[categories]</genre>
+			<id>[pid]</id>
+		</movie>
+	XBMC_MOVIE
 	$filename->{kodi_movie} = $filename->{xbmc_movie};
 	$template->{kodi_movie} = $template->{xbmc_movie};
 
 	# XML template for XBMC - Ref: http://xbmc.org/wiki/?title=Import_-_Export_Library#TV_Episodes
 	$filename->{xbmc} = "$prog->{dir}/$prog->{fileprefix}.nfo";
-	$template->{xbmc} = '
-	<episodedetails>
-		<title>[name] - [episode]</title>
-		<rating>10.00</rating>
-		<season>[seriesnum]</season>
-		<episode>[episodenum]</episode>
-		<plot>[desclong]</plot>
-		<credits>[channel]</credits>
-		<aired>[firstbcast]</aired>
-	</episodedetails>
-	';
+	($template->{xbmc} = <<'	XBMC') =~ s/^\s{2}//gm;
+		<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+		<episodedetails>
+			<title>[episodeshort]</title>
+			<plot>[desclong]</plot>
+			<thumb>[thumbnail]</thumb>
+			<aired>[lastbcastdate]</aired>
+			<season>[seriesnum]</season>
+			<episode>[episodenum]</episode>
+			<studio>[channel]</studio>
+			<genre>[categories]</genre>
+			<id>[pid]</id>
+		</episodedetails>
+	XBMC
 	$filename->{kodi} = $filename->{xbmc};
 	$template->{kodi} = $template->{xbmc};
 
@@ -4796,6 +4825,13 @@ sub create_metadata_file {
 				$text =~ s/FREEVOTYPE/audio/g;
 			} else {
 				$text =~ s/FREEVOTYPE/movie/g;
+			}
+		}
+		if ( $opt->{metadata} =~ /(xbmc|kodi)/ ) {
+			my $cats = $1 if $text =~ /<genre>(.+?)<\/genre>/;
+			if ( $cats ) {
+				$cats =~ s/,/<\/genre><genre>/g;
+				$text =~ s/<genre>.+?<\/genre>/<genre>$cats<\/genre>/;
 			}
 		}
 		print XML $text;
@@ -5259,7 +5295,7 @@ sub download_thumbnail {
 			main::logger "ERROR: Thumbnail Download failed\n";
 			return 1;
 		} else {
-			main::logger "INFO: Downloaded Thumbnail to '$file'\n";
+			main::logger "INFO: Downloaded Thumbnail to '$file'\n" if $opt->{verbose} || $opt->{thumb};
 		}
 
 	} else {
@@ -5287,6 +5323,11 @@ sub check_duration {
 	my $ffout = `$cmd`;
 	if ( $ffout =~ /duration:\s+((\d+):(\d\d):(\d\d))/i ) {
 		my $expected_s = $prog->{duration};
+		if ( $opt->{start} && ! $opt->{stop} ) {
+			$expected_s -= $opt->{start};
+		} elsif ( $opt->{stop} ) {
+			$expected_s = $opt->{stop} - $opt->{start};
+		}		
 		my $expected = sprintf("%02d:%02d:%02d", $expected_s / 3600, ($expected_s % 3600) / 60, $expected_s % 60);
 		my $recorded_s = ($2 * 3600) + ($3 * 60) + $4;
 		my $recorded = $1;
@@ -5374,6 +5415,7 @@ sub get_verpids {
 		# emp.setPlaylist("http://www.bbc.co.uk/learningzone/clips/clips/p_chin/bb/p_chin_ch_05303_16x9_bb.xml")
 		} elsif ( $xml =~ m{setPlaylist\("(http.+?)"\)}i ) {
 			$url = $1;
+			$url =~ s/["']\+location\.host\+["']/www.bbc.co.uk/;
 		# playlist = "http://www.bbc.co.uk/worldservice/meta/tx/flash/live/eneuk.xml";
 		} elsif ( $xml =~ m{\splaylist\s+=\s+"(http.+?)";}i ) {
 			$url = $1;
@@ -5405,7 +5447,23 @@ sub get_verpids {
 		}
 		# URL decode url
 		$url = main::url_decode( $url );
-	# iPlayer LiveTV or PID
+	# iPlayer LiveTV
+	} elsif ( $prog->{type} =~ 'live' && $prog->{pid} =~ /^(bbc_|cb)/i) {
+		my ($verpid, $version);
+		my $hls_pid_map;
+		if ( $prog->{type} eq 'livetv' ) {
+			$hls_pid_map = Programme::livetv->hls_pid_map();
+		} else {
+			$hls_pid_map = Programme::liveradio->hls_pid_map();
+		}
+		my $hls_pid = $hls_pid_map->{$prog->{pid}};
+		$verpid = $hls_pid || $prog->{pid};
+		main::logger "INFO: Using $prog->{type}: $verpid\n" if $opt->{verbose} && $verpid;
+		$version = 'default';
+		$prog->{verpids}->{$version} = $verpid;
+		$prog->{versions} = join ',', keys %{ $prog->{verpids} };
+		return 0;
+	# iPlayer PID
 	} else {
 		$url = 'http://www.bbc.co.uk/iplayer/playlist/'.$prog->{pid};
 		# use the audiodescribed playlist url if non-default versions are specified
@@ -5499,14 +5557,10 @@ sub get_verpids {
 			$version = 'default';
 			# <item kind="programme" live="true" liverewind="true" identifier="bbc_two_england" group="bbc_two_england" simulcast="true" availability_class="liverewind">
 			# $verpid = "http://www.bbc.co.uk/emp/simulcast/".$2.".xml" if m{\s+live="true"\s+(liverewind="true"\s+)?identifier="(.+?)"};
-			if ( $opt->{hdslivetv} ) {
-				my $hds_pid_map = Programme::livetv->hds_pid_map();
-				my $hds_pid = $hds_pid_map->{$prog->{pid}};
-				#$verpid = "http://www.bbc.co.uk/mediaselector/playlists/hds/pc/ak/${hds_pid}.f4m";
-				$verpid = "http://a.files.bbci.co.uk/media/live/manifests/hds/pc/llnw/${hds_pid}.f4m";
-			} else {
-				$verpid = $2 if m{\s+live="true"\s+(liverewind="true"\s+)?identifier="(.+?)"};
-			}
+			$verpid = $2 if m{\s+live="true"\s+(liverewind="true"\s+)?identifier="(.+?)"};
+			my $hls_pid_map = Programme::livetv->hls_pid_map();
+			my $hls_pid = $hls_pid_map->{$prog->{pid}};
+			$verpid = $hls_pid || $verpid;
 			main::logger "INFO: Using Live TV: $verpid\n" if $opt->{verbose} && $verpid;
 		# Live/Non-live EMP tv/radio XML URL
 		} elsif ( $prog->{pid} =~ /^http/i && $url =~ /^http.+xml$/ ) {
@@ -5541,6 +5595,9 @@ sub get_verpids {
 			# Try to get live stream version and verpid
 			# <item kind="radioProgramme" live="true" identifier="bbc_radio_one" group="bbc_radio_one">
 			$verpid = $1 if m{\s+live="true"\s+identifier="(.+?)"};
+			my $hls_pid_map = Programme::liveradio->hls_pid_map();
+			my $hls_pid = $hls_pid_map->{$prog->{pid}};
+			$verpid = $hls_pid || $verpid;
 			$version = 'default';
 			main::logger "INFO: Using Live radio: $verpid\n" if $opt->{verbose} && $verpid;
 
@@ -5812,14 +5869,14 @@ sub get_metadata {
 	eval "use XML::Simple";
 	if ( $@ ) {
 		main::logger "WARNING: Please download and run latest installer or install the XML::Simple Perl module for more accurate programme metadata.\n";
-	} elsif ( $prog->{pid} =~ /^[bp]0[a-z0-9]{6}$/ && ! $opt->{playlistmetadata} ) {
+	} elsif ( $prog->{pid} =~ /^[bp]0[a-z0-9]{6}$/ ) {
 		my $url = $prog_data_url.$prog->{pid}.".xml";
 		main::logger "INFO: Programme metadata URL = $url\n" if $opt->{verbose};
 		my $xml = main::request_url_retry($ua, $url, 3, '', '');
 		if ( $xml ) {
 			my $doc = eval { XMLin($xml, KeyAttr => [], ForceArray => 1, SuppressEmpty => 1) };
 			if ( ! $@ ) {
-				if ( $doc->{type} eq "episode" ) {
+				if ( $doc->{type} eq "episode" || $doc->{type} eq "clip" ) {
 					my $parent = $doc->{parent}->[0]->{programme}->[0];
 					my $grandparent = $parent->{parent}->[0]->{programme}->[0];
 					my $greatgrandparent = $grandparent->{parent}->[0]->{programme}->[0];
@@ -5837,8 +5894,8 @@ sub get_metadata {
 					my $recipe = Programme::bbciplayer->thumb_url_recipes->{ $thumbsize };
 					$recipe = Programme::bbciplayer->thumb_url_recipes->{ 150 } if ! $recipe;
 					$thumbnail = "http://ichef.bbci.co.uk/images/ic/${recipe}/${image_pid}.jpg";
-					$web = "http://www.bbc.co.uk/programmes/$parentpid";
-					if ( $prog_type eq "tv" ) {
+					$web = "http://www.bbc.co.uk/programmes/$parentpid" if $parentpid;
+					if ( $prog_type eq "tv" && $doc->{type} eq "episode" ) {
 						$player = "http://www.bbc.co.uk/iplayer/episode/$pid";
 					} else {
 						$player = "http://www.bbc.co.uk/programmes/$pid";
@@ -5850,7 +5907,7 @@ sub get_metadata {
 						if ( $ancestor->{type} && $ancestor->{title}->[0] ) {
 							if ( $ancestor->{type} eq "brand" ) {
 								$brand = $ancestor->{title}->[0];
-							} else {
+							} elsif ( $ancestor->{type} eq "series" ) {
 								# handle rare subseries
 								if ( $series ) {
 									$episode = "$series $episode";
@@ -5939,6 +5996,8 @@ sub get_metadata {
 							$type = "audiodescribed";
 						} elsif ( grep /sign/i, @{$ver->{types}->[0]->{type}} ) {
 							$type = "signed";
+						} elsif ( grep /open subtitles/i, @{$ver->{types}->[0]->{type}} ) {
+							$type = "opensubtitles";
 						} else {
 							($type = lc($ver->{types}->[0]->{type}->[0])) =~ s/\s+.*$//;
 						}
@@ -5988,7 +6047,7 @@ sub get_metadata {
 			$prog->{streams}->{$version} = get_stream_data($prog, $prog->{verpids}->{$version} );
 		}
 		if ( keys %{ $prog->{streams}->{$version} } == 0 ) {
-			main::logger "INFO: No streams available for '$version' version ($prog->{verpids}->{$version}) - skipping\n" if $opt->{verbose};
+			main::logger "INFO: No streams available for '$version' version ($prog->{verpids}->{$version}) - skipping RDF\n" if $opt->{verbose};
 			next;
 		}
 		$modes->{$version} = join ',', sort keys %{ $prog->{streams}->{$version} };
@@ -6000,11 +6059,17 @@ sub get_metadata {
 				$expiry = $prog->{streams}->{$version}->{$mode}->{expires};
 				$prog->{expiryrel} = Programme::get_time_string( $expiry, time() );
 			}
+			my $size;
 			if ( $prog->{streams}->{$version}->{$mode}->{size} ) {
-				push @sizes, sprintf( "%s=%.0fMB", $mode, $prog->{streams}->{$version}->{$mode}->{size} / 1048576.0 );
+				$size = $prog->{streams}->{$version}->{$mode}->{size};
 			} else {
 				next if ( ! $prog->{durations}->{$version} ) || (! $prog->{streams}->{$version}->{$mode}->{bitrate} );
-				push @sizes, sprintf( "%s=%.0fMB", $mode, $prog->{streams}->{$version}->{$mode}->{bitrate} * $prog->{durations}->{$version} / 8.0 / 1024.0 );
+				$size = $prog->{streams}->{$version}->{$mode}->{bitrate} * $prog->{durations}->{$version} / 8.0 * 1024.0;
+			}
+			if ( $size < 1048576 ) {
+				push @sizes, sprintf( "%s=%.0fKB", $mode, $size / 1024.0 );
+			} else {
+				push @sizes, sprintf( "%s=%.0fMB", $mode, $size / 1048576.0 );
 			}
 		}
 		$mode_sizes->{$version} = join ',', @sizes;
@@ -6061,7 +6126,7 @@ sub get_metadata {
 	
 	# remove versions with no streams
 	for my $version ( sort keys %{ $prog->{verpids} } ) {
-		if ( ! $modes->{$version} ) {
+		if ( ! $modes->{$version} || $modes->{$version} =~ /^subtitles\d+$/ ) {
 			main::logger "INFO: No streams available for '$version' version ($prog->{verpids}->{$version}) - deleting\n" if $opt->{verbose};
 			delete $modes->{$version};
 			delete $mode_sizes->{$version};
@@ -6074,9 +6139,10 @@ sub get_metadata {
 	# collapse alternate versions with same base name
 	for my $version ( sort keys %{ $prog->{verpids} } ) {
 		next if $version !~ /\d+$/;
+		next if ! $modes->{$version};
 		(my $base_version = $version) =~ s/\d+$//;
-		if ( ( ! $modes->{$base_version} || $prog->{durations}->{$base_version} < $prog->{durations}->{$version} ) && $modes->{$version} ) {
-			main::logger "INFO: Using '$version' version ($prog->{verpids}->{$version}) as $base_version\n";
+		if ( ! $modes->{$base_version} || $prog->{durations}->{$base_version} < $prog->{durations}->{$version} ) {
+			main::logger "INFO: Using '$version' version ($prog->{verpids}->{$version}) as '$base_version'\n" if $opt->{verbose};
 			$modes->{$base_version} = $modes->{$version};
 			$mode_sizes->{$base_version} = $mode_sizes->{$version};
 			for my $key ( @fields1 ) {
@@ -6095,12 +6161,21 @@ sub get_metadata {
 		}
 	}
 
-	# use first/longest available variants, ensure default version if possible
+	my @default_versions = $prog->default_version_list();
+	# incorporate unknown versions
 	for my $version ( sort keys %{ $prog->{verpids} } ) {
+		if ( ! grep /^${version}$/, @default_versions ) {
+			push @default_versions, $version;
+		}
+	}
+	
+	# use first/longest available variants, ensure default version if possible
+	for my $version ( @default_versions ) {
 		next if $version =~ /(audiodescribed|signed)/;
+		next if ! $modes->{$version};
 		my $base_version = "default";
-		if ( ( ! $modes->{$base_version} || $prog->{durations}->{$base_version} < $prog->{durations}->{$version} ) && $modes->{$version} ) {
-			main::logger "INFO: Using '$version' version ($prog->{verpids}->{$version}) as $base_version\n" if $version ne "default";
+		if ( ! $modes->{$base_version} || $prog->{durations}->{$base_version} < $prog->{durations}->{$version} ) {
+			main::logger "INFO: Using '$version' version ($prog->{verpids}->{$version}) as '$base_version'\n" if $version ne "default" && $opt->{verbose};
 			$modes->{$base_version} = $modes->{$version};
 			$mode_sizes->{$base_version} = $mode_sizes->{$version};
 			for my $key ( @fields1 ) {
@@ -6111,7 +6186,15 @@ sub get_metadata {
 					$prog->{$key}->{$base_version} = $prog->{$key}->{$version};
 				}
 			}
+			# delete $modes->{$version};
+			# delete $mode_sizes->{$version};
+			# for my $key ( @fields1, @fields2 ) {
+			# 	delete $prog->{$key}->{$version};
+			# }
 		}
+	}
+	if ( ! $modes->{default} ) {
+		main::logger "WARNING: The 'default' programme version could not be determined\n";
 	}
 
 	# check at least one version available
@@ -6975,87 +7058,110 @@ sub parse_attributes {
 }
 
 
-sub parse_f4m_manifest {
-	my $xml = shift;
-	my @medias;
+sub parse_hds_connection {
+	my $media = shift;
+	my $conn = shift;
+	my $min_bitrate = shift;
+	my @hds_medias;
 	eval "use XML::Simple";
 	if ( $@ ) {
 		main::logger "WARNING: Please download and run latest installer or install the XML::Simple Perl module to parse f4m manifests.\n";
 	} else {
+		my $ua = main::create_ua( 'desktop' );
+		my $xml = main::request_url_retry( $ua, $conn->{href}, 3, undef, undef, 1 );
 		my $doc = eval { XMLin($xml, KeyAttr => [], ForceArray => 1, SuppressEmpty => 1) };
 		if ( ! $@ ) {
-			for my $media ( @{$doc->{media} }) {
-				my $xml2 = main::request_url_retry( main::create_ua( 'desktop' ), $media->{href}, 3, undef, undef, 1 );
-				my $doc2 = eval { XMLin($xml2, KeyAttr => [], ForceArray => 1, SuppressEmpty => 1) };
+			for my $hds_media ( @{$doc->{media} }) {
+				next if $min_bitrate && $hds_media->{bitrate} < $min_bitrate;
+				my $xml2 = main::request_url_retry( $ua, $hds_media->{href}, 3, undef, undef, 1 );
+				my $doc2 = eval { XMLin($xml2, KeyAttr => [], ForceArray => 0, SuppressEmpty => 1) };
 				if ( ! $@ ) {
-					$media->{width} = $doc2->{media}->[0]->{width};
-					$media->{height} = $doc2->{media}->[0]->{height};
-					$media->{type} = $doc2->{mimeType}->[0];
-					($media->{kind}) = split(/\//, $media->{type});
-					$media->{encoding} = $media->{kind} eq 'video' ? 'h264' : 'aac';
-					my ($ab, $vb) = ($1, $2) if $doc2->{media}->[0]->{url} =~ m{audio.*?=(\d+)-video=(\d+)};
-					$media->{audio_bitrate} = $ab/1000;
-					$media->{video_bitrate} = $vb/1000;
-					my $supplier;
-					if ( $doc2->{streamType}->[0] eq 'live' ) {
-						$media->{service} = "hls_simulcast_$media->{bitrate}";
-						$supplier = "hls_live";
+					$hds_media->{type} = $media->{type};
+					$hds_media->{kind} = $media->{kind};
+					$hds_media->{encoding} = $media->{encoding};
+					$hds_media->{width} = $doc2->{media}->{width};
+					$hds_media->{height} = $doc2->{media}->{height};
+					my ($ab, $vb) = ($1, $2) if $doc2->{media}->{url} =~ m{audio.*?=(\d+)-(video=(\d+))?};
+					$hds_media->{audio_bitrate} = int($ab/1000);
+					$hds_media->{video_bitrate} = int($vb/1000);
+					if ( $doc2->{streamType} eq 'live' ) {
+						$hds_media->{service} = "gip_hls_simulcast_$hds_media->{bitrate}";
 					} else {
-						$media->{service} = "hls_iplayer_$media->{bitrate}";
-						$supplier = "hls_open";
+						$hds_media->{service} = "gip_hls_iplayer_$hds_media->{bitrate}";
 					}
-					my $href = $media->{href};
- 					delete $media->{href};
-					$href =~ s/\.f4m$/.m3u8/;
- 					@{$media->{connections}} = ({
+					my $href = $hds_media->{href};
+					delete $hds_media->{href};
+					$href =~ s/\.f4m/.m3u8/;
+					@{$hds_media->{connections}} = ({
  						href => $href, 
- 						kind => $supplier,
- 						supplier => $supplier,
+ 						kind => $conn->{supplier},
+ 						supplier => $conn->{supplier},
  						protocol => 'http',
  						transferFormat => 'hls',
+						priority => $conn->{priority},
  					});
-					push @medias, $media;
+					push @hds_medias, $hds_media;
 				} else {
-					main::logger "WARNING: Could not parse f4m sub-manifest: $media->{href}\n";
+					main::logger "WARNING: Could not parse f4m chunklist: $hds_media->{href}: $@.\n";
 				}
 			}
 		} else {
-			main::logger "WARNING: Could not parse f4m manifest.\n";
+			main::logger "WARNING: Could not parse f4m playlist: $@.\n";
 		}
-		return @medias;
+		return @hds_medias;
 	}
 }
 
 # from https://github.com/osklil/hls-fetch
-sub parse_hls_playlist {
+sub parse_hls_connection {
 	my $media = shift;
 	my $conn = shift;
-	my $url = shift;
+	my $min_bitrate = shift;
+	my $pc_medias = shift;
+	my $conn_href;
+	for my $pc_media ( @{$pc_medias} ) {
+		if ( $pc_media->{bitrate} > 2000 ) {
+			for my $pc_conn ( @{$pc_media->{connections}} ) {
+				(my $hd_id = $pc_conn->{identifier}) =~ s/(^mp4:(secure\/)?|\.mp4$)//g;
+				if ( $hd_id ) {
+					($conn_href = $conn->{href}) =~ s/(\*\~hmac|\,\.mp4\.csmil)/,${hd_id}$1/g;
+					last;
+				}
+			}
+		}
+		last if $conn_href;
+	}
+	$conn_href ||= $conn->{href};
 	my @hls_medias;
-	my $data = main::request_url_retry( main::create_ua( 'desktop' ), $url, 3, undef, undef, 1 );
+	my $data = main::request_url_retry( main::create_ua( 'desktop' ), $conn_href, 3, undef, undef, 1 );
+	if ( ! $data ) {
+		main::logger "WARNING: No HLS playlist returned ($conn->{href})\n" if $opt->{verbose};
+		return;
+	}
 	my @lines = split(/\r*\n|\r\n*/, $data);
-	if ( @lines < 1 || $lines[0] ne '#EXTM3U' ) {
-		main::logger "WARNING: Invalid HLS playlist, no header ($url)\n";
+	if ( @lines < 1 || $lines[0] !~ '^#EXTM3U' ) {
+		main::logger "WARNING: Invalid HLS playlist, no header ($conn->{href})\n" if $opt->{verbose};
 		return;
 	}
 
 	if (!grep { /^#EXTINF:/ } @lines) {
 		my (@streams, $last_stream);
 		foreach my $line (@lines) {
+			next if ($line =~ /^#/ && $line !~ /^#EXT/) || $line =~ /^\s*$/;
 			if ($line =~ /^#EXT-X-STREAM-INF:(.*)$/) {
-				$last_stream = { parse_m3u_attribs($url, $1) };
+				$last_stream = { parse_m3u_attribs($conn->{href}, $1) };
 				push @streams, $last_stream;
 			} elsif ($line !~ /^#EXT/) {
 				if ( ! defined $last_stream ) {
-					main::logger "WARNING: Missing #EXT-X-STREAM-INF for URL: $line ($url)\n" ;
-					return
+					main::logger "WARNING: Missing #EXT-X-STREAM-INF for URL: $line ($conn->{href})\n" if $opt->{verbose};
+					return;
 				}
 				$last_stream->{'URL'} = $line;
 				$last_stream = undef;
 			}
 		}
 		if ( ! @streams ) {
-			main::logger "WARNING: No streams found in HLS playlist ($url)\n";
+			main::logger "WARNING: No streams found in HLS playlist ($conn->{href})\n";
 			return,
 		};
 
@@ -7065,16 +7171,18 @@ sub parse_hls_playlist {
 			delete $hls_media->{width};
 			delete $hls_media->{height};
 			delete $hls_media->{bitrate};
+			delete $hls_media->{media_file_size};
 			delete $hls_media->{service};
 			delete $hls_media->{connections};
+			$hls_media->{bitrate} = int($stream->{BANDWIDTH}/1000);
+			next if $min_bitrate && $hls_media->{bitrate} < $min_bitrate;
 			if ( $stream->{RESOLUTION} ) {
 				($hls_media->{width}, $hls_media->{height}) = split(/x/, $stream->{RESOLUTION});
 			} 
-			$hls_media->{bitrate} = $stream->{BANDWIDTH}/1000;
 			if ( $stream->{URL} =~ /live/ ) {
-				$hls_media->{service} = "hls_simulcast_$hls_media->{bitrate}";
+				$hls_media->{service} = "gip_hls_simulcast_$hls_media->{bitrate}";
 			} else {
-				$hls_media->{service} = "hls_iplayer_$hls_media->{bitrate}";
+				$hls_media->{service} = "gip_hls_iplayer_$hls_media->{bitrate}";
 			}
 			my $hls_conn = dclone($conn);
 			my $uri1 = URI->new($hls_conn->{href});
@@ -7085,11 +7193,36 @@ sub parse_hls_playlist {
 			$uri2->query($qs2.$qs1);
 			delete $hls_conn->{href};
 			$hls_conn->{href} = $uri2->as_string;
-			@{$hls_media->{connections}} = ( $hls_conn );
+			$hls_media->{connections} = [ $hls_conn ];
 			push @hls_medias, $hls_media;
 		}
 	}
 	return @hls_medias;
+}
+
+sub parse_pls_connection {
+	my $media = shift;
+	my $conn = shift;
+	my @pls_medias;
+	my $data = main::request_url_retry( main::create_ua( 'desktop' ), $conn->{href}, 3, undef, undef, 1 );
+	my @lines = split(/\r*\n|\r\n*/, $data);
+	if ( @lines < 1 || $lines[0] ne '[playlist]' ) {
+		main::logger "WARNING: Invalid PLS playlist, no header ($conn->{href})\n";
+		return;
+	}
+	foreach my $line (@lines) {
+		my ($idx, $href)  = ( $1, $2 ) if $line =~ /File(\d+)=(.*)$/i;
+		if ( $href ) {
+			my $pls_media = dclone($media);
+			$pls_media->{service} .= "_$idx";
+			my $pls_conn = dclone($conn);
+			$pls_conn->{priority} = $idx;
+			$pls_conn->{href} = $href;
+			$pls_media->{connections} = [ $pls_conn ];
+			push @pls_medias, $pls_media;
+		}
+	}
+	return @pls_medias;
 }
 
 # from https://github.com/osklil/hls-fetch
@@ -7119,7 +7252,6 @@ sub get_stream_data_cdn {
 	#	$data->{$mode}->{bitrate} = 480; # ??
 
 	my $count = 1;
-	my $count_rtsp = 1;
 	for my $cattribs ( @{ $mattribs->{connections} } ) {
 
 		# Get authstring from more specific mediaselector if this mode is specified - fails sometimes otherwise
@@ -7142,7 +7274,7 @@ sub get_stream_data_cdn {
 		# Common attributes
 		# swfurl = Default iPlayer swf version
 		my $conn = {
-			swfurl		=> $opt->{swfurl} || "http://emp.bbci.co.uk/emp/SMPf/1.10.8/StandardMediaPlayerChromelessFlash.swf",
+			swfurl		=> $opt->{swfurl} || "http://emp.bbci.co.uk/emp/SMPf/1.11.16/StandardMediaPlayerChromelessFlash.swf",
 			ext		=> $ext,
 			streamer	=> $streamer,
 			bitrate		=> $mattribs->{bitrate},
@@ -7251,20 +7383,32 @@ sub get_stream_data_cdn {
 			$conn->{streamurl} = $cattribs->{href};
 
 		# hls stream
-		} elsif ( $cattribs->{kind} =~ /hls/ ) {
+		} elsif ( $cattribs->{transferFormat} =~ /hls/ ) {
 			$conn->{streamurl} = $cattribs->{href};
 			$conn->{kind} = $mattribs->{kind};
 			$conn->{live} = 1 if $mattribs->{service} =~ /simulcast/i;
 			if ( $conn->{kind} eq 'video' ) {
+				$conn->{audio_bitrate} = $mattribs->{audio_bitrate};
 				if ( $mattribs->{bitrate} > 2000 ) {
-					$conn->{audio_bitrate} = 128;
+					$conn->{audio_bitrate} ||= 128;
 				} elsif ( $mattribs->{bitrate} > 700 ) {
-					$conn->{audio_bitrate} = 96;
+					$conn->{audio_bitrate} ||= 96;
 				} else {
-					$conn->{audio_bitrate} = 64;
+					$conn->{audio_bitrate} ||= 64;
 				}
-				$conn->{video_bitrate} = $mattribs->{bitrate} - $conn->{audio_bitrate};
+				$conn->{video_bitrate} = $mattribs->{video_bitrate};
+				$conn->{video_bitrate} ||= $mattribs->{bitrate} - $conn->{audio_bitrate};
 			}
+
+		# shoutcast stream
+		} elsif ( $cattribs->{kind} =~ /icy/ ) {
+			$conn->{streamurl} = decode_entities($cattribs->{href});
+			$conn->{kind} = $mattribs->{kind};
+			$conn->{live} = 1 if $mattribs->{service} =~ /simulcast/i;
+
+		# ddlaac stream
+		} elsif ( $cattribs->{kind} eq 'sis_http_open' ) {
+			$conn->{streamurl} = $cattribs->{href};
 
 		# Unknown CDN
 		} else {
@@ -7282,40 +7426,6 @@ sub get_stream_data_cdn {
 		$data->{$mode.$count} = $conn;
 		$count++;
 
-		# synthesized rtsp modes
-		if ( $mode =~ /^flash/ && ! $conn->{live} ) {
-			my $flashmode = $mode.$count_rtsp;
-			my $rtspmode = $flashmode;
-			$rtspmode =~ s/^flash/rtsp/g;
-			$data->{$rtspmode}->{size} = $data->{$flashmode}->{size};
-			$data->{$rtspmode}->{bitrate} = $data->{$flashmode}->{bitrate};
-			$data->{$rtspmode}->{encoding} = $data->{$flashmode}->{encoding};
-			$data->{$rtspmode}->{type} = $data->{$flashmode}->{type};
-			$data->{$rtspmode}->{type} =~ s/streaming_/streaming_rtsp_/g;
-			$data->{$rtspmode}->{identifier} =  $data->{$flashmode}->{identifier};
-			# Audio
-			if ($mode =~ /(audio|aac)/) {
-				$data->{$rtspmode}->{identifier} =~ s|^mp[34]:secure/(\w+?)/(.+$)|$1/secure_auth/$2|;
-			# Video
-			} else {
-				# convert from akamai format
-				$data->{$rtspmode}->{identifier} =~ s|^mp[34]:secure/(\w+?/.+$)|iplayerstream/secure_auth/$1|;
-				# convert from level3
-				$data->{$rtspmode}->{identifier} =~ s|^mp[34]:(\d{3,4}\w+?/.+$)|iplayerstream/secure_auth/$1|;
-			}
-			$data->{$rtspmode}->{identifier} =~ s/^mp[34]://;
-			$data->{$rtspmode}->{ext} = $data->{$flashmode}->{identifier};
-			$data->{$rtspmode}->{ext} =~ s/^(mp[34]):.*$/$1/g;
-			# use .aac ext for audio mp4
-			$data->{$rtspmode}->{ext} = 'aac' if $data->{$rtspmode}->{ext} eq 'mp4' && $mode =~ /(audio|aac)/;
-			$data->{$rtspmode}->{streamurl} = "rtsp://3gp-acl.bbc.net.uk:554/".$data->{$rtspmode}->{identifier};
-			$data->{$rtspmode}->{streamurl} .= '.'.$data->{$rtspmode}->{ext} if $data->{$rtspmode}->{streamurl} !~ m{\.mp[34]$};
-			# Mplayer fails fo some reason - use vlc for now
-			# $data->{$rtspmode}->{streamer} = 'rtsp';
-			$data->{$rtspmode}->{streamer} = '3gp';
-			get_stream_set_type( $data->{$rtspmode} ) if ! $data->{$rtspmode}->{type};
-			$count_rtsp++;
-		}
 	}
 
 	# Add to data structure hased by priority
@@ -7361,24 +7471,62 @@ sub get_stream_data {
 	my $data = {};
 	my $media_stream_data_prefix;
 	my $media_stream_live_prefix;
-	my $media_stream_mobile_prefix;
+	my @media_stream_pc_prefixes;
+	my @media_stream_mobile_prefixes;
+	my @media_stream_shoutcast_prefixes;
+	my ( @pc_mediasets, @mobile_mediasets, @shoutcast_mediasets );
+	# use mediaselector/4 for obvious archive programmes
+	my $mediaselector = $opt->{mediaselector};
+	$opt->{mediaselector} = '4' if $verpid =~ /http:.+?\/archive\/xml\//;
 	if ( $opt->{mediaselector} eq '4' ) {
 		$media_stream_data_prefix = 'http://www.bbc.co.uk/mediaselector/4/mtis/stream/'; # $verpid 
 		$media_stream_live_prefix = 'http://www.bbc.co.uk/mediaselector/4/gtis/stream/'; # $verpid
 	} else {
-		my ($mediaset, $mobile_mediaset);
 		# assume URL in $verpid is XML playlist from news site
 		if ( $verpid =~ /http:/ ) {
-			$mediaset = 'journalism-pc';
-			$mobile_mediaset = 'journalism-http-tablet';
+			@pc_mediasets = ( 'journalism-pc' ); 
+			@mobile_mediasets = ('journalism-http-tablet');
 		} else {
-			$mediaset = 'pc';
-			$mobile_mediaset = 'mobile-tablet-main';
+			@pc_mediasets = ( 'pc' );
+			if ( $prog->{type} =~ /tv/ ) {
+				push @pc_mediasets, 'apple-ipad-hls'; 
+			}
+			@mobile_mediasets = ( 'apple-ipad-hls' ); 
+			if ( $prog->{type} =~ /radio/ ) {
+				push @mobile_mediasets, 'apple-iphone4-ipad-hls-3g'; 
+			}
+			if ( $prog->{type} eq "liveradio" ) {
+				push @shoutcast_mediasets, 'http-icy-mp3-a';
+				# R3 320k AAC stream (temporary)
+				if ( $verpid eq 'bbc_radio_three' ) {
+					push @shoutcast_mediasets, 'http-icy-aac-lc-a';
+				}
+			}
 		}
-		$media_stream_data_prefix = "http://open.live.bbc.co.uk/mediaselector/5/select/version/2.0/mediaset/$mediaset/vpid/"; # $verpid
+		$media_stream_data_prefix = "http://open.live.bbc.co.uk/mediaselector/5/select/version/2.0/mediaset/$pc_mediasets[0]/vpid/"; # $verpid
 		$media_stream_live_prefix = $media_stream_data_prefix;
-		$media_stream_mobile_prefix = "http://open.live.bbc.co.uk/mediaselector/5/select/version/2.0/mediaset/$mobile_mediaset/vpid/"; # $verpid
+		for my $mediaset ( @pc_mediasets ) {
+			push @media_stream_pc_prefixes, "http://open.live.bbc.co.uk/mediaselector/5/select/version/2.0/mediaset/$mediaset/vpid/"; # $verpid
+		}
+		for my $mediaset ( @mobile_mediasets ) {
+			push @media_stream_mobile_prefixes, "http://open.live.bbc.co.uk/mediaselector/5/select/version/2.0/mediaset/$mediaset/vpid/"; # $verpid
+		}
+		for my $mediaset ( @shoutcast_mediasets ) {
+			push @media_stream_shoutcast_prefixes, "http://open.live.bbc.co.uk/mediaselector/5/select/version/2.0/mediaset/$mediaset/vpid/"; # $verpid
+		}
 	}
+	
+  my @exclude_supplier = split(/,/, $opt->{excludesupplier});
+  if ( grep /akamai/, @exclude_supplier ) {
+		push @exclude_supplier, 'ak';
+  }
+  if ( grep /limelight/, @exclude_supplier ) {
+		push @exclude_supplier, 'll';
+  }
+  if ( ! grep /bidi/, @exclude_supplier ) {
+		push @exclude_supplier, 'bidi';
+  }
+  my $exclude_regex = '('.(join('|', @exclude_supplier)).')';
 
 	# Setup user agent with redirection enabled
 	my $ua = main::create_ua( 'desktop' );
@@ -7422,63 +7570,194 @@ sub get_stream_data {
 		# Push into media data structure
 		push @{ $mattribs->{connections} }, $cattribs;
 		push @medias, $mattribs;
-
-	# Live simulcast verpid: http://www.bbc.co.uk/emp/simulcast/bbc_one_london.xml
-	} elsif ( $verpid =~ /http:/ ) {
-		$xml = main::request_url_retry( $ua, $verpid, 3, undef, undef, 1 );
-		main::logger "\n$xml\n" if $opt->{debug};
-		if ( $verpid =~ /\.f4m$/ ) {
-			@medias = parse_f4m_manifest($xml);
-		} else {
+	} else {
+		my (%seen, $stream_key);
+		if ( $verpid =~ /http:/ ) {
+			$xml = main::request_url_retry( $ua, $verpid, 3, undef, undef, 1 );
+			main::logger "\n$xml\n" if $opt->{debug};
 			if  ( $xml =~ m{<mediator identifier=\"(.+?)\"} ) {
 				$verpid = $1;
 				main::logger "new verpid $verpid" if $opt->{debug};
-				$xml = main::request_url_retry( $ua, $media_stream_data_prefix.$verpid.'?cb='.( sprintf "%05.0f", 99999*rand(0) ), 3, undef, undef, 1 );
-				@medias = parse_metadata( $xml );
-				# filter HLS streams from mobile data
-				$xml = main::request_url_retry( $ua, $media_stream_mobile_prefix.$verpid.'?cb='.( sprintf "%05.0f", 99999*rand(0) ), 3, undef, undef, 1 );
-				main::logger "\n$xml\n" if $opt->{debug};
-				my @mobiles = parse_metadata( $xml );
-				my @hls_medias;
-				my %seen;
-				for my $mobile ( @mobiles ) {
-					for my $mobile_conn ( @{$mobile->{connections}} ) {
-						if ( $mobile_conn->{transferFormat} eq 'hls' ) {
-							if ( ! $seen{$mobile_conn->{href}} ) {
-								$seen{$mobile_conn->{href}}++;
-								push @hls_medias, parse_hls_playlist( $mobile, $mobile_conn, $mobile_conn->{href}) ;
-							}
-						}			
+			}
+		}
+		if ( $verpid =~ /http:/ ) {
+			@medias = parse_metadata( $xml );
+		} else { 
+			# get Flash streams for on-demand
+			if ( $prog->{type} !~ /live/ ) {
+				for my $media_stream_pc_prefix ( @media_stream_pc_prefixes ) {
+					$xml = main::request_url_retry( $ua, $media_stream_pc_prefix.$verpid.'/proto/rtmp?cb='.( sprintf "%05.0f", 99999*rand(0) ), 3, undef, undef, 1 );
+					main::logger "\n$xml\n" if $opt->{debug};
+					my @pc_medias = parse_metadata( $xml );
+					for my $pc_media ( @pc_medias ) {
+						my @pc_conns;
+						for my $pc_conn ( @{$pc_media->{connections}} ) {
+							next if ( $pc_conn->{supplier} =~ /$exclude_regex/ );
+							$stream_key = "$pc_conn->{identifier}-$pc_conn->{protocol}-$pc_conn->{supplier}";
+							next if $seen{$stream_key};
+							$seen{$stream_key}++;
+							push @pc_conns, $pc_conn;
+						}
+						@{$pc_media->{connections}} = @pc_conns;
+						push @medias, $pc_media;
 					}
 				}
-				push @medias, @hls_medias;
-			} else {
-				@medias = parse_metadata( $xml );
 			}
-		}
-	# Could also use Javascript based one: 'http://www.bbc.co.uk/iplayer/mediaselector/4/js/stream/$verpid?cb=NNNNN
-	} else {
-		$xml = main::request_url_retry( $ua, $media_stream_data_prefix.$verpid.'?cb='.( sprintf "%05.0f", 99999*rand(0) ), 3, undef, undef, 1 );
-		main::logger "\n$xml\n" if $opt->{debug};
-		@medias = parse_metadata( $xml );
-		# filter HLS streams from mobile data
-		$xml = main::request_url_retry( $ua, $media_stream_mobile_prefix.$verpid.'?cb='.( sprintf "%05.0f", 99999*rand(0) ), 3, undef, undef, 1 );
-		main::logger "\n$xml\n" if $opt->{debug};
-		my @mobiles = parse_metadata( $xml );
-		my @hls_medias;
-		my %seen;
-		for my $mobile ( @mobiles ) {
-			for my $mobile_conn ( @{$mobile->{connections}} ) {
-				if ( $mobile_conn->{transferFormat} eq 'hls' ) {
-					if ( ! $seen{$mobile_conn->{href}} ) {
-						$seen{$mobile_conn->{href}}++;
-						push @hls_medias, parse_hls_playlist( $mobile, $mobile_conn, $mobile_conn->{href}) ;
+			# get HLS streams from mobile data
+			for my $media_stream_mobile_prefix ( @media_stream_mobile_prefixes ) {
+				$xml = main::request_url_retry( $ua, $media_stream_mobile_prefix.$verpid.'/proto/http?cb='.( sprintf "%05.0f", 99999*rand(0) ), 3, undef, undef, 1 );
+				main::logger "\n$xml\n" if $opt->{debug};
+				my @mobile_medias = parse_metadata( $xml );
+				for my $mobile_media ( @mobile_medias ) {
+					for my $mobile_conn ( @{$mobile_media->{connections}} ) {
+						# direct download files
+						if ( $mobile_conn->{supplier} eq "sis_http_open" ) {
+							my $ddl_conn = dclone($mobile_conn);
+							my $ddl_media = dclone($mobile_media);
+							$ddl_media->{service} .= '_ddl';
+							$ddl_media->{connections} = [ $ddl_conn ];
+							push @medias, $ddl_media;
+							next;
+						}
+						next if $mobile_conn->{transferFormat} ne 'hls';
+						next if $mobile_conn->{supplier} =~ /$exclude_regex/;
+						$stream_key = "$mobile_media->{service}-$mobile_conn->{protocol}-$mobile_conn->{supplier}";
+						next if $seen{$stream_key};
+						$seen{$stream_key}++;
+						($stream_key = $mobile_conn->{href}) =~ s/\?.*//;
+						next if $seen{$stream_key};
+						$seen{$stream_key}++;
+						my @hls_medias = parse_hls_connection( $mobile_media, $mobile_conn, 0, \@medias );
+						for my $hls_media ( @hls_medias ) {
+							for my $hls_conn ( @{$hls_media->{connections}} ) {
+								$stream_key = "$hls_media->{service}-$hls_conn->{protocol}-$hls_conn->{supplier}";
+								next if $seen{$stream_key};
+								$seen{$stream_key}++;
+								($stream_key = $hls_conn->{href}) =~ s/\?.*//;
+								next if $seen{$stream_key};
+								$seen{$stream_key}++;
+								# ensure higher priority for UK live streams
+								$hls_conn->{priority} += 100 if $prog->{type} =~ /live/;
+								push @medias, $hls_media;
+								last;
+							}
+						}
 					}
-				}			
+				}
+			}
+			# generate additional live streams
+			if ( $prog->{type} =~ /live/ ) {
+				my ( $media, $href_prefix, $href_prefix_nonuk, $href_ext, $min_bitrate, $uk );
+				# override other HLS streams if requested
+				if ( ( $prog->{type} =~ /tv/ && $opt->{livetvuk} ) || ( $prog->{type} =~ /radio/ && ( $opt->{liveradiouk} || $opt->{liveradiointl} ) ) ) {
+					@medias = ();
+					%seen = ();
+				}
+				if ( $prog->{type} =~ /tv/ ) {
+					$uk = @medias;
+					$uk = 1 if $opt->{livetvuk};
+					$media = { encoding => "h264", kind => "video", type => "video/mp4" };
+					$href_prefix = "http://a.files.bbci.co.uk/media/live/manifests/hds/pc";
+					$href_ext = ".f4m";
+					$min_bitrate = $opt->{livetvuk} ? 0 : 2000; 
+				} else {
+					$uk = grep { $_->{bitrate} >= 120 } @medias;
+					$uk = 0 if $opt->{liveradiointl};
+					$uk = 1 if $opt->{liveradiouk};
+					$media = { encoding => "aac", kind => "audio", type => "audio/mp4" };
+					$href_prefix = "http://a.files.bbci.co.uk/media/live/manifesto/audio/simulcast/hls";
+					$href_ext = ".m3u8";
+					$min_bitrate = 0; 
+				} 
+				my @hls_medias;
+				my $priority = 0;
+				my @cdns = ( "ak", "llnw" );
+				my @rand_cdns = $cdns[rand @cdns];
+				push @rand_cdns, $rand_cdns[0] eq "ak" ? "llnw" : "ak";
+				for my $cdn ( @rand_cdns ) {
+					my $conn_priority = ( $priority % ($#rand_cdns + 1) ) + 1;
+					$priority++;
+					my $conn = { supplier => "gip_${cdn}_hls_live", priority => $conn_priority, transferFormat => 'hls', protocol => 'http' };
+					$conn->{kind} = $conn->{supplier};
+					if ( $prog->{type} =~ /tv/ ) {
+						if ( $uk ) {
+							$conn->{href} = "${href_prefix}/${cdn}/${verpid}${href_ext}";
+							push @hls_medias, parse_hds_connection( $media, $conn, $min_bitrate );
+						}
+					} elsif ( $verpid eq 'bbc_world_service' ) {
+							$conn->{href} = 'http://bbcwsen-lh.akamaihd.net/i/WSEIEUK_1@189911/master.m3u8';
+							push @hls_medias, parse_hls_connection( $media, $conn, $min_bitrate );
+					} else {
+						my $loc;
+						my @sbr;
+						if ( $uk ) {
+							$loc = 'uk';
+							@sbr = ( 'sbr_high', 'sbr_med', 'sbr_low', 'sbr_vlow' );
+						} else {
+							$loc = 'nonuk';
+							@sbr = ( 'sbr_low', 'sbr_vlow' );
+						}
+						for my $sbr ( @sbr ) {
+							$conn->{href} = "${href_prefix}/${loc}/${sbr}/${cdn}/${verpid}${href_ext}";
+							push @hls_medias, parse_hls_connection( $media, $conn, $min_bitrate);
+						}
+					}
+				}
+				for my $hls_media ( @hls_medias ) {
+					for my $hls_conn ( @{$hls_media->{connections}} ) {
+						$stream_key = "$hls_media->{service}-$hls_conn->{protocol}-$hls_conn->{supplier}";
+						next if $seen{$stream_key};
+						$seen{$stream_key}++;
+						($stream_key = $hls_conn->{href}) =~ s/\?.*//;
+						next if $seen{$stream_key};
+						$seen{$stream_key}++;
+						push @medias, $hls_media;
+						last;
+					}
+				}
+			}
+			# generate shoutcast streams
+			if ( $prog->{type} eq 'liveradio' ) {
+				for my $media_stream_shoutcast_prefix ( @media_stream_shoutcast_prefixes ) {
+					$xml = main::request_url_retry( $ua, $media_stream_shoutcast_prefix.$verpid.'?cb='.( sprintf "%05.0f", 99999*rand(0) ), 3, undef, undef, 1 );
+					main::logger "\n$xml\n" if $opt->{debug};
+					my @shoutcast_medias = parse_metadata( $xml );
+					for my $shoutcast_media ( @shoutcast_medias ) {
+						for my $shoutcast_conn ( @{$shoutcast_media->{connections}} ) {
+							next if $shoutcast_conn->{supplier} =~ /$exclude_regex/;
+							$stream_key = "$shoutcast_media->{service}-$shoutcast_conn->{protocol}-$shoutcast_conn->{supplier}";
+							next if $seen{$stream_key};
+							$seen{$stream_key}++;
+							($stream_key = $shoutcast_conn->{href}) =~ s/\?.*//;
+							next if $seen{$stream_key};
+							$seen{$stream_key}++;
+							# world service returns playlist instead of streams
+							if ( $shoutcast_conn->{href} =~ /\.pls/ ) {
+								my @pls_medias = parse_pls_connection( $shoutcast_media, $shoutcast_conn );
+								for my $pls_media ( @pls_medias ) {
+									for my $pls_conn ( @{$pls_media->{connections}} ) {
+										$stream_key = "$pls_media->{service}-$pls_conn->{protocol}-$pls_conn->{supplier}";
+										next if $seen{$stream_key};
+										$seen{$stream_key}++;
+										($stream_key = $pls_conn->{href}) =~ s/\?.*//;
+										next if $seen{$stream_key};
+										$seen{$stream_key}++;
+										push @medias, $pls_media;
+										last;
+									}
+								}
+							} else {
+								my $sc_media = dclone($shoutcast_media);
+								my $sc_conn = dclone($shoutcast_conn);
+								$sc_media->{connections} = [ $sc_conn ];
+								push @medias, $sc_media;
+							}
+						}
+					}
+				}
 			}
 		}
-		push @medias, @hls_medias;
-	}
+ 	}
 
 	# Parse and dump structure
 	my $mode;
@@ -7501,11 +7780,10 @@ sub get_stream_data {
 		} elsif (	$mattribs->{service} =~ /hls/ ) {
 
 			if ( $mattribs->{kind} =~ 'video' ) {
-				# my $ext = $mattribs->{service} =~ 'live' ? "ts" : "mp4";
 				my $ext = "mp4";
-				if ( $mattribs->{bitrate} > 3000 ) {
+				if ( $mattribs->{bitrate} > 3000 or $mattribs->{width} > 1200 ) {
 					get_stream_data_cdn( $data, $mattribs, 'hlshd', 'hls', $ext );
-				} elsif ( $mattribs->{bitrate} > 2000 ) {
+				} elsif ( $mattribs->{bitrate} > 2000 or $mattribs->{width} > 1000 ) {
 					get_stream_data_cdn( $data, $mattribs, 'hlssd', 'hls', $ext );
 				} elsif ( $mattribs->{bitrate} > 1200 ) {
 					get_stream_data_cdn( $data, $mattribs, 'hlsvhigh', 'hls', $ext );
@@ -7515,16 +7793,51 @@ sub get_stream_data {
 					get_stream_data_cdn( $data, $mattribs, 'hlsstd', 'hls', $ext );
 				} elsif ( $mattribs->{bitrate} > 300 ) {
 					get_stream_data_cdn( $data, $mattribs, 'hlslow', 'hls', $ext );
+				#} elsif ( $mattribs->{bitrate} > 200 ) {
+				#	get_stream_data_cdn( $data, $mattribs, 'hlsvlow', 'hls', $ext );
+				#} elsif ( $mattribs->{bitrate} > 100 ) {
+				#	get_stream_data_cdn( $data, $mattribs, 'hlsvvlow', 'hls', $ext );
+				#} else {
+				#	get_stream_data_cdn( $data, $mattribs, 'hlsvvvlow', 'hls', $ext );
 				}
 			} elsif ( $mattribs->{kind} =~ 'audio' ) {
-				# my $ext = $mattribs->{service} =~ 'live' ? "ts" : "m4a";
 				my $ext = "m4a";
 				if (  $mattribs->{bitrate} >= 192 ) {
 					get_stream_data_cdn( $data, $mattribs, 'hlsaachigh', 'hls', $ext );
-				} elsif ( $mattribs->{bitrate} >= 96 ) {
+				} elsif ( $mattribs->{bitrate} >= 120 ) {
 					get_stream_data_cdn( $data, $mattribs, 'hlsaacstd', 'hls', $ext );
-				} elsif ( $mattribs->{service} !~ /3gp/ ) {
+				} elsif ( $mattribs->{bitrate} >= 80 ) {
+					get_stream_data_cdn( $data, $mattribs, 'hlsaacmed', 'hls', $ext );
+				} else {
 					get_stream_data_cdn( $data, $mattribs, 'hlsaaclow', 'hls', $ext );
+				}
+			}
+
+		} elsif ( $mattribs->{type} =~ /x-scpls/ ) {
+			my $enc = $mattribs->{encoding};
+			my $ext = $enc eq 'aac' ? 'm4a' : 'mp3';
+			if (  $mattribs->{bitrate} >= 192 ) {
+				get_stream_data_cdn( $data, $mattribs, "shoutcast${enc}high", 'shoutcast', $ext );
+			} elsif ( $mattribs->{bitrate} >= 96 ) {
+				# R3 320k AAC mislabelled
+				if ( $verpid eq 'bbc_radio_three' && $enc eq 'aac' ) {
+					get_stream_data_cdn( $data, $mattribs, "shoutcast${enc}high", 'shoutcast', $ext );
+				} else {
+					get_stream_data_cdn( $data, $mattribs, "shoutcast${enc}std", 'shoutcast', $ext );
+				}
+			} else {
+				get_stream_data_cdn( $data, $mattribs, "shoutcast${enc}low", 'shoutcast', $ext );
+			}
+
+		} elsif ( $mattribs->{service} =~ /ddl/ ) {
+			if ( $mattribs->{kind} =~ 'audio' ) {
+				my $ext = "m4a";
+				if (  $mattribs->{bitrate} >= 192 ) {
+					get_stream_data_cdn( $data, $mattribs, 'ddlaachigh', 'ddl', $ext );
+				} elsif ( $mattribs->{bitrate} >= 96 ) {
+					get_stream_data_cdn( $data, $mattribs, 'ddlaacstd', 'ddl', $ext );
+				} else {
+					get_stream_data_cdn( $data, $mattribs, 'ddlaaclow', 'ddl', $ext );
 				}
 			}
 
@@ -7668,6 +7981,8 @@ sub get_stream_data {
 		}	
 	}
 
+	$opt->{mediaselector} = $mediaselector;
+	
 	# Do iphone redirect check regardless of an xml entry for iphone (except for EMP/Live) - sometimes the iphone streams exist regardless
 	# Skip check if the modelist selected excludes iphone
 	if ( $prog->{pid} !~ /^http/i && $verpid !~ /^\?/ && $verpid !~ /^http:/ && grep /^iphone/, split ',', $prog->modelist() ) {
@@ -7703,12 +8018,6 @@ sub get_stream_data {
 		return $data->{$media};
 	}
 }
-
-# map pid to HDS pid
-sub hds_pid_map {
-	return {}
-}
-
 
 # map pid to HLS pid
 sub hls_pid_map {
@@ -7752,6 +8061,7 @@ sub channels {
 			'bbc_sport'		=> 'BBC Sport',
 			'cbbc'				=> 'CBBC',
 			'cbeebies'			=> 'CBeebies',
+			'bbc_news'		=> 'BBC News',
 			'bbc_news24'		=> 'BBC News',
 			'bbc_parliament'	=> 'BBC Parliament',
 			'bbc_webonly'		=> 'BBC Web Only',
@@ -7775,14 +8085,14 @@ sub channels_schedule {
 			'bbcthree/programmes/schedules'		=> 'BBC Three',
 			'cbbc/programmes/schedules'		=> 'CBBC',
 			'cbeebies/programmes/schedules'		=> 'CBeebies',
-			'parliament/programmes/schedules'	=> 'BBC Parliament',
+			'bbcparliament/programmes/schedules'	=> 'BBC Parliament',
 		},
 		'regional' => {
-			'bbcone/programmes/schedules/ni'	=> 'BBC One Northern Ireland',
+			#'bbcone/programmes/schedules/ni'	=> 'BBC One Northern Ireland',
 			'bbcone/programmes/schedules/ni_hd'	=> 'BBC One Northern Ireland',
-			'bbcone/programmes/schedules/scotland'	=> 'BBC One Scotland',
+			#'bbcone/programmes/schedules/scotland'	=> 'BBC One Scotland',
 			'bbcone/programmes/schedules/scotland_hd'	=> 'BBC One Scotland',
-			'bbcone/programmes/schedules/wales'	=> 'BBC One Wales',
+			#'bbcone/programmes/schedules/wales'	=> 'BBC One Wales',
 			'bbcone/programmes/schedules/wales_hd'	=> 'BBC One Wales',
 			'bbctwo/programmes/schedules/england'	=> 'BBC Two England',
 			'bbctwo/programmes/schedules/ni'	=> 'BBC Two Northern Ireland',
@@ -7991,8 +8301,8 @@ sub get_links_aod {
 			$episode = $1 if $entry =~ m{<title>(.*?)</title>};
 			($brand_pid, $brand) = ($1, $2) if $entry =~ m{<parent.*?pid="(.*?)".*?type="Brand">(.*?)</parent>};
 			($series_pid, $series) = ($1, $2) if $entry =~ m{<parent.*?pid="(.*?)".*?type="Series">(.*?)</parent>};
-			$episode =~ s/^${brand}:\s+// if $brand;
-			$episode =~ s/^${series}:\s+// if $series;
+			$episode =~ s/^\Q$brand\E:\s+// if $brand;
+			$episode =~ s/^\Q$series\E:\s+// if $series;
 			if ( $brand ) {
 				if ( $series && $series ne $brand ) {
 					$name = "$brand: $series";
@@ -8247,30 +8557,19 @@ sub get_links {
 	my $self = shift; # ignore obj ref
 	my $prog = shift;
 	my $prog_type = shift;
- 	my $feeds = lc($opt->{"refreshfeeds".${prog_type}} || $opt->{"refreshfeeds"});
 	main::logger "\nINFO: Getting $prog_type Index Feeds (this may take a few minutes)\n";
 	my $rc = 0;
-	if ( $feeds eq 'schedule' ) {
+	if ( $prog_type eq 'radio' ) {
+		$rc = $self->get_links_aod($prog, $prog_type);
+	}
+	elsif ( $prog_type eq 'tv' ) {
 		$rc = $self->get_links_schedule($prog, $prog_type, 0);
-	} elsif ( $feeds eq 'ion2' ) {
-		$rc = $self->get_links_ion($prog, $prog_type, 1);
-	} elsif ( $feeds eq 'ion' ) {
-		$rc = $self->get_links_ion($prog, $prog_type);
-	} else {
-		if ( $prog_type eq 'radio' ) {
-			$rc = $self->get_links_aod($prog, $prog_type);
-		}
-		elsif ( $prog_type eq 'tv' ) {
-			$rc = $self->get_links_ion($prog, $prog_type);
-		}
 	}
 	return 1 if $rc && $opt->{refreshabortonerror};
-
 	if ( $opt->{refreshfuture} ) {
 		$rc = $self->get_links_schedule($prog, $prog_type, 1);
 		return 1 if $rc && $opt->{refreshabortonerror};
 	}
-	
 	main::logger "\n";
 	return 0;
 }
@@ -8407,12 +8706,24 @@ sub get_links_schedule_page {
 	main::logger "\nINFO: Got ".($#entries + 1)." programmes for $channel\n" if $opt->{verbose};
 	my $now = time();
 	foreach my $entry (@entries) {
-		my ( $title, $name, $episode, $brand_pid, $series_pid, $brand, $series, $episodenum, $seriesnum, $desc, $pid, $available, $duration, $thumbnail, $version, $guidance, $descshort );
+		my ( $title, $name, $episode, $brand_pid, $series_pid, $brand, $series, $episodenum, $seriesnum, $desc, $pid, $available, $until, $duration, $thumbnail, $version, $guidance, $descshort );
 		# Don't create this prog instance if the availability is in the past 
 		# this prevents programmes which never appear in iPlayer from being indexed
-		$available = $1 if $entry =~ m{<start>\s*(.+?)\s*</start>};
-		next if $future && Programme::get_time_string( $available ) < $now;
-		next if ! $future && $limit && Programme::get_time_string( $available ) < $limit;
+		if ( $future ) {
+			$available = $1 if $entry =~ m{<start>\s*(.+?)\s*</start>};
+		} else {
+			$available = $1 if $entry =~ m{<actual_start>\s*(.+?)\s*</actual_start>};
+		}
+		next if ! $available;
+		if ( $future ) {
+			next if Programme::get_time_string( $available ) < $now;
+		} else {
+			next if Programme::get_time_string( $available ) > $now;
+			next if $limit && Programme::get_time_string( $available ) < $limit;
+			$until = $1 if $entry =~ m{<available_until>\s*(.+?)\s*</available_until>};
+			next if ! $until;
+			next if Programme::get_time_string( $until ) < $now;
+		}
 		$pid = $1 if $entry =~ m{<programme\s+type="episode">.*?<pid>\s*(.+?)\s*</pid>};
 		$desc = $1 if $entry =~ m{<short_synopsis>\s*(.+?)\s*</short_synopsis>};
 		$duration = $1 if $entry =~ m{<duration>\s*(.+?)\s*</duration>};
@@ -8457,8 +8768,11 @@ sub get_links_schedule_page {
 			$prog->{$pid}->{duration} = $duration;
 			$prog->{$pid}->{episodenum} = $episodenum if ! $prog->{$pid}->{episodenum};
 			$prog->{$pid}->{seriesnum} = $seriesnum if ! $prog->{$pid}->{seriesnum};
-			# don't add this as some progs are already available
-			#$prog->{$pid}->{available} = $available;
+			# use listing with earliest availability
+			if ( $available && $prog->{$pid}->{available} && $prog->{$pid}->{available} ne "Unknown" && $available lt $prog->{$pid}->{available} ) {
+				$prog->{$pid}->{available} = $available;
+				$prog->{$pid}->{channel} = $channel;
+			}
 			next;
 		}
 		# only default version in schedules
@@ -8531,6 +8845,11 @@ sub download {
 		return 'next';
 	}
 
+	if ( $mode =~ /^shoutcast/ && (! main::exists_in_path('ffmpeg')) ) {
+		main::logger "\nWARNING: Required ffmpeg does not exist - cannot download Shoutcast audio\n";
+		return 'next';
+	}
+
 	# Get extension from streamdata if defined and raw not specified
 	$prog->{ext} = $prog->{streams}->{$version}->{$mode}->{ext};
 
@@ -8543,7 +8862,7 @@ sub download {
 	# Override flash ext based on raw
 	$prog->{ext} = 'flv' if $opt->{raw} && $mode =~ /^flash/;
 	# Override flashaac ext
-	if ( ! $opt->{raw} && $mode =~ /^(flash|hls)aac/ ) {
+	if ( ! $opt->{raw} && $mode =~ /^(flash|hls|ddl)aac/ ) {
 		if ( $opt->{aactomp3} ) {
 			$prog->{ext} = 'mp3';
 		} else {
@@ -8555,6 +8874,9 @@ sub download {
 	# Override ext based on mkv option
 	$prog->{ext} = 'mkv' if ! $opt->{raw} && $opt->{mkv} && $prog->{type} eq 'tv';
 	$prog->{ext} = 'ts' if $opt->{raw} && $mode =~ /^hls/;
+	$prog->{ext} = 'aac' if $opt->{raw} && $mode =~ /^shoutcastaac/;
+	$prog->{ext} = 'mp3' if $opt->{raw} && $mode =~ /^shoutcastmp3/;
+	$prog->{ext} = 'm4a' if $opt->{raw} && $mode =~ /^ddlaac/;
 
 	# Determine the correct filenames for this recording
 	if ( $prog->generate_filenames( $ua, $prog->file_prefix_format() ) ) {
@@ -9003,6 +9325,7 @@ sub opt_format {
 		wav		=> [ 1, "wav!", 'Recording', '--wav', "In radio realaudio mode output as wav and don't transcode to mp3"],
 		rtmpradioopts	=> [ 1, "rtmp-radio-opts|rtmpradioopts=s", 'Recording', '--rtmp-radio-opts <options>', "Add custom options to rtmpdump for radio"],
 		hlsradioopts	=> [ 1, "hls-radio-opts|hlsradioopts=s", 'Recording', '--hls-radio-opts <options>', "Add custom options to ffmpeg HLS download re-muxing for radio"],
+		ddlradioopts	=> [ 1, "ddl-radio-opts|ddlradioopts=s", 'Recording', '--ddl-radio-opts <options>', "Add custom options to ffmpeg DDL download re-muxing for radio"],
 		ffmpegradioopts	=> [ 1, "ffmpeg-radio-opts|ffmpegradioopts=s", 'Recording', '--ffmpeg-radio-opts <options>', "Add custom options to ffmpeg re-muxing for radio"],
 	};
 }
@@ -9061,7 +9384,7 @@ sub modelist {
 	$mlist = main::expand_list($mlist, 'good', 'default');
 	$mlist = main::expand_list($mlist, 'default', 'flash');
 	$mlist = main::expand_list($mlist, 'rtmp', 'flash');
-	$mlist = main::expand_list($mlist, 'flash', 'flashaachigh,flashaacstd,flashaudio,flashaaclow');
+	$mlist = main::expand_list($mlist, 'flash', 'flashaachigh,flashaacstd,flashaaclow');
 	$mlist = main::expand_list($mlist, 'flashaac', 'flashaachigh,flashaacstd,flashaaclow');
 	$mlist = main::expand_list($mlist, 'hlsbest', 'hlsdefault');
 	$mlist = main::expand_list($mlist, 'hlsvbetter', 'hlsdefault');
@@ -9070,6 +9393,8 @@ sub modelist {
 	$mlist = main::expand_list($mlist, 'hlsdefault', 'hls');
 	$mlist = main::expand_list($mlist, 'hls', 'hlsaac');
 	$mlist = main::expand_list($mlist, 'hlsaac', 'hlsaachigh,hlsaacstd,hlsaaclow');
+	$mlist = main::expand_list($mlist, 'ddl', 'ddlaac');
+	$mlist = main::expand_list($mlist, 'ddlaac', 'ddlaachigh,ddlaacstd,ddlaaclow');
 
 	return $mlist;
 }
@@ -9210,6 +9535,7 @@ sub get_links {
 			my $thumb_pid = $pid;
 			$thumb_pid =~ s/^(bbc_one).*$/${1}_london/;
 			$thumb_pid =~ s/^(bbc_two).*$/${1}_england/;
+			$thumb_pid =~ s/scotland_mw/scotland_fm/g;
 			my $thumbnail = "http://www.bbc.co.uk/iplayer/images/${thumb_prog_type}/${thumb_pid}_640_360.jpg";
 			if ( $channel =~ /s4c/i ) {
 				$thumbnail = "http://www.s4c.co.uk/static/img/s4c.png";
@@ -9217,6 +9543,13 @@ sub get_links {
 			my $web_pid = $pid;
 			if ( $prog_type eq 'livetv' ) {
 				($web_pid = lc($channel)) =~ s/ //g;
+				$web_pid =~ s/(northernireland|scotland|wales)/?area=$1/;
+				$web_pid =~ s/northernireland/northern_ireland/;
+			}
+			if ( $prog_type eq 'liveradio' ) {
+				($web_pid = lc($channel)) =~ s/ //g;
+				$web_pid =~ s/scotland(fm|mw)/scotland/;
+				$web_pid =~ s/bbc//;
 			}
 			# build data structure
 			$prog->{$pid} = main::progclass($prog_type)->new(
@@ -9232,7 +9565,8 @@ sub get_links {
 				'channel'	=> $channel,
 				#'categories'	=> join(',', @category),
 				'type'		=> $prog_type,
-				'web'		=> "http://www.bbc.co.uk/iplayer/live/${web_pid}/",
+				#'web'		=> "http://www.bbc.co.uk/iplayer/live/${web_pid}",
+				'web'		=> "http://www.bbc.co.uk/${web_pid}",
 			);
 	}
 	main::logger "\n";
@@ -9287,49 +9621,35 @@ sub channels {
 			'bbc_parliament'	=> 'BBC Parliament',
 			'bbc_alba'		=> 'BBC Alba',
 			's4cpbs'		=> 'S4C',
+			'bbc_one_northern_ireland_hd'	=> 'BBC One Northern Ireland',
+			'bbc_one_scotland_hd'	=> 'BBC One Scotland',
+			'bbc_one_wales_hd'	=> 'BBC One Wales',
+			'bbc_two_northern_ireland_digital'	=> 'BBC Two Northern Ireland',
+			'bbc_two_scotland'	=> 'BBC Two Scotland',
+			'bbc_two_wales_digital'	=> 'BBC Two Wales',
 		}
 	};
 }
 
-sub hds_pid_map {
-	return {
-		'bbc_one_hd'	=> 'bbc_one_hd',
-		'bbc_two_hd'	=> 'bbc_two_hd',
-		'bbc_three'		=> 'bbc_three_hd',
-		'bbc_four'		=> 'bbc_four_hd',
-		'cbbc'				=> 'cbbc_hd',
-		'cbeebies'		=> 'cbeebies_hd',
-		'bbc_news24'	=> 'bbc_news_channel_hd',
-		'bbc_parliament'	=> 'bbc_parliament',
-		'bbc_alba'		=> 'bbc_alba',
-		's4cpbs'		=> 's4cpbs',
-	}
-}
-
 sub hls_pid_map {
 	return {
-		'bbc_one_hd'	=> 'bbc_one_hd',
-		'bbc_two_hd'	=> 'bbc_two_hd',
 		'bbc_three'		=> 'bbc_three_hd',
 		'bbc_four'		=> 'bbc_four_hd',
 		'cbbc'				=> 'cbbc_hd',
 		'cbeebies'		=> 'cbeebies_hd',
 		'bbc_news24'	=> 'bbc_news_channel_hd',
-		'bbc_parliament'	=> 'bbc_parliament',
-		'bbc_alba'		=> 'bbc_alba',
-		's4cpbs'		=> 's4cpbs',
 	}
 }
 
 # Class cmdline Options
 sub opt_format {
 	return {
-		livetvmode	=> [ 1, "livetvmode=s", 'Recording', '--livetvmode <mode>,<mode>,...', "Live TV recording modes: hlshd,hlssd,hlsvhigh,hlshigh,hlsstd,hlsnormal,hlslow. Shortcuts: default,good,better(=default),vbetter,best,hls. ('default'=hlsvhigh,hlshigh,hlsstd,hlslow)"],
+		livetvmode	=> [ 1, "livetvmode=s", 'Recording', '--livetvmode <mode>,<mode>,...', "Live TV recording modes: hlshd,hlssd,hlsvhigh,hlshigh,hlsstd,hlslow. Shortcuts: default,good,better(=default),vbetter,best,hls. ('default'=hlsvhigh,hlshigh,hlsstd,hlslow)"],
 		outputlivetv	=> [ 1, "outputlivetv=s", 'Output', '--outputlivetv <dir>', "Output directory for live tv recordings (overrides --output)"],
 		rtmplivetvopts	=> [ 1, "rtmp-livetv-opts|rtmplivetvopts=s", 'Recording', '--rtmp-livetv-opts <options>', "Add custom options to rtmpdump for livetv"],
 		hlslivetvopts	=> [ 1, "hls-livetv-opts|hlslivetvopts=s", 'Recording', '--hls-livetv-opts <options>', "Add custom options to ffmpeg HLS download encoding for livetv"],
 		ffmpeglivetvopts	=> [ 1, "ffmpeg-livetv-opts|ffmpeglivetvopts=s", 'Recording', '--ffmpeg-livetv-opts <options>', "Add custom options to ffmpeg re-muxing for livetv"],
-		hdslivetv	=> [ 1, "hds-livetv|hdslivetv!", 'Recording', '--hds-livetv', "Use Adobe HDS manifests to locate live tv streams (for live HD tv where available)"],
+		livetvuk	=> [ 1, "livetv-uk|livetvuk!", 'Recording', '--livetv-uk', "Force use of hard-coded UK streams for HLS live tv"],
 	};
 }
 
@@ -9431,7 +9751,8 @@ sub channels {
 		},
 		'regional' => {
 			'bbc_radio_foyle'			=> 'BBC Radio Foyle',
-			'bbc_radio_scotland'			=> 'BBC Radio Scotland',
+			'bbc_radio_scotland_fm'			=> 'BBC Radio Scotland FM',
+			'bbc_radio_scotland_mw'			=> 'BBC Radio Scotland MW',
 			'bbc_radio_nan_gaidheal'		=> 'BBC Radio Nan Gaidheal',
 			'bbc_radio_ulster'			=> 'BBC Radio Ulster',
 			'bbc_radio_wales'			=> 'BBC Radio Wales',
@@ -9487,11 +9808,14 @@ sub channels {
 # Class cmdline Options
 sub opt_format {
 	return {
-		liveradiomode	=> [ 1, "liveradiomode=s", 'Recording', '--liveradiomode <mode>,<mode>,..', "Live Radio recording modes: flashaachigh,flashaacstd,flashaudio,flashaaclow,wma. Shortcuts: default,good,better(=default),best,rtmp,flash,flashaac. ('default'=flashaachigh,flashaacstd,flashaaclow)"],
+		liveradiomode	=> [ 1, "liveradiomode=s", 'Recording', '--liveradiomode <mode>,<mode>,..', "Live Radio recording modes: hlsaachigh,hlsaacstd,hlsaacmed,hlsaaclow,shoutcastmp3std,shoutcastaachigh(R3 only, UK only). Shortcuts: default,good,better(=default),best,hls. ('default'=hlsaachigh,hlsaacstd,hlsaacmed,hlsaaclow)"],
 		outputliveradio	=> [ 1, "outputliveradio=s", 'Output', '--outputliveradio <dir>', "Output directory for live radio recordings (overrides --output)"],
 		rtmpliveradioopts => [ 1, "rtmp-liveradio-opts|rtmpliveradioopts=s", 'Recording', '--rtmp-liveradio-opts <options>', "Add custom options to rtmpdump for liveradio"],
 		hlsliveradioopts	=> [ 1, "hls-liveradio-opts|hlsliveradioopts=s", 'Recording', '--hls-liveradio-opts <options>', "Add custom options to ffmpeg HLS download re-muxing for liveradio"],
 		ffmpegliveradioopts => [ 1, "ffmpeg-liveradio-opts|ffmpegliveradioopts=s", 'Recording', '--ffmpeg-liveradio-opts <options>', "Add custom options to ffmpeg re-muxing for liveradio"],
+		shoutcastliveradioopts	=> [ 1, "shoutcast-liveradio-opts|shoutcastliveradioopts=s", 'Recording', '--shoutcast-liveradio-opts <options>', "Add custom options to ffmpeg Shoutcast download re-muxing for liveradio"],
+		liveradiouk	=> [ 1, "liveradio-uk|liveradiouk!", 'Recording', '--liveradio-uk', "Force use of hard-coded UK streams for HLS live radio (overrides --liveradio-intl). Ignored for World Service"],
+		liveradiointl	=> [ 1, "liveradio-intl|liveradiointl!", 'Recording', '--liveradio-intl', "Force use of hard-coded international streams for HLS live radio.  Ignored for World Service"],
 	};
 }
 
@@ -9519,30 +9843,30 @@ sub modelist {
 	
 	# Defaults
 	if ( ! $mlist ) {
-		if ( ! main::exists_in_path('rtmpdump') ) {
-			main::logger "WARNING: Not using flash modes since rtmpdump is not found\n" if $opt->{verbose};		
-		} elsif ( ! main::exists_in_path('ffmpeg') ) {
-			main::logger "WARNING: Not using HLS modes since ffmpeg is not found\n" if $opt->{verbose};
+		if ( ! main::exists_in_path('ffmpeg') ) {
+			main::logger "WARNING: Not using HLS and Shoutcast modes since ffmpeg is not found\n" if $opt->{verbose};
 		} else {
 			$mlist = 'default';
 		}
 	}
+	# deal with obsolete values
+	$mlist =~ s/(flash|rtmp)/hls/g;
 	# Deal with BBC Radio fallback modes and expansions
-	$mlist = main::expand_list($mlist, 'best', 'default');
-	$mlist = main::expand_list($mlist, 'vbetter', 'default');
-	$mlist = main::expand_list($mlist, 'better', 'default');
-	$mlist = main::expand_list($mlist, 'good', 'default');
-	$mlist = main::expand_list($mlist, 'default', 'flash');
-	$mlist = main::expand_list($mlist, 'rtmp', 'flash');
-	$mlist = main::expand_list($mlist, 'flash', 'flashaachigh,flashaacstd,flashaudio,flashaaclow');
-	$mlist = main::expand_list($mlist, 'flashaac', 'flashaachigh,flashaacstd,flashaaclow');
+	$mlist = main::expand_list($mlist, 'default', 'hlsdefault');
+	$mlist = main::expand_list($mlist, 'best', 'hlsbest');
+	$mlist = main::expand_list($mlist, 'vbetter', 'hlsvbetter');
+	$mlist = main::expand_list($mlist, 'better', 'hlsbetter');
+	$mlist = main::expand_list($mlist, 'good', 'hlsgood');
 	$mlist = main::expand_list($mlist, 'hlsbest', 'hlsdefault');
 	$mlist = main::expand_list($mlist, 'hlsvbetter', 'hlsdefault');
 	$mlist = main::expand_list($mlist, 'hlsbetter', 'hlsdefault');
 	$mlist = main::expand_list($mlist, 'hlsgood', 'hlsdefault');
 	$mlist = main::expand_list($mlist, 'hlsdefault', 'hls');
 	$mlist = main::expand_list($mlist, 'hls', 'hlsaac');
-	$mlist = main::expand_list($mlist, 'hlsaac', 'hlsaachigh,hlsaacstd,hlsaaclow');
+	$mlist = main::expand_list($mlist, 'hlsaac', 'hlsaachigh,hlsaacstd,hlsaacmed,hlsaaclow');
+	$mlist = main::expand_list($mlist, 'shoutcast', 'shoutcastaac,shoutcastmp3');
+	$mlist = main::expand_list($mlist, 'shoutcastmp3', 'shoutcastmp3high,shoutcastmp3std,shoutcastmp3low');
+	$mlist = main::expand_list($mlist, 'shoutcastaac', 'shoutcastaachigh,shoutcastaacstd,shoutcastaaclow');
 
 	return $mlist;
 }
@@ -9971,7 +10295,9 @@ sub get {
 	}
 
 	# if we fail during the rtmp streaming, try to resume (this gets new streamdata again so that it isn't stale)
-	return 'retry' if $return && -f $file_tmp && stat($file_tmp)->size > $prog->min_download_size();
+	unless ( $return == 2 && $opt->{stop} ) {
+		return 'retry' if $return && -f $file_tmp && stat($file_tmp)->size > $prog->min_download_size();
+	}
 
 	# If file is too small or non-existent then delete and try next mode
 	if ( (! -f $file_tmp) || ( -f $file_tmp && stat($file_tmp)->size < $prog->min_download_size()) ) {
@@ -10094,7 +10420,7 @@ sub opt_format {
 
 
 # %prog (only for {ext} and {mode})
-# Actually do the RTMP streaming
+# Actually do the HLS streaming
 sub get {
 	my ( $stream, undef, undef, $prog, %streamdata ) = @_;
 	my $file_tmp;
@@ -10130,7 +10456,9 @@ sub get {
 	
 	# Add start stop options if defined
 	push @cmdopts, ( '-ss', $opt->{start} ) if $opt->{start};
-	push @cmdopts, ( '-t', $opt->{stop} ) if $opt->{stop};
+	push @cmdopts, ( '-t', $opt->{stop} - $opt->{start} ) if $opt->{stop};
+	# requires ffmpeg 1.2
+	# push @cmdopts, ( '-to', $opt->{stop} ) if $opt->{stop};
 	if ( $live ) {
 		if ( $kind eq 'video' ) {
 			push @cmdopts, ( '-vb', "${vb}k" ) if $vb;
@@ -10294,6 +10622,160 @@ sub get {
 	$prog->create_symlink( $prog->{symlink}, $prog->{filename} ) if $opt->{symlink};
 
 	main::logger "INFO: Recorded $prog->{filename}\n";
+	return 0;
+}
+
+
+################### Streamer::ddl class #################
+package Streamer::ddl;
+
+# Inherit from Streamer class
+use base 'Streamer';
+use File::Copy;
+use File::Path;
+use File::stat;
+use strict;
+
+sub opt_format {
+	return {
+		ffmpeg		=> [ 0, "ffmpeg|avconv=s", 'External Program', '--ffmpeg <path>', "Location of ffmpeg or avconv binary. Synonyms: --avconv"],
+		ffmpegobsolete		=> [ 1, "ffmpeg-obsolete|ffmpegobsolete|avconv-obsolete|avconvobsolete!", 'External Program', '--ffmpeg-obsolete', "Indicates you are using an obsolete version of ffmpeg (<0.7) that does not support the -loglevel option, so  --quiet, --verbose and --debug will not be applied to ffmpeg. Synonym: --avconv-obsolete"],
+	};
+}
+
+
+# %prog (only for {ext} and {mode})
+# Actually do the DDL streaming
+sub get {
+	my ( $stream, undef, undef, $prog, %streamdata ) = @_;
+	my $file_tmp;
+	my @cmd;
+	my @cmdopts;
+	my $return;
+	my $url = $streamdata{streamurl};
+	my $kind = $streamdata{kind};
+	my $mode = $prog->{mode};
+
+	$file_tmp = $prog->{filepart};
+
+	# Remove failed file recording (below a certain size) - hack to get around rtmpdump not returning correct exit code
+	if ( -f $file_tmp && stat($file_tmp)->size < $prog->min_download_size() ) {
+		unlink( $file_tmp );
+	}
+	
+	# Create symlink if required
+	$prog->create_symlink( $prog->{symlink}, $file_tmp ) if $opt->{symlink};
+
+	# Deal with stdout streaming
+	#if ( $opt->{stdout} && not $opt->{nowrite} ) {
+	#	main::logger "ERROR: Cannot stream DDL to STDOUT and file simultaneously\n";
+	#	exit 4;
+	#}
+	
+	push @cmdopts, ( '-vn' );
+	push @cmdopts, ( '-acodec', 'copy' );
+
+	# Add custom options to ffmpeg for this type if specified with --ddl-<type>-opts
+	if ( defined $opt->{'ddl'.$prog->{type}.'opts'} ) {
+		push @cmdopts, ( split /\s+/, $opt->{'ddl'.$prog->{type}.'opts'} );
+	}
+
+	my @globals = ( '-y' );
+	if ( ! grep( /-loglevel/i, @{$binopts->{ffmpeg}} ) ) {
+		push @globals, ( '-loglevel', 'error', '-stats' );
+	}
+	@cmd = (
+		$bin->{ffmpeg},
+		@{$binopts->{ffmpeg}},
+		@globals,
+		'-i', $url,
+	);
+	if ( ! $opt->{nowrite} ) {
+		push @cmd, @cmdopts;
+		push @cmd, ( $file_tmp );
+	}
+	if ( $opt->{stdout} ) {
+		push @cmd, @cmdopts;
+		push @cmd, ( '-f', 'adts', 'pipe:1' );
+	}
+	
+	$return = main::run_cmd( 'normal', @cmd );
+
+	# exit behaviour when streaming
+	if ( $opt->{nowrite} && $opt->{stdout} ) {
+		if ( $return == 0 ) {
+			main::logger "\nINFO: Streaming completed successfully\n";
+			return 0;
+		} else {
+			main::logger "\nINFO: Streaming failed with exit code $return\n";
+			return 'abort';
+		}
+	}
+
+	# if we fail during the hls streaming, try to resume (this gets new streamdata again so that it isn't stale)
+	return 'retry' if $return && -f $file_tmp && stat($file_tmp)->size > $prog->min_download_size();
+
+	# If file is too small or non-existent then delete and try next mode
+	if ( (! -f $file_tmp) || ( -f $file_tmp && stat($file_tmp)->size < $prog->min_download_size()) ) {
+		main::logger "WARNING: Failed to stream file $file_tmp via 3gpaac\n";
+		unlink $file_tmp;
+		return 'next';
+	}
+
+	# Add custom options to ffmpeg for this type if specified with --ffmpeg-<type>-opts
+	my @ffmpeg_opts = ();
+	if ( defined $opt->{'ffmpeg'.$prog->{type}.'opts'} ) {
+		push @ffmpeg_opts, ( split /\s+/, $opt->{'ffmpeg'.$prog->{type}.'opts'} );
+	}
+
+	if ( $opt->{raw} ) {
+		if ( $file_tmp ne $prog->{filename} && ! $opt->{stdout} ) {
+			move($file_tmp, $prog->{filename});
+			$prog->check_duration() if $opt->{checkduration};
+		}
+		return 0;
+
+	} elsif ( $mode =~ /ddlaac/ ) {
+		# transcode to MP3 if directed. If mp3vbr is not set then perform CBR.
+		if ( $opt->{aactomp3} ) {
+			my @br_opts = ('-ab', '128k');
+			if ( $opt->{mp3vbr} =~ /^\d$/ ) {
+				@br_opts = ('-aq', $opt->{mp3vbr});
+			}
+			@cmd = (
+				$bin->{ffmpeg},
+				@{ $binopts->{ffmpeg} },
+				@globals,
+				'-i', $file_tmp,
+				'-vn',
+				'-acodec', 'libmp3lame', '-ac', '2', @br_opts,
+				@ffmpeg_opts,
+				$prog->{filepart},
+			);
+			# Run conversion and delete source file on success
+			$return = main::run_cmd( 'STDERR', @cmd );
+			if ( (! $return) && -f $prog->{filepart} && stat($prog->{filepart})->size > $prog->min_download_size() ) {
+					unlink( $file_tmp );
+			# If the ffmpeg conversion failed, remove the failed-converted file attempt - move the file as done anyway
+			} else {
+				main::logger "WARNING: m4a conversion failed - retaining m4a file\n";
+				unlink $prog->{filepart};
+				$prog->{filepart} = $file_tmp;
+				$prog->{filename} = $file_tmp;
+			}
+		}
+	}
+
+	# Moving file into place as complete
+	if ( $prog->{filepart} ne $prog->{filename} ) {
+		move($prog->{filepart}, $prog->{filename}); 
+		$prog->check_duration() if $opt->{checkduration};
+	}
+	
+	# Re-symlink file
+	$prog->create_symlink( $prog->{symlink}, $prog->{filename} ) if $opt->{symlink};
+
+	main::logger "INFO: Recorded $prog->{filename}  $prog->{filepart}\n";
 	return 0;
 }
 
@@ -10884,7 +11366,6 @@ sub get {
 }
 
 
-
 package Streamer::http;
 
 # Inherit from Streamer class
@@ -10951,6 +11432,205 @@ sub get {
 	return 0;
 }
 
+
+################### Streamer::shoutcast class #################
+package Streamer::shoutcast;
+
+# Inherit from Streamer class
+use base 'Streamer';
+use File::Copy;
+use File::Path;
+use File::stat;
+use strict;
+
+sub opt_format {
+	return {
+		ffmpeg		=> [ 0, "ffmpeg|avconv=s", 'External Program', '--ffmpeg <path>', "Location of ffmpeg or avconv binary. Synonyms: --avconv"],
+		ffmpegobsolete		=> [ 1, "ffmpeg-obsolete|ffmpegobsolete|avconv-obsolete|avconvobsolete!", 'External Program', '--ffmpeg-obsolete', "Indicates you are using an obsolete version of ffmpeg (<0.7) that does not support the -loglevel option, so  --quiet, --verbose and --debug will not be applied to ffmpeg. Synonym: --avconv-obsolete"],
+	};
+}
+
+
+# %prog (only for {ext} and {mode})
+# Actually do the shoutcast streaming
+sub get {
+	my ( $stream, undef, undef, $prog, %streamdata ) = @_;
+	my $file_tmp;
+	my @cmd;
+	my @cmdopts;
+	my $return;
+	my $url = $streamdata{streamurl};
+	my $kind = $streamdata{kind};
+	my $live = $streamdata{live};
+	my $mode = $prog->{mode};
+	my $mode_mp3 = $mode =~ /shoutcastmp3/;
+	my $mode_aac = $mode =~ /shoutcastaac/;
+	
+	if ( $opt->{raw} ) {
+		$file_tmp = $prog->{filepart};
+	} else {
+		if ( $mode_mp3 ) {
+			$file_tmp = $prog->{filepart}.".mp3";
+		} elsif ( $mode_aac ) {
+			$file_tmp = $prog->{filepart}.".aac";
+		}
+	}
+
+	# Remove failed file recording (below a certain size)
+	if ( -f $file_tmp && stat($file_tmp)->size < $prog->min_download_size() ) {
+		unlink( $file_tmp );
+	}
+	
+	# Create symlink if required
+	$prog->create_symlink( $prog->{symlink}, $file_tmp ) if $opt->{symlink};
+
+	# Deal with stdout streaming
+	#if ( $opt->{stdout} && not $opt->{nowrite} ) {
+	#	main::logger "ERROR: Cannot stream Shoutcast to STDOUT and file simultaneously\n";
+	#	exit 4;
+	#}
+	
+	# Add start stop options if defined
+	if ( $opt->{start} || $opt->{stop} ) {
+		push @cmdopts, ( '-ss', $opt->{start} ) if $opt->{start};
+		push @cmdopts, ( '-t', $opt->{stop} ) if $opt->{stop};
+	}
+	push @cmdopts, ( '-acodec', 'copy', '-vn' );
+
+	# Add custom options to ffmpeg for this type if specified with --shoutcast-<type>-opts
+	if ( defined $opt->{'shoutcast'.$prog->{type}.'opts'} ) {
+		push @cmdopts, ( split /\s+/, $opt->{'shoutcast'.$prog->{type}.'opts'} );
+	}
+
+	my @globals = ( '-y' );
+	if ( ! grep( /-loglevel/i, @{$binopts->{ffmpeg}} ) ) {
+		push @globals, ( '-loglevel', 'error', '-stats' );
+	}
+	@cmd = (
+		$bin->{ffmpeg},
+		@{$binopts->{ffmpeg}},
+		@globals,
+		'-i', $url,
+	);
+	if ( ! $opt->{nowrite} ) {
+		push @cmd, @cmdopts;
+		push @cmd, ( $file_tmp );
+	}
+	if ( $opt->{stdout} ) {
+		push @cmd, @cmdopts;
+		if ( $mode_mp3 ) {
+			push @cmd, ( '-f', 'mp3', 'pipe:1' );
+		} elsif ( $mode_aac ) {
+			push @cmd, ( '-f', 'adts', 'pipe:1' );
+		}
+	}
+
+	$return = main::run_cmd( 'normal', @cmd );
+
+	# exit behaviour when streaming
+	if ( $opt->{nowrite} && $opt->{stdout} ) {
+		if ( $return == 0 ) {
+			main::logger "\nINFO: Streaming completed successfully\n";
+			return 0;
+		} else {
+			main::logger "\nINFO: Streaming failed with exit code $return\n";
+			return 'abort';
+		}
+	}
+
+	# if we fail during the hls streaming, try to resume (this gets new streamdata again so that it isn't stale)
+	return 'retry' if $return && -f $file_tmp && stat($file_tmp)->size > $prog->min_download_size();
+
+	# If file is too small or non-existent then delete and try next mode
+	if ( (! -f $file_tmp) || ( -f $file_tmp && stat($file_tmp)->size < $prog->min_download_size()) ) {
+		main::logger "WARNING: Failed to stream file $file_tmp via Shoutcast\n";
+		unlink $file_tmp;
+		return 'next';
+	}
+	
+	# Add custom options to ffmpeg for this type if specified with --ffmpeg-<type>-opts
+	my @ffmpeg_opts = ();
+	if ( defined $opt->{'ffmpeg'.$prog->{type}.'opts'} ) {
+		push @ffmpeg_opts, ( split /\s+/, $opt->{'ffmpeg'.$prog->{type}.'opts'} );
+	}
+
+	# Retain raw aac format if required
+	if ( $opt->{raw} ) {
+		if ( $file_tmp ne $prog->{filename} && ! $opt->{stdout} ) {
+			move($file_tmp, $prog->{filename});
+			$prog->check_duration() if $opt->{checkduration} && ! $live;
+		}
+		return 0;
+
+	} elsif ( $mode_mp3 ) {
+			@cmd = (
+				$bin->{ffmpeg},
+				@{ $binopts->{ffmpeg} },
+				@globals,
+				'-i', $file_tmp,
+				'-vn',
+				'-acodec', 'copy',
+				@ffmpeg_opts,
+				$prog->{filepart},
+			);
+			
+	# Convert aac to m4a/mp3
+	} elsif ( $mode_aac ) {
+		# transcode to MP3 if directed. If mp3vbr is not set then perform CBR.
+		if ( $opt->{aactomp3} ) {
+			my @br_opts = ('-ab', '128k');
+			if ( $opt->{mp3vbr} =~ /^\d$/ ) {
+				@br_opts = ('-aq', $opt->{mp3vbr});
+			}
+			@cmd = (
+				$bin->{ffmpeg},
+				@{ $binopts->{ffmpeg} },
+				@globals,
+				'-i', $file_tmp,
+				'-vn',
+				'-acodec', 'libmp3lame', '-ac', '2', @br_opts,
+				@ffmpeg_opts,
+				$prog->{filepart},
+			);
+		} else {
+			@cmd = (
+				$bin->{ffmpeg},
+				@{ $binopts->{ffmpeg} },
+				@globals,
+				'-i', $file_tmp,
+				'-vn',
+				'-acodec', 'copy',
+				'-absf', 'aac_adtstoasc',
+				@ffmpeg_opts,
+				$prog->{filepart},
+			);
+		}
+	}
+
+	# Run aac conversion and delete source file on success
+	$return = main::run_cmd( 'STDERR', @cmd );
+
+	if ( (! $return) && -f $prog->{filepart} && stat($prog->{filepart})->size > $prog->min_download_size() ) {
+			unlink( $file_tmp );
+	# If the ffmpeg conversion failed, remove the failed-converted file attempt - move the file as done anyway
+	} else {
+		main::logger "WARNING: aac conversion failed - retaining aac file\n";
+		unlink $prog->{filepart};
+		$prog->{filepart} = $file_tmp;
+		$prog->{filename} = $file_tmp;
+	}
+	# Moving file into place as complete (if not stdout)
+	if ( $prog->{filepart} ne $prog->{filename} && ! $opt->{stdout} ) {
+		move($prog->{filepart}, $prog->{filename}); 
+		$prog->check_duration() if $opt->{checkduration} && ! $live;
+	}
+	
+	# Re-symlink file
+	$prog->create_symlink( $prog->{symlink}, $prog->{filename} ) if $opt->{symlink};
+
+	main::logger "INFO: Recorded $prog->{filename}\n";
+	return 0;
+}
 
 
 package Streamer::filestreamonly;
@@ -11417,6 +12097,8 @@ sub load_options {
 	my $name = shift;
 
 	my $optfile_preset;
+	# reset proxy env var
+	$ENV{http_proxy} = $ENV_HTTP_PROXY;
 	# Clear out existing options and file options hashes
 	%{$opt} = ();
 
