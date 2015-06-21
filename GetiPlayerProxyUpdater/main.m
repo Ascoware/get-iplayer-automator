@@ -87,6 +87,7 @@ int main(int argc, const char * argv[])
         NSLog(@"Retrieved Page");
         
         NSScanner *listScanner = [NSScanner scannerWithString:[request responseString]];
+       
         
         [listScanner scanUpToString:@"proxy:name=XROXY" intoString:nil];
         
