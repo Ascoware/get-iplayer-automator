@@ -252,15 +252,13 @@ NSDictionary *radioFormats;
     }
     if ([[itvFormatController arrangedObjects] count] == 0)
     {
+        TVFormat *format0 = [[TVFormat alloc] init];
+        [format0 setFormat:@"Flash - HD"];
         TVFormat *format1 = [[TVFormat alloc] init];
-        [format1 setFormat:@"Flash - High"];
+        [format0 setFormat:@"Flash - Very High"];
         TVFormat *format2 = [[TVFormat alloc] init];
-        [format2 setFormat:@"Flash - Standard"];
-        TVFormat *format3 = [[TVFormat alloc] init];
-        [format3 setFormat:@"Flash - Low"];
-        TVFormat *format4 = [[TVFormat alloc] init];
-        [format4 setFormat:@"Flash - Very Low"];
-        [itvFormatController addObjects:@[format1,format2,format3,format4]];
+        [format1 setFormat:@"Flash - High"];
+        [itvFormatController addObjects:@[format0, format1, format2]];
     }
     
     //Growl Initialization
