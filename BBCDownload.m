@@ -66,16 +66,21 @@
       }
    }
    //Initialize the rest of the arguments
+   NSString *executablesPath = [bundle.executablePath stringByDeletingLastPathComponent];
+
 	NSString *noWarningArg = @"--nocopyright";
 	NSString *noPurgeArg = @"--nopurge";
-	NSString *id3v2Arg = [[NSString alloc] initWithFormat:@"--id3v2=%@", [bundle pathForResource:@"id3v2" ofType:nil]];
-	NSString *mplayerArg = [[NSString alloc] initWithFormat:@"--mplayer=%@", [bundle pathForResource:@"mplayer" ofType:nil]];
-   NSString *rtmpdumpArg = [[NSString alloc] initWithFormat:@"--rtmpdump=%@", [bundle pathForResource:@"rtmpdump-2.4" ofType:nil]];
-	NSString *lameArg = [[NSString alloc] initWithFormat:@"--lame=%@", [bundle pathForResource:@"lame" ofType:nil]];
-	NSString *atomicParsleyArg = [[NSString alloc] initWithFormat:@"--atomicparsley=%@", [bundle pathForResource:@"AtomicParsley" ofType:nil]];
-	NSString *ffmpegArg = [[NSString alloc] initWithFormat:@"--ffmpeg=%@", [bundle pathForResource:@"ffmpeg" ofType:nil]];
+	NSString *id3v2Arg = [[NSString alloc] initWithFormat:@"--id3v2=%@", [executablesPath stringByAppendingPathComponent:@"id3v2"]];
+	NSString *mplayerArg = [[NSString alloc] initWithFormat:@"--mplayer=%@", [executablesPath stringByAppendingPathComponent:@"mplayer"]];
+   NSString *rtmpdumpArg = [[NSString alloc] initWithFormat:@"--rtmpdump=%@", [executablesPath stringByAppendingPathComponent:@"rtmpdump-2.4"]];
+	NSString *lameArg = [[NSString alloc] initWithFormat:@"--lame=%@", [executablesPath stringByAppendingPathComponent:@"lame"]];
+	NSString *atomicParsleyArg = [[NSString alloc] initWithFormat:@"--atomicparsley=%@", [executablesPath stringByAppendingPathComponent:@"AtomicParsley"]];
+	NSString *ffmpegArg = [[NSString alloc] initWithFormat:@"--ffmpeg=%@", [executablesPath stringByAppendingPathComponent:@"ffmpeg"]];
 	NSString *downloadPathArg = [[NSString alloc] initWithFormat:@"--output=%@", downloadPath];
 	NSString *subDirArg = @"--subdir";
+   
+   NSLog(@"ID3V2: %@", id3v2Arg);
+   
 	NSString *getArg;
 	if ([[show processedPID] boolValue])
 		getArg = @"--get";

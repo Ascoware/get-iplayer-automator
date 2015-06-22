@@ -16,8 +16,6 @@
 		39879DAF16904B9F0050CA7D /* GTMNSString+HTML.m in Sources */ = {isa = PBXBuildFile; fileRef = 39879DAC16904B9F0050CA7D /* GTMNSString+HTML.m */; };
 		39879DB016904B9F0050CA7D /* NSString+HTML.m in Sources */ = {isa = PBXBuildFile; fileRef = 39879DAE16904B9F0050CA7D /* NSString+HTML.m */; };
 		39ABB9C017FCCD9300B5D519 /* Growl.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = D93AD85317DC9D6E00458B1C /* Growl.framework */; };
-		39BCA33A1877080F007115F2 /* id3v2 in Resources */ = {isa = PBXBuildFile; fileRef = 39BCA3391877080F007115F2 /* id3v2 */; };
-		39CD35FB1875FC7600BFE53A /* librtmp.1.dylib in Resources */ = {isa = PBXBuildFile; fileRef = 39CD35F91875FC5F00BFE53A /* librtmp.1.dylib */; };
 		39D7C1BD1874AD7400B78698 /* StringTrimFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 39D7C1BC1874AD7400B78698 /* StringTrimFormatter.m */; };
 		39D7C1C01874AD9D00B78698 /* NilToStringTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = 39D7C1BF1874AD9D00B78698 /* NilToStringTransformer.m */; };
 		39FD5E9619D370BD006BC47B /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 39FD5E9519D370BD006BC47B /* Images.xcassets */; };
@@ -25,7 +23,6 @@
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		D904F04A1009F22E00D60BBF /* get_iplayer.pl in Resources */ = {isa = PBXBuildFile; fileRef = D904F0491009F22E00D60BBF /* get_iplayer.pl */; };
-		D904F0731009F6B800D60BBF /* mplayer in Resources */ = {isa = PBXBuildFile; fileRef = D904F0721009F6B800D60BBF /* mplayer */; };
 		D904F424100B077600D60BBF /* Programme.m in Sources */ = {isa = PBXBuildFile; fileRef = D904F423100B077600D60BBF /* Programme.m */; };
 		D914BC59100C9F0100F7E68E /* ScriptingBridge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D914BC58100C9F0100F7E68E /* ScriptingBridge.framework */; };
 		D914BD29100CBFA900F7E68E /* BBCDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = D914BD28100CBFA900F7E68E /* BBCDownload.m */; };
@@ -69,10 +66,15 @@
 		D941D95F1025DB580012A75F /* JRFeedbackController.m in Sources */ = {isa = PBXBuildFile; fileRef = D941D95C1025DB580012A75F /* JRFeedbackController.m */; };
 		D941D99C1025DDA90012A75F /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D941D99B1025DDA90012A75F /* AddressBook.framework */; };
 		D941D9A01025DDCF0012A75F /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D941D99F1025DDCF0012A75F /* SystemConfiguration.framework */; };
-		D961247F10F12C9200046D31 /* AtomicParsley in Resources */ = {isa = PBXBuildFile; fileRef = D961247E10F12C9200046D31 /* AtomicParsley */; };
+		D943D2731B37B1D800452FCD /* id3v2 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 39BCA3391877080F007115F2 /* id3v2 */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		D943D2741B37B1D800452FCD /* librtmp.1.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 39CD35F91875FC5F00BFE53A /* librtmp.1.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		D943D2751B37B1D800452FCD /* ffmpeg in CopyFiles */ = {isa = PBXBuildFile; fileRef = D9CAE545133FF9BE003471DA /* ffmpeg */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		D943D2761B37B1D800452FCD /* rtmpdump-2.4 in CopyFiles */ = {isa = PBXBuildFile; fileRef = DF3A234A13E5F59900B82C2E /* rtmpdump-2.4 */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		D943D2771B37B1D800452FCD /* mplayer in CopyFiles */ = {isa = PBXBuildFile; fileRef = D904F0721009F6B800D60BBF /* mplayer */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		D943D2781B37B1D800452FCD /* lame in CopyFiles */ = {isa = PBXBuildFile; fileRef = D97D96A510743860006ECD39 /* lame */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		D943D2791B37B1D800452FCD /* AtomicParsley in CopyFiles */ = {isa = PBXBuildFile; fileRef = D961247E10F12C9200046D31 /* AtomicParsley */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		D97D9426106DBB68006ECD39 /* TVFormat.m in Sources */ = {isa = PBXBuildFile; fileRef = D97D9423106DBB68006ECD39 /* TVFormat.m */; };
 		D97D9427106DBB68006ECD39 /* RadioFormat.m in Sources */ = {isa = PBXBuildFile; fileRef = D97D9424106DBB68006ECD39 /* RadioFormat.m */; };
-		D97D96A610743860006ECD39 /* lame in Resources */ = {isa = PBXBuildFile; fileRef = D97D96A510743860006ECD39 /* lame */; };
 		D97D97741077EFDF006ECD39 /* LiveTVChannel.m in Sources */ = {isa = PBXBuildFile; fileRef = D97D97731077EFDF006ECD39 /* LiveTVChannel.m */; };
 		D98CC1781873950F00E29F9E /* ITVDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9E7149BCB16004CB558 /* ITVDownload.m */; };
 		D98CC1791873951800E29F9E /* Download.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9EA149BCDEA004CB558 /* Download.m */; };
@@ -87,7 +89,6 @@
 		D9B6DB9E196DBD4600161ECB /* GiASearch.m in Sources */ = {isa = PBXBuildFile; fileRef = D9B6DB9D196DBD4600161ECB /* GiASearch.m */; };
 		D9C1D0ED1993B4B30034465E /* ExtendedShowInformationController.m in Sources */ = {isa = PBXBuildFile; fileRef = D9C1D0EC1993B4B30034465E /* ExtendedShowInformationController.m */; };
 		D9C1D0F01993BBE00034465E /* GetiPlayerProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = D9C1D0EF1993BBE00034465E /* GetiPlayerProxy.m */; };
-		D9CAE546133FF9BE003471DA /* ffmpeg in Resources */ = {isa = PBXBuildFile; fileRef = D9CAE545133FF9BE003471DA /* ffmpeg */; };
 		D9CCF3CC1023485A009205BE /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = D9CCF3CB1023485A009205BE /* dsa_pub.pem */; };
 		D9CCF54C1025AAF9009205BE /* Growl Registration Ticket.growlRegDict in Resources */ = {isa = PBXBuildFile; fileRef = D9CCF54B1025AAF9009205BE /* Growl Registration Ticket.growlRegDict */; };
 		D9CDC9E8186B8F2B0003A4E2 /* GetiPlayerAutomator.sdef in Resources */ = {isa = PBXBuildFile; fileRef = D9CDC9E7186B8F2B0003A4E2 /* GetiPlayerAutomator.sdef */; };
@@ -100,7 +101,6 @@
 		D9F97FE8198EAEA6006494A3 /* GetiPlayerArguments.m in Sources */ = {isa = PBXBuildFile; fileRef = D9F97FE7198EAEA6006494A3 /* GetiPlayerArguments.m */; };
 		D9F97FEC198EBA94006494A3 /* NSFileManager+DirectoryLocations.m in Sources */ = {isa = PBXBuildFile; fileRef = D9F97FEB198EBA94006494A3 /* NSFileManager+DirectoryLocations.m */; };
 		D9FEB87610077790003BADF8 /* AppController.m in Sources */ = {isa = PBXBuildFile; fileRef = D9FEB87510077790003BADF8 /* AppController.m */; };
-		DF3A234B13E5F59900B82C2E /* rtmpdump-2.4 in Resources */ = {isa = PBXBuildFile; fileRef = DF3A234A13E5F59900B82C2E /* rtmpdump-2.4 */; };
 		DFC865E213E96BE200606599 /* ReasonForFailure.m in Sources */ = {isa = PBXBuildFile; fileRef = DFC865E113E96BE200606599 /* ReasonForFailure.m */; };
 		DFC8D40415C97310008E369F /* fourOD_token_decoder.py in Resources */ = {isa = PBXBuildFile; fileRef = DFC8D40315C97310008E369F /* fourOD_token_decoder.py */; };
 		DFE5B67413E70AC20008571B /* plugins in Resources */ = {isa = PBXBuildFile; fileRef = DFE5B67313E70AC20008571B /* plugins */; };
@@ -117,6 +117,22 @@
 				D91F9D5B187151D700D4388B /* GetiPlayerProxyUpdater.1 in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 1;
+		};
+		D943D2721B37B19D00452FCD /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 6;
+			files = (
+				D943D2731B37B1D800452FCD /* id3v2 in CopyFiles */,
+				D943D2741B37B1D800452FCD /* librtmp.1.dylib in CopyFiles */,
+				D943D2751B37B1D800452FCD /* ffmpeg in CopyFiles */,
+				D943D2761B37B1D800452FCD /* rtmpdump-2.4 in CopyFiles */,
+				D943D2771B37B1D800452FCD /* mplayer in CopyFiles */,
+				D943D2781B37B1D800452FCD /* lame in CopyFiles */,
+				D943D2791B37B1D800452FCD /* AtomicParsley in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		D9CCF443102349ED009205BE /* Copy Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -615,7 +631,8 @@
 				8D1107290486CEB800E47090 /* Resources */,
 				8D11072C0486CEB800E47090 /* Sources */,
 				8D11072E0486CEB800E47090 /* Frameworks */,
-				D975D7EB19A11DC400EEF909 /* ShellScript */,
+				D975D7EB19A11DC400EEF909 /* Run Script */,
+				D943D2721B37B19D00452FCD /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -651,6 +668,11 @@
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0630;
+				TargetAttributes = {
+					8D1107260486CEB800E47090 = {
+						DevelopmentTeam = 2C26AD8SGU;
+					};
+				};
 			};
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "Get_iPlayer GUI" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -674,9 +696,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				39CD35FB1875FC7600BFE53A /* librtmp.1.dylib in Resources */,
 				39FD5E9619D370BD006BC47B /* Images.xcassets in Resources */,
-				D904F0731009F6B800D60BBF /* mplayer in Resources */,
 				D9F66963102C5DC500A9449B /* GetOperaURL.applescript in Resources */,
 				D9F668DB102C560500A9449B /* GetFireFoxURL.applescript in Resources */,
 				D9F66955102C5D1200A9449B /* GetCaminoURL.applescript in Resources */,
@@ -684,16 +704,11 @@
 				1DDD58160DA1D0A300B32029 /* MainMenu.xib in Resources */,
 				D904F04A1009F22E00D60BBF /* get_iplayer.pl in Resources */,
 				D9CCF3CC1023485A009205BE /* dsa_pub.pem in Resources */,
-				39BCA33A1877080F007115F2 /* id3v2 in Resources */,
 				D9CCF54C1025AAF9009205BE /* Growl Registration Ticket.growlRegDict in Resources */,
 				D941D9511025DB2B0012A75F /* JRFeedbackProvider.strings in Resources */,
 				D941D9521025DB2B0012A75F /* JRFeedbackProvider.xib in Resources */,
 				D9A4509D102FF8090011E175 /* Credits.html in Resources */,
 				D9A450A4102FFDC00011E175 /* LICENSE.txt in Resources */,
-				D97D96A610743860006ECD39 /* lame in Resources */,
-				D961247F10F12C9200046D31 /* AtomicParsley in Resources */,
-				D9CAE546133FF9BE003471DA /* ffmpeg in Resources */,
-				DF3A234B13E5F59900B82C2E /* rtmpdump-2.4 in Resources */,
 				DFE5B67413E70AC20008571B /* plugins in Resources */,
 				DFFF196713E96288007B52AC /* ReasonsForFailure.plist in Resources */,
 				D9CDC9E8186B8F2B0003A4E2 /* GetiPlayerAutomator.sdef in Resources */,
@@ -720,13 +735,14 @@
 			shellPath = /bin/sh;
 			shellScript = "LOCATION=\"${BUILT_PRODUCTS_DIR}\"/\"${FRAMEWORKS_FOLDER_PATH}\"\nIDENTITY=\"Developer ID Application: Thomas Willson\"\ncodesign --verbose --force --sign \"$IDENTITY\" \"$LOCATION/Sparkle.framework/Versions/A\"";
 		};
-		D975D7EB19A11DC400EEF909 /* ShellScript */ = {
+		D975D7EB19A11DC400EEF909 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
+			name = "Run Script";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -849,7 +865,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_OBJC_ARC = YES;
-				CODE_SIGN_IDENTITY = "Developer ID Application: Thomas Willson";
+				CODE_SIGN_IDENTITY = "Developer ID Application";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -875,7 +891,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CODE_SIGN_FLAGS = "--timestamp=none";
+				OTHER_CODE_SIGN_FLAGS = "--no-strict";
 				OTHER_LDFLAGS = "-licucore";
 				PRODUCT_NAME = "Get iPlayer Automator";
 				PROVISIONING_PROFILE = "";
@@ -890,7 +906,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_OBJC_ARC = YES;
-				CODE_SIGN_IDENTITY = "Developer ID Application: Thomas Willson";
+				CODE_SIGN_IDENTITY = "Developer ID Application";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				FRAMEWORK_SEARCH_PATHS = (
@@ -911,7 +927,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CODE_SIGN_FLAGS = "--timestamp=none";
+				OTHER_CODE_SIGN_FLAGS = "--no-strict";
 				OTHER_LDFLAGS = "-licucore";
 				PRODUCT_NAME = "Get iPlayer Automator";
 				PROVISIONING_PROFILE = "";
