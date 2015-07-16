@@ -12,7 +12,7 @@
 + (void)initFormats
 {
    NSArray *tvFormatKeys = @[@"Flash - HD",@"Flash - Very High",@"Flash - High",@"Flash - Standard",@"Flash - Low"];
-   NSArray *tvFormatObjects = @[@"flashhd2,flashhd1",@"flashvhigh2,flashvhigh1",@"flashhigh2,flashhigh1",@"flashstd2,flashstd1",@"flashlow2,flashlow1"];
+   NSArray *tvFormatObjects = @[@"flashhd",@"flashvhigh",@"flashhigh",@"flashstd",@"flashlow"];
    NSArray *radioFormatKeys = @[@"Flash AAC - High",@"Flash AAC - Standard",@"Flash AAC - Low",@"Flash - MP3"];
    NSArray *radioFormatObjects = @[@"flashaachigh",@"flashaacstd",@"flashaaclow",@"flashaudio"];
 	tvFormats = [[NSDictionary alloc] initWithObjects:tvFormatObjects forKeys:tvFormatKeys];
