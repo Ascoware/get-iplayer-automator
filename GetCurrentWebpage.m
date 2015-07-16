@@ -203,7 +203,7 @@
 		[urlScanner scanString:@"/" intoString:nil];
 		[urlScanner scanUpToString:@"/" intoString:nil];
 		[urlScanner scanString:@"/" intoString:nil];
-		[urlScanner scanUpToString:@"/" intoString:&pid];
+		[urlScanner scanUpToString:@"#" intoString:&pid];
 		NSScanner *scanner = [NSScanner scannerWithString:source];
       [scanner scanUpToString:[NSString stringWithFormat:@"bbcProgrammes.programme = { pid : '%@', type : 'episode' }", pid] intoString:nil];
 		if ([scanner isAtEnd]) {
