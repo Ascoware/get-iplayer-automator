@@ -130,7 +130,7 @@ class TTML2SRTParser(HTMLParser):
                     if attribs['tts:color'] != self.last_color:
                         if self.caption['text']:
                             self.caption['text'] += '\n- '
-                    self.last_color =  attribs['tts:color']
+                    self.last_color = attribs['tts:color']
                 else:
                     if attribs['tts:color'] in self.HEX_COLORS:
                         self.caption['text'] += '<font color="' + self.HEX_COLORS[attribs['tts:color'].lower()] + '">'
@@ -147,9 +147,9 @@ class TTML2SRTParser(HTMLParser):
             return
         if tag == 'p':
             if self.srt_ignore_colors:
-                self.caption['text'] = re.sub(r'^\n+', '',  self.caption['text'])
-                self.caption['text'] = re.sub(r'\n\n+', '\n',  self.caption['text'])
                 self.last_color = ''
+            self.caption['text'] = re.sub(r'\n\s+', '\n',  self.caption['text'])
+            self.caption['text'] = self.caption['text'].strip()
             self.captions.append('%(index)s\n%(begin)s --> %(end)s\n%(text)s\n\n' % self.caption)
             self.caption = None
         elif tag == 'span':
