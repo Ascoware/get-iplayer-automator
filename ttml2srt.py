@@ -126,14 +126,18 @@ class TTML2SRTParser(HTMLParser):
         if tag == 'span':
             attribs = dict(attrs)
             if 'tts:color' in attribs:
+                color = attribs['tts:color'].lower()
                 if self.srt_ignore_colors:
-                    if attribs['tts:color'] != self.last_color:
+                    if color != self.last_color:
                         if self.caption['text']:
                             self.caption['text'] += '\n- '
-                    self.last_color = attribs['tts:color']
+                    self.last_color = color
                 else:
-                    if attribs['tts:color'] in self.HEX_COLORS:
-                        self.caption['text'] += '<font color="' + self.HEX_COLORS[attribs['tts:color'].lower()] + '">'
+                    if color in self.HEX_COLORS:
+                        self.caption['text'] += '<font color="' + self.HEX_COLORS[color] + '">'
+                        self.font_open = True
+                    elif re.match(r'#', color):
+                        self.caption['text'] += '<font color="{}">'.format(color)
                         self.font_open = True
             else:
                 if self.caption['text']:
