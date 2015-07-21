@@ -153,6 +153,9 @@ class TTML2SRTParser(HTMLParser):
             if self.srt_ignore_colors:
                 self.last_color = ''
             self.caption['text'] = re.sub(r'\n\s+', '\n',  self.caption['text'])
+            self.caption['text'] = re.sub(r'\s+\n', '\n',  self.caption['text'])
+            self.caption['text'] = re.sub(r'\n</font>', '</font>\n',  self.caption['text'])
+            self.caption['text'] = re.sub(r'\n\s+<font', '\n<font',  self.caption['text'])
             self.caption['text'] = self.caption['text'].strip()
             self.captions.append('%(index)s\n%(begin)s --> %(end)s\n%(text)s\n\n' % self.caption)
             self.caption = None
