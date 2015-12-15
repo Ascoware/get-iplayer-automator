@@ -63,13 +63,11 @@
                      foundURL=YES;
                      source = [Safari doJavaScript:@"document.documentElement.outerHTML" in:tab];
                   }
-                  else if ([[tab URL] hasPrefix:@"https://www.itv.com/itvplayer/"] ||
-                           [[tab URL] hasPrefix:@"http://www.channel4.com/programmes/"] ||
-                           [[tab URL] hasPrefix:@"http://ps3.channel4.com"])
+                  else if ([[tab URL] hasPrefix:@"http://www.itv.com/hub/"])
                   {
                      url = [NSString stringWithString:[tab URL]];
                      source = [Safari doJavaScript:@"document.documentElement.outerHTML" in:tab];
-                     newShowName = [[[tab name] stringByReplacingOccurrencesOfString:@" | itvplayer" withString:@""] stringByReplacingOccurrencesOfString:@" - 4oD - Channel 4" withString:@""];
+                     newShowName = [[tab name] stringByReplacingOccurrencesOfString:@" - The ITV Hub" withString:@""];
                      foundURL=YES;
                   }
 					}
@@ -133,13 +131,11 @@
                      foundURL=YES;
                      source = [tab executeJavascript:@"document.documentElement.outerHTML"];
                   }
-                  else if ([[tab URL] hasPrefix:@"https://www.itv.com/itvplayer/"] ||
-                           [[tab URL] hasPrefix:@"http://www.channel4.com/programmes/"] ||
-                           [[tab URL] hasPrefix:@"http://ps3.channel4.com"])
+                  else if ([[tab URL] hasPrefix:@"http://www.itv.com/hub/"])
                   {
                      url = [NSString stringWithString:[tab URL]];
                      source = [tab executeJavascript:@"document.documentElement.outerHTML"];
-                     newShowName = [[[tab title] stringByReplacingOccurrencesOfString:@" | itvplayer" withString:@""] stringByReplacingOccurrencesOfString:@" - 4oD - Channel 4" withString:@""];
+                     newShowName = [[tab title] stringByReplacingOccurrencesOfString:@" - The ITV Hub" withString:@""];
                      foundURL=YES;
                   }
 					}
@@ -230,50 +226,43 @@
       [urlScanner scanUpToString:@"kfejklfjklj" intoString:&pid];
       return [[Programme alloc] initWithInfo:nil pid:pid programmeName:newShowName network:@"BBC Sport" logController:logger];
    }
-	else if ([url hasPrefix:@"https://www.itv.com/itvplayer/"])
-	{
-      NSString *progname = nil, *productionId = nil, *pay_rights = nil, *title = nil, *action_type = nil;
-      progname = newShowName;
-		NSScanner *scanner = [NSScanner scannerWithString:source];
-      [scanner scanUpToString:@"\"productionId\":" intoString:nil];
-      [scanner scanString:@"\"productionId\":\"" intoString:nil];
-      [scanner scanUpToString:@"\"" intoString:&productionId];
-      [scanner scanUpToString:@"\"action_type\":" intoString:nil];
-      [scanner scanString:@"\"action_type\":\"" intoString:nil];
-      [scanner scanUpToString:@"\"" intoString:&action_type];
-      [scanner scanUpToString:@"\"pay_rights\":" intoString:nil];
-      [scanner scanString:@"\"pay_rights\":\"" intoString:nil];
-      [scanner scanUpToString:@"\"" intoString:&pay_rights];
-      [scanner scanUpToString:@"<h1 class=\"title episode-title\"" intoString:nil];
-      [scanner scanUpToString:@">" intoString:nil];
-      [scanner scanString:@">" intoString:nil];
-      [scanner scanUpToString:@"<" intoString:&title];
-      if (title) progname = title;
-      if (!progname || !productionId || (![pay_rights isEqualToString:@"free"] && ![action_type isEqualToString:@"free_taster"])) {
-         NSAlert *invalidPage = [[NSAlert alloc] init];
-         [invalidPage addButtonWithTitle:@"OK"];
-         [invalidPage setMessageText:[NSString stringWithFormat:@"Invalid Page: %@",url]];
-         [invalidPage setInformativeText:@"Please ensure the frontmost browser tab is open to an ITV Player free catch-up episode page."];
-         [invalidPage setAlertStyle:NSWarningAlertStyle];
-         [invalidPage runModal];
-         return nil;
-      }
-      NSString *pid = [productionId stringByReplacingOccurrencesOfString:@"\\" withString:@""];
-      NSString *showName = [NSString stringWithFormat:@"%@ - %@", progname, pid];
-		Programme *newProg = [[Programme alloc] init];
-      [newProg setPid:pid];
-      [newProg setShowName:showName];
-      [newProg setTvNetwork:@"ITV"];
-      [newProg setProcessedPID:@YES];
-      [newProg setUrl:url];
-		return newProg;
-	}
+    else if ([url hasPrefix:@"http://www.itv.com/hub/"])
+    {
+        NSString *progname = nil, *productionId = nil, *title = nil;
+        progname = newShowName;
+        NSScanner *scanner = [NSScanner scannerWithString:source];
+        [scanner scanUpToString:@"<meta property=\"og:title\" content=\"" intoString:nil];
+        [scanner scanString:@"<meta property=\"og:title\" content=\"" intoString:nil];
+        [scanner scanUpToString:@"\"" intoString:&title];
+        if (title) progname = [title stringByDecodingHTMLEntities];
+        [scanner scanUpToString:@"&amp;productionId=" intoString:nil];
+        [scanner scanString:@"&amp;productionId=" intoString:nil];
+        [scanner scanUpToString:@"\"" intoString:&productionId];
+        if (!progname || !productionId) {
+            NSAlert *invalidPage = [[NSAlert alloc] init];
+            [invalidPage addButtonWithTitle:@"OK"];
+            [invalidPage setMessageText:[NSString stringWithFormat:@"Invalid Page: %@",url]];
+            [invalidPage setInformativeText:@"Please ensure the frontmost browser tab is open to an ITV Hub episode page."];
+            [invalidPage setAlertStyle:NSWarningAlertStyle];
+            [invalidPage runModal];
+            return nil;
+        }
+        NSString *pid = [productionId stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+        NSString *showName = [NSString stringWithFormat:@"%@ - %@", progname, pid];
+        Programme *newProg = [[Programme alloc] init];
+        [newProg setPid:pid];
+        [newProg setShowName:showName];
+        [newProg setTvNetwork:@"ITV"];
+        [newProg setProcessedPID:@YES];
+        [newProg setUrl:url];
+        return newProg;
+    }
 	else
 	{
 		NSAlert *invalidPage = [[NSAlert alloc] init];
 		[invalidPage addButtonWithTitle:@"OK"];
 		[invalidPage setMessageText:[NSString stringWithFormat:@"Invalid Page: %@",url]];
-		[invalidPage setInformativeText:@"Please ensure the frontmost browser tab is open to an iPlayer episode page or ITV Player free catch-up episode page. 4oD is no longer supported."];
+		[invalidPage setInformativeText:@"Please ensure the frontmost browser tab is open to an iPlayer episode page or ITV Hub episode page."];
 		[invalidPage setAlertStyle:NSWarningAlertStyle];
 		[invalidPage runModal];
       return nil;

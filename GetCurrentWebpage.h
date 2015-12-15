@@ -11,6 +11,7 @@
 #import "Safari.h"
 #import "Programme.h"
 #import "LogController.h"
+#import "NSString+HTML.h"
 
 @interface GetCurrentWebpage : NSObject
 + (Programme *)getCurrentWebpage:(LogController *)logger;

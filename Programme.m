@@ -425,6 +425,12 @@
 
 - (void)getName
 {
+    // skip if pid looks like ITV productionId
+    if ([pid rangeOfString:@"/"].location != NSNotFound ||
+            [pid rangeOfString:@"#"].location != NSNotFound) {
+        [self setStatus:@"Undetermined-ITV"];
+        return;
+    }
     @autoreleasepool {
         getNameRunning = true;
         
