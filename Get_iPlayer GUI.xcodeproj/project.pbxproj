@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		1DDD58160DA1D0A300B32029 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD58140DA1D0A300B32029 /* MainMenu.xib */; };
+		392628B11C999B1A0033CF84 /* EmptyToStringTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = 392628B01C999B1A0033CF84 /* EmptyToStringTransformer.m */; };
 		392A41A4169735340053DEA5 /* HTTPProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 392A41A3169735340053DEA5 /* HTTPProxy.m */; };
 		393D1DEE18A5BBB500F27880 /* RSRTVArrayController.m in Sources */ = {isa = PBXBuildFile; fileRef = 393D1DED18A5BBB500F27880 /* RSRTVArrayController.m */; };
 		3975484D1622504F00470DD1 /* ttml2srt.py in Resources */ = {isa = PBXBuildFile; fileRef = 3975484C1622504F00470DD1 /* ttml2srt.py */; };
@@ -157,6 +158,8 @@
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		32CA4F630368D1EE00C91783 /* Get_iPlayer GUI_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Get_iPlayer GUI_Prefix.pch"; sourceTree = "<group>"; };
+		392628AF1C999B1A0033CF84 /* EmptyToStringTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EmptyToStringTransformer.h; sourceTree = "<group>"; };
+		392628B01C999B1A0033CF84 /* EmptyToStringTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EmptyToStringTransformer.m; sourceTree = "<group>"; };
 		392A41A2169735340053DEA5 /* HTTPProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HTTPProxy.h; sourceTree = "<group>"; };
 		392A41A3169735340053DEA5 /* HTTPProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HTTPProxy.m; sourceTree = "<group>"; };
 		393D1DEC18A5BBB500F27880 /* RSRTVArrayController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSRTVArrayController.h; sourceTree = "<group>"; };
@@ -482,6 +485,8 @@
 			children = (
 				39D7C1BB1874AD7400B78698 /* StringTrimFormatter.h */,
 				39D7C1BC1874AD7400B78698 /* StringTrimFormatter.m */,
+				392628AF1C999B1A0033CF84 /* EmptyToStringTransformer.h */,
+				392628B01C999B1A0033CF84 /* EmptyToStringTransformer.m */,
 				39D7C1BE1874AD9D00B78698 /* NilToStringTransformer.h */,
 				39D7C1BF1874AD9D00B78698 /* NilToStringTransformer.m */,
 				D921C9E9149BCDEA004CB558 /* Download.h */,
@@ -778,6 +783,7 @@
 				D9B6DB9A196D9AEC00161ECB /* LogController.m in Sources */,
 				D921C9B7149BBE9F004CB558 /* ASIDataDecompressor.m in Sources */,
 				D921C9B8149BBE9F004CB558 /* ASIDownloadCache.m in Sources */,
+				392628B11C999B1A0033CF84 /* EmptyToStringTransformer.m in Sources */,
 				D921C9B9149BBE9F004CB558 /* ASIFormDataRequest.m in Sources */,
 				D9C1D0ED1993B4B30034465E /* ExtendedShowInformationController.m in Sources */,
 				D9C1D0F01993BBE00034465E /* GetiPlayerProxy.m in Sources */,

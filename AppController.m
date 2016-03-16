@@ -123,8 +123,14 @@ NSDictionary *radioFormats;
     quickUpdateFailed=NO;
     nilToEmptyStringTransformer = [[NilToStringTransformer alloc] init];
     nilToAsteriskTransformer = [[NilToStringTransformer alloc] initWithString:@"*"];
+    tvFormatTransformer = [[EmptyToStringTransformer alloc] initWithString:@"Please select..."];
+    radioFormatTransformer = [[EmptyToStringTransformer alloc] initWithString:@"Please select..."];
+    itvFormatTransformer = [[EmptyToStringTransformer alloc] initWithString:@"Please select..."];
     [NSValueTransformer setValueTransformer:nilToEmptyStringTransformer forName:@"NilToEmptyStringTransformer"];
     [NSValueTransformer setValueTransformer:nilToAsteriskTransformer forName:@"NilToAsteriskTransformer"];
+    [NSValueTransformer setValueTransformer:tvFormatTransformer forName:@"TVFormatTransformer"];
+    [NSValueTransformer setValueTransformer:radioFormatTransformer forName:@"RadioFormatTransformer"];
+    [NSValueTransformer setValueTransformer:itvFormatTransformer forName:@"ITVFormatTransformer"];
     verbose = [[NSUserDefaults standardUserDefaults] boolForKey:@"Verbose"];
     return self;
 }

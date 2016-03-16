@@ -13,8 +13,8 @@
 {
    NSArray *tvFormatKeys = @[@"Flash - HD",@"Flash - Very High",@"Flash - High",@"Flash - Standard",@"Flash - Low"];
    NSArray *tvFormatObjects = @[@"flashhd",@"flashvhigh",@"flashhigh",@"flashstd",@"flashlow"];
-   NSArray *radioFormatKeys = @[@"Flash AAC - High",@"Flash AAC - Standard",@"Flash AAC - Low",@"Flash - MP3"];
-   NSArray *radioFormatObjects = @[@"flashaachigh",@"flashaacstd",@"flashaaclow",@"flashaudio"];
+   NSArray *radioFormatKeys = @[@"Flash AAC - High",@"Flash AAC - Standard",@"Flash AAC - Low"];
+   NSArray *radioFormatObjects = @[@"flashaachigh",@"flashaacstd",@"flashaaclow"];
 	tvFormats = [[NSDictionary alloc] initWithObjects:tvFormatObjects forKeys:tvFormatKeys];
 	radioFormats = [[NSDictionary alloc] initWithObjects:radioFormatObjects forKeys:radioFormatKeys];
 }

@@ -13,6 +13,7 @@
 #import "Download.h"
 #import <IOKit/pwr_mgt/IOPMLib.h>
 #import "NilToStringTransformer.h"
+#import "EmptyToStringTransformer.h"
 #import "LogController.h"
 #import "GiASearch.h"
 #import "GetCurrentWebpage.h"
@@ -114,6 +115,11 @@
    //PVR list editing
    NilToStringTransformer *nilToEmptyStringTransformer;
    NilToStringTransformer *nilToAsteriskTransformer;
+    
+   // Format preferences
+   EmptyToStringTransformer *tvFormatTransformer;
+   EmptyToStringTransformer *radioFormatTransformer;
+   EmptyToStringTransformer *itvFormatTransformer;
    
    //Verbose Logging
    BOOL verbose;
