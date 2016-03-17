@@ -253,7 +253,7 @@ NSDictionary *radioFormats;
         RadioFormat *format2 = [[RadioFormat alloc] init];
         [format2 setFormat:@"Flash AAC - Standard"];
         RadioFormat *format3 = [[RadioFormat alloc] init];
-        [format3 setFormat:@"Flash - MP3"];
+        [format3 setFormat:@"Flash AAC - Low"];
         [radioFormatController addObjects:@[format1,format2,format3]];
     }
     if ([[itvFormatController arrangedObjects] count] == 0)
