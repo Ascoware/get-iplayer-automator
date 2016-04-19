@@ -61,12 +61,12 @@
                      [nameScanner scanString:@"- " intoString:nil];
                      [nameScanner scanUpToString:@"kjklgfdjfgkdlj" intoString:&newShowName];
                      foundURL=YES;
-                     source = [Safari doJavaScript:@"document.documentElement.outerHTML" in:tab];
+                     source = [tab source];
                   }
                   else if ([[tab URL] hasPrefix:@"http://www.itv.com/hub/"])
                   {
                      url = [NSString stringWithString:[tab URL]];
-                     source = [Safari doJavaScript:@"document.documentElement.outerHTML" in:tab];
+                     source = [tab source];
                      newShowName = [[tab name] stringByReplacingOccurrencesOfString:@" - The ITV Hub" withString:@""];
                      foundURL=YES;
                   }
