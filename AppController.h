@@ -83,7 +83,6 @@
 	IBOutlet NSArrayController *tvFormatController;
 	IBOutlet NSArrayController *radioFormatController;
    IBOutlet NSArrayController *itvFormatController;
-   IBOutlet NSButton *itvTVCheckbox;
    IBOutlet NSPanel *prefsPanel;
    
 	//Scheduling a Start

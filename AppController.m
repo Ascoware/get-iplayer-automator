@@ -61,7 +61,6 @@ NSDictionary *radioFormats;
     defaultValues[@"DefaultFormat"] = @"iPhone";
     defaultValues[@"AlternateFormat"] = @"Flash - Standard";
     defaultValues[@"CacheBBC_TV"] = @YES;
-    defaultValues[@"CacheITV_TV"] = @YES;
     defaultValues[@"CacheBBC_Radio"] = @NO;
     defaultValues[@"CacheBBC_Podcasts"] = @NO;
     defaultValues[@"CacheExpiryTime"] = @"4";
@@ -133,14 +132,6 @@ NSDictionary *radioFormats;
 #pragma mark Delegate Methods
 - (void)awakeFromNib
 {
-#ifdef __x86_64__
-    [itvTVCheckbox setEnabled:YES];
-#else
-    [itvTVCheckbox setEnabled:NO];
-    [itvTVCheckbox setState:NSOffState];
-    [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithBool:NO] forKey:@"CacheITV_TV"];
-#endif
-    
     //Initialize Search Results Click Actions
     [searchResultsTable setTarget:self];
     [searchResultsTable setDoubleAction:@selector(addToQueue:)];
@@ -157,6 +148,7 @@ NSDictionary *radioFormats;
     }
     
     // remove obsolete cache files
+    [fileManager removeItemAtPath:[folder stringByAppendingPathComponent:@"itv.cache"] error:nil];
     [fileManager removeItemAtPath:[folder stringByAppendingPathComponent:@"ch4.cache"] error:nil];
     
     NSString *filename = @"Queue.automatorqueue";
@@ -503,13 +495,11 @@ NSDictionary *radioFormats;
         {
             typesToCache = [[NSMutableArray alloc] initWithCapacity:5];
             if ([[defaults objectForKey:@"CacheBBC_TV"] boolValue]) [typesToCache addObject:@"tv"];
-            if ([[defaults objectForKey:@"CacheITV_TV"] boolValue]) [typesToCache addObject:@"itv"];
             if ([[defaults objectForKey:@"CacheBBC_Radio"] boolValue]) [typesToCache addObject:@"radio"];
             if ([[defaults objectForKey:@"CacheBBC_Podcasts"] boolValue]) [typesToCache addObject:@"podcast"];
             
-            NSArray *urlKeys = @[@"tv",@"itv",@"radio",@"podcast"];
+            NSArray *urlKeys = @[@"tv",@"radio",@"podcast"];
             NSArray *urlObjects = @[@"http://tom-tech.com/get_iplayer/cache/tv.cache",
-                                    @"http://tom-tech.com/get_iplayer/cache/itv.cache",
                                     @"http://tom-tech.com/get_iplayer/cache/radio.cache",
                                     @"http://tom-tech.com/get_iplayer/cache/podcast.cache"];
             updateURLDic = [[NSDictionary alloc] initWithObjects:urlObjects forKeys:urlKeys];
@@ -1824,7 +1814,6 @@ NSDictionary *radioFormats;
     [sharedDefaults removeObjectForKey:@"DefaultFormat"];
     [sharedDefaults removeObjectForKey:@"AlternateFormat"];
     [sharedDefaults removeObjectForKey:@"CacheBBC_TV"];
-    [sharedDefaults removeObjectForKey:@"CacheITV_TV"];
     [sharedDefaults removeObjectForKey:@"CacheBBC_Radio"];
     [sharedDefaults removeObjectForKey:@"CacheBBC_Podcasts"];
     [sharedDefaults removeObjectForKey:@"CacheExpiryTime"];
