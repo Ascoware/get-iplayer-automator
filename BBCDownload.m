@@ -71,9 +71,7 @@
 	NSString *noWarningArg = @"--nocopyright";
 	NSString *noPurgeArg = @"--nopurge";
 	NSString *id3v2Arg = [[NSString alloc] initWithFormat:@"--id3v2=%@", [executablesPath stringByAppendingPathComponent:@"id3v2"]];
-	NSString *mplayerArg = [[NSString alloc] initWithFormat:@"--mplayer=%@", [executablesPath stringByAppendingPathComponent:@"mplayer"]];
-   NSString *rtmpdumpArg = [[NSString alloc] initWithFormat:@"--rtmpdump=%@", [executablesPath stringByAppendingPathComponent:@"rtmpdump-2.4"]];
-	NSString *lameArg = [[NSString alloc] initWithFormat:@"--lame=%@", [executablesPath stringByAppendingPathComponent:@"lame"]];
+    NSString *rtmpdumpArg = [[NSString alloc] initWithFormat:@"--rtmpdump=%@", [executablesPath stringByAppendingPathComponent:@"rtmpdump"]];
 	NSString *atomicParsleyArg = [[NSString alloc] initWithFormat:@"--atomicparsley=%@", [executablesPath stringByAppendingPathComponent:@"AtomicParsley"]];
 	NSString *ffmpegArg = [[NSString alloc] initWithFormat:@"--ffmpeg=%@", [executablesPath stringByAppendingPathComponent:@"ffmpeg"]];
 	NSString *downloadPathArg = [[NSString alloc] initWithFormat:@"--output=%@", downloadPath];
@@ -107,7 +105,7 @@
 	profileDirArg = [[NSString alloc] initWithFormat:@"--profile-dir=%@", appSupportFolder];
 	
    //Add Arguments that can't be NULL
-	NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:getiPlayerPath,profileDirArg,noWarningArg,noPurgeArg,id3v2Arg,mplayerArg,rtmpdumpArg,lameArg,atomicParsleyArg,cacheExpiryArg,downloadPathArg,subDirArg,formatArg,getArg,searchArg,@"--attempts=5",@"--keep-all",@"--fatfilename",@"--thumbsize=6",@"--tag-hdvideo",@"--tag-longdesc",@"--isodate",versionArg,ffmpegArg,proxyArg,partialProxyArg,nil];
+	NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:getiPlayerPath,profileDirArg,noWarningArg,noPurgeArg,id3v2Arg,rtmpdumpArg,atomicParsleyArg,cacheExpiryArg,downloadPathArg,subDirArg,formatArg,getArg,searchArg,@"--attempts=5",@"--keep-all",@"--fatfilename",@"--thumbsize=6",@"--tag-hdvideo",@"--tag-longdesc",@"--isodate",versionArg,ffmpegArg,proxyArg,partialProxyArg,nil];
    //Verbose?
    if (verbose)
 		[args addObject:@"--verbose"];
@@ -142,7 +140,6 @@
 	[task setStandardError:errorPipe];
    
    NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:[task environment]];
-   envVariableDictionary[@"DYLD_LIBRARY_PATH"] = [bundle resourcePath];
    envVariableDictionary[@"HOME"] = [@"~" stringByExpandingTildeInPath];
    envVariableDictionary[@"PERL_UNICODE"] = @"AS";
    [task setEnvironment:envVariableDictionary];
@@ -407,27 +404,6 @@
                   [show setReasonForFailure:@"Unresumable_File"];
                }
             }
-				else if ([message hasPrefix:@"A:"]) //MPlayer
-				{
-               double downloaded, percent, total;
-					NSString *downloadedString, *totalString;
-					[scanner setScanLocation:0];
-					[scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:nil];
-					if (![scanner scanDouble:&downloaded]) downloaded=0.0;
-					[scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:nil];
-					[scanner scanUpToString:@")" intoString:&downloadedString];
-					[scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:nil];
-					if (![scanner scanDouble:&total]) total=0.0;
-					[scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:nil];
-					[scanner scanUpToString:@")" intoString:&totalString];
-					if (total>0) percent = (downloaded/total)*100;
-					else percent = 0.0;
-					if ([downloadedString length] < 7) downloadedString = [@"00:" stringByAppendingString:downloadedString];
-					[self setCurrentProgress:[NSString stringWithFormat:@"%.1f%% - (%@/%@) -- %@",percent,downloadedString,totalString,[show valueForKey:@"showName"]]];
-					[self setPercentage:percent];
-					[show setValue:[NSString stringWithFormat:@"Downloading: %.1f%%", percent] forKey:@"status"];
-               continue;
-				}
             else //Other
             {
                shortStatus = [NSString stringWithFormat:@"Initialising... -- %@", [show valueForKey:@"showName"]];

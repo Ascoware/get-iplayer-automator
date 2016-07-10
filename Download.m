@@ -555,7 +555,7 @@
     }
 
     NSMutableString *cmd = [NSMutableString stringWithCapacity:0];
-    [cmd appendString:[NSString stringWithFormat:@"\"%@\"", [[[NSBundle mainBundle].executablePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:@"rtmpdump-2.4"]]];
+    [cmd appendString:[NSString stringWithFormat:@"\"%@\"", [[[NSBundle mainBundle].executablePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:@"rtmpdump"]]];
     for (NSString *arg in args) {
         if ([arg hasPrefix:@"-"] || [arg hasPrefix:@"\""])
             [cmd appendString:[NSString stringWithFormat:@" %@", arg]];
@@ -569,7 +569,7 @@
     task = [[NSTask alloc] init];
     pipe = [[NSPipe alloc] init];
     errorPipe = [[NSPipe alloc] init];
-    [task setLaunchPath:[[[NSBundle mainBundle].executablePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:@"rtmpdump-2.4"]];
+    [task setLaunchPath:[[[NSBundle mainBundle].executablePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:@"rtmpdump"]];
     
     /* rtmpdump -r "rtmpe://cp72511.edgefcs.net/ondemand?auth=eaEc.b4aodIcdbraJczd.aKchaza9cbdTc0cyaUc2aoblaLc3dsdkd5d9cBduczdLdn-bo64cN-eS-6ys1GDrlysDp&aifp=v002&slist=production/" -W http://www.itv.com/mediaplayer/ITVMediaPlayer.swf?v=11.20.654 -y "mp4:production/priority/CATCHUP/e48ab1e2/1a73/4620/adea/dda6f21f45ee/1-6178-0002-001_THE-ROYAL-VARIETY-PERFORMANCE-2011_TX141211_ITV1200_16X9.mp4" -o test2 */
     
@@ -582,7 +582,6 @@
 	errorFh = [errorPipe fileHandleForReading];
     
     NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:[task environment]];
-    envVariableDictionary[@"DYLD_LIBRARY_PATH"] = [[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"Contents/Resources"];
     envVariableDictionary[@"HOME"] = [@"~" stringByExpandingTildeInPath];
     [task setEnvironment:envVariableDictionary];
     
