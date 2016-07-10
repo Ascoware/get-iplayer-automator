@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9532" systemVersion="15D21" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15F34" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1070" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9532"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication"/>
@@ -33,11 +33,6 @@
                 <outlet property="itvFormatController" destination="1432" id="1439"/>
                 <outlet property="itvTVCheckbox" destination="856" id="1440"/>
                 <outlet property="lastBroadcastField" destination="snH-qy-SJv" id="cJB-UM-xuc"/>
-                <outlet property="liveStart" destination="1179" id="1197"/>
-                <outlet property="liveStop" destination="1181" id="1196"/>
-                <outlet property="liveTVChannelController" destination="1183" id="1195"/>
-                <outlet property="liveTVTableView" destination="1173" id="1194"/>
-                <outlet property="liveTVWindow" destination="1165" id="1193"/>
                 <outlet property="loadingLabel" destination="cAi-OW-zbo" id="7BJ-dy-HBc"/>
                 <outlet property="loadingView" destination="ryX-Qd-Wi8" id="iNJ-wU-9EU"/>
                 <outlet property="log" destination="616" id="677"/>
@@ -162,11 +157,6 @@
             <connections>
                 <binding destination="621" name="contentArray" keyPath="radioFormatList" id="1140"/>
             </connections>
-        </arrayController>
-        <arrayController objectClassName="LiveTVChannel" editable="NO" id="1183" userLabel="Live TV Array">
-            <declaredKeys>
-                <string>channel</string>
-            </declaredKeys>
         </arrayController>
         <window title="Pick a time..." allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="ScheduleStartWindow" animationBehavior="default" id="1148" userLabel="Delayed Start" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" utility="YES" HUD="YES"/>
@@ -1771,17 +1761,17 @@
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
                                                                 </tableHeaderCell>
-                                                                <popUpButtonCell key="dataCell" type="bevel" title="Please select..." bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" borderStyle="bezel" imageScaling="proportionallyDown" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="KJk-TX-uSU" id="qRO-OL-IEE">
+                                                                <popUpButtonCell key="dataCell" type="bevel" title="Please select..." bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="bezel" imageScaling="proportionallyDown" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="KJk-TX-uSU" id="qRO-OL-IEE">
                                                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                     <menu key="menu" id="rsB-Oh-LhM">
                                                                         <items>
-                                                                            <menuItem title="Please select..." id="KJk-TX-uSU">
+                                                                            <menuItem title="Please select..." state="on" id="KJk-TX-uSU">
                                                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                                                             </menuItem>
                                                                             <menuItem title="Flash AAC - High" id="o8l-i9-SFq"/>
                                                                             <menuItem title="Flash AAC - Standard" id="glb-6P-Pu3"/>
-                                                                            <menuItem title="Flash AAC - Low" state="on" id="eZ8-k4-Tug"/>
+                                                                            <menuItem title="Flash AAC - Low" id="eZ8-k4-Tug"/>
                                                                         </items>
                                                                     </menu>
                                                                 </popUpButtonCell>
@@ -1900,12 +1890,12 @@
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
                                                                 </tableHeaderCell>
-                                                                <popUpButtonCell key="dataCell" type="bevel" title="Please select..." bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" borderStyle="bezel" imageScaling="proportionallyDown" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="d0L-Z2-yTh" id="zRE-0Y-zd8">
+                                                                <popUpButtonCell key="dataCell" type="bevel" title="Please select..." bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="bezel" imageScaling="proportionallyDown" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="d0L-Z2-yTh" id="zRE-0Y-zd8">
                                                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                     <menu key="menu" id="1OB-Xn-EuL">
                                                                         <items>
-                                                                            <menuItem title="Please select..." id="d0L-Z2-yTh">
+                                                                            <menuItem title="Please select..." state="on" id="d0L-Z2-yTh">
                                                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                                                             </menuItem>
                                                                             <menuItem title="Flash - HD" id="KiS-Ge-uAn"/>
@@ -1917,7 +1907,7 @@
                                                                             <menuItem title="Flash - Low" id="aq7-E5-mfx">
                                                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                                                             </menuItem>
-                                                                            <menuItem title="Flash - Very Low" state="on" id="rkF-2L-ilO">
+                                                                            <menuItem title="Flash - Very Low" id="rkF-2L-ilO">
                                                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                                                             </menuItem>
                                                                         </items>
@@ -2160,93 +2150,6 @@
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
-                    </button>
-                </subviews>
-            </view>
-        </window>
-        <window title="Watch Live..." allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="WatchLiveWindow" animationBehavior="default" id="1165" userLabel="Live TV">
-            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
-            <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="196" y="280" width="321" height="230"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1178"/>
-            <view key="contentView" id="1166">
-                <rect key="frame" x="0.0" y="0.0" width="321" height="230"/>
-                <autoresizingMask key="autoresizingMask"/>
-                <subviews>
-                    <textField verticalHuggingPriority="750" id="1167">
-                        <rect key="frame" x="17" y="193" width="109" height="17"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Pick a Channel..." id="1168">
-                            <font key="font" metaFont="system"/>
-                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
-                    <scrollView horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" hasHorizontalScroller="NO" hasVerticalScroller="NO" usesPredominantAxisScrolling="NO" id="1170">
-                        <rect key="frame" x="20" y="55" width="281" height="124"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <clipView key="contentView" id="twM-Qr-f6W">
-                            <rect key="frame" x="1" y="1" width="279" height="122"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                            <subviews>
-                                <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" id="1173">
-                                    <rect key="frame" x="0.0" y="0.0" width="279" height="19"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                    <size key="intercellSpacing" width="3" height="2"/>
-                                    <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
-                                    <tableColumns>
-                                        <tableColumn editable="NO" width="276" minWidth="40" maxWidth="1000" id="1175">
-                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
-                                                <font key="font" metaFont="smallSystem"/>
-                                                <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
-                                            </tableHeaderCell>
-                                            <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" alignment="left" title="Text Cell" id="1178">
-                                                <font key="font" metaFont="system"/>
-                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                            <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
-                                            <connections>
-                                                <binding destination="1183" name="value" keyPath="arrangedObjects.channel" id="1201"/>
-                                            </connections>
-                                        </tableColumn>
-                                    </tableColumns>
-                                </tableView>
-                            </subviews>
-                            <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
-                        </clipView>
-                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="1172">
-                            <rect key="frame" x="-100" y="-100" width="223" height="15"/>
-                            <autoresizingMask key="autoresizingMask"/>
-                        </scroller>
-                        <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="1171">
-                            <rect key="frame" x="-100" y="-100" width="15" height="133"/>
-                            <autoresizingMask key="autoresizingMask"/>
-                        </scroller>
-                    </scrollView>
-                    <button verticalHuggingPriority="750" id="1179">
-                        <rect key="frame" x="211" y="7" width="96" height="32"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="push" title="Start" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1180">
-                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="system"/>
-                        </buttonCell>
-                        <connections>
-                            <action selector="startLiveTV:" target="621" id="1198"/>
-                        </connections>
-                    </button>
-                    <button verticalHuggingPriority="750" id="1181">
-                        <rect key="frame" x="106" y="7" width="96" height="32"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="push" title="Stop" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1182">
-                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="system"/>
-                        </buttonCell>
-                        <connections>
-                            <action selector="stopLiveTV:" target="621" id="1199"/>
-                        </connections>
                     </button>
                 </subviews>
             </view>

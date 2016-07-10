@@ -73,7 +73,6 @@
 		D943D2791B37B1D800452FCD /* AtomicParsley in CopyFiles */ = {isa = PBXBuildFile; fileRef = D961247E10F12C9200046D31 /* AtomicParsley */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		D97D9426106DBB68006ECD39 /* TVFormat.m in Sources */ = {isa = PBXBuildFile; fileRef = D97D9423106DBB68006ECD39 /* TVFormat.m */; };
 		D97D9427106DBB68006ECD39 /* RadioFormat.m in Sources */ = {isa = PBXBuildFile; fileRef = D97D9424106DBB68006ECD39 /* RadioFormat.m */; };
-		D97D97741077EFDF006ECD39 /* LiveTVChannel.m in Sources */ = {isa = PBXBuildFile; fileRef = D97D97731077EFDF006ECD39 /* LiveTVChannel.m */; };
 		D98CC1781873950F00E29F9E /* ITVDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9E7149BCB16004CB558 /* ITVDownload.m */; };
 		D98CC1791873951800E29F9E /* Download.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9EA149BCDEA004CB558 /* Download.m */; };
 		D98CC17A1873951C00E29F9E /* Programme.m in Sources */ = {isa = PBXBuildFile; fileRef = D904F423100B077600D60BBF /* Programme.m */; };
@@ -242,8 +241,6 @@
 		D97D9423106DBB68006ECD39 /* TVFormat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TVFormat.m; sourceTree = "<group>"; };
 		D97D9424106DBB68006ECD39 /* RadioFormat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RadioFormat.m; sourceTree = "<group>"; };
 		D97D9425106DBB68006ECD39 /* RadioFormat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RadioFormat.h; sourceTree = "<group>"; };
-		D97D97721077EFDF006ECD39 /* LiveTVChannel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LiveTVChannel.h; sourceTree = "<group>"; };
-		D97D97731077EFDF006ECD39 /* LiveTVChannel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LiveTVChannel.m; sourceTree = "<group>"; };
 		D99890F71A06BD0700420F4F /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
 		D9A4509C102FF8090011E175 /* Credits.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = Credits.html; sourceTree = "<group>"; };
 		D9A450A3102FFDC00011E175 /* LICENSE.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
@@ -497,8 +494,6 @@
 				D97D9423106DBB68006ECD39 /* TVFormat.m */,
 				D97D9425106DBB68006ECD39 /* RadioFormat.h */,
 				D97D9424106DBB68006ECD39 /* RadioFormat.m */,
-				D97D97721077EFDF006ECD39 /* LiveTVChannel.h */,
-				D97D97731077EFDF006ECD39 /* LiveTVChannel.m */,
 				D92687C81087F836000E8132 /* DownloadHistoryEntry.h */,
 				D92687C91087F836000E8132 /* DownloadHistoryEntry.m */,
 				DFC865E013E96BE200606599 /* ReasonForFailure.h */,
@@ -762,7 +757,6 @@
 				D97D9427106DBB68006ECD39 /* RadioFormat.m in Sources */,
 				D9F97FE5198E9043006494A3 /* GetCurrentWebpage.m in Sources */,
 				D9CDC9EC186B90A90003A4E2 /* ASDownloadShows.m in Sources */,
-				D97D97741077EFDF006ECD39 /* LiveTVChannel.m in Sources */,
 				D92687C51087F81F000E8132 /* DownloadHistoryController.m in Sources */,
 				D92687CA1087F836000E8132 /* DownloadHistoryEntry.m in Sources */,
 				DFC865E213E96BE200606599 /* ReasonForFailure.m in Sources */,

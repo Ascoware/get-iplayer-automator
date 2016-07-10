@@ -14,7 +14,6 @@
 #import "Growl.framework/Headers/GrowlApplicationBridge.h"
 #import "Sparkle.framework/Headers/Sparkle.h"
 #import "JRFeedbackController.h"
-#import "LiveTVChannel.h"
 #import "ReasonForFailure.h"
 #import "Chrome.h"
 #import "ASIHTTPRequest.h"
@@ -275,13 +274,6 @@ NSDictionary *radioFormats;
         NSLog(@"ERROR: Growl initialisation failed: %@: %@", [e name], [e description]);
         [logger addToLog:[NSString stringWithFormat:@"ERROR: Growl initialisation failed: %@: %@", [e name], [e description]]];
     }
-    
-    //Populate Live TV Channel List
-    LiveTVChannel *bbcOne = [[LiveTVChannel alloc] initWithChannelName:@"BBC One"];
-    LiveTVChannel *bbcTwo = [[LiveTVChannel alloc] initWithChannelName:@"BBC Two"];
-    LiveTVChannel *bbcNews24 = [[LiveTVChannel alloc] initWithChannelName:@"BBC News 24"];
-    [liveTVChannelController setContent:@[bbcOne,bbcTwo,bbcNews24]];
-    [liveTVTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
     
     //Remove SWFinfo
     NSString *infoPath = @"~/.swfinfo";
@@ -1962,97 +1954,6 @@ NSDictionary *radioFormats;
     [currentIndicator stopAnimation:self];
     [mainWindow setDocumentEdited:NO];
     runScheduled=NO;
-}
-
-#pragma mark Live TV
-- (IBAction)showLiveTVWindow:(id)sender
-{
-    if (!runDownloads)
-    {
-        [liveTVWindow makeKeyAndOrderFront:self];
-    }
-    else
-    {
-        NSAlert *downloadRunning = [NSAlert alertWithMessageText:@"Downloads are Running!"
-                                                   defaultButton:@"Continue"
-                                                 alternateButton:@"Cancel"
-                                                     otherButton:nil
-                                       informativeTextWithFormat:@"You may experience choppy playback while downloads are running."];
-        NSInteger response = [downloadRunning runModal];
-        if (response == NSAlertDefaultReturn)
-        {
-            [liveTVWindow makeKeyAndOrderFront:self];
-        }
-    }
-}
-
-- (IBAction)startLiveTV:(id)sender
-{
-    getiPlayerProxy = [[GetiPlayerProxy alloc] initWithLogger:logger];
-    [getiPlayerProxy loadProxyInBackgroundForSelector:@selector(startLiveTV:proxyDict:) withObject:sender onTarget:self silently:NO];
-}
-
-- (IBAction)startLiveTV:(id)sender proxyDict:(NSDictionary *)proxyDict
-{
-    getiPlayerProxy = nil;
-    if ([proxyDict[@"proxy"] code] == kProxyLoadCancelled)
-        return;
-    getiPlayerStreamer = [[NSTask alloc] init];
-    mplayerStreamer = [[NSTask alloc] init];
-    liveTVPipe = [[NSPipe alloc] init];
-    liveTVError = [[NSPipe alloc] init];
-    
-    [getiPlayerStreamer setLaunchPath:@"/usr/bin/perl"];
-    [getiPlayerStreamer setStandardOutput:liveTVPipe];
-    [getiPlayerStreamer setStandardError:liveTVPipe];
-    [mplayerStreamer setStandardInput:liveTVPipe];
-    [mplayerStreamer setLaunchPath:[[NSBundle mainBundle] pathForResource:@"mplayer" ofType:nil]];
-    [mplayerStreamer setStandardError:liveTVError];
-    [mplayerStreamer setStandardOutput:liveTVError];
-    
-    //Get selected channel
-    LiveTVChannel *selectedChannel = [liveTVChannelController arrangedObjects][[liveTVChannelController selectionIndex]];
-    
-    //Set Proxy Arguments
-    NSString *proxyArg = NULL;
-    NSString *partialProxyArg = NULL;
-    if (proxy)
-    {
-        proxyArg = [[NSString alloc] initWithFormat:@"-p%@", [proxy url]];
-        if (![[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])
-        {
-            partialProxyArg = @"--partial-proxy";
-        }
-    }
-    
-    //Prepare Arguments
-    NSArray *args = @[[[NSBundle mainBundle] pathForResource:@"get_iplayer" ofType:@"pl"],
-                      [GetiPlayerArguments sharedController].profileDirArg,
-                      @"--stream",
-                      @"--modes=flashnormal",
-                      @"--type=livetv",
-                      [selectedChannel channel],
-                      //@"--player=mplayer -cache 3072 -",
-                      // [NSString stringWithFormat:@"--player=\"%@\" -cache 3072 -", [[NSBundle mainBundle] pathForResource:@"mplayer" ofType:nil]],
-                      proxyArg,
-                      partialProxyArg];
-    [getiPlayerStreamer setArguments:args];
-    
-    [mplayerStreamer setArguments:@[@"-cache",@"3072",@"-"]];
-    
-    
-    [getiPlayerStreamer launch];
-    [mplayerStreamer launch];
-    [liveStart setEnabled:NO];
-    [liveStop setEnabled:YES];
-}
-
-- (IBAction)stopLiveTV:(id)sender
-{
-    [getiPlayerStreamer interrupt];
-    [mplayerStreamer interrupt];
-    [liveStart setEnabled:YES];
-    [liveStop setEnabled:NO];
 }
 
 #pragma mark Proxy

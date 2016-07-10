@@ -94,17 +94,6 @@
 	NSTimer *scheduleTimer;
 	BOOL runScheduled;
 	
-	//Live TV
-	IBOutlet NSWindow *liveTVWindow;
-	IBOutlet NSArrayController *liveTVChannelController;
-	IBOutlet NSTableView *liveTVTableView;
-	IBOutlet NSButton *liveStart;
-	IBOutlet NSButton *liveStop;
-	NSTask *getiPlayerStreamer;
-	NSTask *mplayerStreamer;
-	NSPipe *liveTVPipe;
-	NSPipe *liveTVError;
-   
    //Download Solutions
    IBOutlet NSWindow *solutionsWindow;
    IBOutlet NSArrayController *solutionsArrayController;
@@ -174,11 +163,6 @@
 - (IBAction)showScheduleWindow:(id)sender;
 - (IBAction)scheduleStart:(id)sender;
 - (IBAction)cancelSchedule:(id)sender;
-
-//Live TV
-- (IBAction)showLiveTVWindow:(id)sender;
-- (IBAction)startLiveTV:(id)sender;
-- (IBAction)stopLiveTV:(id)sender;
 
 
 //Download Solutions
