@@ -37,14 +37,6 @@ like to download it again, delete the file first.</string>
 proxy option in preferences.</string>
 	<key>MetadataProcessing</key>
 	<string>GiA could not process this programme. Please submit a bug report.</string>
-	<key>4oDHTTP</key>
-	<string>GiA does not support downloading HTTP Dynamic Streaming programmes from 4oD.
-Unfortunately, this show is one of them.</string>
-	<key>4oDFormat</key>
-	<string>GiA did not find a suitable download format for the 4oD programme.</string>
-	<key>4oDUnavailable</key>
-	<string>Many 4oD programmes are unavailable to GiA.
-Unfortunately, this programme is one of them.</string>
 	<key>ITVFormatListEmpty</key>
 	<string>Please go to Preferences -&gt; Other Formats and add
 at least one download format to the list.</string>

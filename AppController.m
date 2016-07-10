@@ -74,9 +74,6 @@ NSDictionary *radioFormats;
     defaultValues[@"RemoveOldSeries"] = @NO;
     defaultValues[@"QuickCache"] = @YES;
     defaultValues[@"TagShows"] = @YES;
-    // TODO: remove 4oD
-    // set 4oD off by default
-    defaultValues[@"Cache4oD_TV"] = @NO;
     defaultValues[@"TestProxy"] = @YES;
     defaultValues[@"ShowDownloadedInSearch"] = @YES;
     
@@ -159,11 +156,7 @@ NSDictionary *radioFormats;
         [fileManager createDirectoryAtPath:folder withIntermediateDirectories:NO attributes:nil error:nil];
     }
     
-    // TODO: remove 4oD
-    // disable 4oD and delete CH4 cache
-    [[NSUserDefaults standardUserDefaults] setValue:@NO forKey:@"Cache4oD_TV"];
-    [ch4TVCheckbox setState:NSOffState];
-    [ch4TVCheckbox setEnabled:NO];
+    // remove obsolete cache files
     [fileManager removeItemAtPath:[folder stringByAppendingPathComponent:@"ch4.cache"] error:nil];
     
     NSString *filename = @"Queue.automatorqueue";
@@ -219,9 +212,6 @@ NSDictionary *radioFormats;
             [radioFormatController removeObject:radioFormat];
         }
     }
-    
-    // TODO: Remove 4oD
-    BOOL hasCached4oD = [[rootObject valueForKey:@"hasUpdatedCacheFor4oD"] boolValue];
     
     filename = @"ITVFormats.automator";
     filePath = [folder stringByAppendingPathComponent:filename];
@@ -280,10 +270,7 @@ NSDictionary *radioFormats;
     infoPath = [infoPath stringByExpandingTildeInPath];
     if ([fileManager fileExistsAtPath:infoPath]) [fileManager removeItemAtPath:infoPath error:nil];
     
-    if (hasCached4oD)
-        [self updateCache:nil];
-    else
-        [self updateCache:@""];
+    [self updateCache:@""];
 }
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)application
 {
@@ -519,15 +506,12 @@ NSDictionary *radioFormats;
             if ([[defaults objectForKey:@"CacheITV_TV"] boolValue]) [typesToCache addObject:@"itv"];
             if ([[defaults objectForKey:@"CacheBBC_Radio"] boolValue]) [typesToCache addObject:@"radio"];
             if ([[defaults objectForKey:@"CacheBBC_Podcasts"] boolValue]) [typesToCache addObject:@"podcast"];
-            // TODO: Remove 4oD
-            if ([[defaults objectForKey:@"Cache4oD_TV"] boolValue]) [typesToCache addObject:@"ch4"];
             
-            NSArray *urlKeys = @[@"tv",@"itv",@"radio",@"podcast",@"ch4"];
+            NSArray *urlKeys = @[@"tv",@"itv",@"radio",@"podcast"];
             NSArray *urlObjects = @[@"http://tom-tech.com/get_iplayer/cache/tv.cache",
                                     @"http://tom-tech.com/get_iplayer/cache/itv.cache",
                                     @"http://tom-tech.com/get_iplayer/cache/radio.cache",
-                                    @"http://tom-tech.com/get_iplayer/cache/podcast.cache",
-                                    @"http://tom-tech.com/get_iplayer/cache/ch4.cache"];
+                                    @"http://tom-tech.com/get_iplayer/cache/podcast.cache"];
             updateURLDic = [[NSDictionary alloc] initWithObjects:urlObjects forKeys:urlKeys];
             
             nextToCache=0;
@@ -1019,8 +1003,6 @@ NSDictionary *radioFormats;
                 {
                     if ([[show tvNetwork] hasPrefix:@"ITV"])
                         currentDownload = [[ITVDownload alloc] initWithProgramme:show itvFormats:[itvFormatController arrangedObjects] proxy:proxy logController:logger];
-                    /*else if ([[show tvNetwork] hasPrefix:@"4oD"])
-                     currentDownload = [[FourODDownload alloc] initWithProgramme:show proxy:proxy];*/
                     else
                         currentDownload = [[BBCDownload alloc] initWithProgramme:show
                                                                        tvFormats:[tvFormatController arrangedObjects]
@@ -1231,8 +1213,6 @@ NSDictionary *radioFormats;
             {
                 if ([[nextShow tvNetwork] hasPrefix:@"ITV"])
                     currentDownload = [[ITVDownload alloc] initWithProgramme:nextShow itvFormats:[itvFormatController arrangedObjects] proxy:proxy logController:logger];
-                /*else if ([[nextShow tvNetwork] hasPrefix:@"4oD"])
-                 currentDownload = [[FourODDownload alloc] initWithProgramme:nextShow proxy:proxy];*/
                 else
                     currentDownload = [[BBCDownload alloc] initWithProgramme:nextShow
                                                                    tvFormats:[tvFormatController arrangedObjects]
@@ -1643,7 +1623,6 @@ NSDictionary *radioFormats;
     
     [rootObject setValue:[tvFormatController arrangedObjects] forKey:@"tvFormats"];
     [rootObject setValue:[radioFormatController arrangedObjects] forKey:@"radioFormats"];
-    [rootObject setValue:@YES forKey:@"hasUpdatedCacheFor4oD"];
     [NSKeyedArchiver archiveRootObject:rootObject toFile:filePath];
     
     filename = @"ITVFormats.automator";
@@ -1848,7 +1827,6 @@ NSDictionary *radioFormats;
     [sharedDefaults removeObjectForKey:@"CacheITV_TV"];
     [sharedDefaults removeObjectForKey:@"CacheBBC_Radio"];
     [sharedDefaults removeObjectForKey:@"CacheBBC_Podcasts"];
-    [sharedDefaults removeObjectForKey:@"Cache4oD_TV"];
     [sharedDefaults removeObjectForKey:@"CacheExpiryTime"];
     [sharedDefaults removeObjectForKey:@"Verbose"];
     [sharedDefaults removeObjectForKey:@"SeriesLinkStartup"];

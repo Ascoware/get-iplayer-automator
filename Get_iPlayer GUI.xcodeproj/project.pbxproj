@@ -12,7 +12,6 @@
 		392A41A4169735340053DEA5 /* HTTPProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 392A41A3169735340053DEA5 /* HTTPProxy.m */; };
 		393D1DEE18A5BBB500F27880 /* RSRTVArrayController.m in Sources */ = {isa = PBXBuildFile; fileRef = 393D1DED18A5BBB500F27880 /* RSRTVArrayController.m */; };
 		3975484D1622504F00470DD1 /* ttml2srt.py in Resources */ = {isa = PBXBuildFile; fileRef = 3975484C1622504F00470DD1 /* ttml2srt.py */; };
-		39814023168E124C003FFF53 /* NSHost+ThreadedAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 39814022168E124B003FFF53 /* NSHost+ThreadedAdditions.m */; };
 		398516A716D1A02500EBB4CE /* Body2 in Resources */ = {isa = PBXBuildFile; fileRef = 398516A616D1A02500EBB4CE /* Body2 */; };
 		39879DAF16904B9F0050CA7D /* GTMNSString+HTML.m in Sources */ = {isa = PBXBuildFile; fileRef = 39879DAC16904B9F0050CA7D /* GTMNSString+HTML.m */; };
 		39879DB016904B9F0050CA7D /* NSString+HTML.m in Sources */ = {isa = PBXBuildFile; fileRef = 39879DAE16904B9F0050CA7D /* NSString+HTML.m */; };
@@ -60,7 +59,6 @@
 		D93AD85417DC9D6E00458B1C /* Growl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D93AD85317DC9D6E00458B1C /* Growl.framework */; };
 		D93FD348187E761400C91E33 /* NSString+HTML.m in Sources */ = {isa = PBXBuildFile; fileRef = 39879DAE16904B9F0050CA7D /* NSString+HTML.m */; };
 		D93FD349187E761800C91E33 /* GTMNSString+HTML.m in Sources */ = {isa = PBXBuildFile; fileRef = 39879DAC16904B9F0050CA7D /* GTMNSString+HTML.m */; };
-		D93FD34A187E761B00C91E33 /* NSHost+ThreadedAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 39814022168E124B003FFF53 /* NSHost+ThreadedAdditions.m */; };
 		D93FD34B187E76AB00C91E33 /* TVFormat.m in Sources */ = {isa = PBXBuildFile; fileRef = D97D9423106DBB68006ECD39 /* TVFormat.m */; };
 		D941D9511025DB2B0012A75F /* JRFeedbackProvider.strings in Resources */ = {isa = PBXBuildFile; fileRef = D941D94D1025DB2B0012A75F /* JRFeedbackProvider.strings */; };
 		D941D9521025DB2B0012A75F /* JRFeedbackProvider.xib in Resources */ = {isa = PBXBuildFile; fileRef = D941D94F1025DB2B0012A75F /* JRFeedbackProvider.xib */; };
@@ -99,7 +97,6 @@
 		D9F97FEC198EBA94006494A3 /* NSFileManager+DirectoryLocations.m in Sources */ = {isa = PBXBuildFile; fileRef = D9F97FEB198EBA94006494A3 /* NSFileManager+DirectoryLocations.m */; };
 		D9FEB87610077790003BADF8 /* AppController.m in Sources */ = {isa = PBXBuildFile; fileRef = D9FEB87510077790003BADF8 /* AppController.m */; };
 		DFC865E213E96BE200606599 /* ReasonForFailure.m in Sources */ = {isa = PBXBuildFile; fileRef = DFC865E113E96BE200606599 /* ReasonForFailure.m */; };
-		DFC8D40415C97310008E369F /* fourOD_token_decoder.py in Resources */ = {isa = PBXBuildFile; fileRef = DFC8D40315C97310008E369F /* fourOD_token_decoder.py */; };
 		DFE5B67413E70AC20008571B /* plugins in Resources */ = {isa = PBXBuildFile; fileRef = DFE5B67313E70AC20008571B /* plugins */; };
 		DFFF196713E96288007B52AC /* ReasonsForFailure.plist in Resources */ = {isa = PBXBuildFile; fileRef = DFFF196613E96288007B52AC /* ReasonsForFailure.plist */; };
 /* End PBXBuildFile section */
@@ -158,8 +155,6 @@
 		393D1DEC18A5BBB500F27880 /* RSRTVArrayController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSRTVArrayController.h; sourceTree = "<group>"; };
 		393D1DED18A5BBB500F27880 /* RSRTVArrayController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSRTVArrayController.m; sourceTree = "<group>"; };
 		3975484C1622504F00470DD1 /* ttml2srt.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = ttml2srt.py; sourceTree = "<group>"; };
-		39814021168E124B003FFF53 /* NSHost+ThreadedAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSHost+ThreadedAdditions.h"; sourceTree = "<group>"; };
-		39814022168E124B003FFF53 /* NSHost+ThreadedAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSHost+ThreadedAdditions.m"; sourceTree = "<group>"; };
 		398516A616D1A02500EBB4CE /* Body2 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Body2; sourceTree = "<group>"; };
 		39879DAB16904B9F0050CA7D /* GTMNSString+HTML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "GTMNSString+HTML.h"; sourceTree = "<group>"; };
 		39879DAC16904B9F0050CA7D /* GTMNSString+HTML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "GTMNSString+HTML.m"; sourceTree = "<group>"; };
@@ -278,9 +273,6 @@
 		D9FEB87510077790003BADF8 /* AppController.m */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.objc; path = AppController.m; sourceTree = "<group>"; tabWidth = 4; };
 		DFC865E013E96BE200606599 /* ReasonForFailure.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReasonForFailure.h; sourceTree = "<group>"; };
 		DFC865E113E96BE200606599 /* ReasonForFailure.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReasonForFailure.m; sourceTree = "<group>"; };
-		DFC8D3F015C557E3008E369F /* FourODDownload.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FourODDownload.h; sourceTree = "<group>"; };
-		DFC8D3F115C557E3008E369F /* FourODDownload.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FourODDownload.m; sourceTree = "<group>"; };
-		DFC8D40315C97310008E369F /* fourOD_token_decoder.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = fourOD_token_decoder.py; sourceTree = "<group>"; };
 		DFE5B67313E70AC20008571B /* plugins */ = {isa = PBXFileReference; lastKnownFileType = folder; path = plugins; sourceTree = "<group>"; };
 		DFFF196613E96288007B52AC /* ReasonsForFailure.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = ReasonsForFailure.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -384,7 +376,6 @@
 			isa = PBXGroup;
 			children = (
 				3975484C1622504F00470DD1 /* ttml2srt.py */,
-				DFC8D40315C97310008E369F /* fourOD_token_decoder.py */,
 				D90EF1361029CB3100290A67 /* Scripting Headers */,
 				32CA4F630368D1EE00C91783 /* Get_iPlayer GUI_Prefix.pch */,
 				29B97316FDCFA39411CA2CEA /* main.m */,
@@ -480,8 +471,6 @@
 				D914BD28100CBFA900F7E68E /* BBCDownload.m */,
 				D921C9E6149BCB16004CB558 /* ITVDownload.h */,
 				D921C9E7149BCB16004CB558 /* ITVDownload.m */,
-				DFC8D3F015C557E3008E369F /* FourODDownload.h */,
-				DFC8D3F115C557E3008E369F /* FourODDownload.m */,
 				D9F97FE3198E9043006494A3 /* GetCurrentWebpage.h */,
 				D9F97FE4198E9043006494A3 /* GetCurrentWebpage.m */,
 				D9F97FE6198EAEA6006494A3 /* GetiPlayerArguments.h */,
@@ -601,8 +590,6 @@
 				39879DAC16904B9F0050CA7D /* GTMNSString+HTML.m */,
 				39879DAD16904B9F0050CA7D /* NSString+HTML.h */,
 				39879DAE16904B9F0050CA7D /* NSString+HTML.m */,
-				39814021168E124B003FFF53 /* NSHost+ThreadedAdditions.h */,
-				39814022168E124B003FFF53 /* NSHost+ThreadedAdditions.m */,
 			);
 			name = Categories;
 			sourceTree = "<group>";
@@ -701,7 +688,6 @@
 				DFFF196713E96288007B52AC /* ReasonsForFailure.plist in Resources */,
 				D9CDC9E8186B8F2B0003A4E2 /* GetiPlayerAutomator.sdef in Resources */,
 				D921C9ED149C4C6F004CB558 /* Body in Resources */,
-				DFC8D40415C97310008E369F /* fourOD_token_decoder.py in Resources */,
 				3975484D1622504F00470DD1 /* ttml2srt.py in Resources */,
 				398516A716D1A02500EBB4CE /* Body2 in Resources */,
 			);
@@ -778,7 +764,6 @@
 				D9F97FEC198EBA94006494A3 /* NSFileManager+DirectoryLocations.m in Sources */,
 				D921C9EB149BCDEB004CB558 /* Download.m in Sources */,
 				D9D06C6F14BB91C200029340 /* ITVMediaFileEntry.m in Sources */,
-				39814023168E124C003FFF53 /* NSHost+ThreadedAdditions.m in Sources */,
 				39879DAF16904B9F0050CA7D /* GTMNSString+HTML.m in Sources */,
 				39879DB016904B9F0050CA7D /* NSString+HTML.m in Sources */,
 				392A41A4169735340053DEA5 /* HTTPProxy.m in Sources */,
@@ -805,7 +790,6 @@
 				D91F9D73187162A800D4388B /* ASINetworkQueue.m in Sources */,
 				D91F9D57187151D700D4388B /* main.m in Sources */,
 				D98CC17C18739D1800E29F9E /* ITVMediaFileEntry.m in Sources */,
-				D93FD34A187E761B00C91E33 /* NSHost+ThreadedAdditions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

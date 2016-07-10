@@ -19,7 +19,6 @@
                 <outlet property="addToQueue" destination="513" id="707"/>
                 <outlet property="application" destination="-2" id="1067"/>
                 <outlet property="categoriesField" destination="KIo-78-9Im" id="Tfd-wV-jO3"/>
-                <outlet property="ch4TVCheckbox" destination="1517" id="1539"/>
                 <outlet property="currentIndicator" destination="505" id="795"/>
                 <outlet property="currentProgress" destination="508" id="796"/>
                 <outlet property="datePicker" destination="1150" id="1161"/>
@@ -1418,17 +1417,6 @@
                                                 </binding>
                                             </connections>
                                         </button>
-                                        <button id="1517">
-                                            <rect key="frame" x="328" y="306" width="69" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="4oD TV" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" imageScaling="proportionallyDown" inset="2" id="1518">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <binding destination="668" name="value" keyPath="values.Cache4oD_TV" id="1528"/>
-                                            </connections>
-                                        </button>
                                         <button id="978">
                                             <rect key="frame" x="396" y="193" width="22" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -2007,6 +1995,7 @@
                     </tabView>
                 </subviews>
             </view>
+            <point key="canvasLocation" x="497" y="385"/>
         </window>
         <window title="Download History" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="DownloadHistoryWindow" animationBehavior="default" id="1212" userLabel="Download History">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
