@@ -46,13 +46,15 @@
    if (!tvFormats || !radioFormats) {
       [BBCDownload initFormats];
    }
-   NSMutableString *temp_Format;
-   temp_Format = [[NSMutableString alloc] initWithString:@"--modes="];
+   NSMutableString *temp_FormatRadio, *temp_FormatTV;
+   temp_FormatRadio = [[NSMutableString alloc] initWithString:@"--radiomode="];
    for (RadioFormat *format in radioFormatList)
-      [temp_Format appendFormat:@"%@,", [radioFormats valueForKey:[format format]]];
-   for (TVFormat *format in tvFormatList)
-      [temp_Format appendFormat:@"%@,",[tvFormats valueForKey:[format format]]];
-   NSString *formatArg = [NSString stringWithString:temp_Format];
+      [temp_FormatRadio appendFormat:@"%@,", [radioFormats valueForKey:[format format]]];
+   NSString *formatArgRadio = [NSString stringWithString:temp_FormatRadio];
+    temp_FormatTV = [[NSMutableString alloc] initWithString:@"--tvmode="];
+    for (TVFormat *format in tvFormatList)
+        [temp_FormatTV appendFormat:@"%@,",[tvFormats valueForKey:[format format]]];
+    NSString *formatArgTV = [NSString stringWithString:temp_FormatTV];
    
    //Set Proxy Arguments
    NSString *proxyArg = nil;
@@ -105,7 +107,7 @@
 	profileDirArg = [[NSString alloc] initWithFormat:@"--profile-dir=%@", appSupportFolder];
 	
    //Add Arguments that can't be NULL
-	NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:getiPlayerPath,profileDirArg,noWarningArg,noPurgeArg,id3v2Arg,rtmpdumpArg,atomicParsleyArg,cacheExpiryArg,downloadPathArg,subDirArg,formatArg,getArg,searchArg,@"--attempts=5",@"--keep-all",@"--fatfilename",@"--thumbsize=6",@"--tag-hdvideo",@"--tag-longdesc",@"--isodate",versionArg,ffmpegArg,proxyArg,partialProxyArg,nil];
+	NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:getiPlayerPath,profileDirArg,noWarningArg,noPurgeArg,id3v2Arg,rtmpdumpArg,atomicParsleyArg,cacheExpiryArg,downloadPathArg,subDirArg,formatArgRadio,formatArgTV,getArg,searchArg,@"--attempts=5",@"--keep-all",@"--fatfilename",@"--thumbsize=6",@"--tag-hdvideo",@"--tag-longdesc",@"--isodate",versionArg,ffmpegArg,proxyArg,partialProxyArg,nil];
    //Verbose?
    if (verbose)
 		[args addObject:@"--verbose"];

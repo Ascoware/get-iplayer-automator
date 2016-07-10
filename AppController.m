@@ -97,18 +97,6 @@ NSDictionary *radioFormats;
     }
     [fileManager changeCurrentDirectoryPath:folder];
     
-    //Install Plugins If Needed
-    NSString *pluginPath = [folder stringByAppendingPathComponent:@"plugins"];
-    if (/*![fileManager fileExistsAtPath:pluginPath]*/TRUE)
-    {
-        [logger addToLog:@"Installing/Updating Get_iPlayer Plugins..." :self];
-        NSString *providedPath = [[NSBundle mainBundle] bundlePath];
-        if ([fileManager fileExistsAtPath:pluginPath]) [fileManager removeItemAtPath:pluginPath error:NULL];
-        providedPath = [providedPath stringByAppendingPathComponent:@"/Contents/Resources/plugins"];
-        [fileManager copyItemAtPath:providedPath toPath:pluginPath error:nil];
-    }
-    
-    
     //Initialize Arguments
     getiPlayerPath = [[NSString alloc] initWithString:[[NSBundle mainBundle] bundlePath]];
     getiPlayerPath = [getiPlayerPath stringByAppendingString:@"/Contents/Resources/get_iplayer.pl"];
