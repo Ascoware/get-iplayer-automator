@@ -394,7 +394,7 @@
             [self setCurrentProgress:[NSString stringWithFormat:@"Downloading Subtitles... -- %@",[show showName]]];
             [self addToLog:[NSString stringWithFormat:@"INFO: Downloading subtitles: %@", subtitleURL] noTag:YES];
             
-            subtitlePath = [[show path] stringByAppendingPathExtension:@"xml"];
+            subtitlePath = [[[show path] stringByDeletingPathExtension] stringByAppendingPathExtension:@"ttml"];
             ASIHTTPRequest *downloadSubs = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:subtitleURL]];
             [downloadSubs setDownloadDestinationPath:subtitlePath];
             [downloadSubs setDelegate:self];
@@ -469,7 +469,7 @@
             {
                 [[NSFileManager defaultManager] removeItemAtPath:subtitlePath error:nil];
             }
-            [self addToLog:[NSString stringWithFormat:@"INFO: Conversion to SubRip complete: %@", [[show path] stringByAppendingPathExtension:@"srt"]] noTag:YES];
+            [self addToLog:[NSString stringWithFormat:@"INFO: Conversion to SubRip complete: %@", [[[show path] stringByDeletingPathExtension] stringByAppendingPathExtension:@"srt"]] noTag:YES];
         }
         else
         {
