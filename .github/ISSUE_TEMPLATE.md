@@ -12,6 +12,6 @@ What programme are you attempting to download (full title, series and episode)? 
 
 If you cannot download a programme, provide a verbose log of the attempt. See [Verbose Log](https://github.com/GetiPlayerAutomator/get-iplayer-automator/wiki/Verbose-Log) in wiki for instructions on posting a verbose log for your ticket. **Your verbose log should show the results from downloading ONLY ONE programme. DO NOT post a massive log covering multiple multiple programme downloads. IMPORTANT: DO NOT paste your verbose log into your issue report. If you do, expect it to be deleted.**
 
-If GiA crashes, provide the OS X crash log by copying the information from Crash Reporter into a file or locating the crash log in `$HOME/Library/Logs/DiagnosticReports`. See [Verbose Log](https://github.com/GetiPlayerAutomator/get-iplayer-automator/wiki/Verbose-Log) in wiki for instructions on posting a crash log with your issue report. **IMPORTANT: DO NOT paste your crash log into your issue report. If you do, expect it to be deleted.**
+If GiA crashes, provide the OS X crash log by copying the information from Crash Reporter into a file or locating the crash log in `$HOME/Library/Logs/DiagnosticReports`. See [Verbose Log](https://github.com/GetiPlayerAutomator/get-iplayer-automator/wiki/Verbose-Log) in wiki for instructions on posting a crash log for your ticket. **IMPORTANT: DO NOT paste your crash log into your issue report. If you do, expect it to be deleted.**
 
 Please provide any additional information below.
