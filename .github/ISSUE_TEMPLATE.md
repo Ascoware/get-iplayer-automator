@@ -1,4 +1,6 @@
-Create a succinct title describing your issue above, then provide the information requested below. If you do not provide the requested information, your ticket may not receive a response.
+Have you searched all open and closed tickets to check if your issue has already been reported? If not, use the search box at the top of the page to do so. If you create a ticket for an issue that has already been reported, it will be marked as a duplicate and closed with no further action. If you are certain your issue has not yet been reported, follow the instructions below.
+
+Create a succinct title describing your issue in the Title field above, then provide the information requested below. If you do not provide the requested information, your ticket may not receive a response.
 
 What steps will reproduce the problem? Be specific, and provide as much detail as possible.
 
