@@ -129,6 +129,8 @@
     [coder encodeObject:realPID forKey:@"realPID"];
     [coder encodeObject:url forKey:@"url"];
     [coder encodeObject:podcast forKey:@"podcast"];
+    [coder encodeInteger:season forKey:@"season"];
+    [coder encodeInteger:episode forKey:@"episode"];
 }
 - (id) initWithCoder: (NSCoder *)coder
 {
@@ -155,6 +157,8 @@
     extendedMetadataRetrieved=@NO;
     getNameRunning = false;
     addedByPVR = false;
+    season = [coder decodeIntegerForKey:@"season"];
+    episode = [coder decodeIntegerForKey:@"episode"];
     return self;
 }
 /*

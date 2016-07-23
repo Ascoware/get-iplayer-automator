@@ -228,13 +228,17 @@
    }
     else if ([url hasPrefix:@"http://www.itv.com/hub/"])
     {
-        NSString *progname = nil, *productionId = nil, *title = nil;
+        NSString *progname = nil, *productionId = nil, *title = nil, *desc = nil;
+        NSInteger seriesnum = 0, episodenum = 0;
         progname = newShowName;
         NSScanner *scanner = [NSScanner scannerWithString:source];
         [scanner scanUpToString:@"<meta property=\"og:title\" content=\"" intoString:nil];
         [scanner scanString:@"<meta property=\"og:title\" content=\"" intoString:nil];
         [scanner scanUpToString:@"\"" intoString:&title];
         if (title) progname = [title stringByDecodingHTMLEntities];
+        [scanner scanUpToString:@"<meta property=\"og:description\" content=\"" intoString:nil];
+        [scanner scanString:@"<meta property=\"og:description\" content=\"" intoString:nil];
+        [scanner scanUpToString:@"\"" intoString:&desc];
         [scanner scanUpToString:@"&amp;productionId=" intoString:nil];
         [scanner scanString:@"&amp;productionId=" intoString:nil];
         [scanner scanUpToString:@"\"" intoString:&productionId];
@@ -255,6 +259,28 @@
         [newProg setTvNetwork:@"ITV"];
         [newProg setProcessedPID:@YES];
         [newProg setUrl:url];
+        scanner = [NSScanner scannerWithString:title];
+        [scanner scanUpToString:@"Series " intoString:nil];
+        [scanner scanString:@"Series " intoString:nil];
+        [scanner scanInteger:&seriesnum];
+        [scanner setScanLocation:0];
+        [scanner scanUpToString:@"Episode " intoString:nil];
+        [scanner scanString:@"Episode " intoString:nil];
+        [scanner scanInteger:&episodenum];
+        scanner = [NSScanner scannerWithString:desc];
+        if ( seriesnum == 0 ) {
+            [scanner scanUpToString:@"Series " intoString:nil];
+            [scanner scanString:@"Series " intoString:nil];
+            [scanner scanInteger:&seriesnum];
+        }
+        if ( episodenum == 0 ) {
+            [scanner setScanLocation:0];
+            [scanner scanUpToString:@"Episode " intoString:nil];
+            [scanner scanString:@"Episode " intoString:nil];
+            [scanner scanInteger:&episodenum];
+        }
+        [newProg setSeason:seriesnum];
+        [newProg setEpisode:episodenum];
         return newProg;
     }
 	else

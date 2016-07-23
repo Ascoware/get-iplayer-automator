@@ -255,16 +255,14 @@
       [show setEpisodeName:@"(No Episode Name)"];
    
    //Retrieve Episode Number
-   NSInteger episodeNumber = 0;
+   NSInteger episodeNumber = [show episode];
    [scanner scanUpToString:@"<EpisodeNumber" intoString:nil];
    if (![scanner scanString:@"<EpisodeNumber/>" intoString:nil])
    {
       [scanner scanString:@"<EpisodeNumber>" intoString:nil];
       [scanner scanInteger:&episodeNumber];
-      [show setEpisode:episodeNumber];
    }
-   else
-      [show setEpisode:0];
+   [show setEpisode:episodeNumber];
    
    //Retrieve Thumbnail URL
    [scanner scanUpToString:@"<PosterFrame>" intoString:nil];
@@ -443,7 +441,7 @@
          [self addToLog:[NSString stringWithFormat:@"DEBUG: playPath = %@", playPath] noTag:YES];
    }
    
-   NSInteger seriesNumber = 0;
+   NSInteger seriesNumber = [show season];
    for (ITVMediaFileEntry *entry in mediaEntries) {
       NSScanner *mescanner = [NSScanner scannerWithString:[entry url]];
       [mescanner scanUpToString:@"(series-" intoString:nil];
