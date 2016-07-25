@@ -1694,7 +1694,7 @@ NSDictionary *radioFormats;
                 else
                 {
                     [logger performSelectorOnMainThread:@selector(addToLog:) withObject:@"iTunes did not accept file." waitUntilDone:YES];
-                    if (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_8) { //10.8 or older
+                    if (floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_8) { //10.8 or older
                         [logger performSelectorOnMainThread:@selector(addToLog:) withObject:@"Try setting iTunes to open in 32-bit mode." waitUntilDone:YES];
                         [self performSelectorOnMainThread:@selector(thirtyTwoBitModeAlert) withObject:nil waitUntilDone:NO];
                     }
