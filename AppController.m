@@ -1617,8 +1617,6 @@ NSDictionary *radioFormats;
     
     [rootObject setValue:[tvFormatController arrangedObjects] forKey:@"tvFormats"];
     [rootObject setValue:[radioFormatController arrangedObjects] forKey:@"radioFormats"];
-    // remove obsolete item
-    [rootObject removeObjectForKey:@"hasUpdatedCacheFor4oD"];
     [NSKeyedArchiver archiveRootObject:rootObject toFile:filePath];
     
     filename = @"ITVFormats.automator";
