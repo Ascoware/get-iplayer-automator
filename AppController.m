@@ -260,7 +260,7 @@ NSDictionary *radioFormats;
     infoPath = [infoPath stringByExpandingTildeInPath];
     if ([fileManager fileExistsAtPath:infoPath]) [fileManager removeItemAtPath:infoPath error:nil];
     
-    [self updateCache:@""];
+    [self updateCache:nil];
 }
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)application
 {
