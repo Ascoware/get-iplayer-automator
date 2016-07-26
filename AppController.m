@@ -86,6 +86,12 @@ NSDictionary *radioFormats;
         [[NSUserDefaults standardUserDefaults] setObject:@YES forKey:@"SignedNew"];
         [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"AudioDescribed"];
     }
+
+    // remove obsolete preferences
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"DefaultFormat"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"AlternateFormat"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CacheITV_TV"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"Cache4oD_TV"];
     
     //Make sure Application Support folder exists
     NSString *folder = @"~/Library/Application Support/Get iPlayer Automator/";
@@ -491,7 +497,7 @@ NSDictionary *radioFormats;
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
         if (!lastUpdate || ([[NSDate date] timeIntervalSinceDate:lastUpdate] > ([[defaults objectForKey:@"CacheExpiryTime"] intValue]*3600)) || [[sender class] isEqualTo:[@"" class]])
         {
-            typesToCache = [[NSMutableArray alloc] initWithCapacity:5];
+            typesToCache = [[NSMutableArray alloc] initWithCapacity:3];
             if ([[defaults objectForKey:@"CacheBBC_TV"] boolValue]) [typesToCache addObject:@"tv"];
             if ([[defaults objectForKey:@"CacheBBC_Radio"] boolValue]) [typesToCache addObject:@"radio"];
             if ([[defaults objectForKey:@"CacheBBC_Podcasts"] boolValue]) [typesToCache addObject:@"podcast"];
@@ -1611,6 +1617,8 @@ NSDictionary *radioFormats;
     
     [rootObject setValue:[tvFormatController arrangedObjects] forKey:@"tvFormats"];
     [rootObject setValue:[radioFormatController arrangedObjects] forKey:@"radioFormats"];
+    // remove obsolete item
+    [rootObject removeObjectForKey:@"hasUpdatedCacheFor4oD"];
     [NSKeyedArchiver archiveRootObject:rootObject toFile:filePath];
     
     filename = @"ITVFormats.automator";
