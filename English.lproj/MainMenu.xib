@@ -2184,26 +2184,27 @@
         <window title="Cache Info" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="CacheInfoWindow" animationBehavior="default" id="882" userLabel="Help Panel: CacheInfo" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" utility="YES" HUD="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="196" y="300" width="397" height="210"/>
+            <rect key="contentRect" x="196" y="300" width="397" height="227"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1178"/>
             <view key="contentView" id="883">
-                <rect key="frame" x="0.0" y="0.0" width="397" height="210"/>
+                <rect key="frame" x="0.0" y="0.0" width="397" height="227"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <textField verticalHuggingPriority="750" id="884">
-                        <rect key="frame" x="17" y="20" width="363" height="170"/>
+                        <rect key="frame" x="17" y="13" width="360" height="194"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" id="885">
                             <font key="font" metaFont="system"/>
-                            <string key="title">Select the types of items you would like cached. An item must be cached in order for it to show up in search or be downloaded. However, the more types of items you choose to be cached, the longer it will take for the cache to be updated.
+                            <string key="title">Select the types of items you would like cached. An item must be cached in order for it to show up in search results or to be downloaded. However, the more types of items you choose to be cached, the longer it will take for the cache to be updated.
 
-Please Note: The searchable/downloadable types will not be updated until the cache has been updated either manually by selecting the menu item or automatically by restarting the application.</string>
+Please Note: The searchable/downloadable types will not be updated until the cache has been updated either manually by selecting the menu item or automatically - if the cache refresh time limit has been exceeded - by restarting the application.</string>
                             <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                             <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.0" colorSpace="calibratedRGB"/>
                         </textFieldCell>
                     </textField>
                 </subviews>
             </view>
+            <point key="canvasLocation" x="232.5" y="835.5"/>
         </window>
         <window title="Cache Refresh Info" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="CacheRefreshInfoWindow" animationBehavior="default" id="895" userLabel="Help Panel: CacheRefresh" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" utility="YES" HUD="YES"/>
