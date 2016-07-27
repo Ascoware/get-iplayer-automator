@@ -77,7 +77,7 @@ static GetiPlayerArguments *sharedController = nil;
 
 - (NSString *)standardListFormat
 {
-   return @"--listformat=<index>: <type>, ~<name> - <episode>~, <channel>, <web>";
+   return @"--listformat=<pid>: <type>, ~<name> - <episode>~, <channel>, <web>";
 }
 
 

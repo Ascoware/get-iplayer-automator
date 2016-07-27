@@ -79,11 +79,7 @@
    
    NSLog(@"ID3V2: %@", id3v2Arg);
    
-	NSString *getArg;
-	if ([[show processedPID] boolValue])
-		getArg = @"--get";
-	else
-		getArg = @"--pid";
+	NSString *getArg = @"--pid";
 	NSString *searchArg = [[NSString alloc] initWithFormat:@"%@", [show pid]];
    
    //AudioDescribed & Signed

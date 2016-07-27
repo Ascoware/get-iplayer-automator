@@ -211,7 +211,7 @@
                                                             @"--nocopyright",
                                                             @"-e60480000000000000",
                                                             @"-i",
-                                                            [NSString stringWithFormat:@"--profile-dir=%@",[@"~/Library/Application Support/Get iPlayer Automator/" stringByExpandingTildeInPath]],pid]];
+                                                            [NSString stringWithFormat:@"--profile-dir=%@",[@"~/Library/Application Support/Get iPlayer Automator/" stringByExpandingTildeInPath]],@"--pid",pid]];
     if (proxyDict[@"proxy"]) {
         [args addObject:[NSString stringWithFormat:@"-p%@",[proxyDict[@"proxy"] url]]];
         
@@ -520,6 +520,7 @@
         i++;
         if (i>1 && i<[array count]-1)
         {
+            // TODO: remove use of index in future version
             NSString *pid, *showName, *index, *type, *tvNetwork, *url;
             @try{
                 NSScanner *scanner = [NSScanner scannerWithString:string];
@@ -545,23 +546,14 @@
                 [getNameException runModal];
                 getNameException = nil;
             }
-            if ([wantedID isEqualToString:pid])
+            if ([wantedID isEqualToString:pid] || [wantedID isEqualToString:index])
             {
                 found=YES;
                 [p setValue:showName forKey:@"showName"];
-                [p setValue:index forKey:@"pid"];
+                [p setValue:pid forKey:@"pid"];
                 [p setValue:tvNetwork forKey:@"tvNetwork"];
                 [p setUrl:url];
                 p.status = @"Available";
-                if ([type isEqualToString:@"radio"]) [p setValue:@YES forKey:@"radio"];
-                else if ([type isEqualToString:@"podcast"]) [p setPodcast:@YES];
-            }
-            else if ([wantedID isEqualToString:index])
-            {
-                found=YES;
-                [p setValue:showName forKey:@"showName"];
-                [p setValue:tvNetwork forKey:@"tvNetwork"];
-                [p setUrl:url];
                 if ([type isEqualToString:@"radio"]) [p setValue:@YES forKey:@"radio"];
                 else if ([type isEqualToString:@"podcast"]) [p setPodcast:@YES];
             }

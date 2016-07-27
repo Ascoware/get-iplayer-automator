@@ -1384,7 +1384,7 @@ NSDictionary *radioFormats;
             
             NSMutableArray *autoRecordArgs = [[NSMutableArray alloc] initWithObjects:getiPlayerPath,
                                               [GetiPlayerArguments sharedController].noWarningArg,@"--nopurge",
-                                              @"--listformat=<index>: <type>, ~<name> - <episode>~, <channel>, <timeadded>, <pid>,<web>",
+                                              @"--listformat=<pid>: <type>, ~<name> - <episode>~, <channel>, <timeadded>, <pid>,<web>",
                                               cacheExpiryArgument,
                                               typeArgument,
                                               [GetiPlayerArguments sharedController].profileDirArg,
