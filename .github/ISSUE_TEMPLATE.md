@@ -12,6 +12,8 @@ If you create a ticket for an issue that has already been reported, your ticket 
 
 Create a succinct title describing your issue in the `Title` field above, then provide the information requested below. If you do not provide the requested information, your ticket will be closed with no further action.
 
+You can delete the instructions above before submitting your ticket.
+
 ---
 
 What steps will reproduce the problem? Be specific, and provide as much detail as possible.
