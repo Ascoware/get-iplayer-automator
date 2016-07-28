@@ -36,7 +36,6 @@
                 <outlet property="log" destination="616" id="677"/>
                 <outlet property="logger" destination="BZI-HO-NFo" id="LLH-v9-nI4"/>
                 <outlet property="mainWindow" destination="371" id="1066"/>
-                <outlet property="modeSizeController" destination="fAe-Gc-WEJ" id="eWI-zV-CwY"/>
                 <outlet property="numbersField" destination="McO-fX-SaA" id="K0F-zH-qB9"/>
                 <outlet property="popover" destination="yim-h9-S9A" id="dBw-DD-LJG"/>
                 <outlet property="prefsPanel" destination="547" id="1471"/>
@@ -215,7 +214,11 @@
             </view>
             <point key="canvasLocation" x="860" y="682.5"/>
         </window>
-        <dictionaryController objectClassName="_NSControllerKeyValuePair" id="fAe-Gc-WEJ" userLabel="modeSizeController"/>
+        <arrayController id="rST-BW-7sr" userLabel="modeSizeController">
+            <connections>
+                <binding destination="GOW-LV-QLu" name="sortDescriptors" keyPath="modeSizeSorters" id="TWw-l1-8F4"/>
+            </connections>
+        </arrayController>
         <menu title="AMainMenu" systemMenu="main" id="29" userLabel="MainMenu">
             <items>
                 <menuItem title="Get iPlayer Automator" id="56">
@@ -2426,7 +2429,7 @@ DQ
             </connections>
         </popover>
         <customView id="kd9-ZF-rkk" userLabel="Popover View">
-            <rect key="frame" x="0.0" y="0.0" width="663" height="323"/>
+            <rect key="frame" x="0.0" y="0.0" width="713" height="323"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <customView wantsLayer="YES" id="ryX-Qd-Wi8" userLabel="Loading Info View">
@@ -2440,7 +2443,7 @@ DQ
                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="cAi-OW-zbo">
                             <rect key="frame" x="18" y="13" width="295" height="17"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Loading Episode Info:" id="XLQ-Se-5nS">
+                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Loading Episode Info" id="XLQ-Se-5nS">
                                 <font key="font" metaFont="system"/>
                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -2449,7 +2452,7 @@ DQ
                     </subviews>
                 </customView>
                 <customView wantsLayer="YES" id="P2i-j0-vSu" userLabel="Episode Info View">
-                    <rect key="frame" x="0.0" y="0.0" width="663" height="323"/>
+                    <rect key="frame" x="0.0" y="0.0" width="786" height="323"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <subviews>
                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" id="uXw-sP-r5Y">
@@ -2523,20 +2526,36 @@ DQ
                             </textFieldCell>
                         </textField>
                         <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="cbA-Cy-Yab">
-                            <rect key="frame" x="374" y="20" width="269" height="135"/>
+                            <rect key="frame" x="374" y="20" width="311" height="135"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <clipView key="contentView" id="x0P-rA-GeF">
-                                <rect key="frame" x="1" y="17" width="267" height="117"/>
+                                <rect key="frame" x="1" y="0.0" width="309" height="134"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="v8t-qS-vxG" id="aGq-Qk-MC8">
-                                        <rect key="frame" x="0.0" y="0.0" width="267" height="19"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="309" height="19"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <size key="intercellSpacing" width="3" height="2"/>
                                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                         <tableColumns>
-                                            <tableColumn width="116" minWidth="40" maxWidth="1000" id="BCS-cW-IrU">
+                                            <tableColumn identifier="" width="110" minWidth="40" maxWidth="1000" id="Lvd-Y0-YIB">
+                                                <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Version">
+                                                    <font key="font" metaFont="smallSystem"/>
+                                                    <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                                </tableHeaderCell>
+                                                <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" alignment="left" title="Text Cell" id="ln7-Pn-kgH">
+                                                    <font key="font" metaFont="system"/>
+                                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                                <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                                <connections>
+                                                    <binding destination="rST-BW-7sr" name="value" keyPath="arrangedObjects.version" id="CFs-Rn-xBn"/>
+                                                </connections>
+                                            </tableColumn>
+                                            <tableColumn width="100" minWidth="40" maxWidth="1000" id="BCS-cW-IrU">
                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Mode">
                                                     <font key="font" metaFont="smallSystem"/>
                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -2549,10 +2568,10 @@ DQ
                                                 </textFieldCell>
                                                 <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                 <connections>
-                                                    <binding destination="fAe-Gc-WEJ" name="value" keyPath="arrangedObjects.key" id="90m-MQ-dy9"/>
+                                                    <binding destination="rST-BW-7sr" name="value" keyPath="arrangedObjects.mode" id="RoF-Z0-acb"/>
                                                 </connections>
                                             </tableColumn>
-                                            <tableColumn width="145" minWidth="40" maxWidth="1000" id="YpI-IS-RSF">
+                                            <tableColumn width="90" minWidth="40" maxWidth="1000" id="YpI-IS-RSF">
                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Size">
                                                     <font key="font" metaFont="smallSystem"/>
                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -2565,16 +2584,19 @@ DQ
                                                 </textFieldCell>
                                                 <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                 <connections>
-                                                    <binding destination="fAe-Gc-WEJ" name="value" keyPath="arrangedObjects.value" id="HC5-3h-Frc"/>
+                                                    <binding destination="rST-BW-7sr" name="value" keyPath="arrangedObjects.size" id="nFD-LK-UQt"/>
                                                 </connections>
                                             </tableColumn>
                                         </tableColumns>
+                                        <connections>
+                                            <binding destination="rST-BW-7sr" name="content" keyPath="arrangedObjects" id="Dad-qr-VE6"/>
+                                        </connections>
                                     </tableView>
                                 </subviews>
                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                             </clipView>
                             <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="9W4-jh-ruF">
-                                <rect key="frame" x="1" y="119" width="223" height="15"/>
+                                <rect key="frame" x="1" y="119" width="384" height="15"/>
                                 <autoresizingMask key="autoresizingMask"/>
                             </scroller>
                             <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="dMv-KY-GQc">
@@ -2582,7 +2604,7 @@ DQ
                                 <autoresizingMask key="autoresizingMask"/>
                             </scroller>
                             <tableHeaderView key="headerView" id="v8t-qS-vxG">
-                                <rect key="frame" x="0.0" y="0.0" width="267" height="17"/>
+                                <rect key="frame" x="0.0" y="0.0" width="309" height="17"/>
                                 <autoresizingMask key="autoresizingMask"/>
                             </tableHeaderView>
                         </scrollView>
@@ -2643,6 +2665,7 @@ DQ
                     </subviews>
                 </customView>
             </subviews>
+            <point key="canvasLocation" x="510.5" y="447.5"/>
         </customView>
         <customObject id="BZI-HO-NFo" customClass="LogController">
             <connections>
@@ -2663,7 +2686,7 @@ DQ
                 <outlet property="lastBroadcastField" destination="snH-qy-SJv" id="gP7-Cx-2QQ"/>
                 <outlet property="loadingLabel" destination="cAi-OW-zbo" id="eNT-sb-Q58"/>
                 <outlet property="loadingView" destination="ryX-Qd-Wi8" id="csE-tM-3fH"/>
-                <outlet property="modeSizeController" destination="fAe-Gc-WEJ" id="XUm-bg-y9e"/>
+                <outlet property="modeSizeController" destination="rST-BW-7sr" id="13K-0O-Xbw"/>
                 <outlet property="numbersField" destination="McO-fX-SaA" id="lzQ-Ch-O0A"/>
                 <outlet property="popover" destination="yim-h9-S9A" id="ONL-a3-wmf"/>
                 <outlet property="retrievingInfoIndicator" destination="lwa-7m-lrw" id="My2-VC-qfX"/>

@@ -9,9 +9,24 @@
 #import "ExtendedShowInformationController.h"
 
 @implementation ExtendedShowInformationController
+- (id)init
+{
+    if (!(self = [super init])) return nil;
+    modeSizeSorters = [NSArray arrayWithObjects:
+                        [NSSortDescriptor sortDescriptorWithKey:@"group" ascending:YES],
+                        [NSSortDescriptor sortDescriptorWithKey:@"version" ascending:YES],
+                        [NSSortDescriptor sortDescriptorWithKey:@"size" ascending:NO comparator:^(id obj1, id obj2) {
+                            return [(NSString *)obj1 compare:(NSString *)obj2 options:NSNumericSearch];
+                        }],
+                        [NSSortDescriptor sortDescriptorWithKey:@"mode" ascending:YES],
+                        nil
+                    ];
+    return self;
+}
 #pragma mark Extended Show Information
 - (IBAction)showExtendedInformationForSelectedProgramme:(id)sender {
    popover.behavior = NSPopoverBehaviorTransient;
+    loadingLabel.stringValue = @"Loading Episode Info";
    [[NSNotificationCenter defaultCenter] postNotificationName:@"AddToLogNotification" object:self userInfo:@{@"message": @"Retrieving Information"}];
    Programme *programme = searchResultsArrayController.arrangedObjects[[searchResultsTable selectedRow]];
    if (programme) {
@@ -98,7 +113,7 @@
       if (programme.modeSizes)
          modeSizeController.content = programme.modeSizes;
       else
-         modeSizeController.content = [NSDictionary dictionary];
+         modeSizeController.content = [NSArray array];
       
       if ([programme typeDescription])
          typeField.stringValue = [NSString stringWithFormat:@"Type: %@",[programme typeDescription]];
@@ -116,4 +131,7 @@
        [[NSNotificationCenter defaultCenter] postNotificationName:@"AddToLogNotification" object:self userInfo:@{@"message":@"Info could not be retrieved."}];
    }
 }
+
+@synthesize modeSizeSorters;
+
 @end

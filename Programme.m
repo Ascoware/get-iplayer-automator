@@ -289,30 +289,70 @@
     if (episodeNumber) {
         episode = [episodeNumber integerValue];
     }
-    NSString *modeSizesString = [self scanField:@"modesizes" fromList:taskOutput];
-    if (modeSizesString) {
-        NSScanner *sizeScanner = [NSScanner scannerWithString:modeSizesString];
-        [sizeScanner scanString:@"default:" intoString:nil];
-        NSString *newSizesString;
-        [sizeScanner scanUpToString:@":" intoString:&newSizesString];
-        
-        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"[a-z]*[0-2]=[0-9]*MB" options:0 error:nil];
-        NSArray *matches = [regex matchesInString:newSizesString options:0 range:NSMakeRange(0, [newSizesString length])];
-        if ([matches count] > 0) {
-            NSMutableDictionary *dictionary = [NSMutableDictionary dictionary];
-            for (NSTextCheckingResult *modesizeResult in matches) {
-                NSString *modesize = [newSizesString substringWithRange:modesizeResult.range];
-                if ([modesize hasPrefix:@"rtsp"] || [modesize hasPrefix:@"wma"]) {
-                    continue;
-                }
-                NSArray *comps = [modesize componentsSeparatedByString:@"="];
-                if ([comps count] == 2) {
-                    [dictionary setObject:comps[1] forKey:comps[0]];
-                }
-            }
-            modeSizes = dictionary;
+    // determine default version
+    NSString *default_version = nil;
+    NSString *info_versions = [self scanField:@"versions" fromList:taskOutput];
+    NSArray *versions = [info_versions componentsSeparatedByString:@","];
+    for (NSString *version in versions) {
+        if (([version isEqualToString:@"default"]) ||
+            ([version isEqualToString:@"original"] && ![default_version isEqualToString:@"default"]) ||
+            (!default_version && ![version isEqualToString:@"signed"] && ![version isEqualToString:@"audiodescribed"])) {
+            default_version = version;
         }
     }
+    // parse mode sizes
+    NSMutableArray *array = [NSMutableArray array];
+    NSScanner *sizeScanner = [NSScanner scannerWithString:taskOutput];
+    [sizeScanner scanUpToString:@"modesizes:" intoString:nil];
+    while ([sizeScanner scanString:@"modesizes:" intoString:nil]) {
+        NSString *version = nil;
+        [sizeScanner scanCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:nil];
+        [sizeScanner scanUpToString:@":" intoString:&version];
+        if (![version isEqualToString:default_version] && ![version isEqualToString:@"signed"] && ![version isEqualToString:@"audiodescribed"]) {
+            [sizeScanner scanUpToString:@"modesizes:" intoString:nil];
+            continue;
+        }
+        NSString *group = nil;
+        if ([version isEqualToString:default_version]) {
+            group = @"A";
+        }
+        else if ([version isEqualToString:@"signed"]) {
+            group = @"C";
+        }
+        else if ([version isEqualToString:@"audiodescribed"]) {
+            group = @"D";
+        }
+        else {
+            group = @"B";
+        }
+        NSString *newSizesString;
+        [sizeScanner scanCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:nil];
+        [sizeScanner scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet] intoString:&newSizesString];
+        // TODO: adjust with switch to HLS
+        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"flash[a-z]+[1-9]=[0-9]+MB" options:0 error:nil];
+        NSArray *matches = [regex matchesInString:newSizesString options:0 range:NSMakeRange(0, [newSizesString length])];
+        if ([matches count] > 0) {
+            for (NSTextCheckingResult *modesizeResult in matches) {
+                NSString *modesize = [newSizesString substringWithRange:modesizeResult.range];
+                NSArray *comps = [modesize componentsSeparatedByString:@"="];
+                if ([comps count] == 2) {
+                    NSMutableDictionary *item = [NSMutableDictionary dictionary];
+                    if ([version isEqualToString:default_version]) {
+                        [item setObject:@"default" forKey:@"version"];
+                    }
+                    else {
+                        [item setObject:version forKey:@"version"];
+                    }
+                    [item setObject:comps[0] forKey:@"mode"];
+                    [item setObject:comps[1] forKey:@"size"];
+                    [item setObject:group forKey:@"group"];
+                    [array addObject:item];
+                }
+            }
+        }
+        [sizeScanner scanUpToString:@"modesizes:" intoString:nil];
+    }
+    modeSizes = array;
     NSString *thumbURL = [self scanField:@"thumbnail4" fromList:taskOutput];
     if (!thumbURL) {
         thumbURL = [self scanField:@"thumbnail" fromList:taskOutput];

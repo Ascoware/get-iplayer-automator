@@ -52,7 +52,7 @@ typedef NS_ENUM(NSInteger, GIA_ProgrammeType) {
     NSString *categories;
     NSDate *__strong firstBroadcast;
     NSDate *__strong lastBroadcast;
-    NSDictionary *modeSizes;
+    NSArray *modeSizes;
     NSImage *thumbnail;
     
     NSMutableString *taskOutput;
@@ -104,7 +104,7 @@ typedef NS_ENUM(NSInteger, GIA_ProgrammeType) {
 @property (readwrite) NSString *categories;
 @property (readwrite) NSDate *firstBroadcast;
 @property (readwrite) NSDate *lastBroadcast;
-@property (readwrite) NSDictionary *modeSizes;
+@property (readwrite) NSArray *modeSizes;
 @property (readwrite) NSImage *thumbnail;
 @property (readwrite) bool addedByPVR;
 @end

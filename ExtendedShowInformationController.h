@@ -27,8 +27,9 @@
    IBOutlet NSTextField *firstBroadcastField;
    IBOutlet NSTextField *lastBroadcastField;
    IBOutlet NSTextView *descriptionView;
-   IBOutlet NSDictionaryController *modeSizeController;
    IBOutlet NSTextField *typeField;
+    IBOutlet NSArrayController *modeSizeController;
+    NSArray *modeSizeSorters;
 }
-
+@property (readonly) NSArray *modeSizeSorters;
 @end
