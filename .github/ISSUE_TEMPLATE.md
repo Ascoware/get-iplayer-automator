@@ -1,3 +1,5 @@
+**This issue tracker is not a discussion forum, so don't use it as such.  If you wish to discuss the BBC, iPlayer or anything else that is not related to an actual problem with the current release of GiA, post in an appropriate forum, not in this issue tracker.**
+
 **STOP! DO NOT submit a ticket if you are unable to download a programme from outside the UK**. 
 
 If you need an explanation, read [this](https://github.com/GetiPlayerAutomator/get-iplayer-automator/wiki/No-Support-for-GiA-Outside-the-UK). If you ignore this instruction, your ticket will be closed with no further action. You can fib about your location if you like, but you will only be wasting your time. If you are using GiA within the UK, continue with the instructions below.
@@ -11,8 +13,6 @@ Before creating a new ticket, search the current open and closed tickets to see 
 If you create a ticket for an issue that has already been reported, your ticket will be closed with no further action. If you are certain your issue has not yet been reported, continue with the instructions below.
 
 Create a succinct title describing your issue in the `Title` field above, then provide the information requested below. If you do not provide the requested information, your ticket will be closed with no further action.
-
-**This issue tracker is not a discussion forum, so don't use it as such.  If you wish to discuss the BBC, iPlayer or anything else that is not related to an actual problem with the current release of GiA, post in an appropriate forum, not in this issue tracker.**
 
 Delete the instructions above before submitting your ticket.
 
