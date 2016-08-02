@@ -485,8 +485,18 @@
       else if ([output hasPrefix:@"WARNING: No programmes are available for this pid with version(s):"] ||
                [output hasPrefix:@"INFO: No versions of this programme were selected"])
       {
-         [show setReasonForFailure:@"AudioDescribedOnly"];
-         [self addToLog:output noTag:YES];
+          NSScanner *versionScanner = [NSScanner scannerWithString:output];
+          [versionScanner scanUpToString:@"available versions:" intoString:nil];
+          [versionScanner scanString:@"available versions:" intoString:nil];
+          [versionScanner scanCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:nil];
+          NSString *availableVersions;
+          [versionScanner scanUpToString:@")" intoString:&availableVersions];
+          if ([availableVersions rangeOfString:@"audiodescribed"].location != NSNotFound ||
+              [availableVersions rangeOfString:@"signed"].location != NSNotFound)
+          {
+              [show setReasonForFailure:@"AudioDescribedOnly"];
+          }
+          [self addToLog:output noTag:YES];
       }
 		else if ([output hasPrefix:@"INFO:"] || [output hasPrefix:@"WARNING:"] || [output hasPrefix:@"ERROR:"] ||
                [output hasSuffix:@"default"] || [output hasPrefix:[show pid]])
