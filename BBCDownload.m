@@ -482,7 +482,8 @@
          [show setReasonForFailure:@"ShowNotFound"];
          [self addToLog:output noTag:YES];
       }
-      else if ([output hasPrefix:@"WARNING: No programmes are available for this pid with version(s): default (available versions: audiodescribed,signed)"])
+      else if ([output hasPrefix:@"WARNING: No programmes are available for this pid with version(s):"] ||
+               [output hasPrefix:@"INFO: No versions of this programme were selected"])
       {
          [show setReasonForFailure:@"AudioDescribedOnly"];
          [self addToLog:output noTag:YES];

@@ -43,14 +43,14 @@ at least one download format to the list.</string>
 	<key>NoSpecifiedFormatAvailableITV</key>
 	<string>None of the specified formats were available. Please go to Preferences -&gt;
 Other Formats and add at least one download format to the list.</string>
-   <key>AudioDescribedOnly</key>
-   <string>This show is only available in audiodescribed and/or signed modes.
-Please enable these modes in preferences if you would like to download this show.</string>
-   <key>External_Disconnected</key>
-   <string>The specified download directory could not be written to.
+	<key>AudioDescribedOnly</key>
+	<string>This show is only available in audiodescribed and/or signed versions.
+Please enable these versions in preferences if you would like to download this show.</string>
+	<key>External_Disconnected</key>
+	<string>The specified download directory could not be written to.
 Most likely this is because your external hard drive is disconnected.</string>
-   <key>Download_Directory_Permissions</key>
-   <string>The specified download directory could not be written to.
+	<key>Download_Directory_Permissions</key>
+	<string>The specified download directory could not be written to.
 Please check your write permission for your download directory or choose a
 new download directory.</string>
 </dict>
