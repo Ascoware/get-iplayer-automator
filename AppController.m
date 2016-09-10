@@ -12,11 +12,11 @@
 #import "Safari.h"
 #import "iTunes.h"
 #import "Growl.framework/Headers/GrowlApplicationBridge.h"
-#import "Sparkle.framework/Headers/Sparkle.h"
+#import <Sparkle/Sparkle.h>
 #import "JRFeedbackController.h"
 #import "ReasonForFailure.h"
 #import "Chrome.h"
-#import "ASIHTTPRequest.h"
+#import <AFNetworking/AFNetworking.h>
 
 static AppController *sharedController;
 bool runDownloads=NO;
@@ -378,7 +378,9 @@ NSDictionary *radioFormats;
     if ((![[[NSUserDefaults standardUserDefaults] objectForKey:@"QuickCache"] boolValue] || quickUpdateFailed) && [[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])
     {
         getiPlayerProxy = [[GetiPlayerProxy alloc] initWithLogger:logger];
-        [getiPlayerProxy loadProxyInBackgroundForSelector:@selector(updateCache:proxyDict:) withObject:sender onTarget:self silently:runScheduled];
+        [getiPlayerProxy loadProxyInBackgroundWithCompletionHandler:^(NSDictionary *proxyDictionary) {
+            [self updateCache:sender proxyDict:proxyDictionary];
+        } silently:runScheduled];
     }
     else
     {
@@ -521,24 +523,31 @@ NSDictionary *radioFormats;
     [logger addToLog:[NSString stringWithFormat:@"    Retrieving %@ index feeds.",type] :nil];
     [currentProgress setStringValue:[NSString stringWithFormat:@"Updating Program Indexes: Getting %@ index feeds from server...",type]];
     
-    ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:updateURLDic[type]]];
-    [request setDelegate:self];
-    [request setDidFinishSelector:@selector(indexRequestFinished:)];
-    [request setDidFailSelector:@selector(indexRequestFinished:)];
-    [request setTimeOutSeconds:10];
-    [request setNumberOfTimesToRetryOnTimeout:2];
-    [request setDownloadDestinationPath:[[@"~/Library/Application Support/Get iPlayer Automator" stringByExpandingTildeInPath] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.cache",type]]];
-    [request startAsynchronous];
+    NSURLSessionDownloadTask *download = [[NSURLSession sharedSession] downloadTaskWithURL:[NSURL URLWithString:updateURLDic[type]]
+                                                    completionHandler:^(NSURL * _Nullable location, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+                                                        [self indexRequestFinished:(NSHTTPURLResponse *)response downloadLocation:location typeUpdated:type];
+                                                    }
+                                          ];
+    [download resume];
 }
-- (void)indexRequestFinished:(ASIHTTPRequest *)request
+- (void)indexRequestFinished:(NSHTTPURLResponse *)response downloadLocation:(NSURL *)downloadLocation typeUpdated:(NSString *)typeUpdated
 {
-    if ([request responseStatusCode] != 200)
+    if (response.statusCode != 200)
     {
         quickUpdateFailed=YES;
         [self updateCache:@""];
     }
     else
     {
+        NSError *moveError;
+		NSURL *url =[NSURL fileURLWithPath:[[@"~/Library/Application Support/Get iPlayer Automator" stringByExpandingTildeInPath] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.cache",typeUpdated]]];
+		[[NSFileManager defaultManager] removeItemAtURL:url error:nil];
+        if (![[NSFileManager defaultManager] moveItemAtURL:downloadLocation
+                                                toURL:url
+                                                     error:&moveError]) {
+            NSLog(@"Error when moving download cache: %@", moveError);
+        }
+        
         didUpdate=YES;
         nextToCache++;
         if (nextToCache < [typesToCache count])
@@ -898,7 +907,9 @@ NSDictionary *radioFormats;
     }
     [self saveAppData]; //Save data in case of crash.
     getiPlayerProxy = [[GetiPlayerProxy alloc] initWithLogger:logger];
-    [getiPlayerProxy loadProxyInBackgroundForSelector:@selector(startDownloads:proxyDict:) withObject:sender onTarget:self silently:runScheduled];
+    [getiPlayerProxy loadProxyInBackgroundWithCompletionHandler:^(NSDictionary *proxyDictionary) {
+        [self startDownloads:sender proxyDict:proxyDictionary];
+    } silently:runScheduled];
 }
 
 - (void)startDownloads:(id)sender proxyDict:(NSDictionary *)proxyDict
@@ -1636,12 +1647,10 @@ NSDictionary *radioFormats;
     else if ([prefsPanel isKeyWindow]) [prefsPanel performClose:self];
     else if ([mainWindow isKeyWindow])
     {
-        NSAlert *downloadAlert = [NSAlert alertWithMessageText:@"Are you sure you wish to quit?"
-                                                 defaultButton:@"Yes"
-                                               alternateButton:@"No"
-                                                   otherButton:nil
-                                     informativeTextWithFormat:nil];
-        NSInteger response = [downloadAlert runModal];
+		NSAlert *alert = [[NSAlert alloc] init];
+		alert.messageText = @"Are you sure you wish to quit?";
+		
+        NSInteger response = [alert runModal];
         if (response == NSAlertDefaultReturn) [mainWindow performClose:self];
     }
 }
@@ -1924,9 +1933,6 @@ NSDictionary *radioFormats;
     [mainWindow setDocumentEdited:NO];
     runScheduled=NO;
 }
-
-#pragma mark Proxy
-
 
 @synthesize getiPlayerPath;
 @end
