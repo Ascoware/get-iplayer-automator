@@ -7,7 +7,7 @@
 	<key>CFBundleExecutable</key>
 	<string>${EXECUTABLE_NAME}</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.thomaswillson.getiPlayerAutomator</string>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -25,7 +25,7 @@
 	<key>NSAppleScriptEnabled</key>
 	<true/>
 	<key>NSMainNibFile</key>
-	<string>MainMenu</string>
+	<string>Interface</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>OSAScriptingDefinition</key>
@@ -38,5 +38,47 @@
 	<string>http://tom-tech.com/get_iplayer/updates.xml</string>
 	<key>SUPublicDSAKeyFile</key>
 	<string>dsa_pub.pem</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+	  <key>NSExceptionDomains</key>
+	  <dict>
+		  <key>tom-tech.com</key>
+		  <dict>
+			  <!--Include to allow subdomains-->
+			  <key>NSIncludesSubdomains</key>
+			  <true/>
+			  <!--Include to allow HTTP requests-->
+			  <key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
+			  <true/>
+		  </dict>
+		  <key>bbci.co.uk</key>
+		  <dict>
+			  <!--Include to allow subdomains-->
+			  <key>NSIncludesSubdomains</key>
+			  <true/>
+			  <!--Include to allow HTTP requests-->
+			  <key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
+			  <true/>
+		  </dict>
+		  <key>bbc.co.uk</key>
+		  <dict>
+			  <!--Include to allow subdomains-->
+			  <key>NSIncludesSubdomains</key>
+			  <true/>
+			  <!--Include to allow HTTP requests-->
+			  <key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
+			  <true/>
+		  </dict>
+		  <key>itv.co.uk</key>
+		  <dict>
+			  <!--Include to allow subdomains-->
+			  <key>NSIncludesSubdomains</key>
+			  <true/>
+			  <!--Include to allow HTTP requests-->
+			  <key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
+			  <true/>
+		  </dict>
+	  </dict>
+	</dict>
 </dict>
 </plist>
