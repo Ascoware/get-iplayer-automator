@@ -38,47 +38,5 @@
 	<string>http://tom-tech.com/get_iplayer/updates.xml</string>
 	<key>SUPublicDSAKeyFile</key>
 	<string>dsa_pub.pem</string>
-	<key>NSAppTransportSecurity</key>
-	<dict>
-	  <key>NSExceptionDomains</key>
-	  <dict>
-		  <key>tom-tech.com</key>
-		  <dict>
-			  <!--Include to allow subdomains-->
-			  <key>NSIncludesSubdomains</key>
-			  <true/>
-			  <!--Include to allow HTTP requests-->
-			  <key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
-			  <true/>
-		  </dict>
-		  <key>bbci.co.uk</key>
-		  <dict>
-			  <!--Include to allow subdomains-->
-			  <key>NSIncludesSubdomains</key>
-			  <true/>
-			  <!--Include to allow HTTP requests-->
-			  <key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
-			  <true/>
-		  </dict>
-		  <key>bbc.co.uk</key>
-		  <dict>
-			  <!--Include to allow subdomains-->
-			  <key>NSIncludesSubdomains</key>
-			  <true/>
-			  <!--Include to allow HTTP requests-->
-			  <key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
-			  <true/>
-		  </dict>
-		  <key>itv.co.uk</key>
-		  <dict>
-			  <!--Include to allow subdomains-->
-			  <key>NSIncludesSubdomains</key>
-			  <true/>
-			  <!--Include to allow HTTP requests-->
-			  <key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
-			  <true/>
-		  </dict>
-	  </dict>
-	</dict>
 </dict>
 </plist>
