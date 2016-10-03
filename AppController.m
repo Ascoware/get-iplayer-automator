@@ -59,6 +59,7 @@ NSDictionary *radioFormats;
     defaultValues[@"AddCompletedToiTunes"] = @YES;
     defaultValues[@"DefaultBrowser"] = @"Safari";
     defaultValues[@"CacheBBC_TV"] = @YES;
+    defaultValues[@"CacheITV_TV"] = @YES;
     defaultValues[@"CacheBBC_Radio"] = @NO;
     defaultValues[@"CacheBBC_Podcasts"] = @NO;
     defaultValues[@"CacheExpiryTime"] = @"4";
@@ -90,7 +91,6 @@ NSDictionary *radioFormats;
     // remove obsolete preferences
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"DefaultFormat"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"AlternateFormat"];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CacheITV_TV"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"Cache4oD_TV"];
     
     //Make sure Application Support folder exists
@@ -152,7 +152,6 @@ NSDictionary *radioFormats;
     }
     
     // remove obsolete cache files
-    [fileManager removeItemAtPath:[folder stringByAppendingPathComponent:@"itv.cache"] error:nil];
     [fileManager removeItemAtPath:[folder stringByAppendingPathComponent:@"ch4.cache"] error:nil];
     
     NSString *filename = @"Queue.automatorqueue";
@@ -246,9 +245,9 @@ NSDictionary *radioFormats;
         TVFormat *format0 = [[TVFormat alloc] init];
         [format0 setFormat:@"Flash - HD"];
         TVFormat *format1 = [[TVFormat alloc] init];
-        [format0 setFormat:@"Flash - Very High"];
+        [format1 setFormat:@"Flash - Very High"];
         TVFormat *format2 = [[TVFormat alloc] init];
-        [format1 setFormat:@"Flash - High"];
+        [format2 setFormat:@"Flash - High"];
         [itvFormatController addObjects:@[format0, format1, format2]];
     }
     
@@ -497,20 +496,26 @@ NSDictionary *radioFormats;
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
         if (!lastUpdate || ([[NSDate date] timeIntervalSinceDate:lastUpdate] > ([[defaults objectForKey:@"CacheExpiryTime"] intValue]*3600)) || [[sender class] isEqualTo:[@"" class]])
         {
-            typesToCache = [[NSMutableArray alloc] initWithCapacity:3];
+            typesToCache = [[NSMutableArray alloc] initWithCapacity:4];
             if ([[defaults objectForKey:@"CacheBBC_TV"] boolValue]) [typesToCache addObject:@"tv"];
+            if ([[defaults objectForKey:@"CacheITV_TV"] boolValue]) [typesToCache addObject:@"itv"];
             if ([[defaults objectForKey:@"CacheBBC_Radio"] boolValue]) [typesToCache addObject:@"radio"];
             if ([[defaults objectForKey:@"CacheBBC_Podcasts"] boolValue]) [typesToCache addObject:@"podcast"];
             
-            NSArray *urlKeys = @[@"tv",@"radio",@"podcast"];
+            NSArray *urlKeys = @[@"tv",@"itv",@"radio",@"podcast"];
             NSArray *urlObjects = @[@"http://tom-tech.com/get_iplayer/cache/tv.cache",
+                                    @"http://tom-tech.com/get_iplayer/cache/itv.cache",
                                     @"http://tom-tech.com/get_iplayer/cache/radio.cache",
                                     @"http://tom-tech.com/get_iplayer/cache/podcast.cache"];
             updateURLDic = [[NSDictionary alloc] initWithObjects:urlObjects forKeys:urlKeys];
             
             nextToCache=0;
-            if ([typesToCache count] > 0)
+            if ([typesToCache count] > 0) {
                 [self updateCacheForType:typesToCache[0]];
+            }
+            else {
+                [self getiPlayerUpdateFinished];
+            }
         }
         else [self getiPlayerUpdateFinished];
         
@@ -1816,6 +1821,7 @@ NSDictionary *radioFormats;
     [sharedDefaults removeObjectForKey:@"AddCompletedToiTunes"];
     [sharedDefaults removeObjectForKey:@"DefaultBrowser"];
     [sharedDefaults removeObjectForKey:@"CacheBBC_TV"];
+    [sharedDefaults removeObjectForKey:@"CacheITV_TV"];
     [sharedDefaults removeObjectForKey:@"CacheBBC_Radio"];
     [sharedDefaults removeObjectForKey:@"CacheBBC_Podcasts"];
     [sharedDefaults removeObjectForKey:@"CacheExpiryTime"];
