@@ -680,7 +680,9 @@ NSDictionary *radioFormats;
             NSArray *array = [string componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
             for (NSString *string in array)
             {
-                if (![string isEqualToString:@"Matches:"] && ![string hasPrefix:@"INFO:"] && ![string hasPrefix:@"WARNING:"] && [string length]>0)
+                if (![string isEqualToString:@"Matches:"] && ![string hasPrefix:@"INFO:"] && ![string hasPrefix:@"WARNING:"]
+                    && ![string hasPrefix:@"reading"]
+                    && [string length] >0)
                 {
                     @try
                     {
@@ -709,7 +711,8 @@ NSDictionary *radioFormats;
                         [p setValue:temp_tvNetwork forKey:@"tvNetwork"];
                         [p setUrl:url];
                         if ([temp_type isEqualToString:@"radio"]) [p setValue:@YES forKey:@"radio"];
-                        if ([[p showName] isEqualToString:[show showName]] || ([[p url] isEqualToString:[show url]] && [show url]))
+
+                        if (  [[p url] isEqualToString:[show url]] && [show url] )
                         {
                             [show setValue:[p pid] forKey:@"pid"];
                             show.status = @"Available";
@@ -841,7 +844,21 @@ NSDictionary *radioFormats;
 - (IBAction)getCurrentWebpage:(id)sender
 {
     Programme *p = [GetCurrentWebpage getCurrentWebpage:logger];
-    if (p) [queueController addObject:p];
+    
+    if (p)  {
+    
+        /* don't allow duplicates */
+    
+        NSArray *tempQueue = [queueController arrangedObjects];
+        BOOL foundIt = false;
+    
+        for (Programme *show in tempQueue)
+            if ( [show.pid isEqualToString:p.pid] )
+                foundIt = true;
+        
+        if ( !foundIt )
+            [queueController addObject:p];
+    }
 }
 - (IBAction)removeFromQueue:(id)sender
 {
@@ -1465,7 +1482,8 @@ NSDictionary *radioFormats;
     NSArray *array = [autoRecordData2 componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
     for (NSString *string in array)
     {
-        if (![string isEqualToString:@"Matches:"] && ![string hasPrefix:@"INFO:"] && ![string hasPrefix:@"WARNING:"] && [string length]>0 && ![string hasPrefix:@"."] && ![string hasPrefix:@"Added:"])
+        if (![string isEqualToString:@"Matches:"] && ![string hasPrefix:@"INFO:"] && ![string hasPrefix:@"WARNING:"] && [string length]>0 && ![string hasPrefix:@"."] && ![string hasPrefix:@"Added:"]
+            && ![string hasPrefix:@"reading"] )
         {
             @try {
                 NSScanner *myScanner = [NSScanner scannerWithString:string];
@@ -1520,8 +1538,10 @@ NSDictionary *radioFormats;
                         [p setValue:@"Added by Series-Link" forKey:@"status"];
                         p.addedByPVR = true;
                         BOOL inQueue=NO;
-                        for (Programme *show in currentQueue)
-                            if ([[show showName] isEqualToString:[p showName]] && [[show pid] isEqualToString:[p pid]]) inQueue=YES;
+                        for (Programme *show in currentQueue)  {
+                            if ( [[show pid]isEqualToString:[p pid]])
+                                inQueue=YES;
+                        }
                         if (!inQueue)
                         {
                             if (runDownloads) [p setValue:@"Waiting..." forKey:@"status"];
@@ -1584,7 +1604,8 @@ NSDictionary *radioFormats;
     for (Programme *show in temptempQueue)
     {
         if (([[show complete] isEqualToNumber:@YES] && [[show successful] isEqualToNumber:@YES])
-            || [[show status] isEqualToString:@"Added by Series-Link"]) [tempQueue removeObject:show];
+            || [[show status] isEqualToString:@"Added by Series-Link"]
+            || [show addedByPVR] ) [tempQueue removeObject:show];
     }
     NSMutableArray *temptempSeries = [[NSMutableArray alloc] initWithArray:tempSeries];
     for (Series *series in temptempSeries)

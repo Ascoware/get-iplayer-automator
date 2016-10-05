@@ -161,7 +161,7 @@
 	[self readHistory:self];
 	NSDictionary *userInfo = [note userInfo];
 	Programme *prog = [userInfo valueForKey:@"Programme"];
-	DownloadHistoryEntry *entry = [[DownloadHistoryEntry alloc] initWithPID:[prog realPID] showName:[prog seriesName] episodeName:[prog episodeName] type:nil someNumber:@"251465" downloadFormat:@"flashhigh" downloadPath:@"/"];
+	DownloadHistoryEntry *entry = [[DownloadHistoryEntry alloc] initWithPID:[prog pid] showName:[prog seriesName] episodeName:[prog episodeName] type:nil someNumber:@"251465" downloadFormat:@"flashhigh" downloadPath:@"/"];
 	[historyArrayController addObject:entry];
 	[self writeHistory:self];
 }

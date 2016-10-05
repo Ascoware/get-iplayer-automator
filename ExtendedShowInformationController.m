@@ -30,6 +30,18 @@
    [[NSNotificationCenter defaultCenter] postNotificationName:@"AddToLogNotification" object:self userInfo:@{@"message": @"Retrieving Information"}];
    Programme *programme = searchResultsArrayController.arrangedObjects[[searchResultsTable selectedRow]];
    if (programme) {
+       
+       if ( [programme.tvNetwork isEqualToString:@"ITV Player"] )
+       {
+           NSAlert *notNewITV = [[NSAlert alloc] init];
+           [notNewITV addButtonWithTitle:@"OK"];
+           [notNewITV setMessageText:[NSString stringWithFormat:@"This feature is not available for ITV programmes"]];
+           [notNewITV setAlertStyle:NSWarningAlertStyle];
+           [notNewITV runModal];
+           notNewITV = nil;
+           return;
+       }
+           
       infoView.alphaValue = 0.1;
       loadingView.alphaValue = 1.0;
       [retrievingInfoIndicator startAnimation:self];
