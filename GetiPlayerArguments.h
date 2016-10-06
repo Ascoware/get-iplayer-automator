@@ -16,7 +16,7 @@
 
 + (GetiPlayerArguments *)sharedController;
 
-- (NSString *)typeArgumentForCacheUpdate:(BOOL)forCacheUpdate;
+- (NSString *)typeArgumentForCacheUpdate:(BOOL)forCacheUpdate andIncludeITV:(BOOL)includeITV;
 - (IBAction)typeChanged:(id)sender;
 - (NSString *)cacheExpiryArgument:(id)sender;
 

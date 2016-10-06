@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1DDD58160DA1D0A300B32029 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD58140DA1D0A300B32029 /* MainMenu.xib */; };
 		392628B11C999B1A0033CF84 /* EmptyToStringTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = 392628B01C999B1A0033CF84 /* EmptyToStringTransformer.m */; };
 		392A41A4169735340053DEA5 /* HTTPProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 392A41A3169735340053DEA5 /* HTTPProxy.m */; };
 		393D1DEE18A5BBB500F27880 /* RSRTVArrayController.m in Sources */ = {isa = PBXBuildFile; fileRef = 393D1DED18A5BBB500F27880 /* RSRTVArrayController.m */; };
@@ -23,8 +22,17 @@
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
+		BF382ECF1D73C18C00BAF106 /* Release X Doco.rtf in Resources */ = {isa = PBXBuildFile; fileRef = BF382ECE1D73C18C00BAF106 /* Release X Doco.rtf */; };
+		BF382ED21D73C23400BAF106 /* AppController.m in Sources */ = {isa = PBXBuildFile; fileRef = BF382ED11D73C23400BAF106 /* AppController.m */; };
+		BF382ED41D73C26800BAF106 /* ExtendedShowInformationController.m in Sources */ = {isa = PBXBuildFile; fileRef = BF382ED31D73C26800BAF106 /* ExtendedShowInformationController.m */; };
+		BF382ED71D73C2A400BAF106 /* GetiPlayerArguments.m in Sources */ = {isa = PBXBuildFile; fileRef = BF382ED61D73C2A400BAF106 /* GetiPlayerArguments.m */; };
+		BF382ED91D73C2C700BAF106 /* GiASearch.m in Sources */ = {isa = PBXBuildFile; fileRef = BF382ED81D73C2C700BAF106 /* GiASearch.m */; };
+		BF382EDB1D73C2E700BAF106 /* Programme.m in Sources */ = {isa = PBXBuildFile; fileRef = BF382EDA1D73C2E700BAF106 /* Programme.m */; };
+		BF382EDE1D73C30400BAF106 /* GetITVListings.m in Sources */ = {isa = PBXBuildFile; fileRef = BF382EDD1D73C30400BAF106 /* GetITVListings.m */; };
+		BF382EE11D73C31600BAF106 /* ITVHistoryWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = BF382EE01D73C31600BAF106 /* ITVHistoryWindowController.m */; };
+		BF382EE31D73C36300BAF106 /* ITVHistoryWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = BF382EE21D73C36300BAF106 /* ITVHistoryWindow.xib */; };
+		BF382EE51D73C37B00BAF106 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = BF382EE41D73C37B00BAF106 /* MainMenu.xib */; };
 		D904F04A1009F22E00D60BBF /* get_iplayer.pl in Resources */ = {isa = PBXBuildFile; fileRef = D904F0491009F22E00D60BBF /* get_iplayer.pl */; };
-		D904F424100B077600D60BBF /* Programme.m in Sources */ = {isa = PBXBuildFile; fileRef = D904F423100B077600D60BBF /* Programme.m */; };
 		D914BC59100C9F0100F7E68E /* ScriptingBridge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D914BC58100C9F0100F7E68E /* ScriptingBridge.framework */; };
 		D914BD29100CBFA900F7E68E /* BBCDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = D914BD28100CBFA900F7E68E /* BBCDownload.m */; };
 		D9178595101345D700B82736 /* Series.m in Sources */ = {isa = PBXBuildFile; fileRef = D9178594101345D700B82736 /* Series.m */; };
@@ -73,7 +81,6 @@
 		D97D9427106DBB68006ECD39 /* RadioFormat.m in Sources */ = {isa = PBXBuildFile; fileRef = D97D9424106DBB68006ECD39 /* RadioFormat.m */; };
 		D98CC1781873950F00E29F9E /* ITVDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9E7149BCB16004CB558 /* ITVDownload.m */; };
 		D98CC1791873951800E29F9E /* Download.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9EA149BCDEA004CB558 /* Download.m */; };
-		D98CC17A1873951C00E29F9E /* Programme.m in Sources */ = {isa = PBXBuildFile; fileRef = D904F423100B077600D60BBF /* Programme.m */; };
 		D98CC17B18739D1500E29F9E /* HTTPProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 392A41A3169735340053DEA5 /* HTTPProxy.m */; };
 		D98CC17C18739D1800E29F9E /* ITVMediaFileEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = D9D06C6E14BB91C200029340 /* ITVMediaFileEntry.m */; };
 		D99890F81A06BD0700420F4F /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D99890F71A06BD0700420F4F /* Sparkle.framework */; };
@@ -81,8 +88,6 @@
 		D9A4509D102FF8090011E175 /* Credits.html in Resources */ = {isa = PBXBuildFile; fileRef = D9A4509C102FF8090011E175 /* Credits.html */; };
 		D9A450A4102FFDC00011E175 /* LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = D9A450A3102FFDC00011E175 /* LICENSE.txt */; };
 		D9B6DB9A196D9AEC00161ECB /* LogController.m in Sources */ = {isa = PBXBuildFile; fileRef = D9B6DB99196D9AEC00161ECB /* LogController.m */; };
-		D9B6DB9E196DBD4600161ECB /* GiASearch.m in Sources */ = {isa = PBXBuildFile; fileRef = D9B6DB9D196DBD4600161ECB /* GiASearch.m */; };
-		D9C1D0ED1993B4B30034465E /* ExtendedShowInformationController.m in Sources */ = {isa = PBXBuildFile; fileRef = D9C1D0EC1993B4B30034465E /* ExtendedShowInformationController.m */; };
 		D9C1D0F01993BBE00034465E /* GetiPlayerProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = D9C1D0EF1993BBE00034465E /* GetiPlayerProxy.m */; };
 		D9CCF3CC1023485A009205BE /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = D9CCF3CB1023485A009205BE /* dsa_pub.pem */; };
 		D9CCF54C1025AAF9009205BE /* Growl Registration Ticket.growlRegDict in Resources */ = {isa = PBXBuildFile; fileRef = D9CCF54B1025AAF9009205BE /* Growl Registration Ticket.growlRegDict */; };
@@ -93,9 +98,7 @@
 		D9F66955102C5D1200A9449B /* GetCaminoURL.applescript in Resources */ = {isa = PBXBuildFile; fileRef = D9F66954102C5D0D00A9449B /* GetCaminoURL.applescript */; };
 		D9F66963102C5DC500A9449B /* GetOperaURL.applescript in Resources */ = {isa = PBXBuildFile; fileRef = D9F66962102C5DB800A9449B /* GetOperaURL.applescript */; };
 		D9F97FE5198E9043006494A3 /* GetCurrentWebpage.m in Sources */ = {isa = PBXBuildFile; fileRef = D9F97FE4198E9043006494A3 /* GetCurrentWebpage.m */; };
-		D9F97FE8198EAEA6006494A3 /* GetiPlayerArguments.m in Sources */ = {isa = PBXBuildFile; fileRef = D9F97FE7198EAEA6006494A3 /* GetiPlayerArguments.m */; };
 		D9F97FEC198EBA94006494A3 /* NSFileManager+DirectoryLocations.m in Sources */ = {isa = PBXBuildFile; fileRef = D9F97FEB198EBA94006494A3 /* NSFileManager+DirectoryLocations.m */; };
-		D9FEB87610077790003BADF8 /* AppController.m in Sources */ = {isa = PBXBuildFile; fileRef = D9FEB87510077790003BADF8 /* AppController.m */; };
 		DFC865E213E96BE200606599 /* ReasonForFailure.m in Sources */ = {isa = PBXBuildFile; fileRef = DFC865E113E96BE200606599 /* ReasonForFailure.m */; };
 		DFE5B67413E70AC20008571B /* plugins in Resources */ = {isa = PBXBuildFile; fileRef = DFE5B67313E70AC20008571B /* plugins */; };
 		DFFF196713E96288007B52AC /* ReasonsForFailure.plist in Resources */ = {isa = PBXBuildFile; fileRef = DFFF196613E96288007B52AC /* ReasonsForFailure.plist */; };
@@ -143,7 +146,6 @@
 		089C165DFE840E0CC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		13E42FB307B3F0F600E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
-		1DDD58150DA1D0A300B32029 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
@@ -169,9 +171,22 @@
 		39FD5E9519D370BD006BC47B /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = "Get iPlayer Automator/Images.xcassets"; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* Get iPlayer Automator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Get iPlayer Automator.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		BF382ECE1D73C18C00BAF106 /* Release X Doco.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = "Release X Doco.rtf"; sourceTree = "<group>"; };
+		BF382ED01D73C21500BAF106 /* AppController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppController.h; sourceTree = "<group>"; };
+		BF382ED11D73C23400BAF106 /* AppController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppController.m; sourceTree = "<group>"; };
+		BF382ED31D73C26800BAF106 /* ExtendedShowInformationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExtendedShowInformationController.m; sourceTree = "<group>"; };
+		BF382ED51D73C29B00BAF106 /* GetiPlayerArguments.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GetiPlayerArguments.h; sourceTree = "<group>"; };
+		BF382ED61D73C2A400BAF106 /* GetiPlayerArguments.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GetiPlayerArguments.m; sourceTree = "<group>"; };
+		BF382ED81D73C2C700BAF106 /* GiASearch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GiASearch.m; sourceTree = "<group>"; };
+		BF382EDA1D73C2E700BAF106 /* Programme.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Programme.m; sourceTree = "<group>"; };
+		BF382EDC1D73C2FB00BAF106 /* GetITVListings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GetITVListings.h; sourceTree = "<group>"; };
+		BF382EDD1D73C30400BAF106 /* GetITVListings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GetITVListings.m; sourceTree = "<group>"; };
+		BF382EDF1D73C30E00BAF106 /* ITVHistoryWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ITVHistoryWindowController.h; sourceTree = "<group>"; };
+		BF382EE01D73C31600BAF106 /* ITVHistoryWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ITVHistoryWindowController.m; sourceTree = "<group>"; };
+		BF382EE21D73C36300BAF106 /* ITVHistoryWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ITVHistoryWindow.xib; sourceTree = "<group>"; };
+		BF382EE41D73C37B00BAF106 /* MainMenu.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MainMenu.xib; sourceTree = "<group>"; };
 		D904F0491009F22E00D60BBF /* get_iplayer.pl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.perl; name = get_iplayer.pl; path = ../get_iplayer.pl; sourceTree = "<group>"; };
 		D904F422100B077600D60BBF /* Programme.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Programme.h; sourceTree = "<group>"; };
-		D904F423100B077600D60BBF /* Programme.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Programme.m; sourceTree = "<group>"; };
 		D914BC2E100C9DEF00F7E68E /* Safari.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Safari.h; sourceTree = "<group>"; };
 		D914BC58100C9F0100F7E68E /* ScriptingBridge.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ScriptingBridge.framework; path = /System/Library/Frameworks/ScriptingBridge.framework; sourceTree = "<absolute>"; };
 		D914BD27100CBFA900F7E68E /* BBCDownload.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BBCDownload.h; sourceTree = "<group>"; };
@@ -244,10 +259,8 @@
 		D9B6DB98196D9AEC00161ECB /* LogController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LogController.h; sourceTree = "<group>"; };
 		D9B6DB99196D9AEC00161ECB /* LogController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LogController.m; sourceTree = "<group>"; };
 		D9B6DB9C196DBD4600161ECB /* GiASearch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GiASearch.h; sourceTree = "<group>"; };
-		D9B6DB9D196DBD4600161ECB /* GiASearch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GiASearch.m; sourceTree = "<group>"; };
 		D9BE0870103563530011CF40 /* Camino.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Camino.h; sourceTree = "<group>"; };
 		D9C1D0EB1993B4B30034465E /* ExtendedShowInformationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtendedShowInformationController.h; sourceTree = "<group>"; };
-		D9C1D0EC1993B4B30034465E /* ExtendedShowInformationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExtendedShowInformationController.m; sourceTree = "<group>"; };
 		D9C1D0EE1993BBE00034465E /* GetiPlayerProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GetiPlayerProxy.h; sourceTree = "<group>"; };
 		D9C1D0EF1993BBE00034465E /* GetiPlayerProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GetiPlayerProxy.m; sourceTree = "<group>"; };
 		D9CAE545133FF9BE003471DA /* ffmpeg */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = ffmpeg; sourceTree = "<group>"; };
@@ -265,12 +278,8 @@
 		D9F66962102C5DB800A9449B /* GetOperaURL.applescript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.applescript; path = GetOperaURL.applescript; sourceTree = "<group>"; };
 		D9F97FE3198E9043006494A3 /* GetCurrentWebpage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GetCurrentWebpage.h; sourceTree = "<group>"; };
 		D9F97FE4198E9043006494A3 /* GetCurrentWebpage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GetCurrentWebpage.m; sourceTree = "<group>"; };
-		D9F97FE6198EAEA6006494A3 /* GetiPlayerArguments.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GetiPlayerArguments.h; sourceTree = "<group>"; };
-		D9F97FE7198EAEA6006494A3 /* GetiPlayerArguments.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GetiPlayerArguments.m; sourceTree = "<group>"; };
 		D9F97FEA198EBA94006494A3 /* NSFileManager+DirectoryLocations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSFileManager+DirectoryLocations.h"; sourceTree = "<group>"; };
 		D9F97FEB198EBA94006494A3 /* NSFileManager+DirectoryLocations.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSFileManager+DirectoryLocations.m"; sourceTree = "<group>"; };
-		D9FEB87410077790003BADF8 /* AppController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppController.h; sourceTree = "<group>"; };
-		D9FEB87510077790003BADF8 /* AppController.m */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.objc; path = AppController.m; sourceTree = "<group>"; tabWidth = 4; };
 		DFC865E013E96BE200606599 /* ReasonForFailure.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReasonForFailure.h; sourceTree = "<group>"; };
 		DFC865E113E96BE200606599 /* ReasonForFailure.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReasonForFailure.m; sourceTree = "<group>"; };
 		DFE5B67313E70AC20008571B /* plugins */ = {isa = PBXFileReference; lastKnownFileType = folder; path = plugins; sourceTree = "<group>"; };
@@ -360,6 +369,7 @@
 			isa = PBXGroup;
 			children = (
 				D9B6DB97196D938300161ECB /* Interface2.xib */,
+				BF382ECE1D73C18C00BAF106 /* Release X Doco.rtf */,
 				D9CCF52E10259DED009205BE /* Features.rtf */,
 				D9F97FE9198EBA73006494A3 /* Categories */,
 				080E96DDFE201D6D7F000001 /* Classes */,
@@ -398,7 +408,8 @@
 				8D1107310486CEB800E47090 /* Info.plist */,
 				D9CCF3CB1023485A009205BE /* dsa_pub.pem */,
 				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
-				1DDD58140DA1D0A300B32029 /* MainMenu.xib */,
+				BF382EE41D73C37B00BAF106 /* MainMenu.xib */,
+				BF382EE21D73C36300BAF106 /* ITVHistoryWindow.xib */,
 				D9CCF54B1025AAF9009205BE /* Growl Registration Ticket.growlRegDict */,
 				DFFF196613E96288007B52AC /* ReasonsForFailure.plist */,
 				D9CDC9E7186B8F2B0003A4E2 /* GetiPlayerAutomator.sdef */,
@@ -473,10 +484,10 @@
 				D921C9E7149BCB16004CB558 /* ITVDownload.m */,
 				D9F97FE3198E9043006494A3 /* GetCurrentWebpage.h */,
 				D9F97FE4198E9043006494A3 /* GetCurrentWebpage.m */,
-				D9F97FE6198EAEA6006494A3 /* GetiPlayerArguments.h */,
-				D9F97FE7198EAEA6006494A3 /* GetiPlayerArguments.m */,
+				BF382ED51D73C29B00BAF106 /* GetiPlayerArguments.h */,
+				BF382ED61D73C2A400BAF106 /* GetiPlayerArguments.m */,
 				D904F422100B077600D60BBF /* Programme.h */,
-				D904F423100B077600D60BBF /* Programme.m */,
+				BF382EDA1D73C2E700BAF106 /* Programme.m */,
 				D9178593101345D700B82736 /* Series.h */,
 				D9178594101345D700B82736 /* Series.m */,
 				D97D9422106DBB68006ECD39 /* TVFormat.h */,
@@ -492,7 +503,7 @@
 				392A41A2169735340053DEA5 /* HTTPProxy.h */,
 				392A41A3169735340053DEA5 /* HTTPProxy.m */,
 				D9B6DB9C196DBD4600161ECB /* GiASearch.h */,
-				D9B6DB9D196DBD4600161ECB /* GiASearch.m */,
+				BF382ED81D73C2C700BAF106 /* GiASearch.m */,
 				D9C1D0EE1993BBE00034465E /* GetiPlayerProxy.h */,
 				D9C1D0EF1993BBE00034465E /* GetiPlayerProxy.m */,
 			);
@@ -558,16 +569,20 @@
 		D9B6DB9B196D9BE600161ECB /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				BF382EDC1D73C2FB00BAF106 /* GetITVListings.h */,
+				BF382EDD1D73C30400BAF106 /* GetITVListings.m */,
+				BF382EDF1D73C30E00BAF106 /* ITVHistoryWindowController.h */,
+				BF382EE01D73C31600BAF106 /* ITVHistoryWindowController.m */,
 				393D1DEC18A5BBB500F27880 /* RSRTVArrayController.h */,
 				393D1DED18A5BBB500F27880 /* RSRTVArrayController.m */,
-				D9FEB87410077790003BADF8 /* AppController.h */,
-				D9FEB87510077790003BADF8 /* AppController.m */,
+				BF382ED01D73C21500BAF106 /* AppController.h */,
+				BF382ED11D73C23400BAF106 /* AppController.m */,
 				D92687C31087F81F000E8132 /* DownloadHistoryController.h */,
 				D92687C41087F81F000E8132 /* DownloadHistoryController.m */,
 				D9B6DB98196D9AEC00161ECB /* LogController.h */,
 				D9B6DB99196D9AEC00161ECB /* LogController.m */,
 				D9C1D0EB1993B4B30034465E /* ExtendedShowInformationController.h */,
-				D9C1D0EC1993B4B30034465E /* ExtendedShowInformationController.m */,
+				BF382ED31D73C26800BAF106 /* ExtendedShowInformationController.m */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -673,14 +688,16 @@
 			files = (
 				39FD5E9619D370BD006BC47B /* Images.xcassets in Resources */,
 				D9F66963102C5DC500A9449B /* GetOperaURL.applescript in Resources */,
+				BF382ECF1D73C18C00BAF106 /* Release X Doco.rtf in Resources */,
 				D9F668DB102C560500A9449B /* GetFireFoxURL.applescript in Resources */,
 				D9F66955102C5D1200A9449B /* GetCaminoURL.applescript in Resources */,
+				BF382EE51D73C37B00BAF106 /* MainMenu.xib in Resources */,
 				8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */,
-				1DDD58160DA1D0A300B32029 /* MainMenu.xib in Resources */,
 				D904F04A1009F22E00D60BBF /* get_iplayer.pl in Resources */,
 				D9CCF3CC1023485A009205BE /* dsa_pub.pem in Resources */,
 				D9CCF54C1025AAF9009205BE /* Growl Registration Ticket.growlRegDict in Resources */,
 				D941D9511025DB2B0012A75F /* JRFeedbackProvider.strings in Resources */,
+				BF382EE31D73C36300BAF106 /* ITVHistoryWindow.xib in Resources */,
 				D941D9521025DB2B0012A75F /* JRFeedbackProvider.xib in Resources */,
 				D9A4509D102FF8090011E175 /* Credits.html in Resources */,
 				D9A450A4102FFDC00011E175 /* LICENSE.txt in Resources */,
@@ -731,16 +748,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				8D11072D0486CEB800E47090 /* main.m in Sources */,
-				D9B6DB9E196DBD4600161ECB /* GiASearch.m in Sources */,
-				D9FEB87610077790003BADF8 /* AppController.m in Sources */,
-				D904F424100B077600D60BBF /* Programme.m in Sources */,
-				D9F97FE8198EAEA6006494A3 /* GetiPlayerArguments.m in Sources */,
 				D914BD29100CBFA900F7E68E /* BBCDownload.m in Sources */,
+				BF382ED71D73C2A400BAF106 /* GetiPlayerArguments.m in Sources */,
 				D9178595101345D700B82736 /* Series.m in Sources */,
 				D941D95E1025DB580012A75F /* NSURLRequest+postForm.m in Sources */,
 				D941D95F1025DB580012A75F /* JRFeedbackController.m in Sources */,
 				D97D9426106DBB68006ECD39 /* TVFormat.m in Sources */,
 				D97D9427106DBB68006ECD39 /* RadioFormat.m in Sources */,
+				BF382EE11D73C31600BAF106 /* ITVHistoryWindowController.m in Sources */,
 				D9F97FE5198E9043006494A3 /* GetCurrentWebpage.m in Sources */,
 				D9CDC9EC186B90A90003A4E2 /* ASDownloadShows.m in Sources */,
 				D92687C51087F81F000E8132 /* DownloadHistoryController.m in Sources */,
@@ -753,8 +768,9 @@
 				D921C9B8149BBE9F004CB558 /* ASIDownloadCache.m in Sources */,
 				392628B11C999B1A0033CF84 /* EmptyToStringTransformer.m in Sources */,
 				D921C9B9149BBE9F004CB558 /* ASIFormDataRequest.m in Sources */,
-				D9C1D0ED1993B4B30034465E /* ExtendedShowInformationController.m in Sources */,
+				BF382EDB1D73C2E700BAF106 /* Programme.m in Sources */,
 				D9C1D0F01993BBE00034465E /* GetiPlayerProxy.m in Sources */,
+				BF382ED41D73C26800BAF106 /* ExtendedShowInformationController.m in Sources */,
 				D921C9BA149BBE9F004CB558 /* ASIHTTPRequest.m in Sources */,
 				D921C9BB149BBE9F004CB558 /* ASIInputStream.m in Sources */,
 				393D1DEE18A5BBB500F27880 /* RSRTVArrayController.m in Sources */,
@@ -764,8 +780,11 @@
 				D9F97FEC198EBA94006494A3 /* NSFileManager+DirectoryLocations.m in Sources */,
 				D921C9EB149BCDEB004CB558 /* Download.m in Sources */,
 				D9D06C6F14BB91C200029340 /* ITVMediaFileEntry.m in Sources */,
+				BF382ED91D73C2C700BAF106 /* GiASearch.m in Sources */,
 				39879DAF16904B9F0050CA7D /* GTMNSString+HTML.m in Sources */,
 				39879DB016904B9F0050CA7D /* NSString+HTML.m in Sources */,
+				BF382EDE1D73C30400BAF106 /* GetITVListings.m in Sources */,
+				BF382ED21D73C23400BAF106 /* AppController.m in Sources */,
 				392A41A4169735340053DEA5 /* HTTPProxy.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -784,7 +803,6 @@
 				D91F9D6D187162A800D4388B /* ASIHTTPRequest.m in Sources */,
 				D93FD34B187E76AB00C91E33 /* TVFormat.m in Sources */,
 				D91F9D71187162A800D4388B /* ASIInputStream.m in Sources */,
-				D98CC17A1873951C00E29F9E /* Programme.m in Sources */,
 				D98CC1791873951800E29F9E /* Download.m in Sources */,
 				D93FD348187E761400C91E33 /* NSString+HTML.m in Sources */,
 				D91F9D73187162A800D4388B /* ASINetworkQueue.m in Sources */,
@@ -802,14 +820,6 @@
 				089C165DFE840E0CC02AAC07 /* English */,
 			);
 			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-		1DDD58140DA1D0A300B32029 /* MainMenu.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				1DDD58150DA1D0A300B32029 /* English */,
-			);
-			name = MainMenu.xib;
 			sourceTree = "<group>";
 		};
 		D941D94D1025DB2B0012A75F /* JRFeedbackProvider.strings */ = {

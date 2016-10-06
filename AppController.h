@@ -64,7 +64,8 @@
 	IBOutlet NSButton *getNamesButton;
 	NSMutableArray *queueArray;
 	IBOutlet NSTableView *queueTableView;
-	
+    IBOutlet NSToolbarItem *addSeriesLinkToQueueButton;
+    
 	//Main Window: Status
 	IBOutlet NSProgressIndicator *overallIndicator;
 	IBOutlet NSProgressIndicator *currentIndicator;
@@ -116,8 +117,23 @@
    //Proxy
    GetiPlayerProxy *getiPlayerProxy;
    HTTPProxy *proxy;
+    
+   // Misc Menu Items / Buttons
+    IBOutlet NSToolbarItem *refreshCacheButton;
+    IBOutlet NSMenuItem *forceCacheUpdateMenuItem;
+    IBOutlet NSMenuItem *checkForCacheUpdateMenuItem;
+    
+   //ITV Cache
+   BOOL                         updatingITVIndex;
+   BOOL                         updatingBBCIndex;
+    IBOutlet NSButton *newITVCacheButton;
+   BOOL                         forceITVUpdateInProgress;
+   IBOutlet NSToolbarItem       *showNewProgrammes;
+   IBOutlet NSMenuItem          *showNewProgrammesMenuItem;
+   IBOutlet NSTextField         *itvProgressText;
+   IBOutlet NSMenuItem          *forceITVUpdateMenuItem;
 }
-
+@property   IBOutlet NSProgressIndicator *itvProgressIndicator;
 
 //Update
 - (void)getiPlayerUpdateFinished;
@@ -166,6 +182,16 @@
 
 //Download Solutions
 //- (IBAction)saveSolutionsAsText:(id)sender;
+
+-(void)updateHistory;
+-(void)updateHistoryForType:(NSString *)chanelType andProgFile:(NSString *)oldProgrammesFile andCacheFile:(NSString *)newCacheFile;
+-(NSScanner *)skip:(NSScanner *)s andDelimiter:(NSString *)d andTimes:(int)times;
+-(void)itvUpdateFinished;
+-(void)forceITVUpdate1;
+-(void)forceITVUpdateFinished;
+-(int)findItemNumberFor:(NSString *)key inString:(NSString *)string;
+-(NSString *)getItemNumber:(int)itemLocation fromString:(NSString *)string;
+
 
 //Key-Value Coding
 @property (readonly) NSString *getiPlayerPath;

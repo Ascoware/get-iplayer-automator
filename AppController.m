@@ -17,12 +17,19 @@
 #import "ReasonForFailure.h"
 #import "Chrome.h"
 #import "ASIHTTPRequest.h"
+#import "GetITVListings.h"
+#import "ITVHistoryWindowController.h"
 
 static AppController *sharedController;
 bool runDownloads=NO;
 bool runUpdate=NO;
 NSDictionary *tvFormats;
 NSDictionary *radioFormats;
+
+// New ITV Cache
+GetITVShows                   *newITVListing;
+ITVHistoryTableViewController *itvHistoryTableViewController;
+NewProgrammeHistory           *sharedHistoryController;
 
 @implementation AppController
 #pragma mark Overriden Methods
@@ -35,6 +42,7 @@ NSDictionary *radioFormats;
     if (!(self = [super init])) return nil;
     sharedController = self;
     
+    sharedHistoryController = [NewProgrammeHistory sharedInstance];
     NSNotificationCenter *nc;
     nc = [NSNotificationCenter defaultCenter];
     
@@ -72,6 +80,28 @@ NSDictionary *radioFormats;
     defaultValues[@"RemoveOldSeries"] = @NO;
     defaultValues[@"QuickCache"] = @YES;
     defaultValues[@"TagShows"] = @YES;
+    defaultValues[@"CacheITV_TV"] = @YES;
+    defaultValues[@"BBC1"] = @YES;
+    defaultValues[@"BBC2"] = @YES;
+    defaultValues[@"BBC3"] = @YES;
+    defaultValues[@"BBC4"] = @YES;
+    defaultValues[@"BBCNews"] = @NO;
+    defaultValues[@"BBCParliament"] = @NO;
+    defaultValues[@"S4C"] = @NO;
+    defaultValues[@"BBCAlba"] = @NO;
+    defaultValues[@"CBeebies"] = @NO;
+    defaultValues[@"CBBC"] = @NO;
+    defaultValues[@"IgnoreAllTVNews"] = @YES;
+    defaultValues[@"Radio 1"] = @YES;
+    defaultValues[@"Radio 2"] = @YES;
+    defaultValues[@"Radio 3"] = @YES;
+    defaultValues[@"Radio 4"] = @YES;
+    defaultValues[@"Radio 5"] = @YES;
+    defaultValues[@"Radio 6"] = @YES;
+    defaultValues[@"ShowDigitalRadioChannels"] = @YES;
+    defaultValues[@"IgnoreAllRadioNews"] = @YES;
+    defaultValues[@"ShowRegionalRadioChannels"] = @NO;
+    defaultValues[@"ShowLocalRadioChannels"] = @NO;
     defaultValues[@"TestProxy"] = @YES;
     defaultValues[@"ShowDownloadedInSearch"] = @YES;
     
@@ -131,6 +161,13 @@ NSDictionary *radioFormats;
     [NSValueTransformer setValueTransformer:radioFormatTransformer forName:@"RadioFormatTransformer"];
     [NSValueTransformer setValueTransformer:itvFormatTransformer forName:@"ITVFormatTransformer"];
     verbose = [[NSUserDefaults standardUserDefaults] boolForKey:@"Verbose"];
+    
+    [nc addObserver:self selector:@selector(itvUpdateFinished) name:@"ITVUpdateFinished" object:nil];
+    [nc addObserver:self selector:@selector(forceITVUpdateFinished) name:@"ForceITVUpdateFinished" object:nil];
+    forceITVUpdateInProgress = NO;
+    newITVListing =  [[GetITVShows alloc] init];
+
+    
     return self;
 }
 #pragma mark Delegate Methods
@@ -265,6 +302,13 @@ NSDictionary *radioFormats;
     infoPath = [infoPath stringByExpandingTildeInPath];
     if ([fileManager fileExistsAtPath:infoPath]) [fileManager removeItemAtPath:infoPath error:nil];
     
+    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheITV_TV"] isEqualTo:@NO])
+    {
+        forceITVUpdateMenuItem.enabled = NO;
+        [[self itvProgressIndicator] setHidden:true];
+        [itvProgressText setHidden:true];
+    }
+
     [self updateCache:nil];
 }
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)application
@@ -423,12 +467,17 @@ NSDictionary *radioFormats;
         //Update Should Be Running:
         [currentIndicator setIndeterminate:YES];
         [currentIndicator startAnimation:nil];
-        [currentProgress setStringValue:@"Updating Program Indexes..."];
         //Shouldn't search until update is done.
         [searchField setEnabled:NO];
         [stopButton setEnabled:NO];
         [startButton setEnabled:NO];
         [pvrSearchField setEnabled:NO];
+        [showNewProgrammes setEnabled:NO];
+        [showNewProgrammesMenuItem setEnabled:NO];
+        [addSeriesLinkToQueueButton setEnabled:NO];
+        [refreshCacheButton setEnabled:NO];
+        [forceCacheUpdateMenuItem setEnabled:NO];
+        [checkForCacheUpdateMenuItem setEnabled:NO];
     }
     @catch (NSException *e) {
         NSLog(@"NO UI");
@@ -438,6 +487,21 @@ NSDictionary *radioFormats;
     if (proxyDict) {
         proxy = proxyDict[@"proxy"];
     }
+    
+    if ( [[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheITV_TV"] isEqualTo:@YES] )
+    {
+        forceITVUpdateMenuItem.enabled = NO;
+        updatingITVIndex = true;
+        [newITVCacheButton setEnabled:NO];
+        [[self itvProgressIndicator] startAnimation:self];
+        [[self itvProgressIndicator] setDoubleValue:0.0];
+        [[self itvProgressIndicator] setHidden:false];
+        [itvProgressText setHidden:false];
+
+        [newITVListing itvUpdateWithLogger:logger];
+    }
+    
+    updatingBBCIndex = YES;
     
     if (![[[NSUserDefaults standardUserDefaults] objectForKey:@"QuickCache"] boolValue] || quickUpdateFailed)
     {
@@ -453,7 +517,7 @@ NSDictionary *radioFormats;
             cacheExpiryArg = [[NSString alloc] initWithFormat:@"-e%d", ([[[NSUserDefaults standardUserDefaults] objectForKey:@"CacheExpiryTime"] intValue]*3600)];
         }
         
-        NSString *typeArgument = [[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:YES];
+        NSString *typeArgument = [[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:YES andIncludeITV:NO];
         
         getiPlayerUpdateArgs = @[getiPlayerPath,cacheExpiryArg,typeArgument,@"--nopurge",[GetiPlayerArguments sharedController].profileDirArg];
         
@@ -517,8 +581,11 @@ NSDictionary *radioFormats;
                 [self getiPlayerUpdateFinished];
             }
         }
-        else [self getiPlayerUpdateFinished];
-        
+        else
+        {
+            updatingBBCIndex = false;
+            [self getiPlayerUpdateFinished];
+        }
     }
 }
 - (void)updateCacheForType:(NSString *)type
@@ -550,6 +617,7 @@ NSDictionary *radioFormats;
             [self updateCacheForType:typesToCache[nextToCache]];
         else
         {
+            updatingBBCIndex = false;
             [self getiPlayerUpdateFinished];
         }
     }
@@ -589,12 +657,14 @@ NSDictionary *radioFormats;
         {
             matches=YES;
             getiPlayerUpdateTask=nil;
+            updatingBBCIndex = false;
             [self getiPlayerUpdateFinished];
         }
     }
     else
     {
         getiPlayerUpdateTask = nil;
+        updatingBBCIndex = false;
         [self getiPlayerUpdateFinished];
     }
     
@@ -602,8 +672,32 @@ NSDictionary *radioFormats;
     if (getiPlayerUpdateTask && !matches)
         [[getiPlayerUpdatePipe fileHandleForReading] readInBackgroundAndNotify];
 }
+- (void)itvUpdateFinished
+{
+    //  ITV Cache Update Finished - turn off progress display and process data
+    
+    updatingITVIndex = false;
+    [newITVCacheButton setEnabled:YES];
+    [[self itvProgressIndicator] stopAnimation:self];
+    [[self itvProgressIndicator] setHidden:true];
+    [itvProgressText setHidden:true];
+    [self getiPlayerUpdateFinished];
+}
 - (void)getiPlayerUpdateFinished
 {
+    if (updatingITVIndex || updatingBBCIndex)
+        return;
+    
+    didUpdate = YES;
+    
+    [self updateHistory];
+    
+    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheITV_TV"] isEqualTo:@YES])
+        forceITVUpdateMenuItem.enabled = YES;
+
+    [showNewProgrammes setEnabled:YES];
+    [showNewProgrammesMenuItem setEnabled:YES];
+    
     runUpdate=NO;
     [mainWindow setDocumentEdited:NO];
     
@@ -615,6 +709,10 @@ NSDictionary *radioFormats;
     getiPlayerUpdateTask = nil;
     [startButton setEnabled:YES];
     [pvrSearchField setEnabled:YES];
+    [addSeriesLinkToQueueButton setEnabled:YES];
+    [refreshCacheButton setEnabled:YES];
+    [forceCacheUpdateMenuItem setEnabled:YES];
+    [checkForCacheUpdateMenuItem setEnabled:YES];
     
     
     if (didUpdate)
@@ -664,7 +762,7 @@ NSDictionary *radioFormats;
             [pipeTask setStandardOutput:newPipe];
             [pipeTask setStandardError:newPipe];
             [pipeTask setLaunchPath:@"/usr/bin/perl"];
-            [pipeTask setArguments:@[getiPlayerPath,[GetiPlayerArguments sharedController].profileDirArg,@"--nopurge",[GetiPlayerArguments sharedController].noWarningArg,[[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO],[[GetiPlayerArguments sharedController] cacheExpiryArgument:nil],[GetiPlayerArguments sharedController].standardListFormat,
+            [pipeTask setArguments:@[getiPlayerPath,[GetiPlayerArguments sharedController].profileDirArg,@"--nopurge",[GetiPlayerArguments sharedController].noWarningArg,[[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO andIncludeITV:YES],[[GetiPlayerArguments sharedController] cacheExpiryArgument:nil],[GetiPlayerArguments sharedController].standardListFormat,
                                      searchArgument]];
             NSMutableString *taskData = [[NSMutableString alloc] initWithString:@""];
             NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:[pipeTask environment]];
@@ -1402,7 +1500,7 @@ NSDictionary *radioFormats;
                 [series setTvNetwork:@"*"];
             }
             NSString *cacheExpiryArgument = [[GetiPlayerArguments sharedController] cacheExpiryArgument:nil];
-            NSString *typeArgument = [[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO];
+            NSString *typeArgument = [[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO andIncludeITV:YES];
             
             NSMutableArray *autoRecordArgs = [[NSMutableArray alloc] initWithObjects:getiPlayerPath,
                                               [GetiPlayerArguments sharedController].noWarningArg,@"--nopurge",
@@ -1472,7 +1570,8 @@ NSDictionary *radioFormats;
         [currentProgress setStringValue:@""];
         [currentIndicator setIndeterminate:NO];
         [currentIndicator stopAnimation:self];
-        [startButton setEnabled:YES];
+        if ( !forceITVUpdateInProgress )
+            [startButton setEnabled:YES];
     }
     NSLog(@"Definitely shouldn't show an updating series-link thing!");
 }
@@ -1851,6 +1950,28 @@ NSDictionary *radioFormats;
     [sharedDefaults removeObjectForKey:@"DownloadSubtitles"];
     [sharedDefaults removeObjectForKey:@"AlwaysUseProxy"];
     [sharedDefaults removeObjectForKey:@"XBMC_naming"];
+    [sharedDefaults removeObjectForKey:@"CacheITV_TV"];
+    [sharedDefaults removeObjectForKey:@"BBC1"];
+    [sharedDefaults removeObjectForKey:@"BBC2"];
+    [sharedDefaults removeObjectForKey:@"BBC3"];
+    [sharedDefaults removeObjectForKey:@"BBC4"];
+    [sharedDefaults removeObjectForKey:@"BBCNews"];
+    [sharedDefaults removeObjectForKey:@"BBCParliament"];
+    [sharedDefaults removeObjectForKey:@"S4C"];
+    [sharedDefaults removeObjectForKey:@"BBCAlba"];
+    [sharedDefaults removeObjectForKey:@"CBeebies"];
+    [sharedDefaults removeObjectForKey:@"CBBC"];
+    [sharedDefaults removeObjectForKey:@"IgnoreAllTVNews"];
+    [sharedDefaults removeObjectForKey:@"Radio 1"];
+    [sharedDefaults removeObjectForKey:@"Radio 2"];
+    [sharedDefaults removeObjectForKey:@"Radio 3"];
+    [sharedDefaults removeObjectForKey:@"Radio 4"];
+    [sharedDefaults removeObjectForKey:@"Radio 5"];
+    [sharedDefaults removeObjectForKey:@"Radio 6"];
+    [sharedDefaults removeObjectForKey:@"IgnoreRadioNews"];
+    [sharedDefaults removeObjectForKey:@"ShowDigitalRadioChannels"];
+    [sharedDefaults removeObjectForKey:@"ShowRegionalRadioChannels"];
+    [sharedDefaults removeObjectForKey:@"ShowLocalRadioChannels"];
 }
 - (void)applescriptStartDownloads
 {
@@ -1952,6 +2073,258 @@ NSDictionary *radioFormats;
     runScheduled=NO;
 }
 
+- (IBAction)showNewProgrammesAction:(id)sender
+{
+    itvHistoryTableViewController = [[ITVHistoryTableViewController alloc]initWithWindowNibName:@"ITVHistoryWindow"];
+    [itvHistoryTableViewController showWindow:self];
+}
+-(IBAction)changeITVCacheOption:(id)sender
+{
+
+    [[GetiPlayerArguments sharedController] typeChanged:sender];
+    
+    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheITV_TV"] isEqualTo:@NO])
+    {
+        forceITVUpdateMenuItem.enabled = NO;
+        return;
+    }
+    
+    forceITVUpdateMenuItem.enabled = YES;
+    
+    /* if just turned on and no or itv programmes cache files exists - create one now */
+
+    NSString *cacheFile = @"~/Library/Application Support/Get iPlayer Automator/itv.cache";
+    cacheFile = [cacheFile stringByExpandingTildeInPath];
+    NSString *programmesFile = @"~/Library/Application Support/Get iPlayer Automator/itvprogrammes.gia";
+    programmesFile = [programmesFile stringByExpandingTildeInPath];
+    
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    
+    if ([fileManager fileExistsAtPath:cacheFile] && [fileManager fileExistsAtPath:programmesFile])
+        return;
+ 
+    NSAlert *downloadAlert = [NSAlert alertWithMessageText:@"GIA Will need to build a new ITV Cache file - this will take some time"
+                                                defaultButton:@"No"
+                                               alternateButton:@"Yes"
+                                                otherButton:nil
+                                    informativeTextWithFormat:@"Are you sure you want to continue?"];
+    NSInteger response = [downloadAlert runModal];
+  
+    if (response == NSAlertDefaultReturn) {
+        [[NSUserDefaults standardUserDefaults] setObject:@0 forKey:@"CacheITV_TV"];
+        forceITVUpdateMenuItem.enabled = NO;
+        return;
+    }
+
+    [self forceITVUpdate1];
+    
+}
+
+- (IBAction)forceITVUpdate:(id)sender
+{
+    NSAlert *downloadAlert = [NSAlert alertWithMessageText:@"Are you sure you want to reset the ITV Cache"
+                                             defaultButton:@"No"
+                                           alternateButton:@"Yes"
+                                               otherButton:nil
+                                 informativeTextWithFormat:@"This will take a few minutes to complete - do NOT abandon"];
+    NSInteger response = [downloadAlert runModal];
+    
+    if (response == NSAlertAlternateReturn)
+        [self forceITVUpdate1];
+    
+}
+
+- (void)forceITVUpdate1
+{    
+    forceITVUpdateInProgress = YES;
+    forceITVUpdateMenuItem.enabled = NO;
+    
+    [searchField setEnabled:NO];
+    [stopButton setEnabled:NO];
+    [startButton setEnabled:NO];
+    [pvrSearchField setEnabled:NO];
+    [newITVCacheButton setEnabled:NO];
+    [addSeriesLinkToQueueButton setEnabled:NO];
+    [refreshCacheButton setEnabled:NO];
+    [forceCacheUpdateMenuItem setEnabled:NO];
+    [checkForCacheUpdateMenuItem setEnabled:NO];
+        
+    [[self itvProgressIndicator] startAnimation:self];
+    [[self itvProgressIndicator] setDoubleValue:0.0];
+    [[self itvProgressIndicator] setHidden:false];
+    [itvProgressText setHidden:false];
+    updatingITVIndex=true;
+    
+    [newITVListing forceITVUpdateWithLogger:logger];
+
+}
+
+-(void)forceITVUpdateFinished
+{
+    forceITVUpdateInProgress = NO;
+    forceITVUpdateMenuItem.enabled = YES;
+    [newITVCacheButton setEnabled:YES];
+    
+    [self itvUpdateFinished];
+}
+
+-(void)updateHistory
+{
+
+    NSArray *files = @[@"tv", @"radio", @"itv"];
+    NSArray *types = @[@"BBC TV", @"BBC Radio", @"ITV"];
+    BOOL active[] = {false, false, false};
+    
+    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheBBC_TV"] boolValue])
+        active[0]=true;
+
+    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheBBC_Radio"] boolValue])
+        active[1]=true;
+    
+    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheITV_TV"] boolValue])
+        active[2]=true;
+             
+    NSString *filePath = @"~/Library/Application Support/Get iPlayer Automator";
+    filePath= [filePath stringByExpandingTildeInPath];
+    
+    for (int i = 0; i < types.count; i++ )
+    {
+        NSString *oldProgrammesFile = [filePath stringByAppendingFormat:@"/%@.gia", files[i]];
+        NSString *newCacheFile = [filePath stringByAppendingFormat:@"/%@.cache", files[i]];
+        
+        if (active[i])
+            [self updateHistoryForType:types[i] andProgFile:oldProgrammesFile andCacheFile:newCacheFile];
+    }
+    
+    [sharedHistoryController flushHistoryToDisk];
+}
+
+-(void)updateHistoryForType:(NSString *)networkName andProgFile:(NSString *)oldProgrammesFile andCacheFile:(NSString *)newCacheFile
+{
+    /* Load old Programmes file */
+
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    BOOL firstTimeBuild;
+    
+    if ( [fileManager fileExistsAtPath:newCacheFile] && ![fileManager fileExistsAtPath:oldProgrammesFile] )
+        firstTimeBuild = true;
+    else
+        firstTimeBuild = false;
+    
+    NSMutableArray *oldProgrammesArray = [NSKeyedUnarchiver unarchiveObjectWithFile:oldProgrammesFile];
+   
+    if ( oldProgrammesArray == nil )
+        oldProgrammesArray = [[NSMutableArray alloc]init];
+
+    /* Load in todays shows cached by get_iplayer or getITVListings and create a dictionary of show names */
+    
+    NSError *error;
+    NSString *newCacheString = [NSString stringWithContentsOfFile:newCacheFile encoding:NSUTF8StringEncoding error:&error];
+    NSArray  *newCacheArray  = [newCacheString componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+    
+    NSMutableSet *todayProgrammes = [[NSMutableSet alloc]init];
+    NSString *entry;
+    NSString *programmeName;
+    NSString  *channel;
+    
+    BOOL firstEntry = true;
+    
+    int programmeNameLocation = 0;
+    int channelLocation = 0;
+    
+    for (entry in newCacheArray)
+    {
+        if (firstEntry )  {
+            firstEntry = false;
+            programmeNameLocation = [self findItemNumberFor:@"name" inString:entry];
+            channelLocation = [self findItemNumberFor:@"channel" inString:entry];
+            
+            if (programmeNameLocation == 0 || channelLocation == 0)
+            {
+               // if this happend - pull out after putting something in error Journal
+            }
+            continue;
+        }
+        
+        programmeName = [self getItemNumber:programmeNameLocation fromString:entry];
+        channel = [self getItemNumber:channelLocation fromString:entry];
+        
+        if ( [programmeName length] == 0 || [channel length] == 0)
+            continue;
+        
+        programmeName = [programmeName capitalizedString];
+        programmeName = [programmeName stringByReplacingOccurrencesOfString:@"Bbc" withString:@"BBC"];
+
+        ProgrammeHistoryObject *p = [[ProgrammeHistoryObject alloc]initWithName:programmeName andTVChannel:channel andDateFound:@"" andSortKey:0 andNetworkName:networkName];
+        [todayProgrammes addObject:p];
+    }
+    
+    /* Put back Today's programmes for comparison on the next run */
+    
+    NSArray *cfProgrammes = [todayProgrammes allObjects];
+    [NSKeyedArchiver archiveRootObject:cfProgrammes toFile:oldProgrammesFile];
+    
+    /* subtract bought forward from today to create new programmes list */
+    
+    NSSet *oldProgrammeSet  = [NSSet setWithArray:oldProgrammesArray];
+    [todayProgrammes minusSet:oldProgrammeSet];
+    NSArray *newProgrammesArray = [todayProgrammes allObjects];
+
+    /* and update history file with new programmes */
+    
+    if ( !firstTimeBuild )
+        for ( ProgrammeHistoryObject *p in newProgrammesArray )
+            [sharedHistoryController addToNewProgrammeHistory:[p programmeName] andTVChannel:[p tvChannel] andNetworkName:networkName];
+
+
+}
+-(NSString *)getItemNumber:(int)itemLocation fromString:(NSString *)string
+{
+    NSString *theItem;
+    NSScanner *scanner = [NSScanner scannerWithString:string];
+    
+    scanner = [self skip:scanner andDelimiter:@"|" andTimes:itemLocation];
+    [scanner scanUpToString:@"|" intoString:&theItem];
+    
+    return theItem;
+}
+
+-(int)findItemNumberFor:(NSString *)key inString:(NSString *)string
+{
+    NSString *theItem;
+    NSScanner *scanner = [NSScanner scannerWithString:string];
+    
+    for (int itemNumber = 1; [scanner scanUpToString:@"|" intoString:&theItem]; itemNumber++ )
+    {
+        if ( [theItem isEqualToString:key] )
+            return itemNumber;
+        
+        [scanner scanString:@"|"  intoString:nil];
+    }
+    return false;
+}
+
+-(NSScanner *) skip:(NSScanner *)s andDelimiter:(NSString *)d andTimes:(int)times
+{
+    if (!--times)
+        return s;
+    
+    do
+    {
+        [s scanUpToString:d intoString:nil];
+        [s scanString:d intoString:nil];
+        
+    } while (--times);
+    
+    return s;
+}
+
+-(IBAction)changeNewProgrmmeDisplayFilter:(id)sender
+{
+    NSNotificationCenter *nc;
+    nc = [NSNotificationCenter defaultCenter];
+    [nc postNotificationName:@"NewProgrammeDisplayFilterChanged" object:nil];
+}
 #pragma mark Proxy
 
 

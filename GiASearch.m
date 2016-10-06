@@ -23,11 +23,12 @@
 		
 		[task setLaunchPath:@"/usr/bin/perl"];
 		NSString *searchArgument = [[NSString alloc] initWithString:searchTerms];
-      NSString *getiPlayerPath = [[NSBundle mainBundle] pathForResource:@"get_iplayer" ofType:@"pl"];
-		NSArray *args = @[getiPlayerPath,@"--nocopyright",@"-e60480000000000000",[[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO],@"--listformat=SearchResult|<pid>|<timeadded>|<type>|<name>|<episode>|<channel>|<seriesnum>|<episodenum>|<desc>|<thumbnail>|<web>",@"--long",@"--nopurge",searchArgument,[GetiPlayerArguments sharedController].profileDirArg];
-      
-      if (![[[NSUserDefaults standardUserDefaults] valueForKey:@"ShowDownloadedInSearch"] boolValue] && allowHidingOfDownloadedItems)
-         args=[args arrayByAddingObject:@"--hide"];
+        NSString *typeArg  = [[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO andIncludeITV:YES];
+        NSString *getiPlayerPath = [[NSBundle mainBundle] pathForResource:@"get_iplayer" ofType:@"pl"];
+        NSArray *args = @[getiPlayerPath,@"--nocopyright",@"-e60480000000000000",typeArg ,@"--listformat=SearchResult|<pid>|<timeadded>|<type>|<name>|<episode>|<channel>|<seriesnum>|<episodenum>|<desc>|<thumbnail>|<web>",@"--long",@"--nopurge",searchArgument,[GetiPlayerArguments sharedController].profileDirArg];
+
+        if (![[[NSUserDefaults standardUserDefaults] valueForKey:@"ShowDownloadedInSearch"] boolValue] && allowHidingOfDownloadedItems)
+            args=[args arrayByAddingObject:@"--hide"];
       
 		[task setArguments:args];
 		

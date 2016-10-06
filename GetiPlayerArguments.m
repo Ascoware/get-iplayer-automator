@@ -30,7 +30,7 @@ static GetiPlayerArguments *sharedController = nil;
    }
    return sharedController;
 }
-- (NSString *)typeArgumentForCacheUpdate:(BOOL)forCacheUpdate
+- (NSString *)typeArgumentForCacheUpdate:(BOOL)forCacheUpdate andIncludeITV:(BOOL)includeITV
 {
    if (forCacheUpdate) {
       runCacheUpdateSinceChange = YES;
@@ -41,8 +41,12 @@ static GetiPlayerArguments *sharedController = nil;
 		NSMutableString *typeArgument = [[NSMutableString alloc] initWithString:@"--type="];
 		if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheBBC_TV"] isEqualTo:@YES])
          [typeArgument appendString:@"tv,"];
-		if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheITV_TV"] isEqualTo:@YES])
+        
+        /* type 'itv' when creating porgramme cache as that is no longer done by getiPlayer */
+        
+		if ( [[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheITV_TV"] isEqualTo:@YES] && includeITV )
          [typeArgument appendString:@"itv,"];
+        
 		if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheBBC_Radio"] isEqualTo:@YES])
          [typeArgument appendString:@"radio,"];
 		if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheBBC_Podcasts"] isEqualTo:@YES])
@@ -57,8 +61,7 @@ static GetiPlayerArguments *sharedController = nil;
 }
 - (IBAction)typeChanged:(id)sender
 {
-	if ([sender state] == NSOffState)
-		runCacheUpdateSinceChange=NO;
+    runCacheUpdateSinceChange=YES;
 }
 - (NSString *)cacheExpiryArgument:(id)sender
 {

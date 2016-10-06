@@ -471,8 +471,12 @@
 {
     // skip if pid looks like ITV productionId
     if ([pid rangeOfString:@"/"].location != NSNotFound ||
-            [pid rangeOfString:@"#"].location != NSNotFound) {
-        [self setStatus:@"Undetermined-ITV"];
+           [pid rangeOfString:@"#"].location != NSNotFound) {
+        
+            if ( [[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheITV_TV"] isEqualTo:@YES] )
+                [self setStatus:@"New ITV Cache"];
+            else
+                [self setStatus:@"Undetermined-ITV"];
         return;
     }
     @autoreleasepool {
@@ -485,7 +489,7 @@
         NSString *fieldsArgument = @"--fields=index,pid";
         NSString *wantedID = pid;
         NSString *cacheExpiryArg = [[GetiPlayerArguments sharedController] cacheExpiryArgument:nil];
-        NSArray *args = @[[[NSBundle mainBundle] pathForResource:@"get_iplayer" ofType:@"pl"],@"--nocopyright",@"--nopurge",cacheExpiryArg,[[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO],listArgument,[GetiPlayerArguments sharedController].profileDirArg,fieldsArgument,wantedID];
+        NSArray *args = @[[[NSBundle mainBundle] pathForResource:@"get_iplayer" ofType:@"pl"],@"--nocopyright",@"--nopurge",cacheExpiryArg,[[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO andIncludeITV:YES],listArgument,[GetiPlayerArguments sharedController].profileDirArg,fieldsArgument,wantedID];
         [getNameTask setArguments:args];
         [getNameTask setLaunchPath:@"/usr/bin/perl"];
         
