@@ -22,11 +22,6 @@
 	<string>1</string>
 	<key>JRFeedbackURL</key>
 	<string>http://tom-tech.com/get_iplayer/feedback.php</string>
-	<key>NSAppTransportSecurity</key>
-	<dict>
-		<key>NSAllowsArbitraryLoads</key>
-		<true/>
-	</dict>
 	<key>NSAppleScriptEnabled</key>
 	<true/>
 	<key>NSMainNibFile</key>
@@ -68,7 +63,7 @@
 				<key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
 				<true/>
 			</dict>
-			<key>itv.co.uk</key>
+			<key>itv.com</key>
 			<dict>
 				<key>NSIncludesSubdomains</key>
 				<true/>

@@ -62,7 +62,7 @@
 
 +(NewProgrammeHistory*)sharedInstance;
 -(id)init;
--(void)addToNewProgrammeHistory:(NSString *)name andTVChannel:(NSString *)tvChannel andNetworkName:(NSString *)netwokrName;
+-(void)addToNewProgrammeHistory:(NSString *)name andTVChannel:(NSString *)tvChannel andNetworkName:(NSString *)networkName;
 -(void)flushHistoryToDisk;
 -(NSMutableArray *)getHistoryArray;
 

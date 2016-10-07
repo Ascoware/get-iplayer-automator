@@ -84,7 +84,6 @@
 	IBOutlet NSArrayController *tvFormatController;
 	IBOutlet NSArrayController *radioFormatController;
    IBOutlet NSArrayController *itvFormatController;
-   IBOutlet NSButton *itvTVCheckbox;
    IBOutlet NSPanel *prefsPanel;
    
 	//Scheduling a Start
@@ -126,12 +125,13 @@
    //ITV Cache
    BOOL                         updatingITVIndex;
    BOOL                         updatingBBCIndex;
-    IBOutlet NSButton *newITVCacheButton;
    BOOL                         forceITVUpdateInProgress;
-   IBOutlet NSToolbarItem       *showNewProgrammes;
    IBOutlet NSMenuItem          *showNewProgrammesMenuItem;
    IBOutlet NSTextField         *itvProgressText;
    IBOutlet NSMenuItem          *forceITVUpdateMenuItem;
+    
+    //New Programmes History
+    NSWindow *newProgrammesWindow;
 }
 @property   IBOutlet NSProgressIndicator *itvProgressIndicator;
 

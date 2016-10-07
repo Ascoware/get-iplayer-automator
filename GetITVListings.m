@@ -646,7 +646,7 @@ AppController           *sharedAppController;
     if ( !todayProgrammeArray.count )  {
         [logger addToLog:@"No programmes found on www.itv.com/hub/shows"];
         
-        NSAlert *noProgs = [NSAlert alertWithMessageText:@"No prgogrammes were found on www.itv.com/hub/shows"
+        NSAlert *noProgs = [NSAlert alertWithMessageText:@"No programmes were found on www.itv.com/hub/shows"
                                                  defaultButton:@"OK"
                                                alternateButton:nil
                                                    otherButton:nil
@@ -680,7 +680,7 @@ AppController           *sharedAppController;
 - (id)initWithName:(NSString *)name andPID:(NSString *)pid andURL:(NSString *)url andNUMBEREPISODES:(int)numberEpisodes andDATELASTAIRED:(NSTimeInterval)timeIntDateLastAired;
 {
     self.programmeName = name;
-    [self fixProgrammeName];
+    //[self fixProgrammeName];
     self.productionId = pid;
     self.programmeURL = url;
     self.numberEpisodes = numberEpisodes;
@@ -801,10 +801,10 @@ AppController           *sharedAppController;
     return self;
 }
 
--(void)addToNewProgrammeHistory:(NSString *)name andTVChannel:(NSString *)tvChannel andNetworkName:(NSString *)netwokrName
+-(void)addToNewProgrammeHistory:(NSString *)name andTVChannel:(NSString *)tvChannel andNetworkName:(NSString *)networkName
 {
     itemsAdded = true;
-    ProgrammeHistoryObject *newEntry = [[ProgrammeHistoryObject alloc]initWithName:name andTVChannel:tvChannel andDateFound:dateFound andSortKey:timeIntervalSince1970UTC andNetworkName:netwokrName];
+    ProgrammeHistoryObject *newEntry = [[ProgrammeHistoryObject alloc]initWithName:name andTVChannel:tvChannel andDateFound:dateFound andSortKey:timeIntervalSince1970UTC andNetworkName:networkName];
     [programmeHistoryArray addObject:newEntry];
 }
 

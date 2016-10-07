@@ -32,7 +32,6 @@
                 <outlet property="itvProgressText" destination="vBT-g6-IDt" id="OYl-hm-aaU"/>
                 <outlet property="logger" destination="BZI-HO-NFo" id="LLH-v9-nI4"/>
                 <outlet property="mainWindow" destination="371" id="1066"/>
-                <outlet property="newITVCacheButton" destination="bGk-Hx-Mhw" id="VaG-Ke-gdk"/>
                 <outlet property="prefsPanel" destination="547" id="1471"/>
                 <outlet property="pvrPanel" destination="517" id="1470"/>
                 <outlet property="pvrQueueController" destination="952" id="959"/>
@@ -48,7 +47,6 @@
                 <outlet property="searchField" destination="689" id="GPC-bQ-Zy7"/>
                 <outlet property="searchIndicator" destination="489" id="687"/>
                 <outlet property="searchResultsTable" destination="493" id="q2l-ti-Osz"/>
-                <outlet property="showNewProgrammes" destination="hC9-0f-nBi" id="l77-jW-zwa"/>
                 <outlet property="showNewProgrammesMenuItem" destination="297" id="nb3-Bf-Qd3"/>
                 <outlet property="solutionsArrayController" destination="1402" id="1403"/>
                 <outlet property="solutionsTableView" destination="1389" id="1400"/>
@@ -543,13 +541,43 @@
                                     <action selector="forceUpdate:" target="621" id="1027"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Force ITV Cache Reset" id="YHY-fr-yTm">
+                            <menuItem title="Force ITV Cache Reset" id="YHY-fr-yTm" userLabel="Force ITV Cache Reset Menu Item">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="forceITVUpdate:" target="621" id="eXX-Gi-PTP"/>
+                                    <binding destination="668" name="hidden" keyPath="values.AltCacheITV_TV" previousBinding="qNO-Ig-X9i" id="3Go-c3-c1X">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
+                                    <binding destination="668" name="enabled" keyPath="values.AltCacheITV_TV" id="VfD-s6-6oe"/>
+                                    <binding destination="668" name="hidden2" keyPath="values.CacheITV_TV" previousBinding="3Go-c3-c1X" id="nQE-yc-2CG">
+                                        <dictionary key="options">
+                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                            <integer key="NSNullPlaceholder" value="-1"/>
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
+                                    <binding destination="668" name="enabled2" keyPath="values.CacheITV_TV" previousBinding="VfD-s6-6oe" id="qNO-Ig-X9i">
+                                        <dictionary key="options">
+                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                            <integer key="NSNullPlaceholder" value="-1"/>
+                                        </dictionary>
+                                    </binding>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="1256"/>
+                            <menuItem title="Show New Programmes" keyEquivalent="n" id="297">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                <connections>
+                                    <action selector="showNewProgrammesAction:" target="621" id="T4j-tc-iJx"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="b5Y-WO-cn5"/>
                             <menuItem title="Edit Download History..." keyEquivalent="h" id="1251">
                                 <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
                                 <connections>
@@ -626,12 +654,6 @@
                 <menuItem title="View" id="295">
                     <menu key="submenu" title="View" id="296">
                         <items>
-                            <menuItem title="Show New Programmes" id="297">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="showNewProgrammesAction:" target="621" id="T4j-tc-iJx"/>
-                                </connections>
-                            </menuItem>
                             <menuItem title="Show Toolbar" keyEquivalent="t" id="Evm-J8-3YY">
                                 <connections>
                                     <action selector="toggleToolbarShown:" target="-1" id="Khz-kw-1n1"/>
@@ -851,8 +873,8 @@
                         <rect key="frame" x="17" y="16" width="778" height="20"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                     </progressIndicator>
-                    <textField verticalHuggingPriority="750" id="508">
-                        <rect key="frame" x="16" y="41" width="778" height="17"/>
+                    <textField verticalHuggingPriority="750" misplaced="YES" id="508">
+                        <rect key="frame" x="16" y="41" width="583" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" id="509">
                             <font key="font" metaFont="system"/>
@@ -921,11 +943,11 @@
                             <action selector="hidePvrShow:" target="621" id="1278"/>
                         </connections>
                     </button>
-                    <progressIndicator wantsLayer="YES" canDrawConcurrently="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" displayedWhenStopped="NO" bezeled="NO" controlSize="small" style="spinning" id="e7O-Z3-UPb">
+                    <progressIndicator hidden="YES" wantsLayer="YES" canDrawConcurrently="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" displayedWhenStopped="NO" bezeled="NO" controlSize="small" style="spinning" id="e7O-Z3-UPb">
                         <rect key="frame" x="754" y="38" width="16" height="16"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     </progressIndicator>
-                    <textField verticalHuggingPriority="750" id="vBT-g6-IDt" userLabel="ITV Progress Cell">
+                    <textField hidden="YES" verticalHuggingPriority="750" id="vBT-g6-IDt" userLabel="ITV Progress Cell">
                         <rect key="frame" x="615" y="39" width="135" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Updating ITV Indexes" id="MT9-wB-y1L">
@@ -1076,11 +1098,6 @@
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="NSToolbarSeparatorItem" id="453"/>
                     <toolbarItem implicitItemIdentifier="NSToolbarCustomizeToolbarItem" id="457"/>
-                    <toolbarItem implicitItemIdentifier="D9AAC0FC-B164-49E3-836D-6E726C764262" label="New Programmes" paletteLabel="New Programmes" toolTip="View ITV History" tag="-1" image="ITV" autovalidates="NO" id="hC9-0f-nBi">
-                        <connections>
-                            <action selector="showNewProgrammesAction:" target="621" id="FrU-yg-y1N"/>
-                        </connections>
-                    </toolbarItem>
                 </allowedToolbarItems>
                 <defaultToolbarItems>
                     <toolbarItem reference="456"/>
@@ -1096,7 +1113,6 @@
                     <toolbarItem reference="456"/>
                     <toolbarItem reference="484"/>
                     <toolbarItem reference="456"/>
-                    <toolbarItem reference="hC9-0f-nBi"/>
                 </defaultToolbarItems>
             </toolbar>
             <connections>
@@ -1361,7 +1377,7 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <tabView misplaced="YES" id="1069">
-                        <rect key="frame" x="13" y="3" width="474" height="558"/>
+                        <rect key="frame" x="13" y="2" width="474" height="558"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <font key="font" metaFont="system"/>
                         <tabViewItems>
@@ -1898,18 +1914,16 @@
                                             <buttonCell key="cell" type="check" title="ITV TV" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" imageScaling="proportionallyDown" inset="2" id="7pT-vJ-dMF">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
-                                                <connections>
-                                                    <action selector="changeITVCacheOption:" target="621" id="Gsc-UD-PbQ"/>
-                                                </connections>
                                             </buttonCell>
                                             <connections>
+                                                <action selector="typeChanged:" target="EFr-RW-vJP" id="6jd-ks-MTU"/>
                                                 <binding destination="668" name="value" keyPath="values.CacheITV_TV" id="jRb-OC-Zbd"/>
                                             </connections>
                                         </button>
                                     </subviews>
                                 </view>
                             </tabViewItem>
-                            <tabViewItem label="BBC Formats" identifier="2" id="1072">
+                            <tabViewItem label="Download Formats" identifier="2" id="1072">
                                 <view key="view" id="1073">
                                     <rect key="frame" x="10" y="33" width="454" height="512"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -2100,398 +2114,44 @@
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                         </button>
-                                    </subviews>
-                                </view>
-                            </tabViewItem>
-                            <tabViewItem label="New Prog Display" identifier="2" id="QB0-M0-Stm" userLabel="New Prog Display">
-                                <view key="view" id="LCA-h7-Ip3">
-                                    <rect key="frame" x="10" y="33" width="454" height="512"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                    <subviews>
-                                        <box borderType="line" title="BBC TV: New Programme Channel Filter" id="gmH-x8-UqZ">
-                                            <rect key="frame" x="2" y="286" width="452" height="193"/>
+                                        <scrollView misplaced="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="P0h-W7-YO2">
+                                            <rect key="frame" x="17" y="37" width="420" height="135"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <view key="contentView" id="dss-T9-HWQ">
-                                                <rect key="frame" x="1" y="1" width="450" height="177"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                <subviews>
-                                                    <button id="mVv-B8-5yS">
-                                                        <rect key="frame" x="230" y="53" width="116" height="18"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="BBC Parliament" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="SkP-JZ-c30">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="9zY-xZ-bkm"/>
-                                                            <binding destination="668" name="value" keyPath="values.BBCParliament" id="eXI-dv-rbh"/>
-                                                        </connections>
-                                                    </button>
-                                                    <button id="Wk6-ae-0Ab">
-                                                        <rect key="frame" x="12" y="133" width="77" height="18"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="BBC One" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="e6W-Fp-His">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="9kc-sg-Mez"/>
-                                                            <binding destination="668" name="value" keyPath="values.BBC1" id="o0u-V2-mWe"/>
-                                                        </connections>
-                                                    </button>
-                                                </subviews>
-                                            </view>
-                                        </box>
-                                        <button id="NsB-KC-X8M">
-                                            <rect key="frame" x="236" y="379" width="48" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="S4C" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="JHF-ml-yAm">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="cKe-R3-dev"/>
-                                                <binding destination="668" name="value" keyPath="values.S4C" id="daR-Jv-9Xg"/>
-                                            </connections>
-                                        </button>
-                                        <button id="EQj-uS-ifA">
-                                            <rect key="frame" x="121" y="419" width="77" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="BBC Two" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="zhN-8d-7Aq">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="Lxt-n7-gQ3"/>
-                                                <binding destination="668" name="value" keyPath="values.BBC2" id="gAi-h0-mQn"/>
-                                            </connections>
-                                        </button>
-                                        <button id="QD7-Hm-kUH">
-                                            <rect key="frame" x="236" y="419" width="87" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="BBC Three" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="X7h-Od-Idk">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="f1b-d2-atM"/>
-                                                <binding destination="668" name="value" keyPath="values.BBC3" id="ou6-yE-Yg2"/>
-                                            </connections>
-                                        </button>
-                                        <button id="kTz-fz-PyE">
-                                            <rect key="frame" x="359" y="419" width="80" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="BBC Four" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="wbk-x4-9tX">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="B83-Rs-nhi"/>
-                                                <binding destination="668" name="value" keyPath="values.BBC4" id="qyS-cP-tV0"/>
-                                            </connections>
-                                        </button>
-                                        <button id="Gr2-CY-l5j">
-                                            <rect key="frame" x="15" y="379" width="86" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="BBC News" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="6gb-yG-qRl">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="CDR-0f-MCM"/>
-                                                <binding destination="668" name="value" keyPath="values.BBCNews" id="6J3-GQ-42c"/>
-                                            </connections>
-                                        </button>
-                                        <button id="bln-wr-bzP">
-                                            <rect key="frame" x="121" y="379" width="79" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="BBC Alba" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="A6D-xE-f82">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="d2S-Yh-Hj5"/>
-                                                <binding destination="668" name="value" keyPath="values.BBCAlba" id="wS7-kK-Loo"/>
-                                            </connections>
-                                        </button>
-                                        <button id="wC5-OD-X8R">
-                                            <rect key="frame" x="121" y="339" width="80" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="CBeebies" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="t1o-go-rn7">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="QD1-SN-2ti"/>
-                                                <binding destination="668" name="value" keyPath="values.CBeebies" id="dOz-n0-geU"/>
-                                            </connections>
-                                        </button>
-                                        <button id="ZiX-yu-Iok">
-                                            <rect key="frame" x="15" y="339" width="58" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="CBBC" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="HKZ-dZ-UA6">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="Abi-lU-bSv"/>
-                                                <binding destination="668" name="value" keyPath="values.CBBC" id="IKq-2v-EHy"/>
-                                            </connections>
-                                        </button>
-                                        <button id="Hc3-nT-3zv" userLabel="Ignore TV All News">
-                                            <rect key="frame" x="15" y="304" width="117" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Ignore All News" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="O3S-RU-Vau">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="2oL-NI-S4M"/>
-                                                <binding destination="668" name="value" keyPath="values.IgnoreAllTVNews" id="1BY-o4-T2h"/>
-                                            </connections>
-                                        </button>
-                                        <button misplaced="YES" id="HJk-bU-Rxk">
-                                            <rect key="frame" x="15" y="222" width="138" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="BBC Radio 1" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="1JW-iw-ETU">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="P48-qt-QAz"/>
-                                                <binding destination="668" name="value" keyPath="values.Radio1" id="19t-Jc-ozh"/>
-                                            </connections>
-                                        </button>
-                                        <button misplaced="YES" id="2k2-DB-89d">
-                                            <rect key="frame" x="15" y="163" width="138" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="BBC Radio 1 Xtra" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="2jG-m4-i4e">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="nXL-To-1OQ"/>
-                                                <binding destination="668" name="value" keyPath="values.Radio1Xtra" id="kdq-V6-2SE"/>
-                                            </connections>
-                                        </button>
-                                        <button misplaced="YES" id="6Lw-33-guR">
-                                            <rect key="frame" x="212" y="222" width="106" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="BBC  Radio 2" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="4f6-Ln-1Bq">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="gSL-JT-XuN"/>
-                                                <binding destination="668" name="value" keyPath="values.Radio2" id="RT2-gx-OFv"/>
-                                            </connections>
-                                        </button>
-                                        <button misplaced="YES" id="8jP-di-hni">
-                                            <rect key="frame" x="15" y="195" width="105" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="BBC Radio 3" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="jhb-jr-N7a">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="cJu-ig-BgL"/>
-                                                <binding destination="668" name="value" keyPath="values.Radio3" id="fzy-qP-iw4"/>
-                                            </connections>
-                                        </button>
-                                        <button misplaced="YES" id="4lJ-eV-Tty">
-                                            <rect key="frame" x="212" y="195" width="109" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="BBC Radio 4" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="hNr-CF-J0S">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="qV4-dv-yJm"/>
-                                                <binding destination="668" name="value" keyPath="values.Radio4" id="Ouh-Qn-kan"/>
-                                            </connections>
-                                        </button>
-                                        <button misplaced="YES" id="9ma-sa-of7">
-                                            <rect key="frame" x="212" y="163" width="145" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="BBC Radio 4 extra" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Uwz-Vs-tux">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="MVB-ji-bHe"/>
-                                                <binding destination="668" name="value" keyPath="values.Radio4extra" id="9fo-zC-f3y"/>
-                                            </connections>
-                                        </button>
-                                        <button misplaced="YES" id="e2T-sc-7gQ">
-                                            <rect key="frame" x="14" y="139" width="151" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="BBC Radio Five Live" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="rak-Wt-HaP">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="2uF-sL-pjH"/>
-                                                <binding destination="668" name="value" keyPath="values.Radio5Live" id="7Sr-RC-7ky"/>
-                                            </connections>
-                                        </button>
-                                        <button misplaced="YES" id="bqc-BZ-buH">
-                                            <rect key="frame" x="212" y="139" width="240" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="BBC Radio Five Live Sports Extra" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="5h4-0M-nCM">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="LzP-Jk-biZ"/>
-                                                <binding destination="668" name="value" keyPath="values.Radio5LiveSportsExtra" id="30j-bN-4aq"/>
-                                            </connections>
-                                        </button>
-                                        <button misplaced="YES" id="gxa-Sy-vru">
-                                            <rect key="frame" x="212" y="115" width="240" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="BBC Radio Asian Network" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="3DI-gT-BDA">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="g4r-sm-BSj"/>
-                                                <binding destination="668" name="value" keyPath="values.BBCRadioAsianNetwork" id="Jm0-fw-50R"/>
-                                            </connections>
-                                        </button>
-                                        <button misplaced="YES" id="tZy-hd-UhF">
-                                            <rect key="frame" x="15" y="115" width="157" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="BBC Radio Six Music" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Vjh-iO-Mds">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="kfp-c6-7hZ"/>
-                                                <binding destination="668" name="value" keyPath="values.Radio6Music" id="hCi-us-dIs"/>
-                                            </connections>
-                                        </button>
-                                        <button misplaced="YES" id="Owy-ED-RS0" userLabel="Show Regional Radio Programmes">
-                                            <rect key="frame" x="14" y="55" width="171" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Show Regional Stations" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="VSC-t4-Xdt" userLabel="Show Regional Stations">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="khg-ua-ft4"/>
-                                                <binding destination="668" name="value" keyPath="values.ShowRegionalRadioChannels" id="i9h-0b-hfc"/>
-                                            </connections>
-                                        </button>
-                                        <button misplaced="YES" id="YWn-u3-Kmr">
-                                            <rect key="frame" x="15" y="89" width="158" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="BBC World Servce" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="ZUN-Md-u59">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="6C9-NK-lJa"/>
-                                                <binding destination="668" name="value" keyPath="values.BBCWorldService" id="OPV-WA-Y9y">
-                                                    <dictionary key="options">
-                                                        <bool key="NSAlwaysPresentsApplicationModalAlerts" value="YES"/>
-                                                    </dictionary>
-                                                </binding>
-                                            </connections>
-                                        </button>
-                                        <box verticalHuggingPriority="750" boxType="separator" id="bVl-5G-Xmc">
-                                            <rect key="frame" x="17" y="406" width="419" height="5"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        </box>
-                                        <box verticalHuggingPriority="750" boxType="separator" id="I0X-1I-0fh">
-                                            <rect key="frame" x="17" y="328" width="419" height="5"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        </box>
-                                        <box verticalHuggingPriority="750" misplaced="YES" boxType="separator" id="LdH-mP-1ip">
-                                            <rect key="frame" x="17" y="186" width="419" height="5"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        </box>
-                                        <box verticalHuggingPriority="750" misplaced="YES" boxType="separator" id="27c-4d-HVj">
-                                            <rect key="frame" x="9" y="77" width="419" height="5"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        </box>
-                                        <button misplaced="YES" id="ID4-f2-23a" userLabel="Ignore Radio All News">
-                                            <rect key="frame" x="212" y="55" width="117" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Ignore All News" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="idt-2N-NKM">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="euu-TE-GRn"/>
-                                                <binding destination="668" name="value" keyPath="values.IgnoreAllRadioNews" id="H5k-AU-RQb"/>
-                                            </connections>
-                                        </button>
-                                        <button misplaced="YES" id="hnU-Bj-KCY" userLabel="Show Local Radio Programmes">
-                                            <rect key="frame" x="14" y="31" width="144" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Show Local Stations" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="f1V-QT-BjD" userLabel="Show Local Stations">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="Bl0-NX-L5D"/>
-                                                <binding destination="668" name="value" keyPath="values.ShowLocalRadioChannels" id="oOD-zA-DSj"/>
-                                            </connections>
-                                        </button>
-                                        <box misplaced="YES" borderType="line" title="BBC Radio: New Programme Station Filter" id="utW-FN-7tD">
-                                            <rect key="frame" x="0.0" y="10" width="448" height="261"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <view key="contentView" id="cZc-eP-6d4">
-                                                <rect key="frame" x="1" y="1" width="446" height="245"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                            </view>
-                                        </box>
-                                    </subviews>
-                                </view>
-                            </tabViewItem>
-                            <tabViewItem label="Other Formats" identifier="" id="1491">
-                                <view key="view" id="1492">
-                                    <rect key="frame" x="10" y="33" width="454" height="512"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                    <subviews>
-                                        <scrollView horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="1416">
-                                            <rect key="frame" x="17" y="364" width="420" height="135"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <clipView key="contentView" id="eiD-ry-zkd">
+                                            <clipView key="contentView" id="Xcv-fl-nad">
                                                 <rect key="frame" x="1" y="0.0" width="403" height="119"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="1426" id="1425">
-                                                        <rect key="frame" x="0.0" y="0.0" width="403" height="102"/>
+                                                    <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="IKG-gn-2PC" id="gbz-Rl-ARO">
+                                                        <rect key="frame" x="0.0" y="0.0" width="403" height="96"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <size key="intercellSpacing" width="3" height="2"/>
                                                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                                         <tableColumns>
-                                                            <tableColumn width="400" minWidth="40" maxWidth="1000" id="1427">
+                                                            <tableColumn width="400" minWidth="40" maxWidth="1000" id="MbW-0I-Tgw">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="ITV TV Show Formats">
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
                                                                 </tableHeaderCell>
-                                                                <popUpButtonCell key="dataCell" type="bevel" title="Please select..." bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="bezel" imageScaling="proportionallyDown" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="d0L-Z2-yTh" id="zRE-0Y-zd8">
+                                                                <popUpButtonCell key="dataCell" type="bevel" title="Please select..." bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="bezel" imageScaling="proportionallyDown" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="7NN-Fg-bJb" id="6Qf-m3-xQN">
                                                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                                     <font key="font" metaFont="smallSystem"/>
-                                                                    <menu key="menu" id="1OB-Xn-EuL">
+                                                                    <menu key="menu" id="rlk-XY-zON">
                                                                         <items>
-                                                                            <menuItem title="Please select..." state="on" id="d0L-Z2-yTh">
+                                                                            <menuItem title="Please select..." state="on" id="7NN-Fg-bJb">
                                                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                                                             </menuItem>
-                                                                            <menuItem title="Flash - HD" id="KiS-Ge-uAn"/>
-                                                                            <menuItem title="Flash - Very High" id="5NM-zS-0hk"/>
-                                                                            <menuItem title="Flash - High" id="7DG-z0-TvK"/>
-                                                                            <menuItem title="Flash - Standard" id="So9-rR-fp1">
+                                                                            <menuItem title="Flash - HD" id="Whe-Zh-iRf"/>
+                                                                            <menuItem title="Flash - Very High" id="4B2-eT-34U"/>
+                                                                            <menuItem title="Flash - High" id="tW6-91-Iyn"/>
+                                                                            <menuItem title="Flash - Standard" id="Wuf-f0-zJi">
                                                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                                                             </menuItem>
-                                                                            <menuItem title="Flash - Low" id="aq7-E5-mfx">
+                                                                            <menuItem title="Flash - Low" id="VS3-9S-XVj">
                                                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                                                             </menuItem>
-                                                                            <menuItem title="Flash - Very Low" id="rkF-2L-ilO">
+                                                                            <menuItem title="Flash - Very Low" id="uCQ-WZ-jSz">
                                                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                                                             </menuItem>
                                                                         </items>
@@ -2499,7 +2159,7 @@
                                                                 </popUpButtonCell>
                                                                 <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                                 <connections>
-                                                                    <binding destination="1432" name="selectedValue" keyPath="arrangedObjects.format" id="HWj-zG-UZ1">
+                                                                    <binding destination="1432" name="selectedValue" keyPath="arrangedObjects.format" id="v7f-yb-bKm">
                                                                         <dictionary key="options">
                                                                             <string key="NSValueTransformerName">ITVFormatTransformer</string>
                                                                         </dictionary>
@@ -2510,45 +2170,45 @@
                                                     </tableView>
                                                 </subviews>
                                             </clipView>
-                                            <scroller key="horizontalScroller" verticalHuggingPriority="750" horizontal="YES" id="1424">
+                                            <scroller key="horizontalScroller" verticalHuggingPriority="750" horizontal="YES" id="fkg-ES-yOP">
                                                 <rect key="frame" x="1" y="119" width="403" height="15"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
-                                            <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="1423">
-                                                <rect key="frame" x="404" y="17" width="15" height="102"/>
+                                            <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="K7M-kc-9tT">
+                                                <rect key="frame" x="404" y="23" width="15" height="96"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
-                                            <tableHeaderView key="headerView" id="1426">
-                                                <rect key="frame" x="0.0" y="0.0" width="403" height="17"/>
+                                            <tableHeaderView key="headerView" id="IKG-gn-2PC">
+                                                <rect key="frame" x="0.0" y="0.0" width="403" height="23"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </tableHeaderView>
                                         </scrollView>
-                                        <button verticalHuggingPriority="750" id="1417">
-                                            <rect key="frame" x="17" y="343" width="29" height="23"/>
+                                        <button verticalHuggingPriority="750" misplaced="YES" id="3ik-hE-3Me">
+                                            <rect key="frame" x="17" y="16" width="29" height="23"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="smallSquare" title="+" bezelStyle="smallSquare" imagePosition="below" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1422">
+                                            <buttonCell key="cell" type="smallSquare" title="+" bezelStyle="smallSquare" imagePosition="below" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="kKG-hL-9vH">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="add:" target="1432" id="1437"/>
+                                                <action selector="add:" target="1432" id="yvt-KY-udx"/>
                                             </connections>
                                         </button>
-                                        <button verticalHuggingPriority="750" id="1418">
-                                            <rect key="frame" x="45" y="343" width="29" height="23"/>
+                                        <button verticalHuggingPriority="750" misplaced="YES" id="QQh-ET-7Tw">
+                                            <rect key="frame" x="45" y="16" width="29" height="23"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="smallSquare" title="-" bezelStyle="smallSquare" imagePosition="below" alignment="center" state="on" borderStyle="border" allowsMixedState="YES" imageScaling="proportionallyDown" inset="2" id="1421">
+                                            <buttonCell key="cell" type="smallSquare" title="-" bezelStyle="smallSquare" imagePosition="below" alignment="center" state="on" borderStyle="border" allowsMixedState="YES" imageScaling="proportionallyDown" inset="2" id="pdw-fv-9UN">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="remove:" target="1432" id="1438"/>
+                                                <action selector="remove:" target="1432" id="qgk-rS-ZmK"/>
                                             </connections>
                                         </button>
-                                        <button verticalHuggingPriority="750" id="1419">
-                                            <rect key="frame" x="73" y="343" width="364" height="23"/>
+                                        <button verticalHuggingPriority="750" misplaced="YES" id="EPg-Rn-dtg">
+                                            <rect key="frame" x="73" y="16" width="364" height="23"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" imagePosition="below" alignment="center" refusesFirstResponder="YES" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1420">
+                                            <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" imagePosition="below" alignment="center" refusesFirstResponder="YES" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="P5s-1g-yFI">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
@@ -2556,13 +2216,367 @@
                                     </subviews>
                                 </view>
                             </tabViewItem>
-                            <tabViewItem label="Advanced" identifier="" id="1530">
+                            <tabViewItem label="New Programmes" identifier="3" id="QB0-M0-Stm">
+                                <view key="view" id="LCA-h7-Ip3">
+                                    <rect key="frame" x="10" y="33" width="454" height="512"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <box misplaced="YES" borderType="line" title="BBC TV: New Programmes Channel Filter" id="gmH-x8-UqZ">
+                                            <rect key="frame" x="1" y="354" width="452" height="155"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <view key="contentView" id="dss-T9-HWQ">
+                                                <rect key="frame" x="1" y="1" width="450" height="139"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <button misplaced="YES" id="Wk6-ae-0Ab">
+                                                        <rect key="frame" x="13" y="103" width="77" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="BBC One" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="e6W-Fp-His">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="9kc-sg-Mez"/>
+                                                            <binding destination="668" name="value" keyPath="values.BBCOne" id="HNj-t8-wiA"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button misplaced="YES" id="EQj-uS-ifA">
+                                                        <rect key="frame" x="124" y="103" width="77" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="BBC Two" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="zhN-8d-7Aq">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="Lxt-n7-gQ3"/>
+                                                            <binding destination="668" name="value" keyPath="values.BBCTwo" id="3rT-P3-dkA"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button misplaced="YES" id="QD7-Hm-kUH">
+                                                        <rect key="frame" x="236" y="103" width="87" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="BBC Three" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="X7h-Od-Idk">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="f1b-d2-atM"/>
+                                                            <binding destination="668" name="value" keyPath="values.BBCThree" id="lT8-O6-9a0"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button misplaced="YES" id="kTz-fz-PyE">
+                                                        <rect key="frame" x="355" y="103" width="80" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="BBC Four" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="wbk-x4-9tX">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="B83-Rs-nhi"/>
+                                                            <binding destination="668" name="value" keyPath="values.BBCFour" id="LSR-WX-bdS"/>
+                                                        </connections>
+                                                    </button>
+                                                    <box verticalHuggingPriority="750" misplaced="YES" boxType="separator" id="Wha-sr-x29">
+                                                        <rect key="frame" x="15" y="91" width="419" height="5"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                    </box>
+                                                    <button misplaced="YES" id="bln-wr-bzP">
+                                                        <rect key="frame" x="13" y="63" width="79" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="BBC Alba" bezelStyle="regularSquare" imagePosition="left" inset="2" id="A6D-xE-f82">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="d2S-Yh-Hj5"/>
+                                                            <binding destination="668" name="value" keyPath="values.BBCAlba" id="wS7-kK-Loo"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button misplaced="YES" id="NsB-KC-X8M">
+                                                        <rect key="frame" x="124" y="63" width="48" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="S4C" bezelStyle="regularSquare" imagePosition="left" inset="2" id="JHF-ml-yAm">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="cKe-R3-dev"/>
+                                                            <binding destination="668" name="value" keyPath="values.S4C" id="daR-Jv-9Xg"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button misplaced="YES" id="ZiX-yu-Iok">
+                                                        <rect key="frame" x="236" y="63" width="58" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="CBBC" bezelStyle="regularSquare" imagePosition="left" inset="2" id="HKZ-dZ-UA6">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="Abi-lU-bSv"/>
+                                                            <binding destination="668" name="value" keyPath="values.CBBC" id="IKq-2v-EHy"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button misplaced="YES" id="wC5-OD-X8R">
+                                                        <rect key="frame" x="355" y="63" width="80" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="CBeebies" bezelStyle="regularSquare" imagePosition="left" inset="2" id="t1o-go-rn7">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="QD1-SN-2ti"/>
+                                                            <binding destination="668" name="value" keyPath="values.CBeebies" id="dOz-n0-geU"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button misplaced="YES" id="Gr2-CY-l5j">
+                                                        <rect key="frame" x="13" y="23" width="86" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="BBC News" bezelStyle="regularSquare" imagePosition="left" inset="2" id="6gb-yG-qRl">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="CDR-0f-MCM"/>
+                                                            <binding destination="668" name="value" keyPath="values.BBCNews" id="6J3-GQ-42c"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button misplaced="YES" id="mVv-B8-5yS">
+                                                        <rect key="frame" x="124" y="23" width="116" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="BBC Parliament" bezelStyle="regularSquare" imagePosition="left" inset="2" id="SkP-JZ-c30">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="9zY-xZ-bkm"/>
+                                                            <binding destination="668" name="value" keyPath="values.BBCParliament" id="eXI-dv-rbh"/>
+                                                        </connections>
+                                                    </button>
+                                                </subviews>
+                                            </view>
+                                        </box>
+                                        <box misplaced="YES" borderType="line" title="BBC Radio: New Programmes Station Filter" id="utW-FN-7tD">
+                                            <rect key="frame" x="1" y="131" width="452" height="219"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <view key="contentView" id="cZc-eP-6d4">
+                                                <rect key="frame" x="1" y="1" width="450" height="203"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <button misplaced="YES" id="HJk-bU-Rxk">
+                                                        <rect key="frame" x="12" y="177" width="96" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="BBC Radio 1" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="1JW-iw-ETU">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="P48-qt-QAz"/>
+                                                            <binding destination="668" name="value" keyPath="values.Radio1" id="19t-Jc-ozh"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button misplaced="YES" id="6Lw-33-guR" userLabel="BBC Radio 2">
+                                                        <rect key="frame" x="154" y="177" width="106" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="BBC Radio 2" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="4f6-Ln-1Bq">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="gSL-JT-XuN"/>
+                                                            <binding destination="668" name="value" keyPath="values.Radio2" id="RT2-gx-OFv"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button misplaced="YES" id="8jP-di-hni">
+                                                        <rect key="frame" x="299" y="177" width="105" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="BBC Radio 3" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="jhb-jr-N7a">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="cJu-ig-BgL"/>
+                                                            <binding destination="668" name="value" keyPath="values.Radio3" id="fzy-qP-iw4"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button misplaced="YES" id="4lJ-eV-Tty">
+                                                        <rect key="frame" x="12" y="139" width="109" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="BBC Radio 4" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="hNr-CF-J0S">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="qV4-dv-yJm"/>
+                                                            <binding destination="668" name="value" keyPath="values.Radio4" id="Ouh-Qn-kan"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button misplaced="YES" id="9ma-sa-of7">
+                                                        <rect key="frame" x="154" y="139" width="133" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="BBC Radio 4 Extra" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Uwz-Vs-tux">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="MVB-ji-bHe"/>
+                                                            <binding destination="668" name="value" keyPath="values.Radio4Extra" id="d79-tE-pJu"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button misplaced="YES" id="tZy-hd-UhF">
+                                                        <rect key="frame" x="299" y="139" width="138" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="BBC Radio 6 Music" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Vjh-iO-Mds">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="kfp-c6-7hZ"/>
+                                                            <binding destination="668" name="value" keyPath="values.Radio6Music" id="hCi-us-dIs"/>
+                                                        </connections>
+                                                    </button>
+                                                    <box verticalHuggingPriority="750" misplaced="YES" boxType="separator" id="bVl-5G-Xmc">
+                                                        <rect key="frame" x="14" y="40" width="419" height="5"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                    </box>
+                                                    <button misplaced="YES" id="YWn-u3-Kmr" userLabel="BBC World Service">
+                                                        <rect key="frame" x="12" y="97" width="136" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="BBC World Service" bezelStyle="regularSquare" imagePosition="left" inset="2" id="ZUN-Md-u59">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="6C9-NK-lJa"/>
+                                                            <binding destination="668" name="value" keyPath="values.BBCWorldService" id="hwe-oY-VKF">
+                                                                <dictionary key="options">
+                                                                    <bool key="NSAlwaysPresentsApplicationModalAlerts" value="YES"/>
+                                                                </dictionary>
+                                                            </binding>
+                                                        </connections>
+                                                    </button>
+                                                    <button misplaced="YES" id="e2T-sc-7gQ">
+                                                        <rect key="frame" x="154" y="97" width="126" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="BBC Radio 5 Live" bezelStyle="regularSquare" imagePosition="left" inset="2" id="rak-Wt-HaP">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="2uF-sL-pjH"/>
+                                                            <binding destination="668" name="value" keyPath="values.Radio5Live" id="7Sr-RC-7ky"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button misplaced="YES" id="2k2-DB-89d">
+                                                        <rect key="frame" x="299" y="97" width="121" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="BBC Radio 1Xtra" bezelStyle="regularSquare" imagePosition="left" inset="2" id="2jG-m4-i4e">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="nXL-To-1OQ"/>
+                                                            <binding destination="668" name="value" keyPath="values.Radio1Xtra" id="kdq-V6-2SE"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button misplaced="YES" id="bqc-BZ-buH">
+                                                        <rect key="frame" x="12" y="60" width="204" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="BBC Radio 5 Live Sports Extra" bezelStyle="regularSquare" imagePosition="left" inset="2" id="5h4-0M-nCM">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="LzP-Jk-biZ"/>
+                                                            <binding destination="668" name="value" keyPath="values.Radio5LiveSportsExtra" id="30j-bN-4aq"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button misplaced="YES" id="gxa-Sy-vru">
+                                                        <rect key="frame" x="261" y="60" width="177" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="BBC Radio Asian Network" bezelStyle="regularSquare" imagePosition="left" inset="2" id="3DI-gT-BDA">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="g4r-sm-BSj"/>
+                                                            <binding destination="668" name="value" keyPath="values.RadioAsianNetwork" id="WhD-0c-hbd"/>
+                                                        </connections>
+                                                    </button>
+                                                    <box verticalHuggingPriority="750" misplaced="YES" boxType="separator" id="LdH-mP-1ip">
+                                                        <rect key="frame" x="14" y="122" width="419" height="5"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                    </box>
+                                                    <button misplaced="YES" id="Owy-ED-RS0" userLabel="Show Regional Radio Programmes">
+                                                        <rect key="frame" x="12" y="14" width="171" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Show Regional Stations" bezelStyle="regularSquare" imagePosition="left" inset="2" id="VSC-t4-Xdt" userLabel="Show Regional Stations">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="khg-ua-ft4"/>
+                                                            <binding destination="668" name="value" keyPath="values.ShowRegionalRadioStations" id="4xK-4v-9Gn"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button misplaced="YES" id="hnU-Bj-KCY" userLabel="Show Local Radio Programmes">
+                                                        <rect key="frame" x="261" y="14" width="144" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Show Local Stations" bezelStyle="regularSquare" imagePosition="left" inset="2" id="f1V-QT-BjD" userLabel="Show Local Stations">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="Bl0-NX-L5D"/>
+                                                            <binding destination="668" name="value" keyPath="values.ShowLocalRadioStations" id="GZm-BE-hmu"/>
+                                                        </connections>
+                                                    </button>
+                                                </subviews>
+                                            </view>
+                                        </box>
+                                        <box misplaced="YES" title="Ignore News Programmes" id="IcO-uY-vt0">
+                                            <rect key="frame" x="1" y="42" width="456" height="85"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <view key="contentView" id="gQ1-Wk-QjY">
+                                                <rect key="frame" x="2" y="2" width="452" height="68"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <button misplaced="YES" id="ID4-f2-23a" userLabel="Ignore Radio All News">
+                                                        <rect key="frame" x="11" y="10" width="341" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Ignore all radio programmes with &quot;news&quot; in the title" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="idt-2N-NKM">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="euu-TE-GRn"/>
+                                                            <binding destination="668" name="value" keyPath="values.IgnoreAllRadioNews" id="H5k-AU-RQb"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button misplaced="YES" id="Hc3-nT-3zv" userLabel="Ignore TV All News">
+                                                        <rect key="frame" x="11" y="42" width="341" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Ignore all TV programmes with &quot;news&quot; in the title" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="O3S-RU-Vau">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="2oL-NI-S4M"/>
+                                                            <binding destination="668" name="value" keyPath="values.IgnoreAllTVNews" id="1BY-o4-T2h"/>
+                                                        </connections>
+                                                    </button>
+                                                </subviews>
+                                            </view>
+                                        </box>
+                                    </subviews>
+                                </view>
+                            </tabViewItem>
+                            <tabViewItem label="Advanced" identifier="4" id="1530">
                                 <view key="view" id="1531">
                                     <rect key="frame" x="10" y="33" width="454" height="512"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <button id="1534">
-                                            <rect key="frame" x="15" y="493" width="208" height="18"/>
+                                            <rect key="frame" x="15" y="493" width="200" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Test Proxy Before Download: " bezelStyle="regularSquare" imagePosition="right" state="on" inset="2" id="1535">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2572,8 +2586,19 @@
                                                 <binding destination="668" name="value" keyPath="values.TestProxy" id="1538"/>
                                             </connections>
                                         </button>
-                                        <button id="MJh-JP-hHq">
-                                            <rect key="frame" x="15" y="473" width="315" height="18"/>
+                                        <button misplaced="YES" id="Ub7-bz-5JJ">
+                                            <rect key="frame" x="15" y="436" width="225" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Use Alternate ITV Cache Refresh:" bezelStyle="regularSquare" imagePosition="right" alignment="left" inset="2" id="Q4c-MN-xPg" userLabel="Use Alternate ITV Cache Refresh:">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <binding destination="668" name="value" keyPath="values.AltCacheITV_TV" id="ceG-QM-BoZ"/>
+                                            </connections>
+                                        </button>
+                                        <button misplaced="YES" id="MJh-JP-hHq">
+                                            <rect key="frame" x="15" y="464" width="300" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Include Downloaded Shows in Search Results:" bezelStyle="regularSquare" imagePosition="right" state="on" inset="2" id="EFC-j7-DR2">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2590,6 +2615,7 @@
                     </tabView>
                 </subviews>
             </view>
+            <point key="canvasLocation" x="-613" y="-253"/>
         </window>
         <window title="Download History" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="DownloadHistoryWindow" animationBehavior="default" id="1212" userLabel="Download History">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
@@ -2771,7 +2797,7 @@
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <scroller key="verticalScroller" verticalHuggingPriority="750" horizontal="NO" id="614">
-                            <rect key="frame" x="454" y="1" width="16" height="380"/>
+                            <rect key="frame" x="455" y="1" width="15" height="380"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                     </scrollView>
@@ -3072,7 +3098,6 @@ DQ
         </menu>
     </objects>
     <resources>
-        <image name="ITV" width="128" height="128"/>
         <image name="log" width="32" height="32"/>
         <image name="play" width="32" height="32"/>
         <image name="pvr" width="32" height="32"/>

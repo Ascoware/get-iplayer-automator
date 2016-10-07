@@ -1,5 +1,5 @@
 //
-//  ITVHistoryWindowController.m
+//  NPHistoryWindowController.m
 //  Get_iPlayer GUI
 //
 //  Created by LFS on 8/6/16.
@@ -7,12 +7,12 @@
 //
 
 #import "GetITVListings.h"
-#import "ITVHistoryWindowController.h"
+#import "NPHistoryWindowController.h"
 #import "GetITVListings.h"
 
 NewProgrammeHistory *sharedHistoryContoller;
 
-@implementation ITVHistoryTableViewController
+@implementation NPHistoryTableViewController
 
 -(id)init
 {
@@ -96,7 +96,7 @@ NewProgrammeHistory *sharedHistoryContoller;
     
     for (ProgrammeHistoryObject *np in programmeHistoryArray )  {
         
-        if ( [self showITVProgramme:np] || [self showBBCProgramme:np] || [self showRadioProgramme:np] )  {
+        if ( [self showITVProgramme:np] || [self showBBCTVProgramme:np] || [self showBBCRadioProgramme:np] )  {
                                                                                                             
             if ( [np.dateFound isNotEqualTo:displayDate] ) {
                 
@@ -138,25 +138,39 @@ NewProgrammeHistory *sharedHistoryContoller;
 
 -(BOOL)showITVProgramme:(ProgrammeHistoryObject *)np
 {
-    return [[[NSUserDefaults standardUserDefaults] valueForKey:@"showITVProgrammes"]isEqualTo:@YES] && [np.networkName isEqualToString:@"ITV"]?YES:NO;
+    if ( [[[NSUserDefaults standardUserDefaults] valueForKey:@"ShowITV"]isEqualTo:@NO] )
+        return NO;
+    
+    if ( ![np.networkName isEqualToString:@"ITV"] )
+        return NO;
+
+    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"IgnoreAllTVNews"]isEqualTo:@YES]) {
+        if ([np.programmeName rangeOfString:@"news" options:NSCaseInsensitiveSearch].location != NSNotFound) {
+            return NO;
+        }
+    }
+    
+    return YES;
 }
--(BOOL)showBBCProgramme:(ProgrammeHistoryObject *)np
+-(BOOL)showBBCTVProgramme:(ProgrammeHistoryObject *)np
 {
     
-    if ( [[[NSUserDefaults standardUserDefaults] valueForKey:@"showBBCProgrammes"]isEqualTo:@NO] )
+    if ( [[[NSUserDefaults standardUserDefaults] valueForKey:@"ShowBBCTV"]isEqualTo:@NO] )
         return NO;
     
     if ( ![np.networkName isEqualToString:@"BBC TV"] )
         return NO;
     
-    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"IgnoreAllTVNews"]isEqualTo:@YES] &&
-        ([np.programmeName containsString:@"News"] || [np.programmeName containsString:@"news"]))
-        return NO;
-    
-    if (([[[NSUserDefaults standardUserDefaults] valueForKey:@"BBC1"]isEqualTo:@YES] && [np.tvChannel hasPrefix:@"BBC One"]) ||
-         ([[[NSUserDefaults standardUserDefaults] valueForKey:@"BBC2"]isEqualTo:@YES] && [np.tvChannel hasPrefix:@"BBC Two"]) ||
-         ([[[NSUserDefaults standardUserDefaults] valueForKey:@"BBC3"]isEqualTo:@YES] && [np.tvChannel hasPrefix:@"BBC Three"]) ||
-         ([[[NSUserDefaults standardUserDefaults] valueForKey:@"BBC4"]isEqualTo:@YES] && [np.tvChannel hasPrefix:@"BBC Four"]) ||
+    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"IgnoreAllTVNews"]isEqualTo:@YES]) {
+        if ([np.programmeName rangeOfString:@"news" options:NSCaseInsensitiveSearch].location != NSNotFound) {
+            return NO;
+        }
+    }
+
+    if (([[[NSUserDefaults standardUserDefaults] valueForKey:@"BBCOne"]isEqualTo:@YES] && [np.tvChannel hasPrefix:@"BBC One"]) ||
+         ([[[NSUserDefaults standardUserDefaults] valueForKey:@"BBCTwo"]isEqualTo:@YES] && [np.tvChannel hasPrefix:@"BBC Two"]) ||
+         ([[[NSUserDefaults standardUserDefaults] valueForKey:@"BBCThree"]isEqualTo:@YES] && [np.tvChannel hasPrefix:@"BBC Three"]) ||
+         ([[[NSUserDefaults standardUserDefaults] valueForKey:@"BBCFour"]isEqualTo:@YES] && [np.tvChannel hasPrefix:@"BBC Four"]) ||
          ([[[NSUserDefaults standardUserDefaults] valueForKey:@"BBCNews"]isEqualTo:@YES] && [np.tvChannel isEqualToString:@"BBC News"]) ||
          ([[[NSUserDefaults standardUserDefaults] valueForKey:@"BBCParliament"]isEqualTo:@YES] && [np.tvChannel isEqualToString:@"BBC Parliament"]) ||
          ([[[NSUserDefaults standardUserDefaults] valueForKey:@"S4C"]isEqualTo:@YES] && [np.tvChannel isEqualToString:@"S4C"]) ||
@@ -168,21 +182,23 @@ NewProgrammeHistory *sharedHistoryContoller;
     
     return NO;
 }
--(BOOL)showRadioProgramme:(ProgrammeHistoryObject *)np
+-(BOOL)showBBCRadioProgramme:(ProgrammeHistoryObject *)np
 {
     NSArray *regions = @[@"Radio Scotland", @"Radio Nan", @"Radio Shetland", @"Radio Orkney", @"Radio Wales", @"Radio Cymru", @"Radio Ulster", @"Radio Foyle" ];
    
     /* Filter out if not radio or news and news not wanted */
     
-    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"showBBCRadio"]isEqualTo:@NO])
+    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"ShowBBCRadio"]isEqualTo:@NO])
         return NO;
     
     if (![np.networkName isEqualToString:@"BBC Radio"])
         return NO;
     
-    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"IgnoreAllRadioNews"]isEqualTo:@YES] &&
-        ([np.programmeName containsString:@"News"] || [np.programmeName containsString:@"news"]))
-        return NO;
+    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"IgnoreAllRadioNews"]isEqualTo:@YES]) {
+        if ([np.programmeName rangeOfString:@"news" options:NSCaseInsensitiveSearch].location != NSNotFound) {
+            return NO;
+        }
+    }
 
     /* Filter each of the nationals in turn */
     
@@ -202,7 +218,7 @@ NewProgrammeHistory *sharedHistoryContoller;
         return [[[NSUserDefaults standardUserDefaults] valueForKey:@"Radio1Xtra"]isEqualTo:@YES] ? YES:NO;
     
     if ([np.tvChannel isEqualToString:@"BBC Radio 4 Extra"])
-        return [[[NSUserDefaults standardUserDefaults] valueForKey:@"Radio4extra"]isEqualTo:@YES] ? YES:NO;
+        return [[[NSUserDefaults standardUserDefaults] valueForKey:@"Radio4Extra"]isEqualTo:@YES] ? YES:NO;
     
     if ([np.tvChannel isEqualToString:@"BBC Radio 5 live"])
         return [[[NSUserDefaults standardUserDefaults] valueForKey:@"Radio5Live"]isEqualTo:@YES] ? YES:NO;
@@ -214,7 +230,7 @@ NewProgrammeHistory *sharedHistoryContoller;
         return [[[NSUserDefaults standardUserDefaults] valueForKey:@"Radio6Music"]isEqualTo:@YES] ? YES:NO;
 
     if ([np.tvChannel isEqualToString:@"BBC Asian Network"])
-        return [[[NSUserDefaults standardUserDefaults] valueForKey:@"BBCRadioAsianNetwork"]isEqualTo:@YES] ? YES:NO;
+        return [[[NSUserDefaults standardUserDefaults] valueForKey:@"RadioAsianNetwork"]isEqualTo:@YES] ? YES:NO;
     
     if ([np.tvChannel isEqualToString:@"BBC World Service"])
         return [[[NSUserDefaults standardUserDefaults] valueForKey:@"BBCWorldService"]isEqualTo:@YES]  ? YES:NO;
@@ -223,11 +239,11 @@ NewProgrammeHistory *sharedHistoryContoller;
     
     for (int i=0; i<regions.count;i++)
         if ([np.tvChannel containsString:regions[i]])
-            return [[[NSUserDefaults standardUserDefaults] valueForKey:@"ShowRegionalRadioChannels"]isEqualTo:@YES] ? YES:NO;
+            return [[[NSUserDefaults standardUserDefaults] valueForKey:@"ShowRegionalRadioStations"]isEqualTo:@YES] ? YES:NO;
     
     /* Otherwise must be local */
     
-    return [[[NSUserDefaults standardUserDefaults] valueForKey:@"ShowLocalRadioChannels"]isEqualTo:@YES] ? YES:NO;
+    return [[[NSUserDefaults standardUserDefaults] valueForKey:@"ShowLocalRadioStations"]isEqualTo:@YES] ? YES:NO;
 
 }
 

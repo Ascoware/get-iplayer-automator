@@ -130,7 +130,7 @@
 	else
 	{
 		NSAlert *alert = [NSAlert alertWithMessageText:@"Download History cannot be edited while downloads are running." 
-										 defaultButton:nil alternateButton:nil otherButton:nil informativeTextWithFormat:nil];
+										 defaultButton:nil alternateButton:nil otherButton:nil informativeTextWithFormat:@""];
 		[alert runModal];
 	}
 }

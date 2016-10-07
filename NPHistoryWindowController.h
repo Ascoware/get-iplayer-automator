@@ -1,5 +1,5 @@
 //
-//  ITVHistoryWindowController.h
+//  NPHistoryWindowController.h
 //  Get_iPlayer GUI
 //
 //  Created by LFS on 8/6/16.
@@ -9,7 +9,7 @@
 #import <Cocoa/Cocoa.h>
 
 
-@interface ITVHistoryTableViewController : NSWindowController  <NSTableViewDataSource>
+@interface NPHistoryTableViewController : NSWindowController  <NSTableViewDataSource>
 {
     IBOutlet NSTableView    *historyTable;
     NSMutableArray          *historyDisplayArray;
@@ -20,8 +20,8 @@
 -(id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row;
 -(void)loadDisplayData;
 -(BOOL)showITVProgramme:(ProgrammeHistoryObject *)np;
--(BOOL)showBBCProgramme:(ProgrammeHistoryObject *)np;
--(BOOL)showRadioProgramme:(ProgrammeHistoryObject *)np;
+-(BOOL)showBBCTVProgramme:(ProgrammeHistoryObject *)np;
+-(BOOL)showBBCRadioProgramme:(ProgrammeHistoryObject *)np;
 
 
 

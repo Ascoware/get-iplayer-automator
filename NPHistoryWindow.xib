@@ -6,10 +6,14 @@
         <capability name="box content view" minToolsVersion="7.0"/>
     </dependencies>
     <objects>
-        <customObject id="-2" userLabel="File's Owner" customClass="ITVHistoryTableViewController"/>
+        <customObject id="-2" userLabel="File's Owner" customClass="NPHistoryTableViewController">
+            <connections>
+                <outlet property="window" destination="F0z-JX-Cv5" id="SA4-wr-gPC"/>
+            </connections>
+        </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <window title="New Programme History" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" showsToolbarButton="NO" animationBehavior="default" id="F0z-JX-Cv5" userLabel="ITV History">
+        <window title="New Programmes History" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" showsToolbarButton="NO" animationBehavior="default" id="F0z-JX-Cv5" userLabel="New Programmes History" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" topStrut="YES"/>
             <rect key="contentRect" x="490" y="311" width="690" height="447"/>
@@ -18,52 +22,54 @@
                 <rect key="frame" x="0.0" y="0.0" width="690" height="447"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <button id="MJx-4J-sm5" userLabel="Show ITV Programmes">
-                        <rect key="frame" x="49" y="398" width="164" height="18"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="check" title="Show ITV" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="MJc-VI-rfH" userLabel="Show ITV Programmes">
-                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                            <font key="font" metaFont="system"/>
-                        </buttonCell>
-                        <connections>
-                            <action selector="changeFilter:" target="xrI-VN-sTE" id="VCr-kj-ASh"/>
-                            <binding destination="vEM-N5-ttu" name="value" keyPath="values.showITVProgrammes" id="0zd-ML-owu"/>
-                        </connections>
-                    </button>
-                    <button id="LhV-vR-Qj2" userLabel="Show BBC Radio">
-                        <rect key="frame" x="526" y="398" width="146" height="17"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="check" title="Show BBC Radio" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="erj-6r-wCb">
-                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                            <font key="font" metaFont="system"/>
-                            <connections>
-                                <action selector="changeFilter:" target="xrI-VN-sTE" id="Eg6-NH-xg4"/>
-                            </connections>
-                        </buttonCell>
-                        <connections>
-                            <binding destination="vEM-N5-ttu" name="value" keyPath="values.showBBCRadio" id="F1W-5n-7U5"/>
-                        </connections>
-                    </button>
-                    <button id="Gv6-d3-doF" userLabel="Show BBC Programmes">
-                        <rect key="frame" x="270" y="399" width="202" height="17"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="check" title="Show BBC TV" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="pB3-5R-V19" userLabel="Show BBC Programmes">
-                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                            <font key="font" metaFont="system"/>
-                            <connections>
-                                <action selector="changeFilter:" target="xrI-VN-sTE" id="IRr-kZ-131"/>
-                            </connections>
-                        </buttonCell>
-                        <connections>
-                            <binding destination="vEM-N5-ttu" name="value" keyPath="values.showBBCProgrammes" id="7CX-zQ-CKt"/>
-                        </connections>
-                    </button>
                     <box boxType="secondary" borderType="line" title="Display Options" id="TBR-0V-SZd">
                         <rect key="frame" x="17" y="387" width="656" height="53"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <view key="contentView" id="E93-rG-8OQ">
                             <rect key="frame" x="1" y="1" width="654" height="34"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <subviews>
+                                <button misplaced="YES" id="Gv6-d3-doF">
+                                    <rect key="frame" x="10" y="9" width="106" height="18"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    <buttonCell key="cell" type="check" title="Show BBC TV" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="pB3-5R-V19" userLabel="Show BBC Programmes">
+                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                        <connections>
+                                            <action selector="changeFilter:" target="xrI-VN-sTE" id="IRr-kZ-131"/>
+                                        </connections>
+                                    </buttonCell>
+                                    <connections>
+                                        <binding destination="vEM-N5-ttu" name="value" keyPath="values.ShowBBCTV" id="c03-sd-0zF"/>
+                                    </connections>
+                                </button>
+                                <button id="LhV-vR-Qj2" userLabel="Show BBC Radio">
+                                    <rect key="frame" x="265" y="9" width="123" height="18"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    <buttonCell key="cell" type="check" title="Show BBC Radio" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="erj-6r-wCb">
+                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                        <connections>
+                                            <action selector="changeFilter:" target="xrI-VN-sTE" id="Eg6-NH-xg4"/>
+                                        </connections>
+                                    </buttonCell>
+                                    <connections>
+                                        <binding destination="vEM-N5-ttu" name="value" keyPath="values.ShowBBCRadio" id="XnT-ID-O3y"/>
+                                    </connections>
+                                </button>
+                                <button misplaced="YES" id="MJx-4J-sm5">
+                                    <rect key="frame" x="556" y="8" width="80" height="18"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    <buttonCell key="cell" type="check" title="Show ITV" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="MJc-VI-rfH" userLabel="Show ITV Programmes">
+                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="changeFilter:" target="xrI-VN-sTE" id="VCr-kj-ASh"/>
+                                        <binding destination="vEM-N5-ttu" name="value" keyPath="values.ShowITV" id="IGt-Jg-BmY"/>
+                                    </connections>
+                                </button>
+                            </subviews>
                         </view>
                         <font key="titleFont" metaFont="system"/>
                     </box>
@@ -134,7 +140,7 @@
             </connections>
             <point key="canvasLocation" x="230" y="295.5"/>
         </window>
-        <customObject id="xrI-VN-sTE" customClass="ITVHistoryTableViewController">
+        <customObject id="xrI-VN-sTE" customClass="NPHistoryTableViewController">
             <connections>
                 <outlet property="historyTable" destination="KMb-b6-4wT" id="zXS-kb-hfU"/>
             </connections>
