@@ -201,12 +201,16 @@
 		[urlScanner scanString:@"/" intoString:nil];
 		[urlScanner scanUpToString:@"#" intoString:&pid];
 		NSScanner *scanner = [NSScanner scannerWithString:source];
-      [scanner scanUpToString:[NSString stringWithFormat:@"bbcProgrammes.programme = { pid : '%@', type : 'episode' }", pid] intoString:nil];
+        [scanner scanUpToString:[NSString stringWithFormat:@"bbcProgrammes.programme = { pid : '%@', type : 'episode' }", pid] intoString:nil];
+        if ([scanner isAtEnd]) {
+            [scanner setScanLocation:0];
+            [scanner scanUpToString:[NSString stringWithFormat:@"bbcProgrammes.programme = { pid : '%@', type : 'clip' }", pid] intoString:nil];
+        }
 		if ([scanner isAtEnd]) {
          NSAlert *invalidPage = [[NSAlert alloc] init];
          [invalidPage addButtonWithTitle:@"OK"];
          [invalidPage setMessageText:[NSString stringWithFormat:@"Invalid Page: %@",url]];
-         [invalidPage setInformativeText:@"Please ensure the frontmost browser tab is open to an iPlayer episode page."];
+         [invalidPage setInformativeText:@"Please ensure the frontmost browser tab is open to an iPlayer episode page or programme clip page."];
          [invalidPage setAlertStyle:NSWarningAlertStyle];
          [invalidPage runModal];
          return nil;
