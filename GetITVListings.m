@@ -680,7 +680,7 @@ AppController           *sharedAppController;
 - (id)initWithName:(NSString *)name andPID:(NSString *)pid andURL:(NSString *)url andNUMBEREPISODES:(int)numberEpisodes andDATELASTAIRED:(NSTimeInterval)timeIntDateLastAired;
 {
     self.programmeName = name;
-    //[self fixProgrammeName];
+    [self fixProgrammeName];
     self.productionId = pid;
     self.programmeURL = url;
     self.numberEpisodes = numberEpisodes;
