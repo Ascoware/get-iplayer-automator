@@ -45,7 +45,6 @@
     reasonForFailure=[[NSString alloc] init];
     availableModes=[[NSString alloc] init];
     desc=[[NSString alloc] init];
-    podcast=@NO;
     extendedMetadataRetrieved=@NO;
     getNameRunning = false;
     addedByPVR = false;
@@ -70,7 +69,6 @@
     reasonForFailure=[show reasonForFailure];
     availableModes=[[NSString alloc] init];
     desc=[[NSString alloc] init];
-    podcast = [show podcast];
     extendedMetadataRetrieved=@NO;
     getNameRunning = false;
     addedByPVR = false;
@@ -104,7 +102,6 @@
     reasonForFailure=[[NSString alloc] init];
     availableModes=[[NSString alloc] init];
     desc=[[NSString alloc] init];
-    podcast=@NO;
     extendedMetadataRetrieved=@NO;
     getNameRunning = false;
     addedByPVR = false;
@@ -128,7 +125,6 @@
     [coder encodeObject:radio forKey:@"radio"];
     [coder encodeObject:realPID forKey:@"realPID"];
     [coder encodeObject:url forKey:@"url"];
-    [coder encodeObject:podcast forKey:@"podcast"];
     [coder encodeInteger:season forKey:@"season"];
     [coder encodeInteger:episode forKey:@"episode"];
 }
@@ -153,7 +149,6 @@
     reasonForFailure=[[NSString alloc] init];
     availableModes=[[NSString alloc] init];
     desc=[[NSString alloc] init];
-    podcast = [coder decodeObjectForKey:@"podcast"];
     extendedMetadataRetrieved=@NO;
     getNameRunning = false;
     addedByPVR = false;
@@ -430,8 +425,6 @@
 {
     if (radio.boolValue)
         return GiA_ProgrammeTypeBBC_Radio;
-    else if (podcast.boolValue)
-        return GiA_ProgrammeTypeBBC_Podcast;
     else if ([tvNetwork hasPrefix:@"ITV"])
         return GIA_ProgrammeTypeITV;
     else
@@ -442,7 +435,6 @@
 {
     NSDictionary *dic = @{@(GiA_ProgrammeTypeBBC_TV): @"BBC TV",
                           @(GiA_ProgrammeTypeBBC_Radio): @"BBC Radio",
-                          @(GiA_ProgrammeTypeBBC_Podcast): @"BBC Podcast",
                           @(GIA_ProgrammeTypeITV): @"ITV"};
     
     return [dic objectForKey:@([self type])];
@@ -559,7 +551,6 @@
                 [p setUrl:url];
                 p.status = @"Available";
                 if ([type isEqualToString:@"radio"]) [p setValue:@YES forKey:@"radio"];
-                else if ([type isEqualToString:@"podcast"]) [p setPodcast:@YES];
             }
         }
         
@@ -724,7 +715,6 @@
 @synthesize url;
 @synthesize dateAired;
 @synthesize desc;
-@synthesize podcast;
 
 @synthesize extendedMetadataRetrieved;
 @synthesize successfulRetrieval;

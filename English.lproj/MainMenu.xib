@@ -1593,22 +1593,6 @@
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <button id="860">
-                                            <rect key="frame" x="232" y="280" width="106" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="BBC Podcasts" bezelStyle="regularSquare" imagePosition="left" alignment="left" imageScaling="proportionallyDown" inset="2" id="861">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="typeChanged:" target="EFr-RW-vJP" id="mNn-Fm-h28"/>
-                                                <binding destination="668" name="value" keyPath="values.CacheBBC_Podcasts" id="1013">
-                                                    <dictionary key="options">
-                                                        <integer key="NSConditionallySetsEnabled" value="0"/>
-                                                    </dictionary>
-                                                </binding>
-                                            </connections>
-                                        </button>
                                         <button horizontalHuggingPriority="750" verticalHuggingPriority="750" id="862">
                                             <rect key="frame" x="70" y="278" width="25" height="25"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>

@@ -548,7 +548,7 @@
 		}
 		else
 		{
-			//Process iPhone/Podcast/Radio Downloads Status Message
+			//Process iPhone/Radio Downloads Status Message
 			NSScanner *scanner = [NSScanner scannerWithString:output];
 			NSDecimal recieved, total, percentage;
 			NSInteger speed=0;

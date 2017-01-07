@@ -45,8 +45,6 @@ static GetiPlayerArguments *sharedController = nil;
          [typeArgument appendString:@"itv,"];
 		if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheBBC_Radio"] isEqualTo:@YES])
          [typeArgument appendString:@"radio,"];
-		if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheBBC_Podcasts"] isEqualTo:@YES])
-         [typeArgument appendString:@"podcast,"];
 		[typeArgument deleteCharactersInRange:NSMakeRange([typeArgument length]-1,1)];
 		currentTypeArgument = [typeArgument copy];
 		return [NSString stringWithString:typeArgument];

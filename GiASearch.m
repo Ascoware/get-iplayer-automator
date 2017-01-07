@@ -108,8 +108,6 @@
             [myScanner scanString:@"|" intoString:nil];
             if ([buffer isEqualToString:@"radio"])
                p.radio = @YES;
-            else if ([buffer isEqualToString:@"podcast"])
-               p.podcast = @YES;
             
             [myScanner scanUpToString:@"|" intoString:&buffer];
             [myScanner scanString:@"|" intoString:nil];

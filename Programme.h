@@ -14,7 +14,6 @@
 typedef NS_ENUM(NSInteger, GIA_ProgrammeType) {
     GiA_ProgrammeTypeBBC_TV,
     GiA_ProgrammeTypeBBC_Radio,
-    GiA_ProgrammeTypeBBC_Podcast,
     GIA_ProgrammeTypeITV
 };
 
@@ -43,7 +42,6 @@ typedef NS_ENUM(NSInteger, GIA_ProgrammeType) {
     NSString *url;
     NSDate *__strong dateAired;
     NSString *desc;
-    NSNumber *podcast;
     
     //Extended Metadata
     NSNumber *extendedMetadataRetrieved;
@@ -96,7 +94,6 @@ typedef NS_ENUM(NSInteger, GIA_ProgrammeType) {
 @property (readwrite) NSString *url;
 @property (readwrite, strong) NSDate *dateAired;
 @property (readwrite) NSString *desc;
-@property (readwrite) NSNumber *podcast;
 
 @property (readwrite) NSNumber *extendedMetadataRetrieved;
 @property (readwrite) NSNumber *successfulRetrieval;

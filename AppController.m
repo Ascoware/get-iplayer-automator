@@ -69,7 +69,6 @@ NewProgrammeHistory           *sharedHistoryController;
     defaultValues[@"CacheBBC_TV"] = @YES;
     defaultValues[@"CacheITV_TV"] = @YES;
     defaultValues[@"CacheBBC_Radio"] = @NO;
-    defaultValues[@"CacheBBC_Podcasts"] = @NO;
     defaultValues[@"CacheExpiryTime"] = @"4";
     defaultValues[@"Verbose"] = @NO;
     defaultValues[@"SeriesLinkStartup"] = @YES;
@@ -128,6 +127,7 @@ NewProgrammeHistory           *sharedHistoryController;
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"DefaultFormat"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"AlternateFormat"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"Cache4oD_TV"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CacheBBC_Podcasts"];
     
     //Make sure Application Support folder exists
     NSString *folder = @"~/Library/Application Support/Get iPlayer Automator/";
@@ -196,6 +196,7 @@ NewProgrammeHistory           *sharedHistoryController;
     
     // remove obsolete cache files
     [fileManager removeItemAtPath:[folder stringByAppendingPathComponent:@"ch4.cache"] error:nil];
+    [fileManager removeItemAtPath:[folder stringByAppendingPathComponent:@"podcast.cache"] error:nil];
     
     NSString *filename = @"Queue.automatorqueue";
     NSString *filePath = [folder stringByAppendingPathComponent:filename];
@@ -587,13 +588,11 @@ NewProgrammeHistory           *sharedHistoryController;
             if ([[defaults objectForKey:@"CacheBBC_TV"] boolValue]) [typesToCache addObject:@"tv"];
             if (!altITV && [[defaults objectForKey:@"CacheITV_TV"] boolValue]) [typesToCache addObject:@"itv"];
             if ([[defaults objectForKey:@"CacheBBC_Radio"] boolValue]) [typesToCache addObject:@"radio"];
-            if ([[defaults objectForKey:@"CacheBBC_Podcasts"] boolValue]) [typesToCache addObject:@"podcast"];
             
-            NSArray *urlKeys = @[@"tv",@"itv",@"radio",@"podcast"];
+            NSArray *urlKeys = @[@"tv",@"itv",@"radio"];
             NSArray *urlObjects = @[@"http://tom-tech.com/get_iplayer/cache/tv.cache",
                                     @"http://tom-tech.com/get_iplayer/cache/itv.cache",
-                                    @"http://tom-tech.com/get_iplayer/cache/radio.cache",
-                                    @"http://tom-tech.com/get_iplayer/cache/podcast.cache"];
+                                    @"http://tom-tech.com/get_iplayer/cache/radio.cache"];
             updateURLDic = [[NSDictionary alloc] initWithObjects:urlObjects forKeys:urlKeys];
             
             nextToCache=0;
@@ -1650,7 +1649,6 @@ NewProgrammeHistory           *sharedHistoryController;
                         [p setEpisodeName:episode_Name];
                         [p setUrl:url];
                         if ([temp_type isEqualToString:@"radio"]) [p setValue:@YES forKey:@"radio"];
-                        else if ([temp_type isEqualToString:@"podcast"]) [p setPodcast:@YES];
                         [p setValue:@"Added by Series-Link" forKey:@"status"];
                         p.addedByPVR = true;
                         BOOL inQueue=NO;
@@ -1856,7 +1854,7 @@ NewProgrammeHistory           *sharedHistoryController;
             else
             {
                 [logger performSelectorOnMainThread:@selector(addToLog:) withObject:@"Can't add to iTunes; incompatible format." waitUntilDone:YES];
-                [logger performSelectorOnMainThread:@selector(addToLog:) withObject:@"			iTunes Compatible Modes: Flash - High, Flash - Standard, Flash - HD, iPhone, Radio - MP3, Podcast" waitUntilDone:YES];
+                [logger performSelectorOnMainThread:@selector(addToLog:) withObject:@"			iTunes Compatible Modes: Flash - High, Flash - Standard, Flash - HD, iPhone, Radio - MP3" waitUntilDone:YES];
                 [show setValue:@"Download Complete" forKey:@"status"];
             }
         }
@@ -1961,7 +1959,6 @@ NewProgrammeHistory           *sharedHistoryController;
     [sharedDefaults removeObjectForKey:@"CacheBBC_TV"];
     [sharedDefaults removeObjectForKey:@"CacheITV_TV"];
     [sharedDefaults removeObjectForKey:@"CacheBBC_Radio"];
-    [sharedDefaults removeObjectForKey:@"CacheBBC_Podcasts"];
     [sharedDefaults removeObjectForKey:@"CacheExpiryTime"];
     [sharedDefaults removeObjectForKey:@"Verbose"];
     [sharedDefaults removeObjectForKey:@"SeriesLinkStartup"];
