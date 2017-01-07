@@ -109,7 +109,7 @@ NewProgrammeHistory           *sharedHistoryController;
     defaultValues[@"ShowITV"] = @YES;
     defaultValues[@"TestProxy"] = @YES;
     defaultValues[@"ShowDownloadedInSearch"] = @YES;
-    defaultValues[@"AltCacheITV_TV"] = @NO;
+    defaultValues[@"AltCacheITV_TV"] = @YES;
     defaultValues[@"AudioDescribedNew"] = @NO;
     defaultValues[@"SignedNew"] = @NO;
     
@@ -503,9 +503,7 @@ NewProgrammeHistory           *sharedHistoryController;
         proxy = proxyDict[@"proxy"];
     }
     
-    BOOL altITV = [[[NSUserDefaults standardUserDefaults] valueForKey:@"AltCacheITV_TV"] isEqualTo:@YES];
-
-    if ( altITV && [[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheITV_TV"] isEqualTo:@YES] )
+    if ( [[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheITV_TV"] isEqualTo:@YES] )
     {
         updatingITVIndex = true;
         [[self itvProgressIndicator] startAnimation:self];
@@ -532,7 +530,7 @@ NewProgrammeHistory           *sharedHistoryController;
             cacheExpiryArg = [[NSString alloc] initWithFormat:@"-e%d", ([[[NSUserDefaults standardUserDefaults] objectForKey:@"CacheExpiryTime"] intValue]*3600)];
         }
         
-        NSString *typeArgument = [[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:YES andIncludeITV:!altITV];
+        NSString *typeArgument = [[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:YES andIncludeITV:NO];
         
         if (![typeArgument isEqualToString:@"--type"]) {
         
@@ -586,12 +584,10 @@ NewProgrammeHistory           *sharedHistoryController;
         {
             typesToCache = [[NSMutableArray alloc] initWithCapacity:4];
             if ([[defaults objectForKey:@"CacheBBC_TV"] boolValue]) [typesToCache addObject:@"tv"];
-            if (!altITV && [[defaults objectForKey:@"CacheITV_TV"] boolValue]) [typesToCache addObject:@"itv"];
             if ([[defaults objectForKey:@"CacheBBC_Radio"] boolValue]) [typesToCache addObject:@"radio"];
             
-            NSArray *urlKeys = @[@"tv",@"itv",@"radio"];
+            NSArray *urlKeys = @[@"tv",@"radio"];
             NSArray *urlObjects = @[@"http://tom-tech.com/get_iplayer/cache/tv.cache",
-                                    @"http://tom-tech.com/get_iplayer/cache/itv.cache",
                                     @"http://tom-tech.com/get_iplayer/cache/radio.cache"];
             updateURLDic = [[NSDictionary alloc] initWithObjects:urlObjects forKeys:urlKeys];
             

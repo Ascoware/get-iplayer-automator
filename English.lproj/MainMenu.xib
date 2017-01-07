@@ -1842,26 +1842,15 @@
                                                 <binding destination="668" name="value" keyPath="values.SignedNew" id="klz-kq-uMx"/>
                                             </connections>
                                         </button>
-                                        <textField verticalHuggingPriority="750" id="1479">
-                                            <rect key="frame" x="14" y="76" width="100" height="17"/>
+                                        <textField verticalHuggingPriority="750" misplaced="YES" id="1479">
+                                            <rect key="frame" x="14" y="76" width="166" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Quick Caching:" id="1480">
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Quick Caching (BBC Only):" id="1480">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <button id="1481">
-                                            <rect key="frame" x="117" y="75" width="22" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="1482">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <binding destination="668" name="value" keyPath="values.QuickCache" id="1483"/>
-                                            </connections>
-                                        </button>
                                         <textField verticalHuggingPriority="750" id="1484">
                                             <rect key="frame" x="14" y="51" width="291" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -1903,6 +1892,17 @@
                                             <connections>
                                                 <action selector="typeChanged:" target="EFr-RW-vJP" id="6jd-ks-MTU"/>
                                                 <binding destination="668" name="value" keyPath="values.CacheITV_TV" id="jRb-OC-Zbd"/>
+                                            </connections>
+                                        </button>
+                                        <button misplaced="YES" id="1481">
+                                            <rect key="frame" x="183" y="74" width="22" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="1482">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <binding destination="668" name="value" keyPath="values.QuickCache" id="1483"/>
                                             </connections>
                                         </button>
                                     </subviews>
@@ -2571,10 +2571,10 @@
                                                 <binding destination="668" name="value" keyPath="values.TestProxy" id="1538"/>
                                             </connections>
                                         </button>
-                                        <button misplaced="YES" id="Ub7-bz-5JJ">
+                                        <button hidden="YES" misplaced="YES" id="Ub7-bz-5JJ">
                                             <rect key="frame" x="15" y="436" width="225" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Use Alternate ITV Cache Refresh:" bezelStyle="regularSquare" imagePosition="right" alignment="left" inset="2" id="Q4c-MN-xPg" userLabel="Use Alternate ITV Cache Refresh:">
+                                            <buttonCell key="cell" type="check" title="Use Alternate ITV Cache Refresh:" bezelStyle="regularSquare" imagePosition="right" alignment="left" state="on" inset="2" id="Q4c-MN-xPg" userLabel="Use Alternate ITV Cache Refresh:">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
