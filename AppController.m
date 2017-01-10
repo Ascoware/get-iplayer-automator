@@ -109,7 +109,6 @@ NewProgrammeHistory           *sharedHistoryController;
     defaultValues[@"ShowITV"] = @YES;
     defaultValues[@"TestProxy"] = @YES;
     defaultValues[@"ShowDownloadedInSearch"] = @YES;
-    defaultValues[@"AltCacheITV_TV"] = @YES;
     defaultValues[@"AudioDescribedNew"] = @NO;
     defaultValues[@"SignedNew"] = @NO;
     
@@ -1995,7 +1994,6 @@ NewProgrammeHistory           *sharedHistoryController;
     [sharedDefaults removeObjectForKey:@"ShowITV"];
     [sharedDefaults removeObjectForKey:@"TestProxy"];
     [sharedDefaults removeObjectForKey:@"ShowDownloadedInSearch"];
-    [sharedDefaults removeObjectForKey:@"AltCacheITV_TV"];
     [sharedDefaults removeObjectForKey:@"AudiodescribedNew"];
     [sharedDefaults removeObjectForKey:@"SignedNew"];
 }
