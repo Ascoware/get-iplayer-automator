@@ -60,7 +60,7 @@ NewProgrammeHistory           *sharedHistoryController;
     
     NSString *defaultDownloadDirectory = @"~/Movies/TV Shows";
     defaultValues[@"DownloadPath"] = [defaultDownloadDirectory stringByExpandingTildeInPath];
-    defaultValues[@"Proxy"] = @"Provided";
+    defaultValues[@"Proxy"] = @"None";
     defaultValues[@"CustomProxy"] = @"";
     defaultValues[@"AutoRetryFailed"] = @YES;
     defaultValues[@"AutoRetryTime"] = @"30";
@@ -77,7 +77,7 @@ NewProgrammeHistory           *sharedHistoryController;
     defaultValues[@"XBMC_naming"] = @NO;
     defaultValues[@"KeepSeriesFor"] = @"30";
     defaultValues[@"RemoveOldSeries"] = @NO;
-    defaultValues[@"QuickCache"] = @YES;
+    defaultValues[@"QuickCache"] = @NO;
     defaultValues[@"TagShows"] = @YES;
     defaultValues[@"BBCOne"] = @YES;
     defaultValues[@"BBCTwo"] = @YES;
@@ -112,6 +112,7 @@ NewProgrammeHistory           *sharedHistoryController;
     defaultValues[@"AltCacheITV_TV"] = @NO;
     defaultValues[@"AudioDescribedNew"] = @NO;
     defaultValues[@"SignedNew"] = @NO;
+    defaultValues[@"TomTech"] = @NO;
     
     [[NSUserDefaults standardUserDefaults] registerDefaults:defaultValues];
     defaultValues = nil;
@@ -128,7 +129,17 @@ NewProgrammeHistory           *sharedHistoryController;
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"AlternateFormat"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"Cache4oD_TV"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CacheBBC_Podcasts"];
-    
+
+    // disable/hide features dependent on tom-tech.com
+    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"TomTech"] isEqualTo:@NO]) {
+        if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"QuickCache"] isEqualTo:@YES]) {
+            [[NSUserDefaults standardUserDefaults] setValue:@NO forKey:@"QuickCache"];
+        }
+        if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"] isEqualToString:@"Provided"]) {
+            [[NSUserDefaults standardUserDefaults] setValue:@"None" forKey:@"Proxy"];
+        }
+    }
+
     //Make sure Application Support folder exists
     NSString *folder = @"~/Library/Application Support/Get iPlayer Automator/";
     folder = [folder stringByExpandingTildeInPath];
@@ -876,8 +887,10 @@ NewProgrammeHistory           *sharedHistoryController;
     }
     
     //Check for Updates - Don't want to prompt the user when updates are running.
-    SUUpdater *updater = [SUUpdater sharedUpdater];
-    [updater checkForUpdatesInBackground];
+    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"TomTech"] isEqualTo:@YES]) {
+        SUUpdater *updater = [SUUpdater sharedUpdater];
+        [updater checkForUpdatesInBackground];
+    }
     
     if (runDownloads)
     {
@@ -1401,7 +1414,9 @@ NewProgrammeHistory           *sharedHistoryController;
                 NSLog(@"ERROR: Growl notification failed (nextDownload - complete): %@: %@", [e name], [e description]);
                 [logger addToLog:[NSString stringWithFormat:@"ERROR: Growl notification failed (nextDownload - complete): %@: %@", [e name], [e description]]];
             }
-            [[SUUpdater sharedUpdater] checkForUpdatesInBackground];
+            if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"TomTech"] isEqualTo:@YES]) {
+                [[SUUpdater sharedUpdater] checkForUpdatesInBackground];
+            }
             
             if (downloadsFailed>0)
                 [solutionsWindow makeKeyAndOrderFront:self];
@@ -2002,6 +2017,7 @@ NewProgrammeHistory           *sharedHistoryController;
     [sharedDefaults removeObjectForKey:@"AltCacheITV_TV"];
     [sharedDefaults removeObjectForKey:@"AudiodescribedNew"];
     [sharedDefaults removeObjectForKey:@"SignedNew"];
+    [sharedDefaults removeObjectForKey:@"TomTech"];
 }
 - (void)applescriptStartDownloads
 {

@@ -466,12 +466,24 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="showFeedback:" target="621" id="1011"/>
+                                    <binding destination="668" name="enabled" keyPath="values.TomTech" id="hnb-vu-uK5"/>
+                                    <binding destination="668" name="hidden" keyPath="values.TomTech" previousBinding="hnb-vu-uK5" id="Fcb-yL-3a2">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
                                 </connections>
                             </menuItem>
                             <menuItem title="Check for Updates..." id="1003">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="checkForUpdates:" target="987" id="1005"/>
+                                    <binding destination="668" name="enabled" keyPath="values.TomTech" id="rVq-zm-Juj"/>
+                                    <binding destination="668" name="hidden" keyPath="values.TomTech" previousBinding="rVq-zm-Juj" id="8ov-cD-Jxv">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="1002"/>
@@ -1557,6 +1569,9 @@
                                                     <buttonCell type="radio" title="Provided" imagePosition="left" alignment="left" imageScaling="proportionallyDown" inset="2" id="559">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system"/>
+                                                        <connections>
+                                                            <binding destination="668" name="enabled" keyPath="values.TomTech" id="uvA-h0-jER"/>
+                                                        </connections>
                                                     </buttonCell>
                                                     <buttonCell type="radio" title="None" imagePosition="left" alignment="left" state="on" imageScaling="proportionallyDown" inset="2" id="561" userLabel="None">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1841,28 +1856,8 @@
                                                 <binding destination="668" name="value" keyPath="values.SignedNew" id="klz-kq-uMx"/>
                                             </connections>
                                         </button>
-                                        <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="1479">
-                                            <rect key="frame" x="14" y="76" width="100" height="17"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Quick Caching:" id="1480">
-                                                <font key="font" metaFont="system"/>
-                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                        </textField>
-                                        <button id="1481">
-                                            <rect key="frame" x="117" y="75" width="22" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="1482">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <binding destination="668" name="value" keyPath="values.QuickCache" id="1483"/>
-                                            </connections>
-                                        </button>
-                                        <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="1484">
-                                            <rect key="frame" x="14" y="51" width="291" height="17"/>
+                                        <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="YES" id="1484">
+                                            <rect key="frame" x="14" y="76" width="291" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Tag Downloaded Programmes with Metadata:" id="1485">
                                                 <font key="font" metaFont="system"/>
@@ -1870,8 +1865,8 @@
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <button id="1486">
-                                            <rect key="frame" x="308" y="49" width="22" height="18"/>
+                                        <button misplaced="YES" id="1486">
+                                            <rect key="frame" x="308" y="74" width="22" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="1487">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1904,6 +1899,40 @@
                                                 <binding destination="668" name="value" keyPath="values.CacheITV_TV" id="jRb-OC-Zbd"/>
                                             </connections>
                                         </button>
+                                        <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="YES" id="1479">
+                                            <rect key="frame" x="15" y="51" width="100" height="17"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Quick Caching:" id="1480">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                            <connections>
+                                                <binding destination="668" name="enabled" keyPath="values.TomTech" id="Kx5-LS-ThD"/>
+                                                <binding destination="668" name="hidden" keyPath="values.TomTech" previousBinding="Kx5-LS-ThD" id="DFY-Lh-TMG">
+                                                    <dictionary key="options">
+                                                        <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                    </dictionary>
+                                                </binding>
+                                            </connections>
+                                        </textField>
+                                        <button misplaced="YES" id="1481">
+                                            <rect key="frame" x="118" y="50" width="22" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="1482">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <binding destination="668" name="enabled" keyPath="values.TomTech" id="dd5-n4-8RI"/>
+                                                <binding destination="668" name="hidden" keyPath="values.TomTech" previousBinding="dd5-n4-8RI" id="UYO-nS-98h">
+                                                    <dictionary key="options">
+                                                        <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                    </dictionary>
+                                                </binding>
+                                                <binding destination="668" name="value" keyPath="values.QuickCache" id="1483"/>
+                                            </connections>
+                                        </button>
                                     </subviews>
                                 </view>
                             </tabViewItem>
@@ -1917,7 +1946,7 @@
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <clipView key="contentView" id="iNe-PX-Coi">
                                                 <rect key="frame" x="1" y="0.0" width="403" height="119"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <autoresizingMask key="autoresizingMask"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="1079" id="1078">
                                                         <rect key="frame" x="0.0" y="0.0" width="403" height="102"/>
@@ -1983,7 +2012,7 @@
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <clipView key="contentView" id="Yo1-zO-Vaa">
                                                 <rect key="frame" x="1" y="0.0" width="403" height="119"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <autoresizingMask key="autoresizingMask"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="1086" id="1087">
                                                         <rect key="frame" x="0.0" y="0.0" width="403" height="102"/>
@@ -2103,7 +2132,7 @@
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <clipView key="contentView" id="Xcv-fl-nad">
                                                 <rect key="frame" x="1" y="0.0" width="403" height="119"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <autoresizingMask key="autoresizingMask"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="IKG-gn-2PC" id="gbz-Rl-ARO">
                                                         <rect key="frame" x="0.0" y="0.0" width="403" height="96"/>
@@ -2599,7 +2628,7 @@
                     </tabView>
                 </subviews>
             </view>
-            <point key="canvasLocation" x="-613" y="-253"/>
+            <point key="canvasLocation" x="-105" y="-332"/>
         </window>
         <window title="Download History" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="DownloadHistoryWindow" animationBehavior="default" id="1212" userLabel="Download History">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
