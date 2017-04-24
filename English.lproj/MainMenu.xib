@@ -546,7 +546,22 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="forceITVUpdate:" target="621" id="eXX-Gi-PTP"/>
-                                    <binding destination="668" name="enabled" keyPath="values.CacheITV_TV" id="rub-UD-XCf">
+                                    <binding destination="668" name="hidden" keyPath="values.AltCacheITV_TV" previousBinding="qNO-Ig-X9i" id="3Go-c3-c1X">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
+                                    <binding destination="668" name="enabled" keyPath="values.AltCacheITV_TV" id="VfD-s6-6oe"/>
+                                    <binding destination="668" name="hidden2" keyPath="values.CacheITV_TV" previousBinding="3Go-c3-c1X" id="nQE-yc-2CG">
+                                        <dictionary key="options">
+                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                            <integer key="NSNullPlaceholder" value="-1"/>
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
+                                    <binding destination="668" name="enabled2" keyPath="values.CacheITV_TV" previousBinding="VfD-s6-6oe" id="qNO-Ig-X9i">
                                         <dictionary key="options">
                                             <integer key="NSMultipleValuesPlaceholder" value="-1"/>
                                             <integer key="NSNoSelectionPlaceholder" value="-1"/>
@@ -2554,6 +2569,17 @@
                                             </buttonCell>
                                             <connections>
                                                 <binding destination="668" name="value" keyPath="values.TestProxy" id="1538"/>
+                                            </connections>
+                                        </button>
+                                        <button hidden="YES" misplaced="YES" id="Ub7-bz-5JJ">
+                                            <rect key="frame" x="15" y="436" width="225" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Use Alternate ITV Cache Refresh:" bezelStyle="regularSquare" imagePosition="right" alignment="left" state="on" inset="2" id="Q4c-MN-xPg" userLabel="Use Alternate ITV Cache Refresh:">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <binding destination="668" name="value" keyPath="values.AltCacheITV_TV" id="ceG-QM-BoZ"/>
                                             </connections>
                                         </button>
                                         <button misplaced="YES" id="MJh-JP-hHq">
