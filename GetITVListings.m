@@ -101,7 +101,7 @@ AppController           *sharedAppController;
 - (id)requestTodayListing
 {
     
-    [[mySession dataTaskWithURL:[NSURL URLWithString:@"http://www.itv.com/hub/shows"] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
+    [[mySession dataTaskWithURL:[NSURL URLWithString:@"https://www.itv.com/hub/shows"] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
     {
         htmlData = [[NSString alloc]initWithData:data encoding:NSASCIIStringEncoding];
         if ( ![self createTodayProgrammeArray] )
@@ -152,7 +152,7 @@ AppController           *sharedAppController;
     NSString *token        = nil;
     NSString *fullProgramme = nil;
     NSString *searchPath    = nil;
-    NSString *basePath     = @"<a href=\"http://www.itv.com/hub/";
+    NSString *basePath     = @"<a href=\"https://www.itv.com/hub/";
     NSUInteger scanPoint   = 0;
     int seriesNumber = 0;
     int  episodeNumber = 0;
@@ -586,7 +586,7 @@ AppController           *sharedAppController;
     
     /* Get first programme  */
     
-    [scanner scanUpToString:@"<a href=\"http://www.itv.com/hub/" intoString:NULL];
+    [scanner scanUpToString:@"<a href=\"https://www.itv.com/hub/" intoString:NULL];
     [scanner scanUpToString:@"</a>" intoString:&fullProgramme];
     
     while ( (![scanner isAtEnd]) && ++testingProgrammeCount ) {
@@ -602,7 +602,7 @@ AppController           *sharedAppController;
         /* Programme Name */
         
         fullProgrammeScanner.scanLocation = scanPoint;
-        [fullProgrammeScanner scanString:@"<a href=\"http://www.itv.com/hub/" intoString:NULL];
+        [fullProgrammeScanner scanString:@"<a href=\"https://www.itv.com/hub/" intoString:NULL];
         [fullProgrammeScanner scanUpToString:@"/" intoString:&programmeName];
         
         /* Production ID */
@@ -636,7 +636,7 @@ AppController           *sharedAppController;
         
         /* Scan for next programme */
         
-        [scanner scanUpToString:@"<a href=\"http://www.itv.com/hub/" intoString:NULL];
+        [scanner scanUpToString:@"<a href=\"https://www.itv.com/hub/" intoString:NULL];
         [scanner scanUpToString:@"</a>" intoString:&fullProgramme];
         
     }
