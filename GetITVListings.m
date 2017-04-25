@@ -311,7 +311,7 @@ AppController           *sharedAppController;
     NSString *episodeString = nil;
     
     NSDateFormatter* dateFormatter1 = [[NSDateFormatter alloc] init];
-    dateFormatter1.dateFormat = @"yyyy-MM-dd'T'HH:mm:ssZ";
+    dateFormatter1.dateFormat = @"yyyy-MM-dd'T'HH:mm:ssZZZZZ";
     NSString *dateAiredString = nil;
 
     NSDate *dateAiredUTC;
