@@ -1,3 +1,5 @@
+## 2017-04-26: BBC support is dead until further notice. GiA is currently unable to download iPlayer programmes.
+
 get-iplayer-automator
 =====================
 
