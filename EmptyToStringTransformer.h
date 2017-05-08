@@ -9,5 +9,5 @@
 {
     NSString *string;
 }
-- (id)initWithString:(NSString *)aString;
+- (instancetype)initWithString:(NSString *)aString NS_DESIGNATED_INITIALIZER;
 @end

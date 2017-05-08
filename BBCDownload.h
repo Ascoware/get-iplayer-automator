@@ -16,20 +16,19 @@ extern bool runDownloads;
 extern NSDictionary *tvFormats;
 extern NSDictionary *radioFormats;
 
-#import "Download.h"
-
 @interface BBCDownload : Download {
-	NSString *profileDirArg;
-	
-	BOOL runAgain;
-	int noDataCount;
-	
-	BOOL foundLastLine;
-	NSString *LastLine;
-	NSString *reasonForFailure;
 }
+@property (nonatomic) NSString *profileDirArg;
+	
+@property (nonatomic, assign) BOOL runAgain;
+@property (nonatomic, assign) NSInteger noDataCount;
+	
+@property (nonatomic, assign) BOOL foundLastLine;
+@property (nonatomic) NSString *LastLine;
+@property (nonatomic) NSString *reasonForFailure;
+
 + (void)initFormats;
-- (id)initWithProgramme:(Programme *)tempShow tvFormats:(NSArray *)tvFormatList radioFormats:(NSArray *)radioFormatList proxy:(HTTPProxy *)aProxy logController:(LogController *)logger;
+- (instancetype)initWithProgramme:(Programme *)tempShow tvFormats:(NSArray *)tvFormatList radioFormats:(NSArray *)radioFormatList proxy:(HTTPProxy *)aProxy logController:(LogController *)logger NS_DESIGNATED_INITIALIZER;
 - (void)processGetiPlayerOutput:(NSString *)outp;
 
 @end

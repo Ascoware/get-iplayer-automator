@@ -18,7 +18,7 @@
 @property (readonly) NSWindow *window;
 @property (readwrite) NSMutableAttributedString *log_value;
 
-- (id)init;
+- (instancetype)init;
 - (IBAction)showLog:(id)sender;
 - (IBAction)copyLog:(id)sender;
 - (void)addToLog:(NSString *)string :(id)sender;

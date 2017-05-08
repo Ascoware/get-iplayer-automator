@@ -12,7 +12,7 @@
 
 
 @implementation DownloadHistoryController
-- (id)init
+- (instancetype)init
 {
 	if (!(self = [super init])) return nil;
 	[self readHistory:self];
@@ -22,18 +22,18 @@
 - (void)readHistory:(id)sender
 {
 	NSLog(@"Read History");
-	if ([[historyArrayController arrangedObjects] count] > 0)
-		[historyArrayController removeObjectsAtArrangedObjectIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, [[historyArrayController arrangedObjects] count])]];
+	if ([historyArrayController.arrangedObjects count] > 0)
+		[historyArrayController removeObjectsAtArrangedObjectIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, [historyArrayController.arrangedObjects count])]];
 	
 	NSString *historyFilePath = @"~/Library/Application Support/Get iPlayer Automator/download_history";
-	NSFileHandle *historyFile = [NSFileHandle fileHandleForReadingAtPath:[historyFilePath stringByExpandingTildeInPath]];
+	NSFileHandle *historyFile = [NSFileHandle fileHandleForReadingAtPath:historyFilePath.stringByExpandingTildeInPath];
 	NSData *historyFileData = [historyFile readDataToEndOfFile];
 	NSString *historyFileInfo = [[NSString alloc] initWithData:historyFileData encoding:NSUTF8StringEncoding];
 	
-	if ([historyFileInfo length] > 0)
+	if (historyFileInfo.length > 0)
 	{
 		NSString *string = [NSString stringWithString:historyFileInfo];
-		NSUInteger length = [string length];
+		NSUInteger length = string.length;
 		NSUInteger paraStart = 0, paraEnd = 0, contentsEnd = 0;
 		NSMutableArray *array = [NSMutableArray array];
 		NSRange currentRange;
@@ -45,7 +45,7 @@
 		}
 		for (NSString *entry in array)
 		{
-			if ([entry length] >0)
+			if (entry.length >0)
 			{
 				NSScanner *scanner = [NSScanner scannerWithString:entry];
 				NSString *pidtwo, *showNametwo, *episodeNametwo, *typetwo, *someNumbertwo, *downloadFormattwo, *downloadPathtwo;
@@ -81,14 +81,14 @@
 	if (!runDownloads || [sender isEqualTo:self])
 	{
 		NSLog(@"Write History to File");
-		NSArray *currentHistory = [historyArrayController arrangedObjects];
+		NSArray *currentHistory = historyArrayController.arrangedObjects;
 		NSMutableString *historyString = [[NSMutableString alloc] init];
 		for (DownloadHistoryEntry *entry in currentHistory)
 		{
 			[historyString appendFormat:@"%@\n", [entry entryString]];
 		}
 		NSString *historyPath = @"~/Library/Application Support/Get iPlayer Automator/download_history";
-		historyPath = [historyPath stringByExpandingTildeInPath];
+		historyPath = historyPath.stringByExpandingTildeInPath;
 		NSData *historyData = [historyString dataUsingEncoding:NSUTF8StringEncoding];
 		NSFileManager *fileManager = [NSFileManager defaultManager];
 		if (![fileManager fileExistsAtPath:historyPath])
@@ -123,9 +123,9 @@
 {
 	if (!runDownloads)
 	{
-		if (![historyWindow isDocumentEdited]) [self readHistory:self];
+		if (!historyWindow.documentEdited) [self readHistory:self];
 		[historyWindow makeKeyAndOrderFront:self];
-		[saveButton setEnabled:[historyWindow isDocumentEdited]];
+		saveButton.enabled = historyWindow.documentEdited;
 	}
 	else
 	{
@@ -159,9 +159,9 @@
 - (void)addToHistory:(NSNotification *)note
 {
 	[self readHistory:self];
-	NSDictionary *userInfo = [note userInfo];
+	NSDictionary *userInfo = note.userInfo;
 	Programme *prog = [userInfo valueForKey:@"Programme"];
-	DownloadHistoryEntry *entry = [[DownloadHistoryEntry alloc] initWithPID:[prog pid] showName:[prog seriesName] episodeName:[prog episodeName] type:nil someNumber:@"251465" downloadFormat:@"flashhigh" downloadPath:@"/"];
+	DownloadHistoryEntry *entry = [[DownloadHistoryEntry alloc] initWithPID:prog.pid showName:prog.seriesName episodeName:prog.episodeName type:nil someNumber:@"251465" downloadFormat:@"flashhigh" downloadPath:@"/"];
 	[historyArrayController addObject:entry];
 	[self writeHistory:self];
 }

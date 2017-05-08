@@ -35,7 +35,7 @@
 //  Returns:
 //    Autoreleased NSString
 //
-- (NSString *)gtm_stringByEscapingForHTML;
+@property (nonatomic, readonly, copy) NSString *gtm_stringByEscapingForHTML;
 
 /// Get a string where internal characters that need escaping for HTML are escaped 
 //
@@ -51,7 +51,7 @@
 //  Returns:
 //    Autoreleased NSString
 //
-- (NSString *)gtm_stringByEscapingForAsciiHTML;
+@property (nonatomic, readonly, copy) NSString *gtm_stringByEscapingForAsciiHTML;
 
 /// Get a string where internal characters that are escaped for HTML are unescaped 
 //
@@ -61,6 +61,6 @@
 //  Returns:
 //    Autoreleased NSString
 //
-- (NSString *)gtm_stringByUnescapingFromHTML;
+@property (nonatomic, readonly, copy) NSString *gtm_stringByUnescapingFromHTML;
 
 @end

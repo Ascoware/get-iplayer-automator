@@ -14,7 +14,7 @@ NewProgrammeHistory *sharedHistoryContoller;
 
 @implementation NPHistoryTableViewController
 
--(id)init
+-(instancetype)init
 {
     self = [super init];
     
@@ -29,11 +29,8 @@ NewProgrammeHistory *sharedHistoryContoller;
     historyDisplayArray = [[NSMutableArray alloc]init];
     
     [self loadDisplayData];
-    
-    NSNotificationCenter *nc;
-    nc = [NSNotificationCenter defaultCenter];
-    
-    [nc addObserver:self selector:@selector(loadDisplayData) name:@"NewProgrammeDisplayFilterChanged" object:nil];
+        
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(loadDisplayData) name:@"NewProgrammeDisplayFilterChanged" object:nil];
     
     return self;
 }
@@ -44,7 +41,7 @@ NewProgrammeHistory *sharedHistoryContoller;
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
-    return [historyDisplayArray count];
+    return historyDisplayArray.count;
     
 }
 
@@ -52,9 +49,9 @@ NewProgrammeHistory *sharedHistoryContoller;
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
     
-    ProgrammeHistoryObject *np = [historyDisplayArray objectAtIndex:row];
+    ProgrammeHistoryObject *np = historyDisplayArray[row];
     
-    NSString *identifer = [tableColumn identifier];
+    NSString *identifer = tableColumn.identifier;
     
     return [np valueForKey:identifer];
     
@@ -69,9 +66,9 @@ NewProgrammeHistory *sharedHistoryContoller;
     
     /* Set up date for use in headings comparison */
     
-    double secondsSince1970 = [[NSDate date] timeIntervalSince1970];
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];            [dateFormatter setDateFormat:@"EEE MMM dd"];
-    NSDateFormatter *dateFormatterDayOfWeek = [[NSDateFormatter alloc] init];   [dateFormatterDayOfWeek setDateFormat:@"EEEE"];
+    double secondsSince1970 = [NSDate date].timeIntervalSince1970;
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];            dateFormatter.dateFormat = @"EEE MMM dd";
+    NSDateFormatter *dateFormatterDayOfWeek = [[NSDateFormatter alloc] init];   dateFormatterDayOfWeek.dateFormat = @"EEEE";
     
     NSMutableDictionary *dayNames = [[NSMutableDictionary alloc]init];
 
@@ -102,7 +99,7 @@ NewProgrammeHistory *sharedHistoryContoller;
                 
                 displayDate = np.dateFound;
                 
-                headerDate = [dayNames objectForKey:np.dateFound];
+                headerDate = dayNames[np.dateFound];
                 
                 if (!headerDate)  {
                     headerDate = @"On : ";
@@ -115,7 +112,7 @@ NewProgrammeHistory *sharedHistoryContoller;
             }
             
             theItem = @"     ";
-            theItem = [theItem stringByAppendingString:[np programmeName]];
+            theItem = [theItem stringByAppendingString:np.programmeName];
             
             [historyDisplayArray addObject:[[HistoryDisplay alloc]initWithItemString:theItem andTVChannel:np.tvChannel andLineNumber:1 andPageNumber:pageNumber]];
         }
@@ -129,7 +126,7 @@ NewProgrammeHistory *sharedHistoryContoller;
     NSSortDescriptor *sort3 = [NSSortDescriptor sortDescriptorWithKey:@"programmeNameString" ascending:YES];
     NSSortDescriptor *sort2 = [NSSortDescriptor sortDescriptorWithKey:@"lineNumber" ascending:YES];
     NSSortDescriptor *sort1 = [NSSortDescriptor sortDescriptorWithKey:@"pageNumber" ascending:NO];
-    [historyDisplayArray sortUsingDescriptors:[NSArray arrayWithObjects:sort1, sort2, sort3, sort4, nil]];
+    [historyDisplayArray sortUsingDescriptors:@[sort1, sort2, sort3, sort4]];
     
     [historyTable reloadData];
     
@@ -254,7 +251,7 @@ NewProgrammeHistory *sharedHistoryContoller;
 
 @implementation HistoryDisplay
 
-- (id)initWithItemString:(NSString *)aItemString andTVChannel:(NSString *)aTVChannel andLineNumber:(int)aLineNumber andPageNumber:(int)aPageNumber;
+- (instancetype)initWithItemString:(NSString *)aItemString andTVChannel:(NSString *)aTVChannel andLineNumber:(int)aLineNumber andPageNumber:(int)aPageNumber;
 {
     programmeNameString = aItemString;
     lineNumber = aLineNumber;

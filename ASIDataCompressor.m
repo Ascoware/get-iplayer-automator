@@ -81,7 +81,7 @@
 	zStream.avail_in = (unsigned int)length;
 	zStream.avail_out = 0;
 
-	NSInteger bytesProcessedAlready = zStream.total_out;
+	NSUInteger bytesProcessedAlready = zStream.total_out;
 	while (zStream.avail_out == 0) {
 		
 		if (zStream.total_out-bytesProcessedAlready >= [outputData length]) {
@@ -130,7 +130,7 @@
 	// Create an empty file at the destination path
 	if (![fileManager createFileAtPath:destinationPath contents:[NSData data] attributes:nil]) {
 		if (err) {
-			*err = [NSError errorWithDomain:NetworkRequestErrorDomain code:ASICompressionError userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Compression of %@ failed because we were to create a file at %@",sourcePath,destinationPath]}];
+			*err = [NSError errorWithDomain:NetworkRequestErrorDomain code:ASICompressionError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:@"Compression of %@ failed because we were to create a file at %@",sourcePath,destinationPath],NSLocalizedDescriptionKey,nil]];
 		}
 		return NO;
 	}
@@ -138,7 +138,7 @@
 	// Ensure the source file exists
 	if (![fileManager fileExistsAtPath:sourcePath]) {
 		if (err) {
-			*err = [NSError errorWithDomain:NetworkRequestErrorDomain code:ASICompressionError userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Compression of %@ failed the file does not exist",sourcePath]}];
+			*err = [NSError errorWithDomain:NetworkRequestErrorDomain code:ASICompressionError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:@"Compression of %@ failed the file does not exist",sourcePath],NSLocalizedDescriptionKey,nil]];
 		}
 		return NO;
 	}
@@ -161,9 +161,9 @@
 		readLength = [inputStream read:inputData maxLength:DATA_CHUNK_SIZE];
 
 		// Make sure nothing went wrong
-		if ([inputStream streamStatus] == NSStreamEventErrorOccurred) {
+		if ([inputStream streamStatus] == NSStreamStatusError) {
 			if (err) {
-				*err = [NSError errorWithDomain:NetworkRequestErrorDomain code:ASICompressionError userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Compression of %@ failed because we were unable to read from the source data file",sourcePath],NSUnderlyingErrorKey: [inputStream streamError]}];
+				*err = [NSError errorWithDomain:NetworkRequestErrorDomain code:ASICompressionError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:@"Compression of %@ failed because we were unable to read from the source data file",sourcePath],NSLocalizedDescriptionKey,[inputStream streamError],NSUnderlyingErrorKey,nil]];
 			}
 			[compressor closeStream];
 			return NO;
@@ -174,7 +174,7 @@
 		}
 		
 		// Attempt to deflate the chunk of data
-		outputData = [compressor compressBytes:inputData length:readLength error:&theError shouldFinish:readLength < DATA_CHUNK_SIZE ];
+		outputData = [compressor compressBytes:inputData length:(NSUInteger)readLength error:&theError shouldFinish:readLength < DATA_CHUNK_SIZE];
 		if (theError) {
 			if (err) {
 				*err = theError;
@@ -187,9 +187,9 @@
 		[outputStream write:(const uint8_t *)[outputData bytes] maxLength:[outputData length]];
 		
 		// Make sure nothing went wrong
-		if ([inputStream streamStatus] == NSStreamEventErrorOccurred) {
+		if ([inputStream streamStatus] == NSStreamStatusError) {
 			if (err) {
-				*err = [NSError errorWithDomain:NetworkRequestErrorDomain code:ASICompressionError userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Compression of %@ failed because we were unable to write to the destination data file at %@",sourcePath,destinationPath],NSUnderlyingErrorKey: [outputStream streamError]}];
+				*err = [NSError errorWithDomain:NetworkRequestErrorDomain code:ASICompressionError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:@"Compression of %@ failed because we were unable to write to the destination data file at %@",sourcePath,destinationPath],NSLocalizedDescriptionKey,[outputStream streamError],NSUnderlyingErrorKey,nil]];
             }
 			[compressor closeStream];
 			return NO;
@@ -212,7 +212,7 @@
 
 + (NSError *)deflateErrorWithCode:(int)code
 {
-	return [NSError errorWithDomain:NetworkRequestErrorDomain code:ASICompressionError userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Compression of data failed with code %i",code]}];
+	return [NSError errorWithDomain:NetworkRequestErrorDomain code:ASICompressionError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:@"Compression of data failed with code %d",code],NSLocalizedDescriptionKey,nil]];
 }
 
 @synthesize streamReady;

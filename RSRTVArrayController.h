@@ -34,8 +34,7 @@
 }
 
 // Allow dragging (reordering) to be temporarily disabled
-- (BOOL) draggingEnabled;
-- (void) setDraggingEnabled: (BOOL) flag;
+@property (nonatomic) BOOL draggingEnabled;
 
 // Table view drag and drop support
 //- (BOOL)tableView:(NSTableView *)tv writeRows:(NSArray*)rows toPasteboard:(NSPasteboard*)pboard;

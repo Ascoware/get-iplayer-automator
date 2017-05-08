@@ -7,34 +7,28 @@
 
 @implementation HTTPProxy
 
-- (id)initWithURL:(NSURL *)aURL
+- (instancetype)initWithURL:(NSURL *)aURL
 {
-    self = [super init];
-    url = [aURL copy];
-    if ([[[url scheme] lowercaseString] isEqualToString:@"https"])
-        type = (NSString *)kCFProxyTypeHTTPS;
-    else
-        type = (NSString *)kCFProxyTypeHTTP;
-    host = [[url host] copy];
-    port = [[url port] integerValue];
-    user = [[url user] copy];
-    password = [[url password] copy];
+    if (self = [super init]) {
+        _url = [aURL copy];
+        if ([_url.scheme.lowercaseString isEqualToString:@"https"])
+            _type = (NSString *)kCFProxyTypeHTTPS;
+        else
+            _type = (NSString *)kCFProxyTypeHTTP;
+        _host = [_url.host copy];
+        _port = _url.port.integerValue;
+        _user = [_url.user copy];
+        _password = [_url.password copy];
+    }
     return self;
 }
 
-- (id)initWithString:(NSString *)aString
+- (instancetype)initWithString:(NSString *)aString
 {
-    if ([[aString lowercaseString] hasPrefix:@"http://"] || [[aString lowercaseString] hasPrefix:@"https://"])
+    if ([aString.lowercaseString hasPrefix:@"http://"] || [aString.lowercaseString hasPrefix:@"https://"])
         return [self initWithURL:[NSURL URLWithString:aString]];
     else
         return [self initWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://%@", aString]]];
 }
-
-@synthesize url;
-@synthesize type;
-@synthesize host;
-@synthesize port;
-@synthesize user;
-@synthesize password;
 
 @end

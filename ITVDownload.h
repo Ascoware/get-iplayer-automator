@@ -11,10 +11,9 @@
 #import "TVFormat.h"
 #import "LogController.h"
 
-@interface ITVDownload : Download {
-    
+@interface ITVDownload : Download
 
-}
-- (id)initWithProgramme:(Programme *)tempShow itvFormats:(NSArray *)itvFormatList proxy:(HTTPProxy *)aProxy logController:(LogController *)logger;
-- (id)initTest:(Programme *)tempShow proxy:(HTTPProxy *)aProxy;
+- (instancetype)initWithProgramme:(Programme *)tempShow itvFormats:(NSArray *)itvFormatList proxy:(HTTPProxy *)aProxy logController:(LogController *)logger;
+- (instancetype)initTest:(Programme *)tempShow proxy:(HTTPProxy *)aProxy;
+
 @end

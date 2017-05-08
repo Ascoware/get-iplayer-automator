@@ -12,7 +12,7 @@
 static GetiPlayerArguments *sharedController = nil;
 
 @implementation GetiPlayerArguments
-- (id)init
+- (instancetype)init
 {
    self = [super init];
    if (self) {
@@ -41,11 +41,9 @@ static GetiPlayerArguments *sharedController = nil;
 		NSMutableString *typeArgument = [[NSMutableString alloc] initWithString:@"--type="];
 		if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheBBC_TV"] isEqualTo:@YES])
          [typeArgument appendString:@"tv,"];
-		if ( [[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheITV_TV"] isEqualTo:@YES] && includeITV )
-         [typeArgument appendString:@"itv,"];
 		if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheBBC_Radio"] isEqualTo:@YES])
          [typeArgument appendString:@"radio,"];
-		[typeArgument deleteCharactersInRange:NSMakeRange([typeArgument length]-1,1)];
+		[typeArgument deleteCharactersInRange:NSMakeRange(typeArgument.length-1,1)];
 		currentTypeArgument = [typeArgument copy];
 		return [NSString stringWithString:typeArgument];
 	}
@@ -66,7 +64,7 @@ static GetiPlayerArguments *sharedController = nil;
 
 - (NSString *)profileDirArg
 {
-   return [NSString stringWithFormat:@"--profile-dir=%@", [NSFileManager defaultManager].applicationSupportDirectory];
+   return [NSString stringWithFormat:@"--profile-dir=\"%@\"", [NSFileManager defaultManager].applicationSupportDirectory];
 }
 
 - (NSString *)noWarningArg

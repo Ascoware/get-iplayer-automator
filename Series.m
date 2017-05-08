@@ -10,45 +10,42 @@
 
 
 @implementation Series
- - (id)init
+ - (instancetype)init
 {
 	if (!(self = [super init])) return nil;
-	showName = [[NSString alloc] init];
-	tvNetwork = [[NSString alloc] init];
-	lastFound = [[NSDate alloc] init];
-    added = @([[[NSDate alloc] init] timeIntervalSince1970]);
+	_showName = [[NSString alloc] init];
+	_tvNetwork = [[NSString alloc] init];
+	_lastFound = [[NSDate alloc] init];
+    _added = @([[NSDate alloc] init].timeIntervalSince1970);
 	return self;
 }
-- (id)initWithShowname:(NSString *)SHOWNAME
+- (instancetype)initWithShowname:(NSString *)SHOWNAME
 {
 	if (!(self = [super init])) return nil;
-	showName = [[NSString alloc] initWithString:SHOWNAME];
-	tvNetwork = [[NSString alloc] init];
-	lastFound = [NSDate date];
+	_showName = [[NSString alloc] initWithString:SHOWNAME];
+	_tvNetwork = [[NSString alloc] init];
+	_lastFound = [NSDate date];
 	return self;
 }
 - (void) encodeWithCoder: (NSCoder *)coder
 {
-	[coder encodeObject: showName forKey:@"showName"];
-	[coder encodeObject: added forKey:@"added"];
-	[coder encodeObject: tvNetwork forKey:@"tvNetwork"];
-	[coder encodeObject: lastFound  forKey:@"lastFound"];
+	[coder encodeObject: _showName forKey:@"showName"];
+	[coder encodeObject: _added forKey:@"added"];
+	[coder encodeObject: _tvNetwork forKey:@"tvNetwork"];
+	[coder encodeObject: _lastFound  forKey:@"lastFound"];
 }
-- (id) initWithCoder: (NSCoder *)coder
+- (instancetype) initWithCoder: (NSCoder *)coder
 {
 	if (!(self = [super init])) return nil;
-	showName = [[NSString alloc] initWithString:[coder decodeObjectForKey:@"showName"]];
-	added = [coder decodeObjectForKey:@"added"];
-	tvNetwork = [[NSString alloc] initWithString:[coder decodeObjectForKey:@"tvNetwork"]];
-	lastFound = [coder decodeObjectForKey:@"lastFound"];
+	_showName = [[NSString alloc] initWithString:[coder decodeObjectForKey:@"showName"]];
+	_added = [coder decodeObjectForKey:@"added"];
+	_tvNetwork = [[NSString alloc] initWithString:[coder decodeObjectForKey:@"tvNetwork"]];
+	_lastFound = [coder decodeObjectForKey:@"lastFound"];
 	return self;
 }
 - (id)description
 {
-	return [NSString stringWithFormat:@"%@ (%@)", showName,tvNetwork];
+	return [NSString stringWithFormat:@"%@ (%@)", _showName,_tvNetwork];
 }
-@synthesize showName;
-@synthesize added;
-@synthesize tvNetwork;
-@synthesize lastFound;
+
 @end

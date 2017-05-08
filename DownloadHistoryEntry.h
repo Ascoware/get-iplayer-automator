@@ -10,23 +10,16 @@
 
 
 @interface DownloadHistoryEntry : NSObject {
-	NSString *pid;
-	NSString *showName;
-	NSString *episodeName;
-	NSString *type;
-	NSString *someNumber;
-	NSString *downloadFormat;
-	NSString *downloadPath;
 }
-- (id)initWithPID:(NSString *)temp_pid showName:(NSString *)temp_showName episodeName:(NSString *)temp_episodeName type:(NSString *)temp_type someNumber:(NSString *)temp_someNumber downloadFormat:(NSString *)temp_downloadFormat downloadPath:(NSString *)temp_downloadPath;
-- (NSString *)entryString;
+@property (nonatomic) NSString *pid;
+@property (nonatomic) NSString *showName;
+@property (nonatomic) NSString *episodeName;
+@property (nonatomic) NSString *type;
+@property (nonatomic) NSString *someNumber;
+@property (nonatomic) NSString *downloadFormat;
+@property (nonatomic) NSString *downloadPath;
+@property (nonatomic, readonly, copy) NSString *entryString;
 
-@property(readwrite) NSString *pid;
-@property(readwrite) NSString *showName;
-@property(readwrite) NSString *episodeName;
-@property(readwrite) NSString *type;
-@property(readwrite) NSString *someNumber;
-@property(readwrite) NSString *downloadFormat;
-@property(readwrite) NSString *downloadPath;
+- (instancetype)initWithPID:(NSString *)temp_pid showName:(NSString *)temp_showName episodeName:(NSString *)temp_episodeName type:(NSString *)temp_type someNumber:(NSString *)temp_someNumber downloadFormat:(NSString *)temp_downloadFormat downloadPath:(NSString *)temp_downloadPath;
 
 @end

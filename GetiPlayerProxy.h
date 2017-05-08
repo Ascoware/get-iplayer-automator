@@ -12,19 +12,18 @@
 #import "ASIHTTPRequest.h"
 
 @interface GetiPlayerProxy : NSObject {
-   //Proxy
-   LogController *logger;
-   NSMutableDictionary *proxyDict;
-   BOOL currentIsSilent;
-   
-   enum {
-      kProxyLoadCancelled = 1,
-      kProxyLoadFailed = 2,
-      kProxyTestFailed = 3
-   };
-   
 }
+@property (nonatomic) LogController *logger;
+@property (nonatomic) NSMutableDictionary *proxyDict;
+@property (nonatomic) BOOL currentIsSilent;
+
+enum {
+    kProxyLoadCancelled = 1,
+    kProxyLoadFailed = 2,
+    kProxyTestFailed = 3
+};
+
 - (void)loadProxyInBackgroundForSelector:(SEL)selector withObject:(id)object onTarget:(id)target silently:(BOOL)silent;
-- (id)initWithLogger:(LogController *)logger;
+- (instancetype)initWithLogger:(LogController *)logger;
 
 @end

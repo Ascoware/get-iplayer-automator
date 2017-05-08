@@ -12,44 +12,40 @@
 AppController           *sharedAppController;
 
 @implementation GetITVShows
-- (id)init;
+- (instancetype)init;
 {
-    if (!(self = [super init])) return nil;
+    if (self = [super init]) {
+        _forceUpdateAllProgrammes = false;
+        _getITVShowRunning = false;
+        sharedAppController     = [AppController sharedController];
+    }
     
-    nc = [NSNotificationCenter defaultCenter];
-    forceUpdateAllProgrammes = false;
-    getITVShowRunning = false;
-    sharedAppController     = [AppController sharedController];
-
     return self;
 }
 
 
 -(void)forceITVUpdateWithLogger:(LogController *)theLogger
 {
-    logger = theLogger;
-    
-    [logger addToLog:@"GetITVShows: Force all programmes update "];
-    
-    forceUpdateAllProgrammes = true;
-    [self itvUpdateWithLogger:logger];
-
+    _logger = theLogger;
+    [_logger addToLog:@"GetITVShows: Force all programmes update "];
+    _forceUpdateAllProgrammes = true;
+    [self itvUpdateWithLogger:_logger];
 }
 
 -(void)itvUpdateWithLogger:(LogController *)theLogger
 {
     /* cant run if we are already running */
     
-    if ( getITVShowRunning == true )
+    if (_getITVShowRunning == true )
         return;
     
-    logger = theLogger;
+    _logger = theLogger;
     
-    [logger addToLog:@"GetITVShows: ITV Cache Update Starting "];
+    [_logger addToLog:@"GetITVShows: ITV Cache Update Starting "];
     
-    getITVShowRunning = true;
-    myQueueSize = 0;
-    htmlData = nil;
+    _getITVShowRunning = true;
+    _myQueueSize = 0;
+    _htmlData = nil;
     
     /* Create the NUSRLSession */
     
@@ -59,38 +55,38 @@ AppController           *sharedAppController;
     defaultConfigObject.URLCache = myCache;
     defaultConfigObject.requestCachePolicy = NSURLRequestUseProtocolCachePolicy;
     
-    mySession = [NSURLSession sessionWithConfiguration:defaultConfigObject delegate:self delegateQueue: [NSOperationQueue mainQueue]];
+    _mySession = [NSURLSession sessionWithConfiguration:defaultConfigObject delegate:self delegateQueue: [NSOperationQueue mainQueue]];
     
     /* Load in carried forward programmes & programme History*/
     
-    filesPath = @"~/Library/Application Support/Get iPlayer Automator/";
-    filesPath= [filesPath stringByExpandingTildeInPath];
+    _filesPath = @"~/Library/Application Support/Get iPlayer Automator/";
+    _filesPath= _filesPath.stringByExpandingTildeInPath;
 
-    programmesFilePath = [filesPath stringByAppendingString:@"/itvprogrammes.gia"];
+    _programmesFilePath = [_filesPath stringByAppendingString:@"/itvprogrammes.gia"];
     
-    if ( !forceUpdateAllProgrammes )
-        boughtForwardProgrammeArray = [NSKeyedUnarchiver unarchiveObjectWithFile:programmesFilePath];
+    if ( !_forceUpdateAllProgrammes )
+        _boughtForwardProgrammeArray = [NSKeyedUnarchiver unarchiveObjectWithFile:_programmesFilePath];
 
-    if ( boughtForwardProgrammeArray == nil || forceUpdateAllProgrammes ) {
+    if ( _boughtForwardProgrammeArray == nil || _forceUpdateAllProgrammes ) {
         ProgrammeData *emptyProgramme = [[ProgrammeData alloc]initWithName:@"program to be deleted" andPID:@"PID" andURL:@"URL" andNUMBEREPISODES:0 andDATELASTAIRED:0];
-        boughtForwardProgrammeArray = [[NSMutableArray alloc]init];
-        [boughtForwardProgrammeArray addObject:emptyProgramme];
+        _boughtForwardProgrammeArray = [[NSMutableArray alloc]init];
+        [_boughtForwardProgrammeArray addObject:emptyProgramme];
     }
     
     /* Create empty carriedForwardProgrammeArray & history array */
     
-    carriedForwardProgrammeArray = [[NSMutableArray alloc]init];
+    _carriedForwardProgrammeArray = [[NSMutableArray alloc]init];
     
     /* establish time added for any new programmes we find today */
     
-    NSTimeInterval timeAdded = [[NSDate date] timeIntervalSince1970];
+    NSTimeInterval timeAdded = [NSDate date].timeIntervalSince1970;
     timeAdded += [[NSTimeZone systemTimeZone] secondsFromGMTForDate:[NSDate date]];
-    intTimeThisRun = timeAdded;
+    _intTimeThisRun = timeAdded;
 
     /* Load in todays shows for itv.com */
     
     self.myOpQueue = [[NSOperationQueue alloc] init];
-    [self.myOpQueue setMaxConcurrentOperationCount:1];
+    (self.myOpQueue).maxConcurrentOperationCount = 1;
     [self.myOpQueue addOperation:[[NSInvocationOperation alloc] initWithTarget:self selector:@selector(requestTodayListing) object:nil]];
     
     return;
@@ -101,9 +97,9 @@ AppController           *sharedAppController;
 - (id)requestTodayListing
 {
     
-    [[mySession dataTaskWithURL:[NSURL URLWithString:@"https://www.itv.com/hub/shows"] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
+    [[_mySession dataTaskWithURL:[NSURL URLWithString:@"https://www.itv.com/hub/shows"] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
     {
-        htmlData = [[NSString alloc]initWithData:data encoding:NSASCIIStringEncoding];
+        _htmlData = [[NSString alloc]initWithData:data encoding:NSASCIIStringEncoding];
         if ( ![self createTodayProgrammeArray] )
             [self endOfRun];
         else
@@ -123,10 +119,10 @@ AppController           *sharedAppController;
     
     usleep(1);
 
-    [[mySession dataTaskWithURL:[NSURL URLWithString:myProgramme.programmeURL] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
+    [[_mySession dataTaskWithURL:[NSURL URLWithString:myProgramme.programmeURL] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
       {
           if ( error ) {
-            [logger addToLog:[NSString stringWithFormat:@"GetITVListings (Error(%@)): Unable to retreive programme episodes for %@", error, myProgramme.programmeURL]];
+            [_logger addToLog:[NSString stringWithFormat:@"GetITVListings (Error(%@)): Unable to retreive programme episodes for %@", error, myProgramme.programmeURL]];
             [[NSAlert alertWithMessageText:@"GetITVShows: Unable to retreive programme episode data" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"If problem persists, please submit a bug report and include the log file."] runModal];
           }
           else {
@@ -162,8 +158,8 @@ AppController           *sharedAppController;
     NSTimeInterval timeIntDateLastAired = 0;
     
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc]init];
-    [dateFormatter setDateFormat:@"yyyy'-'MM'-'dd'T'HH':'mm'Z'"];
-    [dateFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
+    dateFormatter.dateFormat = @"yyyy'-'MM'-'dd'T'HH':'mm'Z'";
+    dateFormatter.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
     
     /* Scan to start of episodes data  - first re-hyphonate the programe name */
     
@@ -176,7 +172,7 @@ AppController           *sharedAppController;
     [scanner scanUpToString:searchPath intoString:NULL];
     [scanner scanUpToString:@"</a>" intoString:&fullProgramme];
 
-    while ( ![scanner isAtEnd] ) {
+    while ( !scanner.atEnd ) {
         
         fullProgrammeScanner = [NSScanner scannerWithString:fullProgramme];
         
@@ -193,7 +189,7 @@ AppController           *sharedAppController;
         [fullProgrammeScanner scanUpToString:@"productionId=" intoString:&temp];
         [fullProgrammeScanner scanString:@"productionId=" intoString:&temp];
         [fullProgrammeScanner scanUpToString:@"\"" intoString:&token];
-        productionId=[token stringByRemovingPercentEncoding];
+        productionId=token.stringByRemovingPercentEncoding;
         
         /* Series (if available) */
         
@@ -201,7 +197,7 @@ AppController           *sharedAppController;
         seriesNumber = 0;
         [fullProgrammeScanner scanUpToString:@"Series" intoString:&temp];
         
-        if ( ![fullProgrammeScanner isAtEnd])  {
+        if ( !fullProgrammeScanner.atEnd)  {
             [fullProgrammeScanner scanString:@"Series" intoString:&temp];
             [fullProgrammeScanner scanInt:&seriesNumber];
         }
@@ -210,7 +206,7 @@ AppController           *sharedAppController;
         fullProgrammeScanner.scanLocation = scanPoint;
         [fullProgrammeScanner scanUpToString:@"Episode" intoString:&temp];
         
-        if ( ![fullProgrammeScanner isAtEnd])  {
+        if ( !fullProgrammeScanner.atEnd)  {
             [fullProgrammeScanner scanString:@"Episode" intoString:&temp];
             [fullProgrammeScanner scanInt:&episodeNumber];
         }
@@ -221,10 +217,10 @@ AppController           *sharedAppController;
         fullProgrammeScanner.scanLocation = scanPoint;
         [fullProgrammeScanner scanUpToString:@"datetime=\"" intoString:&temp];
         
-        if ( ![fullProgrammeScanner isAtEnd])  {
+        if ( !fullProgrammeScanner.atEnd)  {
             [fullProgrammeScanner scanString:@"datetime=\"" intoString:&temp];
             [fullProgrammeScanner scanUpToString:@"\"" intoString:&dateLastAired];
-            timeIntDateLastAired = [[dateFormatter dateFromString:dateLastAired] timeIntervalSince1970];
+            timeIntDateLastAired = [dateFormatter dateFromString:dateLastAired].timeIntervalSince1970;
         }
         /* Create ProgrammeData Object and store in array */
         
@@ -235,15 +231,15 @@ AppController           *sharedAppController;
         if (numberEpisodesFound == 1)
             [myProgramme makeNew];
         
-        [carriedForwardProgrammeArray addObject:myProgramme];
+        [_carriedForwardProgrammeArray addObject:myProgramme];
 
         /* if we couldnt find dateAired then mark first programme for forced cache update - hopefully this will repair issue on next run */
         
         if ( myProgramme.timeIntDateLastAired == 0 )  {
 
-            [[carriedForwardProgrammeArray objectAtIndex:[carriedForwardProgrammeArray count]-numberEpisodesFound] forceCacheUpdateOn];
+            [_carriedForwardProgrammeArray[_carriedForwardProgrammeArray.count-numberEpisodesFound] forceCacheUpdateOn];
             
-            [logger addToLog:[NSString stringWithFormat:@"GetITVListings: WARNING: Date aired not found %@", aProgramme.programmeName]];
+            [_logger addToLog:[NSString stringWithFormat:@"GetITVListings: WARNING: Date aired not found %@", aProgramme.programmeName]];
         }
         
         /* Scan for next programme */
@@ -259,16 +255,16 @@ AppController           *sharedAppController;
         /* if not - mark first entry as requireing a full update on next run - hopefully this will repair the issue */
         
         if ( numberEpisodesFound > 0 )
-            [[carriedForwardProgrammeArray objectAtIndex:[carriedForwardProgrammeArray count]-numberEpisodesFound] forceCacheUpdateOn];
+            [_carriedForwardProgrammeArray[_carriedForwardProgrammeArray.count-numberEpisodesFound] forceCacheUpdateOn];
        
-        [logger addToLog:[NSString stringWithFormat:@"GetITVListings (Warning): Processing Error %@ - episodes expected/found %d/%d", aProgramme.programmeURL, aProgramme.numberEpisodes, numberEpisodesFound]];
+        [_logger addToLog:[NSString stringWithFormat:@"GetITVListings (Warning): Processing Error %@ - episodes expected/found %ld/%d", aProgramme.programmeURL, (long)aProgramme.numberEpisodes, numberEpisodesFound]];
     }
     
     /* Check if there is any outstanding work before processing the carried forward programme list */
     
-    [[sharedAppController itvProgressIndicator]incrementBy:myQueueSize -1 ? 100.0f/(float)(myQueueSize -1.0f) : 100.0f];
+    [sharedAppController.itvProgressIndicator incrementBy:_myQueueSize -1 ? 100.0f/(float)(_myQueueSize -1.0f) : 100.0f];
 
-    if ( !--myQueueLeft  )
+    if ( !--_myQueueLeft  )
         [self processCarriedForwardProgrammes];
 }
 
@@ -278,14 +274,14 @@ AppController           *sharedAppController;
     
     NSSortDescriptor *sort1 = [NSSortDescriptor sortDescriptorWithKey:@"productionId" ascending:YES];
     
-    [boughtForwardProgrammeArray sortUsingDescriptors:[NSArray arrayWithObjects:sort1, nil]];
+    [_boughtForwardProgrammeArray sortUsingDescriptors:@[sort1]];
     
-    for ( int i=0; i < [carriedForwardProgrammeArray count]; i++ )  {
-        ProgrammeData *cfProgramme = [carriedForwardProgrammeArray objectAtIndex:i];
+    for ( int i=0; i < _carriedForwardProgrammeArray.count; i++ )  {
+        ProgrammeData *cfProgramme = _carriedForwardProgrammeArray[i];
                                       
-        cfProgramme.timeAddedInt = [self searchForProductionId:cfProgramme.productionId inProgrammeArray:boughtForwardProgrammeArray];
+        cfProgramme.timeAddedInt = [self searchForProductionId:cfProgramme.productionId inProgrammeArray:_boughtForwardProgrammeArray];
         
-        [carriedForwardProgrammeArray replaceObjectAtIndex:i withObject:cfProgramme];
+        _carriedForwardProgrammeArray[i] = cfProgramme;
     }
 
     /* Now we sort the programmes & write CF to disk */
@@ -294,9 +290,9 @@ AppController           *sharedAppController;
     NSSortDescriptor *sort2 = [NSSortDescriptor sortDescriptorWithKey:@"isNew" ascending:NO];
     NSSortDescriptor *sort3 = [NSSortDescriptor sortDescriptorWithKey:@"timeIntDateLastAired" ascending:NO];
     
-    [carriedForwardProgrammeArray sortUsingDescriptors:[NSArray arrayWithObjects:sort1, sort2, sort3, nil]];
+    [_carriedForwardProgrammeArray sortUsingDescriptors:@[sort1, sort2, sort3]];
     
-    [NSKeyedArchiver archiveRootObject:carriedForwardProgrammeArray toFile:programmesFilePath];
+    [NSKeyedArchiver archiveRootObject:_carriedForwardProgrammeArray toFile:_programmesFilePath];
 
     
     /* Now create the cache file that used to be created by get_iplayer */
@@ -307,7 +303,7 @@ AppController           *sharedAppController;
     
 
     NSDateFormatter *dateFormatter=[[NSDateFormatter alloc] init];
-    [dateFormatter setDateFormat:@"EEE MMM dd"];
+    dateFormatter.dateFormat = @"EEE MMM dd";
     NSString *episodeString = nil;
     
     NSDateFormatter* dateFormatter1 = [[NSDateFormatter alloc] init];
@@ -316,7 +312,7 @@ AppController           *sharedAppController;
 
     NSDate *dateAiredUTC;
     
-    for (ProgrammeData *carriedForwardProgramme in carriedForwardProgrammeArray)    {
+    for (ProgrammeData *carriedForwardProgramme in _carriedForwardProgrammeArray)    {
         
         if ( carriedForwardProgramme.timeIntDateLastAired )  {
             dateAiredUTC = [[NSDate alloc] initWithTimeIntervalSince1970:carriedForwardProgramme.timeIntDateLastAired];
@@ -339,14 +335,14 @@ AppController           *sharedAppController;
         [cacheFileContentString appendString:@"|"];
         [cacheFileContentString appendString:episodeString];
         [cacheFileContentString appendString:@"|||default|||ITV Player|TV||"];
-        [cacheFileContentString appendFormat:@"%d||",carriedForwardProgramme.timeAddedInt];
+        [cacheFileContentString appendFormat:@"%ld||",(long)carriedForwardProgramme.timeAddedInt];
         [cacheFileContentString appendString:carriedForwardProgramme.programmeURL];
         [cacheFileContentString appendString:@"|\n"];
     }
 
     NSData *cacheData = [cacheFileContentString dataUsingEncoding:NSUTF8StringEncoding];
 
-    NSString *cacheFilePath = [filesPath stringByAppendingString:@"/itv.cache"];
+    NSString *cacheFilePath = [_filesPath stringByAppendingString:@"/itv.cache"];
     NSFileManager *fileManager = [NSFileManager defaultManager];
     
     if (![fileManager fileExistsAtPath:cacheFilePath])  {
@@ -371,20 +367,21 @@ AppController           *sharedAppController;
 {
     /* Notify finish and invaliate the NSURLSession */
 
-    getITVShowRunning = false;
-    [mySession finishTasksAndInvalidate];
+    _getITVShowRunning = false;
+    [_mySession finishTasksAndInvalidate];
 
-    if (forceUpdateAllProgrammes)
-        [nc postNotificationName:@"ForceITVUpdateFinished" object:nil];
-    else
-        [nc postNotificationName:@"ITVUpdateFinished" object:NULL];
+    if (_forceUpdateAllProgrammes) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"ForceITVUpdateFinished" object:nil];
+    } else {
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"ITVUpdateFinished" object:nil];
+    }
     
-    forceUpdateAllProgrammes = false;
+    _forceUpdateAllProgrammes = false;
     
-    [logger addToLog:@"GetITVShows: Update Finished"];
+    [_logger addToLog:@"GetITVShows: Update Finished"];
 }
 
--(int)searchForProductionId:(NSString *)productionId inProgrammeArray:(NSMutableArray *)programmeArray
+-(NSInteger)searchForProductionId:(NSString *)productionId inProgrammeArray:(NSMutableArray *)programmeArray
 {
     NSInteger startPoint = 0;
     NSInteger endPoint   = programmeArray.count -1;
@@ -393,7 +390,7 @@ AppController           *sharedAppController;
     
     while (startPoint <= endPoint) {
         
-        midProgramme = [programmeArray objectAtIndex:midPoint];
+        midProgramme = programmeArray[midPoint];
         NSString *midProductionId = midProgramme.productionId;
 
         NSComparisonResult result = [midProductionId compare:productionId];
@@ -403,7 +400,7 @@ AppController           *sharedAppController;
                 startPoint = midPoint +1;
                 break;
             case NSOrderedSame:
-                return midProgramme.timeAddedInt ? midProgramme.timeAddedInt : intTimeThisRun;
+                return midProgramme.timeAddedInt ? midProgramme.timeAddedInt : _intTimeThisRun;
                 break;
             case NSOrderedDescending:
                 endPoint = midPoint -1;
@@ -412,7 +409,7 @@ AppController           *sharedAppController;
         midPoint = (startPoint + endPoint)/2;
     }
     
-    return intTimeThisRun;
+    return _intTimeThisRun;
 }
 
 
@@ -421,22 +418,22 @@ AppController           *sharedAppController;
     int bfIndex = 0;
     int todayIndex = 0;
     
-    ProgrammeData *bfProgramme = [boughtForwardProgrammeArray objectAtIndex:bfIndex];
-    ProgrammeData *todayProgramme  = [todayProgrammeArray objectAtIndex:todayIndex];
+    ProgrammeData *bfProgramme = _boughtForwardProgrammeArray[bfIndex];
+    ProgrammeData *todayProgramme  = _todayProgrammeArray[todayIndex];
     NSString *bfProgrammeName;
     NSString *todayProgrammeName;
     
     do {
 
-        if (bfIndex < boughtForwardProgrammeArray.count) {
-            bfProgramme = [boughtForwardProgrammeArray objectAtIndex:bfIndex];
+        if (bfIndex < _boughtForwardProgrammeArray.count) {
+            bfProgramme = _boughtForwardProgrammeArray[bfIndex];
             bfProgrammeName = bfProgramme.programmeName;
         }
         else {
             bfProgrammeName = @"~~~~~~~~~~";
         }
-        if (todayIndex < todayProgrammeArray.count) {
-            todayProgramme = [todayProgrammeArray objectAtIndex:todayIndex];
+        if (todayIndex < _todayProgrammeArray.count) {
+            todayProgramme = _todayProgrammeArray[todayIndex];
             todayProgrammeName = todayProgramme.programmeName;
         }
         else {
@@ -453,10 +450,10 @@ AppController           *sharedAppController;
             
                 if ( todayProgramme.numberEpisodes == 1 )  {
                     [todayProgramme makeNew];
-                    [carriedForwardProgrammeArray addObject:todayProgramme];
+                    [_carriedForwardProgrammeArray addObject:todayProgramme];
                 }
                 else {
-                    myQueueSize++;
+                    _myQueueSize++;
                     [self.myOpQueue addOperation:[[NSInvocationOperation alloc] initWithTarget:self selector:@selector(requestProgrammeEpisodes:) object:todayProgramme]];
                 }
             
@@ -472,16 +469,16 @@ AppController           *sharedAppController;
                      ( bfProgramme.forceCacheUpdate == true || ![todayProgramme.productionId isEqualToString:bfProgramme.productionId] ||todayProgramme.numberEpisodes > bfProgramme.numberEpisodes) )  {
                     
                         if (bfProgramme.forceCacheUpdate == true)
-                            [logger addToLog:[NSString stringWithFormat:@"GetITVListings (Warning): Cache upate forced for: %@", bfProgramme.programmeName]];
+                            [_logger addToLog:[NSString stringWithFormat:@"GetITVListings (Warning): Cache upate forced for: %@", bfProgramme.programmeName]];
                         
-                        myQueueSize++;
+                        _myQueueSize++;
                         
                         [self.myOpQueue addOperation:[[NSInvocationOperation alloc] initWithTarget:self selector:@selector(requestProgrammeEpisodes:)object:todayProgramme]];
                     
                         /* Now skip remaining BF episodes */
                     
-                        for (bfIndex++; (bfIndex < boughtForwardProgrammeArray.count  &&
-                                     [todayProgramme.programmeName isEqualToString:((ProgrammeData *)[boughtForwardProgrammeArray objectAtIndex:bfIndex]).programmeName]); bfIndex++ );
+                        for (bfIndex++; (bfIndex < _boughtForwardProgrammeArray.count  &&
+                                     [todayProgramme.programmeName isEqualToString:((ProgrammeData *)_boughtForwardProgrammeArray[bfIndex]).programmeName]); bfIndex++ );
                  
                 }
                 
@@ -490,12 +487,12 @@ AppController           *sharedAppController;
                     /* For programmes with only 1 episode found just copy it from today to CF */
                     
                     [todayProgramme makeNew];
-                    [carriedForwardProgrammeArray addObject:todayProgramme];
+                    [_carriedForwardProgrammeArray addObject:todayProgramme];
                 
                     /* Now skip remaining BF episodes (if any) */
                 
-                    for (bfIndex++; (bfIndex < boughtForwardProgrammeArray.count  &&
-                                     [todayProgramme.programmeName isEqualToString:((ProgrammeData *)[boughtForwardProgrammeArray objectAtIndex:bfIndex]).programmeName]); bfIndex++ );
+                    for (bfIndex++; (bfIndex < _boughtForwardProgrammeArray.count  &&
+                                     [todayProgramme.programmeName isEqualToString:((ProgrammeData *)_boughtForwardProgrammeArray[bfIndex]).programmeName]); bfIndex++ );
                 }
                 
                 else if ( [todayProgramme.productionId isEqualToString:bfProgramme.productionId] && todayProgramme.numberEpisodes == bfProgramme.numberEpisodes  )              {
@@ -503,40 +500,40 @@ AppController           *sharedAppController;
                     /* For programmes where the current episode and number of episodes has not changed so just copy BF to CF  */
                     
                     do {
-                        [carriedForwardProgrammeArray addObject:[boughtForwardProgrammeArray objectAtIndex:bfIndex]];
+                        [_carriedForwardProgrammeArray addObject:_boughtForwardProgrammeArray[bfIndex]];
                         
-                    } while (  ++bfIndex < boughtForwardProgrammeArray.count  &&
-                             [todayProgramme.programmeName isEqualToString:((ProgrammeData *)[boughtForwardProgrammeArray objectAtIndex:bfIndex]).programmeName]);
+                    } while (  ++bfIndex < _boughtForwardProgrammeArray.count  &&
+                             [todayProgramme.programmeName isEqualToString:((ProgrammeData *)_boughtForwardProgrammeArray[bfIndex]).programmeName]);
                 }
                 
                 else if ( todayProgramme.numberEpisodes < bfProgramme.numberEpisodes )  {
                     
                     /* For programmes where the current episode has changed but fewer episodes found today; copy available episodes & drop the remainder */
                     
-                    for (int i = todayProgramme.numberEpisodes; i; i--, bfIndex++ ) {
-                        ProgrammeData *pd = [boughtForwardProgrammeArray objectAtIndex:bfIndex];  
+                    for (NSInteger i = todayProgramme.numberEpisodes; i; i--, bfIndex++ ) {
+                        ProgrammeData *pd = _boughtForwardProgrammeArray[bfIndex];  
                         pd.numberEpisodes = todayProgramme.numberEpisodes;
-                        [carriedForwardProgrammeArray addObject:pd];
+                        [_carriedForwardProgrammeArray addObject:pd];
                     }
                 
                     /* and drop the rest */
                     
-                    for (; (bfIndex < boughtForwardProgrammeArray.count  &&
-                            [todayProgramme.programmeName isEqualToString:((ProgrammeData *)[boughtForwardProgrammeArray objectAtIndex:bfIndex]).programmeName]); bfIndex++ );
+                    for (; (bfIndex < _boughtForwardProgrammeArray.count  &&
+                            [todayProgramme.programmeName isEqualToString:((ProgrammeData *)_boughtForwardProgrammeArray[bfIndex]).programmeName]); bfIndex++ );
                 }
                 
                 else {
                 
                     /* Should never get here fo full reload & skip all episodes for this programme */
                     
-                    [logger addToLog:[NSString stringWithFormat:@"GetITVListings (Error): Failed to correctly process %@ will issue a full refresh", todayProgramme]];
+                    [_logger addToLog:[NSString stringWithFormat:@"GetITVListings (Error): Failed to correctly process %@ will issue a full refresh", todayProgramme]];
                     
-                    myQueueSize++;
+                    _myQueueSize++;
                     
                     [self.myOpQueue addOperation:[[NSInvocationOperation alloc] initWithTarget:self selector:@selector(requestProgrammeEpisodes:)object:todayProgramme]];
                     
-                    for (bfIndex++; (bfIndex < boughtForwardProgrammeArray.count  &&
-                                     [todayProgramme.programmeName isEqualToString:((ProgrammeData *)[boughtForwardProgrammeArray objectAtIndex:bfIndex]).programmeName]); bfIndex++ );
+                    for (bfIndex++; (bfIndex < _boughtForwardProgrammeArray.count  &&
+                                     [todayProgramme.programmeName isEqualToString:((ProgrammeData *)_boughtForwardProgrammeArray[bfIndex]).programmeName]); bfIndex++ );
                 }
         
         todayIndex++;
@@ -547,22 +544,22 @@ AppController           *sharedAppController;
 
                 /*  BF not found; Skip all episdoes on BF as programme no longer available */
             
-                for (bfIndex++; (bfIndex < boughtForwardProgrammeArray.count  &&
-                             [bfProgramme.programmeName isEqualToString:((ProgrammeData *)[boughtForwardProgrammeArray objectAtIndex:bfIndex]).programmeName]);  bfIndex++ );
+                for (bfIndex++; (bfIndex < _boughtForwardProgrammeArray.count  &&
+                             [bfProgramme.programmeName isEqualToString:((ProgrammeData *)_boughtForwardProgrammeArray[bfIndex]).programmeName]);  bfIndex++ );
                 
                 break;
         }
         
-    } while ( bfIndex < boughtForwardProgrammeArray.count  || todayIndex < todayProgrammeArray.count  );
+    } while ( bfIndex < _boughtForwardProgrammeArray.count  || todayIndex < _todayProgrammeArray.count  );
     
-    [logger addToLog:[NSString stringWithFormat:@"GetITVShows (Info): Merge complete B/F Programmes: %ld C/F Programmes: %ld Today Programmes: %ld ", boughtForwardProgrammeArray.count, carriedForwardProgrammeArray.count, todayProgrammeArray.count]];
+    [_logger addToLog:[NSString stringWithFormat:@"GetITVShows (Info): Merge complete B/F Programmes: %ld C/F Programmes: %ld Today Programmes: %ld ", _boughtForwardProgrammeArray.count, _carriedForwardProgrammeArray.count, _todayProgrammeArray.count]];
     
-    myQueueLeft = myQueueSize;
+    _myQueueLeft = _myQueueSize;
     
-    if (myQueueSize < 2 )
-        [[sharedAppController itvProgressIndicator]incrementBy:100.0f];
+    if (_myQueueSize < 2 )
+        [sharedAppController.itvProgressIndicator incrementBy:100.0f];
 
-    if (!myQueueSize)
+    if (!_myQueueSize)
         [self processCarriedForwardProgrammes];
 }
 
@@ -570,8 +567,8 @@ AppController           *sharedAppController;
 {
     /* Scan itv.com/shows to create full listing of programmes (not episodes) that are available today */
     
-    todayProgrammeArray = [[NSMutableArray alloc]init];
-    NSScanner *scanner = [NSScanner scannerWithString:htmlData];
+    _todayProgrammeArray = [[NSMutableArray alloc]init];
+    NSScanner *scanner = [NSScanner scannerWithString:_htmlData];
 
     NSString *programmeName = nil;
     NSString *programmeURL = nil;
@@ -589,7 +586,7 @@ AppController           *sharedAppController;
     [scanner scanUpToString:@"<a href=\"https://www.itv.com/hub/" intoString:NULL];
     [scanner scanUpToString:@"</a>" intoString:&fullProgramme];
     
-    while ( (![scanner isAtEnd]) && ++testingProgrammeCount ) {
+    while ( (!scanner.atEnd) && ++testingProgrammeCount ) {
     
         NSScanner *fullProgrammeScanner = [NSScanner scannerWithString:fullProgramme];
         scanPoint = fullProgrammeScanner.scanLocation;
@@ -610,7 +607,7 @@ AppController           *sharedAppController;
         [fullProgrammeScanner scanUpToString:@"productionId=" intoString:NULL];
         [fullProgrammeScanner scanString:@"productionId=" intoString:NULL];
         [fullProgrammeScanner scanUpToString:@"\"" intoString:&token];
-        productionId=[token stringByRemovingPercentEncoding];
+        productionId=token.stringByRemovingPercentEncoding;
         
         /* Get mumber of episodes, assume 1 if you cant figure it out */
         
@@ -618,12 +615,12 @@ AppController           *sharedAppController;
         
         [fullProgrammeScanner scanUpToString:@"<p class=\"tout__meta theme__meta\">" intoString:&temp];
         
-        if ( ![fullProgrammeScanner isAtEnd])  {
+        if ( !fullProgrammeScanner.atEnd)  {
             [fullProgrammeScanner scanString:@"<p class=\"tout__meta theme__meta\">" intoString:&temp];
             scanPoint = fullProgrammeScanner.scanLocation;
             [fullProgrammeScanner scanUpToString:@"episode" intoString:&temp];
                 
-            if ( ![fullProgrammeScanner isAtEnd])  {
+            if ( !fullProgrammeScanner.atEnd)  {
                 fullProgrammeScanner.scanLocation = scanPoint;
                 [fullProgrammeScanner scanInt:&numberEpisodes];
             }
@@ -631,8 +628,8 @@ AppController           *sharedAppController;
         
         /* Create ProgrammeData Object and store in array */
         
-        ProgrammeData *myProgramme = [[ProgrammeData alloc]initWithName:programmeName andPID:productionId andURL:programmeURL andNUMBEREPISODES:numberEpisodes andDATELASTAIRED:timeIntervalSince1970UTC];
-        [todayProgrammeArray addObject:myProgramme];
+        ProgrammeData *myProgramme = [[ProgrammeData alloc]initWithName:programmeName andPID:productionId andURL:programmeURL andNUMBEREPISODES:numberEpisodes andDATELASTAIRED:_timeIntervalSince1970UTC];
+        [_todayProgrammeArray addObject:myProgramme];
         
         /* Scan for next programme */
         
@@ -643,8 +640,8 @@ AppController           *sharedAppController;
 
     /* Now we sort the programmes and the drop duplicates */
     
-    if ( !todayProgrammeArray.count )  {
-        [logger addToLog:@"No programmes found on www.itv.com/hub/shows"];
+    if ( !_todayProgrammeArray.count )  {
+        [_logger addToLog:@"No programmes found on www.itv.com/hub/shows"];
         
         NSAlert *noProgs = [NSAlert alertWithMessageText:@"No programmes were found on www.itv.com/hub/shows"
                                                  defaultButton:@"OK"
@@ -657,14 +654,14 @@ AppController           *sharedAppController;
     }
     
     NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:@"programmeName" ascending:YES];
-    [todayProgrammeArray sortUsingDescriptors:[NSArray arrayWithObject:sort]];
+    [_todayProgrammeArray sortUsingDescriptors:@[sort]];
     
-    for (int i=0; i < todayProgrammeArray.count -1; i++) {
-        ProgrammeData *programme1 = [todayProgrammeArray objectAtIndex:i];
-        ProgrammeData *programme2 = [todayProgrammeArray objectAtIndex:i+1];
+    for (int i=0; i < _todayProgrammeArray.count -1; i++) {
+        ProgrammeData *programme1 = _todayProgrammeArray[i];
+        ProgrammeData *programme2 = _todayProgrammeArray[i+1];
         
         if ( [programme1.programmeName isEqualToString:programme2.programmeName] ) {
-            [todayProgrammeArray removeObjectAtIndex:i];
+            [_todayProgrammeArray removeObjectAtIndex:i];
         }
     }
 
@@ -677,16 +674,16 @@ AppController           *sharedAppController;
 @implementation ProgrammeData
 
 
-- (id)initWithName:(NSString *)name andPID:(NSString *)pid andURL:(NSString *)url andNUMBEREPISODES:(int)numberEpisodes andDATELASTAIRED:(NSTimeInterval)timeIntDateLastAired;
+- (instancetype)initWithName:(NSString *)name andPID:(NSString *)pid andURL:(NSString *)url andNUMBEREPISODES:(NSInteger)numberEpisodes andDATELASTAIRED:(NSTimeInterval)timeIntDateLastAired;
 {
-    self.programmeName = name;
+    _programmeName = name;
     [self fixProgrammeName];
-    self.productionId = pid;
-    self.programmeURL = url;
+    _productionId = pid;
+    _programmeURL = url;
     self.numberEpisodes = numberEpisodes;
-    seriesNumber = 0;
-    episodeNumber = 0;
-    isNew = false;
+    _seriesNumber = 0;
+    _episodeNumber = 0;
+    _isNew = false;
     self.forceCacheUpdate = false;
     self.timeIntDateLastAired = timeIntDateLastAired;
     self.timeAddedInt = 0;
@@ -697,15 +694,15 @@ AppController           *sharedAppController;
 
 - (id)addProgrammeSeriesInfo:(int)aSeriesNumber :(int)aEpisodeNumber
 {
-    seriesNumber = aSeriesNumber;
-    episodeNumber = aEpisodeNumber;
+    _seriesNumber = aSeriesNumber;
+    _episodeNumber = aEpisodeNumber;
     
     return self;
 }
 
 - (id)makeNew
 {
-    isNew = true;
+    _isNew = true;
     
     return self;
 }
@@ -721,16 +718,16 @@ AppController           *sharedAppController;
     [encoder encodeObject:self.programmeName forKey:@"programmeName"];
     [encoder encodeObject:self.productionId forKey:@"productionId"];
     [encoder encodeObject:self.programmeURL forKey:@"programmeURL"];
-    [encoder encodeObject:[NSNumber numberWithInt:self.numberEpisodes] forKey:@"numberEpisodes"];
-    [encoder encodeObject:[NSNumber numberWithInt:seriesNumber] forKey:@"seriesNumber"];
-    [encoder encodeObject:[NSNumber numberWithInt:episodeNumber] forKey:@"episodeNumber"];
-    [encoder encodeObject:[NSNumber numberWithInt:isNew] forKey:@"isNew"];
-    [encoder encodeObject:[NSNumber numberWithInt:self.forceCacheUpdate] forKey:@"forceCacheUpdate"];
-    [encoder encodeObject:[NSNumber numberWithFloat:self.timeIntDateLastAired] forKey:@"timeIntDateLastAired"];
-    [encoder encodeObject:[NSNumber numberWithInt:self.timeAddedInt] forKey:@"timeAddedInt"];
+    [encoder encodeObject:@(self.numberEpisodes) forKey:@"numberEpisodes"];
+    [encoder encodeObject:@(_seriesNumber) forKey:@"seriesNumber"];
+    [encoder encodeObject:@(_episodeNumber) forKey:@"episodeNumber"];
+    [encoder encodeObject:@(_isNew) forKey:@"isNew"];
+    [encoder encodeObject:@(self.forceCacheUpdate) forKey:@"forceCacheUpdate"];
+    [encoder encodeObject:[NSNumber numberWithDouble:self.timeIntDateLastAired] forKey:@"timeIntDateLastAired"];
+    [encoder encodeObject:@(self.timeAddedInt) forKey:@"timeAddedInt"];
 }
 
-- (id)initWithCoder:(NSCoder *)decoder
+- (instancetype)initWithCoder:(NSCoder *)decoder
 {
     self = [super init];
     
@@ -739,9 +736,9 @@ AppController           *sharedAppController;
         self.productionId = [decoder decodeObjectForKey:@"productionId"];
         self.programmeURL = [decoder decodeObjectForKey:@"programmeURL"];
         self.numberEpisodes = [[decoder decodeObjectForKey:@"numberEpisodes"] intValue];
-        seriesNumber = [[decoder decodeObjectForKey:@"seriesNumber"] intValue];
-        episodeNumber = [[decoder decodeObjectForKey:@"episodeNumber"] intValue];
-        isNew = [[decoder decodeObjectForKey:@"isNew"] intValue];
+        _seriesNumber = [[decoder decodeObjectForKey:@"seriesNumber"] intValue];
+        _episodeNumber = [[decoder decodeObjectForKey:@"episodeNumber"] intValue];
+        _isNew = [[decoder decodeObjectForKey:@"isNew"] intValue];
         self.forceCacheUpdate = [[decoder decodeObjectForKey:@"forceCacheUpdate"] intValue];
         self.timeIntDateLastAired = [[decoder decodeObjectForKey:@"timeIntDateLastAired"] floatValue];
         self.timeAddedInt = [[decoder decodeObjectForKey:@"timeAddedInt"] intValue];
@@ -753,7 +750,7 @@ AppController           *sharedAppController;
 -(void)fixProgrammeName
 {
     self.programmeName = [self.programmeName stringByReplacingOccurrencesOfString:@"-" withString:@" "];
-    self.programmeName = [self.programmeName capitalizedString];
+    self.programmeName = (self.programmeName).capitalizedString;
 }
 
 @end
@@ -773,52 +770,52 @@ AppController           *sharedAppController;
     return sharedInstance;
 }
 
--(id)init
+-(instancetype)init
 {
     if (self = [super init]) {
         
-        itemsAdded = false;
-        historyFilePath = @"~/Library/Application Support/Get iPlayer Automator/history.gia";
-        historyFilePath= [historyFilePath stringByExpandingTildeInPath];
-        programmeHistoryArray = [NSKeyedUnarchiver unarchiveObjectWithFile:historyFilePath];
+        _itemsAdded = false;
+        _historyFilePath = @"~/Library/Application Support/Get iPlayer Automator/history.gia";
+        _historyFilePath= _historyFilePath.stringByExpandingTildeInPath;
+        _programmeHistoryArray = [NSKeyedUnarchiver unarchiveObjectWithFile:_historyFilePath];
         
-        if ( programmeHistoryArray == nil )
-               programmeHistoryArray = [[NSMutableArray alloc]init];
+        if ( _programmeHistoryArray == nil )
+               _programmeHistoryArray = [[NSMutableArray alloc]init];
         
         /* Cull history if > 3,000 entries */
         
-        while ( [programmeHistoryArray count] > 3000 )
-            [programmeHistoryArray removeObjectAtIndex:0];
+        while ( _programmeHistoryArray.count > 3000 )
+            [_programmeHistoryArray removeObjectAtIndex:0];
         
-        timeIntervalSince1970UTC = [[NSDate date] timeIntervalSince1970];
-        timeIntervalSince1970UTC += [[NSTimeZone systemTimeZone] secondsFromGMTForDate:[NSDate date]];
-        timeIntervalSince1970UTC /= (24*60*60);
+        _timeIntervalSince1970UTC = [NSDate date].timeIntervalSince1970;
+        _timeIntervalSince1970UTC += [[NSTimeZone systemTimeZone] secondsFromGMTForDate:[NSDate date]];
+        _timeIntervalSince1970UTC /= (24*60*60);
         
         NSDateFormatter *dateFormatter=[[NSDateFormatter alloc] init];
-        [dateFormatter setDateFormat:@"EEE MMM dd"];
-        dateFound = [dateFormatter stringFromDate:[NSDate date]];
+        dateFormatter.dateFormat = @"EEE MMM dd";
+        _dateFound = [dateFormatter stringFromDate:[NSDate date]];
     }
     return self;
 }
 
 -(void)addToNewProgrammeHistory:(NSString *)name andTVChannel:(NSString *)tvChannel andNetworkName:(NSString *)networkName
 {
-    itemsAdded = true;
-    ProgrammeHistoryObject *newEntry = [[ProgrammeHistoryObject alloc]initWithName:name andTVChannel:tvChannel andDateFound:dateFound andSortKey:timeIntervalSince1970UTC andNetworkName:networkName];
-    [programmeHistoryArray addObject:newEntry];
+    _itemsAdded = true;
+    ProgrammeHistoryObject *newEntry = [[ProgrammeHistoryObject alloc]initWithName:name andTVChannel:tvChannel andDateFound:_dateFound andSortKey:_timeIntervalSince1970UTC andNetworkName:networkName];
+    [_programmeHistoryArray addObject:newEntry];
 }
 
 -(NSMutableArray *)getHistoryArray
 {
-    if (itemsAdded)
+    if (_itemsAdded)
         [self flushHistoryToDisk];
     
-    return programmeHistoryArray;
+    return _programmeHistoryArray;
 }
 
 -(void)flushHistoryToDisk;
 {
-    itemsAdded = false;
+    _itemsAdded = false;
     
     /* Sort history array and flush to disk */
     
@@ -826,16 +823,16 @@ AppController           *sharedAppController;
     NSSortDescriptor *sort2 = [NSSortDescriptor sortDescriptorWithKey:@"programmeName" ascending:YES];
     NSSortDescriptor *sort3 = [NSSortDescriptor sortDescriptorWithKey:@"tvChannel" ascending:YES];
     
-    [programmeHistoryArray sortUsingDescriptors:[NSArray arrayWithObjects:sort1, sort2, sort3, nil]];
+    [_programmeHistoryArray sortUsingDescriptors:@[sort1, sort2, sort3]];
     
-    [NSKeyedArchiver archiveRootObject:programmeHistoryArray toFile:historyFilePath];
+    [NSKeyedArchiver archiveRootObject:_programmeHistoryArray toFile:_historyFilePath];
 }
 
 @end
 
 @implementation ProgrammeHistoryObject
 
-- (id)initWithName:(NSString *)name andTVChannel:(NSString *)aTVChannel andDateFound:(NSString *)dateFound andSortKey:(NSUInteger)aSortKey andNetworkName:(NSString *)networkName
+- (instancetype)initWithName:(NSString *)name andTVChannel:(NSString *)aTVChannel andDateFound:(NSString *)dateFound andSortKey:(NSUInteger)aSortKey andNetworkName:(NSString *)networkName
 {
     
     self.sortKey             = aSortKey;
@@ -850,14 +847,14 @@ AppController           *sharedAppController;
 
 - (void) encodeWithCoder:(NSCoder *)encoder
 {
-    [encoder encodeObject:[NSNumber numberWithLong:self.sortKey] forKey:@"sortKey"];
+    [encoder encodeObject:@(self.sortKey) forKey:@"sortKey"];
     [encoder encodeObject:self.programmeName forKey:@"programmeName"];
     [encoder encodeObject:self.dateFound forKey:@"dateFound"];
     [encoder encodeObject:self.tvChannel forKey:@"tvChannel"];
     [encoder encodeObject:self.networkName forKey:@"networkName"];
 }
 
-- (id)initWithCoder:(NSCoder *)decoder
+- (instancetype)initWithCoder:(NSCoder *)decoder
 {
     self = [super init];
     
@@ -879,7 +876,7 @@ AppController           *sharedAppController;
 
 - (NSUInteger)hash
 {
-    return [self.programmeName hash];
+    return (self.programmeName).hash;
 }
 @end
 

@@ -12,92 +12,84 @@
 #import "AppController.h"
 
 @interface ProgrammeData : NSObject <NSCoding>
-{
-    int afield;
-    int seriesNumber;
-    int episodeNumber;
-    int isNew;
-}
-@property NSString *programmeName;
-@property NSString *productionId;
-@property NSString *programmeURL;
-@property int numberEpisodes;
-@property int forceCacheUpdate;
-@property NSTimeInterval timeIntDateLastAired;
-@property int timeAddedInt;
 
-- (id)initWithName:(NSString *)name andPID:(NSString *)pid andURL:(NSString *)url andNUMBEREPISODES:(int)numberEpisodes andDATELASTAIRED:(NSTimeInterval)timeIntDateLastAired;
+@property (nonatomic, assign) NSInteger afield;
+@property (nonatomic, assign) NSInteger seriesNumber;
+@property (nonatomic, assign) NSInteger episodeNumber;
+@property (nonatomic, assign) BOOL isNew;
+@property (nonatomic)  NSString *programmeName;
+@property (nonatomic) NSString *productionId;
+@property (nonatomic) NSString *programmeURL;
+@property (nonatomic, assign) NSInteger numberEpisodes;
+@property (nonatomic, assign) NSInteger forceCacheUpdate;
+@property (nonatomic, assign) NSTimeInterval timeIntDateLastAired;
+@property (nonatomic, assign) NSInteger timeAddedInt;
+
+- (instancetype)initWithName:(NSString *)name andPID:(NSString *)pid andURL:(NSString *)url andNUMBEREPISODES:(NSInteger)numberEpisodes andDATELASTAIRED:(NSTimeInterval)timeIntDateLastAired;
 - (id)addProgrammeSeriesInfo:(int)seriesNumber :(int)episodeNumber;
-- (id)makeNew;
-- (id)forceCacheUpdateOn;
+@property (nonatomic, readonly, strong) id makeNew;
+@property (nonatomic, readonly, strong) id forceCacheUpdateOn;
 -(void)fixProgrammeName;
-
 
 @end
 
 
 @interface ProgrammeHistoryObject : NSObject <NSCoding>
-{
-   // long      sortKey;
-}
-@property long      sortKey;
-@property NSString  *programmeName;
-@property NSString  *dateFound;
-@property NSString  *tvChannel;
-@property NSString  *networkName;
+@property (nonatomic, assign) long      sortKey;
+@property (nonatomic) NSString  *programmeName;
+@property (nonatomic) NSString  *dateFound;
+@property (nonatomic) NSString  *tvChannel;
+@property (nonatomic) NSString  *networkName;
 
-- (id)initWithName:(NSString *)name andTVChannel:(NSString *)aTVChannel andDateFound:(NSString *)dateFound andSortKey:(NSUInteger)sortKey andNetworkName:(NSString *)networkName;
+- (instancetype)initWithName:(NSString *)name andTVChannel:(NSString *)aTVChannel andDateFound:(NSString *)dateFound andSortKey:(NSUInteger)sortKey andNetworkName:(NSString *)networkName;
 
 @end
 
 
 @interface NewProgrammeHistory : NSObject
-{
-    NSString        *historyFilePath;
-    NSMutableArray  *programmeHistoryArray;
-    BOOL            itemsAdded;
-    NSUInteger      timeIntervalSince1970UTC;
-    NSString        *dateFound;
-}
+
+@property (nonatomic)     NSString        *historyFilePath;
+@property (nonatomic) NSMutableArray  *programmeHistoryArray;
+@property (nonatomic, assign) BOOL            itemsAdded;
+@property (nonatomic, assign) NSUInteger      timeIntervalSince1970UTC;
+@property (nonatomic) NSString        *dateFound;
+@property (nonatomic, getter=getHistoryArray, readonly, copy) NSMutableArray *historyArray;
 
 +(NewProgrammeHistory*)sharedInstance;
--(id)init;
+
+-(instancetype)init;
 -(void)addToNewProgrammeHistory:(NSString *)name andTVChannel:(NSString *)tvChannel andNetworkName:(NSString *)networkName;
 -(void)flushHistoryToDisk;
--(NSMutableArray *)getHistoryArray;
 
 @end
 
 @interface GetITVShows : NSObject <NSURLSessionDelegate, NSURLSessionTaskDelegate, NSURLSessionDataDelegate>
-{
-    NSUInteger          myQueueSize;
-    NSUInteger          myQueueLeft;
-    NSURLSession        *mySession;
-    NSString            *htmlData;
-    NSMutableArray      *boughtForwardProgrammeArray;
-    NSMutableArray      *todayProgrammeArray;
-    NSMutableArray      *carriedForwardProgrammeArray;
-    NSString            *filesPath;
-    NSString            *programmesFilePath;
-    BOOL                getITVShowRunning;
-    BOOL                forceUpdateAllProgrammes;
-    NSTimeInterval      timeIntervalSince1970UTC;
-    int                 intTimeThisRun;
-    LogController       *logger;
-    NSNotificationCenter *nc;
-}
 
-@property NSOperationQueue  *myOpQueue;
+@property (nonatomic, assign)    NSUInteger          myQueueSize;
+@property (nonatomic, assign) NSUInteger          myQueueLeft;
+@property (nonatomic) NSURLSession        *mySession;
+@property (nonatomic) NSString            *htmlData;
+@property (nonatomic) NSMutableArray      *boughtForwardProgrammeArray;
+@property (nonatomic) NSMutableArray      *todayProgrammeArray;
+@property (nonatomic) NSMutableArray      *carriedForwardProgrammeArray;
+@property (nonatomic) NSString            *filesPath;
+@property (nonatomic) NSString            *programmesFilePath;
+@property (nonatomic, assign) BOOL                getITVShowRunning;
+@property (nonatomic, assign) BOOL                forceUpdateAllProgrammes;
+@property (nonatomic, assign) NSTimeInterval      timeIntervalSince1970UTC;
+@property (nonatomic, assign) NSInteger                 intTimeThisRun;
+@property (nonatomic) LogController       *logger;
+@property (nonatomic) NSOperationQueue  *myOpQueue;
+@property (nonatomic, readonly) id requestTodayListing;
+@property (nonatomic, readonly) BOOL createTodayProgrammeArray;
 
--(id)init;
+-(instancetype)init;
 -(void)itvUpdateWithLogger:(LogController *)theLogger;;
 -(void)forceITVUpdateWithLogger:(LogController *)theLogger;
--(id)requestTodayListing;
--(BOOL)createTodayProgrammeArray;
 -(void)requestProgrammeEpisodes:(ProgrammeData *)myProgramme;
 -(void)processProgrammeEpisodesData:(ProgrammeData *)myProgramm :(NSString *)myHtmlData;
 -(void)processCarriedForwardProgrammes;
--(int)searchForProductionId:(NSString *)productionId inProgrammeArray:(NSMutableArray *)programmeArray;
+-(NSInteger)searchForProductionId:(NSString *)productionId inProgrammeArray:(NSMutableArray *)programmeArray;
 -(void)endOfRun;
 
 @end

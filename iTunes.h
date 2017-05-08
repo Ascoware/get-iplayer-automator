@@ -8,38 +8,38 @@
 
 @class iTunesPrintSettings, iTunesApplication, iTunesItem, iTunesArtwork, iTunesEncoder, iTunesEQPreset, iTunesPlaylist, iTunesAudioCDPlaylist, iTunesDevicePlaylist, iTunesLibraryPlaylist, iTunesRadioTunerPlaylist, iTunesSource, iTunesTrack, iTunesAudioCDTrack, iTunesDeviceTrack, iTunesFileTrack, iTunesSharedTrack, iTunesURLTrack, iTunesUserPlaylist, iTunesFolderPlaylist, iTunesVisual, iTunesWindow, iTunesBrowserWindow, iTunesEQWindow, iTunesPlaylistWindow;
 
-typedef enum {
+typedef NS_ENUM(unsigned int, iTunesEKnd) {
 	iTunesEKndTrackListing = 'kTrk' /* a basic listing of tracks within a playlist */,
 	iTunesEKndAlbumListing = 'kAlb' /* a listing of a playlist grouped by album */,
 	iTunesEKndCdInsert = 'kCDi' /* a printout of the playlist for jewel case inserts */
-} iTunesEKnd;
+};
 
-typedef enum {
+typedef NS_ENUM(unsigned int, iTunesEnum) {
 	iTunesEnumStandard = 'lwst' /* Standard PostScript error handling */,
 	iTunesEnumDetailed = 'lwdt' /* print a detailed report of PostScript errors */
-} iTunesEnum;
+};
 
-typedef enum {
+typedef NS_ENUM(unsigned int, iTunesEPlS) {
 	iTunesEPlSStopped = 'kPSS',
 	iTunesEPlSPlaying = 'kPSP',
 	iTunesEPlSPaused = 'kPSp',
 	iTunesEPlSFastForwarding = 'kPSF',
 	iTunesEPlSRewinding = 'kPSR'
-} iTunesEPlS;
+};
 
-typedef enum {
+typedef NS_ENUM(unsigned int, iTunesERpt) {
 	iTunesERptOff = 'kRpO',
 	iTunesERptOne = 'kRp1',
 	iTunesERptAll = 'kAll'
-} iTunesERpt;
+};
 
-typedef enum {
+typedef NS_ENUM(unsigned int, iTunesEVSz) {
 	iTunesEVSzSmall = 'kVSS',
 	iTunesEVSzMedium = 'kVSM',
 	iTunesEVSzLarge = 'kVSL'
-} iTunesEVSz;
+};
 
-typedef enum {
+typedef NS_ENUM(unsigned int, iTunesESrc) {
 	iTunesESrcLibrary = 'kLib',
 	iTunesESrcIPod = 'kPod',
 	iTunesESrcAudioCD = 'kACD',
@@ -48,18 +48,18 @@ typedef enum {
 	iTunesESrcRadioTuner = 'kTun',
 	iTunesESrcSharedLibrary = 'kShd',
 	iTunesESrcUnknown = 'kUnk'
-} iTunesESrc;
+};
 
-typedef enum {
+typedef NS_ENUM(unsigned int, iTunesESrA) {
 	iTunesESrAAlbums = 'kSrL' /* albums only */,
 	iTunesESrAAll = 'kAll' /* all text fields */,
 	iTunesESrAArtists = 'kSrR' /* artists only */,
 	iTunesESrAComposers = 'kSrC' /* composers only */,
 	iTunesESrADisplayed = 'kSrV' /* visible text fields */,
 	iTunesESrASongs = 'kSrS' /* song names only */
-} iTunesESrA;
+};
 
-typedef enum {
+typedef NS_ENUM(unsigned int, iTunesESpK) {
 	iTunesESpKNone = 'kNon',
 	iTunesESpKAudiobooks = 'kSpA',
 	iTunesESpKFolder = 'kSpF',
@@ -70,19 +70,19 @@ typedef enum {
 	iTunesESpKPurchasedMusic = 'kSpM',
 	iTunesESpKTVShows = 'kSpT',
 	iTunesESpKVideos = 'kSpV'
-} iTunesESpK;
+};
 
-typedef enum {
+typedef NS_ENUM(unsigned int, iTunesEVdK) {
 	iTunesEVdKNone = 'kNon' /* not a video or unknown video kind */,
 	iTunesEVdKMovie = 'kVdM' /* movie track */,
 	iTunesEVdKMusicVideo = 'kVdV' /* music video track */,
 	iTunesEVdKTVShow = 'kVdT' /* TV show track */
-} iTunesEVdK;
+};
 
-typedef enum {
+typedef NS_ENUM(unsigned int, iTunesERtK) {
 	iTunesERtKUser = 'kRtU' /* user-specified rating */,
 	iTunesERtKComputed = 'kRtC' /* iTunes-computed rating */
-} iTunesERtK;
+};
 
 
 
@@ -108,7 +108,7 @@ typedef enum {
 - (void) close;  // Close an object
 - (void) delete;  // Delete an element from an object
 - (SBObject *) duplicateTo:(SBObject *)to;  // Duplicate one or more object(s)
-- (BOOL) exists;  // Verify if an object exists
+@property (nonatomic, readonly) BOOL exists;  // Verify if an object exists
 - (void) open;  // open the specified object(s)
 - (void) playOnce:(BOOL)once;  // play the current track or the specified track or file.
 
@@ -123,14 +123,14 @@ typedef enum {
 // The application program
 @interface iTunesApplication : SBApplication
 
-- (SBElementArray *) browserWindows;
-- (SBElementArray *) encoders;
-- (SBElementArray *) EQPresets;
-- (SBElementArray *) EQWindows;
-- (SBElementArray *) playlistWindows;
-- (SBElementArray *) sources;
-- (SBElementArray *) visuals;
-- (SBElementArray *) windows;
+@property (nonatomic, readonly, copy) SBElementArray *browserWindows;
+@property (nonatomic, readonly, copy) SBElementArray *encoders;
+@property (nonatomic, readonly, copy) SBElementArray *EQPresets;
+@property (nonatomic, readonly, copy) SBElementArray *EQWindows;
+@property (nonatomic, readonly, copy) SBElementArray *playlistWindows;
+@property (nonatomic, readonly, copy) SBElementArray *sources;
+@property (nonatomic, readonly, copy) SBElementArray *visuals;
+@property (nonatomic, readonly, copy) SBElementArray *windows;
 
 @property (copy) iTunesEncoder *currentEncoder;  // the currently selected encoder (MP3, AIFF, WAV, etc.)
 @property (copy) iTunesEQPreset *currentEQPreset;  // the currently selected equalizer preset
@@ -181,7 +181,7 @@ typedef enum {
 @interface iTunesItem : SBObject
 
 @property (copy, readonly) SBObject *container;  // the container of the item
-- (NSInteger) id;  // the id of the item
+@property (nonatomic, readonly) NSInteger id;  // the id of the item
 @property (readonly) NSInteger index;  // The index of the item in internal application order.
 @property (copy) NSString *name;  // the name of the item
 @property (copy, readonly) NSString *persistentID;  // the id of the item as a hexidecimal string. This id does not change over time.
@@ -190,7 +190,7 @@ typedef enum {
 - (void) close;  // Close an object
 - (void) delete;  // Delete an element from an object
 - (SBObject *) duplicateTo:(SBObject *)to;  // Duplicate one or more object(s)
-- (BOOL) exists;  // Verify if an object exists
+@property (nonatomic, readonly) BOOL exists;  // Verify if an object exists
 - (void) open;  // open the specified object(s)
 - (void) playOnce:(BOOL)once;  // play the current track or the specified track or file.
 - (void) reveal;  // reveal and select a track or playlist
@@ -241,7 +241,7 @@ typedef enum {
 // a list of songs/streams
 @interface iTunesPlaylist : iTunesItem
 
-- (SBElementArray *) tracks;
+@property (nonatomic, readonly, copy) SBElementArray *tracks;
 
 @property (readonly) NSInteger duration;  // the total length of all songs (in seconds)
 @property (copy) NSString *name;  // the name of the playlist
@@ -261,7 +261,7 @@ typedef enum {
 // a playlist representing an audio CD
 @interface iTunesAudioCDPlaylist : iTunesPlaylist
 
-- (SBElementArray *) audioCDTracks;
+@property (nonatomic, readonly, copy) SBElementArray *audioCDTracks;
 
 @property (copy) NSString *artist;  // the artist of the CD
 @property BOOL compilation;  // is this CD a compilation album?
@@ -277,7 +277,7 @@ typedef enum {
 // a playlist representing the contents of a portable device
 @interface iTunesDevicePlaylist : iTunesPlaylist
 
-- (SBElementArray *) deviceTracks;
+@property (nonatomic, readonly, copy) SBElementArray *deviceTracks;
 
 
 @end
@@ -285,8 +285,8 @@ typedef enum {
 // the master music library playlist
 @interface iTunesLibraryPlaylist : iTunesPlaylist
 
-- (SBElementArray *) fileTracks;
-- (SBElementArray *) URLTracks;
+@property (nonatomic, readonly, copy) SBElementArray *fileTracks;
+@property (nonatomic, readonly, copy) SBElementArray *URLTracks;
 - (SBElementArray *) sharedTracks;
 
 
@@ -295,7 +295,7 @@ typedef enum {
 // the radio tuner playlist
 @interface iTunesRadioTunerPlaylist : iTunesPlaylist
 
-- (SBElementArray *) URLTracks;
+@property (nonatomic, readonly, copy) SBElementArray *URLTracks;
 
 
 @end
@@ -303,12 +303,12 @@ typedef enum {
 // a music source (music library, CD, device, etc.)
 @interface iTunesSource : iTunesItem
 
-- (SBElementArray *) audioCDPlaylists;
-- (SBElementArray *) devicePlaylists;
-- (SBElementArray *) libraryPlaylists;
-- (SBElementArray *) playlists;
-- (SBElementArray *) radioTunerPlaylists;
-- (SBElementArray *) userPlaylists;
+@property (nonatomic, readonly, copy) SBElementArray *audioCDPlaylists;
+@property (nonatomic, readonly, copy) SBElementArray *devicePlaylists;
+@property (nonatomic, readonly, copy) SBElementArray *libraryPlaylists;
+@property (nonatomic, readonly, copy) SBElementArray *playlists;
+@property (nonatomic, readonly, copy) SBElementArray *radioTunerPlaylists;
+@property (nonatomic, readonly, copy) SBElementArray *userPlaylists;
 
 @property (readonly) long long capacity;  // the total size of the source if it has a fixed size
 @property (readonly) long long freeSpace;  // the free space on the source if it has a fixed size
@@ -322,7 +322,7 @@ typedef enum {
 // playable audio source
 @interface iTunesTrack : iTunesItem
 
-- (SBElementArray *) artworks;
+@property (nonatomic, readonly, copy) SBElementArray *artworks;
 
 @property (copy) NSString *album;  // the album name of the track
 @property (copy) NSString *albumArtist;  // the album artist of the track
@@ -427,8 +427,8 @@ typedef enum {
 // custom playlists created by the user
 @interface iTunesUserPlaylist : iTunesPlaylist
 
-- (SBElementArray *) fileTracks;
-- (SBElementArray *) URLTracks;
+@property (nonatomic, readonly, copy) SBElementArray *fileTracks;
+@property (nonatomic, readonly, copy) SBElementArray *URLTracks;
 - (SBElementArray *) sharedTracks;
 
 @property BOOL shared;  // is this playlist shared?

@@ -10,7 +10,7 @@
 
 @implementation ReasonForFailure
 
-- (id)init
+- (instancetype)init
 {
 	if (!(self = [super init])) return nil;
 	showName = [[NSString alloc] init];

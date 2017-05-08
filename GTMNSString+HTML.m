@@ -375,7 +375,7 @@ static int EscapeMapCompare(const void *ucharVoid, const void *mapVoid) {
 - (NSString *)gtm_stringByEscapingHTMLUsingTable:(HTMLEscapeMap*)table 
                                           ofSize:(NSUInteger)size 
                                  escapingUnicode:(BOOL)escapeUnicode {  
-	NSUInteger length = [self length];
+	NSUInteger length = self.length;
 	if (!length) {
 		return self;
 	}
@@ -395,8 +395,8 @@ static int EscapeMapCompare(const void *ucharVoid, const void *mapVoid) {
 			return nil;
 			// COV_NF_END
 		}
-		[self getCharacters:[data mutableBytes]];
-		buffer = [data bytes];
+		[self getCharacters:data.mutableBytes];
+		buffer = data.bytes;
 	}
 	
 	if (!buffer || !data2) {
@@ -406,7 +406,7 @@ static int EscapeMapCompare(const void *ucharVoid, const void *mapVoid) {
 		// COV_NF_END
 	}
 	
-	unichar *buffer2 = (unichar *)[data2 mutableBytes];
+	unichar *buffer2 = (unichar *)data2.mutableBytes;
 	
 	NSUInteger buffer2Length = 0;
 	
@@ -454,7 +454,7 @@ static int EscapeMapCompare(const void *ucharVoid, const void *mapVoid) {
 } // gtm_stringByEscapingAsciiHTML
 
 - (NSString *)gtm_stringByUnescapingFromHTML {
-	NSRange range = NSMakeRange(0, [self length]);
+	NSRange range = NSMakeRange(0, self.length);
 	NSRange subrange = [self rangeOfString:@"&" options:NSBackwardsSearch range:range];
 	
 	// if no ampersands, we've got a quick way out
@@ -470,7 +470,7 @@ static int EscapeMapCompare(const void *ucharVoid, const void *mapVoid) {
 		}
 		NSRange escapeRange = NSMakeRange(subrange.location, semiColonRange.location - subrange.location + 1);
 		NSString *escapeString = [self substringWithRange:escapeRange];
-		NSUInteger length = [escapeString length];
+		NSUInteger length = escapeString.length;
 		// a squence must be longer than 3 (&lt;) and less than 11 (&thetasym;)
 		if (length > 3 && length < 11) {
 			if ([escapeString characterAtIndex:1] == '#') {
@@ -483,7 +483,7 @@ static int EscapeMapCompare(const void *ucharVoid, const void *mapVoid) {
 					if ([scanner scanHexInt:&value] && 
 						value < USHRT_MAX &&
 						value > 0 
-						&& [scanner scanLocation] == length - 4) {
+						&& scanner.scanLocation == length - 4) {
 						unichar uchar = value;
 						NSString *charString = [NSString stringWithCharacters:&uchar length:1];
 						[finalString replaceCharactersInRange:escapeRange withString:charString];
@@ -497,7 +497,7 @@ static int EscapeMapCompare(const void *ucharVoid, const void *mapVoid) {
 					if ([scanner scanInt:&value] && 
 						value < USHRT_MAX &&
 						value > 0 
-						&& [scanner scanLocation] == length - 3) {
+						&& scanner.scanLocation == length - 3) {
 						unichar uchar = value;
 						NSString *charString = [NSString stringWithCharacters:&uchar length:1];
 						[finalString replaceCharactersInRange:escapeRange withString:charString];

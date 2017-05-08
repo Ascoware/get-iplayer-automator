@@ -75,7 +75,7 @@
 					// Closing tag - replace with space unless it's inline
 					tagName = nil; dontReplaceTagWithSpace = NO;
 					if ([scanner scanCharactersFromSet:tagNameCharacters intoString:&tagName]) {
-						tagName = [tagName lowercaseString];
+						tagName = tagName.lowercaseString;
 						dontReplaceTagWithSpace = ([tagName isEqualToString:@"a"] ||
 												   [tagName isEqualToString:@"b"] ||
 												   [tagName isEqualToString:@"i"] ||
@@ -90,7 +90,7 @@
 					}
 					
 					// Replace tag with string unless it was an inline
-					if (!dontReplaceTagWithSpace && result.length > 0 && ![scanner isAtEnd]) [result appendString:@" "];
+					if (!dontReplaceTagWithSpace && result.length > 0 && !scanner.atEnd) [result appendString:@" "];
 					
 				}
 				
@@ -104,12 +104,12 @@
 			
 			// Stopped at whitespace - replace all whitespace and newlines with a space
 			if ([scanner scanCharactersFromSet:newLineAndWhitespaceCharacters intoString:NULL]) {
-				if (result.length > 0 && ![scanner isAtEnd]) [result appendString:@" "]; // Dont append space to beginning or end of result
+				if (result.length > 0 && !scanner.atEnd) [result appendString:@" "]; // Dont append space to beginning or end of result
 			}
 			
 		}
 		
-	} while (![scanner isAtEnd]);
+	} while (!scanner.atEnd);
 	
 	
 	// Decode HTML entities and return
@@ -178,7 +178,7 @@
 			
 		}
 		
-	} while (![scanner isAtEnd]);
+	} while (!scanner.atEnd);
 	
 	// Cleanup & return
 	NSString *retString = [NSString stringWithString:result];
@@ -203,7 +203,7 @@
 	NSCharacterSet *newLineAndWhitespaceCharacters = [NSCharacterSet characterSetWithCharactersInString:
 													  [NSString stringWithFormat:@" \t\n\r%C%C%C%C", 0x0085, 0x000C, 0x2028, 0x2029]];
 	// Scan
-	while (![scanner isAtEnd]) {
+	while (!scanner.atEnd) {
 		
 		// Get non new line or whitespace characters
 		temp = nil;
@@ -212,7 +212,7 @@
 		
 		// Replace with a space
 		if ([scanner scanCharactersFromSet:newLineAndWhitespaceCharacters intoString:NULL]) {
-			if (result.length > 0 && ![scanner isAtEnd]) // Dont append space to beginning or end of result
+			if (result.length > 0 && !scanner.atEnd) // Dont append space to beginning or end of result
 				[result appendString:@" "];
 		}
 		
@@ -230,7 +230,7 @@
     if (!NSClassFromString(@"NSRegularExpression")) return self;
     NSString *pattern = @"(?<!=\")\\b((http|https):\\/\\/[\\w\\-_]+(\\.[\\w\\-_]+)+([\\w\\-\\.,@?^=%%&amp;:/~\\+#]*[\\w\\-\\@?^=%%&amp;/~\\+#])?)";
     NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:pattern options:0 error:nil];
-    NSString *modifiedString = [regex stringByReplacingMatchesInString:self options:0 range:NSMakeRange(0, [self length])
+    NSString *modifiedString = [regex stringByReplacingMatchesInString:self options:0 range:NSMakeRange(0, self.length)
                                                            withTemplate:@"<a href=\"$1\" class=\"linkified\">$1</a>"];
     return modifiedString;
 }
@@ -260,7 +260,7 @@
 			[tags addObject:t];
 		}
 		
-	} while (![scanner isAtEnd]);
+	} while (!scanner.atEnd);
 	
 	// Strings
 	NSMutableString *result = [[NSMutableString alloc] initWithString:self];

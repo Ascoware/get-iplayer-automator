@@ -14,19 +14,18 @@
  the feedback is sent.
  NOTE: you must add an entry to your Growl Dict plist to register this new message
  */
-#define USE_GROWL 1
+#define USE_GROWL 0
 
-typedef enum {
+typedef NS_ENUM(NSUInteger, JRFeedbackController_Section) {
     JRFeedbackController_BugReport,
     JRFeedbackController_FeatureRequest,
     JRFeedbackController_SupportRequest,
     JRFeedbackController_SectionCount
-} JRFeedbackController_Section;
+};
 
 @interface JRFeedbackController : NSWindowController {
     IBOutlet NSTextView *textView;
     IBOutlet NSButton *includeHardwareDetailsCheckbox;
-	IBOutlet NSButton *includeLogCheckbox;
     IBOutlet NSTextField *nameTextField;
     IBOutlet NSComboBox *emailAddressComboBox;
     IBOutlet NSProgressIndicator *progress;
@@ -38,14 +37,12 @@ typedef enum {
     NSAttributedString *sectionStrings[JRFeedbackController_SectionCount];
     JRFeedbackController_Section currentSection;
     BOOL includeContactInfo;
-	NSMutableDictionary *form;
 }
 
 + (void)showFeedback;
 + (void)showFeedbackWithBugDetails:(NSString *)details;
 
-- (BOOL)includeContactInfo;
-- (void)setIncludeContactInfo:(BOOL)flag;
+@property (nonatomic) BOOL includeContactInfo;
 
 - (IBAction)switchSectionAction:(NSSegmentedControl*)sender;
 - (IBAction)submitAction:(id)sender;
@@ -57,7 +54,6 @@ typedef enum {
 		withInformativeText:(NSString *)text 
 			  andAlertStyle:(NSAlertStyle)alertStyle;
 
-- (void)finish;
-
+- (void)showWindow:(id)sender;
 
 @end

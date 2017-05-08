@@ -10,7 +10,7 @@
 
 
 @implementation RadioFormat
-- (id)init
+- (instancetype)init
 {
 	if (!(self = [super init])) return nil;
 	format = [[NSString alloc] init];
@@ -21,7 +21,7 @@
 {
 	[coder encodeObject: format forKey:@"format"];
 }
-- (id) initWithCoder: (NSCoder *)coder
+- (instancetype) initWithCoder: (NSCoder *)coder
 {
 	if (!(self = [super init])) return nil;
 	format = [[NSString alloc] initWithString:[coder decodeObjectForKey:@"format"]];

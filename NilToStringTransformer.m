@@ -7,12 +7,12 @@
 
 @implementation NilToStringTransformer
 
--(id)init
+-(instancetype)init
 {
     return [self initWithString:@""];
 }
 
-- (id)initWithString:(NSString *)aString;
+- (instancetype)initWithString:(NSString *)aString;
 {
     if (self = [super init])
     {

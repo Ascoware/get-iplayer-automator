@@ -1,6 +1,6 @@
 /*******************************************************************************
 	NSURLRequest+postForm.h
-		Copyright (c) 2008 Jonathan 'Wolf' Rentzsch: <http://rentzsch.com>
+		Copyright (c) 2008-2009 Jonathan 'Wolf' Rentzsch: <http://rentzsch.com>
 		Some rights reserved: <http://opensource.org/licenses/mit-license.php>
 
 	***************************************************************************/
@@ -9,6 +9,6 @@
 
 @interface NSURLRequest (postForm)
 
-+ (id)requestWithURL:(NSURL*)url postForm:(NSDictionary*)values;
++ (instancetype)requestWithURL:(NSURL*)url postForm:(NSDictionary*)values;
 
 @end

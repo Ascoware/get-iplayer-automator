@@ -10,19 +10,20 @@
 #import "Programme.h"
 #import "LogController.h"
 
-@interface GiASearch : NSObject {
-   NSTask *task;
-	NSPipe *pipe;
-	NSMutableString *data;
-   id target;
-   SEL selector;
-   LogController *logger;
-}
+@interface GiASearch : NSObject
 
-- (id)initWithSearchTerms:(NSString *)searchTerms
-  allowHidingOfDownloadedItems:(BOOL)allowHidingOfDownloadedItems
-            logController:(LogController *)logger
-                 selector:(SEL)selector
-               withTarget:(id)target;
+@property (nonatomic) NSTask *task;
+@property (nonatomic) NSPipe *pipe;
+@property (nonatomic) NSPipe *errorPipe;
+@property (nonatomic) NSMutableString *data;
+@property (nonatomic) id target;
+@property (nonatomic) SEL selector;
+@property (nonatomic) LogController *logger;
+
+- (instancetype)initWithSearchTerms:(NSString *)searchTerms
+       allowHidingOfDownloadedItems:(BOOL)allowHidingOfDownloadedItems
+                      logController:(LogController *)logger
+                           selector:(SEL)selector
+                         withTarget:(id)target;
 
 @end

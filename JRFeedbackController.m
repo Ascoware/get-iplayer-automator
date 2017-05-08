@@ -9,9 +9,10 @@
 #import <AddressBook/AddressBook.h>
 #import "NSURLRequest+postForm.h"
 #import <SystemConfiguration/SCNetwork.h>
+#import <SystemConfiguration/SystemConfiguration.h>
 
 #if USE_GROWL
-	#import "Growl.framework/Headers/GrowlApplicationBridge.h"
+	#import <Growl/GrowlApplicationBridge.h>
 #endif
 
 JRFeedbackController *gFeedbackController = nil;
@@ -34,9 +35,16 @@ NSString *JRFeedbackType[JRFeedbackController_SectionCount] = {
 
 + (void)showFeedbackWithBugDetails:(NSString *)details {
     SCNetworkConnectionFlags reachabilityFlags;
-    Boolean reachabilityResult = SCNetworkCheckReachabilityByName([[[JRFeedbackController postURL] host] UTF8String], &reachabilityFlags);
-    
-    //NSLog(@"reachabilityFlags: %lx", reachabilityFlags);
+    const char *hostname = [JRFeedbackController postURL].host.UTF8String;  
+#ifdef MAC_OS_X_VERSION_10_6
+    SCNetworkReachabilityRef reachability = SCNetworkReachabilityCreateWithName(NULL, hostname);
+    Boolean reachabilityResult = SCNetworkReachabilityGetFlags(reachability, &reachabilityFlags);
+    CFRelease(reachability);
+#else  
+    Boolean reachabilityResult = SCNetworkCheckReachabilityByName(hostname, &reachabilityFlags);
+#endif
+  
+//    NSLog(@"reachabilityFlags: %lx", reachabilityFlags);
     BOOL showFeedbackWindow = reachabilityResult
         && (reachabilityFlags & kSCNetworkFlagsReachable)
         && !(reachabilityFlags & kSCNetworkFlagsConnectionRequired)
@@ -44,11 +52,11 @@ NSString *JRFeedbackType[JRFeedbackController_SectionCount] = {
         && !(reachabilityFlags & kSCNetworkFlagsInterventionRequired);
     
     if (!showFeedbackWindow) {
-        int alertResult = [[NSAlert alertWithMessageText:NSLocalizedStringFromTable(@"Feedback Host Not Reachable", @"JRFeedbackProvider", nil)
+        NSModalResponse alertResult = [[NSAlert alertWithMessageText:NSLocalizedStringFromTable(@"Feedback Host Not Reachable", @"JRFeedbackProvider", nil)
                                            defaultButton:NSLocalizedStringFromTable(@"Proceed Anyway", @"JRFeedbackProvider", nil)
                                          alternateButton:NSLocalizedStringFromTable(@"Cancel", @"JRFeedbackProvider", nil)
                                              otherButton:nil
-                               informativeTextWithFormat:NSLocalizedStringFromTable(@"Unreachable Explanation", @"JRFeedbackProvider", nil), [[JRFeedbackController postURL] host]
+                               informativeTextWithFormat:NSLocalizedStringFromTable(@"Unreachable Explanation", @"JRFeedbackProvider", nil), [JRFeedbackController postURL].host
                             ] runModal];
         if (NSAlertDefaultReturn == alertResult) {
             showFeedbackWindow = YES;
@@ -68,7 +76,7 @@ NSString *JRFeedbackType[JRFeedbackController_SectionCount] = {
     }
 }
 
-- (id)init {
+- (instancetype)init {
     self = [super initWithWindowNibName:@"JRFeedbackProvider"];
     if (self) {
         //[self window];
@@ -81,28 +89,28 @@ NSString *JRFeedbackType[JRFeedbackController_SectionCount] = {
 #if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
     // Not sure why, but you have to call this twice to "take" (10.5.7).
     // First call always sets it to NSSegmentStyleRounded.
-    [segmentedControl setSegmentStyle:NSSegmentStyleTexturedSquare];
-    [segmentedControl setSegmentStyle:NSSegmentStyleTexturedSquare];
+    segmentedControl.segmentStyle = NSSegmentStyleTexturedSquare;
+    segmentedControl.segmentStyle = NSSegmentStyleTexturedSquare;
 #endif
     NSString* fmt = NSLocalizedStringFromTable(@"Title", @"JRFeedbackProvider", nil);
-    NSString* title = [NSString stringWithFormat:fmt, [[NSBundle bundleForClass:[self class]] infoDictionary][(NSString*)kCFBundleNameKey]];
-    [[self window] setTitle:title];
+    NSString* title = [NSString stringWithFormat:fmt, [NSBundle bundleForClass:[self class]].infoDictionary[(NSString*)kCFBundleNameKey]];
+    self.window.title = title;
     
-    NSTextStorage *text = [textView textStorage];
+    NSTextStorage *text = textView.textStorage;
     
     NSString *separator = @"\n\n--\n\n";
     
-    NSRange separatorRange = [[text string] rangeOfString:separator];
+    NSRange separatorRange = [text.string rangeOfString:separator];
     sectionStrings[JRFeedbackController_BugReport] = [text attributedSubstringFromRange:NSMakeRange(0, separatorRange.location)];
-    [text deleteCharactersInRange:NSMakeRange(0, separatorRange.location + [separator length])];
+    [text deleteCharactersInRange:NSMakeRange(0, separatorRange.location + separator.length)];
     //NSLog(@"bugReport: <%@>", [sectionStrings[JRFeedbackController_BugReport] string]);
     
-    separatorRange = [[text string] rangeOfString:separator];
+    separatorRange = [text.string rangeOfString:separator];
     sectionStrings[JRFeedbackController_FeatureRequest] = [text attributedSubstringFromRange:NSMakeRange(0, separatorRange.location)];
-    [text deleteCharactersInRange:NSMakeRange(0, separatorRange.location + [separator length])];
+    [text deleteCharactersInRange:NSMakeRange(0, separatorRange.location + separator.length)];
     //NSLog(@"featureRequest: <%@>", [sectionStrings[JRFeedbackController_FeatureRequest] string]);
     
-    sectionStrings[JRFeedbackController_SupportRequest] = [text attributedSubstringFromRange:NSMakeRange(0, [text length])];
+    sectionStrings[JRFeedbackController_SupportRequest] = [text attributedSubstringFromRange:NSMakeRange(0, text.length)];
     //NSLog(@"supportRequest: <%@>", [sectionStrings[JRFeedbackController_SupportRequest] string]);
     
     [text setAttributedString:sectionStrings[JRFeedbackController_BugReport]];
@@ -111,9 +119,9 @@ NSString *JRFeedbackType[JRFeedbackController_SectionCount] = {
     
     ABPerson *me = [[ABAddressBook sharedAddressBook] me];
     if (me) {
-        [nameTextField setStringValue:[NSString stringWithFormat:@"%@ %@", [me valueForProperty:kABFirstNameProperty], [me valueForProperty:kABLastNameProperty]]];
+        nameTextField.stringValue = [NSString stringWithFormat:@"%@ %@", [me valueForProperty:kABFirstNameProperty], [me valueForProperty:kABLastNameProperty]];
         ABMutableMultiValue *emailAddresses = [me valueForProperty:kABEmailProperty];
-        unsigned addyIndex = 0, addyCount = [emailAddresses count];
+        NSUInteger addyIndex = 0, addyCount = [emailAddresses count];
         if (addyCount) {
             for (; addyIndex < addyCount; addyIndex++) {
                 [emailAddressComboBox addItemWithObjectValue:[emailAddresses valueAtIndex:addyIndex]];
@@ -131,10 +139,10 @@ NSString *JRFeedbackType[JRFeedbackController_SectionCount] = {
 }
 
 - (IBAction)switchSectionAction:(NSSegmentedControl*)sender {
-    sectionStrings[currentSection] = [[textView textStorage] copy];
+    sectionStrings[currentSection] = [textView.textStorage copy];
     
-    currentSection = [sender selectedSegment];
-    [[textView textStorage] setAttributedString:sectionStrings[currentSection]];
+    currentSection = sender.selectedSegment;
+    [textView.textStorage setAttributedString:sectionStrings[currentSection]];
     [textView moveToBeginningOfDocument:self];
     [textView moveDown:self];
     
@@ -150,13 +158,13 @@ NSString *JRFeedbackType[JRFeedbackController_SectionCount] = {
 		[sendButton setEnabled:NO];
 		[cancelButton setEnabled:NO];
 		
-		sectionStrings[currentSection] = [[textView textStorage] copy];
+		sectionStrings[currentSection] = [textView.textStorage copy];
 		[textView setEditable:NO];
 		
 		[progress startAnimation:self];
 		
 		// if they checked not to include hardware, don't scan. Post right away.
-		if ([includeHardwareDetailsCheckbox intValue] == 1) 
+		if (includeHardwareDetailsCheckbox.intValue == 1) 
 		{
 			[NSThread detachNewThreadSelector:@selector(system_profilerThread:)
 									 toTarget:self
@@ -188,13 +196,13 @@ NSString *JRFeedbackType[JRFeedbackController_SectionCount] = {
             NSPipe *outputPipe = [NSPipe pipe];
             
             NSTask *scriptTask = [[NSTask alloc] init];
-            [scriptTask setLaunchPath:@"/usr/sbin/system_profiler"];
-            [scriptTask setArguments:@[@"-detailLevel", @"mini"]];
-            [scriptTask setStandardOutput:outputPipe];
+            scriptTask.launchPath = @"/usr/sbin/system_profiler";
+            scriptTask.arguments = @[@"-detailLevel", @"mini"];
+            scriptTask.standardOutput = outputPipe;
             [scriptTask launch];
             
-            [[inputPipe fileHandleForWriting] closeFile];
-            systemProfile = [[NSString alloc] initWithData:[[outputPipe fileHandleForReading] readDataToEndOfFile]
+            [inputPipe.fileHandleForWriting closeFile];
+            systemProfile = [[NSString alloc] initWithData:[outputPipe.fileHandleForReading readDataToEndOfFile]
                                                    encoding:NSUTF8StringEncoding];
         }
         [self performSelectorOnMainThread:@selector(postFeedback:)
@@ -205,40 +213,33 @@ NSString *JRFeedbackType[JRFeedbackController_SectionCount] = {
 
 - (void)postFeedback:(NSString*)systemProfile {
     
-    form = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+    NSMutableDictionary *form = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                  JRFeedbackType[currentSection], @"feedbackType",
-                                 [sectionStrings[currentSection] string], @"feedback",
-                                 [[NSBundle bundleForClass:[self class]] infoDictionary][@"CFBundleName"], @"appName",
-                                 [[NSBundle bundleForClass:[self class]] infoDictionary][@"CFBundleIdentifier"], @"bundleID",
-                                 [[NSBundle bundleForClass:[self class]] infoDictionary][@"CFBundleShortVersionString"], @"version",
+                                 sectionStrings[currentSection].string, @"feedback",
+                                 [NSBundle bundleForClass:[self class]].infoDictionary[@"CFBundleName"], @"appName",
+                                 [NSBundle bundleForClass:[self class]].infoDictionary[@"CFBundleIdentifier"], @"bundleID",
+                                 [NSBundle bundleForClass:[self class]].infoDictionary[@"CFBundleVersion"], @"version",
                                  nil];
     if (systemProfile) {
         form[@"systemProfile"] = systemProfile;
     }
     if ([self includeContactInfo]) {
-        if ([[emailAddressComboBox stringValue] length]) {
-            form[@"email"] = [emailAddressComboBox stringValue];
+        if (emailAddressComboBox.stringValue.length) {
+            form[@"email"] = emailAddressComboBox.stringValue;
         }
-        if ([[nameTextField stringValue] length]) {
-            form[@"name"] = [nameTextField stringValue];
+        if (nameTextField.stringValue.length) {
+            form[@"name"] = nameTextField.stringValue;
         }
     }
-	if ([includeLogCheckbox state] == NSOnState)
-	{
-		NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-		[nc addObserver:self selector:@selector(recieveLog:) name:@"Log" object:nil];
-		[nc postNotificationName:@"NeedLog" object:nil];
-	}
-	else
-	{
-		[self finish];
-	}
+    
+    NSURLRequest *request = [NSURLRequest requestWithURL:[JRFeedbackController postURL] postForm:form];
+    [NSURLConnection connectionWithRequest:request delegate:self];
 }
 
 - (void)closeFeedback {
     if (gFeedbackController) {
         assert(gFeedbackController == self);
-        [[gFeedbackController window] orderOut:self];
+        [gFeedbackController.window orderOut:self];
         gFeedbackController = nil;
     }
 }
@@ -251,7 +252,7 @@ NSString *JRFeedbackType[JRFeedbackController_SectionCount] = {
 #if USE_GROWL
 	[GrowlApplicationBridge setGrowlDelegate:@""];
 	[GrowlApplicationBridge notifyWithTitle:@"Thank you!"
-								description:@"Your feedback has been sent"
+								description:@"Your feedback has been sent."
 						   notificationName:@"Feedback Sent"
 								   iconData:nil
 								   priority:0
@@ -261,7 +262,7 @@ NSString *JRFeedbackType[JRFeedbackController_SectionCount] = {
 #else
 	//	drop thank you sheet
 	[self displayAlertMessage:@"Thank you for your feedback!"
-		  withInformativeText:@"Your feedback has been sent"
+		  withInformativeText:@"Your feedback has been sent."
 				andAlertStyle:NSInformationalAlertStyle];
 #endif
 }
@@ -277,16 +278,16 @@ NSString *JRFeedbackType[JRFeedbackController_SectionCount] = {
 {
 	NSAlert *thankYouAlert = [[NSAlert alloc] init];
 	[thankYouAlert addButtonWithTitle:@"OK"];
-	[thankYouAlert setMessageText:message];
-	[thankYouAlert setInformativeText:text];
-	[thankYouAlert setAlertStyle:alertStyle];
+	thankYouAlert.messageText = message;
+	thankYouAlert.informativeText = text;
+	thankYouAlert.alertStyle = alertStyle;
 	
 	//	stop the animation of the progress indicator, so user doesn't think 
 	//	something is still going on
 	[progress stopAnimation:self];
 	
 	//	disply thank you
-    [thankYouAlert beginSheetModalForWindow:[gFeedbackController window]
+    [thankYouAlert beginSheetModalForWindow:gFeedbackController.window
 							  modalDelegate:self 
 							 didEndSelector:@selector(alertDidEnd:returnCode:contextInfo:)
 								contextInfo:nil];
@@ -308,30 +309,25 @@ NSString *JRFeedbackType[JRFeedbackController_SectionCount] = {
 
 - (void)setTextViewStringTo:(NSString *)details
 {
-    NSFont *resetFontWeight = [[textView textStorage] font];
-	[[textView textStorage] setFont:[NSFont fontWithName:[resetFontWeight familyName] size:[resetFontWeight pointSize]]];
-    [textView setString:details];
+    NSFont *resetFontWeight = textView.textStorage.font;
+	textView.textStorage.font = [NSFont fontWithName:resetFontWeight.familyName size:resetFontWeight.pointSize];
+    textView.string = details;
 }
 
 + (NSURL*)postURL {
-    NSString *postURLString = [[NSBundle bundleForClass:[self class]] infoDictionary][@"JRFeedbackURL"];
+    NSString *postURLString = [NSBundle bundleForClass:[self class]].infoDictionary[@"JRFeedbackURL"];
     if ([[NSUserDefaults standardUserDefaults] stringForKey:@"JRFeedbackURL"]) {
         postURLString = [[NSUserDefaults standardUserDefaults] stringForKey:@"JRFeedbackURL"];
     }
     NSAssert(postURLString, @"JRFeedbackURL not defined");
     return [NSURL URLWithString:postURLString];
 }
-- (void)finish
+
+// overloaded to center the window after display
+- (void)showWindow:(id)sender
 {
-	NSURLRequest *request = [NSURLRequest requestWithURL:[JRFeedbackController postURL] postForm:form];
-    [NSURLConnection connectionWithRequest:request delegate:self];
-}
-- (void)recieveLog:(NSNotification *)note
-{
-	NSString *log = [note object];
-	log = [log stringByReplacingOccurrencesOfString:@"\r" withString:@"\n"];
-	form[@"log"] = [log copy];
-	[self finish];
+    [self.window center];
+    [super showWindow:sender];
 }
 
 @end

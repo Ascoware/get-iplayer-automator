@@ -17,7 +17,7 @@
 // The application's top-level scripting object.
 @interface ChromeApplication : SBApplication
 
-- (SBElementArray *) windows;
+@property (nonatomic, readonly, copy) SBElementArray *windows;
 
 @property (copy, readonly) NSString *name;  // The name of the application.
 @property (readonly) BOOL frontmost;  // Is this the frontmost (active) application?
@@ -32,10 +32,10 @@
 // A window.
 @interface ChromeWindow : SBObject
 
-- (SBElementArray *) tabs;
+@property (nonatomic, readonly, copy) SBElementArray *tabs;
 
 @property (copy, readonly) NSString *name;  // The full title of the window.
-- (NSInteger) id;  // The unique identifier of the window.
+@property (nonatomic, readonly) NSInteger id;  // The unique identifier of the window.
 @property NSInteger index;  // The index of the window, ordered front to back.
 @property NSRect bounds;  // The bounding rectangle of the window.
 @property (readonly) BOOL closeable;  // Whether the window has a close box.
@@ -81,7 +81,7 @@
 // The application's top-level scripting object.
 @interface ChromeApplication (ChromiumSuite)
 
-- (SBElementArray *) bookmarkFolders;
+@property (nonatomic, readonly, copy) SBElementArray *bookmarkFolders;
 
 @property (copy, readonly) ChromeBookmarkFolder *bookmarksBar;  // The bookmarks bar bookmark folder.
 @property (copy, readonly) ChromeBookmarkFolder *otherBookmarks;  // The other bookmarks bookmark folder.
@@ -91,7 +91,7 @@
 // A tab.
 @interface ChromeTab : SBObject
 
-- (NSInteger) id;  // Unique ID of the tab.
+@property (nonatomic, readonly) NSInteger id;  // Unique ID of the tab.
 @property (copy, readonly) NSString *title;  // The title of the tab.
 @property (copy) NSString *URL;  // The url visible to the user.
 @property (readonly) BOOL loading;  // Is loading?
@@ -122,10 +122,10 @@
 // A bookmarks folder that contains other bookmarks folder and bookmark items.
 @interface ChromeBookmarkFolder : SBObject
 
-- (SBElementArray *) bookmarkFolders;
-- (SBElementArray *) bookmarkItems;
+@property (nonatomic, readonly, copy) SBElementArray *bookmarkFolders;
+@property (nonatomic, readonly, copy) SBElementArray *bookmarkItems;
 
-- (NSNumber *) id;  // Unique ID of the bookmark folder.
+@property (nonatomic, readonly, copy) NSNumber *id;  // Unique ID of the bookmark folder.
 @property (copy) NSString *title;  // The title of the folder.
 @property (copy, readonly) NSNumber *index;  // Returns the index with respect to its parent bookmark folder
 
@@ -155,7 +155,7 @@
 // An item consists of an URL and the title of a bookmark
 @interface ChromeBookmarkItem : SBObject
 
-- (NSInteger) id;  // Unique ID of the bookmark item.
+@property (nonatomic, readonly) NSInteger id;  // Unique ID of the bookmark item.
 @property (copy) NSString *title;  // The title of the bookmark item.
 @property (copy) NSString *URL;  // The URL of the bookmark.
 @property (copy, readonly) NSNumber *index;  // Returns the index with respect to its parent bookmark folder

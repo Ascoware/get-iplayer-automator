@@ -22,65 +22,65 @@
 	//Prepare Alert in Case the Browser isn't Open
 	NSAlert *browserNotOpen = [[NSAlert alloc] init];
 	[browserNotOpen addButtonWithTitle:@"OK"];
-	[browserNotOpen setMessageText:[NSString stringWithFormat:@"%@ is not open.", browser]];
-	[browserNotOpen setInformativeText:@"Please ensure your browser is running and has at least one window open."];
-	[browserNotOpen setAlertStyle:NSWarningAlertStyle];
+	browserNotOpen.messageText = [NSString stringWithFormat:@"%@ is not open.", browser];
+	browserNotOpen.informativeText = @"Please ensure your browser is running and has at least one window open.";
+	browserNotOpen.alertStyle = NSWarningAlertStyle;
 
 	//Get URL
 	if ([browser isEqualToString:@"Safari"])
 	{
 		BOOL foundURL=NO;
 		SafariApplication *Safari = [SBApplication applicationWithBundleIdentifier:@"com.apple.Safari"];
-		if ([Safari isRunning])
+		if (Safari.running)
 		{
 			@try
 			{
 				SBElementArray *windows = [Safari windows];
-				if ([@([windows count]) intValue])
+				if ((@(windows.count)).intValue)
 				{
 					for (SafariWindow *window in windows)
  					{
-                  SafariTab *tab = [window currentTab];
-                  if ([[tab URL] hasPrefix:@"http://www.bbc.co.uk/iplayer/episode/"] ||
-                      [[tab URL] hasPrefix:@"http://bbc.co.uk/iplayer/episode/"] ||
-                      [[tab URL] hasPrefix:@"http://bbc.co.uk/iplayer/console/"] ||
-                      [[tab URL] hasPrefix:@"http://www.bbc.co.uk/iplayer/console/"] ||
-                      [[tab URL] hasPrefix:@"http://bbc.co.uk/sport"] ||
-                      [[tab URL] hasPrefix:@"https://www.bbc.co.uk/iplayer/episode/"] ||
-                      [[tab URL] hasPrefix:@"https://bbc.co.uk/iplayer/episode/"] ||
-                      [[tab URL] hasPrefix:@"https://bbc.co.uk/iplayer/console/"] ||
-                      [[tab URL] hasPrefix:@"https://www.bbc.co.uk/iplayer/console/"] ||
-                      [[tab URL] hasPrefix:@"https://bbc.co.uk/sport"])
+                  SafariTab *tab = window.currentTab;
+                  if ([tab.URL hasPrefix:@"http://www.bbc.co.uk/iplayer/episode/"] ||
+                      [tab.URL hasPrefix:@"http://bbc.co.uk/iplayer/episode/"] ||
+                      [tab.URL hasPrefix:@"http://bbc.co.uk/iplayer/console/"] ||
+                      [tab.URL hasPrefix:@"http://www.bbc.co.uk/iplayer/console/"] ||
+                      [tab.URL hasPrefix:@"http://bbc.co.uk/sport"] ||
+                      [tab.URL hasPrefix:@"https://www.bbc.co.uk/iplayer/episode/"] ||
+                      [tab.URL hasPrefix:@"https://bbc.co.uk/iplayer/episode/"] ||
+                      [tab.URL hasPrefix:@"https://bbc.co.uk/iplayer/console/"] ||
+                      [tab.URL hasPrefix:@"https://www.bbc.co.uk/iplayer/console/"] ||
+                      [tab.URL hasPrefix:@"https://bbc.co.uk/sport"])
                   {
-                     url = [NSString stringWithString:[tab URL]];
-                     NSScanner *nameScanner = [NSScanner scannerWithString:[tab name]];
+                     url = [NSString stringWithString:tab.URL];
+                     NSScanner *nameScanner = [NSScanner scannerWithString:tab.name];
                      [nameScanner scanString:@"BBC iPlayer - " intoString:nil];
                      [nameScanner scanString:@"BBC Sport - " intoString:nil];
                      [nameScanner scanUpToString:@"kjklgfdjfgkdlj" intoString:&newShowName];
                      foundURL=YES;
                   }
-                  else if ([[tab URL] hasPrefix:@"http://www.bbc.co.uk/programmes/"] ||
-                          [[tab URL] hasPrefix:@"https://www.bbc.co.uk/programmes/"]) {
-                     url = [NSString stringWithString:[tab URL]];
-                     NSScanner *nameScanner = [NSScanner scannerWithString:[tab name]];
+                  else if ([tab.URL hasPrefix:@"http://www.bbc.co.uk/programmes/"] ||
+                          [tab.URL hasPrefix:@"https://www.bbc.co.uk/programmes/"]) {
+                     url = [NSString stringWithString:tab.URL];
+                     NSScanner *nameScanner = [NSScanner scannerWithString:tab.name];
                      [nameScanner scanUpToString:@"- " intoString:nil];
                      [nameScanner scanString:@"- " intoString:nil];
                      [nameScanner scanUpToString:@"kjklgfdjfgkdlj" intoString:&newShowName];
                      foundURL=YES;
-                     source = [tab source];
+                     source = tab.source;
                   }
-                  else if ([[tab URL] hasPrefix:@"http://www.itv.com/hub/"] ||
-                           [[tab URL] hasPrefix:@"https://www.itv.com/hub/"])
+                  else if ([tab.URL hasPrefix:@"http://www.itv.com/hub/"] ||
+                           [tab.URL hasPrefix:@"https://www.itv.com/hub/"])
                   {
-                     url = [NSString stringWithString:[tab URL]];
-                     source = [tab source];
-                     newShowName = [[tab name] stringByReplacingOccurrencesOfString:@" - The ITV Hub" withString:@""];
+                     url = [NSString stringWithString:tab.URL];
+                     source = tab.source;
+                     newShowName = [tab.name stringByReplacingOccurrencesOfString:@" - The ITV Hub" withString:@""];
                      foundURL=YES;
                   }
 					}
 					if (foundURL==NO)
 					{
-						url = [NSString stringWithString:[[windows[0] currentTab] URL]];
+						url = [NSString stringWithString:[windows[0] currentTab].URL];
                   //Might be incorrect
 					}
 				}
@@ -106,56 +106,56 @@
 	{
 		BOOL foundURL=NO;
 		ChromeApplication *Chrome = [SBApplication applicationWithBundleIdentifier:@"com.google.Chrome"];
-		if ([Chrome isRunning])
+		if (Chrome.running)
 		{
 			@try
 			{
 				SBElementArray *windows = [Chrome windows];
-				if ([@([windows count]) intValue])
+				if ((@(windows.count)).intValue)
 				{
 					for (ChromeWindow *window in windows)
  					{
-                  ChromeTab *tab = [window activeTab];
-                  if ([[tab URL] hasPrefix:@"http://www.bbc.co.uk/iplayer/episode/"] ||
-                      [[tab URL] hasPrefix:@"http://bbc.co.uk/iplayer/episode/"] ||
-                      [[tab URL] hasPrefix:@"http://bbc.co.uk/iplayer/console/"] ||
-                      [[tab URL] hasPrefix:@"http://www.bbc.co.uk/iplayer/console/"] ||
-                      [[tab URL] hasPrefix:@"http://bbc.co.uk/sport"] ||
-                      [[tab URL] hasPrefix:@"https://www.bbc.co.uk/iplayer/episode/"] ||
-                      [[tab URL] hasPrefix:@"https://bbc.co.uk/iplayer/episode/"] ||
-                      [[tab URL] hasPrefix:@"https://bbc.co.uk/iplayer/console/"] ||
-                      [[tab URL] hasPrefix:@"https://www.bbc.co.uk/iplayer/console/"] ||
-                      [[tab URL] hasPrefix:@"https://bbc.co.uk/sport"])
+                  ChromeTab *tab = window.activeTab;
+                  if ([tab.URL hasPrefix:@"http://www.bbc.co.uk/iplayer/episode/"] ||
+                      [tab.URL hasPrefix:@"http://bbc.co.uk/iplayer/episode/"] ||
+                      [tab.URL hasPrefix:@"http://bbc.co.uk/iplayer/console/"] ||
+                      [tab.URL hasPrefix:@"http://www.bbc.co.uk/iplayer/console/"] ||
+                      [tab.URL hasPrefix:@"http://bbc.co.uk/sport"] ||
+                      [tab.URL hasPrefix:@"https://www.bbc.co.uk/iplayer/episode/"] ||
+                      [tab.URL hasPrefix:@"https://bbc.co.uk/iplayer/episode/"] ||
+                      [tab.URL hasPrefix:@"https://bbc.co.uk/iplayer/console/"] ||
+                      [tab.URL hasPrefix:@"https://www.bbc.co.uk/iplayer/console/"] ||
+                      [tab.URL hasPrefix:@"https://bbc.co.uk/sport"])
                   {
-                     url = [NSString stringWithString:[tab URL]];
-                     NSScanner *nameScanner = [NSScanner scannerWithString:[tab title]];
+                     url = [NSString stringWithString:tab.URL];
+                     NSScanner *nameScanner = [NSScanner scannerWithString:tab.title];
                      [nameScanner scanString:@"BBC iPlayer - " intoString:nil];
                      [nameScanner scanString:@"BBC Sport - " intoString:nil];
                      [nameScanner scanUpToString:@"kjklgfdjfgkdlj" intoString:&newShowName];
                      foundURL=YES;
                   }
-                  else if ([[tab URL] hasPrefix:@"http://www.bbc.co.uk/programmes/"] ||
-                           [[tab URL] hasPrefix:@"https://www.bbc.co.uk/programmes/"]) {
-                     url = [NSString stringWithString:[tab URL]];
-                     NSScanner *nameScanner = [NSScanner scannerWithString:[tab title]];
+                  else if ([tab.URL hasPrefix:@"http://www.bbc.co.uk/programmes/"] ||
+                           [tab.URL hasPrefix:@"https://www.bbc.co.uk/programmes/"]) {
+                     url = [NSString stringWithString:tab.URL];
+                     NSScanner *nameScanner = [NSScanner scannerWithString:tab.title];
                      [nameScanner scanUpToString:@"- " intoString:nil];
                      [nameScanner scanString:@"- " intoString:nil];
                      [nameScanner scanUpToString:@"kjklgfdjfgkdlj" intoString:&newShowName];
                      foundURL=YES;
                      source = [tab executeJavascript:@"document.documentElement.outerHTML"];
                   }
-                  else if ([[tab URL] hasPrefix:@"http://www.itv.com/hub/"] ||
-                           [[tab URL] hasPrefix:@"https://www.itv.com/hub/"])
+                  else if ([tab.URL hasPrefix:@"http://www.itv.com/hub/"] ||
+                           [tab.URL hasPrefix:@"https://www.itv.com/hub/"])
                   {
-                     url = [NSString stringWithString:[tab URL]];
+                     url = [NSString stringWithString:tab.URL];
                      source = [tab executeJavascript:@"document.documentElement.outerHTML"];
-                     newShowName = [[tab title] stringByReplacingOccurrencesOfString:@" - The ITV Hub" withString:@""];
+                     newShowName = [tab.title stringByReplacingOccurrencesOfString:@" - The ITV Hub" withString:@""];
                      foundURL=YES;
                   }
 					}
 					if (foundURL==NO)
 					{
-						url = [NSString stringWithString:[[windows[0] activeTab] URL]];
+						url = [NSString stringWithString:[windows[0] activeTab].URL];
                   //Might be incorrect
 					}
 				}
@@ -191,8 +191,8 @@
 		NSString *pid = nil;
 		NSScanner *urlScanner = [[NSScanner alloc] initWithString:url];
 		[urlScanner scanUpToString:@"/episode/" intoString:nil];
-		if ([urlScanner isAtEnd]) {
-			[urlScanner setScanLocation:0];
+		if (urlScanner.atEnd) {
+			urlScanner.scanLocation = 0;
 			[urlScanner scanUpToString:@"/console/" intoString:nil];
 		}
 		[urlScanner scanString:@"/" intoString:nil];
@@ -201,7 +201,7 @@
 		[urlScanner scanUpToString:@"/" intoString:&pid];
 		Programme *newProg = [[Programme alloc] initWithLogController:logger];
 		[newProg setValue:pid forKey:@"pid"];
-      if (newShowName) [newProg setShowName:newShowName];
+      if (newShowName) newProg.showName = newShowName;
 //        newProg.status = @"Processing...";
 //        [newProg performSelectorInBackground:@selector(getName) withObject:nil];
       return newProg;
@@ -217,22 +217,22 @@
 		[urlScanner scanUpToString:@"#" intoString:&pid];
 		NSScanner *scanner = [NSScanner scannerWithString:source];
         [scanner scanUpToString:[NSString stringWithFormat:@"bbcProgrammes.programme = { pid : '%@', type : 'episode' }", pid] intoString:nil];
-        if ([scanner isAtEnd]) {
-            [scanner setScanLocation:0];
+        if (scanner.atEnd) {
+            scanner.scanLocation = 0;
             [scanner scanUpToString:[NSString stringWithFormat:@"bbcProgrammes.programme = { pid : '%@', type : 'clip' }", pid] intoString:nil];
         }
-		if ([scanner isAtEnd]) {
+		if (scanner.atEnd) {
          NSAlert *invalidPage = [[NSAlert alloc] init];
          [invalidPage addButtonWithTitle:@"OK"];
-         [invalidPage setMessageText:[NSString stringWithFormat:@"Invalid Page: %@",url]];
-         [invalidPage setInformativeText:@"Please ensure the frontmost browser tab is open to an iPlayer episode page or programme clip page."];
-         [invalidPage setAlertStyle:NSWarningAlertStyle];
+         invalidPage.messageText = [NSString stringWithFormat:@"Invalid Page: %@",url];
+         invalidPage.informativeText = @"Please ensure the frontmost browser tab is open to an iPlayer episode page or programme clip page.";
+         invalidPage.alertStyle = NSWarningAlertStyle;
          [invalidPage runModal];
          return nil;
       }
 		Programme *newProg = [[Programme alloc] init];
 		[newProg setValue:pid forKey:@"pid"];
-      if (newShowName) [newProg setShowName:newShowName];
+      if (newShowName) newProg.showName = newShowName;
 //        newProg.status = @"Processing...";
 //        [newProg performSelectorInBackground:@selector(getName) withObject:nil];
         return newProg;
@@ -265,25 +265,25 @@
         if (!progname || !productionId) {
             NSAlert *invalidPage = [[NSAlert alloc] init];
             [invalidPage addButtonWithTitle:@"OK"];
-            [invalidPage setMessageText:[NSString stringWithFormat:@"Invalid Page: %@",url]];
-            [invalidPage setInformativeText:@"Please ensure the frontmost browser tab is open to an ITV Hub episode page."];
-            [invalidPage setAlertStyle:NSWarningAlertStyle];
+            invalidPage.messageText = [NSString stringWithFormat:@"Invalid Page: %@",url];
+            invalidPage.informativeText = @"Please ensure the frontmost browser tab is open to an ITV Hub episode page.";
+            invalidPage.alertStyle = NSWarningAlertStyle;
             [invalidPage runModal];
             return nil;
         }
         NSString *pid = [productionId stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
         NSString *showName = [NSString stringWithFormat:@"%@ - %@", progname, pid];
         Programme *newProg = [[Programme alloc] init];
-        [newProg setPid:pid];
-        [newProg setShowName:showName];
-        [newProg setTvNetwork:@"ITV"];
-        [newProg setProcessedPID:@YES];
-        [newProg setUrl:url];
+        newProg.pid = pid;
+        newProg.showName = showName;
+        newProg.tvNetwork = @"ITV";
+        newProg.processedPID = @YES;
+        newProg.url = url;
         scanner = [NSScanner scannerWithString:title];
         [scanner scanUpToString:@"Series " intoString:nil];
         [scanner scanString:@"Series " intoString:nil];
         [scanner scanInteger:&seriesnum];
-        [scanner setScanLocation:0];
+        scanner.scanLocation = 0;
         [scanner scanUpToString:@"Episode " intoString:nil];
         [scanner scanString:@"Episode " intoString:nil];
         [scanner scanInteger:&episodenum];
@@ -294,22 +294,22 @@
             [scanner scanInteger:&seriesnum];
         }
         if ( episodenum == 0 ) {
-            [scanner setScanLocation:0];
+            scanner.scanLocation = 0;
             [scanner scanUpToString:@"Episode " intoString:nil];
             [scanner scanString:@"Episode " intoString:nil];
             [scanner scanInteger:&episodenum];
         }
-        [newProg setSeason:seriesnum];
-        [newProg setEpisode:episodenum];
+        newProg.season = seriesnum;
+        newProg.episode = episodenum;
         return newProg;
     }
 	else
 	{
 		NSAlert *invalidPage = [[NSAlert alloc] init];
 		[invalidPage addButtonWithTitle:@"OK"];
-		[invalidPage setMessageText:[NSString stringWithFormat:@"Invalid Page: %@",url]];
-		[invalidPage setInformativeText:@"Please ensure the frontmost browser tab is open to an iPlayer episode page or ITV Hub episode page."];
-		[invalidPage setAlertStyle:NSWarningAlertStyle];
+		invalidPage.messageText = [NSString stringWithFormat:@"Invalid Page: %@",url];
+		invalidPage.informativeText = @"Please ensure the frontmost browser tab is open to an iPlayer episode page or ITV Hub episode page.";
+		invalidPage.alertStyle = NSWarningAlertStyle;
 		[invalidPage runModal];
       return nil;
 	}

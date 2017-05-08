@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12120" systemVersion="16E195" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
-        <deployment version="1070" identifier="macosx"/>
+        <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12120"/>
         <capability name="box content view" minToolsVersion="7.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -54,7 +54,7 @@
                 <outlet property="solutionsWindow" destination="1374" id="1401"/>
                 <outlet property="startButton" destination="481" id="930"/>
                 <outlet property="stopButton" destination="482" id="931"/>
-                <outlet property="tvFormatController" destination="1106" id="1145"/>
+                <outlet property="tvFormatController" destination="1106" id="Q0Z-dY-VJ5"/>
             </connections>
         </customObject>
         <arrayController objectClassName="ReasonForFailure" id="1402" userLabel="SolutionsArrayController">
@@ -466,24 +466,24 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="showFeedback:" target="621" id="1011"/>
-                                    <binding destination="668" name="enabled" keyPath="values.TomTech" id="hnb-vu-uK5"/>
                                     <binding destination="668" name="hidden" keyPath="values.TomTech" previousBinding="hnb-vu-uK5" id="Fcb-yL-3a2">
                                         <dictionary key="options">
                                             <string key="NSValueTransformerName">NSNegateBoolean</string>
                                         </dictionary>
                                     </binding>
+                                    <binding destination="668" name="enabled" keyPath="values.TomTech" id="hnb-vu-uK5"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Check for Updates..." id="1003">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="checkForUpdates:" target="987" id="1005"/>
-                                    <binding destination="668" name="enabled" keyPath="values.TomTech" id="rVq-zm-Juj"/>
                                     <binding destination="668" name="hidden" keyPath="values.TomTech" previousBinding="rVq-zm-Juj" id="8ov-cD-Jxv">
                                         <dictionary key="options">
                                             <string key="NSValueTransformerName">NSNegateBoolean</string>
                                         </dictionary>
                                     </binding>
+                                    <binding destination="668" name="enabled" keyPath="values.TomTech" id="rVq-zm-Juj"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="1002"/>
@@ -1163,7 +1163,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                         <clipView key="contentView" id="en0-B7-GvD">
                             <rect key="frame" x="1" y="0.0" width="566" height="148"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" autosaveColumns="NO" headerView="526" id="525">
                                     <rect key="frame" x="0.0" y="0.0" width="566" height="131"/>
@@ -1221,8 +1221,8 @@
                             <autoresizingMask key="autoresizingMask"/>
                         </tableHeaderView>
                     </scrollView>
-                    <button verticalHuggingPriority="750" id="531">
-                        <rect key="frame" x="452" y="408" width="154" height="24"/>
+                    <button verticalHuggingPriority="750" misplaced="YES" id="531">
+                        <rect key="frame" x="449" y="404" width="154" height="30"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="bevel" title="Auto-Record" bezelStyle="regularSquare" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="532">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1238,7 +1238,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" id="vxe-2Q-IFs">
                             <rect key="frame" x="1" y="0.0" width="566" height="125"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" autosaveColumns="NO" headerView="537" id="536">
                                     <rect key="frame" x="0.0" y="0.0" width="648" height="108"/>
@@ -1512,7 +1512,7 @@
                                         <button id="852">
                                             <rect key="frame" x="126" y="311" width="79" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="BBC TV" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" imageScaling="proportionallyDown" inset="2" id="853">
+                                            <buttonCell key="cell" type="check" title="BBC TV" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="853">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
@@ -1556,7 +1556,7 @@
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             <size key="cellSize" width="85" height="18"/>
                                             <size key="intercellSpacing" width="4" height="2"/>
-                                            <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" imageScaling="proportionallyDown" inset="2" id="560">
+                                            <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" inset="2" id="560">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
@@ -1566,14 +1566,14 @@
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system"/>
                                                     </buttonCell>
-                                                    <buttonCell type="radio" title="Provided" imagePosition="left" alignment="left" imageScaling="proportionallyDown" inset="2" id="559">
+                                                    <buttonCell type="radio" title="Provided" imagePosition="left" alignment="left" inset="2" id="559">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system"/>
                                                         <connections>
                                                             <binding destination="668" name="enabled" keyPath="values.TomTech" id="uvA-h0-jER"/>
                                                         </connections>
                                                     </buttonCell>
-                                                    <buttonCell type="radio" title="None" imagePosition="left" alignment="left" state="on" imageScaling="proportionallyDown" inset="2" id="561" userLabel="None">
+                                                    <buttonCell type="radio" title="None" imagePosition="left" alignment="left" state="on" inset="2" id="561" userLabel="None">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system"/>
                                                     </buttonCell>
@@ -1586,7 +1586,7 @@
                                         <button id="579">
                                             <rect key="frame" x="260" y="367" width="63" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="left" alignment="left" imageScaling="proportionallyDown" inset="2" id="580">
+                                            <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="580">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
@@ -1621,7 +1621,7 @@
                                         <button id="936">
                                             <rect key="frame" x="79" y="224" width="63" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" imageScaling="proportionallyDown" inset="2" id="937">
+                                            <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="937">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
@@ -1657,7 +1657,7 @@
                                         <button id="858">
                                             <rect key="frame" x="126" y="280" width="97" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="BBC Radio" bezelStyle="regularSquare" imagePosition="left" alignment="left" imageScaling="proportionallyDown" inset="2" id="859">
+                                            <buttonCell key="cell" type="check" title="BBC Radio" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="859">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
@@ -1673,7 +1673,7 @@
                                         <button id="978">
                                             <rect key="frame" x="396" y="199" width="22" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" imageScaling="proportionallyDown" inset="2" id="979">
+                                            <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="979">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
@@ -1890,7 +1890,7 @@
                                         <button id="bGk-Hx-Mhw">
                                             <rect key="frame" x="232" y="311" width="83" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="ITV TV" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" imageScaling="proportionallyDown" inset="2" id="7pT-vJ-dMF">
+                                            <buttonCell key="cell" type="check" title="ITV TV" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="7pT-vJ-dMF">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
@@ -1908,12 +1908,12 @@
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                             <connections>
-                                                <binding destination="668" name="enabled" keyPath="values.TomTech" id="Kx5-LS-ThD"/>
                                                 <binding destination="668" name="hidden" keyPath="values.TomTech" previousBinding="Kx5-LS-ThD" id="DFY-Lh-TMG">
                                                     <dictionary key="options">
                                                         <string key="NSValueTransformerName">NSNegateBoolean</string>
                                                     </dictionary>
                                                 </binding>
+                                                <binding destination="668" name="enabled" keyPath="values.TomTech" id="Kx5-LS-ThD"/>
                                             </connections>
                                         </textField>
                                         <button misplaced="YES" id="1481">
@@ -1924,13 +1924,13 @@
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
-                                                <binding destination="668" name="enabled" keyPath="values.TomTech" id="dd5-n4-8RI"/>
+                                                <binding destination="668" name="value" keyPath="values.QuickCache" id="1483"/>
                                                 <binding destination="668" name="hidden" keyPath="values.TomTech" previousBinding="dd5-n4-8RI" id="UYO-nS-98h">
                                                     <dictionary key="options">
                                                         <string key="NSValueTransformerName">NSNegateBoolean</string>
                                                     </dictionary>
                                                 </binding>
-                                                <binding destination="668" name="value" keyPath="values.QuickCache" id="1483"/>
+                                                <binding destination="668" name="enabled" keyPath="values.TomTech" id="dd5-n4-8RI"/>
                                             </connections>
                                         </button>
                                     </subviews>
@@ -1946,7 +1946,7 @@
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <clipView key="contentView" id="iNe-PX-Coi">
                                                 <rect key="frame" x="1" y="0.0" width="403" height="119"/>
-                                                <autoresizingMask key="autoresizingMask"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="1079" id="1078">
                                                         <rect key="frame" x="0.0" y="0.0" width="403" height="102"/>
@@ -1971,7 +1971,6 @@
                                                                             </menuItem>
                                                                             <menuItem title="Flash - HD" state="on" id="k2x-Yo-cqd"/>
                                                                             <menuItem title="Flash - Very High" id="QPv-lH-1Bk"/>
-                                                                            <menuItem title="Flash - High" id="81i-mQ-EQ5"/>
                                                                             <menuItem title="Flash - Standard" id="tY8-Gc-9rQ">
                                                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                                                             </menuItem>
@@ -2012,7 +2011,7 @@
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <clipView key="contentView" id="Yo1-zO-Vaa">
                                                 <rect key="frame" x="1" y="0.0" width="403" height="119"/>
-                                                <autoresizingMask key="autoresizingMask"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="1086" id="1087">
                                                         <rect key="frame" x="0.0" y="0.0" width="403" height="102"/>
@@ -2132,7 +2131,7 @@
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <clipView key="contentView" id="Xcv-fl-nad">
                                                 <rect key="frame" x="1" y="0.0" width="403" height="119"/>
-                                                <autoresizingMask key="autoresizingMask"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="IKG-gn-2PC" id="gbz-Rl-ARO">
                                                         <rect key="frame" x="0.0" y="0.0" width="403" height="96"/>

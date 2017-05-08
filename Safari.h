@@ -8,16 +8,16 @@
 
 @class SafariItem, SafariApplication, SafariColor, SafariDocument, SafariWindow, SafariAttributeRun, SafariCharacter, SafariParagraph, SafariText, SafariAttachment, SafariWord, SafariDocument, SafariTab, SafariWindow, SafariPrintSettings;
 
-typedef enum {
+typedef NS_ENUM(unsigned int, SafariSavo) {
 	SafariSavoAsk = 'ask ' /* Ask the user whether or not to save the file. */,
 	SafariSavoNo = 'no  ' /* Do not save the file. */,
 	SafariSavoYes = 'yes ' /* Save the file. */
-} SafariSavo;
+};
 
-typedef enum {
+typedef NS_ENUM(unsigned int, SafariEnum) {
 	SafariEnumStandard = 'lwst' /* Standard PostScript error handling */,
 	SafariEnumDetailed = 'lwdt' /* print a detailed report of PostScript errors */
-} SafariEnum;
+};
 
 
 
@@ -33,7 +33,7 @@ typedef enum {
 - (void) closeSaving:(SafariSavo)saving savingIn:(NSURL *)savingIn;  // Close an object.
 - (void) delete;  // Delete an object.
 - (void) duplicateTo:(SBObject *)to withProperties:(NSDictionary *)withProperties;  // Copy object(s) and put the copies at a new location.
-- (BOOL) exists;  // Verify if an object exists.
+@property (nonatomic, readonly) BOOL exists;  // Verify if an object exists.
 - (void) moveTo:(SBObject *)to;  // Move object(s) to a new location.
 - (void) saveAs:(NSString *)as in:(NSURL *)in_;  // Save an object.
 
@@ -42,8 +42,8 @@ typedef enum {
 // An application's top level scripting object.
 @interface SafariApplication : SBApplication
 
-- (SBElementArray *) documents;
-- (SBElementArray *) windows;
+@property (nonatomic, readonly, copy) SBElementArray *documents;
+@property (nonatomic, readonly, copy) SBElementArray *windows;
 
 @property (readonly) BOOL frontmost;  // Is this the frontmost (active) application?
 @property (copy, readonly) NSString *name;  // The name of the application.
@@ -81,7 +81,7 @@ typedef enum {
 @property (readonly) BOOL closeable;  // Whether the window has a close box.
 @property (copy, readonly) SafariDocument *document;  // The document whose contents are being displayed in the window.
 @property (readonly) BOOL floating;  // Whether the window floats.
-- (NSInteger) id;  // The unique identifier of the window.
+@property (nonatomic, readonly) NSInteger id;  // The unique identifier of the window.
 @property NSInteger index;  // The index of the window, ordered front to back.
 @property (readonly) BOOL miniaturizable;  // Whether the window can be miniaturized.
 @property BOOL miniaturized;  // Whether the window is currently miniaturized.
@@ -105,11 +105,11 @@ typedef enum {
 // This subdivides the text into chunks that all have the same attributes.
 @interface SafariAttributeRun : SafariItem
 
-- (SBElementArray *) attachments;
-- (SBElementArray *) attributeRuns;
-- (SBElementArray *) characters;
-- (SBElementArray *) paragraphs;
-- (SBElementArray *) words;
+@property (nonatomic, readonly, copy) SBElementArray *attachments;
+@property (nonatomic, readonly, copy) SBElementArray *attributeRuns;
+@property (nonatomic, readonly, copy) SBElementArray *characters;
+@property (nonatomic, readonly, copy) SBElementArray *paragraphs;
+@property (nonatomic, readonly, copy) SBElementArray *words;
 
 @property (copy) NSColor *color;  // The color of the first character.
 @property (copy) NSString *font;  // The name of the font of the first character.
@@ -121,11 +121,11 @@ typedef enum {
 // This subdivides the text into characters.
 @interface SafariCharacter : SafariItem
 
-- (SBElementArray *) attachments;
-- (SBElementArray *) attributeRuns;
-- (SBElementArray *) characters;
-- (SBElementArray *) paragraphs;
-- (SBElementArray *) words;
+@property (nonatomic, readonly, copy) SBElementArray *attachments;
+@property (nonatomic, readonly, copy) SBElementArray *attributeRuns;
+@property (nonatomic, readonly, copy) SBElementArray *characters;
+@property (nonatomic, readonly, copy) SBElementArray *paragraphs;
+@property (nonatomic, readonly, copy) SBElementArray *words;
 
 @property (copy) NSColor *color;  // The color of the first character.
 @property (copy) NSString *font;  // The name of the font of the first character.
@@ -137,11 +137,11 @@ typedef enum {
 // This subdivides the text into paragraphs.
 @interface SafariParagraph : SafariItem
 
-- (SBElementArray *) attachments;
-- (SBElementArray *) attributeRuns;
-- (SBElementArray *) characters;
-- (SBElementArray *) paragraphs;
-- (SBElementArray *) words;
+@property (nonatomic, readonly, copy) SBElementArray *attachments;
+@property (nonatomic, readonly, copy) SBElementArray *attributeRuns;
+@property (nonatomic, readonly, copy) SBElementArray *characters;
+@property (nonatomic, readonly, copy) SBElementArray *paragraphs;
+@property (nonatomic, readonly, copy) SBElementArray *words;
 
 @property (copy) NSColor *color;  // The color of the first character.
 @property (copy) NSString *font;  // The name of the font of the first character.
@@ -153,11 +153,11 @@ typedef enum {
 // Rich (styled) text
 @interface SafariText : SafariItem
 
-- (SBElementArray *) attachments;
-- (SBElementArray *) attributeRuns;
-- (SBElementArray *) characters;
-- (SBElementArray *) paragraphs;
-- (SBElementArray *) words;
+@property (nonatomic, readonly, copy) SBElementArray *attachments;
+@property (nonatomic, readonly, copy) SBElementArray *attributeRuns;
+@property (nonatomic, readonly, copy) SBElementArray *characters;
+@property (nonatomic, readonly, copy) SBElementArray *paragraphs;
+@property (nonatomic, readonly, copy) SBElementArray *words;
 
 @property (copy) NSColor *color;  // The color of the first character.
 @property (copy) NSString *font;  // The name of the font of the first character.
@@ -178,11 +178,11 @@ typedef enum {
 // This subdivides the text into words.
 @interface SafariWord : SafariItem
 
-- (SBElementArray *) attachments;
-- (SBElementArray *) attributeRuns;
-- (SBElementArray *) characters;
-- (SBElementArray *) paragraphs;
-- (SBElementArray *) words;
+@property (nonatomic, readonly, copy) SBElementArray *attachments;
+@property (nonatomic, readonly, copy) SBElementArray *attributeRuns;
+@property (nonatomic, readonly, copy) SBElementArray *characters;
+@property (nonatomic, readonly, copy) SBElementArray *paragraphs;
+@property (nonatomic, readonly, copy) SBElementArray *words;
 
 @property (copy) NSColor *color;  // The color of the first character.
 @property (copy) NSString *font;  // The name of the font of the first character.
@@ -222,7 +222,7 @@ typedef enum {
 // A Safari window.
 @interface SafariWindow (SafariSuite)
 
-- (SBElementArray *) tabs;
+@property (nonatomic, readonly, copy) SBElementArray *tabs;
 
 @property (copy) SafariTab *currentTab;  // The current tab.
 
@@ -250,7 +250,7 @@ typedef enum {
 - (void) closeSaving:(SafariSavo)saving savingIn:(NSURL *)savingIn;  // Close an object.
 - (void) delete;  // Delete an object.
 - (void) duplicateTo:(SBObject *)to withProperties:(NSDictionary *)withProperties;  // Copy object(s) and put the copies at a new location.
-- (BOOL) exists;  // Verify if an object exists.
+@property (nonatomic, readonly) BOOL exists;  // Verify if an object exists.
 - (void) moveTo:(SBObject *)to;  // Move object(s) to a new location.
 - (void) saveAs:(NSString *)as in:(NSURL *)in_;  // Save an object.
 

@@ -61,22 +61,17 @@ NSString * const DirectoryLocationDomain = @"DirectoryLocationDomain";
 		searchPathDirectory,
 		domainMask,
 		YES);
-	if ([paths count] == 0)
+	if (paths.count == 0)
 	{
 		if (errorOut)
 		{
 			NSDictionary *userInfo =
-				[NSDictionary dictionaryWithObjectsAndKeys:
-					NSLocalizedStringFromTable(
+				@{NSLocalizedDescriptionKey: NSLocalizedStringFromTable(
 						@"No path found for directory in domain.",
 						@"Errors",
 					nil),
-					NSLocalizedDescriptionKey,
-					[NSNumber numberWithInteger:searchPathDirectory],
-					@"NSSearchPathDirectory",
-					[NSNumber numberWithInteger:domainMask],
-					@"NSSearchPathDomainMask",
-				nil];
+					@"NSSearchPathDirectory": @(searchPathDirectory),
+					@"NSSearchPathDomainMask": @(domainMask)};
 			*errorOut =
 				[NSError 
 					errorWithDomain:DirectoryLocationDomain
@@ -89,7 +84,7 @@ NSString * const DirectoryLocationDomain = @"DirectoryLocationDomain";
 	//
 	// Normally only need the first path returned
 	//
-	NSString *resolvedPath = [paths objectAtIndex:0];
+	NSString *resolvedPath = paths[0];
 
 	//
 	// Append the extra path component
@@ -137,7 +132,7 @@ NSString * const DirectoryLocationDomain = @"DirectoryLocationDomain";
 - (NSString *)applicationSupportDirectory
 {
 	NSString *executableName =
-		[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleExecutable"];
+		[NSBundle mainBundle].infoDictionary[@"CFBundleExecutable"];
 	NSError *error;
 	NSString *result =
 		[self

@@ -9,18 +9,15 @@
 #import "ExtendedShowInformationController.h"
 
 @implementation ExtendedShowInformationController
-- (id)init
+- (instancetype)init
 {
     if (!(self = [super init])) return nil;
-    modeSizeSorters = [NSArray arrayWithObjects:
-                        [NSSortDescriptor sortDescriptorWithKey:@"group" ascending:YES],
+    modeSizeSorters = @[[NSSortDescriptor sortDescriptorWithKey:@"group" ascending:YES],
                         [NSSortDescriptor sortDescriptorWithKey:@"version" ascending:YES],
                         [NSSortDescriptor sortDescriptorWithKey:@"size" ascending:NO comparator:^(id obj1, id obj2) {
                             return [(NSString *)obj1 compare:(NSString *)obj2 options:NSNumericSearch];
                         }],
-                        [NSSortDescriptor sortDescriptorWithKey:@"mode" ascending:YES],
-                        nil
-                    ];
+                        [NSSortDescriptor sortDescriptorWithKey:@"mode" ascending:YES]];
     return self;
 }
 #pragma mark Extended Show Information
@@ -28,15 +25,15 @@
    popover.behavior = NSPopoverBehaviorTransient;
     loadingLabel.stringValue = @"Loading Episode Info";
    [[NSNotificationCenter defaultCenter] postNotificationName:@"AddToLogNotification" object:self userInfo:@{@"message": @"Retrieving Information"}];
-   Programme *programme = searchResultsArrayController.arrangedObjects[[searchResultsTable selectedRow]];
+   Programme *programme = searchResultsArrayController.arrangedObjects[searchResultsTable.selectedRow];
    if (programme) {
        
        if ( [programme.tvNetwork isEqualToString:@"ITV Player"] )
        {
            NSAlert *notNewITV = [[NSAlert alloc] init];
            [notNewITV addButtonWithTitle:@"OK"];
-           [notNewITV setMessageText:[NSString stringWithFormat:@"This feature is not available for ITV programmes"]];
-           [notNewITV setAlertStyle:NSWarningAlertStyle];
+           notNewITV.messageText = [NSString stringWithFormat:@"This feature is not available for ITV programmes"];
+           notNewITV.alertStyle = NSWarningAlertStyle;
            [notNewITV runModal];
            notNewITV = nil;
            return;
@@ -47,10 +44,10 @@
       [retrievingInfoIndicator startAnimation:self];
       
       @try {
-         [popover showRelativeToRect:[searchResultsTable frameOfCellAtColumn:1 row:[searchResultsTable selectedRow]] ofView:(NSView *)searchResultsTable preferredEdge:NSMaxYEdge];
+         [popover showRelativeToRect:[searchResultsTable frameOfCellAtColumn:1 row:searchResultsTable.selectedRow] ofView:(NSView *)searchResultsTable preferredEdge:NSMaxYEdge];
       }
       @catch (NSException *exception) {
-         NSLog(@"%@",[exception description]);
+         NSLog(@"%@",exception.description);
          NSLog(@"%@",searchResultsTable);
          return;
       }
@@ -66,7 +63,7 @@
 }
 - (void)timeoutTimer:(NSTimer *)timer
 {
-   Programme *programme = searchResultsArrayController.arrangedObjects[[searchResultsTable selectedRow]];
+   Programme *programme = searchResultsArrayController.arrangedObjects[searchResultsTable.selectedRow];
    if (!programme.extendedMetadataRetrieved.boolValue) {
       [[NSNotificationCenter defaultCenter] postNotificationName:@"AddToLogNotification" object:self userInfo:@{@"message":@"Metadata Retrieval Timed Out"}];
       [programme cancelMetadataRetrieval];
@@ -108,12 +105,12 @@
          categoriesField.stringValue = @"";
       
       if (programme.firstBroadcast)
-         firstBroadcastField.stringValue = [NSString stringWithFormat:@"First Broadcast: %@",[programme.firstBroadcast description]];
+         firstBroadcastField.stringValue = [NSString stringWithFormat:@"First Broadcast: %@",(programme.firstBroadcast).description];
       else
          firstBroadcastField.stringValue = @"";
       
       if (programme.lastBroadcast)
-         lastBroadcastField.stringValue = [NSString stringWithFormat:@"Last Broadcast: %@", [programme.lastBroadcast description]];
+         lastBroadcastField.stringValue = [NSString stringWithFormat:@"Last Broadcast: %@", (programme.lastBroadcast).description];
       else
          lastBroadcastField.stringValue = @"";
       
@@ -125,7 +122,7 @@
       if (programme.modeSizes)
          modeSizeController.content = programme.modeSizes;
       else
-         modeSizeController.content = [NSArray array];
+         modeSizeController.content = @[];
       
       if ([programme typeDescription])
          typeField.stringValue = [NSString stringWithFormat:@"Type: %@",[programme typeDescription]];

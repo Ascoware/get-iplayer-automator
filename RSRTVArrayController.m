@@ -62,7 +62,7 @@ NSString *kRSRTVMovedRowsType = @"com.red-sweater.RSRTVArrayController";
 
 - (BOOL) tableObjectsSupportCopying
 {
-	return [[self arrangedObjects][0] conformsToProtocol:@protocol(NSCopying)];
+	return [self.arrangedObjects[0] conformsToProtocol:@protocol(NSCopying)];
 }
 
 - (NSDragOperation)tableView:(NSTableView*)tv validateDrop:(id <NSDraggingInfo>)info proposedRow:(NSInteger)row proposedDropOperation:(NSTableViewDropOperation)op
@@ -118,7 +118,7 @@ NSString *kRSRTVMovedRowsType = @"com.red-sweater.RSRTVArrayController";
 			rowsAbove = [self rowsAboveRow:row inIndexSet:indexSet];
 		}
 		
-		NSRange range = NSMakeRange(row - rowsAbove, [indexSet count]);
+		NSRange range = NSMakeRange(row - rowsAbove, indexSet.count);
 		indexSet = [NSIndexSet indexSetWithIndexesInRange:range];
 		[self setSelectionIndexes:indexSet];
 		
@@ -130,8 +130,8 @@ NSString *kRSRTVMovedRowsType = @"com.red-sweater.RSRTVArrayController";
 
 -(void) copyObjectsInArrangedObjectsFromIndexes:(NSIndexSet*)indexSet toIndex:(NSUInteger)insertIndex
 {	
-    NSArray	*objects = [self arrangedObjects];
-	NSUInteger copyFromIndex = [indexSet lastIndex];
+    NSArray	*objects = self.arrangedObjects;
+	NSUInteger copyFromIndex = indexSet.lastIndex;
 	
     NSInteger			aboveInsertIndexCount = 0;
     id			object;
@@ -159,8 +159,8 @@ NSString *kRSRTVMovedRowsType = @"com.red-sweater.RSRTVArrayController";
 -(void) moveObjectsInArrangedObjectsFromIndexes:(NSIndexSet*)indexSet toIndex:(NSUInteger)insertIndex
 {
 	
-    NSArray	*objects = [self arrangedObjects];
-	NSUInteger thisIndex = [indexSet lastIndex];
+    NSArray	*objects = self.arrangedObjects;
+	NSUInteger thisIndex = indexSet.lastIndex;
 	
     NSInteger			aboveInsertIndexCount = 0;
     id			object;
@@ -200,7 +200,7 @@ NSString *kRSRTVMovedRowsType = @"com.red-sweater.RSRTVArrayController";
     NSNumber *idx;
     while (idx = [rowEnumerator nextObject])
     {
-		[indexSet addIndex:[idx intValue]];
+		[indexSet addIndex:idx.intValue];
     }
     return indexSet;
 }
@@ -208,7 +208,7 @@ NSString *kRSRTVMovedRowsType = @"com.red-sweater.RSRTVArrayController";
 
 - (NSUInteger)rowsAboveRow:(NSUInteger)row inIndexSet:(NSIndexSet *)indexSet
 {
-    NSUInteger currentIndex = [indexSet firstIndex];
+    NSUInteger currentIndex = indexSet.firstIndex;
     NSInteger i = 0;
     while (currentIndex != NSNotFound)
     {
@@ -226,7 +226,7 @@ NSString *kRSRTVMovedRowsType = @"com.red-sweater.RSRTVArrayController";
 {
 	// Pay attention to column resizes and aggressively force the tableview's 
 	// cornerview to redraw.
-	[[oTableView cornerView] setNeedsDisplay:YES];
+	[oTableView.cornerView setNeedsDisplay:YES];
 }
 
 @end

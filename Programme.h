@@ -19,89 +19,57 @@ typedef NS_ENUM(NSInteger, GIA_ProgrammeType) {
 
 
 @interface Programme : NSObject <NSCoding> {
-    LogController *logger;
-    
-    NSString *tvNetwork;
-    NSString *showName;
-    NSString *pid;
-    NSString *status;
-    NSString *seriesName;
-    NSString *episodeName;
-    NSNumber *complete;
-    NSNumber *successful;
-    NSNumber *timeadded;
-    NSString *path;
-    NSInteger season;
-    NSInteger episode;
-    NSNumber *processedPID;
-    NSNumber *radio;
-    NSString *realPID;
-    NSString *subtitlePath;
-    NSString *reasonForFailure;
-    NSString *availableModes;
-    NSString *url;
-    NSDate *__strong dateAired;
-    NSString *desc;
+}
+@property (nonatomic) LogController *logger;
+@property (nonatomic) NSString *tvNetwork;
+@property (nonatomic) NSString *showName;
+@property (nonatomic) NSString *pid;
+@property (nonatomic) NSString *status;
+@property (nonatomic) NSString *seriesName;
+@property (nonatomic) NSString *episodeName;
+@property (nonatomic) NSNumber *complete;
+@property (nonatomic) NSNumber *successful;
+@property (nonatomic) NSNumber *timeadded;
+@property (nonatomic) NSString *path;
+@property (nonatomic) NSInteger season;
+@property (nonatomic) NSInteger episode;
+@property (nonatomic) NSNumber *processedPID;
+@property (nonatomic) NSNumber *radio;
+@property (nonatomic) NSString *realPID;
+@property (nonatomic) NSString *subtitlePath;
+@property (nonatomic) NSString *reasonForFailure;
+@property (nonatomic) NSString *availableModes;
+@property (nonatomic) NSString *url;
+@property (nonatomic) NSDate *dateAired;
+@property (nonatomic) NSString *desc;
     
     //Extended Metadata
-    NSNumber *extendedMetadataRetrieved;
-    NSNumber *successfulRetrieval;
-    NSNumber *duration;
-    NSString *categories;
-    NSDate *__strong firstBroadcast;
-    NSDate *__strong lastBroadcast;
-    NSArray *modeSizes;
-    NSImage *thumbnail;
+@property (nonatomic) NSNumber *extendedMetadataRetrieved;
+@property (nonatomic) NSNumber *successfulRetrieval;
+@property (nonatomic) NSNumber *duration;
+@property (nonatomic) NSString *categories;
+@property (nonatomic) NSDate *firstBroadcast;
+@property (nonatomic) NSDate *lastBroadcast;
+@property (nonatomic) NSArray *modeSizes;
+@property (nonatomic) NSImage *thumbnail;
     
-    NSMutableString *taskOutput;
-    NSPipe *pipe;
-    volatile bool taskRunning;
-    NSTask *metadataTask;
-    GetiPlayerProxy *getiPlayerProxy;
-    bool addedByPVR;
-    
-}
-- (id)initWithInfo:(id)sender pid:(NSString *)PID programmeName:(NSString *)SHOWNAME network:(NSString *)TVNETWORK logController:(LogController *)logger;
-- (id)initWithShow:(Programme *)show;
-- (id)initWithLogController:(LogController *)logger;
+@property (nonatomic) NSMutableString *taskOutput;
+@property (nonatomic) NSPipe *pipe;
+@property (nonatomic, assign) BOOL taskRunning;
+@property (nonatomic) NSTask *metadataTask;
+@property (nonatomic) GetiPlayerProxy *getiPlayerProxy;
+@property (nonatomic, assign) BOOL addedByPVR;
+
+- (instancetype)initWithInfo:(id)sender pid:(NSString *)PID programmeName:(NSString *)SHOWNAME network:(NSString *)TVNETWORK logController:(LogController *)logger;
+- (instancetype)initWithShow:(Programme *)show;
+- (instancetype)initWithLogController:(LogController *)logger;
 - (void)printLongDescription;
 - (void)retrieveExtendedMetadata;
 - (void)cancelMetadataRetrieval;
-- (GIA_ProgrammeType)type;
-- (NSString *)typeDescription;
+@property (nonatomic, readonly) GIA_ProgrammeType type;
+@property (nonatomic, readonly, copy) NSString *typeDescription;
 - (void)getName;
 - (void)processGetNameData:(NSString *)getNameData;
 - (void)getNameSynchronous;
 
-@property (readwrite) NSString *showName;
-@property (readwrite) NSString *tvNetwork;
-@property (readwrite) NSString *pid;
-@property (readwrite) NSString *status;
-@property (readwrite) NSString *seriesName;
-@property (readwrite) NSString *episodeName;
-@property (readwrite) NSNumber *complete;
-@property (readwrite) NSNumber *successful;
-@property (readwrite) NSNumber *timeadded;
-@property (readwrite) NSString *path;
-@property (readwrite, assign) NSInteger season;
-@property (readwrite, assign) NSInteger episode;
-@property (readwrite) NSNumber *processedPID;
-@property (readwrite) NSNumber *radio;
-@property (readwrite) NSString *realPID;
-@property (readwrite) NSString *subtitlePath;
-@property (readwrite) NSString *reasonForFailure;
-@property (readwrite) NSString *availableModes;
-@property (readwrite) NSString *url;
-@property (readwrite, strong) NSDate *dateAired;
-@property (readwrite) NSString *desc;
-
-@property (readwrite) NSNumber *extendedMetadataRetrieved;
-@property (readwrite) NSNumber *successfulRetrieval;
-@property (readwrite) NSNumber *duration;
-@property (readwrite) NSString *categories;
-@property (readwrite) NSDate *firstBroadcast;
-@property (readwrite) NSDate *lastBroadcast;
-@property (readwrite) NSArray *modeSizes;
-@property (readwrite) NSImage *thumbnail;
-@property (readwrite) bool addedByPVR;
 @end
