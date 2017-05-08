@@ -64,7 +64,7 @@ static GetiPlayerArguments *sharedController = nil;
 
 - (NSString *)profileDirArg
 {
-   return [NSString stringWithFormat:@"--profile-dir=\"%@\"", [NSFileManager defaultManager].applicationSupportDirectory];
+   return [NSString stringWithFormat:@"--profile-dir=%@", [NSFileManager defaultManager].applicationSupportDirectory];
 }
 
 - (NSString *)noWarningArg

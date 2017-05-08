@@ -205,12 +205,17 @@
     _pipe = [[NSPipe alloc] init];
     
     _metadataTask.launchPath = @"/usr/bin/perl";
+    NSString *profileDirPath = [@"~/Library/Application Support/Get iPlayer Automator/" stringByExpandingTildeInPath];
+    NSString *profileArg = [NSString stringWithFormat:@"--profile-dir=%@", profileDirPath];
+    
     NSMutableArray *args = [NSMutableArray arrayWithArray:@[[[NSBundle mainBundle] pathForResource:@"get_iplayer" ofType:@"pl"],
                                                             @"--nopurge",
                                                             @"--nocopyright",
                                                             @"-e60480000000000000",
                                                             @"-i",
-                                                            [NSString stringWithFormat:@"--profile-dir=%@",(@"~/Library/Application Support/Get iPlayer Automator/").stringByExpandingTildeInPath],@"--pid",_pid]];
+                                                            profileArg,
+                                                            @"--pid",
+                                                            _pid]];
     if (proxyDict[@"proxy"]) {
         [args addObject:[NSString stringWithFormat:@"-p%@",[proxyDict[@"proxy"] url]]];
         
