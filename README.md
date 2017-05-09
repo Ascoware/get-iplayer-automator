@@ -9,11 +9,11 @@ The current release is 1.9b2. I will keep naming these 'beta' until I get Sparkl
 
 ### [Report Issues](https://github.com/Ascoware/get-iplayer-automator/wiki/Reporting-Issues)
 
-## Version history
+### Version history
 
-# 1.9b1:
+#### 1.9b1:
 - Integrated get_iplayer 3.01
 
-# 1.9b2:
+#### 1.9b2:
 - Restored searching of ITV archives
 - Fixed bug with generation of Application Support folder.
