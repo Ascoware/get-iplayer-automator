@@ -676,18 +676,19 @@ AppController           *sharedAppController;
 
 - (instancetype)initWithName:(NSString *)name andPID:(NSString *)pid andURL:(NSString *)url andNUMBEREPISODES:(NSInteger)numberEpisodes andDATELASTAIRED:(NSTimeInterval)timeIntDateLastAired;
 {
-    _programmeName = name;
-    [self fixProgrammeName];
-    _productionId = pid;
-    _programmeURL = url;
-    self.numberEpisodes = numberEpisodes;
-    _seriesNumber = 0;
-    _episodeNumber = 0;
-    _isNew = false;
-    self.forceCacheUpdate = false;
-    self.timeIntDateLastAired = timeIntDateLastAired;
-    self.timeAddedInt = 0;
-    
+    if (self = [super init]) {
+        _programmeName = name;
+        [self fixProgrammeName];
+        _productionId = pid;
+        _programmeURL = url;
+        self.numberEpisodes = numberEpisodes;
+        _seriesNumber = 0;
+        _episodeNumber = 0;
+        _isNew = false;
+        self.forceCacheUpdate = false;
+        self.timeIntDateLastAired = timeIntDateLastAired;
+        self.timeAddedInt = 0;
+    }
     return self;
     
 }
