@@ -182,3 +182,7 @@ xcuserdata
 #BBEdit Temporary Files
 #
 \#*\#
+
+####
+# Carthage support folders
+Carthage

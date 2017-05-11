@@ -1,0 +1,2 @@
+github "AFNetworking/AFNetworking" ~> 3.1
+github "sparkle-project/Sparkle" ~> 1.17

@@ -421,8 +421,8 @@
     }
     
     if (!foundIt) {
-        NSLog(@"ERROR: None of the modes in your download format list are available for this self.show. Try adding more modes if possible.");
-        [self addToLog:@"ERROR: None of the modes in your download format list are available for this self.show. Try adding more modes if possible."];
+        NSLog(@"ERROR: None of the modes in your download format list are available for this show. Try adding more modes if possible.");
+        [self addToLog:@"ERROR: None of the modes in your download format list are available for this show. Try adding more modes if possible."];
         self.show.reasonForFailure = @"NoSpecifiedFormatAvailableITV";
         self.show.complete = @YES;
         self.show.successful = @NO;

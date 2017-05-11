@@ -7,12 +7,12 @@
 //
 
 #import "AppController.h"
+#import <Sparkle/Sparkle.h>
 #import "HTTPProxy.h"
 #import "Programme.h"
 #import "Safari.h"
 #import "iTunes.h"
 #import "Growl.framework/Headers/GrowlApplicationBridge.h"
-#import "Sparkle.framework/Headers/Sparkle.h"
 #import "JRFeedbackController.h"
 #import "ReasonForFailure.h"
 #import "Chrome.h"

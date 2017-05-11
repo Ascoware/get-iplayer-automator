@@ -38,13 +38,19 @@
         if (!tvFormats || !radioFormats) {
             [BBCDownload initFormats];
         }
-        NSMutableString *temp_Format;
-        temp_Format = [[NSMutableString alloc] initWithString:@"--modes="];
-        for (RadioFormat *format in radioFormatList)
-            [temp_Format appendFormat:@"%@,", [radioFormats valueForKey:format.format]];
-        for (TVFormat *format in tvFormatList)
-            [temp_Format appendFormat:@"%@,",[tvFormats valueForKey:format.format]];
-        NSString *formatArg = [NSString stringWithString:temp_Format];
+        NSMutableString *formatArg = [[NSMutableString alloc] initWithString:@"--modes="];
+        NSMutableArray *formatStrings = [NSMutableArray array];
+        
+        for (RadioFormat *format in radioFormatList) {
+            [formatStrings addObject:[radioFormats valueForKey:format.format]];
+        }
+        for (TVFormat *format in tvFormatList) {
+            [formatStrings addObject:[tvFormats valueForKey:format.format]];
+        }
+        
+        NSString *commaSeparatedFormats = [formatStrings componentsJoinedByString:@","];
+        
+        [formatArg appendString:commaSeparatedFormats];
         
         //Set Proxy Arguments
         NSString *proxyArg = nil;
@@ -73,6 +79,7 @@
         
         NSString *getArg = @"--pid";
         NSString *searchArg = [[NSString alloc] initWithFormat:@"%@", self.show.pid];
+        NSString *whitespaceArg = @"--whitespace";
         
         //AudioDescribed & Signed
         NSMutableString *versionArg = [NSMutableString stringWithString:@"--versions="];
@@ -105,6 +112,7 @@
                                 formatArg,
                                 getArg,
                                 searchArg,
+                                whitespaceArg,
                                 @"--attempts=5",
                                 @"--thumbsize=6",
                                 versionArg,
@@ -274,7 +282,7 @@
         [self.show setValue:@YES forKey:@"complete"];
         [self.show setValue:@NO forKey:@"successful"];
         [self.show setValue:@"Failed: No Specified Modes" forKey:@"status"];
-        [self addToLog:@"REASON FOR FAILURE: None of the modes in your download format list are available for this self.show." noTag:YES];
+        [self addToLog:@"REASON FOR FAILURE: None of the modes in your download format list are available for this show." noTag:YES];
         [self addToLog:@"Try adding more modes." noTag:YES];
         [self addToLog:[NSString stringWithFormat:@"%@ Failed",self.show.showName]];
         self.show.reasonForFailure = @"Specified_Modes";
@@ -310,14 +318,21 @@
             self.show.reasonForFailure = @"Download_Directory_Permissions";
         }
     }
-    else if ([_LastLine hasPrefix:@"INFO: Tagged file:"])
+    else if ([_LastLine hasPrefix:@"INFO: Tagged file:"] ||
+             [_LastLine hasPrefix:@"INFO: Recorded file:"])
     {
         [self.show setValue:@YES forKey:@"complete"];
         [self.show setValue:@YES forKey:@"successful"];
         [self.show setValue:@"Download Complete" forKey:@"status"];
         NSScanner *scanner = [NSScanner scannerWithString:_LastLine];
         NSString *path;
-        [scanner scanString:@"INFO: Tagged file:" intoString:nil];
+        
+        if ([_LastLine hasPrefix:@"INFO: Tagged file:"]) {
+            [scanner scanString:@"INFO: Tagged file:" intoString:nil];
+        } else {
+            [scanner scanString:@"INFO: Recorded file:" intoString:nil];
+        }
+        
         [scanner scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet] intoString:&path];
         self.show.path = path;
         [self addToLog:[NSString stringWithFormat:@"%@ Completed Successfully",self.show.showName]];
