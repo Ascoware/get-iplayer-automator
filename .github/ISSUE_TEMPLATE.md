@@ -14,22 +14,22 @@ If you create a ticket for an issue that has already been reported, your ticket 
 
 Create a succinct title describing your issue in the `Title` field above, then provide the information requested below. If you do not provide the requested information, your ticket will be closed with no further action.
 
-Delete the instructions above before submitting your ticket.
-
----
-
-What steps will reproduce the problem? Be specific, and provide as much detail as possible.
-
-What is the expected output? What do you see instead?
-
-What version of GiA are you using? On what version of OS X?
-
-Are you using a web proxy? DNS proxy? VPN? VPS?
-
-What program are you attempting to download (full title, series and episode)? **Provide only ONE program as an example. Please DO NOT list multiple program.**
-
 If you cannot download a program, provide a verbose log of the attempt. See [Verbose Log](https://github.com/Ascoware/get-iplayer-automator/wiki/Verbose-Log) in wiki for instructions on posting a verbose log for your ticket. **Your verbose log should show the results from downloading ONLY ONE program. DO NOT post a massive log covering multiple multiple program downloads. IMPORTANT: DO NOT paste your verbose log into your issue report. If you do, expect it to be deleted.**
 
 If GiA crashes, provide the OS X crash log by copying the information from Crash Reporter into a file or locating the crash log in `$HOME/Library/Logs/DiagnosticReports`. See [Verbose Log](https://github.com/Ascoware/get-iplayer-automator/wiki/Verbose-Log) in wiki for instructions on posting a crash log for your ticket. **IMPORTANT: DO NOT paste your crash log into your issue report. If you do, expect it to be deleted.**
 
-Please provide any additional information below.
+**Delete the instructions above before submitting your ticket.**
+
+---------------
+
+*What steps will reproduce the problem? Be specific, and provide as much detail as possible.*
+
+*What is the expected output? What do you see instead?*
+
+*What version of GiA are you using? On what version of OS X?*
+
+*Are you using a web proxy? DNS proxy? VPN? VPS?*
+
+*What program are you attempting to download (full title, series and episode)? **Provide only ONE program as an example.** *
+
+*Please provide any additional information below.*
