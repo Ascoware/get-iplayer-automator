@@ -23,3 +23,6 @@ The current release is 1.9b3. I will keep naming these 'beta' until I get Sparkl
 - The formerly alternative 'ITV quick caching' is now the default method for getting ITV listings.
 - Recordings are now saved without underscores in the names. App now uses the --whitespace option from get_iplayer.
 - Deployment target/minimum version restored to 10.7.
+
+#### 1.9b4:
+- Changed some framework loading options for compatibility with Gatekeeper on 10.9.
