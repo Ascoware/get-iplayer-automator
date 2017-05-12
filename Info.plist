@@ -61,5 +61,9 @@
 	<string>NO</string>
 	<key>SUEnableAutomaticChecks</key>
 	<string>NO</string>
+	<key>SUFeedURL</key>
+	<string>https://ancient-plains-97889.herokuapp.com/get-iplayer-automator/appcast.xml</string>
+	<key>SUPublicDSAKeyFile</key>
+	<string>dsa_pub.pem</string>
 </dict>
 </plist>

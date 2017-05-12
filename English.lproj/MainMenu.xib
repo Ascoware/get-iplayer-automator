@@ -188,7 +188,7 @@
                             <autoresizingMask key="autoresizingMask"/>
                             <clipView key="contentView" id="LYx-5P-gHI">
                                 <rect key="frame" x="1" y="1" width="309" height="133"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <autoresizingMask key="autoresizingMask"/>
                                 <subviews>
                                     <textView editable="NO" importsGraphics="NO" usesFontPanel="YES" findStyle="panel" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" spellingCorrection="YES" smartInsertDelete="YES" id="7Pi-tT-G0Q" userLabel="Description View">
                                         <rect key="frame" x="0.0" y="0.0" width="309" height="133"/>
@@ -224,7 +224,7 @@
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <clipView key="contentView" id="jHT-Hr-sFJ">
                                 <rect key="frame" x="1" y="0.0" width="309" height="134"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <autoresizingMask key="autoresizingMask"/>
                                 <subviews>
                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="jeg-8F-HB4" id="MRJ-oM-h7R">
                                         <rect key="frame" x="0.0" y="0.0" width="309" height="117"/>
@@ -1163,7 +1163,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                         <clipView key="contentView" id="en0-B7-GvD">
                             <rect key="frame" x="1" y="0.0" width="566" height="148"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <autoresizingMask key="autoresizingMask"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" autosaveColumns="NO" headerView="526" id="525">
                                     <rect key="frame" x="0.0" y="0.0" width="566" height="131"/>
@@ -1238,7 +1238,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" id="vxe-2Q-IFs">
                             <rect key="frame" x="1" y="0.0" width="566" height="125"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <autoresizingMask key="autoresizingMask"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" autosaveColumns="NO" headerView="537" id="536">
                                     <rect key="frame" x="0.0" y="0.0" width="648" height="108"/>
@@ -1569,9 +1569,6 @@
                                                     <buttonCell type="radio" title="Provided" imagePosition="left" alignment="left" inset="2" id="559">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system"/>
-                                                        <connections>
-                                                            <binding destination="668" name="enabled" keyPath="values.TomTech" id="uvA-h0-jER"/>
-                                                        </connections>
                                                     </buttonCell>
                                                     <buttonCell type="radio" title="None" imagePosition="left" alignment="left" state="on" inset="2" id="561" userLabel="None">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1969,12 +1966,22 @@
                                                                             <menuItem title="Please select..." state="on" id="fiI-sm-4j3">
                                                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                                                             </menuItem>
-                                                                            <menuItem title="Flash - HD" state="on" id="k2x-Yo-cqd"/>
-                                                                            <menuItem title="Flash - Very High" id="QPv-lH-1Bk"/>
-                                                                            <menuItem title="Flash - Standard" id="tY8-Gc-9rQ">
+                                                                            <menuItem title="Best" state="on" id="k2x-Yo-cqd" userLabel="Best">
                                                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                                                             </menuItem>
-                                                                            <menuItem title="Flash - Low" id="1gB-ry-erP">
+                                                                            <menuItem title="Better" id="QPv-lH-1Bk" userLabel="Better">
+                                                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                                                            </menuItem>
+                                                                            <menuItem title="Very Good" id="tY8-Gc-9rQ" userLabel="Very Good">
+                                                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                                                            </menuItem>
+                                                                            <menuItem title="Good" id="1gB-ry-erP" userLabel="Good">
+                                                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                                                            </menuItem>
+                                                                            <menuItem title="Worse" id="d8c-cU-VWY">
+                                                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                                                            </menuItem>
+                                                                            <menuItem title="Worst" id="MNn-oe-AHd">
                                                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                                                             </menuItem>
                                                                         </items>
@@ -2034,9 +2041,18 @@
                                                                             <menuItem title="Please select..." state="on" id="KJk-TX-uSU">
                                                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                                                             </menuItem>
-                                                                            <menuItem title="Flash AAC - High" id="o8l-i9-SFq"/>
-                                                                            <menuItem title="Flash AAC - Standard" id="glb-6P-Pu3"/>
-                                                                            <menuItem title="Flash AAC - Low" id="eZ8-k4-Tug"/>
+                                                                            <menuItem title="Best" id="o8l-i9-SFq"/>
+                                                                            <menuItem title="Better" id="Swo-hy-7U9">
+                                                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                                                            </menuItem>
+                                                                            <menuItem title="Very Good" id="glb-6P-Pu3"/>
+                                                                            <menuItem title="Good" id="eZ8-k4-Tug"/>
+                                                                            <menuItem title="Worse" id="QOv-mI-7kd">
+                                                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                                                            </menuItem>
+                                                                            <menuItem title="Worst" id="Coz-Qs-UQO">
+                                                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                                                            </menuItem>
                                                                         </items>
                                                                     </menu>
                                                                 </popUpButtonCell>
@@ -2587,8 +2603,8 @@
                                     <rect key="frame" x="10" y="33" width="454" height="512"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <button id="1534">
-                                            <rect key="frame" x="15" y="493" width="200" height="18"/>
+                                        <button misplaced="YES" id="1534">
+                                            <rect key="frame" x="15" y="479" width="200" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Test Proxy Before Download: " bezelStyle="regularSquare" imagePosition="right" state="on" inset="2" id="1535">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2598,19 +2614,8 @@
                                                 <binding destination="668" name="value" keyPath="values.TestProxy" id="1538"/>
                                             </connections>
                                         </button>
-                                        <button misplaced="YES" id="Ub7-bz-5JJ">
-                                            <rect key="frame" x="15" y="436" width="225" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Use Alternate ITV Cache Refresh:" bezelStyle="regularSquare" imagePosition="right" alignment="left" inset="2" id="Q4c-MN-xPg" userLabel="Use Alternate ITV Cache Refresh:">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <binding destination="668" name="value" keyPath="values.AltCacheITV_TV" id="ceG-QM-BoZ"/>
-                                            </connections>
-                                        </button>
                                         <button misplaced="YES" id="MJh-JP-hHq">
-                                            <rect key="frame" x="15" y="464" width="300" height="18"/>
+                                            <rect key="frame" x="15" y="446" width="300" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Include Downloaded Shows in Search Results:" bezelStyle="regularSquare" imagePosition="right" state="on" inset="2" id="EFC-j7-DR2">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2644,7 +2649,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" id="Npw-zh-ApO">
                             <rect key="frame" x="1" y="0.0" width="534" height="257"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnSelection="YES" autosaveColumns="NO" headerView="1218" id="1217">
                                     <rect key="frame" x="0.0" y="0.0" width="534" height="240"/>

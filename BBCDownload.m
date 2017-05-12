@@ -11,10 +11,10 @@
 @implementation BBCDownload
 + (void)initFormats
 {
-    NSArray *tvFormatKeys = @[@"Flash - HD",@"Flash - Very High",@"Flash - Standard",@"Flash - Low"];
-    NSArray *tvFormatObjects = @[@"hlshd",@"hlsvhigh",@"hlsstd",@"hlslow"];
-    NSArray *radioFormatKeys = @[@"Flash AAC - High",@"Flash AAC - Standard",@"Flash AAC - Low"];
-    NSArray *radioFormatObjects = @[@"dafhigh",@"dafstd",@"daflow"];
+    NSArray *tvFormatKeys = @[@"Best", @"Better", @"Very Good", @"Good", @"Low", @"Poor"];
+    NSArray *tvFormatObjects = @[@"tvbest",@"tvbetter",@"tvvgood",@"tvgood", @"tvworse", @"tvworst"];
+    NSArray *radioFormatKeys = @[@"Best", @"Better", @"Very Good", @"Good", @"Low", @"Poor"];
+    NSArray *radioFormatObjects = @[@"radiobest",@"radiobetter",@"radiovgood",@"radiogood", @"radioworse", @"radioworst"];
     tvFormats = [[NSDictionary alloc] initWithObjects:tvFormatObjects forKeys:tvFormatKeys];
     radioFormats = [[NSDictionary alloc] initWithObjects:radioFormatObjects forKeys:radioFormatKeys];
 }

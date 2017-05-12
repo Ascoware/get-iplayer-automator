@@ -136,7 +136,6 @@
 - (void)getiPlayerUpdateFinished;
 - (IBAction)updateCache:(id)sender;
 - (IBAction)forceUpdate:(id)sender;
-- (void)updateCacheForType:(NSString *)type;
 
 //Search
 - (IBAction)pvrSearch:(id)sender;
