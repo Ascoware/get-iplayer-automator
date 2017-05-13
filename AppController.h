@@ -7,11 +7,12 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import <Sparkle/Sparkle.h>
+#import <IOKit/pwr_mgt/IOPMLib.h>
 #import "BBCDownload.h"
 #import "Series.h"
 #import "ITVDownload.h"
 #import "Download.h"
-#import <IOKit/pwr_mgt/IOPMLib.h>
 #import "NilToStringTransformer.h"
 #import "EmptyToStringTransformer.h"
 #import "LogController.h"
@@ -20,7 +21,7 @@
 #import "GetiPlayerArguments.h"
 #import "GetiPlayerProxy.h"
 
-@interface AppController : NSObject
+@interface AppController : NSObject <SUUpdaterDelegate>
 //General
 @property (nonatomic, readonly) NSString *getiPlayerPath;
 @property (nonatomic) IBOutlet NSWindow *mainWindow;

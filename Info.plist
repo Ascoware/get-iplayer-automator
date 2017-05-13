@@ -60,7 +60,7 @@
 	<key>SUAllowsAutomaticUpdates</key>
 	<string>NO</string>
 	<key>SUEnableAutomaticChecks</key>
-	<string>NO</string>
+	<string>YES</string>
 	<key>SUFeedURL</key>
 	<string>https://ancient-plains-97889.herokuapp.com/get-iplayer-automator/appcast.xml</string>
 	<key>SUPublicDSAKeyFile</key>

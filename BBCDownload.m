@@ -11,9 +11,9 @@
 @implementation BBCDownload
 + (void)initFormats
 {
-    NSArray *tvFormatKeys = @[@"Best", @"Better", @"Very Good", @"Good", @"Low", @"Poor"];
+    NSArray *tvFormatKeys = @[@"Best", @"Better", @"Very Good", @"Good", @"Worse", @"Worst"];
     NSArray *tvFormatObjects = @[@"tvbest",@"tvbetter",@"tvvgood",@"tvgood", @"tvworse", @"tvworst"];
-    NSArray *radioFormatKeys = @[@"Best", @"Better", @"Very Good", @"Good", @"Low", @"Poor"];
+    NSArray *radioFormatKeys = @[@"Best", @"Better", @"Very Good", @"Good", @"Worse", @"Worst"];
     NSArray *radioFormatObjects = @[@"radiobest",@"radiobetter",@"radiovgood",@"radiogood", @"radioworse", @"radioworst"];
     tvFormats = [[NSDictionary alloc] initWithObjects:tvFormatObjects forKeys:tvFormatKeys];
     radioFormats = [[NSDictionary alloc] initWithObjects:radioFormatObjects forKeys:radioFormatKeys];
@@ -68,8 +68,6 @@
         
         NSString *noWarningArg = @"--nocopyright";
         NSString *noPurgeArg = @"--nopurge";
-        //    NSString *id3v2Arg = [[NSString alloc] initWithFormat:@"--id3v2=%@", [executablesPath stringByAppendingPathComponent:@"id3v2"]];
-        //    NSString *rtmpdumpArg = [[NSString alloc] initWithFormat:@"--rtmpdump=%@", [executablesPath stringByAppendingPathComponent:@"rtmpdump"]];
         NSString *atomicParsleyArg = [[NSString alloc] initWithFormat:@"--atomicparsley=%@", [executablesPath stringByAppendingPathComponent:@"AtomicParsley"]];
         NSString *ffmpegArg = [[NSString alloc] initWithFormat:@"--ffmpeg=%@", [executablesPath stringByAppendingPathComponent:@"ffmpeg"]];
         NSString *downloadPathArg = [[NSString alloc] initWithFormat:@"--output=%@", self.downloadPath];
@@ -136,13 +134,15 @@
             [args addObject:@"--file-prefix=<nameshort><.senum><.episodeshort>"];
             [args addObject:@"--subdir-format=<nameshort>"];
         }
+        
+        // 50 FPS frames?
+        if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"Use50FPSStreams"] boolValue]) {
+            [args addObject:@"--fps50"];
+        }
+        
         //Tagging
         if (![[[NSUserDefaults standardUserDefaults] objectForKey:@"TagShows"] boolValue])
             [args addObject:@"--no-tag"];
-        
-        if ([[NSUserDefaults standardUserDefaults] boolForKey:[NSString stringWithFormat:@"%@TagCNID", self.defaultsPrefix]]) {
-            [args addObject:@"--tag-cnid"];
-        }
         
         self.task.arguments = args;
         self.task.launchPath = @"/usr/bin/perl";

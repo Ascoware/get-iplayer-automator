@@ -12,7 +12,7 @@
 #import "Programme.h"
 #import "Safari.h"
 #import "iTunes.h"
-#import "Growl.framework/Headers/GrowlApplicationBridge.h"
+#import <Growl/Growl.h>
 #import "JRFeedbackController.h"
 #import "ReasonForFailure.h"
 #import "Chrome.h"
@@ -111,6 +111,7 @@ NewProgrammeHistory           *sharedHistoryController;
     defaultValues[@"ShowDownloadedInSearch"] = @YES;
     defaultValues[@"AudioDescribedNew"] = @NO;
     defaultValues[@"SignedNew"] = @NO;
+    defaultValues[@"Use50FPSStreams"] = @NO;
     
     [[NSUserDefaults standardUserDefaults] registerDefaults:defaultValues];
     defaultValues = nil;
@@ -394,6 +395,12 @@ NewProgrammeHistory           *sharedHistoryController;
 {
     NSLog(@"didFinishLoadingAppcast");
 }
+
+- (void)updaterDidNotFindUpdate:(SUUpdater *)updater
+{
+    NSLog(@"No update found.");
+}
+
 - (void)updater:(SUUpdater *)updater didFindValidUpdate:(SUAppcastItem *)update
 {
     @try
@@ -806,6 +813,7 @@ NewProgrammeHistory           *sharedHistoryController;
     
     //Check for Updates - Don't want to prompt the user when updates are running.
     SUUpdater *updater = [SUUpdater sharedUpdater];
+    updater.delegate = self;
     [updater checkForUpdatesInBackground];
 
     if (runDownloads)
@@ -1924,7 +1932,7 @@ NewProgrammeHistory           *sharedHistoryController;
     [sharedDefaults removeObjectForKey:@"AltCacheITV_TV"];
     [sharedDefaults removeObjectForKey:@"AudiodescribedNew"];
     [sharedDefaults removeObjectForKey:@"SignedNew"];
-    [sharedDefaults removeObjectForKey:@"TomTech"];
+    [sharedDefaults removeObjectForKey:@"Use50FPSStreams"];
 }
 - (void)applescriptStartDownloads
 {
