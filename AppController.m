@@ -81,7 +81,6 @@ NewProgrammeHistory           *sharedHistoryController;
     defaultValues[@"TagShows"] = @YES;
     defaultValues[@"BBCOne"] = @YES;
     defaultValues[@"BBCTwo"] = @YES;
-    defaultValues[@"BBCThree"] = @YES;
     defaultValues[@"BBCFour"] = @YES;
     defaultValues[@"BBCAlba"] = @NO;
     defaultValues[@"S4C"] = @NO;
@@ -813,7 +812,6 @@ NewProgrammeHistory           *sharedHistoryController;
     
     //Check for Updates - Don't want to prompt the user when updates are running.
     SUUpdater *updater = [SUUpdater sharedUpdater];
-    updater.delegate = self;
     [updater checkForUpdatesInBackground];
 
     if (runDownloads)

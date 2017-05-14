@@ -11,6 +11,10 @@ The current release is 1.9b5. I will keep naming these 'beta' until I get Sparkl
 
 ### Version history
 
+#### 1.9b6:
+- Turned on update checking. This is almost ready to go.
+- Fixed a few more places where it didn't detect the end of the download.
+
 #### 1.9b5:
 - Fixed lowest quality recording names.
 - Added option to retrieve 50 FPS shows, if available.

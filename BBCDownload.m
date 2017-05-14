@@ -463,7 +463,8 @@
             srtPath = [srtPath stringByAppendingPathExtension:@"srt"];
             self.show.subtitlePath = srtPath;
         }
-        else if ([output hasPrefix:@"INFO: Tagged File:"])
+        else if ([output hasPrefix:@"INFO: Tagged file:"] ||
+                 [output hasPrefix:@"INFO: Recorded file:"])
         {
             _LastLine = [NSString stringWithString:output];
             _foundLastLine=YES;

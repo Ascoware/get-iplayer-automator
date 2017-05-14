@@ -63,7 +63,11 @@
                 <string>solution</string>
             </declaredKeys>
         </arrayController>
-        <customObject id="987" customClass="SUUpdater"/>
+        <customObject id="987" customClass="SUUpdater">
+            <connections>
+                <outlet property="delegate" destination="621" id="sxG-cb-VS0"/>
+            </connections>
+        </customObject>
         <customObject id="1203" customClass="DownloadHistoryController">
             <connections>
                 <outlet property="cancelButton" destination="1227" id="1247"/>
@@ -478,12 +482,6 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="checkForUpdates:" target="987" id="1005"/>
-                                    <binding destination="668" name="hidden" keyPath="values.TomTech" previousBinding="rVq-zm-Juj" id="8ov-cD-Jxv">
-                                        <dictionary key="options">
-                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                        </dictionary>
-                                    </binding>
-                                    <binding destination="668" name="enabled" keyPath="values.TomTech" id="rVq-zm-Juj"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="1002"/>
@@ -2291,20 +2289,8 @@
                                                             <binding destination="668" name="value" keyPath="values.BBCTwo" id="3rT-P3-dkA"/>
                                                         </connections>
                                                     </button>
-                                                    <button misplaced="YES" id="QD7-Hm-kUH">
-                                                        <rect key="frame" x="236" y="103" width="87" height="18"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="BBC Three" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="X7h-Od-Idk">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="f1b-d2-atM"/>
-                                                            <binding destination="668" name="value" keyPath="values.BBCThree" id="lT8-O6-9a0"/>
-                                                        </connections>
-                                                    </button>
                                                     <button misplaced="YES" id="kTz-fz-PyE">
-                                                        <rect key="frame" x="355" y="103" width="80" height="18"/>
+                                                        <rect key="frame" x="236" y="103" width="80" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC Four" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="wbk-x4-9tX">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
