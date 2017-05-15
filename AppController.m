@@ -7,12 +7,12 @@
 //
 
 #import "AppController.h"
+#import <Sparkle/Sparkle.h>
 #import "HTTPProxy.h"
 #import "Programme.h"
 #import "Safari.h"
 #import "iTunes.h"
-#import "Growl.framework/Headers/GrowlApplicationBridge.h"
-#import "Sparkle.framework/Headers/Sparkle.h"
+#import <Growl/Growl.h>
 #import "JRFeedbackController.h"
 #import "ReasonForFailure.h"
 #import "Chrome.h"
@@ -81,7 +81,6 @@ NewProgrammeHistory           *sharedHistoryController;
     defaultValues[@"TagShows"] = @YES;
     defaultValues[@"BBCOne"] = @YES;
     defaultValues[@"BBCTwo"] = @YES;
-    defaultValues[@"BBCThree"] = @YES;
     defaultValues[@"BBCFour"] = @YES;
     defaultValues[@"BBCAlba"] = @NO;
     defaultValues[@"S4C"] = @NO;
@@ -109,10 +108,9 @@ NewProgrammeHistory           *sharedHistoryController;
     defaultValues[@"ShowITV"] = @YES;
     defaultValues[@"TestProxy"] = @YES;
     defaultValues[@"ShowDownloadedInSearch"] = @YES;
-    defaultValues[@"AltCacheITV_TV"] = @NO;
     defaultValues[@"AudioDescribedNew"] = @NO;
     defaultValues[@"SignedNew"] = @NO;
-    defaultValues[@"TomTech"] = @NO;
+    defaultValues[@"Use50FPSStreams"] = @NO;
     
     [[NSUserDefaults standardUserDefaults] registerDefaults:defaultValues];
     defaultValues = nil;
@@ -129,16 +127,6 @@ NewProgrammeHistory           *sharedHistoryController;
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"AlternateFormat"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"Cache4oD_TV"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CacheBBC_Podcasts"];
-
-    // disable/hide features dependent on tom-tech.com
-    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"TomTech"] isEqualTo:@NO]) {
-        if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"QuickCache"] isEqualTo:@YES]) {
-            [[NSUserDefaults standardUserDefaults] setValue:@NO forKey:@"QuickCache"];
-        }
-        if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"] isEqualToString:@"Provided"]) {
-            [[NSUserDefaults standardUserDefaults] setValue:@"None" forKey:@"Proxy"];
-        }
-    }
 
     //Make sure Application Support folder exists
     NSString *folder = @"~/Library/Application Support/Get iPlayer Automator/";
@@ -281,21 +269,21 @@ NewProgrammeHistory           *sharedHistoryController;
     if ([_tvFormatController.arrangedObjects count] == 0)
     {
         TVFormat *format1 = [[TVFormat alloc] init];
-        format1.format = @"Flash - HD";
+        format1.format = @"Best";
         TVFormat *format2 = [[TVFormat alloc] init];
-        format2.format = @"Flash - Very High";
+        format2.format = @"Better";
         TVFormat *format3 = [[TVFormat alloc] init];
-        format3.format = @"Flash - High";
+        format3.format = @"Very Good";
         [_tvFormatController addObjects:@[format1,format2,format3]];
     }
     if ([_radioFormatController.arrangedObjects count] == 0)
     {
         RadioFormat *format1 = [[RadioFormat alloc] init];
-        format1.format = @"Flash AAC - High";
+        format1.format = @"Best";
         RadioFormat *format2 = [[RadioFormat alloc] init];
-        format2.format = @"Flash AAC - Standard";
+        format2.format = @"Better";
         RadioFormat *format3 = [[RadioFormat alloc] init];
-        format3.format = @"Flash AAC - Low";
+        format3.format = @"Very Good";
         [_radioFormatController addObjects:@[format1,format2,format3]];
     }
     if ([_itvFormatController.arrangedObjects count] == 0)
@@ -401,6 +389,17 @@ NewProgrammeHistory           *sharedHistoryController;
     
     [self saveAppData];
 }
+
+- (void)updater:(SUUpdater *)updater didFinishLoadingAppcast:(SUAppcast *)appcast
+{
+    NSLog(@"didFinishLoadingAppcast");
+}
+
+- (void)updaterDidNotFindUpdate:(SUUpdater *)updater
+{
+    NSLog(@"No update found.");
+}
+
 - (void)updater:(SUUpdater *)updater didFindValidUpdate:(SUAppcastItem *)update
 {
     @try
@@ -516,9 +515,7 @@ NewProgrammeHistory           *sharedHistoryController;
         _proxy = proxyDict[@"proxy"];
     }
     
-    BOOL altITV = [[[NSUserDefaults standardUserDefaults] valueForKey:@"AltCacheITV_TV"] isEqualTo:@YES];
-
-    if ( altITV && [[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheITV_TV"] isEqualTo:@YES] )
+    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheITV_TV"] isEqualTo:@YES])
     {
         _updatingITVIndex = true;
         [self.itvProgressIndicator startAnimation:self];
@@ -531,134 +528,59 @@ NewProgrammeHistory           *sharedHistoryController;
     
     _updatingBBCIndex = true;
 
-    if (![[[NSUserDefaults standardUserDefaults] objectForKey:@"QuickCache"] boolValue] || _quickUpdateFailed)
+    NSString *cacheExpiryArg;
+    if ([[sender class] isEqualTo:[@"" class]])
     {
-        _quickUpdateFailed=NO;
-        
-        NSString *cacheExpiryArg;
-        if ([[sender class] isEqualTo:[@"" class]])
-        {
-            cacheExpiryArg = @"-e1";
-        }
-        else
-        {
-            cacheExpiryArg = [[NSString alloc] initWithFormat:@"-e%d", ([[[NSUserDefaults standardUserDefaults] objectForKey:@"CacheExpiryTime"] intValue]*3600)];
-        }
-        
-        NSString *typeArgument = [[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:YES andIncludeITV:!altITV];
-        
-        if (![typeArgument isEqualToString:@"--type"]) {
-        
-            _getiPlayerUpdateArgs = @[_getiPlayerPath,cacheExpiryArg,typeArgument,@"--nopurge",[GetiPlayerArguments sharedController].profileDirArg];
-            
-            if (_proxy && [[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])
-            {
-                _getiPlayerUpdateArgs = [_getiPlayerUpdateArgs arrayByAddingObject:[[NSString alloc] initWithFormat:@"-p%@", _proxy.url]];
-            }
-            
-            [_logger addToLog:@"Updating Programme Index Feeds...\r" :self];
-            _currentProgress.stringValue = @"Updating Programme Index Feeds...";
-            
-            _getiPlayerUpdateTask = [[NSTask alloc] init];
-            _getiPlayerUpdateTask.launchPath = @"/usr/bin/perl";
-            _getiPlayerUpdateTask.arguments = _getiPlayerUpdateArgs;
-            _getiPlayerUpdatePipe = [[NSPipe alloc] init];
-            _getiPlayerUpdateTask.standardOutput = _getiPlayerUpdatePipe;
-            _getiPlayerUpdateTask.standardError =_getiPlayerUpdatePipe;
-            
-            NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-            
-            [nc addObserver:self
-                   selector:@selector(dataReady:)
-                       name:NSFileHandleReadCompletionNotification
-                     object:_getiPlayerUpdatePipe.fileHandleForReading];
-            [_getiPlayerUpdatePipe.fileHandleForReading readInBackgroundAndNotify];
-
-            NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:_getiPlayerUpdateTask.environment];
-            envVariableDictionary[@"HOME"] = (@"~").stringByExpandingTildeInPath;
-            envVariableDictionary[@"PERL_UNICODE"] = @"AS";
-            _updatingBBCIndex = true;
-            _getiPlayerUpdateTask.environment = envVariableDictionary;
-            [_getiPlayerUpdateTask launch];
-        }
-        else
-        {
-            _updatingBBCIndex = false;
-            [self getiPlayerUpdateFinished];
-        }
+        cacheExpiryArg = @"-e1";
     }
     else
     {
-        [_logger addToLog:@"Updating Programme Index Feeds from Server..." :nil];
-        
-        NSLog(@"DEBUG: Last cache update: %@",_lastUpdate);
-        
-        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-        if (!_lastUpdate || ([[NSDate date] timeIntervalSinceDate:_lastUpdate] > ([[defaults objectForKey:@"CacheExpiryTime"] intValue]*3600)) || [[sender class] isEqualTo:[@"" class]])
-        {
-            _typesToCache = [[NSMutableArray alloc] initWithCapacity:4];
-            if ([[defaults objectForKey:@"CacheBBC_TV"] boolValue]) [_typesToCache addObject:@"tv"];
-            if (!altITV && [[defaults objectForKey:@"CacheITV_TV"] boolValue]) [_typesToCache addObject:@"itv"];
-            if ([[defaults objectForKey:@"CacheBBC_Radio"] boolValue]) [_typesToCache addObject:@"radio"];
-            
-            NSArray *urlKeys = @[@"tv",@"itv",@"radio"];
-            NSArray *urlObjects = @[@"http://tom-tech.com/get_iplayer/cache/tv.cache",
-                                    @"http://tom-tech.com/get_iplayer/cache/itv.cache",
-                                    @"http://tom-tech.com/get_iplayer/cache/radio.cache"];
-            _updateURLDic = [[NSDictionary alloc] initWithObjects:urlObjects forKeys:urlKeys];
-            
-            _nextToCache=0;
-            if (_typesToCache.count > 0) {
-                [self updateCacheForType:_typesToCache[0]];
-            }
-            else {
-                _updatingBBCIndex = false;
-                [self getiPlayerUpdateFinished];
-            }
-        }
-        else
-        {
-            _updatingBBCIndex = false;
-            [self getiPlayerUpdateFinished];
-        }
+        cacheExpiryArg = [[NSString alloc] initWithFormat:@"-e%d", ([[[NSUserDefaults standardUserDefaults] objectForKey:@"CacheExpiryTime"] intValue]*3600)];
     }
-}
-- (void)updateCacheForType:(NSString *)type
-{
-    [_logger addToLog:[NSString stringWithFormat:@"    Retrieving %@ index feeds.",type] :nil];
-    _currentProgress.stringValue = [NSString stringWithFormat:@"Updating Program Indexes: Getting %@ index feeds from server...",type];
     
-    ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:_updateURLDic[type]]];
-    request.delegate = self;
-    request.didFinishSelector = @selector(indexRequestFinished:);
-    request.didFailSelector = @selector(indexRequestFinished:);
-    request.timeOutSeconds = 10;
-    request.numberOfTimesToRetryOnTimeout = 2;
-    request.downloadDestinationPath = [(@"~/Library/Application Support/Get iPlayer Automator").stringByExpandingTildeInPath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.cache",type]];
-    [request startAsynchronous];
-}
-- (void)indexRequestFinished:(ASIHTTPRequest *)request
-{
-    if (request.responseStatusCode != 200)
-    {
-        _quickUpdateFailed=YES;
-        [self updateCache:@""];
+    NSString *typeArgument = [[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:YES andIncludeITV:NO];
+    
+    if (![typeArgument isEqualToString:@"--type"]) {
+        
+        _getiPlayerUpdateArgs = @[_getiPlayerPath,cacheExpiryArg,typeArgument,@"--nopurge",[GetiPlayerArguments sharedController].profileDirArg];
+        
+        if (_proxy && [[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])
+        {
+            _getiPlayerUpdateArgs = [_getiPlayerUpdateArgs arrayByAddingObject:[[NSString alloc] initWithFormat:@"-p%@", _proxy.url]];
+        }
+        
+        [_logger addToLog:@"Updating Programme Index Feeds...\r" :self];
+        _currentProgress.stringValue = @"Updating Programme Index Feeds...";
+        
+        _getiPlayerUpdateTask = [[NSTask alloc] init];
+        _getiPlayerUpdateTask.launchPath = @"/usr/bin/perl";
+        _getiPlayerUpdateTask.arguments = _getiPlayerUpdateArgs;
+        _getiPlayerUpdatePipe = [[NSPipe alloc] init];
+        _getiPlayerUpdateTask.standardOutput = _getiPlayerUpdatePipe;
+        _getiPlayerUpdateTask.standardError =_getiPlayerUpdatePipe;
+        
+        NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+        
+        [nc addObserver:self
+               selector:@selector(dataReady:)
+                   name:NSFileHandleReadCompletionNotification
+                 object:_getiPlayerUpdatePipe.fileHandleForReading];
+        [_getiPlayerUpdatePipe.fileHandleForReading readInBackgroundAndNotify];
+        
+        NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:_getiPlayerUpdateTask.environment];
+        envVariableDictionary[@"HOME"] = (@"~").stringByExpandingTildeInPath;
+        envVariableDictionary[@"PERL_UNICODE"] = @"AS";
+        _updatingBBCIndex = true;
+        _getiPlayerUpdateTask.environment = envVariableDictionary;
+        [_getiPlayerUpdateTask launch];
     }
     else
     {
-        _didUpdate=YES;
-        _nextToCache++;
-        if (_nextToCache < _typesToCache.count)
-            [self updateCacheForType:_typesToCache[_nextToCache]];
-        else
-        {
-            _updatingBBCIndex = false;
-            [self getiPlayerUpdateFinished];
-        }
+        _updatingBBCIndex = false;
+        [self getiPlayerUpdateFinished];
     }
 }
-//- (void)dataReady:(NSData *)data
-//{
+
 - (void)dataReady:(NSNotification *)n
 {
     NSData *d;
@@ -889,11 +811,9 @@ NewProgrammeHistory           *sharedHistoryController;
     }
     
     //Check for Updates - Don't want to prompt the user when updates are running.
-    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"TomTech"] isEqualTo:@YES]) {
-        SUUpdater *updater = [SUUpdater sharedUpdater];
-        [updater checkForUpdatesInBackground];
-    }
-    
+    SUUpdater *updater = [SUUpdater sharedUpdater];
+    [updater checkForUpdatesInBackground];
+
     if (runDownloads)
     {
         [_logger addToLog:@"Download(s) are still running." :self];
@@ -1408,9 +1328,8 @@ NewProgrammeHistory           *sharedHistoryController;
                 NSLog(@"ERROR: Growl notification failed (nextDownload - complete): %@: %@", e.name, e.description);
                 [_logger addToLog:[NSString stringWithFormat:@"ERROR: Growl notification failed (nextDownload - complete): %@: %@", e.name, e.description]];
             }
-            if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"TomTech"] isEqualTo:@YES]) {
-                [[SUUpdater sharedUpdater] checkForUpdatesInBackground];
-            }
+            
+            [[SUUpdater sharedUpdater] checkForUpdatesInBackground];
             
             if (downloadsFailed>0)
                 [_solutionsWindow makeKeyAndOrderFront:self];
@@ -2011,7 +1930,7 @@ NewProgrammeHistory           *sharedHistoryController;
     [sharedDefaults removeObjectForKey:@"AltCacheITV_TV"];
     [sharedDefaults removeObjectForKey:@"AudiodescribedNew"];
     [sharedDefaults removeObjectForKey:@"SignedNew"];
-    [sharedDefaults removeObjectForKey:@"TomTech"];
+    [sharedDefaults removeObjectForKey:@"Use50FPSStreams"];
 }
 - (void)applescriptStartDownloads
 {
