@@ -9,6 +9,6 @@
 #import <Foundation/Foundation.h>
 
 @interface ASDownloadShows : NSScriptCommand
-- (void)performDefaultImplementation;
+- (id)performDefaultImplementation;
 @end
 

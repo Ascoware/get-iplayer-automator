@@ -62,7 +62,7 @@
 @property (nonatomic) IBOutlet NSButton *addToQueue;
 @property (nonatomic) IBOutlet NSArrayController *queueController;
 @property (nonatomic) IBOutlet NSButton *getNamesButton;
-@property (nonatomic, copy) NSMutableArray *queueArray;
+@property (nonatomic) NSMutableArray *queueArray;
 @property (nonatomic) IBOutlet NSTableView *queueTableView;
 @property (nonatomic)  IBOutlet NSToolbarItem *addSeriesLinkToQueueButton;
 

@@ -2092,16 +2092,16 @@ NewProgrammeHistory           *sharedHistoryController;
 
     NSArray *files = @[@"tv", @"radio", @"itv"];
     NSArray *types = @[@"BBC TV", @"BBC Radio", @"ITV"];
-    BOOL active[] = {false, false, false};
+    NSMutableArray *active = [NSMutableArray arrayWithObjects:@false, @false, @false, nil];
     
     if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheBBC_TV"] boolValue])
-        active[0]=true;
+        active[0]=@true;
 
     if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheBBC_Radio"] boolValue])
-        active[1]=true;
+        active[1]=@true;
     
     if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheITV_TV"] boolValue])
-        active[2]=true;
+        active[2]=@true;
              
     NSString *filePath = @"~/Library/Application Support/Get iPlayer Automator";
     filePath= filePath.stringByExpandingTildeInPath;
@@ -2111,7 +2111,7 @@ NewProgrammeHistory           *sharedHistoryController;
         NSString *oldProgrammesFile = [filePath stringByAppendingFormat:@"/%@.gia", files[i]];
         NSString *newCacheFile = [filePath stringByAppendingFormat:@"/%@.cache", files[i]];
         
-        if (active[i])
+        if ([active[i] boolValue])
             [self updateHistoryForType:types[i] andProgFile:oldProgrammesFile andCacheFile:newCacheFile];
     }
     

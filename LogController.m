@@ -12,22 +12,23 @@
 
 - (instancetype)init
 {
-   //Initialize Log
-   NSString *version = [NSString stringWithFormat:@"%@", [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"]];
-   NSLog(@"Get iPlayer Automator %@ Initialized.", version);
-	log_value = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Get iPlayer Automator %@ Initialized.", version]];
-	[self addToLog:@"" :nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(addToLogNotification:) name:@"AddToLog" object:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(postLog:) name:@"NeedLog" object:nil];
-   
-   NSString *filePath = (@"~/Library/Application Support/Get iPlayer Automator/log.txt").stringByExpandingTildeInPath;
-   [[NSFileManager defaultManager] createFileAtPath:filePath
-                                           contents:nil
-                                         attributes:nil];
-   fh = [NSFileHandle fileHandleForWritingAtPath:filePath];
-   [fh seekToEndOfFile];
-   
-   return self;
+    //Initialize Log
+    if (self = [super init]) {
+        NSString *version = [NSString stringWithFormat:@"%@", [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"]];
+        NSLog(@"Get iPlayer Automator %@ Initialized.", version);
+        log_value = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Get iPlayer Automator %@ Initialized.", version]];
+        [self addToLog:@"" :nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(addToLogNotification:) name:@"AddToLog" object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(postLog:) name:@"NeedLog" object:nil];
+        
+        NSString *filePath = (@"~/Library/Application Support/Get iPlayer Automator/log.txt").stringByExpandingTildeInPath;
+        [[NSFileManager defaultManager] createFileAtPath:filePath
+                                                contents:nil
+                                              attributes:nil];
+        fh = [NSFileHandle fileHandleForWritingAtPath:filePath];
+        [fh seekToEndOfFile];
+    }
+    return self;
 }
 - (void)showLog:(id)sender
 {

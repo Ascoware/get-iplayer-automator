@@ -9,8 +9,9 @@
 #import "ASDownloadShows.h"
 
 @implementation ASDownloadShows
-- (void)performDefaultImplementation {
+- (id)performDefaultImplementation {
     [[NSNotificationCenter defaultCenter] postNotificationName:@"StartDownloads" object:self];
+    return nil;
 }
 @end
 
