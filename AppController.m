@@ -1483,23 +1483,25 @@ NewProgrammeHistory           *sharedHistoryController;
 }
 - (void)seriesLinkFinished:(NSNotification *)note
 {
-    NSLog(@"Thread Finished Notification Received");
-    if (!runDownloads)
-    {
-        _currentProgress.stringValue = @"";
-        [_currentIndicator setIndeterminate:NO];
-        [_currentIndicator stopAnimation:self];
-        [_startButton setEnabled:YES];
-    }
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"NSThreadWillExitNotification" object:nil];
-    
-    //If this is an update initiated by the scheduler, run the downloads.
-    if (_runScheduled && !_scheduleTimer)
-    {
-        [self performSelectorOnMainThread:@selector(startDownloads:) withObject:self waitUntilDone:NO];
-    }
-    [self performSelectorOnMainThread:@selector(scheduleTimerForFinished:) withObject:nil waitUntilDone:NO];
-    NSLog(@"Series-Link Thread Finished");
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSLog(@"Thread Finished Notification Received");
+        if (!runDownloads)
+        {
+            _currentProgress.stringValue = @"";
+            [_currentIndicator setIndeterminate:NO];
+            [_currentIndicator stopAnimation:self];
+            [_startButton setEnabled:YES];
+        }
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:@"NSThreadWillExitNotification" object:nil];
+        
+        //If this is an update initiated by the scheduler, run the downloads.
+        if (_runScheduled && !_scheduleTimer)
+        {
+            [self performSelectorOnMainThread:@selector(startDownloads:) withObject:self waitUntilDone:NO];
+        }
+        [self performSelectorOnMainThread:@selector(scheduleTimerForFinished:) withObject:nil waitUntilDone:NO];
+        NSLog(@"Series-Link Thread Finished");
+    });
 }
 
 - (void)scheduleTimerForFinished:(id)sender

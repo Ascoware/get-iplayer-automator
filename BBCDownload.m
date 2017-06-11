@@ -591,7 +591,7 @@
             NSScanner *scanner = [NSScanner scannerWithString:output];
             NSDecimal recieved, total, percentage, speed, ignored;
             NSString *timeRemaining;
-            
+            NSString *units;
             [scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet]
                                     intoString:nil];
             if(![scanner scanDecimal:&recieved]) recieved = (@0).decimalValue;
@@ -615,41 +615,45 @@
                                     intoString:nil];
             if(![scanner scanDecimal:&speed]) speed = (@0).decimalValue;
             [scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet]
-                                    intoString:nil];
+                                    intoString:&units];
             if(![scanner scanUpToString:@"rem" intoString:&timeRemaining]) timeRemaining=@"Unknown";
-            
-            double adjustedSpeed = [NSDecimalNumber decimalNumberWithDecimal:speed].doubleValue/8;
             
             [self setPercentage:[NSDecimalNumber decimalNumberWithDecimal:percentage].doubleValue];
             if ([NSDecimalNumber decimalNumberWithDecimal:total].doubleValue < 5.00 && [NSDecimalNumber decimalNumberWithDecimal:recieved].doubleValue > 0)
             {
-                [self setCurrentProgress:[NSString stringWithFormat:@"%3.1f%% (%3.2fMB/%3.2fMB) - %5.1fKB/s -- Getting MOV atom.",
+                [self setCurrentProgress:[NSString stringWithFormat:@"%3.1f%% (%3.2fMB/%3.2fMB) - %5.1f %@ -- Getting MOV atom.",
                                           [NSDecimalNumber decimalNumberWithDecimal:percentage].doubleValue,
                                           [NSDecimalNumber decimalNumberWithDecimal:recieved].doubleValue,
                                           [NSDecimalNumber decimalNumberWithDecimal:total].doubleValue,
-                                          adjustedSpeed]];
+                                          [NSDecimalNumber decimalNumberWithDecimal:speed].doubleValue,
+                                          units]];
                 [self.show setValue:[NSString stringWithFormat:@"Getting MOV atom: %3.1f%%",
                                 [NSDecimalNumber decimalNumberWithDecimal:percentage].doubleValue]
                         forKey:@"status"];
             }
             else if ([NSDecimalNumber decimalNumberWithDecimal:total].doubleValue == 0)
             {
-                [self setCurrentProgress:[NSString stringWithFormat:@"%3.1f%% (%3.2fMB/%3.2fMB) - %5.1fKB/s -- Initializing..",
+                [self setCurrentProgress:[NSString stringWithFormat:@"%3.1f%% (%3.2fMB/%3.2fMB) - %5.1f %@ -- Initializing..",
                                           [NSDecimalNumber decimalNumberWithDecimal:percentage].doubleValue,
                                           [NSDecimalNumber decimalNumberWithDecimal:recieved].doubleValue,
                                           [NSDecimalNumber decimalNumberWithDecimal:total].doubleValue,
-                                          adjustedSpeed]];
+                                          [NSDecimalNumber decimalNumberWithDecimal:speed].doubleValue,
+                                          units]];
                 [self.show setValue:[NSString stringWithFormat:@"Initializing: %3.1f%%",
                                 [NSDecimalNumber decimalNumberWithDecimal:percentage].doubleValue]
                         forKey:@"status"];
             }
             else
             {
-                [self setCurrentProgress:[NSString stringWithFormat:@"%3.1f%% (%3.2fMB/%3.2fMB) - %.1fKB/s - %@ Remaining -- %@",
+                [self setCurrentProgress:[NSString stringWithFormat:@"%3.1f%% (%3.2fMB/%3.2fMB) - %.1f %@ - %@ Remaining -- %@",
                                           [NSDecimalNumber decimalNumberWithDecimal:percentage].doubleValue,
                                           [NSDecimalNumber decimalNumberWithDecimal:recieved].doubleValue,
                                           [NSDecimalNumber decimalNumberWithDecimal:total].doubleValue,
-                                          adjustedSpeed,timeRemaining,self.show.showName]];
+                                          [NSDecimalNumber decimalNumberWithDecimal:speed].doubleValue,
+                                          units,
+                                          timeRemaining,
+                                          self.show.showName]];
+                                          
                 [self.show setValue:[NSString stringWithFormat:@"Downloading: %3.1f%%",
                                 [NSDecimalNumber decimalNumberWithDecimal:percentage].doubleValue]
                         forKey:@"status"];
