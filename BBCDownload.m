@@ -140,6 +140,11 @@
             [args addObject:@"--fps50"];
         }
         
+        // Episode thumbnails (instead of series?)
+        if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"UseEpisodeThumbnails"] boolValue]) {
+            [args addObject:@"--episodethumb"];
+        }
+        
         //Tagging
         if (![[[NSUserDefaults standardUserDefaults] objectForKey:@"TagShows"] boolValue])
             [args addObject:@"--no-tag"];

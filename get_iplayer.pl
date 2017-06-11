@@ -123,6 +123,7 @@ my $opt_format = {
 	# Recording
 	attempts	=> [ 1, "attempts=n", 'Recording', '--attempts <number>', "Number of attempts to make or resume a failed connection.  --attempts is applied per-stream, per-mode.  Many modes have two or more streams available."],
 	excludesupplier	=> [ 1, "excludesupplier|exclude-supplier=s", 'Recording', '--exclude-supplier <supplier>,<supplier>,...', "Comma-separated list of media stream suppliers to skip.  Possible values: akamai,limelight"],
+    episodethumb => [1, "episodethumb", 'Recording', '--episodethumb', "Get the episode thumbnail instead of the series or brand thumbnail."],
 	force		=> [ 1, "force|force-download!", 'Recording', '--force', "Ignore programme history (unsets --hide option also).  Forces a script update if used with -u"],
 	fps50		=> [ 1, "fps50", 'Recording', '--fps50', "Prefer 50 fps streams for TV programmes (not available for all video sizes)."],
 	get		=> [ 2, "get|record|g!", 'Recording', '--get, -g', "Start recording matching programmes.  Search terms required unless --pid specified.  Use  --search=.* to force download of all available programmes."],
@@ -724,6 +725,11 @@ sub init_search {
 	if ( $opt->{thumbonly} ) {
 		$opt->{thumb} = 1;
 	}
+    
+    # Set --thumbnail if --episodethumb is used
+    if ( $opt->{episodethumb} ) {
+        $opt->{thumb} = 1;
+    }
 
 	# Ensure lowercase types
 	$opt->{type} = lc( $opt->{type} );
@@ -4728,11 +4734,15 @@ sub get_metadata {
 					my $image_pid = $doc->{image}->{pid};
 					my $series_image_pid = $doc->{parent}->{programme}->{image}->{pid};
 					my $brand_image_pid = $doc->{parent}->{programme}->{parent}->{programme}->{image}->{pid};
-					if ( $series_image_pid ) {
-						$image_pid = $series_image_pid;
-					} elsif ( $brand_image_pid ) {
-						$image_pid = $brand_image_pid;
-					}
+                    
+                    if ( !$opt->{episodethumb} ) {
+                        if ( $series_image_pid ) {
+                            $image_pid = $series_image_pid;
+                        } elsif ( $brand_image_pid ) {
+                            $image_pid = $brand_image_pid;
+                        }
+                    }
+                    
 					my $thumbsize = $opt->{thumbsize} || $opt->{thumbsizecache} || 150;
 					my $recipe = Programme::bbciplayer->thumb_url_recipes->{ $thumbsize };
 					$recipe = Programme::bbciplayer->thumb_url_recipes->{ 150 } if ! $recipe;
@@ -7182,11 +7192,13 @@ sub get_links_schedule_page {
 		my $image_pid = $1 if $entry =~ m{<image><pid>(.*?)</pid>}s;
 		my $series_image_pid = $1 if $entry =~ m{<programme\s+type="series">.*?<image><pid>(.*?)</pid>};
 		my $brand_image_pid = $1 if $entry =~ m{<programme\s+type="brand">.*?<image><pid>(.*?)</pid>};
-		if ( $series_image_pid ) {
-			$image_pid = $series_image_pid;
-		} elsif ( $brand_image_pid ) {
-			$image_pid = $brand_image_pid;
-		}
+        if (! $opt->{episodethumb} ) {
+            if ( $series_image_pid ) {
+                $image_pid = $series_image_pid;
+            } elsif ( $brand_image_pid ) {
+                $image_pid = $brand_image_pid;
+            }
+        }
 		my $suffix = Programme::bbciplayer->thumb_url_suffixes->{ $thumbsize };
 		$suffix = Programme::bbciplayer->thumb_url_suffixes->{ 150 } unless $suffix;
 		my $thumbnail = "http://ichef.bbci.co.uk/programmeimages/${image_pid}/${pid}${suffix}";
