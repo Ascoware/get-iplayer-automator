@@ -645,7 +645,7 @@
             }
             else
             {
-                [self setCurrentProgress:[NSString stringWithFormat:@"%3.1f%% (%3.2fMB/%3.2fMB) - %.1f %@ - %@ Remaining -- %@",
+                [self setCurrentProgress:[NSString stringWithFormat:@"%3.1f%% (%3.2fMB/%3.2fMB) - %.1f %@- %@Remaining -- %@",
                                           [NSDecimalNumber decimalNumberWithDecimal:percentage].doubleValue,
                                           [NSDecimalNumber decimalNumberWithDecimal:recieved].doubleValue,
                                           [NSDecimalNumber decimalNumberWithDecimal:total].doubleValue,

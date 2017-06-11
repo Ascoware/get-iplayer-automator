@@ -349,7 +349,7 @@
         return;
     }
     NSLog(@"DEBUG: Parsing MediaFile entries");
-    if (verKorea)
+    if (self.verbose)
         [self addToLog:@"DEBUG: Parsing MediaFile entries" noTag:YES];
     NSMutableArray *mediaEntries = [[NSMutableArray alloc] init];
     NSUInteger beforeMediaFiles = scanner.scanLocation;
@@ -379,12 +379,12 @@
         entry.itvRate = itvRate;
         [mediaEntries addObject:entry];
         NSLog(@"DEBUG: ITVMediaFileEntry: bitrate=%@ itvRate=%@ url=%@", bitrate, itvRate, url);
-        if (verKorea)
+        if (self.verbose)
             [self addToLog:[NSString stringWithFormat:@"DEBUG: ITVMediaFileEntry: bitrate=%@ itvRate=%@ url=%@", bitrate, itvRate, url] noTag:YES];
     }
     
     NSLog(@"DEBUG: Searching for itvRate match");
-    if (verKorea)
+    if (self.verbose)
         [self addToLog:@"DEBUG: Searching for itvRate match" noTag:YES];
     BOOL foundIt=FALSE;
     for (NSString *rate in itvRateArray) {
@@ -393,7 +393,7 @@
                 foundIt=TRUE;
                 playPath=entry.url;
                 NSLog(@"DEBUG: foundIt (itvRate): rate=%@ url=%@", rate, playPath);
-                if (verKorea)
+                if (self.verbose)
                     [self addToLog:[NSString stringWithFormat:@"DEBUG: foundIt (itvRate): rate=%@ url=%@", rate, playPath] noTag:YES];
                 break;
             }
