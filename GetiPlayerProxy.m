@@ -75,25 +75,6 @@
             [self finishProxyLoad];
         }
     }
-    else if ([proxyOption isEqualToString:@"Provided"])
-    {
-        NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithObjectsAndKeys:[NSValue valueWithPointer:selector],@"selector",target,@"target", nil];
-        if (object){
-            [userInfo addEntriesFromDictionary:@{@"object": object}];
-        }
-        
-        ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:@"http://tom-tech.com/get_iplayer/proxy.txt"]];
-        request.userInfo = userInfo;
-        request.delegate = self;
-        request.didFailSelector = @selector(providedProxyDidFinish:);
-        request.didFinishSelector = @selector(providedProxyDidFinish:);
-        request.timeOutSeconds = 10;
-        request.numberOfTimesToRetryOnTimeout = 2;
-        [self updateProxyLoadStatus:YES message:[NSString stringWithFormat:@"Loading provided proxy (may take up to %ld seconds)...", (NSInteger)request.timeOutSeconds]];
-        NSLog(@"INFO: Loading provided proxy (may take up to %ld seconds)...", (NSInteger)request.timeOutSeconds);
-        [_logger addToLog:[NSString stringWithFormat:@"INFO: Loading provided proxy (may take up to %ld seconds)...", (NSInteger)request.timeOutSeconds*2]];
-        [request startAsynchronous];
-    }
     else
     {
         NSLog(@"INFO: No proxy to load");

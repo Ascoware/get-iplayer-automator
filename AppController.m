@@ -76,7 +76,6 @@ NewProgrammeHistory           *sharedHistoryController;
     defaultValues[@"XBMC_naming"] = @NO;
     defaultValues[@"KeepSeriesFor"] = @"30";
     defaultValues[@"RemoveOldSeries"] = @NO;
-    defaultValues[@"QuickCache"] = @NO;
     defaultValues[@"TagShows"] = @YES;
     defaultValues[@"BBCOne"] = @YES;
     defaultValues[@"BBCTwo"] = @YES;
@@ -328,7 +327,7 @@ NewProgrammeHistory           *sharedHistoryController;
         NSInteger response = [downloadAlert runModal];
         if (response == NSAlertDefaultReturn) return NSTerminateCancel;
     }
-    else if (runUpdate && ![[[NSUserDefaults standardUserDefaults] objectForKey:@"QuickCache"] boolValue])
+    else if (runUpdate)
     {
         NSAlert *updateAlert = [NSAlert alertWithMessageText:@"Are you sure?"
                                                defaultButton:@"No"
@@ -347,7 +346,7 @@ NewProgrammeHistory           *sharedHistoryController;
 {
     if ([sender isEqualTo:_mainWindow])
     {
-        if (runUpdate && ![[[NSUserDefaults standardUserDefaults] objectForKey:@"QuickCache"] boolValue])
+        if (runUpdate)
         {
             NSAlert *updateAlert = [NSAlert alertWithMessageText:@"Are you sure?"
                                                    defaultButton:@"No"
@@ -437,14 +436,12 @@ NewProgrammeHistory           *sharedHistoryController;
     @catch (NSException *e) {
         NSLog(@"NO UI: updateCache:");
     }
-#ifdef PROXY_SUPPORT
-    if ((![[[NSUserDefaults standardUserDefaults] objectForKey:@"QuickCache"] boolValue]) && [[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])
+    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])
     {
         _getiPlayerProxy = [[GetiPlayerProxy alloc] initWithLogger:_logger];
         [_getiPlayerProxy loadProxyInBackgroundForSelector:@selector(updateCache:proxyDict:) withObject:sender onTarget:self silently:_runScheduled];
     }
     else
-#endif
     {
         [self updateCache:sender proxyDict:nil];
     }
