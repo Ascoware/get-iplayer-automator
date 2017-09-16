@@ -77,10 +77,7 @@
 		[[NSNotificationCenter defaultCenter] postNotificationName:@"setPercentage" object:self userInfo:nil];
 	}
 }
-- (void)requestFailed:(ASIHTTPRequest *)request
-{
-    [request startAsynchronous];
-}
+
 #pragma mark Message Processers
 - (void)processFLVStreamerMessage:(NSString *)message
 {
@@ -298,12 +295,11 @@
             {
                 [self addToLog:@"INFO: Downloading thumbnail" noTag:YES];
                 _thumbnailPath = [_show.path stringByAppendingPathExtension:@"jpg"];
-                ASIHTTPRequest *downloadThumb = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:_thumbnailURL]];
-                downloadThumb.downloadDestinationPath = _thumbnailPath;
-                downloadThumb.delegate = self;
-                [downloadThumb startAsynchronous];
-                downloadThumb.didFinishSelector = @selector(thumbnailRequestFinished:);
-                downloadThumb.didFailSelector = @selector(thumbnailRequestFinished:);
+                NSURLSessionDownloadTask *downloadTask = [self.session downloadTaskWithURL: [NSURL URLWithString:_thumbnailURL] completionHandler:^(NSURL * _Nullable location, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+                    [self thumbnailRequestFinished:location];
+                }];
+                
+                [downloadTask resume];
             }
             else
             {
@@ -324,64 +320,81 @@
         [[NSNotificationCenter defaultCenter] postNotificationName:@"DownloadFinished" object:_show];
     }
 }
-- (void)thumbnailRequestFinished:(ASIHTTPRequest *)request
+
+- (void)thumbnailRequestFinished:(NSURL *)location
 {
     [self addToLog:@"INFO: Thumbnail Download Completed" noTag:YES];
-    _apTask = [[NSTask alloc] init];
-    _apPipe = [[NSPipe alloc] init];
-    _apFh = _apPipe.fileHandleForReading;
-    
-    //[apTask setStandardOutput:apPipe];
-    //[apTask setStandardError:apPipe];
-    
-    _apTask.launchPath = [([NSBundle mainBundle].executablePath).stringByDeletingLastPathComponent stringByAppendingPathComponent:@"AtomicParsley"];
-    if (request && request.responseStatusCode == 200)
-        _apTask.arguments = @[[NSString stringWithFormat:@"%@",_show.path],
-                              @"--stik",@"value=10",
-                              @"--TVNetwork",_show.tvNetwork,
-                              @"--TVShowName",_show.seriesName,
-                              @"--TVSeasonNum",[NSString stringWithFormat:@"%ld",(long)_show.season],
-                              @"--TVEpisodeNum",[NSString stringWithFormat:@"%ld",(long)_show.episode],
-                              @"--TVEpisode",_show.episodeName,
-                              @"--title",_show.showName,
-                              @"--artwork",request.downloadDestinationPath,
-                              @"--comment",_show.desc,
-                              @"--description",_show.desc,
-                              @"--longdesc",_show.desc,
-                              @"--lyrics",_show.desc,
-                              @"--artist",_show.tvNetwork,
-                              @"--overWrite"];
-    else
-        _apTask.arguments = @[[NSString stringWithFormat:@"%@",_show.path],
-                              @"--stik",@"value=10",
-                              @"--TVNetwork",_show.tvNetwork,
-                              @"--TVShowName",_show.seriesName,
-                              @"--TVSeasonNum",[NSString stringWithFormat:@"%ld",(long)_show.season],
-                              @"--TVEpisodeNum",[NSString stringWithFormat:@"%ld",(long)_show.episode],
-                              @"--TVEpisode",_show.episodeName,
-                              @"--title",_show.showName,
-                              @"--comment",_show.desc,
-                              @"--description",_show.desc,
-                              @"--longdesc",_show.desc,
-                              @"--lyrics",_show.desc,
-                              @"--artist",_show.tvNetwork,
-                              @"--overWrite"];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-           selector:@selector(DownloadDataReady:)
-               name:NSFileHandleReadCompletionNotification
-             object:_apFh];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-           selector:@selector(atomicParsleyFinished:) 
-               name:NSTaskDidTerminateNotification 
-             object:_apTask];
-    
-    [self addToLog:@"INFO: Beginning AtomicParsley Tagging." noTag:YES];
-    
-    [_apTask launch];
-    [_apFh readInBackgroundAndNotify];
-    
-    [self setCurrentProgress:[NSString stringWithFormat:@"Tagging the Programme... -- %@",_show.showName]];
-    
+   
+    if (location) {
+        NSFileManager *fm = [NSFileManager defaultManager];
+        NSURL *destinationURL = [NSURL fileURLWithPath:_thumbnailPath];
+        NSError *error = nil;
+        [fm removeItemAtPath:_thumbnailPath error:&error];
+        if (![fm copyItemAtURL:location toURL:destinationURL error:&error]) {
+            NSLog(@"Unable to save downloaded thumbnail: %@", error.description);
+            [self addToLog:@"INFO: Thumbnail Download Failed" noTag:YES];
+            return;
+        }
+    }
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        _apTask = [[NSTask alloc] init];
+        _apPipe = [[NSPipe alloc] init];
+        _apFh = _apPipe.fileHandleForReading;
+
+        NSString *filename = [NSString stringWithUTF8String: [location fileSystemRepresentation]];
+        
+        _apTask.launchPath = [([NSBundle mainBundle].executablePath).stringByDeletingLastPathComponent stringByAppendingPathComponent:@"AtomicParsley"];
+        
+        if (filename) {
+            _apTask.arguments = @[[NSString stringWithFormat:@"%@",_show.path],
+                                  @"--stik",@"value=10",
+                                  @"--TVNetwork",_show.tvNetwork,
+                                  @"--TVShowName",_show.seriesName,
+                                  @"--TVSeasonNum",[NSString stringWithFormat:@"%ld",(long)_show.season],
+                                  @"--TVEpisodeNum",[NSString stringWithFormat:@"%ld",(long)_show.episode],
+                                  @"--TVEpisode",_show.episodeName,
+                                  @"--title",_show.showName,
+                                  @"--artwork", _thumbnailPath,
+                                  @"--comment",_show.desc,
+                                  @"--description",_show.desc,
+                                  @"--longdesc",_show.desc,
+                                  @"--lyrics",_show.desc,
+                                  @"--artist",_show.tvNetwork,
+                                  @"--overWrite"];
+        } else {
+            _apTask.arguments = @[[NSString stringWithFormat:@"%@",_show.path],
+                                  @"--stik",@"value=10",
+                                  @"--TVNetwork",_show.tvNetwork,
+                                  @"--TVShowName",_show.seriesName,
+                                  @"--TVSeasonNum",[NSString stringWithFormat:@"%ld",(long)_show.season],
+                                  @"--TVEpisodeNum",[NSString stringWithFormat:@"%ld",(long)_show.episode],
+                                  @"--TVEpisode",_show.episodeName,
+                                  @"--title",_show.showName,
+                                  @"--comment",_show.desc,
+                                  @"--description",_show.desc,
+                                  @"--longdesc",_show.desc,
+                                  @"--lyrics",_show.desc,
+                                  @"--artist",_show.tvNetwork,
+                                  @"--overWrite"];
+        }
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(DownloadDataReady:)
+                                                     name:NSFileHandleReadCompletionNotification
+                                                   object:_apFh];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(atomicParsleyFinished:)
+                                                     name:NSTaskDidTerminateNotification
+                                                   object:_apTask];
+        
+        [self addToLog:@"INFO: Beginning AtomicParsley Tagging." noTag:YES];
+        
+        [_apTask launch];
+        [_apFh readInBackgroundAndNotify];
+        
+        [self setCurrentProgress:[NSString stringWithFormat:@"Tagging the Programme... -- %@",_show.showName]];
+        
+    });
 }
 - (void)atomicParsleyFinished:(NSNotification *)finishedNote
 {
@@ -406,16 +419,17 @@
             [self addToLog:[NSString stringWithFormat:@"INFO: Downloading subtitles: %@", _subtitleURL] noTag:YES];
             
             _subtitlePath = [_show.path.stringByDeletingPathExtension stringByAppendingPathExtension:@"ttml"];
-            ASIHTTPRequest *downloadSubs = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:_subtitleURL]];
-            downloadSubs.downloadDestinationPath = _subtitlePath;
-            downloadSubs.delegate = self;
-            downloadSubs.didFinishSelector = @selector(subtitleRequestFinished:);
-            downloadSubs.didFailSelector = @selector(subtitleRequestFinished:);
-            [downloadSubs startAsynchronous];
+            NSURLSessionDownloadTask *downloadSubs = [self.session downloadTaskWithURL:[NSURL URLWithString:_subtitleURL]
+                                                                                     completionHandler:^(NSURL * _Nullable location, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+                                                                                         [self subtitlesSavedTo: location
+                                                                                                      withError: error];
+                                                                                     }];
+            
+            [downloadSubs resume];
         }
         else
         {
-            [self subtitleRequestFinished:nil];
+            [self subtitlesSavedTo:nil withError:nil];
         }
     }
     else
@@ -423,51 +437,53 @@
         [self convertSubtitlesFinished:nil];
     }
 }
-- (void)subtitleRequestFinished:(ASIHTTPRequest *)request
+- (void)subtitlesSavedTo:(NSURL *)location withError:(NSError *)error
 {
-    if (request)
-    {
-        if (request.responseStatusCode == 200)
-        {
-            [self addToLog:@"INFO: Subtitles Download Completed" noTag:YES];
-            if (![_subtitlePath.pathExtension isEqual: @"srt"])
-            {
-                [_show setValue:@"Converting Subtitles..." forKey:@"status"];
-                [self setPercentage:102];
-                [self setCurrentProgress:[NSString stringWithFormat:@"Converting Subtitles... -- %@",_show.showName]];
-                [self addToLog:@"INFO: Converting Subtitles..." noTag:YES];
-                [self convertSubtitles];
-            }
-        }
-        else
-        {
+    if (location) {
+        NSFileManager *fm = [NSFileManager defaultManager];
+        NSURL *destinationURL = [NSURL fileURLWithPath:_subtitlePath];
+        NSError *error = nil;
+        [fm removeItemAtPath:_subtitlePath error:&error];
+        if (![fm copyItemAtURL:location toURL:destinationURL error:&error]) {
+            NSLog(@"Unable to save downloaded subtitles: %@", error.description);
             [self addToLog:@"INFO: Subtitles Download Failed" noTag:YES];
-            [self convertSubtitlesFinished:nil];
+            return;
         }
     }
-    else
+    
+    [self addToLog:@"INFO: Subtitles Download Completed" noTag:YES];
+    if (![_subtitlePath.pathExtension isEqual: @"srt"])
     {
-        [self convertSubtitlesFinished:nil];
+        [_show setValue:@"Converting Subtitles..." forKey:@"status"];
+        [self setPercentage:102];
+        [self setCurrentProgress:[NSString stringWithFormat:@"Converting Subtitles... -- %@",_show.showName]];
+        [self addToLog:@"INFO: Converting Subtitles..." noTag:YES];
+        [self convertSubtitles];
     }
+
+    [self convertSubtitlesFinished:nil];
 }
+
 - (void)convertSubtitles
 {
-    [self addToLog:[NSString stringWithFormat:@"INFO: Converting to SubRip: %@", _subtitlePath] noTag:YES];
-    NSString *ttml2srtPath = [[NSBundle mainBundle] pathForResource:@"ttml2srt.py" ofType:nil];
-    NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:ttml2srtPath, nil];
-    BOOL srtIgnoreColors = [[NSUserDefaults standardUserDefaults] boolForKey:[NSString stringWithFormat:@"%@SRTIgnoreColors", _defaultsPrefix]];
-    if (srtIgnoreColors)
-    {
-        [args addObject:@"--srt-ignore-colors"];
-    }
-    [args addObject:_subtitlePath];
-    _subsTask = [[NSTask alloc] init];
-    _subsErrorPipe = [[NSPipe alloc] init];
-    _subsTask.standardError = _subsErrorPipe;
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(convertSubtitlesFinished:) name:NSTaskDidTerminateNotification object:_subsTask];
-    _subsTask.launchPath = @"/usr/bin/python";
-    _subsTask.arguments = args;
-    [_subsTask launch];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self addToLog:[NSString stringWithFormat:@"INFO: Converting to SubRip: %@", _subtitlePath] noTag:YES];
+        NSString *ttml2srtPath = [[NSBundle mainBundle] pathForResource:@"ttml2srt.py" ofType:nil];
+        NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:ttml2srtPath, nil];
+        BOOL srtIgnoreColors = [[NSUserDefaults standardUserDefaults] boolForKey:[NSString stringWithFormat:@"%@SRTIgnoreColors", _defaultsPrefix]];
+        if (srtIgnoreColors)
+        {
+            [args addObject:@"--srt-ignore-colors"];
+        }
+        [args addObject:_subtitlePath];
+        _subsTask = [[NSTask alloc] init];
+        _subsErrorPipe = [[NSPipe alloc] init];
+        _subsTask.standardError = _subsErrorPipe;
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(convertSubtitlesFinished:) name:NSTaskDidTerminateNotification object:_subsTask];
+        _subsTask.launchPath = @"/usr/bin/python";
+        _subsTask.arguments = args;
+        [_subsTask launch];
+    });
 }
 - (void)convertSubtitlesFinished:(NSNotification *)aNotification
 {
@@ -497,8 +513,9 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"DownloadFinished" object:_show];
 }
-- (void)DownloadDataReady:(NSData *)data
+- (void)DownloadDataReady:(NSNotification *)note
 {
+    NSData *data = [note.userInfo valueForKey:NSFileHandleNotificationDataItem];
     if (data.length > 0) {
 		NSString *s = [[NSString alloc] initWithData:data
 											encoding:NSUTF8StringEncoding];
@@ -652,9 +669,9 @@
 }
 - (void)cancelDownload:(id)sender
 {
-    [_currentRequest clearDelegatesAndCancel];
+    [_currentRequest cancel];
 	//Some basic cleanup.
-	[_task interrupt];
+	[_task terminate];
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSFileHandleReadCompletionNotification object:_fh];
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSFileHandleReadCompletionNotification object:_errorFh];
 	[_show setValue:@"Cancelled" forKey:@"status"];

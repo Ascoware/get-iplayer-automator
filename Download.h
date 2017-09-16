@@ -9,7 +9,6 @@
 #import <Cocoa/Cocoa.h>
 #import "HTTPProxy.h"
 #import "Programme.h"
-#import "ASIHTTPRequest.h"
 #import "LogController.h"
 
 @interface Download : NSObject
@@ -73,9 +72,12 @@
 //Proxy Info
 @property (nonatomic) HTTPProxy *proxy;
 
+// If proxy is set, this will be a session configured with the set proxy.
+// Otherwise, it uses the system (shared) session information.
+@property (nonatomic) NSURLSession *session;
 @property (nonatomic) BOOL isFilm;
 
-@property (nonatomic) ASIHTTPRequest *currentRequest;
+@property (nonatomic) NSURLSessionDataTask *currentRequest;
 
 //Download Test
 @property (nonatomic) BOOL isTest;

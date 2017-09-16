@@ -1,0 +1,144 @@
+%= javascript '/mojo/jquery/jquery.js'
+<div id="mojobar">
+  <style scoped="scoped">
+    #mojobar {
+      background-color: #1a1a1a;
+      background: -webkit-linear-gradient(top, #2a2a2a 0%, #000 100%);
+      background: -moz-linear-gradient(top, #2a2a2a 0%, #000 100%);
+      background: linear-gradient(top, #2a2a2a 0%, #000 100%);
+      box-shadow: 0px 1px 0px rgba(0, 0, 0, 0.5);
+      height: 46px;
+      overflow: hidden;
+      position: absolute;
+      text-align: right;
+      vertical-align: middle;
+      width: 100%;
+      z-index: 1000;
+    }
+    #mojobar-content {
+      margin: 0 auto;
+      max-width: 1000px;
+    }
+    #mojobar-logo {
+      float: left;
+      margin-left: 5em;
+      padding-top: 4px;
+    }
+    #mojobar-links {
+      display:table-cell;
+      float: right;
+      height: 60px;
+      margin-right: 5em;
+      margin-top: 0.8em;
+    }
+    #mojobar-links a {
+      color: #bbb;
+      font: 0.9em 'Helvetica Neue', Helvetica, sans-serif;
+      margin-left: 0.5em;
+      text-decoration: none;
+      transition: all 200ms ease-in-out;
+    }
+    #mojobar-links a:hover { color: #fff }
+    #mojobar-links input {
+      background-color: #3a3a3a;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 3px;
+      color: #eee;
+      display: inline;
+      margin-left: 1em;
+      padding: 4px;
+      transition: all 0.15s;
+    }
+    #mojobar-links input:focus {
+      background-color: #fff;
+      color: #111;
+      outline: 0;
+    }
+    #mojobar-links form { display: inline }
+    .animated { transition: all 0.25s ease }
+  </style>
+  <div id="mojobar-content">
+    <div id="mojobar-logo">
+      %= link_to 'http://mojolicious.org' => begin
+        %= image '/mojo/logo-white.png', alt => 'Mojolicious logo'
+      % end
+    </div>
+    <div id="mojobar-links">
+      %= link_to Documentation => 'http://mojolicious.org/perldoc'
+      %= link_to Chat => 'https://chat.mibbit.com/?channel=%23mojo&server=irc.perl.org'
+      %= link_to Wiki => 'https://github.com/kraih/mojo/wiki'
+      %= link_to GitHub => 'https://github.com/kraih/mojo'
+      %= link_to CPAN => 'https://metacpan.org/release/Mojolicious/'
+      %= link_to MailingList => 'https://groups.google.com/group/mojolicious'
+      %= link_to Blog => 'http://blog.mojolicious.org'
+      %= link_to Twitter => 'https://twitter.com/kraih'
+      %= form_for 'https://www.google.com/cse' => (target => '_blank') => begin
+        %= hidden_field cx => '014527573091551588235:pwfplkjpgbi'
+        %= hidden_field ie => 'UTF-8'
+        %= search_field 'q', placeholder => 'Search'
+      %= end
+    </div>
+  </div>
+</div>
+<script>
+  var mojobar = $('#mojobar');
+  var mojobarHeight = mojobar.outerHeight();
+  function getElementByHash(hash) {
+    return $(hash.replace(/(:|\.|\[|\]|,)/g, '\\$1'));
+  }
+  function fixOffset() {
+    var offset = getElementByHash(window.location.hash).offset();
+    if (offset) {
+      $('html, body').animate({scrollTop: offset.top - mojobarHeight}, 1);
+    }
+  }
+  $(window).on('load', function () {
+    if (window.location.hash) {
+      fixOffset();
+    }
+    var start = mojobar.offset().top;
+    var fixed;
+    var lastScrollTop = $(window).scrollTop();
+    var hidden = mojobarHeight + 1;
+    $(window).on('scroll', function () {
+      var st = $(window).scrollTop();
+      if (fixed) {
+        if (st <= start) {
+          fixed = false;
+          mojobar.removeClass('animated');
+          mojobar.css({'position': 'absolute', 'top': start + 'px'});
+        }
+        else if (Math.abs(lastScrollTop - st) > 100) {
+          if (!mojobar.hasClass('animated')) {
+            mojobar.addClass('animated');
+          }
+          if (st > lastScrollTop && st > (mojobarHeight + start + 250)) {
+            mojobar.css('transform', 'translateY(-' + hidden + 'px)');
+          }
+          else if (st < lastScrollTop) {
+            mojobar.css('transform', 'translateY(0px)');
+          }
+          lastScrollTop = st;
+        }
+      }
+      else if (st > start) {
+        fixed = true;
+        mojobar.css({'position': 'fixed', 'top': 0});
+        lastScrollTop = $(window).scrollTop();
+      }
+    });
+  });
+  $(function () {
+    $('a[href^="#"]').addClass('​mojoscroll').on('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      var hash   = '#' + this.href.split('#')[1];
+      var target = getElementByHash(hash);
+      var old    = target.attr('id');
+      target.attr('id', '');
+      location.hash = hash;
+      target.attr('id', old);
+      fixOffset();
+    });
+  });
+</script>

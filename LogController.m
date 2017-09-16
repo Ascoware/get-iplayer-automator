@@ -53,7 +53,7 @@
 	NSMutableAttributedString *current_log = [[NSMutableAttributedString alloc] initWithAttributedString:log_value];
 	
 	//Define Return Character for Easy Use
-	NSAttributedString *return_character = [[NSAttributedString alloc] initWithString:@"\r"];
+	NSAttributedString *return_character = [[NSAttributedString alloc] initWithString:@"\n"];
 	
 	//Initialize Sender Prefix
 	NSAttributedString *from_string;

@@ -7,7 +7,6 @@
 //
 
 #import "ITVDownload.h"
-#import "ASIHTTPRequest.h"
 #import "NSString+HTML.h"
 #import "ITVMediaFileEntry.h"
 
@@ -122,48 +121,66 @@
     NSLog(@"DEBUG: Metadata URL: %@",requestURL);
     if (self.verbose)
         [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata URL: %@", requestURL] noTag:YES];
-    [self.currentRequest clearDelegatesAndCancel];
-    self.currentRequest = [ASIHTTPRequest requestWithURL:requestURL];
-    [self.currentRequest addRequestHeader:@"Referer" value:@"http://www.itv.com/mercury/Mercury_VideoPlayer.swf?v=1.5.309/[[DYNAMIC]]/2"];
-    [self.currentRequest addRequestHeader:@"Content-Type" value:@"text/xml; charset=utf-8"];
-    [self.currentRequest addRequestHeader:@"SOAPAction" value:@"\"http://tempuri.org/PlaylistService/GetPlaylist\""];
-    self.currentRequest.requestMethod = @"POST";
-    self.currentRequest.postBody = [NSMutableData dataWithData:[body dataUsingEncoding:NSUTF8StringEncoding]];
-    self.currentRequest.delegate = self;
-    self.currentRequest.didFailSelector = @selector(metaRequestFinished:);
-    self.currentRequest.didFinishSelector = @selector(metaRequestFinished:);
-    self.currentRequest.timeOutSeconds = 10;
-    self.currentRequest.numberOfTimesToRetryOnTimeout = 3;
-    [self.currentRequest addRequestHeader:@"Accept" value:@"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"];
+    [self.currentRequest cancel];
+    NSMutableURLRequest *downloadRequest = [NSMutableURLRequest requestWithURL:requestURL];
+    
+    [downloadRequest addValue:@"http://www.itv.com/mercury/Mercury_VideoPlayer.swf?v=1.5.309/[[DYNAMIC]]/2" forHTTPHeaderField:@"Referer"];
+    [downloadRequest addValue:@"text/xml; charset=utf-8" forHTTPHeaderField:@"Content-Type"];
+    [downloadRequest addValue:@"\"http://tempuri.org/PlaylistService/GetPlaylist\"" forHTTPHeaderField:@"SOAPAction"];
+    [downloadRequest addValue:@"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8" forHTTPHeaderField:@"Accept"];
+    downloadRequest.HTTPMethod = @"POST";
+    downloadRequest.HTTPBody = [NSMutableData dataWithData:[body dataUsingEncoding:NSUTF8StringEncoding]];
+    downloadRequest.timeoutInterval = 10;
+
+    self.session = [NSURLSession sharedSession];
+    
     if (self.proxy)
     {
-        self.currentRequest.proxyType = self.proxy.type;
-        self.currentRequest.proxyHost = self.proxy.host;
-        if (self.proxy.port)
-            self.currentRequest.proxyPort = self.proxy.port;
+        // Create an NSURLSessionConfiguration that uses the proxy
+        NSMutableDictionary *proxyDict = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                          (NSString *)kCFProxyTypeKey, (NSString *)kCFProxyTypeHTTP,
+                                          (NSString *)kCFNetworkProxiesHTTPEnable, @(1),
+                                          (NSString *)kCFNetworkProxiesHTTPProxy, self.proxy.host,
+                                          (NSString *)kCFNetworkProxiesHTTPPort, @(self.proxy.port),
+                                          nil];
+        
         if (self.proxy.user) {
-            self.currentRequest.proxyUsername = self.proxy.user;
-            self.currentRequest.proxyPassword = self.proxy.password;
+            proxyDict[(NSString *)kCFProxyUsernameKey] = self.proxy.user;
+            proxyDict[(NSString *)kCFProxyPasswordKey] = self.proxy.password;
         }
+        
+        NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration ephemeralSessionConfiguration];
+        configuration.connectionProxyDictionary = proxyDict;
+        
+        // Create a NSURLSession with our proxy aware configuration
+        self.session = [NSURLSession sessionWithConfiguration:configuration delegate:nil delegateQueue:[NSOperationQueue mainQueue]];
     }
+        
     NSLog(@"INFO: Requesting Metadata.");
     [self addToLog:@"INFO: Requesting Metadata." noTag:YES];
-    [self.currentRequest startAsynchronous];
+    self.currentRequest = [self.session dataTaskWithRequest:downloadRequest
+                                     completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+                                         if ([response isKindOfClass:[NSHTTPURLResponse class]]) {
+                                             [self metaRequestFinishedWithResponse: (NSHTTPURLResponse *)response
+                                                                              data: data
+                                                                             error: error];
+                                         }
+                                     }];
+    [self.currentRequest resume];
 }
 
--(void)metaRequestFinished:(ASIHTTPRequest *)request
+-(void)metaRequestFinishedWithResponse:(NSHTTPURLResponse *)request data:(NSData *)data error:(NSError *)error
 {
     if (!self.running)
         return;
-    NSLog(@"DEBUG: Metadata response status code: %d", request.responseStatusCode);
+    NSLog(@"DEBUG: Metadata response status code: %ld", request.statusCode);
     if (self.verbose)
-        [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata response status code: %d", request.responseStatusCode] noTag:YES];
-    NSString *responseString = [[NSString alloc] initWithData:[request responseData] encoding:NSUTF8StringEncoding];
+        [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata response status code: %ld", request.statusCode] noTag:YES];
+    NSString *responseString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
     NSLog(@"DEBUG: Metadata response: %@",responseString);
     if (self.verbose)
         [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata response: %@", responseString] noTag:YES];
-    NSError *error = request.error;
-    if (request.responseStatusCode == 0)
+    if (request.statusCode == 0)
     {
         NSLog(@"ERROR: No response received (probably a proxy issue): %@", (error ? error.localizedDescription : @"Unknown error"));
         [self addToLog:[NSString stringWithFormat:@"ERROR: No response received (probably a proxy issue): %@", (error ? error.localizedDescription : @"Unknown error")]];
@@ -192,7 +209,7 @@
         [self addToLog:@"Download Failed" noTag:NO];
         return;
     }
-    else if (request.responseStatusCode != 200 || responseString.length == 0)
+    else if (request.statusCode != 200 || responseString.length == 0)
     {
         NSLog(@"ERROR: Could not retrieve programme metadata: %@", (error ? error.localizedDescription : @"Unknown error"));
         [self addToLog:[NSString stringWithFormat:@"ERROR: Could not retrieve programme metadata: %@", (error ? error.localizedDescription : @"Unknown error")]];
@@ -474,34 +491,41 @@
     NSLog(@"DEBUG: Programme data URL: %@",dataURL);
     if (self.verbose)
         [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme data URL: %@", dataURL] noTag:YES];
-    [self.currentRequest clearDelegatesAndCancel];
-    self.currentRequest = [ASIHTTPRequest requestWithURL:dataURL];
-    self.currentRequest.didFailSelector = @selector(dataRequestFinished:);
-    self.currentRequest.didFinishSelector = @selector(dataRequestFinished:);
-    self.currentRequest.timeOutSeconds = 10;
-    self.currentRequest.numberOfTimesToRetryOnTimeout = 3;
-    self.currentRequest.delegate = self;
-    [self.currentRequest addRequestHeader:@"Accept" value:@"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"];
-    NSLog(@"INFO: Requesting programme data.");
-    [self addToLog:@"INFO: Requesting programme data." noTag:YES];
-    [self.currentRequest startAsynchronous];
+    [self.currentRequest cancel];
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSMutableURLRequest *downloadRequest = [NSMutableURLRequest requestWithURL:dataURL];
+        [downloadRequest addValue:@"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8" forHTTPHeaderField:@"Accept"];
+        downloadRequest.timeoutInterval = 10;
+        NSLog(@"INFO: Requesting programme data.");
+        [self addToLog:@"INFO: Requesting programme data." noTag:YES];
+        self.currentRequest = [self.session dataTaskWithRequest:downloadRequest
+                                                              completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+                                                                  if ([response isKindOfClass:[NSHTTPURLResponse class]]) {
+                                                                      [self dataRequestFinished:(NSHTTPURLResponse *)response
+                                                                                           data: data
+                                                                                          error: error];
+                                                                  }
+                                                              }];
+        [self.currentRequest resume];
+    });
 }
 
--(void)dataRequestFinished:(ASIHTTPRequest *)request
+-(void)dataRequestFinished:(NSHTTPURLResponse *)request data:(NSData *)data error:(NSError *)error
 {
     if (!self.running)
         return;
     NSScanner *scanner = nil;
-    NSLog(@"DEBUG: Programme data response status code: %d", request.responseStatusCode);
-    if (self.verbose)
-        [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme data response status code: %d", request.responseStatusCode] noTag:YES];
-    NSString *responseString = [[NSString alloc] initWithData:[request responseData] encoding:NSUTF8StringEncoding];
+    NSLog(@"DEBUG: Programme data response status code: %ld", request.statusCode);
+    if (self.verbose) {
+        [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme data response status code: %ld", request.statusCode] noTag:YES];
+    }
+    NSString *responseString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
     NSLog(@"DEBUG: Programme data response: %@", responseString);
     if (self.verbose)
         [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme data response: %@", responseString] noTag:YES];
-    NSError *error = request.error;
     NSString *description = nil, *showname = nil, *senum = nil, *epnum = nil, *epname = nil, *temp_showname = nil;
-    if (request.responseStatusCode == 200 && responseString.length > 0)
+    if (request.statusCode == 200 && responseString.length > 0)
     {
         scanner = [NSScanner scannerWithString:responseString];
         [scanner scanUpToString:@"<h2>" intoString:nil];
@@ -573,17 +597,19 @@
         swfplayer = @"http://www.itv.com/mediaplayer/ITVMediaPlayer.swf?v=11.20.654";
     }
     
-    NSMutableArray *args = [NSMutableArray arrayWithObjects:
-                            @"-r",self.downloadParams[@"authURL"],
-                            @"-W",swfplayer,
-                            @"-y",self.downloadParams[@"playPath"],
-                            @"-o",self.downloadPath,
-                            nil];
-    if (self.verbose)
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSMutableArray *args = [NSMutableArray arrayWithObjects:
+                                @"-r",self.downloadParams[@"authURL"],
+                                @"-W",swfplayer,
+                                @"-y",self.downloadParams[@"playPath"],
+                                @"-o",self.downloadPath,
+                                nil];
+        if (self.verbose)
         [args addObject:@"--verbose"];
-    NSLog(@"DEBUG: RTMPDump args: %@",args);
-    if (self.verbose)
+        NSLog(@"DEBUG: RTMPDump args: %@",args);
+        if (self.verbose)
         [self addToLog:[NSString stringWithFormat:@"DEBUG: RTMPDump args: %@", args] noTag:YES];
-    [self launchRTMPDumpWithArgs:args];
+        [self launchRTMPDumpWithArgs:args];
+    });
 }
 @end

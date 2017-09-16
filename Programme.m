@@ -10,7 +10,6 @@
 #import "NSString+HTML.h"
 #import "AppController.h"
 #import "HTTPProxy.h"
-#import "ASIHTTPRequest.h"
 //extern bool runDownloads;
 
 
@@ -363,20 +362,23 @@
     }
     if (thumbURL) {
         NSLog(@"URL: %@", thumbURL);
-        ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:thumbURL]];
-        request.delegate = self;
-        request.didFinishSelector = @selector(thumbnailRequestFinished:);
-        request.didFailSelector = @selector(thumbnailRequestFinished:);
-        request.timeOutSeconds = 3;
-        request.numberOfTimesToRetryOnTimeout = 3;
-        [request startAsynchronous];
+        NSURLSessionDownloadTask *downloadTask = [[NSURLSession sharedSession] downloadTaskWithURL:[NSURL URLWithString:thumbURL]
+                                                                                 completionHandler:^(NSURL * _Nullable location, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+                                                                                     NSData *thumbnailData = nil;
+                                                                                     if (location) {
+                                                                                         thumbnailData = [NSData dataWithContentsOfURL:location];
+                                                                                     }
+                                                                                     [self thumbnailRequestFinished:thumbnailData];
+                                                                                 }];
+
+        [downloadTask resume];
     }
 }
 
-- (void)thumbnailRequestFinished:(ASIHTTPRequest *)request
+- (void)thumbnailRequestFinished:(nullable NSData *)thumbnailData
 {
-    if (request.responseStatusCode == 200) {
-        _thumbnail = [[NSImage alloc] initWithData:request.responseData];
+    if (thumbnailData) {
+        _thumbnail = [[NSImage alloc] initWithData:thumbnailData];
     }
     _successfulRetrieval = @YES;
     _extendedMetadataRetrieved = @YES;

@@ -21,10 +21,12 @@
 		39D7C1BD1874AD7400B78698 /* StringTrimFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 39D7C1BC1874AD7400B78698 /* StringTrimFormatter.m */; };
 		39D7C1C01874AD9D00B78698 /* NilToStringTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = 39D7C1BF1874AD9D00B78698 /* NilToStringTransformer.m */; };
 		39FD5E9619D370BD006BC47B /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 39FD5E9519D370BD006BC47B /* Images.xcassets */; };
+		7F9DB6131F6340A30020D5D7 /* get_iplayer in Resources */ = {isa = PBXBuildFile; fileRef = 7F9DB6121F6340460020D5D7 /* get_iplayer */; };
 		7F9FE9211EC16ED80058CB1B /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F9FE9201EC16ED80058CB1B /* libz.tbd */; };
 		7F9FE9231EC16F160058CB1B /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F9FE9221EC16F160058CB1B /* IOKit.framework */; };
 		7F9FE9241EC170E60058CB1B /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F9FE91E1EC16E3E0058CB1B /* Sparkle.framework */; };
 		7F9FE9251EC170E60058CB1B /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7F9FE91E1EC16E3E0058CB1B /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		7FA4E50A1F6DCC45008CF604 /* perl5 in Resources */ = {isa = PBXBuildFile; fileRef = 7FA4E5091F6DCC3F008CF604 /* perl5 */; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
@@ -35,7 +37,6 @@
 		BF382EDB1D73C2E700BAF106 /* Programme.m in Sources */ = {isa = PBXBuildFile; fileRef = BF382EDA1D73C2E700BAF106 /* Programme.m */; };
 		BF382EDE1D73C30400BAF106 /* GetITVListings.m in Sources */ = {isa = PBXBuildFile; fileRef = BF382EDD1D73C30400BAF106 /* GetITVListings.m */; };
 		BF382EE31D73C36300BAF106 /* NPHistoryWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = BF382EE21D73C36300BAF106 /* NPHistoryWindow.xib */; };
-		D904F04A1009F22E00D60BBF /* get_iplayer.pl in Resources */ = {isa = PBXBuildFile; fileRef = D904F0491009F22E00D60BBF /* get_iplayer.pl */; };
 		D914BC59100C9F0100F7E68E /* ScriptingBridge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D914BC58100C9F0100F7E68E /* ScriptingBridge.framework */; };
 		D914BD29100CBFA900F7E68E /* BBCDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = D914BD28100CBFA900F7E68E /* BBCDownload.m */; };
 		D9178595101345D700B82736 /* Series.m in Sources */ = {isa = PBXBuildFile; fileRef = D9178594101345D700B82736 /* Series.m */; };
@@ -94,7 +95,6 @@
 		D9F97FE5198E9043006494A3 /* GetCurrentWebpage.m in Sources */ = {isa = PBXBuildFile; fileRef = D9F97FE4198E9043006494A3 /* GetCurrentWebpage.m */; };
 		D9F97FEC198EBA94006494A3 /* NSFileManager+DirectoryLocations.m in Sources */ = {isa = PBXBuildFile; fileRef = D9F97FEB198EBA94006494A3 /* NSFileManager+DirectoryLocations.m */; };
 		DFC865E213E96BE200606599 /* ReasonForFailure.m in Sources */ = {isa = PBXBuildFile; fileRef = DFC865E113E96BE200606599 /* ReasonForFailure.m */; };
-		DFE5B67413E70AC20008571B /* plugins in Resources */ = {isa = PBXBuildFile; fileRef = DFE5B67313E70AC20008571B /* plugins */; };
 		DFFF196713E96288007B52AC /* ReasonsForFailure.plist in Resources */ = {isa = PBXBuildFile; fileRef = DFFF196613E96288007B52AC /* ReasonsForFailure.plist */; };
 /* End PBXBuildFile section */
 
@@ -164,9 +164,11 @@
 		39D7C1BE1874AD9D00B78698 /* NilToStringTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NilToStringTransformer.h; sourceTree = "<group>"; };
 		39D7C1BF1874AD9D00B78698 /* NilToStringTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NilToStringTransformer.m; sourceTree = "<group>"; };
 		39FD5E9519D370BD006BC47B /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = "Get iPlayer Automator/Images.xcassets"; sourceTree = "<group>"; };
+		7F9DB6121F6340460020D5D7 /* get_iplayer */ = {isa = PBXFileReference; lastKnownFileType = text; path = get_iplayer; sourceTree = SOURCE_ROOT; };
 		7F9FE91E1EC16E3E0058CB1B /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = Carthage/Build/Mac/Sparkle.framework; sourceTree = "<group>"; };
 		7F9FE9201EC16ED80058CB1B /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		7F9FE9221EC16F160058CB1B /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
+		7FA4E5091F6DCC3F008CF604 /* perl5 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = perl5; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* Get iPlayer Automator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Get iPlayer Automator.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BF382ED01D73C21500BAF106 /* AppController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppController.h; sourceTree = "<group>"; };
@@ -179,7 +181,6 @@
 		BF382EDC1D73C2FB00BAF106 /* GetITVListings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GetITVListings.h; sourceTree = "<group>"; };
 		BF382EDD1D73C30400BAF106 /* GetITVListings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = GetITVListings.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		BF382EE21D73C36300BAF106 /* NPHistoryWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NPHistoryWindow.xib; sourceTree = "<group>"; };
-		D904F0491009F22E00D60BBF /* get_iplayer.pl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.perl; name = get_iplayer.pl; path = ../get_iplayer.pl; sourceTree = "<group>"; };
 		D904F422100B077600D60BBF /* Programme.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Programme.h; sourceTree = "<group>"; };
 		D914BC2E100C9DEF00F7E68E /* Safari.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Safari.h; sourceTree = "<group>"; };
 		D914BC58100C9F0100F7E68E /* ScriptingBridge.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ScriptingBridge.framework; path = /System/Library/Frameworks/ScriptingBridge.framework; sourceTree = "<absolute>"; };
@@ -266,7 +267,6 @@
 		D9F97FEB198EBA94006494A3 /* NSFileManager+DirectoryLocations.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSFileManager+DirectoryLocations.m"; sourceTree = "<group>"; };
 		DFC865E013E96BE200606599 /* ReasonForFailure.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReasonForFailure.h; sourceTree = "<group>"; };
 		DFC865E113E96BE200606599 /* ReasonForFailure.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReasonForFailure.m; sourceTree = "<group>"; };
-		DFE5B67313E70AC20008571B /* plugins */ = {isa = PBXFileReference; lastKnownFileType = folder; path = plugins; sourceTree = "<group>"; };
 		DFFF196613E96288007B52AC /* ReasonsForFailure.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = ReasonsForFailure.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -376,7 +376,6 @@
 				39FD5E9519D370BD006BC47B /* Images.xcassets */,
 				398516A616D1A02500EBB4CE /* Body2 */,
 				D921C9EC149C4C6F004CB558 /* Body */,
-				DFE5B67313E70AC20008571B /* plugins */,
 				D9A450A3102FFDC00011E175 /* LICENSE.txt */,
 				D9A4509C102FF8090011E175 /* Credits.html */,
 				D90EF2A7102B5D6300290A67 /* Scripts */,
@@ -412,7 +411,8 @@
 				39AE5F5C1D3294C40019E5EF /* rtmpdump */,
 				D9CAE545133FF9BE003471DA /* ffmpeg */,
 				D961247E10F12C9200046D31 /* AtomicParsley */,
-				D904F0491009F22E00D60BBF /* get_iplayer.pl */,
+				7FA4E5091F6DCC3F008CF604 /* perl5 */,
+				7F9DB6121F6340460020D5D7 /* get_iplayer */,
 			);
 			path = Binaries;
 			sourceTree = "<group>";
@@ -661,13 +661,14 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7F9DB6131F6340A30020D5D7 /* get_iplayer in Resources */,
 				39FD5E9619D370BD006BC47B /* Images.xcassets in Resources */,
 				D9F66963102C5DC500A9449B /* GetOperaURL.applescript in Resources */,
 				D9F668DB102C560500A9449B /* GetFireFoxURL.applescript in Resources */,
 				D9F66955102C5D1200A9449B /* GetCaminoURL.applescript in Resources */,
+				7FA4E50A1F6DCC45008CF604 /* perl5 in Resources */,
 				396FDA611DA98179003F3F57 /* MainMenu.xib in Resources */,
 				8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */,
-				D904F04A1009F22E00D60BBF /* get_iplayer.pl in Resources */,
 				D9CCF3CC1023485A009205BE /* dsa_pub.pem in Resources */,
 				D9CCF54C1025AAF9009205BE /* Growl Registration Ticket.growlRegDict in Resources */,
 				D941D9511025DB2B0012A75F /* JRFeedbackProvider.strings in Resources */,
@@ -675,7 +676,6 @@
 				D941D9521025DB2B0012A75F /* JRFeedbackProvider.xib in Resources */,
 				D9A4509D102FF8090011E175 /* Credits.html in Resources */,
 				D9A450A4102FFDC00011E175 /* LICENSE.txt in Resources */,
-				DFE5B67413E70AC20008571B /* plugins in Resources */,
 				DFFF196713E96288007B52AC /* ReasonsForFailure.plist in Resources */,
 				D9CDC9E8186B8F2B0003A4E2 /* GetiPlayerAutomator.sdef in Resources */,
 				D921C9ED149C4C6F004CB558 /* Body in Resources */,
@@ -689,7 +689,7 @@
 /* Begin PBXShellScriptBuildPhase section */
 		D975D7EB19A11DC400EEF909 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
+			buildActionMask = 8;
 			files = (
 			);
 			inputPaths = (
@@ -697,7 +697,7 @@
 			name = "Run Script";
 			outputPaths = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
+			runOnlyForDeploymentPostprocessing = 1;
 			shellPath = /bin/sh;
 			shellScript = "${PROJECT_DIR}/scripts/UpdateBuildNumber.sh";
 		};
