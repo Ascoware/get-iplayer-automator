@@ -32,7 +32,7 @@
         
         //Initialize Paths
         NSBundle *bundle = [NSBundle mainBundle];
-        NSString *getiPlayerPath = [bundle pathForResource:@"get_iplayer" ofType:@"pl"];
+        NSString *getiPlayerPath = [bundle pathForResource:@"get_iplayer" ofType:nil];
         
         //Initialize Formats
         if (!tvFormats || !radioFormats) {
@@ -138,11 +138,6 @@
         // 50 FPS frames?
         if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"Use50FPSStreams"] boolValue]) {
             [args addObject:@"--fps50"];
-        }
-        
-        // Episode thumbnails (instead of series?)
-        if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"UseEpisodeThumbnails"] boolValue]) {
-            [args addObject:@"--episodethumb"];
         }
         
         //Tagging
@@ -323,8 +318,7 @@
             self.show.reasonForFailure = @"Download_Directory_Permissions";
         }
     }
-    else if ([_LastLine hasPrefix:@"INFO: Tagged file:"] ||
-             [_LastLine hasPrefix:@"INFO: Recorded file:"])
+    else if ([_LastLine hasPrefix:@"INFO: Finished recording file: "])
     {
         [self.show setValue:@YES forKey:@"complete"];
         [self.show setValue:@YES forKey:@"successful"];
@@ -332,11 +326,7 @@
         NSScanner *scanner = [NSScanner scannerWithString:_LastLine];
         NSString *path;
         
-        if ([_LastLine hasPrefix:@"INFO: Tagged file:"]) {
-            [scanner scanString:@"INFO: Tagged file:" intoString:nil];
-        } else {
-            [scanner scanString:@"INFO: Recorded file:" intoString:nil];
-        }
+        [scanner scanString:@"INFO: Finished recording file: " intoString:nil];
         
         [scanner scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet] intoString:&path];
         self.show.path = path;
@@ -468,8 +458,7 @@
             srtPath = [srtPath stringByAppendingPathExtension:@"srt"];
             self.show.subtitlePath = srtPath;
         }
-        else if ([output hasPrefix:@"INFO: Tagged file:"] ||
-                 [output hasPrefix:@"INFO: Recorded file:"])
+        else if ([output hasPrefix:@"INFO: Finished recording file"])
         {
             _LastLine = [NSString stringWithString:output];
             _foundLastLine=YES;

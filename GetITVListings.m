@@ -297,7 +297,7 @@ AppController           *sharedAppController;
     
     /* Now create the cache file that used to be created by get_iplayer */
     
-    NSMutableString *cacheFileContentString = [[NSMutableString alloc] initWithString:@"#index|type|name|pid|available|episode|seriesnum|episodenum|versions|duration|desc|channel|categories|thumbnail|timeadded|guidance|web\n"];
+    NSMutableString *cacheFileContentString = [[NSMutableString alloc] initWithString:@"#index|type|name|pid|available|expires|episode|seriesnum|episodenum|versions|duration|desc|channel|categories|thumbnail|timeadded|guidance|web\n"];
 
     int cacheIndexNumber = 100000;
     
@@ -332,7 +332,7 @@ AppController           *sharedAppController;
         [cacheFileContentString appendString:carriedForwardProgramme.productionId];
         [cacheFileContentString appendString:@"|"];
         [cacheFileContentString appendString:dateAiredString];
-        [cacheFileContentString appendString:@"|"];
+        [cacheFileContentString appendString:@"||"];
         [cacheFileContentString appendString:episodeString];
         [cacheFileContentString appendString:@"|||default|||ITV Player|TV||"];
         [cacheFileContentString appendFormat:@"%ld||",(long)carriedForwardProgramme.timeAddedInt];

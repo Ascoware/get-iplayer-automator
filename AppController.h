@@ -36,7 +36,6 @@
 @property (nonatomic) NSMutableArray *typesToCache;
 @property (nonatomic) BOOL didUpdate;
 @property (nonatomic) BOOL runSinceChange;
-@property (nonatomic) BOOL quickUpdateFailed;
 @property (nonatomic) NSUInteger nextToCache;
 @property (nonatomic) NSDictionary *updateURLDic;
 @property (nonatomic) NSDate *lastUpdate;

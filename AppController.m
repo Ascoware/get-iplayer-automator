@@ -16,7 +16,6 @@
 #import "JRFeedbackController.h"
 #import "ReasonForFailure.h"
 #import "Chrome.h"
-#import "ASIHTTPRequest.h"
 #import "GetITVListings.h"
 #import "NPHistoryWindowController.h"
 
@@ -152,9 +151,9 @@ NewProgrammeHistory           *sharedHistoryController;
     
     //Initialize Arguments
     _getiPlayerPath = [[NSString alloc] initWithString:[NSBundle mainBundle].bundlePath];
-    _getiPlayerPath = [_getiPlayerPath stringByAppendingString:@"/Contents/Resources/get_iplayer.pl"];
+    _getiPlayerPath = [_getiPlayerPath stringByAppendingString:@"/Contents/Resources/get_iplayer"];
     _runScheduled=NO;
-    _quickUpdateFailed=NO;
+
     _nilToEmptyStringTransformer = [[NilToStringTransformer alloc] init];
     _nilToAsteriskTransformer = [[NilToStringTransformer alloc] initWithString:@"*"];
     _tvFormatTransformer = [[EmptyToStringTransformer alloc] initWithString:@"Please select..."];
@@ -438,12 +437,14 @@ NewProgrammeHistory           *sharedHistoryController;
     @catch (NSException *e) {
         NSLog(@"NO UI: updateCache:");
     }
-    if ((![[[NSUserDefaults standardUserDefaults] objectForKey:@"QuickCache"] boolValue] || _quickUpdateFailed) && [[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])
+#ifdef PROXY_SUPPORT
+    if ((![[[NSUserDefaults standardUserDefaults] objectForKey:@"QuickCache"] boolValue]) && [[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])
     {
         _getiPlayerProxy = [[GetiPlayerProxy alloc] initWithLogger:_logger];
         [_getiPlayerProxy loadProxyInBackgroundForSelector:@selector(updateCache:proxyDict:) withObject:sender onTarget:self silently:_runScheduled];
     }
     else
+#endif
     {
         [self updateCache:sender proxyDict:nil];
     }
@@ -570,6 +571,11 @@ NewProgrammeHistory           *sharedHistoryController;
         NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:_getiPlayerUpdateTask.environment];
         envVariableDictionary[@"HOME"] = (@"~").stringByExpandingTildeInPath;
         envVariableDictionary[@"PERL_UNICODE"] = @"AS";
+        
+        NSString *perlPath = [[NSBundle mainBundle] resourcePath];
+        perlPath = [perlPath stringByAppendingPathComponent:@"perl5"];
+        envVariableDictionary[@"PERL5LIB"] = perlPath;
+        
         _updatingBBCIndex = true;
         _getiPlayerUpdateTask.environment = envVariableDictionary;
         [_getiPlayerUpdateTask launch];
