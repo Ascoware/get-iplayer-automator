@@ -160,8 +160,8 @@
                     <rect key="frame" x="0.0" y="0.0" width="713" height="323"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <subviews>
-                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="R0p-fW-D4M" userLabel="Series Name Field">
-                            <rect key="frame" x="237" y="284" width="447" height="19"/>
+                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="YES" id="R0p-fW-D4M" userLabel="Series Name Field">
+                            <rect key="frame" x="237" y="284" width="447" height="21"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Series Name" id="WqU-bC-wAB">
                                 <font key="font" metaFont="systemBold" size="17"/>
@@ -192,7 +192,7 @@
                             <autoresizingMask key="autoresizingMask"/>
                             <clipView key="contentView" id="LYx-5P-gHI">
                                 <rect key="frame" x="1" y="1" width="309" height="133"/>
-                                <autoresizingMask key="autoresizingMask"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <textView editable="NO" importsGraphics="NO" verticallyResizable="YES" usesFontPanel="YES" findStyle="panel" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" spellingCorrection="YES" smartInsertDelete="YES" id="7Pi-tT-G0Q" userLabel="Description View">
                                         <rect key="frame" x="0.0" y="0.0" width="309" height="133"/>
@@ -228,7 +228,7 @@
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <clipView key="contentView" id="jHT-Hr-sFJ">
                                 <rect key="frame" x="1" y="0.0" width="309" height="134"/>
-                                <autoresizingMask key="autoresizingMask"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="jeg-8F-HB4" id="MRJ-oM-h7R">
                                         <rect key="frame" x="0.0" y="0.0" width="309" height="117"/>

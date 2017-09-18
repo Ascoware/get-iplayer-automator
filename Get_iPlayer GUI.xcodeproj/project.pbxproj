@@ -590,9 +590,9 @@
 				D9CCF443102349ED009205BE /* Copy Frameworks */,
 				8D1107290486CEB800E47090 /* Resources */,
 				8D11072C0486CEB800E47090 /* Sources */,
+				D943D2721B37B19D00452FCD /* CopyFiles */,
 				8D11072E0486CEB800E47090 /* Frameworks */,
 				D975D7EB19A11DC400EEF909 /* Run Script */,
-				D943D2721B37B19D00452FCD /* CopyFiles */,
 			);
 			buildRules = (
 			);
