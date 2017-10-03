@@ -70,7 +70,9 @@
         
         [tempShow printLongDescription];
         
-        [self launchMetaRequest];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self launchMetaRequest];
+        });
     }
     return self;
 }
@@ -493,10 +495,10 @@
         [self addToLog:[NSString stringWithFormat:@"DEBUG: Programme data URL: %@", dataURL] noTag:YES];
     [self.currentRequest cancel];
 
+    NSMutableURLRequest *downloadRequest = [NSMutableURLRequest requestWithURL:dataURL];
+    [downloadRequest addValue:@"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8" forHTTPHeaderField:@"Accept"];
+    downloadRequest.timeoutInterval = 10;
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSMutableURLRequest *downloadRequest = [NSMutableURLRequest requestWithURL:dataURL];
-        [downloadRequest addValue:@"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8" forHTTPHeaderField:@"Accept"];
-        downloadRequest.timeoutInterval = 10;
         NSLog(@"INFO: Requesting programme data.");
         [self addToLog:@"INFO: Requesting programme data." noTag:YES];
         self.currentRequest = [self.session dataTaskWithRequest:downloadRequest

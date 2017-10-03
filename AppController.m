@@ -1183,6 +1183,12 @@ NewProgrammeHistory           *sharedHistoryController;
 }
 - (void)nextDownload:(NSNotification *)note
 {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self performNextDownload:note];
+    });
+}
+
+- (void)performNextDownload:(NSNotification *)note {
     if (runDownloads)
     {
         Programme *finishedShow = note.object;
