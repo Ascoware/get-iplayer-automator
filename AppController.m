@@ -390,12 +390,12 @@ NewProgrammeHistory           *sharedHistoryController;
 
 - (void)updater:(SUUpdater *)updater didFinishLoadingAppcast:(SUAppcast *)appcast
 {
-    NSLog(@"didFinishLoadingAppcast");
+//    NSLog(@"didFinishLoadingAppcast");
 }
 
 - (void)updaterDidNotFindUpdate:(SUUpdater *)updater
 {
-    NSLog(@"No update found.");
+//    NSLog(@"No update found.");
 }
 
 - (void)updater:(SUUpdater *)updater didFindValidUpdate:(SUAppcastItem *)update
