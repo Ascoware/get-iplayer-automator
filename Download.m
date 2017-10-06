@@ -466,24 +466,28 @@
 
 - (void)convertSubtitles
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self addToLog:[NSString stringWithFormat:@"INFO: Converting to SubRip: %@", _subtitlePath] noTag:YES];
-        NSString *ttml2srtPath = [[NSBundle mainBundle] pathForResource:@"ttml2srt.py" ofType:nil];
-        NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:ttml2srtPath, nil];
-        BOOL srtIgnoreColors = [[NSUserDefaults standardUserDefaults] boolForKey:[NSString stringWithFormat:@"%@SRTIgnoreColors", _defaultsPrefix]];
-        if (srtIgnoreColors)
-        {
-            [args addObject:@"--srt-ignore-colors"];
-        }
-        [args addObject:_subtitlePath];
-        _subsTask = [[NSTask alloc] init];
-        _subsErrorPipe = [[NSPipe alloc] init];
-        _subsTask.standardError = _subsErrorPipe;
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(convertSubtitlesFinished:) name:NSTaskDidTerminateNotification object:_subsTask];
-        _subsTask.launchPath = @"/usr/bin/python";
-        _subsTask.arguments = args;
-        [_subsTask launch];
-    });
+    if (!_subtitlePath) {
+        [self convertSubtitlesFinished:nil];
+    } else {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self addToLog:[NSString stringWithFormat:@"INFO: Converting to SubRip: %@", _subtitlePath] noTag:YES];
+            NSString *ttml2srtPath = [[NSBundle mainBundle] pathForResource:@"ttml2srt.py" ofType:nil];
+            NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:ttml2srtPath, nil];
+            BOOL srtIgnoreColors = [[NSUserDefaults standardUserDefaults] boolForKey:[NSString stringWithFormat:@"%@SRTIgnoreColors", _defaultsPrefix]];
+            if (srtIgnoreColors)
+            {
+                [args addObject:@"--srt-ignore-colors"];
+            }
+            [args addObject:_subtitlePath];
+            _subsTask = [[NSTask alloc] init];
+            _subsErrorPipe = [[NSPipe alloc] init];
+            _subsTask.standardError = _subsErrorPipe;
+            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(convertSubtitlesFinished:) name:NSTaskDidTerminateNotification object:_subsTask];
+            _subsTask.launchPath = @"/usr/bin/python";
+            _subsTask.arguments = args;
+            [_subsTask launch];
+        });
+    }
 }
 - (void)convertSubtitlesFinished:(NSNotification *)aNotification
 {
