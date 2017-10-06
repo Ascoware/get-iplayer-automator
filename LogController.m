@@ -49,48 +49,50 @@
    [self addToLog:string :nil];
 }
 -(void)addToLog:(NSString *)string :(id)sender {
-	//Get Current Log
-	NSMutableAttributedString *current_log = [[NSMutableAttributedString alloc] initWithAttributedString:log_value];
-	
-	//Define Return Character for Easy Use
-	NSAttributedString *return_character = [[NSAttributedString alloc] initWithString:@"\n"];
-	
-	//Initialize Sender Prefix
-	NSAttributedString *from_string;
-	if (sender != nil)
-	{
-		from_string = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@: ", [sender description]]];
-	}
-	else
-	{
-		from_string = [[NSAttributedString alloc] initWithString:@""];
-	}
-	
-	//Convert String to Attributed String
-	NSAttributedString *converted_string = [[NSAttributedString alloc] initWithString:string];
-	
-	//Append the new items to the log.
-	[current_log appendAttributedString:return_character];
-	[current_log appendAttributedString:from_string];
-	[current_log appendAttributedString:converted_string];
-	
-	//Make the Text White.
-	[current_log addAttribute:NSForegroundColorAttributeName
-                       value:[NSColor whiteColor]
-                       range:NSMakeRange(0, current_log.length)];
-	
-	//Update the log.
-	[self setValue:current_log forKey:@"log_value"];
-	
-	//Scroll log to bottom only if it is visible.
-	if (window.visible) {
-		[log scrollRangeToVisible:NSMakeRange(current_log.length, current_log.length)];
-	}
-   
-   //Write log out to file.
-   [fh writeData:[return_character.string dataUsingEncoding:NSUTF8StringEncoding]];
-   [fh writeData:[from_string.string dataUsingEncoding:NSUTF8StringEncoding]];
-   [fh writeData:[converted_string.string dataUsingEncoding:NSUTF8StringEncoding]];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        //Get Current Log
+        NSMutableAttributedString *current_log = [[NSMutableAttributedString alloc] initWithAttributedString:log_value];
+        
+        //Define Return Character for Easy Use
+        NSAttributedString *return_character = [[NSAttributedString alloc] initWithString:@"\n"];
+        
+        //Initialize Sender Prefix
+        NSAttributedString *from_string;
+        if (sender != nil)
+        {
+            from_string = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@: ", [sender description]]];
+        }
+        else
+        {
+            from_string = [[NSAttributedString alloc] initWithString:@""];
+        }
+        
+        //Convert String to Attributed String
+        NSAttributedString *converted_string = [[NSAttributedString alloc] initWithString:string];
+        
+        //Append the new items to the log.
+        [current_log appendAttributedString:return_character];
+        [current_log appendAttributedString:from_string];
+        [current_log appendAttributedString:converted_string];
+        
+        //Make the Text White.
+        [current_log addAttribute:NSForegroundColorAttributeName
+                            value:[NSColor whiteColor]
+                            range:NSMakeRange(0, current_log.length)];
+        
+        //Update the log.
+        [self setValue:current_log forKey:@"log_value"];
+        
+        //Scroll log to bottom only if it is visible.
+        if (window.visible) {
+            [log scrollRangeToVisible:NSMakeRange(current_log.length, current_log.length)];
+        }
+        
+        //Write log out to file.
+        [fh writeData:[return_character.string dataUsingEncoding:NSUTF8StringEncoding]];
+        [fh writeData:[from_string.string dataUsingEncoding:NSUTF8StringEncoding]];
+        [fh writeData:[converted_string.string dataUsingEncoding:NSUTF8StringEncoding]];
+    });
 }
 - (void)addToLogNotification:(NSNotification *)note
 {

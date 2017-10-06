@@ -131,7 +131,7 @@
         }
         else
         {
-            [args addObject:@"--file-prefix=<nameshort><.senum><.episodeshort><.modeshort>"];
+            [args addObject:@"--file-prefix=<nameshort><.senum><.episodeshort>"];
             [args addObject:@"--subdir-format=<nameshort>"];
         }
         
@@ -152,6 +152,10 @@
         NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:self.task.environment];
         envVariableDictionary[@"HOME"] = (@"~").stringByExpandingTildeInPath;
         envVariableDictionary[@"PERL_UNICODE"] = @"AS";
+        NSString *perlPath = [[NSBundle mainBundle] resourcePath];
+        perlPath = [perlPath stringByAppendingPathComponent:@"perl5"];
+        envVariableDictionary[@"PERL5LIB"] = perlPath;
+
         self.task.environment = envVariableDictionary;
         
         self.fh = self.pipe.fileHandleForReading;
