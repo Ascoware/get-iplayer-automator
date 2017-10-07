@@ -17,4 +17,4 @@ xcodebuild archive -project "$PROJECT_NAME.xcodeproj" -scheme "$PROJECT_NAME" -a
 xcodebuild -exportArchive -archivePath "Archive/$PROJECT_NAME.xcarchive" -exportPath "Product/$PROJECT_NAME" -exportOptionsPlist ExportOptions.plist
 
 cd "Product/${PROJECT_NAME}"
-zip -r "../$PROJECT_NAME.v${CFBundleShortVersionString}.b${CFBundleVersion}.zip" "$PROJECT_NAME.app"
+ditto -c -k --keepParent -rsrc "$PROJECT_NAME.app" "../$PROJECT_NAME.v${CFBundleShortVersionString}.b${CFBundleVersion}.zip"
