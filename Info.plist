@@ -19,7 +19,7 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>20171006001</string>
+	<string>20171006002</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>10.7</string>
 	<key>NSAppTransportSecurity</key>
@@ -62,8 +62,6 @@
 	<key>SUEnableAutomaticChecks</key>
 	<string>YES</string>
 	<key>SUFeedURL</key>
-	<string>https://ancient-plains-97889.herokuapp.com/get-iplayer-automator/appcast.xml</string>
-	<key>SUPublicDSAKeyFile</key>
-	<string>dsa_pub.pem</string>
+	<string>https://ascoware.github.io/get-iplayer-automator/appcast.xml</string>
 </dict>
 </plist>
