@@ -12,7 +12,7 @@
                         <description><![CDATA[{{ release.body | markdownify }}]]></description>
                         <pubDate>{{ release.published_at | date_to_rfc822 }}</pubDate>
                         {% for asset in release.assets limit:1 %}
-                            {% assign build_nums = asset.name | replace_first:'Project.v','' | replace_first:'.b',',' | remove_first:'.zip' | split:',' %}
+                            {% assign build_nums = asset.name | replace_first:'Get.iPlayer.Automator_','' | replace_first:'.b',',' | remove_first:'.zip' | split:',' %}
                             {% if build_nums.size == 2 %}
                                 {% assign version = build_nums[1] %}
                                 {% assign short_version = release.tag_name | remove_first:'v' %}
