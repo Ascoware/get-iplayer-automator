@@ -1,4 +1,4 @@
-#!/bin/bash -v
+#!/bin/bash -x
 
 PROJECT_NAME="Get iPlayer Automator"
 PROJECT_DIR=$(pwd)
