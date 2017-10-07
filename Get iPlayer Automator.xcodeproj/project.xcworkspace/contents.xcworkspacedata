@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:Get_iPlayer GUI.xcodeproj">
+      location = "self:Get iPlayer Automator.xcodeproj">
    </FileRef>
 </Workspace>
