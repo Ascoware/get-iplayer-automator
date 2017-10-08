@@ -459,9 +459,9 @@
         [self setCurrentProgress:[NSString stringWithFormat:@"Converting Subtitles... -- %@",_show.showName]];
         [self addToLog:@"INFO: Converting Subtitles..." noTag:YES];
         [self convertSubtitles];
+    } else {
+        [self convertSubtitlesFinished:nil];
     }
-
-    [self convertSubtitlesFinished:nil];
 }
 
 - (void)convertSubtitles
