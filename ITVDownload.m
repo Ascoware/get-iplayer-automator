@@ -140,10 +140,17 @@
     {
         // Create an NSURLSessionConfiguration that uses the proxy
         NSMutableDictionary *proxyDict = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                          (NSString *)kCFProxyTypeKey, (NSString *)kCFProxyTypeHTTP,
-                                          (NSString *)kCFNetworkProxiesHTTPEnable, @(1),
-                                          (NSString *)kCFNetworkProxiesHTTPProxy, self.proxy.host,
-                                          (NSString *)kCFNetworkProxiesHTTPPort, @(self.proxy.port),
+                                          (__bridge NSString *)kCFProxyTypeHTTP,
+                                          (__bridge NSString *)kCFProxyTypeKey,
+                                          
+                                          @(1),
+                                          (__bridge NSString *)kCFNetworkProxiesHTTPEnable,
+                                          
+                                          self.proxy.host,
+                                          (__bridge NSString *)kCFStreamPropertyHTTPProxyHost,
+                                          
+                                          @(self.proxy.port),
+                                          (__bridge NSString *)kCFStreamPropertyHTTPProxyPort,
                                           nil];
         
         if (self.proxy.user) {
