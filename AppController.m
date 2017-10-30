@@ -109,7 +109,8 @@ NewProgrammeHistory           *sharedHistoryController;
     defaultValues[@"AudioDescribedNew"] = @NO;
     defaultValues[@"SignedNew"] = @NO;
     defaultValues[@"Use50FPSStreams"] = @NO;
-    
+    defaultValues[@"GetHigherQualityAudio"] = @YES;
+
     [[NSUserDefaults standardUserDefaults] registerDefaults:defaultValues];
     defaultValues = nil;
     
@@ -1734,11 +1735,7 @@ NewProgrammeHistory           *sharedHistoryController;
     
     return string;
 }
-- (void)thirtyTwoBitModeAlert
-{
-    if ([[NSAlert alertWithMessageText:@"File could not be added to iTunes," defaultButton:@"Help Me!" alternateButton:@"Do nothing" otherButton:nil informativeTextWithFormat:@"This is usually fixed by running iTunes in 32-bit mode. Would you like instructions to do this?"] runModal] == NSAlertDefaultReturn)
-        [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"http://support.apple.com/kb/TS3771"]];
-}
+
 - (void)addToiTunesThread:(Programme *)show
 {
     @autoreleasepool {
@@ -1780,28 +1777,22 @@ NewProgrammeHistory           *sharedHistoryController;
                 else
                 {
                     [_logger performSelectorOnMainThread:@selector(addToLog:) withObject:@"iTunes did not accept file." waitUntilDone:YES];
-                    if (floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_8) { //10.8 or older
-                        [_logger performSelectorOnMainThread:@selector(addToLog:) withObject:@"Try setting iTunes to open in 32-bit mode." waitUntilDone:YES];
-                        [self performSelectorOnMainThread:@selector(thirtyTwoBitModeAlert) withObject:nil waitUntilDone:NO];
-                    }
-                    else { //Newer than 10.8. iTunes can no longer be run in 32-bit mode.
-                        [_logger performSelectorOnMainThread:@selector(addToLog:) withObject:@"Unfortunately new versions of iTunes cannot accept this file." waitUntilDone:YES];
-                    }
+                    [_logger performSelectorOnMainThread:@selector(addToLog:) withObject:@"Try dragging the file from the Finder into iTunes." waitUntilDone:YES];
                     [show setValue:@"Complete: Not in iTunes" forKey:@"status"];
                 }
             }
             else
             {
-                [_logger performSelectorOnMainThread:@selector(addToLog:) withObject:@"Can't add to iTunes; incompatible format." waitUntilDone:YES];
-                [_logger performSelectorOnMainThread:@selector(addToLog:) withObject:@"			iTunes Compatible Modes: Flash - High, Flash - Standard, Flash - HD, iPhone, Radio - MP3" waitUntilDone:YES];
+                NSString *message = [NSString stringWithFormat:@"Can't add %@ file to iTunes -- incompatible format.", ext];
+                [_logger performSelectorOnMainThread:@selector(addToLog:) withObject:message waitUntilDone:YES];
                 [show setValue:@"Download Complete" forKey:@"status"];
             }
         }
         @catch (NSException *e)
         {
-            [_logger performSelectorOnMainThread:@selector(addToLog:) withObject:@"Unable to Add to iTunes" waitUntilDone:YES];
-            NSLog(@"Unable %@ to iTunes",show);
-            [show setValue:@"Complete, Could not add to iTunes." forKey:@"status"];
+            NSString *message = [NSString stringWithFormat:@"Unable to add %@ to iTunes", show];
+            [_logger performSelectorOnMainThread:@selector(addToLog:) withObject:message waitUntilDone:YES];
+            [show setValue:@"Complete: Not in iTunes" forKey:@"status"];
         }
     }
 }
@@ -1942,6 +1933,7 @@ NewProgrammeHistory           *sharedHistoryController;
     [sharedDefaults removeObjectForKey:@"AudiodescribedNew"];
     [sharedDefaults removeObjectForKey:@"SignedNew"];
     [sharedDefaults removeObjectForKey:@"Use50FPSStreams"];
+    [sharedDefaults removeObjectForKey:@"GetHigherQualityAudio"];
 }
 - (void)applescriptStartDownloads
 {

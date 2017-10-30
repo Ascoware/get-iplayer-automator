@@ -112,7 +112,7 @@
                                 searchArg,
                                 whitespaceArg,
                                 @"--attempts=5",
-                                @"--thumbsize=6",
+                                @"--thumbsize=640",
                                 versionArg,
                                 ffmpegArg,
                                 proxyArg,
@@ -138,6 +138,11 @@
         // 50 FPS frames?
         if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"Use50FPSStreams"] boolValue]) {
             [args addObject:@"--fps50"];
+        }
+        
+        // High quality audio is on by default.
+        if (![[[NSUserDefaults standardUserDefaults] objectForKey:@"GetHigherQualityAudio"] boolValue]) {
+            [args addObject:@"--no-hq-audio"];
         }
         
         //Tagging
@@ -322,7 +327,15 @@
             self.show.reasonForFailure = @"Download_Directory_Permissions";
         }
     }
-    else if ([_LastLine hasPrefix:@"INFO: Finished recording file: "])
+    else if ([_LastLine hasPrefix:@"WARNING: The BBC has blocked"])
+    {
+        self.show.complete = @YES;
+        self.show.successful = @NO;
+        self.show.status = @"Failed: Blocked Access";
+        [self addToLog:[NSString stringWithFormat:@"%@ Failed",self.show.showName]];
+        self.show.reasonForFailure = @"proxy";
+    }
+    else if ([_LastLine hasPrefix:@"INFO: Finished recording"])
     {
         [self.show setValue:@YES forKey:@"complete"];
         [self.show setValue:@YES forKey:@"successful"];
@@ -330,7 +343,7 @@
         NSScanner *scanner = [NSScanner scannerWithString:_LastLine];
         NSString *path;
         
-        [scanner scanString:@"INFO: Finished recording file: " intoString:nil];
+        [scanner scanString:@"INFO: Finished recording " intoString:nil];
         
         [scanner scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet] intoString:&path];
         self.show.path = path;
@@ -462,7 +475,7 @@
             srtPath = [srtPath stringByAppendingPathExtension:@"srt"];
             self.show.subtitlePath = srtPath;
         }
-        else if ([output hasPrefix:@"INFO: Finished recording file"])
+        else if ([output hasPrefix:@"INFO: Finished recording"])
         {
             _LastLine = [NSString stringWithString:output];
             _foundLastLine=YES;
@@ -529,57 +542,50 @@
             //Add Status Message to Log
             [self addToLog:output noTag:YES];
         }
-        else if ([output hasPrefix:@" Progress"])
-        {
-            [self setPercentage:102];
-            [self setCurrentProgress:[NSString stringWithFormat:@"Processing Download.. - %@", [self.show valueForKey:@"showName"]]];
-            [self setValue:@"Processing Download.." forKey:@"status"];
-        }
-        // TODO: Not sent anymore?
-        else if ([output hasPrefix:@"Threads:"])
-        {
-            //If it is an MPlayer (ITV) status message:
-            NSScanner *scanner = [NSScanner scannerWithString:output];
-            
-            NSString *threadRecieved;
-            [scanner scanUpToString:@"recorded" intoString:&threadRecieved];
-            
-            NSScanner *threadRecievedScanner = [NSScanner scannerWithString:threadRecieved];
-            double downloaded=0;
-            while ([threadRecievedScanner scanUpToString:@")" intoString:nil])
-            {
-                [threadRecievedScanner scanString:@") " intoString:nil];
-                double thread;
-                [threadRecievedScanner scanDouble:&thread];
-                downloaded = downloaded + thread;
-            }
-            NSInteger speed;
-            [scanner scanUpToString:@"(" intoString:nil];
-            [scanner scanString:@"(" intoString:nil];
-            [scanner scanInteger:&speed];
-            
-            [self setCurrentProgress:[NSString stringWithFormat:@"Unknown%% (%3.2fMB/Unknown) - %5.1fKB/s -- %@",
-                                      downloaded,
-                                      [NSDecimalNumber numberWithInteger:speed].doubleValue/8,
-                                      self.show.showName]];
-            [self.show setValue:@"Downloading.." forKey:@"status"];
-            [self setPercentage:102];
-            
-        }
         // Thumbnail notification
-        else if ([output hasPrefix:@"INFO: Getting thumbnail"]) {
+        else if ([output hasPrefix:@"INFO: Downloading thumbnail"]) {
             [self.show setValue:@"Downloading Artwork.." forKey:@"status"];
             [self setPercentage:102];
             [self setCurrentProgress:[NSString stringWithFormat:@"Downloading Artwork.. -- %@", self.show.showName]];
         }
-        else if ([output hasPrefix:@"INFO: Downloaded Thumbnail"])
-        {
-            [self.show setValue:@"Artwork Done.." forKey:@"status"];
-            [self setPercentage:102];
-            [self setCurrentProgress:[NSString stringWithFormat:@"Finished Artwork.. -- %@", self.show.showName]];
+        else if ([output hasSuffix:@"[audio+video]"] || [output hasSuffix:@"[audio]"]) {
+            if (self.verbose) {
+                [self addToLog:output noTag:YES];
         }
-        else if ([output hasPrefix:@"Recording: "])
+            //Process iPhone/Radio Downloads Status Message
+            NSScanner *scanner = [NSScanner scannerWithString:output];
+            NSDecimal percentage, h, m, s;
+            [scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet]
+                                    intoString:nil];
+            if(![scanner scanDecimal:&percentage]) percentage = (@0).decimalValue;
+            [scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet]
+                                    intoString:nil];
+            if(![scanner scanDecimal:&h]) h = (@0).decimalValue;
+            [scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet]
+                                    intoString:nil];
+            if(![scanner scanDecimal:&m]) m = (@0).decimalValue;
+            [scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet]
+                                    intoString:nil];
+            if(![scanner scanDecimal:&s]) s = (@0).decimalValue;
+            [scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet]
+                                    intoString:nil];
+            
+            [self setPercentage:[NSDecimalNumber decimalNumberWithDecimal:percentage].doubleValue];
+            NSString *eta = [NSString stringWithFormat:@"%.2ld:%.2ld:%.2ld remaining",
+                             [NSDecimalNumber decimalNumberWithDecimal:h].integerValue,
+                             [NSDecimalNumber decimalNumberWithDecimal:m].integerValue,
+                             [NSDecimalNumber decimalNumberWithDecimal:s].integerValue];
+            [self setCurrentProgress:eta];
+            NSString *format = [output hasSuffix:@"[audio+video]"] ? @"Video downloaded: %ld%%" : @"HQ Audio downloaded: %ld%%";
+            [self.show setValue:[NSString stringWithFormat:format,
+                                     [NSDecimalNumber decimalNumberWithDecimal:percentage].integerValue]
+                             forKey:@"status"];
+        }
+        else if ([output hasPrefix:@"Downloading: "])
         {
+            if (self.verbose) {
+                [self addToLog:output noTag:YES];
+            }
             //Process iPhone/Radio Downloads Status Message
             NSScanner *scanner = [NSScanner scannerWithString:output];
             NSDecimal recieved, total, percentage, speed, ignored;
