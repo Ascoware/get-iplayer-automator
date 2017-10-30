@@ -41,6 +41,7 @@ typedef NS_ENUM(NSInteger, GIA_ProgrammeType) {
 @property (nonatomic) NSString *availableModes;
 @property (nonatomic) NSString *url;
 @property (nonatomic) NSDate *dateAired;
+@property (nonatomic) NSString *standardizedAirDate;
 @property (nonatomic) NSString *desc;
     
     //Extended Metadata

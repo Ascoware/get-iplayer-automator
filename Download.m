@@ -354,6 +354,7 @@
                                   @"--TVSeasonNum",[NSString stringWithFormat:@"%ld",(long)_show.season],
                                   @"--TVEpisodeNum",[NSString stringWithFormat:@"%ld",(long)_show.episode],
                                   @"--TVEpisode",_show.episodeName,
+                                  @"--year", _show.standardizedAirDate,
                                   @"--title",_show.showName,
                                   @"--artwork", _thumbnailPath,
                                   @"--comment",_show.desc,

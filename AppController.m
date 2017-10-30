@@ -1195,7 +1195,7 @@ NewProgrammeHistory           *sharedHistoryController;
         if (finishedShow.successful.boolValue)
         {
             [finishedShow setValue:@"Processing..." forKey:@"status"];
-            if ([finishedShow.path.pathExtension isEqualToString:@"mov"])
+            if ([finishedShow.tvNetwork hasPrefix:@"ITV"])
             {
                 [self cleanUpPath:finishedShow];
                 [self seasonEpisodeInfo:finishedShow];
