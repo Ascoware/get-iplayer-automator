@@ -342,43 +342,33 @@
         _apPipe = [[NSPipe alloc] init];
         _apFh = _apPipe.fileHandleForReading;
 
-        NSString *filename = [NSString stringWithUTF8String: [location fileSystemRepresentation]];
-        
         _apTask.launchPath = [([NSBundle mainBundle].executablePath).stringByDeletingLastPathComponent stringByAppendingPathComponent:@"AtomicParsley"];
         
-        if (filename) {
-            _apTask.arguments = @[[NSString stringWithFormat:@"%@",_show.path],
-                                  @"--stik",@"value=10",
-                                  @"--TVNetwork",_show.tvNetwork,
-                                  @"--TVShowName",_show.seriesName,
-                                  @"--TVSeasonNum",[NSString stringWithFormat:@"%ld",(long)_show.season],
-                                  @"--TVEpisodeNum",[NSString stringWithFormat:@"%ld",(long)_show.episode],
-                                  @"--TVEpisode",_show.episodeName,
-                                  @"--year", _show.standardizedAirDate,
-                                  @"--title",_show.showName,
-                                  @"--artwork", _thumbnailPath,
-                                  @"--comment",_show.desc,
-                                  @"--description",_show.desc,
-                                  @"--longdesc",_show.desc,
-                                  @"--lyrics",_show.desc,
-                                  @"--artist",_show.tvNetwork,
-                                  @"--overWrite"];
-        } else {
-            _apTask.arguments = @[[NSString stringWithFormat:@"%@",_show.path],
-                                  @"--stik",@"value=10",
-                                  @"--TVNetwork",_show.tvNetwork,
-                                  @"--TVShowName",_show.seriesName,
-                                  @"--TVSeasonNum",[NSString stringWithFormat:@"%ld",(long)_show.season],
-                                  @"--TVEpisodeNum",[NSString stringWithFormat:@"%ld",(long)_show.episode],
-                                  @"--TVEpisode",_show.episodeName,
-                                  @"--title",_show.showName,
-                                  @"--comment",_show.desc,
-                                  @"--description",_show.desc,
-                                  @"--longdesc",_show.desc,
-                                  @"--lyrics",_show.desc,
-                                  @"--artist",_show.tvNetwork,
-                                  @"--overWrite"];
+        NSMutableArray *arguments = [NSMutableArray arrayWithObjects:
+                                     [NSString stringWithFormat:@"%@",_show.path],
+                                     @"--stik",@"value=10",
+                                     @"--TVNetwork",_show.tvNetwork,
+                                     @"--TVShowName",_show.seriesName,
+                                     @"--TVSeasonNum",[NSString stringWithFormat:@"%ld",(long)_show.season],
+                                     @"--TVEpisodeNum",[NSString stringWithFormat:@"%ld",(long)_show.episode],
+                                     @"--TVEpisode",_show.episodeName,
+                                     @"--title",_show.showName,
+                                     @"--artwork", _thumbnailPath,
+                                     @"--comment",_show.desc,
+                                     @"--description",_show.desc,
+                                     @"--longdesc",_show.desc,
+                                     @"--lyrics",_show.desc,
+                                     @"--artist",_show.tvNetwork,
+                                     @"--overWrite",
+                                     nil];
+       
+        if (_show.standardizedAirDate) {
+            [arguments addObject: @"--year"];
+            [arguments addObject:_show.standardizedAirDate];
         }
+            
+        _apTask.arguments = arguments;
+        
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(DownloadDataReady:)
                                                      name:NSFileHandleReadCompletionNotification

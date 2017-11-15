@@ -267,17 +267,19 @@
     [scanner scanUpToString:@"<TransmissionTime>" intoString:nil];
     [scanner scanString:@"<TransmissionTime>" intoString:nil];
     [scanner scanUpToString:@"</TransmissionTime>" intoString:&timeString];
-    dateFormat.dateFormat = @"HH:mm";
-    NSDate *transmissionTime = [dateFormat dateFromString:timeString];
-    NSCalendar *thisYear = [NSCalendar currentCalendar];
-    thisYear.timeZone = dateFormat.timeZone;
     
-    NSDateComponents *transmissionTimeComponents = [thisYear components:(NSCalendarUnitHour | NSCalendarUnitMinute) fromDate:transmissionTime];
-    NSDate *airDate = [thisYear dateByAddingComponents:transmissionTimeComponents toDate:transmissionDate options:0];
-    self.show.dateAired = airDate;
-    dateFormat.dateFormat = @"yyyy-MM-dd'T'HH:mm:ssZ";
-    self.show.standardizedAirDate = [dateFormat stringFromDate:self.show.dateAired];
-    
+    if (timeString) {
+        dateFormat.dateFormat = @"HH:mm";
+        NSDate *transmissionTime = [dateFormat dateFromString:timeString];
+        NSCalendar *thisYear = [NSCalendar currentCalendar];
+        thisYear.timeZone = dateFormat.timeZone;
+        
+        NSDateComponents *transmissionTimeComponents = [thisYear components:(NSCalendarUnitHour | NSCalendarUnitMinute) fromDate:transmissionTime];
+        NSDate *airDate = [thisYear dateByAddingComponents:transmissionTimeComponents toDate:transmissionDate options:0];
+        self.show.dateAired = airDate;
+        dateFormat.dateFormat = @"yyyy-MM-dd'T'HH:mm:ssZ";
+        self.show.standardizedAirDate = [dateFormat stringFromDate:self.show.dateAired];
+    }
     //Retrieve Episode Name
     NSString *episodeName = nil;
     [scanner scanUpToString:@"<EpisodeTitle" intoString:nil];
