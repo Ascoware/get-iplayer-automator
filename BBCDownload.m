@@ -12,7 +12,7 @@
 + (void)initFormats
 {
     NSArray *tvFormatKeys = @[@"Best", @"Better", @"Very Good", @"Good", @"Worse", @"Worst"];
-    NSArray *tvFormatObjects = @[@"tvbest",@"tvbetter",@"tvvgood",@"tvgood", @"tvworse", @"tvworst"];
+    NSArray *tvFormatObjects = @[@"hlsbest",@"hlsbetter",@"hlsvgood",@"hlsgood", @"hlsworse", @"hlsworst"];
     NSArray *radioFormatKeys = @[@"Best", @"Better", @"Very Good", @"Good", @"Worse", @"Worst"];
     NSArray *radioFormatObjects = @[@"radiobest",@"radiobetter",@"radiovgood",@"radiogood", @"radioworse", @"radioworst"];
     tvFormats = [[NSDictionary alloc] initWithObjects:tvFormatObjects forKeys:tvFormatKeys];
@@ -117,6 +117,7 @@
                                 ffmpegArg,
                                 proxyArg,
                                 partialProxyArg,
+                                @"--log-progress",
                                 nil];
         //Verbose?
         if (self.verbose)
