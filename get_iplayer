@@ -5908,9 +5908,18 @@ sub postproc {
 	push @input_opts, ( '-i', $video_file ) if $video_ok;
 	my @codec_opts;
 	if ( ! $opt->{ffmpegobsolete} ) {
-		push @codec_opts, ( '-c:v', 'copy', '-c:a', 'copy' );
+        # For DASH video, need to convert to H.264
+        if ( $prog->{mode} =~ /(dvf)/ ) {
+            push @codec_opts, ( '-c:v', 'libx264', '-c:a', 'aac' );
+        } else {
+            push @codec_opts, ( '-c:v', 'copy', '-c:a', 'copy' );
+        }
 	} else {
-		push @codec_opts, ( '-vcodec', 'copy', '-acodec', 'copy' );
+        if ( $prog->{mode} =~ /(dvf)/ ) {
+            push @codec_opts, ( '-vcodec', 'libx264', '-acodec', 'aac' );
+        } else {
+            push @codec_opts, ( '-vcodec', 'copy', '-acodec', 'copy' );
+        }
 	}
 	my @stream_opts;
 	push @stream_opts, ( '-map', '0:a:0', '-map', '1:v:0' ) if $audio_ok && $video_ok;
