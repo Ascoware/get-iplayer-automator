@@ -15,11 +15,11 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.9.11</string>
+	<string>1.9.12</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>20171115001</string>
+	<string>20171116001</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>10.7</string>
 	<key>NSAppTransportSecurity</key>
