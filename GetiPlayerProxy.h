@@ -9,7 +9,6 @@
 #import <Foundation/Foundation.h>
 #import "HTTPProxy.h"
 #import "LogController.h"
-#import "ASIHTTPRequest.h"
 
 @interface GetiPlayerProxy : NSObject {
 }
