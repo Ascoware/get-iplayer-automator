@@ -5910,13 +5910,13 @@ sub postproc {
 	if ( ! $opt->{ffmpegobsolete} ) {
         # For DASH video, need to convert to H.264
         if ( $prog->{mode} =~ /(dvf)/ ) {
-            push @codec_opts, ( '-c:v', 'libx264', '-c:a', 'aac' );
+            push @codec_opts, ( '-c:v', 'libx264', '-c:a', 'copy', '-preset', 'ultrafast', '-movflags', '+faststart' );
         } else {
             push @codec_opts, ( '-c:v', 'copy', '-c:a', 'copy' );
         }
 	} else {
         if ( $prog->{mode} =~ /(dvf)/ ) {
-            push @codec_opts, ( '-vcodec', 'libx264', '-acodec', 'aac' );
+            push @codec_opts, ( '-vcodec', 'libx264', '-acodec', 'copy', '-preset', 'ultrafast', '-movflags', '+faststart' );
         } else {
             push @codec_opts, ( '-vcodec', 'copy', '-acodec', 'copy' );
         }
