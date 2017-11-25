@@ -24,7 +24,7 @@
 - (IBAction)showExtendedInformationForSelectedProgramme:(id)sender {
     popover.behavior = NSPopoverBehaviorTransient;
     loadingLabel.stringValue = @"Loading Episode Info";
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"AddToLogNotification" object:self userInfo:@{@"message": @"Retrieving Information"}];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"AddToLog" object:self userInfo:@{@"message": @"Retrieving Information"}];
     Programme *programme = searchResultsArrayController.arrangedObjects[searchResultsTable.selectedRow];
     if (programme) {
         
@@ -65,7 +65,7 @@
 {
     Programme *programme = searchResultsArrayController.arrangedObjects[searchResultsTable.selectedRow];
     if (!programme.extendedMetadataRetrieved.boolValue) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"AddToLogNotification" object:self userInfo:@{@"message":@"Metadata Retrieval Timed Out"}];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"AddToLog" object:self userInfo:@{@"message":@"Metadata Retrieval Timed Out"}];
         [programme cancelMetadataRetrieval];
         loadingLabel.stringValue = @"Programme Information Retrieval Timed Out";
     }
@@ -73,72 +73,74 @@
 - (void)informationRetrieved:(NSNotification *)note {
     Programme *programme = note.object;
     
-    if (programme.successfulRetrieval.boolValue) {
-        if (programme.thumbnail)
-        imageView.image = programme.thumbnail;
-        else
-        imageView.image = nil;
-        
-        if (programme.seriesName)
-        seriesNameField.stringValue = programme.seriesName;
-        else
-        seriesNameField.stringValue = @"Unable to Retrieve";
-        
-        if (programme.episodeName)
-        episodeNameField.stringValue = programme.episodeName;
-        else
-        seriesNameField.stringValue = @"";
-        
-        if (programme.season && programme.episode)
-        numbersField.stringValue = [NSString stringWithFormat:@"Series: %ld Episode: %ld",(long)programme.season,(long)programme.episode];
-        else
-        numbersField.stringValue = @"";
-        
-        if (programme.duration)
-        durationField.stringValue = [NSString stringWithFormat:@"Duration: %d minutes",programme.duration.intValue];
-        else
-        durationField.stringValue = @"";
-        
-        if (programme.categories)
-        categoriesField.stringValue = [NSString stringWithFormat:@"Categories: %@",programme.categories];
-        else
-        categoriesField.stringValue = @"";
-        
-        if (programme.firstBroadcast)
-        firstBroadcastField.stringValue = [NSString stringWithFormat:@"First Broadcast: %@",(programme.firstBroadcast).description];
-        else
-        firstBroadcastField.stringValue = @"";
-        
-        if (programme.lastBroadcast)
-        lastBroadcastField.stringValue = [NSString stringWithFormat:@"Last Broadcast: %@", (programme.lastBroadcast).description];
-        else
-        lastBroadcastField.stringValue = @"";
-        
-        if (programme.desc)
-        descriptionView.string = programme.desc;
-        else
-        descriptionView.string = @"";
-        
-        if (programme.modeSizes)
-        modeSizeController.content = programme.modeSizes;
-        else
-        modeSizeController.content = @[];
-        
-        if ([programme typeDescription])
-        typeField.stringValue = [NSString stringWithFormat:@"Type: %@",[programme typeDescription]];
-        else
-        typeField.stringValue = @"";
-        
-        [retrievingInfoIndicator stopAnimation:self];
-        infoView.alphaValue = 1.0;
-        loadingView.alphaValue = 0.0;
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"AddToLogNotification" object:self userInfo:@{@"message":@"Info Retrieved"}];
-    }
-    else {
-        [retrievingInfoIndicator stopAnimation:self];
-        loadingLabel.stringValue = @"Info could not be retrieved.";
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"AddToLogNotification" object:self userInfo:@{@"message":@"Info could not be retrieved."}];
-    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (programme.successfulRetrieval.boolValue) {
+            if (programme.thumbnail)
+                imageView.image = programme.thumbnail;
+            else
+                imageView.image = nil;
+            
+            if (programme.seriesName)
+                seriesNameField.stringValue = programme.seriesName;
+            else
+                seriesNameField.stringValue = @"Unable to Retrieve";
+            
+            if (programme.episodeName)
+                episodeNameField.stringValue = programme.episodeName;
+            else
+                seriesNameField.stringValue = @"";
+            
+            if (programme.season && programme.episode)
+                numbersField.stringValue = [NSString stringWithFormat:@"Series: %ld Episode: %ld",(long)programme.season,(long)programme.episode];
+            else
+                numbersField.stringValue = @"";
+            
+            if (programme.duration)
+                durationField.stringValue = [NSString stringWithFormat:@"Duration: %d minutes",programme.duration.intValue];
+            else
+                durationField.stringValue = @"";
+            
+            if (programme.categories)
+                categoriesField.stringValue = [NSString stringWithFormat:@"Categories: %@",programme.categories];
+            else
+                categoriesField.stringValue = @"";
+            
+            if (programme.firstBroadcast)
+                firstBroadcastField.stringValue = [NSString stringWithFormat:@"First Broadcast: %@",(programme.firstBroadcast).description];
+            else
+                firstBroadcastField.stringValue = @"";
+            
+            if (programme.lastBroadcast)
+                lastBroadcastField.stringValue = [NSString stringWithFormat:@"Last Broadcast: %@", (programme.lastBroadcast).description];
+            else
+                lastBroadcastField.stringValue = @"";
+            
+            if (programme.desc)
+                descriptionView.string = programme.desc;
+            else
+                descriptionView.string = @"";
+            
+            if (programme.modeSizes)
+                modeSizeController.content = programme.modeSizes;
+            else
+                modeSizeController.content = @[];
+            
+            if ([programme typeDescription])
+                typeField.stringValue = [NSString stringWithFormat:@"Type: %@",[programme typeDescription]];
+            else
+                typeField.stringValue = @"";
+            
+            [retrievingInfoIndicator stopAnimation:self];
+            infoView.alphaValue = 1.0;
+            loadingView.alphaValue = 0.0;
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"AddToLog" object:self userInfo:@{@"message":@"Info Retrieved"}];
+        }
+        else {
+            [retrievingInfoIndicator stopAnimation:self];
+            loadingLabel.stringValue = @"Info could not be retrieved.";
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"AddToLog" object:self userInfo:@{@"message":@"Info could not be retrieved."}];
+        }
+    });
 }
 
 @synthesize modeSizeSorters;

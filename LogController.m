@@ -16,43 +16,40 @@
     if (self = [super init]) {
         NSString *version = [NSString stringWithFormat:@"%@", [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"]];
         NSLog(@"Get iPlayer Automator %@ Initialized.", version);
-        log_value = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Get iPlayer Automator %@ Initialized.", version]];
-        [self addToLog:@"" :nil];
+        NSString *initialLog = [NSString stringWithFormat:@"Get iPlayer Automator %@ Initialized.", version];
+        [self addToLog:initialLog :nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(addToLogNotification:) name:@"AddToLog" object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(postLog:) name:@"NeedLog" object:nil];
         
         NSString *filePath = (@"~/Library/Application Support/Get iPlayer Automator/log.txt").stringByExpandingTildeInPath;
         [[NSFileManager defaultManager] createFileAtPath:filePath
                                                 contents:nil
                                               attributes:nil];
-        fh = [NSFileHandle fileHandleForWritingAtPath:filePath];
-        [fh seekToEndOfFile];
+        _fh = [NSFileHandle fileHandleForWritingAtPath:filePath];
+        [_fh seekToEndOfFile];
     }
     return self;
 }
+
+-(void)awakeFromNib {
+    _log.textColor = [NSColor whiteColor];
+    _log.font = [NSFont fontWithName:@"Monaco" size:12];
+}
+
 - (void)showLog:(id)sender
 {
-	[window makeKeyAndOrderFront:self];
-	
-	//Make sure the log scrolled to the bottom. It might not have if the Log window was not open.
-	NSAttributedString *temp_log = [[NSAttributedString alloc] initWithAttributedString:[self valueForKey:@"log_value"]];
-	[log scrollRangeToVisible:NSMakeRange(temp_log.length, temp_log.length)];
+	[_window makeKeyAndOrderFront:self];
+    [_log scrollToEndOfDocument:self];
 }
-- (void)postLog:(NSNotification *)note
-{
-	NSString *tempLog = log.string;
-	
-	[[NSNotificationCenter defaultCenter]postNotification:[NSNotification notificationWithName:@"Log" object:tempLog]];
-}
+
 -(void)addToLog:(NSString *)string
 {
    [self addToLog:string :nil];
 }
+
 -(void)addToLog:(NSString *)string :(id)sender {
     dispatch_async(dispatch_get_main_queue(), ^{
-        //Get Current Log
-        NSMutableAttributedString *current_log = [[NSMutableAttributedString alloc] initWithAttributedString:log_value];
-        
+        NSMutableAttributedString *current_log = [[NSMutableAttributedString alloc] init];
+
         //Define Return Character for Easy Use
         NSAttributedString *return_character = [[NSAttributedString alloc] initWithString:@"\n"];
         
@@ -71,27 +68,34 @@
         NSAttributedString *converted_string = [[NSAttributedString alloc] initWithString:string];
         
         //Append the new items to the log.
-        [current_log appendAttributedString:return_character];
         [current_log appendAttributedString:from_string];
         [current_log appendAttributedString:converted_string];
-        
+        [current_log appendAttributedString:return_character];
+
         //Make the Text White.
         [current_log addAttribute:NSForegroundColorAttributeName
                             value:[NSColor whiteColor]
                             range:NSMakeRange(0, current_log.length)];
         
-        //Update the log.
-        [self setValue:current_log forKey:@"log_value"];
+        NSFont *logFont =  [NSFont fontWithName:@"Monaco" size:12.0];
+        [current_log addAttribute:NSFontAttributeName
+                            value:logFont
+                            range:NSMakeRange(0, current_log.length)];
         
+        [_log.textStorage appendAttributedString:current_log];
+
         //Scroll log to bottom only if it is visible.
-        if (window.visible) {
-            [log scrollRangeToVisible:NSMakeRange(current_log.length, current_log.length)];
+        if (_window.visible) {
+            BOOL shouldAutoScroll = ((int)NSMaxY([_log bounds]) == (int)NSMaxY([_log visibleRect]));
+            if (shouldAutoScroll) {
+                [_log scrollToEndOfDocument:nil];
+            }
         }
         
         //Write log out to file.
-        [fh writeData:[return_character.string dataUsingEncoding:NSUTF8StringEncoding]];
-        [fh writeData:[from_string.string dataUsingEncoding:NSUTF8StringEncoding]];
-        [fh writeData:[converted_string.string dataUsingEncoding:NSUTF8StringEncoding]];
+        [_fh writeData:[return_character.string dataUsingEncoding:NSUTF8StringEncoding]];
+        [_fh writeData:[from_string.string dataUsingEncoding:NSUTF8StringEncoding]];
+        [_fh writeData:[string dataUsingEncoding:NSUTF8StringEncoding]];
     });
 }
 - (void)addToLogNotification:(NSNotification *)note
@@ -101,7 +105,7 @@
 }
 - (IBAction)copyLog:(id)sender
 {
-	NSString *unattributedLog = log.string;
+	NSString *unattributedLog = _log.string;
 	NSPasteboard *pb = [NSPasteboard generalPasteboard];
 	NSArray *types = @[NSStringPboardType];
 	[pb declareTypes:types owner:self];
@@ -110,10 +114,7 @@
 
 - (void)dealloc
 {
-   [fh closeFile];
+   [_fh closeFile];
 }
 
-
-@synthesize window;
-@synthesize log_value;
 @end

@@ -548,7 +548,7 @@ NewProgrammeHistory           *sharedHistoryController;
             _getiPlayerUpdateArgs = [_getiPlayerUpdateArgs arrayByAddingObject:[[NSString alloc] initWithFormat:@"-p%@", _proxy.url]];
         }
         
-        [_logger addToLog:@"Updating Programme Index Feeds...\r" :self];
+        [_logger addToLog:@"Updating Programme Index Feeds...\n" :self];
         _currentProgress.stringValue = @"Updating Programme Index Feeds...";
         
         _getiPlayerUpdateTask = [[NSTask alloc] init];
@@ -1006,7 +1006,7 @@ NewProgrammeHistory           *sharedHistoryController;
         runDownloads=YES;
         _runScheduled=NO;
         [_mainWindow setDocumentEdited:YES];
-        [_logger addToLog:@"\rAppController: Starting Downloads" :nil];
+        [_logger addToLog:@"AppController: Starting Downloads\n" :nil];
         
         //Clean-Up Queue
         NSArray *tempQueue = _queueController.arrangedObjects;
@@ -1054,7 +1054,7 @@ NewProgrammeHistory           *sharedHistoryController;
             [nc addObserver:self selector:@selector(nextDownload:) name:@"DownloadFinished" object:nil];
             
             tempQueue = _queueController.arrangedObjects;
-            [_logger addToLog:[NSString stringWithFormat:@"\rDownloading Show %lu/%lu:\r",
+            [_logger addToLog:[NSString stringWithFormat:@"\nDownloading Show %lu/%lu:\n",
                               (unsigned long)1,
                               (unsigned long)tempQueue.count]
                             :nil];
@@ -1272,7 +1272,7 @@ NewProgrammeHistory           *sharedHistoryController;
                 NSException *noneLeft = [NSException exceptionWithName:@"EndOfDownloads" reason:@"Done" userInfo:nil];
                 [noneLeft raise];
             }
-            [_logger addToLog:[NSString stringWithFormat:@"\rDownloading Show %lu/%lu:\r",
+            [_logger addToLog:[NSString stringWithFormat:@"\nDownloading Show %lu/%lu:\n",
                               (unsigned long)([tempQueue indexOfObject:nextShow]+1),
                               (unsigned long)tempQueue.count]
                             :nil];
@@ -1300,7 +1300,7 @@ NewProgrammeHistory           *sharedHistoryController;
             @try {[_currentIndicator stopAnimation:nil];}
             @catch (NSException *exception) {NSLog(@"Unable to stop Animation.");}
             [_currentIndicator setIndeterminate:NO];
-            [_logger addToLog:@"\rAppController: Downloads Finished" :nil];
+            [_logger addToLog:@"AppController: Downloads Finished" :nil];
             NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
             [nc removeObserver:self name:@"setPercentage" object:nil];
             [nc removeObserver:self name:@"setCurrentProgress" object:nil];

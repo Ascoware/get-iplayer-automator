@@ -8,15 +8,11 @@
 
 #import <Foundation/Foundation.h>
 
-@interface LogController : NSObject {
-   IBOutlet NSTextView *log;
-   IBOutlet NSWindow *window;
-   NSMutableAttributedString *log_value;
-   NSFileHandle *fh;
-}
+@interface LogController : NSObject
 
-@property (readonly) NSWindow *window;
-@property (readwrite) NSMutableAttributedString *log_value;
+@property (nonatomic) IBOutlet NSTextView *log;
+@property (nonatomic, weak) IBOutlet NSWindow *window;
+@property (nonatomic) NSFileHandle *fh;
 
 - (instancetype)init;
 - (IBAction)showLog:(id)sender;
