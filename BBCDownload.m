@@ -80,12 +80,18 @@
         NSString *whitespaceArg = @"--whitespace";
         
         //AudioDescribed & Signed
-        NSMutableString *versionArg = [NSMutableString stringWithString:@"--versions="];
-        if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"AudioDescribedNew"] boolValue])
-            [versionArg appendString:@"audiodescribed,"];
-        if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"SignedNew"] boolValue])
-            [versionArg appendString:@"signed,"];
-        [versionArg  appendString:@"default"];
+        BOOL needVersions = NO;
+        
+        NSMutableArray *nonDefaultVersions = [[NSMutableArray alloc] init];
+        
+        if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"AudioDescribedNew"] boolValue]) {
+            [nonDefaultVersions addObject:@"audiodescribed"];
+            needVersions = YES;
+        }
+        if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"SignedNew"] boolValue]) {
+            [nonDefaultVersions addObject:@"signed"];
+            needVersions = YES;
+        }
         
         //We don't want this to refresh now!
         NSString *cacheExpiryArg = @"-e604800000000";
@@ -113,12 +119,20 @@
                                 whitespaceArg,
                                 @"--attempts=5",
                                 @"--thumbsize=640",
-                                versionArg,
                                 ffmpegArg,
                                 proxyArg,
                                 partialProxyArg,
                                 @"--log-progress",
                                 nil];
+        
+        // Only add a --versions parameter for audio described or signed. Otherwise, let get_iplayer figure it out.
+        if (needVersions) {
+            [nonDefaultVersions addObject:@"default"];
+            NSMutableString *versionArg = [NSMutableString stringWithString:@"--versions="];
+            [versionArg appendString:[nonDefaultVersions componentsJoinedByString:@","]];
+            [args addObject:versionArg];
+        }
+        
         //Verbose?
         if (self.verbose)
             [args addObject:@"--verbose"];
