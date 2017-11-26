@@ -109,7 +109,8 @@ NewProgrammeHistory           *sharedHistoryController;
     defaultValues[@"AudioDescribedNew"] = @NO;
     defaultValues[@"SignedNew"] = @NO;
     defaultValues[@"Use50FPSStreams"] = @NO;
-    
+    defaultValues[@"GetHigherQualityAudio"] = @YES;
+
     [[NSUserDefaults standardUserDefaults] registerDefaults:defaultValues];
     defaultValues = nil;
     
@@ -547,7 +548,7 @@ NewProgrammeHistory           *sharedHistoryController;
             _getiPlayerUpdateArgs = [_getiPlayerUpdateArgs arrayByAddingObject:[[NSString alloc] initWithFormat:@"-p%@", _proxy.url]];
         }
         
-        [_logger addToLog:@"Updating Programme Index Feeds...\r" :self];
+        [_logger addToLog:@"Updating Programme Index Feeds...\n" :self];
         _currentProgress.stringValue = @"Updating Programme Index Feeds...";
         
         _getiPlayerUpdateTask = [[NSTask alloc] init];
@@ -1005,7 +1006,7 @@ NewProgrammeHistory           *sharedHistoryController;
         runDownloads=YES;
         _runScheduled=NO;
         [_mainWindow setDocumentEdited:YES];
-        [_logger addToLog:@"\rAppController: Starting Downloads" :nil];
+        [_logger addToLog:@"AppController: Starting Downloads\n" :nil];
         
         //Clean-Up Queue
         NSArray *tempQueue = _queueController.arrangedObjects;
@@ -1053,7 +1054,7 @@ NewProgrammeHistory           *sharedHistoryController;
             [nc addObserver:self selector:@selector(nextDownload:) name:@"DownloadFinished" object:nil];
             
             tempQueue = _queueController.arrangedObjects;
-            [_logger addToLog:[NSString stringWithFormat:@"\rDownloading Show %lu/%lu:\r",
+            [_logger addToLog:[NSString stringWithFormat:@"\nDownloading Show %lu/%lu:\n",
                               (unsigned long)1,
                               (unsigned long)tempQueue.count]
                             :nil];
@@ -1195,7 +1196,7 @@ NewProgrammeHistory           *sharedHistoryController;
         if (finishedShow.successful.boolValue)
         {
             [finishedShow setValue:@"Processing..." forKey:@"status"];
-            if ([finishedShow.path.pathExtension isEqualToString:@"mov"])
+            if ([finishedShow.tvNetwork hasPrefix:@"ITV"])
             {
                 [self cleanUpPath:finishedShow];
                 [self seasonEpisodeInfo:finishedShow];
@@ -1271,7 +1272,7 @@ NewProgrammeHistory           *sharedHistoryController;
                 NSException *noneLeft = [NSException exceptionWithName:@"EndOfDownloads" reason:@"Done" userInfo:nil];
                 [noneLeft raise];
             }
-            [_logger addToLog:[NSString stringWithFormat:@"\rDownloading Show %lu/%lu:\r",
+            [_logger addToLog:[NSString stringWithFormat:@"\nDownloading Show %lu/%lu:\n",
                               (unsigned long)([tempQueue indexOfObject:nextShow]+1),
                               (unsigned long)tempQueue.count]
                             :nil];
@@ -1299,7 +1300,7 @@ NewProgrammeHistory           *sharedHistoryController;
             @try {[_currentIndicator stopAnimation:nil];}
             @catch (NSException *exception) {NSLog(@"Unable to stop Animation.");}
             [_currentIndicator setIndeterminate:NO];
-            [_logger addToLog:@"\rAppController: Downloads Finished" :nil];
+            [_logger addToLog:@"AppController: Downloads Finished" :nil];
             NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
             [nc removeObserver:self name:@"setPercentage" object:nil];
             [nc removeObserver:self name:@"setCurrentProgress" object:nil];
@@ -1734,11 +1735,7 @@ NewProgrammeHistory           *sharedHistoryController;
     
     return string;
 }
-- (void)thirtyTwoBitModeAlert
-{
-    if ([[NSAlert alertWithMessageText:@"File could not be added to iTunes," defaultButton:@"Help Me!" alternateButton:@"Do nothing" otherButton:nil informativeTextWithFormat:@"This is usually fixed by running iTunes in 32-bit mode. Would you like instructions to do this?"] runModal] == NSAlertDefaultReturn)
-        [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"http://support.apple.com/kb/TS3771"]];
-}
+
 - (void)addToiTunesThread:(Programme *)show
 {
     @autoreleasepool {
@@ -1780,28 +1777,22 @@ NewProgrammeHistory           *sharedHistoryController;
                 else
                 {
                     [_logger performSelectorOnMainThread:@selector(addToLog:) withObject:@"iTunes did not accept file." waitUntilDone:YES];
-                    if (floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_8) { //10.8 or older
-                        [_logger performSelectorOnMainThread:@selector(addToLog:) withObject:@"Try setting iTunes to open in 32-bit mode." waitUntilDone:YES];
-                        [self performSelectorOnMainThread:@selector(thirtyTwoBitModeAlert) withObject:nil waitUntilDone:NO];
-                    }
-                    else { //Newer than 10.8. iTunes can no longer be run in 32-bit mode.
-                        [_logger performSelectorOnMainThread:@selector(addToLog:) withObject:@"Unfortunately new versions of iTunes cannot accept this file." waitUntilDone:YES];
-                    }
+                    [_logger performSelectorOnMainThread:@selector(addToLog:) withObject:@"Try dragging the file from the Finder into iTunes." waitUntilDone:YES];
                     [show setValue:@"Complete: Not in iTunes" forKey:@"status"];
                 }
             }
             else
             {
-                [_logger performSelectorOnMainThread:@selector(addToLog:) withObject:@"Can't add to iTunes; incompatible format." waitUntilDone:YES];
-                [_logger performSelectorOnMainThread:@selector(addToLog:) withObject:@"			iTunes Compatible Modes: Flash - High, Flash - Standard, Flash - HD, iPhone, Radio - MP3" waitUntilDone:YES];
+                NSString *message = [NSString stringWithFormat:@"Can't add %@ file to iTunes -- incompatible format.", ext];
+                [_logger performSelectorOnMainThread:@selector(addToLog:) withObject:message waitUntilDone:YES];
                 [show setValue:@"Download Complete" forKey:@"status"];
             }
         }
         @catch (NSException *e)
         {
-            [_logger performSelectorOnMainThread:@selector(addToLog:) withObject:@"Unable to Add to iTunes" waitUntilDone:YES];
-            NSLog(@"Unable %@ to iTunes",show);
-            [show setValue:@"Complete, Could not add to iTunes." forKey:@"status"];
+            NSString *message = [NSString stringWithFormat:@"Unable to add %@ to iTunes", show];
+            [_logger performSelectorOnMainThread:@selector(addToLog:) withObject:message waitUntilDone:YES];
+            [show setValue:@"Complete: Not in iTunes" forKey:@"status"];
         }
     }
 }
@@ -1942,6 +1933,7 @@ NewProgrammeHistory           *sharedHistoryController;
     [sharedDefaults removeObjectForKey:@"AudiodescribedNew"];
     [sharedDefaults removeObjectForKey:@"SignedNew"];
     [sharedDefaults removeObjectForKey:@"Use50FPSStreams"];
+    [sharedDefaults removeObjectForKey:@"GetHigherQualityAudio"];
 }
 - (void)applescriptStartDownloads
 {

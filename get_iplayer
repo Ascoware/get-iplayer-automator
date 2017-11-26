@@ -24,17 +24,17 @@
 #
 #
 package main;
-my $version = 3.02;
+my $version = 3.06;
 my $version_text;
 $version_text = sprintf("v%.2f", $version) unless $version_text;
 #
 # Help:
 #	./get_iplayer --help | --longhelp
 #
-# Changelog:
+# Release notes:
 # 	https://github.com/get-iplayer/get_iplayer/wiki/releasenotes
 #
-# Usage and Examples:
+# Documentation:
 # 	https://github.com/get-iplayer/get_iplayer/wiki/documentation
 #
 use Env qw[@PATH];
@@ -63,7 +63,7 @@ use Encode qw(:DEFAULT :fallback_all);
 use PerlIO::encoding;
 $PerlIO::encoding::fallback = XMLCREF;
 use constant FB_EMPTY => sub { '' };
-use constant DIVIDER => "-==-" x 15;
+use constant DIVIDER => "-==-" x 20;
 
 my %SIGORIG;
 # Save default SIG actions
@@ -87,13 +87,14 @@ my $opt_format = {
 	hash		=> [ 1, "hash!", 'Recording', '--hash', "Show recording progress as hashes"],
 	logprogress		=> [ 1, "log-progress|logprogress!", 'Recording', '--log-progress', "Force HLS/DASH download progress display to be captured when screen output is redirected to file.  Progress display is normally omitted unless writing to terminal."],
 	modes		=> [ 0, "modes=s", 'Recording', '--modes <mode>,<mode>,...', "Recording modes.  See --tvmode and --radiomode (with --long-help) for available modes and defaults.  Shortcuts: tvworst,tvworse,tvgood,tvvgood,tvbetter,tvbest,radioworst,radioworse,radiogood,radiovgood,radiobetter,radiobest (default=default for programme type)."],
+	nohqaudio	=> [ 1, "nohqaudio|no-hq-audio!", 'Recording', '--no-hq-audio', "Do not attempt to use higher-quality audio with HLS TV streams ('hvf' and 'hls' modes)."],
 	noproxy	=> [ 1, "noproxy|no-proxy!", 'Recording', '--no-proxy', "Ignore --proxy setting in preferences and/or http_proxy environment variable."],
 	overwrite	=> [ 1, "overwrite|over-write!", 'Recording', '--overwrite', "Overwrite recordings if they already exist"],
 	partialproxy	=> [ 1, "partial-proxy!", 'Recording', '--partial-proxy', "Only uses web proxy where absolutely required (try this extra option if your proxy fails)."],
 	_url		=> [ 2, "", 'Recording', '--url <url>,<url>,...', "Record the embedded media in the specified iPlayer episode URLs.  Use with --type."],
 	pid		=> [ 2, "pid|url=s@", 'Recording', '--pid <pid>,<pid>,...', "Record arbitrary PIDs that do not necessarily appear in the index."],
 	pidrecursive	=> [ 1, "pidrecursive|pid-recursive!", 'Recording', '--pid-recursive', "Record all related episodes if value of --pid is a series or brand PID.  Requires --pid."],
-	proxy		=> [ 0, "proxy|p=s", 'Recording', '--proxy, -p <url>', "Web proxy URL e.g. 'http://USERNAME:PASSWORD\@SERVER:PORT' or 'http://SERVER:PORT'.  Value of http_proxy environment variable (if present) will be used unless --proxy is specified. Used for both HTTP and HTTPS. Overridden by --no-proxy."],
+	proxy		=> [ 0, "proxy|p=s", 'Recording', '--proxy, -p <url>', "Web proxy URL, e.g., http://username:password\@server:port or http://server:port.  Value of http_proxy environment variable (if present) will be used unless --proxy is specified. Used for both HTTP and HTTPS. Overridden by --no-proxy."],
 	start		=> [ 1, "start=s", 'Recording', '--start <secs|hh:mm:ss>', "Recording/streaming start offset (actual start may be several seconds earlier for HLS and DASH streams)"],
 	stop		=> [ 1, "stop=s", 'Recording', '--stop <secs|hh:mm:ss>', "Recording/streaming stop offset (actual stop may be several seconds later for HLS and DASH streams)"],
 	subsrequired	=> [ 1, "subsrequired|subs-required|subtitles-required!", 'Recording', '--subtitles-required', "Do not download TV programme if subtitles are not available."],
@@ -146,7 +147,7 @@ my $opt_format = {
 	cachereset	=> [ 1, "resetcache|reset-cache|cachereset|cache-reset!", 'Config', '--cache-reset', "Reset cache to retain only latest update and discard previous contents."],
 	expiry		=> [ 1, "expiry|e=n", 'Config', '--expiry, -e <secs>', "Cache expiry in seconds (default 4hrs)"],
 	limitmatches	=> [ 1, "limitmatches|limit-matches=n", 'Config', '--limit-matches <number>', "Limits the number of matching results for any search (and for every PVR search)"],
-	nopurge		=> [ 1, "no-purge|nopurge!", 'Config', '--nopurge', "Don't ask to delete programmes recorded over 30 days ago"],
+	nopurge		=> [ 1, "no-purge|nopurge!", 'Config', '--nopurge', "Don't show warning about programmes recorded over 30 days ago"],
 	prefsadd	=> [ 0, "addprefs|add-prefs|prefsadd|prefs-add!", 'Config', '--prefs-add', "Add/Change specified saved user or preset options"],
 	prefsdel	=> [ 0, "del-prefs|delprefs|prefsdel|prefs-del!", 'Config', '--prefs-del', "Remove specified saved user or preset options"],
 	prefsclear	=> [ 0, "clear-prefs|clearprefs|prefsclear|prefs-clear!", 'Config', '--prefs-clear', "Remove *ALL* saved user or preset options"],
@@ -210,6 +211,7 @@ my $opt_format = {
 	encodinglocalefs	=> [ 1, "encodinglocalefs|encoding-locale-fs=s", 'Misc', '--encoding-locale-fs <name>', "Character encoding used to encode file and directory names.  Encoding name must be known to Perl Encode module.  Default (only if auto-detect fails): Linux/Unix/OSX = UTF-8, Windows = cp1252"],
 	indexmaxconn	=> [ 1, "indexmaxconn|index-maxconn=n", 'Misc', '--index-maxconn <number>', "Maximum number of connections to use for concurrent programme indexing.  Default: 5 Min: 1 Max: 10"],
 	noindexconcurrent	=> [ 1, "noindexconcurrent|no-index-concurrent!", 'Deprecated', '--no-index-concurrent', "Do not use concurrent indexing to update programme cache.  Cache updates will be very slow."],
+	purgefiles	=> [ 1, "purgefiles|purge-files!", 'Misc', '--purge-files', "Delete downloaded programmes more than 30 days old"],
 	throttle	=> [ 1, "bw|throttle=f", 'Misc', '--throttle <Mibit/s>', "Bandwidth limit (in Mibit/s) for media file download. Default: unlimited. Synonym: --bw"],
 	trimhistory	=> [ 1, "trimhistory|trim-history=s", 'Misc', '--trim-history <# days to retain>', "Remove download history entries older than number of days specified in option value.  Cannot specify 0 - use 'all' to completely delete download history"],
 
@@ -251,7 +253,6 @@ sub logger(@) {
 		}
 	}
 }
-
 
 # fallback encodings
 $opt->{encodinglocale} = $opt->{encodinglocalefs} = default_encodinglocale();
@@ -308,33 +309,30 @@ if ( $opt_pre->{showver} ) {
 
 # This is where all profile data/caches/cookies etc goes
 my $profile_dir;
-# This is where system-wide default options are specified
-my $optfile_system;
-
 # Options directories specified by env vars
 if ( defined $ENV{GETIPLAYERUSERPREFS} ) {
 	$profile_dir = $opt_pre->{profiledir} || $ENV{GETIPLAYERUSERPREFS};
 # Otherwise look for windows style file locations
 } elsif ( defined $ENV{USERPROFILE} && $^O eq "MSWin32" ) {
-	$profile_dir = $opt_pre->{profiledir} || $ENV{USERPROFILE}.'/.get_iplayer';
+	$profile_dir = $opt_pre->{profiledir} || File::Spec->catfile($ENV{USERPROFILE}, '.get_iplayer');
 # Options on unix-like systems
 } elsif ( defined $ENV{HOME} ) {
-	$profile_dir = $opt_pre->{profiledir} || $ENV{HOME}.'/.get_iplayer';
+	$profile_dir = $opt_pre->{profiledir} || File::Spec->catfile($ENV{HOME}, '.get_iplayer');
 }
+# This is where user options are specified
+my $optfile_default = File::Spec->catfile($profile_dir, 'options');
 
+# This is where system-wide default options are specified
+my $optfile_system;
 # System options file specified by env var
 if ( defined $ENV{GETIPLAYERSYSPREFS} ) {
 	$optfile_system = $ENV{GETIPLAYERSYSPREFS};
 # Otherwise look for windows style file locations
 } elsif ( defined $ENV{ALLUSERSPROFILE} && $^O eq "MSWin32" ) {
-	$optfile_system = $ENV{ALLUSERSPROFILE}.'/get_iplayer/options';
+	$optfile_system = File::Spec->catfile($ENV{ALLUSERSPROFILE}, 'get_iplayer', 'options');
 # System options on unix-like systems
 } else {
 	$optfile_system = '/etc/get_iplayer/options';
-	# Show warning if this deprecated location exists and is not a symbolic link
-	if ( -f '/var/lib/get_iplayer/options' && ! -l '/var/lib/get_iplayer/options' ) {
-		logger "WARNING: System-wide options file /var/lib/get_iplayer/options will be deprecated in future, please use /etc/get_iplayer/options instead\n";
-	}
 }
 # Make profile dir if it doesn't exist
 mkpath $profile_dir if ! -d $profile_dir;
@@ -349,10 +347,9 @@ if ( ! $ENV{IPLAYER_OUTDIR} && $^O eq "MSWin32" ) {
 }
 
 # Parse cmdline opts definitions from each Programme class/subclass
-Options->get_class_options( $_ ) for qw( Streamer Programme Pvr Tagger );
+Options->get_class_options( $_ ) for qw( Streamer Programme Programme::bbciplayer Pvr Tagger );
 Options->get_class_options( progclass($_) ) for progclass();
 Options->get_class_options( "Streamer::$_" ) for qw( hls );
-
 
 # Parse the cmdline using the opt_format hash
 Options->usage( 0 ) if not $opt_cmdline->parse();
@@ -370,35 +367,35 @@ if ( defined $opt_cmdline->{metadata} ) {
 }
 
 # Set the personal options according to the specified preset
-my $optfile_default = "${profile_dir}/options";
 my $optfile_preset;
+my $presets_dir;
 if ( $opt_cmdline->{preset} ) {
 	# create dir if it does not exist
-	mkpath "${profile_dir}/presets/" if ! -d "${profile_dir}/presets/";
+	$presets_dir = File::Spec->catfile($profile_dir, 'presets');
+	mkpath $presets_dir if ! -d $presets_dir;
 	# Sanitize preset file name
 	my $presetname = StringUtils::sanitize_path( $opt_cmdline->{preset}, 0, 1 );
-	$optfile_preset = "${profile_dir}/presets/${presetname}";
+	$optfile_preset = File::Spec->catfile($presets_dir, $presetname);
 	logger "INFO: Using user options preset '${presetname}'\n";
 }
-logger "DEBUG: User Preset Options File: $optfile_preset\n" if defined $optfile_preset && $opt->{debug};
+logger "DEBUG: User preset options file: $optfile_preset\n" if defined $optfile_preset && $opt->{debug};
 
 # Parse options if we're not saving/adding/deleting options (system-wide options are overridden by personal options)
 if ( ! ( $opt_pre->{prefsadd} || $opt_pre->{prefsdel} || $opt_pre->{prefsclear} ) ) {
 	# Load options from files into $opt_file
 	# system, Default, './.get_iplayer/options' and Preset options in that order should they exist
-	$opt_file->load( $opt, '/var/lib/get_iplayer/options', $optfile_system, $optfile_default, './.get_iplayer/options', $optfile_preset );
+	my $optfile_local = File::Spec->catfile('.', '.get_iplayer', 'options');
+	$opt_file->load( $opt, $optfile_system, $optfile_default, $optfile_local, $optfile_preset );
 	# Copy these loaded options into $opt
 	$opt->copy_set_options_from( $opt_file );
 }
 
-
 # Copy to $opt from opt_cmdline those options which are actually set
 $opt->copy_set_options_from( $opt_cmdline );
 
-
 # Update or show user opts file (or preset if defined) if required
 if ( $opt_cmdline->{presetlist} ) {
-	$opt->preset_list( "${profile_dir}/presets/" );
+	$opt->preset_list( $presets_dir );
 	exit 0;
 } elsif ( $opt_cmdline->{prefsadd} ) {
 	$opt->add( $opt_cmdline, $optfile_preset || $optfile_default, @ARGV );
@@ -414,7 +411,6 @@ if ( $opt_cmdline->{presetlist} ) {
 	exit 0;
 }
 
-
 # Show copyright notice
 logger Options->copyright_notice if not $opt->{nocopyright};
 
@@ -425,9 +421,11 @@ if ( $opt->{verbose} ) {
 }
 
 # Display prefs dirs if required
-main::logger "INFO: User prefs dir: $profile_dir\n" if $opt->{verbose};
-main::logger "INFO: System options dir: $optfile_system\n" if $opt->{verbose};
-
+if ( $opt->{verbose} ) {
+	main::logger "INFO: Profile dir: $profile_dir\n";
+	main::logger "INFO: User options file: $optfile_default\n";
+	main::logger "INFO: System options file: $optfile_system\n";
+}
 
 # Display Usage
 Options->usage( 2 ) if $opt_cmdline->{helpbasic};
@@ -446,8 +444,6 @@ if ( $opt_cmdline->{warranty} || $opt_cmdline->{conditions}) {
 	logger request_url_retry( create_ua( 'get_iplayer', 1 ), 'http://www.gnu.org/licenses/gpl-3.0.txt'."\n", 1);
 	exit 1;
 }
-
-
 
 ########## Global vars ###########
 
@@ -563,6 +559,10 @@ my $retcode = 0;
 if ( defined($opt->{trimhistory}) ) {
 	my $hist = History->new();
 	$hist->trim();
+# purge files
+} elsif ( $opt->{purgefiles} ) {
+	my $hist = History->new();
+	purge_downloaded_files( $hist, 30 );
 # PVR functions
 } elsif ( $opt->{pvradd} ) {
 	if ( ! $opt->{pid} && $no_search_args ) {
@@ -620,6 +620,7 @@ if ( defined($opt->{trimhistory}) ) {
 		$opt->{pid} = $_;
 		$retcode += find_pid_matches( $hist );
 	}
+	purge_warning( $hist, 30 );
 
 # Show history
 } elsif ( $opt->{history} ) {
@@ -634,12 +635,12 @@ if ( defined($opt->{trimhistory}) ) {
 	}
 	my $hist = History->new();
 	$retcode = download_matches( $hist, find_matches( $hist, @search_args ) );
-	purge_downloaded_files( $hist, 30 );
+	purge_warning( $hist, 30 );
 }
 exit $retcode;
 
 sub print_divider {
-	main::logger "${\DIVIDER}\n";
+	main::logger $opt->{verbose} ? "${\DIVIDER}\n" : "\n";
 }
 
 sub init_search {
@@ -685,6 +686,7 @@ sub init_search {
 	} else {
 		unless ( $opt->{proxy} ) {
 			$opt->{proxy} = $ENV{HTTP_PROXY} || $ENV{http_proxy};
+			delete $opt->{proxy} unless defined $opt->{proxy};
 		}
 		logger "INFO: Using proxy: $opt->{proxy}\n" if $opt->{proxy};
 	}
@@ -734,76 +736,8 @@ sub init_search {
 	my $index_prog = {};
 	logger "INFO: Search args: '".(join "','", @search_args)."'\n" if $opt->{verbose};
 
-	# External Binaries
-	$bin->{ffmpeg}		= $opt->{ffmpeg} || 'ffmpeg';
-	if (! main::exists_in_path('ffmpeg') ) {
-		$bin->{ffmpeg} = 'ffmpeg';
-	}
-	# ffmpeg checks
-	my ($ffvs, $ffvn);
-	my $ffcmd = main::encode_fs("\"$bin->{ffmpeg}\" -version 2>&1");
-	my $ffout = `$ffcmd`;
-	if ( $ffout =~ /ffmpeg version (\S+)/i ) {
-		$ffvs = $1;
-		if ( $ffvs =~ /^(\d+\.\d+)/i ) {
-			$ffvn = $1;
-			if ( $ffvn >= 3.0 ) {
-				$opt->{ffmpeg30} = 1;
-				$opt->{ffmpeg25} = 1;
-			} elsif ( $ffvn >= 2.5 ) {
-				$opt->{ffmpeg25} = 1;
-			} elsif ( $ffvn < 1.0 ) {
-				$opt->{ffmpegobsolete} = 1;
-			}
-		}
-	}
-	if ( $opt->{verbose} ) {
-		main::logger "INFO: ffmpeg version string = ".($ffvs || "not found")."\n";
-		main::logger "INFO: ffmpeg version number = ".($ffvn || "unknown")."\n";
-	}
-	$opt->{ffmpegversion} = $ffvn;
-	unless ( $opt->{ffmpegversion} ) {
-		if ( $bin->{ffmpeg} =~ /avconv/ || $ffout =~ /avconv/ ) {
-			delete $opt->{ffmpegobsolete};
-			$opt->{ffmpegav} = 1;
-		}
-		$opt->{ffmpegxx} = 1;
-	}
-	# override ffmpeg checks
-	if ( $opt->{ffmpegforce} ) {
-		$opt->{ffmpeg30} = 1;
-		$opt->{ffmpeg25} = 1;
-		delete $opt->{ffmpegav};
-		delete $opt->{ffmpegxx};
-	}
-	delete $binopts->{ffmpeg};
-	push @{ $binopts->{ffmpeg} }, ();
-	if ( ! $opt->{ffmpegobsolete} ) {
-		if ( $opt->{quiet} || $opt->{silent} ) {
-			push @{ $binopts->{ffmpeg} }, ('-loglevel', 'quiet');
-		} elsif ( $opt->{ffmpegloglevel} ) {
-			if ( $opt->{ffmpegloglevel} =~ /^(quiet|-8|panic|0|fatal|8|error|16|warning|24|info|32|verbose|40|debug|48|trace|56)$/ ) {
-				push @{ $binopts->{ffmpeg} }, ('-loglevel', $opt->{ffmpegloglevel});
-			} else {
-				logger "WARNING: invalid value for --ffmpeg-loglevel ('$opt->{ffmpegloglevel}') - using default\n";
-				push @{ $binopts->{ffmpeg} }, ('-loglevel', 'fatal');
-			}
-		} else {
-			push @{ $binopts->{ffmpeg} }, ('-loglevel', 'fatal');
-		}
-		if ( main::hide_progress() ) {
-			push @{ $binopts->{ffmpeg} }, ( '-nostats' );
-		} elsif ( ! ( $opt->{quiet} || $opt->{silent} ) ) {
-			push @{ $binopts->{ffmpeg} }, ( '-stats' );
-		}
-	}
-
-	$bin->{atomicparsley}	= $opt->{atomicparsley} || 'AtomicParsley';
-
 	return ( $type, $prog, $index_prog );
 }
-
-
 
 sub find_pid_matches {
 	my $hist = shift;
@@ -836,6 +770,7 @@ sub find_pid_matches {
 		if ( $pid =~ m{^(.+?)\:(.+?)$} && is_prog_type(lc($1)) ) {
 			( $prog_type, $prog_pid ) = ( lc($1), $2 );
 		}
+		print_divider if $#pids > 0;
 		my $retcode;
 		if ( $prog->{$prog_pid}->{pid} ) {
 			$retcode = download_pid( $hist, $prog->{$prog_pid} );
@@ -850,31 +785,19 @@ sub find_pid_matches {
 	return $totalretcode;
 }
 
-
 sub download_pid {
 	my $hist = shift;
 	my $this = shift;
 	my $retcode;
 	# Prune future scheduled match if not specified
 	if ( $this->{available} && (! $opt->{future}) && Programme::get_time_string( $this->{available} ) > time() ) {
-		logger "WARNING: Ignoring future programme ($this->{pid}): '$this->{index}: $this->{name} - $this->{episode} - $this->{available}'\n";
-		logger "WARNING: Use --future to download future programmes that are already available from iPlayer.\n";
-		# Don't attempt to download
-		return 1;
-	}
-	logger "INFO: Trying to download PID: $this->{pid} using type: $this->{type}\n";
-	if ( $this->{index} ) {
-		logger "INFO: PID found in cache: $this->{pid}\n"
-	} else {
-		logger "INFO: PID not found in cache: $this->{pid}\n"
+		logger "WARNING: Future programme may not yet be available ($this->{pid}): '$this->{index}: $this->{name} - $this->{episode} - $this->{available}'\n";
 	}
 	# Display pid match for recording
 	if ( $opt->{history} ) {
 		$hist->list_progs( 'pid:'.$this->{pid} );
-	} elsif ( $this->{index} ) {
-		list_progs( { $this->{type} => 1 }, $this );
 	} else {
-		list_progs( { $this->{type} => 1 } );
+		list_progs( { $this->{type} => 1 }, $this );
 	}
 	# Don't do a pid recording if metadataonly or thumbonly were specified
 	if ( !( $opt->{metadataonly} || $opt->{thumbonly} || $opt->{subsonly} || $opt->{info} || $opt->{tagonly} ) ) {
@@ -882,8 +805,6 @@ sub download_pid {
 	}
 	return $retcode;
 }
-
-
 
 # Use the specified options to process the matches in specified array
 # Usage: find_matches( $pids_history_ref, @search_args )
@@ -999,17 +920,24 @@ sub find_matches {
 	if ( ! $opt->{future} ) {
 		my $now = time();
 		my @pruned;
+		my $ignored;
+		my $no_future_warn = $opt->{pvr} || $opt->{pvrsingle} || $opt->{pvrscheduler};
 		for my $this (@match_list) {
 			# If the prog object exists with pid in history delete it from the prog list
 			my $available = Programme::get_time_string( $this->{available} );
 			if ( $available && ( $available > $now ) ) {
-				logger "DEBUG: Ignoring Future Prog: '$this->{index}: $this->{name} - $this->{episode} - $this->{available}'\n" if $opt->{debug};
+				logger "WARNING: Ignoring future programme ($this->{pid}): '$this->{index}: $this->{name} - $this->{episode} - $this->{available}'\n" unless $no_future_warn;
+				$ignored = 1;
 			} else {
 				push @pruned, $this;
 			}
 		}
 		@match_list = @pruned;
+		logger "WARNING: Use --future to download future programmes that are already available from iPlayer\n" if $ignored && ! $no_future_warn;
 	}
+
+	# apply sort
+	@match_list = sort_matches(@match_list);
 
 	# Truncate the array of matches if --limit-matches is specified
 	if ( $opt->{limitmatches} && $#match_list > $opt->{limitmatches} - 1 ) {
@@ -1023,15 +951,13 @@ sub find_matches {
 	return @match_list;
 }
 
-
-
 sub download_matches {
 	my $hist = shift;
 	my @match_list = @_;
 
 	# Do the recordings based on list of index numbers if required
 	my $failcount = 0;
-	if ( $opt->{get} ) {
+	if ( $opt->{get} && ! $opt->{info} ) {
 		for my $this (@match_list) {
 			print_divider;
 			$failcount += $this->download_retry_loop( $hist );
@@ -1041,27 +967,8 @@ sub download_matches {
 	return $failcount;
 }
 
-
-
-# Usage: list_progs( \%type, @prog_refs )
-# Lists progs given an array of index numbers
-sub list_progs {
-	my $typeref = shift;
-	# Use a rogue value if undefined
-	my $number_of_types = keys %{$typeref} || 2;
-	my $ua = create_ua( 'desktop', 1 );
-	my %names;
-	my ( @matches ) = ( @_ );
-
-
-	# Setup user agent for a persistent connection to get programme metadata
-	if ( $opt->{info} ) {
-		# Truncate array if were lisiting info and > $info_limit entries are requested - be nice to the beeb!
-		if ( $#matches >= $info_limit ) {
-			$#matches = $info_limit - 1;
-			logger "WARNING: Only processing the first $info_limit matches\n";
-		}
-	}
+sub sort_matches {
+	my @matches = @_;
 
 	# Sort array by specified field
 	if ( $opt->{sortmatches} ) {
@@ -1099,6 +1006,28 @@ sub list_progs {
 		@matches = @tmp;
 	}
 
+	return @matches;
+}
+
+# Usage: list_progs( \%type, @prog_refs )
+# Lists progs given an array of index numbers
+sub list_progs {
+	my $typeref = shift;
+	# Use a rogue value if undefined
+	my $number_of_types = keys %{$typeref} || 2;
+	my $ua = create_ua( 'desktop', 1 );
+	my %names;
+	my ( @matches ) = ( @_ );
+
+	# Setup user agent for a persistent connection to get programme metadata
+	if ( $opt->{info} ) {
+		# Truncate array if were lisiting info and > $info_limit entries are requested - be nice to the beeb!
+		if ( $#matches >= $info_limit ) {
+			$#matches = $info_limit - 1;
+			logger "WARNING: Only processing the first $info_limit matches\n";
+		}
+	}
+
 	# Determine number of episodes for each name
 	my %episodes;
 	my $episode_width;
@@ -1110,7 +1039,6 @@ sub list_progs {
 	}
 
 	# Sort display order by field (won't work in tree mode)
-
 
 	# Calculate page sizes etc if required
 	my $items = $#matches+1;
@@ -1186,8 +1114,6 @@ sub list_progs {
 			}
 			# tag
 			if ( $opt->{tagonly} && ! $opt->{notag} ) {
-				# this probably needs to be initialised earlier - needed for tagging
-				$bin->{atomicparsley} = $opt->{atomicparsley} || 'AtomicParsley';
 				$this->create_dir();
 				$this->tag_file;
 			}
@@ -1201,10 +1127,10 @@ sub list_progs {
 			delete $this->{ext};
 		}
 	}
+	# PID not in cache
+	@matches = () if $#matches == 0 && ! $matches[0]->{index};
 	logger "INFO: ".($#matches + 1)." matching programmes\n" if ( $opt->{pvr} && $#matches >= 0 ) || ! $opt->{pvr};
 }
-
-
 
 # Returns matching programme objects using supplied regex
 # Usage: get_regex_matches ( \%prog, $regex )
@@ -1257,6 +1183,7 @@ sub get_regex_matches {
 		main::logger "DEBUG: Search before = $before\n";
 		main::logger "DEBUG: Search available_since = $available_since\n";
 		main::logger "DEBUG: Search expires_before = $expires_before\n";
+		main::logger "\n";
 	}
 
 	# Determine fields to search
@@ -1306,8 +1233,6 @@ sub get_regex_matches {
 	return @match_list;
 }
 
-
-
 # Usage: sort_index( \%prog, \%index_prog, [$prog_type], [sortfield] )
 # Populates the index if the prog hash as well as creating the %index_prog hash
 # Should be run after any number of get_links methods
@@ -1317,11 +1242,13 @@ sub sort_index {
 	my $prog_type = shift;
 	my $sortfield = shift || 'name';
 	my $counter = 1;
+	my $max_index = 0;
 	my @sort_key;
 
 	# Add index field based on alphabetical sorting by $sortfield
 	# Start index counter at 'min' for this prog type
 	$counter = progclass($prog_type)->index_min if defined $prog_type;
+	$max_index = progclass($prog_type)->index_max if defined $prog_type;
 
 	# Create unique array of '<$sortfield|pid>' for this prog type
 	for my $pid ( keys %{$prog} ) {
@@ -1342,11 +1269,13 @@ sub sort_index {
 
 		# Increment the index counter for this prog type
 		$counter++;
+		if ( $max_index && $counter >= $max_index ) {
+			main::logger "WARNING: $prog_type cache index numbers exceeded the maximum supported value ($max_index). Please alert the developer.\n";
+			$max_index = 0;
+		}
 	}
 	return 0;
 }
-
-
 
 sub make_array_unique_ordered {
 	# De-dup array and retain order (don't ask!)
@@ -1355,8 +1284,6 @@ sub make_array_unique_ordered {
 	my @unique = grep { ! $seen{ $_ }++ } @array;
 	return @unique;
 }
-
-
 
 # User Agents
 # Uses global $ua_cache
@@ -1397,7 +1324,6 @@ sub user_agent {
 	return $uas || '';
 }
 
-
 # Returns classname for prog type or if not specified, an array of all prog types
 sub progclass {
 	my $prog_type = shift;
@@ -1406,11 +1332,10 @@ sub progclass {
     } elsif ( $prog_type =~ /^(itv|tv|radio)$/ ) {
 		return "Programme::$prog_type";
 	} else {
-		main::logger "ERROR: Programe Type '$prog_type' does not exist\n";
+		main::logger "ERROR: Programme type '$prog_type' does not exist\n";
 		exit 3;
 	}
 }
-
 
 # return true if valid prog type
 sub is_prog_type {
@@ -1418,7 +1343,6 @@ sub is_prog_type {
 	return 1 if $prog_type =~ /^(itv|tv|radio)$/;
 	return 0;
 }
-
 
 # Feed Info:
 # # schedule feeds
@@ -1490,7 +1414,6 @@ sub get_links {
 		logger "INFO: No file cache exists for $prog_type\n" if $opt->{verbose};
 	}
 
-
 	# Do we need to refresh the cache ?
 	# if a cache file doesn't exist/corrupted/empty, refresh option is specified or original file is older than $cache_sec then download new data
 	my $cache_secs = $opt->{expiry} || main::progclass( $prog_type )->expiry() || 14400;
@@ -1531,6 +1454,7 @@ sub get_links {
 		# Open cache file for writing
 		unlink $cachefile;
 		if ( open(CACHE, "> $cachefile") ) {
+			my $added = 0;
 			print CACHE "#".(join '|', @cache_format)."\n";
 			# loop through all progs just obtained through get_links above (in numerical index order)
 			for my $index ( sort {$a <=> $b} keys %{$index_prog} ) {
@@ -1548,7 +1472,8 @@ sub get_links {
 					# Else this is a new entry
 					} else {
 						$this->{timeadded} = $now;
-						$this->list_entry( 'Added: ' ) unless $opt->{quiet};
+						$this->list_entry( 'Added: ' ) if $opt->{verbose};
+						$added++;
 					}
 					# Write each field into cache line
 					print CACHE $this->{$_}.'|' for @cache_format;
@@ -1556,6 +1481,7 @@ sub get_links {
 				}
 			}
 			close (CACHE);
+			main::logger "INFO: Added $added $prog_type programmes to cache\n";
 		} else {
 			logger "WARNING: Couldn't open cache file '$cachefile' for writing\n";
 		}
@@ -1574,7 +1500,6 @@ sub get_links {
 				main::logger "DEBUG: Removed PID $pid from memcache\n" if $opt->{debug};
 			}
 		}
-
 
 	# Else copy data from existing cache file into new prog instances and memcache
 	} else {
@@ -1598,8 +1523,6 @@ sub get_links {
 	return 0;
 }
 
-
-
 # Generic
 # Returns an offset timestamp given an srt begin or end timestamp and offset in ms
 sub subtitle_offset {
@@ -1616,8 +1539,6 @@ sub subtitle_offset {
 	$ms = $ts;
 	return sprintf( '%02d:%02d:%02d,%03d', $hr, $min, $sec, $ms );
 }
-
-
 
 # Generic
 sub display_stream_info {
@@ -1639,8 +1560,6 @@ sub display_stream_info {
 	return 0;
 }
 
-
-
 sub proxy_disable {
 	my $ua = shift;
 	$ua->proxy( ['http', 'https'] => undef );
@@ -1649,16 +1568,12 @@ sub proxy_disable {
 	main::logger "INFO: Disabled proxy: $proxy_save\n" if $opt->{verbose};
 }
 
-
-
 sub proxy_enable {
 	my $ua = shift;
 	$ua->proxy( ['http', 'https'] => $opt->{proxy} ) if $opt->{proxy} && $opt->{proxy} !~ /^prepend:/;
 	$opt->{proxy} = $proxy_save;
 	main::logger "INFO: Restored proxy to $opt->{proxy}\n" if $opt->{verbose};
 }
-
-
 
 # Generic
 # create_ua( <agentname>|'', [<cookie mode>] )
@@ -1684,8 +1599,6 @@ sub create_ua {
 	return $ua;
 };
 
-
-
 # Generic
 # Gets the contents of a URL and retries if it fails, returns '' if no page could be retrieved
 # Usage <content> = request_url_retry(<ua>, <url>, <retries>, <succeed message>, [<fail message>], <1=mustproxy>, [<fail_content>] );
@@ -1697,7 +1610,6 @@ sub request_url_retry {
 
 	my ($ua, $url, $retries, $succeedmsg, $failmsg, $mustproxy, $fail_content) = @_;
 	my $res;
-
 
 	# Use url prepend if required
 	if ( defined $opt->{proxy} && $opt->{proxy} =~ /^prepend:/ ) {
@@ -1714,7 +1626,7 @@ sub request_url_retry {
 	# Disable proxy unless mustproxy is flagged
 	main::proxy_disable($ua) if $opt->{partialproxy} && ! $mustproxy;
 	my $i;
-	logger "INFO: Getting page $url\n" if $opt->{verbose};
+	logger "INFO: Getting URL: $url\n" if $opt->{verbose};
 	for ($i = 0; $i < $retries; $i++) {
 		$res = $ua->request( HTTP::Request->new( GET => $url ) );
 		if ( ! $res->is_success ) {
@@ -1737,8 +1649,6 @@ sub request_url_retry {
 	return $res->decoded_content;
 }
 
-
-
 # Generic
 # Checks if a particular program exists (or program.exe) in the $ENV{PATH} or if it has a path already check for existence of file
 sub exists_in_path {
@@ -1755,8 +1665,6 @@ sub exists_in_path {
 	return 0;
 }
 
-
-
 # Generic
 # Checks history for files that are over 30 days old and asks user if they should be deleted
 # "$prog->{pid}|$prog->{name}|$prog->{episode}|$prog->{type}|".time()."|$prog->{mode}|$prog->{filename}\n";
@@ -1765,9 +1673,6 @@ sub purge_downloaded_files {
 	my @delete;
 	my @proglist;
 	my $days = shift;
-
-	# Return if disabled or running in a typically non-interactive mode
-	return 0 if $opt->{nopurge} || $opt->{nowrite} || $opt->{quiet} || $opt->{silent};
 
 	for my $pid ( $hist->get_pids() ) {
 		my $record = $hist->get_record( $pid );
@@ -1800,7 +1705,27 @@ sub purge_downloaded_files {
 	return 0;
 }
 
-
+sub purge_warning {
+	my $hist = shift;
+	my $days = shift;
+	my $overdue;
+	return 0 if $opt->{nopurge} || $opt->{nowrite};
+	for my $pid ( $hist->get_pids() ) {
+		my $record = $hist->get_record( $pid );
+		if ( $record->{timeadded} < (time() - $days*86400) && $record->{filename} && -f $record->{filename} ) {
+			$overdue = 1;
+			last;
+		}
+	}
+	if ( $overdue ) {
+		print STDOUT "WARNING: You have programmes over 30 days old that should be deleted.\n";
+		print STDOUT "WARNING: Find them with 'get_iplayer --history --before=720'\n";
+		print STDOUT "WARNING: or use the 'Recordings' tab in the Web PVR Manager.\n";
+		print STDOUT "WARNING: Use 'get_iplayer --purge-files' to delete all programmes over 30 days old.\n";
+		print STDOUT "WARNING: Use 'get_iplayer --prefs-add --no-purge' to suppress this warning.\n";
+	}
+	return 0;
+}
 
 # Returns url decoded string
 sub url_decode {
@@ -1809,16 +1734,12 @@ sub url_decode {
 	return $str;
 }
 
-
-
 # Returns url encoded string
 sub url_encode {
 	my $str = shift;
 	$str =~ s/([^A-Za-z0-9])/sprintf("%%%02X", ord($1))/seg;
 	return $str;
 }
-
-
 
 # list_unique_element_counts( \%type, $element_name, @matchlist);
 # Show channels for currently specified types in @matchlist - an array of progs
@@ -1846,8 +1767,6 @@ sub list_unique_element_counts {
 	return 0;
 }
 
-
-
 # Invokes command in @args as a system call (hopefully) without using a shell
 # Can also redirect all stdout and stderr to either: STDOUT, STDERR or unchanged
 # Usage: run_cmd( <normal|STDERR|STDOUT>, @args )
@@ -1867,7 +1786,7 @@ sub run_cmd {
 	} else {
 		$log_str = $log_cmd[0]
 	}
-	main::logger "\n\nINFO: Command: $log_str\n\n" if $opt->{verbose};
+	main::logger "INFO: Command: $log_str\n" if $opt->{verbose};
 
 	# Define what to do with STDOUT and STDERR of the child process
 	my $fh_child_out = ">&STDOUT";
@@ -1966,16 +1885,12 @@ sub run_cmd {
 	return $return;
 }
 
-
-
 # Generic
 # Escape chars in string for shell use
 sub StringUtils::esc_chars {
 	# will change, for example, a!!a to a\!\!a
 	$_[0] =~ s/([;<>\*\|&\$!#\(\)\[\]\{\}:'"])/\\$1/g;
 }
-
-
 
 sub StringUtils::clean_utf8_and_whitespace {
 	# Remove non utf8
@@ -2041,7 +1956,6 @@ sub StringUtils::sanitize_path {
 	return $string;
 }
 
-
 # Generic
 # Signal handler to clean up after a ctrl-c or kill
 sub cleanup {
@@ -2052,7 +1966,6 @@ sub cleanup {
 	$SIGORIG{$signal}->() if ref($SIGORIG{$signal}) eq 'CODE';
 	exit 1;
 }
-
 
 # Uses: global $lockfile
 # Lock file detection (<stale_secs>)
@@ -2090,8 +2003,6 @@ sub lockfile {
 	return 0;
 }
 
-
-
 sub expand_list {
 	my $list = shift;
 	my $search = shift;
@@ -2102,8 +2013,6 @@ sub expand_list {
 	}
 	return join ',', @elements;
 }
-
-
 
 # Converts any number words (or numbers) 0 - 99 to a number
 sub convert_words_to_number {
@@ -2162,8 +2071,6 @@ sub convert_words_to_number {
 	return $number;
 }
 
-
-
 # Returns a regex string that matches all number words (or numbers) 0 - 99
 sub regex_numbers {
 	my $regex_units = '(zero|one|two|three|four|five|six|seven|eight|nine)';
@@ -2172,18 +2079,15 @@ sub regex_numbers {
 	return '(\d+|'.$regex_units.'|'.$regex_ten_to_nineteen.'|'.$regex_tens.'((\s+|\-|)'.$regex_units.')?)';
 }
 
-
 sub default_encodinglocale {
 	return 'UTF-8' if (${^UNICODE} & 32);
 	return ($^O eq "MSWin32" ? 'cp1252' : 'UTF-8');
 }
 
-
 sub default_encodingconsoleout {
 	return 'UTF-8' if (${^UNICODE} & 6);
 	return ($^O eq "MSWin32" ? 'cp850' : 'UTF-8');
 }
-
 
 sub encode_fs {
 	my $string = shift;
@@ -2204,7 +2108,7 @@ sub hide_progress {
 
 ############## OO ################
 
-############## Options default class ################
+############## Options class ################
 package Options;
 
 use Env qw[@PATH];
@@ -2230,13 +2134,11 @@ sub new {
 	bless $self, $type;
 }
 
-
 # Use to bind a new options ref to the class global $opt_format_ref var
 sub add_opt_format_object {
 	my $self = shift;
 	$Options::opt_format_ref = shift;
 }
-
 
 # Parse cmdline opts using supplied hash
 # If passthru flag is set then no error will result if there are unrecognised options etc
@@ -2266,8 +2168,6 @@ sub parse {
 	return GetOptions(%get_opts);
 }
 
-
-
 sub copyright_notice {
 	shift;
 	my $text = "get_iplayer $version_text, ";
@@ -2280,8 +2180,6 @@ Copyright (C) 2008-2010 Phil Lewis
 EOF
 	return $text;
 }
-
-
 
 # Usage: $opt_cmdline->usage( <helplevel>, <manpage>, <dump> );
 sub usage {
@@ -2299,7 +2197,7 @@ sub usage {
 	my @man;
 	my @dump;
 	push @man,
-		'.TH GET_IPLAYER "1" "August 2017" "Phil Lewis" "get_iplayer Manual"',
+		'.TH GET_IPLAYER "1" "October 2017" "Phil Lewis" "get_iplayer Manual"',
 		'.SH NAME', 'get_iplayer - Stream Recording tool and PVR for BBC iPlayer',
 		'.SH SYNOPSIS',
 		'\fBget_iplayer\fR [<options>] [<regex|index> ...]',
@@ -2386,7 +2284,7 @@ sub usage {
 	if ( $manpage ) {
 		push @man,
 			'.SH AUTHOR',
-			'get_iplayer was written by Phil Lewis <iplayer2 (at sign) linuxcentre.net> and is now maintained by the contributors at http://www.infradead.org/get_iplayer/html/get_iplayer.html',
+			'get_iplayer was written by Phil Lewis <iplayer2 (at sign) linuxcentre.net> and is now maintained by the contributors at https://github.com/get-iplayer/get_iplayer',
 			'.PP',
 			'This manual page was originally written by Jonathan Wiltshire <jmw@debian.org> for the Debian project (but may be used by others).',
 			'.SH COPYRIGHT NOTICE';
@@ -2415,7 +2313,6 @@ sub usage {
 	exit 0;
 }
 
-
 # Add all the options into supplied hash from specified class
 # Usage: Options->get_class_options( 'Programme:tv' );
 sub get_class_options {
@@ -2432,7 +2329,6 @@ sub get_class_options {
 	}
 }
 
-
 # Copies values in one instance to another only if they are set with a value/defined
 # Usage: $opt->copy_set_options_from( $opt_cmdline );
 sub copy_set_options_from {
@@ -2444,13 +2340,10 @@ sub copy_set_options_from {
 	}
 }
 
-
-
 # specify regex of options that cannot be saved
 sub excludeopts {
-	return '^(cache|profiledir|encoding|silent|help|debug|get|pvr|prefs|preset|warranty|conditions|dumpoptions|comment)';
+	return '^(cache|profiledir|encoding|silent|help|debug|get|pvr|prefs|preset|warranty|conditions|dumpoptions|comment|purge)';
 }
-
 
 # List all available presets in the specified dir
 sub preset_list {
@@ -2465,7 +2358,6 @@ sub preset_list {
 	main::logger "\n";
 }
 
-
 # Clears all option entries for a particular preset (i.e. deletes the file)
 sub clear {
 	my $opt = shift;
@@ -2474,7 +2366,6 @@ sub clear {
 	unlink $prefsfile;
 	main::logger "INFO: Removed all above options from $prefsfile\n";
 }
-
 
 # $opt->add( $opt_cmdline, $optfile, @search_args )
 # Add/change cmdline-only options to file
@@ -2508,8 +2399,6 @@ sub add {
 	put( $opt, $entry, $optfile );
 }
 
-
-
 # $opt->add( $opt_cmdline, $optfile )
 # Add/change cmdline-only options to file
 sub del {
@@ -2536,8 +2425,6 @@ sub del {
 	put( $opt, $entry, $optfile );
 }
 
-
-
 # $opt->show( $optfile )
 # show options from file
 sub show {
@@ -2555,8 +2442,6 @@ sub show {
 		main::logger "\t$_ = $entry->{$_}\n";
 	}
 }
-
-
 
 # $opt->save( $opt_cmdline, $optfile )
 # Save cmdline-only options to file
@@ -2579,8 +2464,6 @@ sub put {
 	main::logger "INFO: Options file $optfile updated\n";
 	return;
 }
-
-
 
 # Returns a hashref of 'optname => internal_opt_name' for all options
 sub get_opt_map {
@@ -2608,7 +2491,6 @@ sub get_opt_map {
 	}
 	return $optname;
 }
-
 
 # $entry = get( $opt, $optfile )
 # get all options from file into $entry ($opt is used just to get access to general options like debug)
@@ -2667,8 +2549,6 @@ sub get {
 	return $entry;
 }
 
-
-
 # $opt_file->load( $opt, $optfile )
 # Load default options from file(s) into instance
 sub load {
@@ -2686,8 +2566,6 @@ sub load {
 
 	return;
 }
-
-
 
 # Usage: $opt_file->display( [<exclude regex>], [<title>] );
 # Display options
@@ -2710,12 +2588,7 @@ sub display {
 	return 0;
 }
 
-
-
-
-########################################################
-
-################ History default class #################
+################ History class #################
 package History;
 
 use Encode;
@@ -2743,7 +2616,6 @@ sub new {
 	bless $self, $type;
 }
 
-
 # $opt->{<option>} access method
 sub opt {
 	my $self = shift;
@@ -2751,13 +2623,11 @@ sub opt {
 	return $opt->{$optname};
 }
 
-
 # Use to bind a new options ref to the class global $opt_ref var
 sub add_opt_object {
 	my $self = shift;
 	$History::optref = shift;
 }
-
 
 sub trim {
 	my $oldhistoryfile = "$historyfile.old";
@@ -2838,22 +2708,20 @@ sub add {
 	return 0;
 }
 
-
-
 # Uses global @history_format
 # returns, for all the pids in the history file, $history->{pid}->{key} = value
 sub load {
 	my $hist = shift;
 
 	# Return if force option specified
-	return 0 if ( $opt->{force} && ! $opt->{pid} ) || $opt->{nowrite};
+	return 0 if ! $opt->{history} && ( ( $opt->{force} && ! $opt->{pid} ) || $opt->{nowrite} );
 
 	# clear first
 	$hist->clear();
 
 	main::logger "INFO: Loading recordings history\n" if $opt->{verbose};
 	if ( ! open(HIST, "< $historyfile") ) {
-		main::logger "WARNING: Cannot read $historyfile\n\n" if $opt->{verbose} && -f $historyfile;
+		main::logger "WARNING: Cannot read $historyfile\n" if $opt->{verbose} && -f $historyfile;
 		return 0;
 	}
 
@@ -2892,17 +2760,13 @@ sub load {
 	return 0;
 }
 
-
-
 # Clear the history in %{$hist}
 sub clear {
 	my $hist = shift;
 	# There is probably a faster way
-	delete $hist->{$_} for keys %{ $pvr };
+	delete $hist->{$_} for keys %{ $hist };
 	return 0;
 }
-
-
 
 # Loads hist from file if required
 sub conditional_load {
@@ -2916,8 +2780,6 @@ sub conditional_load {
 	return 0;
 }
 
-
-
 # Returns a history pid instance ref
 sub get_record {
 	my $hist = shift;
@@ -2929,16 +2791,12 @@ sub get_record {
 	return undef;
 }
 
-
-
 # Returns a list of current history pids
 sub get_pids {
 	my $hist = shift;
 	$hist->conditional_load();
 	return keys %{ $hist };
 }
-
-
 
 # Lists current history items
 # Requires a load()
@@ -3026,13 +2884,14 @@ sub list_progs {
 		@match_list = @pruned;
 	}
 
+	# apply sort
+	@match_list = main::sort_matches(@match_list);
+
 	# De-dup matches and retain order then list matching programmes in history
 	main::list_progs( undef, main::make_array_unique_ordered( @match_list ) );
 
 	return 0;
 }
-
-
 
 # Generic
 # Checks history for previous download of this pid
@@ -3059,11 +2918,7 @@ sub check {
 	return 0;
 }
 
-
-
-
 #################### Programme class ###################
-
 package Programme;
 
 use Encode;
@@ -3101,7 +2956,6 @@ sub opt_format {
 	return {
 	};
 }
-
 
 # Filter channel names matched with options --refreshexclude/--refreshinclude
 sub channels_filtered {
@@ -3151,11 +3005,9 @@ sub channels_filtered {
 	return \%channels;
 }
 
-
 sub channels_schedule {
 	return {};
 }
-
 
 # Method to return optional list_entry format
 sub optional_list_entry_format {
@@ -3163,24 +3015,20 @@ sub optional_list_entry_format {
 	return '';
 }
 
-
 # Returns the modes to try for this prog type
 sub modelist {
 	return '';
 }
-
 
 # Default minimum expected download size for a programme type
 sub min_download_size {
 	return 1024000;
 }
 
-
 # Default cache expiry in seconds
 sub expiry {
 	return 14400;
 }
-
 
 # Constructor
 # Usage: $prog{$pid} = Programme->new( 'pid' => $pid, 'name' => $name, <and so on> );
@@ -3198,13 +3046,11 @@ sub new {
 	bless $self, $type;
 }
 
-
 # Use to bind a new options ref to the class global $optref var
 sub add_opt_object {
 	my $self = shift;
 	$Programme::optref = shift;
 }
-
 
 # $opt->{<option>} access method
 sub opt {
@@ -3217,11 +3063,9 @@ sub opt {
 	#return $self->{optref}->{$optname};
 }
 
-
 # This gets run before the download retry loop if this class type is selected
 sub init {
 }
-
 
 # Create dir if it does not exist
 sub create_dir {
@@ -3235,7 +3079,6 @@ sub create_dir {
 		}
 	}
 }
-
 
 # Return metadata of the prog
 sub get_metadata {
@@ -3251,7 +3094,6 @@ sub get_metadata {
 	$prog->{versions} = join ',', sort keys %{ $prog->{verpids} };
 	return 0;
 }
-
 
 # Return metadata which is generic such as time and date
 sub get_metadata_general {
@@ -3273,7 +3115,6 @@ sub get_metadata_general {
 
 	return 0;
 }
-
 
 # Displays specified metadata from supplied object
 # Usage: $prog->display_metadata( <array of elements to display> )
@@ -3308,6 +3149,7 @@ sub display_metadata {
 				main::logger sprintf "%-15s ", $_.':';
 				if ( ref$data{$_}->{$key} ne 'HASH' ) {
 					main::logger "$key: $data{$_}->{$key}";
+					main::logger " [estimated sizes only]" if $_ eq "modesizes";
 				# This is the same as 'modes' list
 				#} else {
 				#	main::logger "$key: ".(join ',', sort keys %{ $data{$_}->{$key} } );
@@ -3329,15 +3171,11 @@ sub display_metadata {
 	return 0;
 }
 
-
-
 # Return a list of episode pids from the given contents page/pid
 sub get_pids_recursive {
 	my $prog = shift;
 	return '';
 }
-
-
 
 # Return hash of version => verpid given a pid
 # Also put verpids in $prog->{verpids}->{<version>} = <verpid>
@@ -3347,19 +3185,15 @@ sub get_verpids {
 	return 0;
 }
 
-
-
 # Download Subtitles, convert to srt(SubRip) format and apply time offset
 sub download_subtitles {
 	# return failed...
 	return 1;
 }
 
-
 sub default_version_list {
 	return qw/ default original iplayer technical editorial lengthened shortened podcast opensubtitles other /;
 }
-
 
 # Usage: generate_version_list ($prog)
 # Returns sorted array of versions
@@ -3392,7 +3226,7 @@ sub generate_version_list {
 	if ( $got == 0 ) {
 		main::logger "INFO: No versions of this programme were selected (available versions: ".(keys %{ $prog->{verpids} } == 0 ? "none" : join ',', sort keys %{ $prog->{verpids} } ).")\n";
 	} else {
-		main::logger "INFO: Will search for versions: ".(join ',', @version_list)."\n" if $opt->{verbose};
+		main::logger "INFO: Searching for versions: ".(join ',', @version_list)."\n" if $opt->{verbose};
 	}
 	return @version_list;
 }
@@ -3400,17 +3234,17 @@ sub generate_version_list {
 sub cmp_modes($$) {
 	my ($x, $y) = @_;
 	my %ranks = (
-		'hd(\d+)' => 100,
-		'[^x]sd(\d+)' => 200,
-		'xsd(\d+)' => 300,
-		'vhigh(\d+)' => 400,
-		'[^vx]high(\d+)' => 500,
-		'xhigh(\d+)' => 600,
-		'[^x]std(\d+)' => 700,
-		'xstd(\d+)' => 800,
-		'med(\d+)' => 900,
-		'low(\d+)' => 1000,
-		'subtitles(\d+)' => 1100,
+		'hd(\d+)?' => 100,
+		'[^x]sd(\d+)?' => 200,
+		'xsd(\d+)?' => 300,
+		'vhigh(\d+)?' => 400,
+		'[^vx]high(\d+)?' => 500,
+		'xhigh(\d+)?' => 600,
+		'[^x]std(\d+)?' => 700,
+		'xstd(\d+)?' => 800,
+		'med(\d+)?' => 900,
+		'low(\d+)?' => 1000,
+		'subtitles(\d+)?' => 1100,
 	);
 	my %ranks2 = (
 		'^daf' => 10000,
@@ -3477,13 +3311,12 @@ sub download_retry_loop {
 		return 1;
 	}
 
-
 	my @version_search_list = $prog->generate_version_list;
 	return 1 if $#version_search_list < 0;
 
 	if ( $prog->{type} eq "tv" && ! $opt->{nowarntvlicence} ) {
 		$opt->{nowarntvlicence} = 1;
-		main::logger "WARNING: A UK TV licence is required to legally access BBC iPlayer TV content\n";
+		main::logger "WARNING: A UK TV licence is required to access BBC iPlayer TV content legally\n";
 	}
 
 	# Get all possible (or user overridden) modes for this prog recording
@@ -3494,11 +3327,10 @@ sub download_retry_loop {
 	# Do this for each version tried in this order (if they appeared in the content)
 	for my $version ( @version_search_list ) {
 		my $retcode = 1;
-		main::logger "DEBUG: Trying version '$version'\n" if $opt->{debug};
+		main::logger "INFO: Searching for version: '$version'\n" if $opt->{verbose};
 		if ( $prog->{verpids}->{$version} ) {
-			main::logger "INFO: Checking existence of '$version' version\n" if $opt->{verbose};
 			$prog->{version} = $version;
-			main::logger "INFO: Version found: '$prog->{version}'\n" if $opt->{verbose};
+			main::logger "INFO: Found version: '$prog->{version}'\n" if $opt->{verbose};
 
 			# Try to get stream data for this version if not already populated
 			if ( not defined $prog->{streams}->{$version} ) {
@@ -3515,7 +3347,9 @@ sub download_retry_loop {
 				# find all numbered modes starting with this modename
 				push @modes, sort { $a cmp $b } grep /^$modename(\d+)?$/, @available_modes;
 			}
+			main::logger "INFO: Modes to try for '$version' version: ".join(',', @modes)."\n" if $opt->{verbose};
 
+			main::logger "INFO: Downloading $prog->{type}: '$prog->{name} - $prog->{episode} ($prog->{pid}) [$version]'\n";
 			# Check for no applicable modes - report which ones are available if none are specified
 			if ($#modes < 0) {
 				my %available_modes_short;
@@ -3532,14 +3366,12 @@ sub download_retry_loop {
 				}
 				main::logger "INFO: $msg ".($modelist ? "($modelist) " : "")."available for this programme with version '$version'\n";
 				if ( keys %available_modes_short ) {
-					main::logger "INFO: Try using --modes=".(join ',', sort Programme::cmp_modes keys %available_modes_short)."\n";
+					main::logger "INFO: Available modes: ".(join ',', sort Programme::cmp_modes keys %available_modes_short)."\n";
 				} else {
 					main::logger "INFO: No other modes are available\n";
 				}
 				next;
 			}
-			main::logger "INFO: Begin recording $prog->{type}: '$prog->{name} - $prog->{episode} ($prog->{pid})'\n";
-			main::logger "INFO: Modes to try for '$version' version: ".join(',', @modes)."\n";
 
 			# Expand the modes into a loop
 			for my $mode ( @modes ) {
@@ -3564,18 +3396,16 @@ sub download_retry_loop {
 		}
 		# stop condition
 		last if $retcode == 3;
-		main::logger "INFO: Finished recording $prog->{type}: '$prog->{name} - $prog->{episode} ($prog->{pid})'\n" unless $retcode;
+        main::logger "INFO: Finished recording $prog->{filename}\n" unless $retcode;
 		# Break out of loop if we have a successful recording for this version and mode
 		return 0 if not $retcode;
 	}
 
 	if (! $opt->{test}) {
-		main::logger "ERROR: Failed recording $prog->{type}: '$prog->{name} - $prog->{episode} ($prog->{pid})'\n";
+		main::logger "ERROR: Failed $prog->{type}: '$prog->{name} - $prog->{episode} ($prog->{pid})'\n" if $opt->{verbose};
 	}
 	return 1;
 }
-
-
 
 # returns 1 on fail, 0 on success
 sub mode_ver_download_retry_loop {
@@ -3586,10 +3416,9 @@ sub mode_ver_download_retry_loop {
 
 	# Retry loop
 	for ($count = 1; $count <= $retries; $count++) {
-		main::logger "INFO: Trying '$mode' mode: attempt $count / $retries\n";
+		main::logger "INFO: Trying '$mode' mode: attempt $count / $retries\n" if $opt->{verbose};
 
 		$retcode = $prog->download( $ua, $mode, $version, $version_pid );
-		main::logger "DEBUG: Record using '$mode' mode return code: '$retcode'\n" if $opt->{verbose};
 
 		# Exit
 		if ( $retcode eq 'abort' ) {
@@ -3614,15 +3443,26 @@ sub mode_ver_download_retry_loop {
 
 		# Success
 		} elsif ( $retcode eq '0' ) {
-			# Add to history, tag file, and run post-record command if a stream was written
-			if ( $opt->{thumb} ) {
-				$prog->create_dir();
-				$prog->download_thumbnail();
+			# Get subtitles if they exist and are required and media download succeeded
+			my $subfile_done;
+			my $subfile;
+			if ( $opt->{subtitles} && $prog->{type} eq 'tv' ) {
+				$subfile_done = "$prog->{dir}/$prog->{fileprefix}.srt";
+				$subfile = "$prog->{dir}/$prog->{fileprefix}.partial.srt";
+				unless ( $prog->download_subtitles( $ua, $subfile, [ $version ] ) ) {
+					# Rename the subtitle file accordingly if the stream get was successful
+					move($subfile, $subfile_done) if -f $subfile;
+				}
 			}
 			if ( $opt->{metadata} ) {
 				$prog->create_dir();
 				$prog->create_metadata_file();
 			}
+			if ( $opt->{thumb} ) {
+				$prog->create_dir();
+				$prog->download_thumbnail();
+			}
+			# Add to history, tag file, and run post-record command if a stream was written
 			if ( ! $opt->{nowrite} ) {
 				$hist->add( $prog );
 				$prog->tag_file if ! $opt->{notag} && ! $opt->{raw};
@@ -3636,7 +3476,7 @@ sub mode_ver_download_retry_loop {
 
 		# Retry this mode
 		} elsif ( $retcode eq 'retry' && $count < $retries ) {
-			main::logger "WARNING: Retry recording $prog->{type}: '$prog->{name} - $prog->{episode} ($prog->{pid})'\n";
+			main::logger "WARNING: Retrying $prog->{type}: '$prog->{name} - $prog->{episode} ($prog->{pid}) [$version]'\n";
 			# Try to get stream data for this version/mode - retries require new auth data
 			$prog->{streams}->{$version} = $prog->get_stream_data( $version_pid, undef, $version );
 		}
@@ -3644,16 +3484,12 @@ sub mode_ver_download_retry_loop {
 	return 1;
 }
 
-
-
 # Send a message to STDOUT so that cron can use this to email
 sub report {
 	my $prog = shift;
 	print STDOUT "New $prog->{type} programme: '$prog->{name} - $prog->{episode}', '$prog->{desc}'\n";
 	return 0;
 }
-
-
 
 # add metadata tags to file
 sub tag_file {
@@ -3665,7 +3501,7 @@ sub tag_file {
 			$prog->{ext} =~ s/^\.//;
 		}
 		elsif ( $prog->{filename} =~ /\.EXT$/ ) {
-			for my $ext ( 'mp4', 'm4a', 'mp3' ) {
+			for my $ext ( 'mp4', 'm4a' ) {
 				(my $filename = $prog->{filename}) =~ s/\.EXT$/\.$ext/;
 				if ( -f $filename ) {
 					$prog->{filename} = $filename;
@@ -3675,25 +3511,20 @@ sub tag_file {
 			}
 		}
 		if ( ! -f $prog->{filename} ) {
-			main::logger "WARNING: Cannot tag missing file $prog->{filename}\n";
+			main::logger "WARNING: Cannot tag missing file: $prog->{filename}\n";
 			return;
 		}
-		main::logger "INFO: Tagging file $prog->{filename}\n";
 	}
 	# return if file does not exist
 	return if ! -f $prog->{filename};
-	# download thumbnail if necessary
-	if ( -f $prog->{thumbfile} ) {
-		main::logger("WARNING: File $prog->{thumbfile} already exists\n\n") if $opt->{verbose};
-	}
-	$prog->download_thumbnail if ( ! -f $prog->{thumbfile} && ! $opt->{noartwork} );
+	# assume --thumbnail used if file exists
+	my $thumb_found = -f $prog->{thumbfile};
+	$prog->download_thumbnail unless $opt->{noartwork} || $thumb_found;
 	# tag programme
 	Tagger->tag_prog($prog);
 	# clean up thumbnail if necessary
-	unlink $prog->{thumbfile} if ! $opt->{thumb};
+	unlink $prog->{thumbfile} unless $opt->{thumb} || $thumb_found;
 }
-
-
 
 # Create a metadata file if required
 sub create_metadata_file {
@@ -3714,7 +3545,7 @@ sub create_metadata_file {
 		return;
 	}
 
-	main::logger "INFO: Writing $opt->{metadata} metadata to file '$filename->{ $opt->{metadata} }'\n";
+	main::logger "INFO: Writing metadata\n";
 
 	if ( open(XML, "> $filename->{ $opt->{metadata} }") ) {
 		my $text = $prog->substitute( $template->{ $opt->{metadata} }, 3, '\[', '\]' );
@@ -3723,11 +3554,10 @@ sub create_metadata_file {
 		print XML $text;
 		close XML;
 	} else {
-		main::logger "WARNING: Couldn't write to metadata file '$filename->{ $opt->{metadata} }'\n";
+		main::logger "ERROR: Couldn't write to metadata file: $filename->{ $opt->{metadata} }\n";
+		main::logger "ERROR: Use --metadata-only to retry\n";
 	}
 }
-
-
 
 # Usage: print $prog{$pid}->substitute('<name>-<pid>-<episode>', [mode], [begin regex tag], [end regex tag]);
 # Return a string with formatting fields substituted for a given pid
@@ -3814,8 +3644,6 @@ sub substitute {
 	}
 	return $string;
 }
-
-
 
 # Determine the correct filenames for a recording
 # Sets the various filenames and creates appropriate directories
@@ -3958,17 +3786,8 @@ sub generate_filenames {
 			if ( $opt->{overwrite} ) {
 				# DASH tv output files with --raw
 				if ( $mode =~ /dvf/ ) {
-					if ( -f $audio_raw ) {
-						main::logger "WARNING: Overwriting raw audio file: $audio_raw\n";
-					}
-					if ( -f $video_raw ) {
-						main::logger "WARNING: Overwriting raw video file: $video_raw\n";
-					}
 					unlink ( $audio_raw, $video_raw ) unless $opt->{test};
 				} else {
-					if ( -f $media_raw ) {
-						main::logger "WARNING: Overwriting raw $media_type file: $media_raw\n";
-					}
 					unlink ( $media_raw ) unless $opt->{test};
 				}
 			} else {
@@ -3994,11 +3813,10 @@ sub generate_filenames {
 			}
 		} elsif ( -f $prog->{filename} && stat($prog->{filename})->size > $min_download_size ) {
 			if ( $opt->{overwrite} ) {
-				main::logger("WARNING: Overwriting file: $prog->{filename}\n");
 				unlink $prog->{filename} unless $opt->{test};
 			} else {
 				main::logger("WARNING: File already exists: $prog->{filename}\n");
-				main::logger "WARNING: Use --overwrite to replace\n\n";
+				main::logger "WARNING: Use --overwrite to replace\n";
 				return 3;
 			}
 		}
@@ -4025,13 +3843,11 @@ sub generate_filenames {
 	# Check path length is < 256 chars (Windows only)
 	if ( length( $prog->{filepart} ) > 255 && $^O eq "MSWin32" ) {
 		main::logger("ERROR: Generated file path is too long, please use --fileprefix, --subdir-format, --subdir and --output options to shorten it to below 256 characters\n");
-		main::logger("ERROR: Generated file path: $prog->{filepart}\n\n");
+		main::logger("ERROR: Generated file path: $prog->{filepart}\n");
 		return 1;
 	}
 	return 0;
 }
-
-
 
 # Run a user specified command
 # e.g. --command 'echo "<pid> <name> recorded"'
@@ -4052,8 +3868,6 @@ sub run_user_command {
 	main::logger "INFO: Command succeeded\n" if $opt->{verbose} && ! $exit_value;
 				return 0;
 }
-
-
 
 # %type
 # Display a line containing programme info (using long, terse, and type options)
@@ -4099,7 +3913,6 @@ sub list_entry {
 	}
 	return 0;
 }
-
 
 # Get time ago made available (x days y hours ago) from '2008-06-22T05:01:49Z' and specified epoch time
 # Or, Get time in epoch from '2008-06-22T05:01:49Z' or '2008-06-22T05:01:49[+-]NN:NN' if no specified epoch time
@@ -4162,45 +3975,42 @@ sub get_time_string {
 	}
 }
 
-
-
 sub download_thumbnail {
 	my $prog = shift;
 	my $file;
 	my $ext;
 	my $image;
-
 	if ( $prog->{thumbnail} =~ /^http/i && $prog->{thumbfile} ) {
-		main::logger "INFO: Downloading thumbnail from: $prog->{thumbnail}\n" if $opt->{verbose};
 		$file = $prog->{thumbfile};
-
+		# Don't redownload thumbnail if the file already exists
+		if ( -f $file && ! $opt->{overwrite} ) {
+			main::logger "INFO: Thumbnail file already exists: $file\n";
+			main::logger "INFO: Use --overwrite to re-download\n";
+			return 0;
+		}
+		main::logger "INFO: Downloading thumbnail\n" if $opt->{thumb} || $opt->{verbose};
 		# Download thumb
 		$image = main::request_url_retry( main::create_ua( 'desktop', 1 ), $prog->{thumbnail}, 3);
 		if (! $image ) {
 			main::logger "ERROR: Thumbnail download failed\n";
+			main::logger "ERROR: Use --thumbnail-only to re-download\n";
 			return 1;
-		} else {
-			main::logger "INFO: Downloading thumbnail to: $file\n" if $opt->{verbose} || $opt->{thumb};
 		}
-
 	} else {
 		# Return if we have no url
-		main::logger "INFO: Thumbnail not available\n" if $opt->{verbose};
+		main::logger "INFO: Thumbnail not available\n";
 		return 2;
 	}
-
 	# Write to file
 	unlink($file);
 	open( my $fh, ">:raw", $file );
 	binmode $fh;
 	print $fh $image;
 	close $fh;
-
 	return 0;
 }
 
-
-################### iPlayer Parent class #################
+################### iPlayer Programme parent class #################
 package Programme::bbciplayer;
 
 use Env qw[@PATH];
@@ -4220,11 +4030,19 @@ use Storable qw(dclone);
 use strict;
 use Time::Local;
 use URI;
-
 # Inherit from Programme class
 use base 'Programme';
-
 use constant REGEX_PID => qr/^[b-df-hj-np-tv-z0-9]{8,}$/;
+my $ffmpeg_check;
+
+sub opt_format {
+	return {
+		ffmpeg		=> [ 0, "ffmpeg=s", 'External Program', '--ffmpeg <path>', "Location of ffmpeg binary. Assumed to be ffmpeg 3.0 or higher unless --ffmpeg-obsolete is specified."],
+		ffmpegobsolete		=> [ 1, "ffmpeg-obsolete|ffmpegobsolete!", 'External Program', '--ffmpeg-obsolete', "Indicates you are using an obsolete version of ffmpeg (<1.0) that may not support certain options. Without this option, MP4 conversion may fail with obsolete versions of ffmpeg."],
+		ffmpegforce		=> [ 1, "ffmpeg-force|ffmpegforce!", 'External Program', '--ffmpeg-force', "Bypass version checks and assume ffmpeg is version 3.0 or higher"],
+		ffmpegloglevel		=> [ 1, "ffmpeg-loglevel|ffmpegloglevel=s", 'External Program', '--ffmpeg-loglevel <level>', "Set logging level for ffmpeg. Overridden by --quiet and --silent. Default: 'fatal'"],
+	};
+}
 
 sub pid_ok {
 	my $prog = shift;
@@ -4239,7 +4057,7 @@ sub clean_pid {
 		my $uri = URI->new($prog->{pid});
 		my @pids = grep /${\REGEX_PID}/, $uri->path_segments;
 		if ( @pids ) {
-	 		$prog->{pid} = $pids[$#pids];
+			$prog->{pid} = $pids[$#pids];
 		}
 	}
 }
@@ -4260,7 +4078,6 @@ sub get_verpids {
 	main::logger "WARNING: No programmes are available for this PID with version(s): ".($opt->{versionlist} ? $opt->{versionlist} : 'default').($prog->{versions} ? " (available versions: $prog->{versions})\n" : "\n");
 	return 1;
 }
-
 
 # Return hash of version => verpid given a PID
 # and fill in minimal metadata
@@ -4347,7 +4164,6 @@ sub get_verpids_json {
 	return 1 if ! $found;
 	return 0;
 }
-
 
 # Return hash of version => verpid given a PID
 # and fill in minimal metadata
@@ -4500,16 +4316,12 @@ sub get_metadata {
 
 	# This URL works for tv/radio prog types:
 	# http://www.bbc.co.uk/programmes/{pid}.json
-
-	main::logger "DEBUG: Getting metadata for $prog->{pid}:\n" if $opt->{debug};
-
 	my $got_metadata;
 	eval "use JSON::PP";
 	if ( $@ ) {
 		main::logger "WARNING: Please download and run latest installer or install the JSON::PP Perl module to retrieve programme metadata.\n";
 	} else {
 		my $url = $prog_data_url.$prog->{pid}.".json";
-		main::logger "INFO: Programme metadata URL = $url\n" if $opt->{verbose};
 		my $json = main::request_url_retry($ua, $url, 3, '', '');
 		if ( $json ) {
 			my $dec = eval { decode_json($json) };
@@ -4636,24 +4448,25 @@ sub get_metadata {
 					# programme versions
 					my %found;
 					for my $ver ( @{$doc->{versions}} ) {
-						for my $ver_type ( @{$ver->{types}} ) {
-							my $type;
-							# check for audiodescribed and signed first
-							if ( $ver_type =~ /(described|description)/i ) {
-								$type = "audiodescribed";
-							} elsif ( $ver_type =~ /sign/i ) {
-								$type = "signed";
-							} elsif ( $ver_type =~ /open subtitles/i ) {
-								$type = "opensubtitles";
-							} else {
-								($type = lc($ver_type)) =~ s/\s+.*$//;
-							}
-							if ( $type ) {
-								my $version = $type;
-								$version .= $found{$type} if ++$found{$type} > 1;
-								$prog->{verpids}->{$version} = $ver->{pid};
-								$prog->{durations}->{$version} = $ver->{duration};
-							}
+						my @ver_types = @{$ver->{types}};
+						next unless @ver_types;
+						my $type;
+						if ( grep /(described|description)/i, @ver_types ) {
+							$type = "audiodescribed";
+						} elsif ( grep /sign/i, @ver_types ) {
+							$type = "signed";
+						} elsif ( grep /open subtitles/i, @ver_types ) {
+							$type = "opensubtitles";
+						} else {
+							my @other_types = grep !/(described|description|sign|open subtitles)/i, @ver_types;
+							next unless @other_types;
+							($type = lc($other_types[0])) =~ s/\s+.*$//;
+						}
+						if ( $type ) {
+							my $version = $type;
+							$version .= $found{$type} if ++$found{$type} > 1;
+							$prog->{verpids}->{$version} = $ver->{pid};
+							$prog->{durations}->{$version} = $ver->{duration};
 						}
 					}
 					$got_metadata = 1 if $pid;
@@ -4734,10 +4547,11 @@ sub get_metadata {
 			main::logger "INFO: No streams available for '$version' version ($prog->{verpids}->{$version}) - skipping\n" if $opt->{verbose};
 			next;
 		}
-		$modes->{$version} = join ',', sort Programme::cmp_modes keys %{ $prog->{streams}->{$version} };
+		my @version_modes = sort Programme::cmp_modes keys %{ $prog->{streams}->{$version} };
+		$modes->{$version} = join ',', @version_modes;
 		# Estimate the file sizes for each mode
 		my @sizes;
-		for my $mode ( sort Programme::cmp_modes keys %{ $prog->{streams}->{$version} } ) {
+		for my $mode ( @version_modes ) {
 			# get expiry from stream data
 			if ( ! $prog->{expires} && $prog->{streams}->{$version}->{$mode}->{expires} ) {
 				$prog->{expires} = Programme::get_time_string( $prog->{streams}->{$version}->{$mode}->{expires} );
@@ -4767,7 +4581,7 @@ sub get_metadata {
 	# remove versions with no streams
 	for my $version ( sort keys %{ $prog->{verpids} } ) {
 		if ( ! $modes->{$version} || $modes->{$version} =~ /^subtitles\d+$/ ) {
-			main::logger "INFO: No streams available for '$version' version ($prog->{verpids}->{$version}) - deleting\n" if $opt->{verbose};
+			main::logger "INFO: No streams found for '$version' version ($prog->{verpids}->{$version}) - deleting\n" if $opt->{verbose};
 			delete $modes->{$version};
 			delete $mode_sizes->{$version};
 			for my $key ( @fields1 ) {
@@ -4851,9 +4665,9 @@ sub fetch_episode_pids {
 	my %seen;
 	my $max_page = 1;
 	my $curr_page = 1;
-	eval "use XML::LibXML '1.70'";
+	eval "use XML::LibXML '1.91'";
 	if ( $@ ) {
-		main::logger "WARNING: Please download and run latest installer or install the XML::LibXML Perl module to recursively extract episode PIDs.\n";
+		main::logger "WARNING: Please download and run latest installer or install the XML::LibXML Perl module 1.91 or higher to recursively extract episode PIDs.\n";
 		return \@pids;
 	}
 	if ( $HTML::Parser::VERSION < 3.71 && ! $opt->{nowarnhtmlparserepisode} ) {
@@ -4932,7 +4746,7 @@ sub get_pids_recursive {
 	my $prog_type;
 
 	# Clean up the pid
-	main::logger "INFO: Cleaning PID - old: '$prog->{pid}', " if $opt->{verbose};
+	main::logger "INFO: Cleaning PID - old: '$prog->{pid}'" if $opt->{verbose};
 	$prog->clean_pid();
 	main::logger " new: '$prog->{pid}'\n" if $opt->{verbose};
 	if ( ! $prog->pid_ok() ) {
@@ -4946,13 +4760,13 @@ sub get_pids_recursive {
 		main::logger "WARNING: Could not determine PID type ($prog->{pid}). Trying to record PID directly.\n";
 		return "$prog_type:$prog->{pid}";
 	} elsif ( $pid_type eq "episode" ) {
-		main::logger "INFO: $prog_type episode PID detected ($prog->{pid})\n";
+		main::logger "INFO: $prog_type episode PID detected ($prog->{pid})\n" if $opt->{verbose};
 		push @pids, "$prog_type:$prog->{pid}";
 	} elsif ( $pid_type eq "clip" ) {
-		main::logger "INFO: $prog_type clip PID detected ($prog->{pid})\n";
+		main::logger "INFO: $prog_type clip PID detected ($prog->{pid})\n" if $opt->{verbose};
 		push @pids, "$prog_type:$prog->{pid}";
 	} elsif ( $pid_type eq "series" || $pid_type eq "brand" ) {
-		main::logger "INFO: $prog_type series or brand PID detected ($prog->{pid})\n";
+		main::logger "INFO: $prog_type series or brand PID detected ($prog->{pid})\n" if $opt->{verbose};
 		my $epids = fetch_episode_pids($ua, $prog->{pid});
 		if ( ! $opt->{pidrecursive} ) {
 			main::logger "INFO: Please run the command again using one of the above episode PIDs or to get all programmes add the --pid-recursive option\n";
@@ -4968,7 +4782,6 @@ sub get_pids_recursive {
 	@pids = main::make_array_unique_ordered( @pids );
 	return @pids;
 }
-
 
 # Intelligently split name and episode from title string for BBC iPlayer metadata
 sub split_title {
@@ -4988,7 +4801,6 @@ sub split_title {
 	return ( $name, $episode );
 }
 
-
 sub insert_episode_number {
 	my $episode = shift;
 	my $episodenum = shift;
@@ -5001,19 +4813,20 @@ sub insert_episode_number {
 	return $episode;
 }
 
-
 sub thumb_url_recipe {
 	my $prog = shift;
 	my $defsize = 192;
 	my $thumbsize = $opt->{thumbsize} || $defsize;
 	my $recipe = $prog->thumb_url_recipes->{ $thumbsize };
 	if ( ! $recipe ) {
+		if ( $thumbsize >= 1 && $thumbsize <= 11 ) {
+			main::logger "WARNING: Index numbers 1-11 no longer valid with --thumbsize - specify thumbnail image width\n";
+		}
 		main::logger "WARNING: Invalid thumbnail size: $thumbsize - using default ($defsize)\n";
 		$recipe = $prog->thumb_url_recipes->{ $defsize };
 	}
 	return $recipe;
 }
-
 
 sub thumb_url_recipes {
 	return {
@@ -5034,20 +4847,8 @@ sub thumb_url_recipes {
 		1280	=> '1280x720',
 		1600	=> '1600x900',
 		1920	=> '1920x1080',
-		1	=> '86x48',
-		2	=> '150x84',
-		3	=> '178x100',
-		4	=> '512x288',
-		5	=> '528x297',
-		6	=> '640x360',
-		7	=> '832x468',
-		8	=> '1024x576',
-		9	=> '1280x720',
-		10	=> '1600x900',
-		11	=> '1920x1080',
 	}
 }
-
 
 #new_stream_report($mattribs, $cattribs)
 sub new_stream_report {
@@ -5080,8 +4881,6 @@ sub new_stream_report {
 	return 0;
 }
 
-
-
 sub parse_metadata {
 	my @medias;
 	my $xml = shift;
@@ -5108,7 +4907,6 @@ sub parse_metadata {
 		push @medias, $mattribs;
 	}
 
-
 	# Parse and dump structure
 	if ( $opt->{debug} ) {
 		for my $mattribs ( @medias ) {
@@ -5134,8 +4932,6 @@ sub parse_metadata {
 	return @medias;
 }
 
-
-
 sub parse_attributes {
 	$_ = shift;
 	my $attribs;
@@ -5145,7 +4941,6 @@ sub parse_attributes {
 	}
 	return $attribs;
 }
-
 
 # from https://github.com/osklil/hls-fetch
 sub parse_hls_connection {
@@ -5258,11 +5053,11 @@ sub parse_m3u_attribs {
 }
 
 sub parse_dash_connection {
-	eval "use XML::LibXML '1.70'; use XML::LibXML::XPathContext;";
+	eval "use XML::LibXML '1.91'; use XML::LibXML::XPathContext;";
 	if ( $@ ) {
 		if ( ! $opt->{nowarnlibxmldash} ) {
 			$opt->{nowarnlibxmldash} = 1;
-			main::logger "WARNING: Please download and run latest installer or install the XML::LibXML Perl module to use MPEG-DASH streams.\n";
+			main::logger "WARNING: Please download and run latest installer or install the XML::LibXML Perl module 1.91 or higher to use MPEG-DASH streams.\n";
 		}
 		return;
 	}
@@ -5282,7 +5077,7 @@ sub parse_dash_connection {
 	my $dom = XML::LibXML->load_xml(string => $xml);
 	my $xpc = XML::LibXML::XPathContext->new($dom);
 	my ($doc) = $xpc->findnodes('/*');
-	$xpc->registerNs('mpd', $doc->namespaceURI());
+	$xpc->registerNs('mpd', $doc->namespaceURI());		
 	my $mediaPresentationDuration = $doc->findvalue('@mediaPresentationDuration');
 	$mediaPresentationDuration =~ /^(-)?P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:((\d+)(\.(\d+))?)S)?)?$/;
 	my $programme_duration = int($5 * 3600 + $6 * 60 + $7);
@@ -5444,11 +5239,7 @@ sub get_stream_data_cdn {
 			$conn->{kind} = $mattribs->{kind};
 			if ( $conn->{kind} eq 'video' ) {
 				$conn->{audio_bitrate} = $mattribs->{audio_bitrate};
-				if ( $mattribs->{bitrate} > 2000 ) {
-					$conn->{audio_bitrate} ||= 128;
-				} else {
-					$conn->{audio_bitrate} ||= 96;
-				}
+				$conn->{audio_bitrate} ||= 96;
 				$conn->{video_bitrate} = $mattribs->{video_bitrate};
 				$conn->{video_bitrate} ||= $mattribs->{bitrate} - $conn->{audio_bitrate};
 			}
@@ -5494,8 +5285,6 @@ sub get_stream_data_cdn {
 	}
 }
 
-
-
 # Builds connection type string
 sub get_stream_set_type {
 		my ( $conn, $mattribs, $cattribs ) = ( @_ );
@@ -5512,11 +5301,9 @@ sub get_stream_set_type {
 		$conn->{type} = join ' ', @type;
 }
 
-
 sub check_geoblock {
 	return shift =~ /geolocation|notukerror/;
 }
-
 
 # Generic
 # Gets media streams data for this version pid
@@ -5646,8 +5433,10 @@ sub get_stream_data {
 							next;
 						}
 						my $prefix = $iptv_conn->{supplier} =~ /hls_open/ ? "hls" : "hvf";
-						# for 320k audio (tv/radio) and 96k audio (radio)
-						$iptv_conn->{href} =~ s!([^/]+)\.ism(?:\.hlsv2\.ism)?/[^/]+\.m3u8!$1.ism/$1.m3u8!;
+						unless ( $opt->{nohqaudio} ) {
+							# for 320k audio
+							$iptv_conn->{href} =~ s!([^/]+)\.ism(?:\.hlsv2\.ism)?/[^/]+\.m3u8!$1.ism/$1.m3u8!;
+						}
 						my ( $min_bitrate, $max_bitrate );
 						if ( $prefix eq "hvf" ) {
 							$min_bitrate = 1500;
@@ -5703,8 +5492,10 @@ sub get_stream_data {
 							$prefix = "hlsaac";
 						}
 					}
-					# for 320k audio (tv/radio) and 96k audio (radio)
-					$mobile_conn->{href} =~ s!([^/]+)\.ism(?:\.hlsv2\.ism)?/[^/]+\.m3u8!$1.ism/$1.m3u8!;
+					unless ( $prog->{type} eq "tv" && $opt->{nohqaudio} ) {
+						# for 320k audio (tv/radio) and 96k audio (radio)
+						$mobile_conn->{href} =~ s!([^/]+)\.ism(?:\.hlsv2\.ism)?/[^/]+\.m3u8!$1.ism/$1.m3u8!;
+					}
 					my ( $min_bitrate, $max_bitrate );
 					if ( $prefix eq "hvf" ) {
 						$max_bitrate = 6500;
@@ -5855,7 +5646,7 @@ sub get_stream_data {
 
 	# Report modes found
 	if ( $opt->{verbose} ) {
-	main::logger "INFO: Found mode $_: $data->{$_}->{type}\n" for sort Programme::cmp_modes keys %{ $data };
+		main::logger "INFO: Found mode '$_': $data->{$_}->{type}\n" for sort Programme::cmp_modes keys %{ $data };
 	}
 
 	# Return a hash with media => url if '' is specified - otherwise just the specified url
@@ -5885,16 +5676,15 @@ sub modelist {
 		$mlist =~ s/hlshigh/hlsstd/g;
 		$mlist =~ s/hlslow/hlsxstd/g;
 		$mlist =~ s/hvfvhigh/hvfxsd/g;
-		$mlist =~ s/hvfstd/hvflow/g;
 	} elsif ( $prog->{type} eq "radio" ) {
 		$mlist =~ s/\bhls\b/hlsaac/g if $mlist !~ /hlsaac/;
 		$mlist =~ s/dash/daf/g;
 	}
-	if ( $mlist ne $mlist_orig && ! $opt->{modewarn} ) {
+	if ( $mlist ne $mlist_orig && ! $opt->{nowarnmoderemap} ) {
 		main::logger "WARNING: Some recording modes were remapped to new values\n";
 		main::logger "WARNING: Input mode list remapped from '$mlist_orig' to '$mlist'\n";
 		main::logger "WARNING: Please update your preferences\n";
-		$opt->{modewarn} = 1;
+		$opt->{nowarnmoderemap} = 1;
 	}
 	# Deal with fallback modes and expansions
 	# Generic aliases
@@ -5982,7 +5772,7 @@ sub modelist {
 			$mlist = main::expand_list($mlist, 'hvfvgood', 'hvfgood');
 			$mlist = main::expand_list($mlist, 'hvfgood', 'hvfxhigh,hvfworse');
 		}
-		$mlist = main::expand_list($mlist, 'hvfworse', 'hvfworst');
+		$mlist = main::expand_list($mlist, 'hvfworse', 'hvfstd,hvfworst');
 		$mlist = main::expand_list($mlist, 'hvfworst', 'hvflow');
 	}
 	# default on-demand radio
@@ -6011,14 +5801,179 @@ sub modelist {
 			$mlist = main::expand_list($mlist, 'tvvgood', 'hlsvhigh,tvgood');
 			$mlist = main::expand_list($mlist, 'tvgood', 'hvfxhigh,dvfxhigh,tvworse');
 		}
-		$mlist = main::expand_list($mlist, 'tvworse', 'hlsstd,hlsxstd,tvworst');
+		$mlist = main::expand_list($mlist, 'tvworse', 'hvfstd,hlsstd,hlsxstd,tvworst');
 		$mlist = main::expand_list($mlist, 'tvworst', 'hvflow,dvflow');
 	}
 	return $mlist;
 }
 
+sub ffmpeg_init {
+	return if $ffmpeg_check;
+	$bin->{ffmpeg} = $opt->{ffmpeg} || 'ffmpeg';
+	if (! main::exists_in_path('ffmpeg') ) {
+		if ( $bin->{ffmpeg} ne 'ffmpeg' ) {
+			$bin->{ffmpeg} = 'ffmpeg';
+			if (! main::exists_in_path('ffmpeg') ) {
+				$ffmpeg_check = 1;
+				return;
+			}
+		} else {
+			$ffmpeg_check = 1;
+			return;
+		}
+	}
+	# ffmpeg checks
+	my ($ffvs, $ffvn);
+	my $ffcmd = main::encode_fs("\"$bin->{ffmpeg}\" -version 2>&1");
+	my $ffout = `$ffcmd`;
+	if ( $ffout =~ /ffmpeg version (\S+)/i ) {
+		$ffvs = $1;
+		if ( $ffvs =~ /^(\d+\.\d+)/i ) {
+			$ffvn = $1;
+			if ( $ffvn >= 3.0 ) {
+				$opt->{myffmpeg30} = 1;
+				$opt->{myffmpeg25} = 1;
+			} elsif ( $ffvn >= 2.5 ) {
+				$opt->{myffmpeg25} = 1;
+			} elsif ( $ffvn < 1.0 ) {
+				$opt->{ffmpegobsolete} = 1 unless defined $opt->{ffmpegobsolete};
+			}
+		}
+	}
+	if ( $opt->{verbose} ) {
+		main::logger "INFO: ffmpeg version string = ".($ffvs || "not found")."\n";
+		main::logger "INFO: ffmpeg version number = ".($ffvn || "unknown")."\n";
+	}
+	$opt->{myffmpegversion} = $ffvn;
+	unless ( $opt->{myffmpegversion} ) {
+		if ( $bin->{ffmpeg} =~ /avconv/ || $ffout =~ /avconv/ ) {
+			delete $opt->{ffmpegobsolete};
+			$opt->{myffmpegav} = 1;
+		}
+		$opt->{myffmpegxx} = 1;
+	}
+	# override ffmpeg checks
+	if ( $opt->{ffmpegforce} ) {
+		$opt->{myffmpeg30} = 1;
+		$opt->{myffmpeg25} = 1;
+		delete $opt->{myffmpegav};
+		delete $opt->{myffmpegxx};
+	}
+	delete $binopts->{ffmpeg};
+	push @{ $binopts->{ffmpeg} }, ();
+	if ( ! $opt->{ffmpegobsolete} ) {
+		if ( $opt->{quiet} || $opt->{silent} ) {
+			push @{ $binopts->{ffmpeg} }, ('-loglevel', 'quiet');
+		} elsif ( $opt->{ffmpegloglevel} ) {
+			if ( $opt->{ffmpegloglevel} =~ /^(quiet|-8|panic|0|fatal|8|error|16|warning|24|info|32|verbose|40|debug|48|trace|56)$/ ) {
+				push @{ $binopts->{ffmpeg} }, ('-loglevel', $opt->{ffmpegloglevel});
+			} else {
+				main::logger "WARNING: invalid value for --ffmpeg-loglevel ('$opt->{ffmpegloglevel}') - using default\n";
+				push @{ $binopts->{ffmpeg} }, ('-loglevel', 'fatal');
+			}
+		} else {
+			push @{ $binopts->{ffmpeg} }, ('-loglevel', 'fatal');
+		}
+		if ( main::hide_progress() || ! $opt->{verbose} ) {
+			push @{ $binopts->{ffmpeg} }, ( '-nostats' );
+		} else {
+			push @{ $binopts->{ffmpeg} }, ( '-stats' );
+		}
+	}
+	$ffmpeg_check = 1;
+	return;
+}
 
-################### TV class #################
+sub postproc {
+	my ( $prog, $audio_file, $video_file ) = @_;
+	my @cmd;
+	my $return;
+
+	main::logger "INFO: Converting to \U$prog->{ext}\E\n";
+
+	$prog->ffmpeg_init();
+	if ( ! main::exists_in_path('ffmpeg') ) {
+		main::logger "WARNING: Required ffmpeg utility not found - cannot convert to \U$prog->{ext}\E\n";
+		return 'stop';
+	}
+
+	# do nothing if no files
+	my $audio_ok = $audio_file && -f $audio_file;
+	my $video_ok = $video_file && -f $video_file;
+	return 0 unless ( $audio_ok || $video_ok);
+
+	my @global_opts = ( '-y' );
+	my @input_opts;
+	push @input_opts, ( '-i', $audio_file ) if $audio_ok;
+	push @input_opts, ( '-i', $video_file ) if $video_ok;
+	my @codec_opts;
+	if ( ! $opt->{ffmpegobsolete} ) {
+        # For DASH video, need to convert to H.264
+        if ( $prog->{mode} =~ /(dvf)/ ) {
+            push @codec_opts, ( '-c:v', 'libx264', '-c:a', 'copy', '-preset', 'ultrafast', '-movflags', '+faststart' );
+        } else {
+            push @codec_opts, ( '-c:v', 'copy', '-c:a', 'copy' );
+        }
+	} else {
+        if ( $prog->{mode} =~ /(dvf)/ ) {
+            push @codec_opts, ( '-vcodec', 'libx264', '-acodec', 'copy', '-preset', 'ultrafast', '-movflags', '+faststart' );
+        } else {
+            push @codec_opts, ( '-vcodec', 'copy', '-acodec', 'copy' );
+        }
+	}
+	my @stream_opts;
+	push @stream_opts, ( '-map', '0:a:0', '-map', '1:v:0' ) if $audio_ok && $video_ok;
+	my @filter_opts;
+	if ( $prog->{mode} =~ /(haf|hvf|hls)/ ) {
+		# need filter for HLS
+		if ( ! $opt->{ffmpegobsolete} ) {
+			push @filter_opts, ( '-bsf:a', 'aac_adtstoasc' );
+		} else {
+			push @filter_opts, ( '-absf', 'aac_adtstoasc' );
+		}
+	}
+	my @other_opts;
+	if ( ! $opt->{ffmpegobsolete} && $opt->{notag} ) {
+		push @other_opts, ( '-movflags', 'faststart' );
+	}
+
+	@cmd = (
+		$bin->{ffmpeg},
+		@{ $binopts->{ffmpeg} },
+		@global_opts,
+		@input_opts,
+		@codec_opts,
+		@stream_opts,
+		@filter_opts,
+		@other_opts,
+		$prog->{filepart},
+	);
+
+	# Run conversion and delete source file on success
+	$return = main::run_cmd( 'STDERR', @cmd );
+
+	my $min_download_size = main::progclass($prog->{type})->min_download_size();
+
+	if ( (! $return) && -f $prog->{filepart} && stat($prog->{filepart})->size > $min_download_size ) {
+		unlink( $audio_file, $video_file );
+	} else {
+		# remove the failed converted file
+		unlink $prog->{filepart};
+		main::logger "ERROR: Conversion failed - retaining audio file: $audio_file\n" if $audio_ok;
+		main::logger "ERROR: Conversion failed - retaining video file: $video_file\n" if $video_ok;
+		return 'stop';
+	}
+	# Moving file into place as complete
+	if ( ! move($prog->{filepart}, $prog->{filename}) ) {
+		main::logger "ERROR: Could not rename file: $prog->{filepart}\n";
+		main::logger "ERROR: Destination file name: $prog->{filename}\n";
+		return 'stop';
+	}
+
+	return 0;
+}
+
+################### TV Programme class #################
 package Programme::tv;
 
 use Env qw[@PATH];
@@ -6043,7 +5998,7 @@ use base 'Programme::bbciplayer';
 
 # Class vars
 sub index_min { return 1 }
-sub index_max { return 9999 }
+sub index_max { return 29999 }
 sub channels {
 	return {
 		'national' => {
@@ -6111,7 +6066,6 @@ sub channels_schedule {
 	};
 }
 
-
 # Class cmdline Options
 sub opt_format {
 	return {
@@ -6120,8 +6074,6 @@ sub opt_format {
 		outputtv	=> [ 1, "outputtv=s", 'Output', '--outputtv <dir>', "Output directory for tv recordings (overrides --output)"],
 	};
 }
-
-
 
 # Method to return optional list_entry format
 sub optional_list_entry_format {
@@ -6133,7 +6085,6 @@ sub optional_list_entry_format {
 	return ', '.join ', ', @format;
 }
 
-
 # Usage: Programme::tv->get_links( \%prog, 'tv' );
 # Uses: %{ channels_schedule() }, \%prog
 sub get_links {
@@ -6141,7 +6092,6 @@ sub get_links {
 	my $prog = shift;
 	my $prog_type = shift;
 	my $now = shift || time();
-	main::logger "\nINFO: Getting $prog_type Index Feeds (this may take a few minutes)\n";
 	my $rc = 0;
 	$rc = $self->get_links_schedule($prog, $prog_type, 0, $now);
 	return 1 if $rc && $opt->{refreshabortonerror};
@@ -6153,7 +6103,6 @@ sub get_links {
 	return 0;
 }
 
-
 # get cache info for programmes from schedule
 sub get_links_schedule {
 	my $self = shift;
@@ -6162,9 +6111,9 @@ sub get_links_schedule {
 	my $future = shift;
 	my $now = shift || time();
 	# check XML::LibXML here before using elsewhere
-	eval "use XML::LibXML '1.70'";
+	eval "use XML::LibXML '1.91'";
 	if ( $@ ) {
-		main::logger "WARNING: Please download and run latest installer or install the XML::LibXML Perl module to index $prog_type programmes.\n";
+		main::logger "WARNING: Please download and run latest installer or install the XML::LibXML Perl module 1.91 or higher to index $prog_type programmes.\n";
 		return;
 	}
 	my @schedule_dates;
@@ -6215,7 +6164,7 @@ sub get_links_schedule {
 		if ( $@ ) {
 			main::logger "WARNING: Please download and run latest installer or install the Mojolicious Perl module for concurrent indexing of $prog_type programmes.\n";
 		} else {
-			main::logger "\nINFO: Using concurrent indexing\n";
+			main::logger "\nINFO: Indexing $prog_type programmes (concurrent)\n";
 			my @mojo_urls;
 			my %mojo_channel_ids;
 			my %mojo_channels;
@@ -6240,7 +6189,7 @@ sub get_links_schedule {
 	}
 	my $ua = main::create_ua( 'desktop', 1 );
 	$ua->timeout(60);
-	main::logger "\nINFO: Using sequential indexing\n";
+	main::logger "\nINFO: Indexing $prog_type programmes (sequential)\n";
 	for my $channel_id ( @channel_list ) {
 		for my $schedule_date ( @schedule_dates ) {
 			my ($url, $rc);
@@ -6375,9 +6324,9 @@ sub get_links_schedule_html_page {
 	my $limit = shift;
 	my $now = shift || time();
 	return 1 unless $html;
-	eval "use XML::LibXML '1.70'";
+	eval "use XML::LibXML '1.91'";
 	if ( $@ ) {
-		main::logger "WARNING: XML::LibXML not available to index $prog_type programmes.\n";
+		main::logger "WARNING: Please download and run latest installer or install the XML::LibXML Perl module 1.91 or higher to index $prog_type programmes.\n";
 		return 1;
 	}
 	my $cache_channel = $channel;
@@ -6395,7 +6344,7 @@ sub get_links_schedule_html_page {
 	foreach my $entry (@entries) {
 		my ( $title, $name, $episode, $brand_pid, $series_pid, $brand, $series, $episodenum, $seriesnum, $desc, $pid, $available, $expires, $max_expires, $duration, $thumbnail, $version, $guidance, $descshort );
 		my ($available_str, $until_str);
-		my $pid = $entry->findvalue('.//div[@typeof="Episode" or @typeof="RadioEpisode"]/@data-pid');
+		my $pid = $entry->findvalue('.//div[@typeof="Episode" or @typeof="TVEpisode" or @typeof="RadioEpisode"]/@data-pid');
 		next unless $pid;
 		my $available_str = $entry->findvalue('.//h3[@property="startDate"]/@content');
 		next unless $available_str;
@@ -6478,53 +6427,55 @@ sub get_links_schedule_html_page {
 	}
 }
 
-
 # Usage: download (<prog>, <ua>, <mode>, <version>, <version_pid>)
 sub download {
 	my ( $prog, $ua, $mode, $version, $version_pid ) = ( @_ );
 
-	# require ffmpeg for HLS
-	if ( $mode =~ /^(hls|hvf|haf)/ && ! $opt->{raw} && ! main::exists_in_path('ffmpeg') ) {
-		main::logger "WARNING: Required ffmpeg utility not found - not converting .ts file\n";
-		$opt->{raw} = 1;
-	}
-	# cannot convert hvf with avconv or ffmpeg < 2.5
-	if ( $mode =~ /^hvf/ && ! $opt->{raw} ) {
-		if ( $opt->{ffmpegav} ) {
-			main::logger "WARNING: avconv does not support conversion of hvf downloads to MP4 - not converting .ts file\n";
-			$opt->{raw} = 1;
-		} elsif ( $opt->{ffmpegxx} ) {
-			main::logger "WARNING: Unable to determine ffmpeg version - MP4 conversion for hvf downloads may fail\n";
-		} elsif ( ! $opt->{ffmpeg25} ) {
-			main::logger "WARNING: Your version of ffmpeg ($opt->{ffmpegversion}) does not support conversion of hvf downloads to MP4 - not converting .ts file\n";
+	if ( ! $opt->{raw} ) {
+		$prog->ffmpeg_init();
+		# require ffmpeg for HLS
+		if ( $mode =~ /^(hls|hvf|haf)/ && ! $opt->{raw} && ! main::exists_in_path('ffmpeg') ) {
+			main::logger "WARNING: Required ffmpeg utility not found - not converting .ts file(s)\n";
 			$opt->{raw} = 1;
 		}
-		if ( $opt->{ffmpegav} || $opt->{ffmpegxx} || ! $opt->{ffmpeg25} ) {
-			main::logger "WARNING: ffmpeg 2.5 or higher is required to convert hvf downloads to MP4\n";
-			main::logger "WARNING: Use --raw to bypass MP4 conversion and retain .ts file\n";
-			main::logger "WARNING: Use --ffmpeg-force to override checks and force MP4 conversion attempt\n";
+		# cannot convert hvf with avconv or ffmpeg < 2.5
+		if ( $mode =~ /^hvf/ && ! $opt->{raw} ) {
+			if ( $opt->{myffmpegav} ) {
+				main::logger "WARNING: avconv does not support conversion of hvf downloads to MP4 - not converting .ts file\n";
+				$opt->{raw} = 1;
+			} elsif ( $opt->{myffmpegxx} ) {
+				main::logger "WARNING: Unable to determine ffmpeg version - MP4 conversion for hvf downloads may fail\n";
+			} elsif ( ! $opt->{myffmpeg25} ) {
+				main::logger "WARNING: Your version of ffmpeg ($opt->{myffmpegversion}) does not support conversion of hvf downloads to MP4 - not converting .ts file\n";
+				$opt->{raw} = 1;
+			}
+			if ( $opt->{myffmpegav} || $opt->{myffmpegxx} || ! $opt->{myffmpeg25} ) {
+				main::logger "WARNING: ffmpeg 2.5 or higher is required to convert hvf downloads to MP4\n";
+				main::logger "WARNING: Use --raw to bypass MP4 conversion and retain .ts file\n";
+				main::logger "WARNING: Use --ffmpeg-force to override checks and force MP4 conversion attempt\n";
+			}
 		}
-	}
-	# require ffmpeg for DASH
-	if ( $mode =~ /^(daf|dvf)/ && ! $opt->{raw} && ! main::exists_in_path('ffmpeg') ) {
-		main::logger "WARNING: Required ffmpeg utility not found - not converting .m4a and .m4v files\n";
-		$opt->{raw} = 1;
-	}
-	# cannot convert dvf with avconv or ffmpeg < 3.0
-	if ( $mode =~ /^dvf/ && ! $opt->{raw} ) {
-		if ( $opt->{ffmpegav} ) {
-			main::logger "WARNING: avconv does not support conversion of dvf downloads to MP4 - not converting .m4a and .m4v files\n";
-			$opt->{raw} = 1;
-		} elsif ( $opt->{ffmpegxx} ) {
-			main::logger "WARNING: Unable to determine ffmpeg version - MP4 conversion for dvf downloads may fail\n";
-		} elsif ( ! $opt->{ffmpeg30} ) {
-			main::logger "WARNING: Your version of ffmpeg ($opt->{ffmpegversion}) does not support conversion of dvf downloads to MP4 - not converting .m4a and .m4v files\n";
+		# require ffmpeg for DASH
+		if ( $mode =~ /^(daf|dvf)/ && ! $opt->{raw} && ! main::exists_in_path('ffmpeg') ) {
+			main::logger "WARNING: Required ffmpeg utility not found - not converting .m4a and .m4v files\n";
 			$opt->{raw} = 1;
 		}
-		if ( $opt->{ffmpegav} || $opt->{ffmpegxx} || ! $opt->{ffmpeg30} ) {
-			main::logger "WARNING: ffmpeg 3.0 or higher is required to convert dvf downloads to MP4\n";
-			main::logger "WARNING: Use --raw to bypass MP4 conversion and retain .m4a and .m4v files\n";
-			main::logger "WARNING: Use --ffmpeg-force to override checks and force MP4 conversion attempt\n";
+		# cannot convert dvf with avconv or ffmpeg < 3.0
+		if ( $mode =~ /^dvf/ && ! $opt->{raw} ) {
+			if ( $opt->{myffmpegav} ) {
+				main::logger "WARNING: avconv does not support conversion of dvf downloads to MP4 - not converting .m4a and .m4v files\n";
+				$opt->{raw} = 1;
+			} elsif ( $opt->{myffmpegxx} ) {
+				main::logger "WARNING: Unable to determine ffmpeg version - MP4 conversion for dvf downloads may fail\n";
+			} elsif ( ! $opt->{myffmpeg30} ) {
+				main::logger "WARNING: Your version of ffmpeg ($opt->{myffmpegversion}) does not support conversion of dvf downloads to MP4 - not converting .m4a and .m4v files\n";
+				$opt->{raw} = 1;
+			}
+			if ( $opt->{myffmpegav} || $opt->{myffmpegxx} || ! $opt->{myffmpeg30} ) {
+				main::logger "WARNING: ffmpeg 3.0 or higher is required to convert dvf downloads to MP4\n";
+				main::logger "WARNING: Use --raw to bypass MP4 conversion and retain .m4a and .m4v files\n";
+				main::logger "WARNING: Use --ffmpeg-force to override checks and force MP4 conversion attempt\n";
+			}
 		}
 	}
 
@@ -6542,15 +6493,9 @@ sub download {
 	# Skip from here if we are only testing recordings
 	return 'skip' if $opt->{test};
 
-	# Get subtitles if they exist and are required
-	# best to do this before streaming file so that the subtitles can be enjoyed while recording progresses
-	my $subfile_done;
-	my $subfile;
-	if ( $opt->{subtitles} ) {
-		$subfile_done = "$prog->{dir}/$prog->{fileprefix}.srt";
-		$subfile = "$prog->{dir}/$prog->{fileprefix}.partial.srt";
-		main::logger "\n";
-		if ( $prog->download_subtitles( $ua, $subfile, [ $version ] ) && $opt->{subsrequired} && $prog->{type} eq 'tv') {
+	# check subtitles if required
+	if ( $opt->{subtitles} && $opt->{subsrequired} && $prog->{type} eq 'tv' ) {
+		if ( ! $prog->subtitles_available( [ $version ] ) ) {
 			main::logger "WARNING: Subtitles not available and --subsrequired specified.\n";
 			return 'skip';
 		}
@@ -6574,19 +6519,27 @@ sub download {
 		my $stream = $class->new;
 
 		# Do recording
-		$return = $stream->get( $ua, $prog->{streams}->{$version}->{$mode}->{streamurl}, $prog, %{ $prog->{streams}->{$version}->{$mode} } );
+		$return = $stream->get( $ua, $prog->{streams}->{$version}->{$mode}->{streamurl}, $prog, $version, %{ $prog->{streams}->{$version}->{$mode} } );
 
 		# Re-enable proxy here if required
 		main::proxy_enable($ua) if $opt->{partialproxy};
 	}
 
-	# Rename the subtitle file accordingly if the stream get was successful
-	move($subfile, $subfile_done) if $opt->{subtitles} && -f $subfile && ! $return;
-
 	return $return;
 }
 
-
+sub subtitles_available {
+	my ( $prog, $versions ) = @_;
+	for my $version ( @$versions ) {
+		my @subkeys = grep /subtitles/, sort keys %{$prog->{streams}->{$version}};
+		for my $subkey ( @subkeys ) {
+			my $suburl = $prog->{streams}->{$version}->{$subkey}->{streamurl};
+			if ( $suburl ) {
+				return 1;
+			}
+		}
+	}
+}
 
 # BBC iPlayer TV
 # Download Subtitles, convert to srt(SubRip) format and apply time offset
@@ -6600,8 +6553,9 @@ sub download_subtitles {
 	return unless $prog->{type} eq "tv";
 
 	# Don't redownload subs if the file already exists
-	if ( ( -f $file || -f "$prog->{dir}/$prog->{fileprefix}.partial.srt" ) && ! $opt->{overwrite} ) {
-		main::logger "INFO: Skipping subtitles download - file already exists: $file\n" if $opt->{verbose};
+	if ( -f $file  && ! $opt->{overwrite} ) {
+		main::logger "INFO: Subtitles file already exists: $file\n";
+		main::logger "INFO: Use --overwrite to re-download\n";
 		return 0;
 	}
 
@@ -6612,7 +6566,7 @@ sub download_subtitles {
 			my $suburl = $prog->{streams}->{$version}->{$subkey}->{streamurl};
 			if ( $suburl ) {
 				$found = 1;
-				main::logger "INFO: Getting subtitles from $suburl\n" if $opt->{verbose};
+				main::logger "INFO: Downloading subtitles\n";
 				$subs = main::request_url_retry($ua, $suburl, 3);
 				last if $subs;
 			}
@@ -6626,17 +6580,17 @@ sub download_subtitles {
 		return 2;
 	}
 	if (! $subs ) {
-		main::logger "ERROR: Subtitle download failed\n";
+		main::logger "ERROR: Subtitles download failed\n";
+		main::logger "ERROR: Use --subtitles-only to re-download\n";
 		return 1;
-	} else {
-		# Dump raw subs into a file if required
-		if ( $opt->{subsraw} ) {
-			unlink("$prog->{dir}/$prog->{fileprefix}.ttxt");
-			main::logger "INFO: Downloading raw subtitles to: $prog->{dir}/$prog->{fileprefix}.ttxt\n";
-			open( my $fhraw, "> $prog->{dir}/$prog->{fileprefix}.ttxt");
-			print $fhraw $subs;
-			close $fhraw;
-		}
+	}
+	# Dump raw subs into a file if required
+	if ( $opt->{subsraw} ) {
+		main::logger "INFO: Saving raw subtitles\n" if $opt->{verbose};
+		unlink("$prog->{dir}/$prog->{fileprefix}.ttxt");
+		open( my $fhraw, "> $prog->{dir}/$prog->{fileprefix}.ttxt");
+		print $fhraw $subs;
+		close $fhraw;
 		main::logger "INFO: Downloading subtitles to: $prog->{dir}/$prog->{fileprefix}.srt\n";
 	}
 
@@ -6664,9 +6618,9 @@ sub ttml_to_srt {
 		'white'   => '#ffffff'
 	);
 
-	eval "use XML::LibXML '1.70'; use XML::LibXML::XPathContext;";
+	eval "use XML::LibXML '1.91'; use XML::LibXML::XPathContext;";
 	if ( $@ ) {
-		print "WARNING: Please download and run latest installer or install the XML::LibXML Perl module to convert subtitles.\n";
+		main::logger "WARNING: Please download and run latest installer or install the XML::LibXML Perl module 1.91 or higher to convert subtitles.\n";
 		return 1;
 	}
 
@@ -6839,8 +6793,8 @@ use URI;
 use base 'Programme::bbciplayer';
 
 # Class vars
-sub index_min { return 10001 }
-sub index_max { return 39999 };
+sub index_min { return 30001 }
+sub index_max { return 99999 };
 
 # channel ids be found on http://www.bbc.co.uk/radio/stations
 sub channels_schedule {
@@ -6917,7 +6871,6 @@ sub channels_schedule {
 	};
 }
 
-
 # Class cmdline Options
 sub opt_format {
 	return {
@@ -6927,13 +6880,9 @@ sub opt_format {
 	};
 }
 
-
-
 # This gets run before the download retry loop if this class type is selected
 sub init {
 }
-
-
 
 # Method to return optional list_entry format
 sub optional_list_entry_format {
@@ -6945,13 +6894,10 @@ sub optional_list_entry_format {
 	return ', '.join ', ', @format;
 }
 
-
-
 # Default minimum expected download size for a programme type
 sub min_download_size {
 	return 102400;
 }
-
 
 sub get_links {
 	shift;
@@ -6959,16 +6905,14 @@ sub get_links {
 	return Programme::tv->get_links(@_);
 }
 
-
-
 sub download {
 	# Delegate to Programme::tv (same function is used)
 	return Programme::tv::download(@_);
 }
 
-
 ################### Streamer class #################
 package Streamer;
+
 use File::stat;
 use File::Basename;
 use File::Copy;
@@ -6979,7 +6923,6 @@ use Text::ParseWords;
 # Global options
 my $optref;
 my $opt;
-
 
 # Constructor
 # Usage: $streamer = Streamer->new();
@@ -6995,13 +6938,11 @@ sub new {
 	bless $self, $type;
 }
 
-
 # Use to bind a new options ref to the class global $optref var
 sub add_opt_object {
 	my $self = shift;
 	$Streamer::optref = shift;
 }
-
 
 # $opt->{<option>} access method
 sub opt {
@@ -7010,94 +6951,7 @@ sub opt {
 	return $opt->{$optname};
 }
 
-sub opt_format {
-	return {
-		ffmpeg		=> [ 0, "ffmpeg=s", 'External Program', '--ffmpeg <path>', "Location of ffmpeg binary. Assumed to be ffmpeg 3.0 or higher unless --ffmpeg-obsolete is specified."],
-		ffmpegobsolete		=> [ 1, "ffmpeg-obsolete|ffmpegobsolete!", 'External Program', '--ffmpeg-obsolete', "Indicates you are using an obsolete version of ffmpeg (<1.0) that may not support certain options. Without this option, MP4 conversion may fail with obsolete versions of ffmpeg."],
-		ffmpegforce		=> [ 1, "ffmpeg-force|ffmpegforce!", 'External Program', '--ffmpeg-force', "Bypass version checks and assume ffmpeg is version 3.0 or higher"],
-		ffmpegloglevel		=> [ 1, "ffmpeg-loglevel|ffmpegloglevel=s", 'External Program', '--ffmpeg-loglevel <level>', "Set logging level for ffmpeg. Overridden by --quiet and --silent. Default: 'fatal'"],
-	};
-}
-
-sub remux {
-	my ( $self, $audio_file, $video_file, $prog, %streamdata ) = @_;
-	my @cmd;
-	my $return;
-
-	# do nothing if no files
-	my $audio_ok = $audio_file && -f $audio_file;
-	my $video_ok = $video_file && -f $video_file;
-	return 0 unless ( $audio_ok || $video_ok);
-
-	my @global_opts = ( '-y' );
-	my @input_opts;
-	push @input_opts, ( '-i', $audio_file ) if $audio_ok;
-	push @input_opts, ( '-i', $video_file ) if $video_ok;
-	my @codec_opts;
-	if ( ! $opt->{ffmpegobsolete} ) {
-		push @codec_opts, ( '-c:v', 'copy', '-c:a', 'copy' );
-		if ( $opt->{notag} ) {
-			push @codec_opts, ( '-movflags', 'faststart' );
-		}
-	} else {
-		push @codec_opts, ( '-vcodec', 'copy', '-acodec', 'copy' );
-	}
-	my @filter_opts;
-	if ( $prog->{mode} =~ /(haf|hvf|hls)/ ) {
-		# need filter for HLS
-		if ( ! $opt->{ffmpegobsolete} ) {
-			push @filter_opts, ( '-bsf:a', 'aac_adtstoasc' );
-		} else {
-			push @filter_opts, ( '-absf', 'aac_adtstoasc' );
-		}
-	}
-
-	@cmd = (
-		$bin->{ffmpeg},
-		@{ $binopts->{ffmpeg} },
-		@global_opts,
-		@input_opts,
-		@codec_opts,
-		@filter_opts,
-		$prog->{filepart},
-	);
-
-	main::logger "INFO: Begin converting to: \U$prog->{ext}\E\n";
-	if ( $opt->{verbose} ) {
-		main::logger "INFO: Begin converting to file: $prog->{filepart}\n";
-		main::logger "INFO: Input audio file: $audio_file\n" if $audio_ok;
-		main::logger "INFO: Input video file: $video_file\n" if $video_ok;
-	}
-
-	# Run conversion and delete source file on success
-	$return = main::run_cmd( 'STDERR', @cmd );
-
-	my $min_download_size = main::progclass($prog->{type})->min_download_size();
-
-	if ( (! $return) && -f $prog->{filepart} && stat($prog->{filepart})->size > $min_download_size ) {
-		unlink( $audio_file, $video_file );
-		main::logger "INFO: Finished converting to file: $prog->{filepart}\n" if $opt->{verbose};
-	} else {
-		# remove the failed converted file
-		unlink $prog->{filepart};
-		main::logger "ERROR: Conversion failed - retaining audio file: $audio_file\n" if $audio_ok;
-		main::logger "ERROR: Conversion failed - retaining video file: $video_file\n" if $video_ok;
-		return 'stop';
-	}
-	main::logger "INFO: Finished converting to: \U$prog->{ext}\E\n";
-	# Moving file into place as complete
-	if ( ! move($prog->{filepart}, $prog->{filename}) ) {
-		main::logger "ERROR: Could not rename file: $prog->{filepart}\n";
-		main::logger "ERROR: Destination file name: $prog->{filename}\n";
-		return 'stop';
-	}
-	main::logger "INFO: Finished recording file: $prog->{filename}\n";
-
-	return 0;
-}
-
-
-################### Streamer::hls class #################
+################### HLS Streamer class #################
 package Streamer::hls;
 
 # Inherit from Streamer class
@@ -7169,7 +7023,7 @@ sub parse_playlist {
 }
 
 sub get {
-	my ( $self, $ua, $url, $prog, %streamdata ) = @_;
+	my ( $self, $ua, $url, $prog, $version, %streamdata ) = @_;
 	my $rc;
 
 	# media file
@@ -7180,7 +7034,6 @@ sub get {
 	my $media_raw = $prog->{filename};
 
 	if ( $opt->{overwrite} ) {
-		main::logger "INFO: Overwriting HLS $media_type file: $media_file\n" if -f $media_file;
 		unlink $media_file;
 	} else {
 		if ( -f $media_file ) {
@@ -7190,6 +7043,7 @@ sub get {
 	}
 
 	unless ( -f $media_file ) {
+		$streamdata{kind} = "audio+video";
 		my $segments = $self->parse_playlist($ua, $url);
 		if ( keys %{$segments} == 0 ) {
 			main::logger "ERROR: No file segments in HLS playlist\n";
@@ -7203,7 +7057,61 @@ sub get {
 			main::logger "ERROR: Destination file name: $media_file\n";
 			return 'skip';
 		}
-		main::logger "INFO: Saved HLS $media_type file: $media_file\n" if $opt->{verbose};
+	}
+
+	# look for higher-quality audio for hls modes
+	my $audio_file;	
+	my $audio_raw;	
+	my $hq_audio = $prog->{type} eq "tv" && $prog->{mode} =~ /hls/ && ! $opt->{nohqaudio};
+	if ( $hq_audio ) {
+		main::logger "INFO: Attempting to download higher-quality audio for '$prog->{mode}' mode\n" if $opt->{verbose};
+		my $audio_prefix = "$prog->{fileprefix}.hqa";
+		my $audio_tmp = main::encode_fs(File::Spec->catfile($prog->{dir}, "${audio_prefix}.audio.ts"));
+		$audio_file = main::encode_fs(File::Spec->catfile($prog->{dir}, "${audio_prefix}.hls.ts"));
+		$audio_raw = main::encode_fs(File::Spec->catfile($prog->{dir}, "${audio_prefix}.ts"));
+		if ( $opt->{overwrite} ) {
+			unlink $audio_file;
+		} else {
+			if ( -f $audio_file ) {
+				main::logger "INFO: Using existing HLS audio file: $audio_file\n";
+				main::logger "INFO: Use --overwrite to re-download\n";
+			}
+		}
+		unless ( -f $audio_file ) {
+			my @hvf_modes = sort Programme::cmp_modes grep /^hvf/, keys %{ $prog->{streams}->{$version} };
+			my @hq_modes = grep { my $abr = $prog->{streams}->{$version}->{$_}->{audio_bitrate}; $abr > 0 && $abr > $streamdata{audio_bitrate} } @hvf_modes;
+			my @modes = sort { $prog->{streams}->{$version}->{$b}->{audio_bitrate} <=> $prog->{streams}->{$version}->{$a}->{audio_bitrate} } @hq_modes;
+			splice @modes, 3;
+			for my $mode ( @modes ) {
+				my $audio_url = $prog->{streams}->{$version}->{$mode}->{streamurl};
+				next unless $audio_url =~ /-video=\d+/;
+				$audio_url =~ s/-video=\d+//;
+				if ( $streamdata{audio_bitrate} ) {
+					$streamdata{media_size} = undef;
+					$streamdata{media_bitrate} = $streamdata{audio_bitrate};
+				}
+				$streamdata{kind} = "audio";
+				$streamdata{mode} = $mode;
+				my $segments = $self->parse_playlist($ua, $audio_url);
+				if ( keys %{$segments} == 0 ) {
+					main::logger "ERROR: No file segments in HLS playlist\n";
+					main::logger "ERROR: HLS playlist URL: $url\n";
+					next;
+				} else {
+					$rc = $self->fetch( $ua, $segments, $audio_tmp, $prog, %streamdata );
+					if ( ! $rc ) {
+						if ( ! move($audio_tmp, $audio_file) ) {
+							main::logger "ERROR: Could not rename file: $audio_tmp\n";
+							main::logger "ERROR: Destination file name: $audio_file\n";
+						}
+						last;
+					}
+				}
+			}
+		}
+		if ( $opt->{verbose} && ! -f $audio_file ) {
+			main::logger "WARNING: Could not record higher-quality audio for '$prog->{mode}' mode - using default audio\n";
+		}
 	}
 	if ( $opt->{raw} ) {
 		if ( ! move($media_file, $media_raw) ) {
@@ -7211,12 +7119,20 @@ sub get {
 			main::logger "ERROR: Destination file name: $media_raw\n";
 			return 'skip';
 		}
-		main::logger "INFO: Finished recording raw $media_type file: $media_raw\n";
+		if ( $hq_audio && -f $audio_file ) {
+			if ( ! move($audio_file, $audio_raw) ) {
+				main::logger "ERROR: Could not rename file: $audio_file\n";
+				main::logger "ERROR: Destination file name: $audio_raw\n";
+			}
+			if ( $opt->{verbose} && ! -f $audio_raw ) {
+				main::logger "WARNING: Could not record raw higher-quality audio for '$prog->{mode}' mode - using default audio\n";
+			}
+		}
 		return 0;
 	}
 
-	my ($audio_file, $video_file) = $prog->{type} eq "tv" ? (undef, $media_file) : ($media_file, undef);
-	return $self->remux($audio_file, $video_file, $prog, %streamdata);
+	my ($audio_file, $video_file) = $prog->{type} eq "tv" ? ($audio_file, $media_file) : ($media_file, undef);
+	return $prog->postproc($audio_file, $video_file);
 }
 
 sub fetch {
@@ -7281,10 +7197,10 @@ sub fetch {
 			$curr_size = $size;
 			$curr_elapsed = $elapsed;
 		}
-		if ( $opt->{hash} || $opt->{logprogress} ) {
-			return if ($curr_percent - $prev_percent) < 1;
-		} else {
+		if ( $opt->{verbose} && ! $opt->{logprogress} ) {
 			return if ($curr_percent - $prev_percent) < 0.1;
+		} else {
+			return if ($curr_percent - $prev_percent) < 1;
 		}
 		$prev_percent = $curr_percent;
 		my $curr_time = time();
@@ -7305,13 +7221,13 @@ sub fetch {
 				my $time;
 				if ($curr_time - $begin_time < 1) {
 					$rate = '----.- Mibit/s';
-					$time = '--:--:-- remaining';
+					$time = '--:--:--';
 				} else {
 					$rate = sprintf("%6.1f Mibit/s", $rate_mibit);
-					$time = sprintf("%02d:%02d:%02d remaining", ( gmtime( max(0, ($file_size - $curr_size)) / $rate_bps ) )[2,1,0] );
+					$time = sprintf("%02d:%02d:%02d", ( gmtime( max(0, ($file_size - $curr_size)) / $rate_bps ) )[2,1,0] );
 				}
 				if ( $opt->{verbose} ) {
-					main::logger sprintf ( "Recording: %8.2f MiB / ~%.2f MiB (%02d:%02d:%02d / %8s) [%5d / %d] %5.1f%% %s %s${crlf}",
+					main::logger sprintf("Downloading: %8.2f MiB / ~%.2f MiB (%02d:%02d:%02d / %8s) [%5d / %d] %5.1f%% %s %s remaining${crlf}",
 						$curr_size / 1024.0 / 1024.0,
 						$file_size / 1024.0 / 1024.0,
 						(gmtime($curr_elapsed))[2,1,0],
@@ -7323,12 +7239,11 @@ sub fetch {
 						$time,
 					);
 				} else {
-					main::logger sprintf ( "Recording: %8.2f MiB / ~%.2f MiB %5.1f%% %s %s${crlf}",
-						$curr_size / 1024.0 / 1024.0,
-						$file_size / 1024.0 / 1024.0,
+					main::logger sprintf("%3d%% [%-25s] ETA: %s (%s) [%s]${crlf}",
 						$curr_percent,
-						$rate,
-						$time,
+						'=' x int($curr_percent / 4),
+						$time, $streamdata{mode} || $prog->{mode},
+						$streamdata{kind}
 					);
 				}
 			}
@@ -7453,8 +7368,7 @@ sub fetch {
 		my $tmp_size = -s $file_tmp || 0;
 		# overwrite any partial segment appended in last run
 		if ( $resume_size < $tmp_size ) {
-			main::logger "INFO: Resizing file: $file_tmp\n";
-			main::logger "INFO: Resizing from $tmp_size to $resume_size for resume\n";
+			main::logger "INFO: Resizing file from $tmp_size to $resume_size for resume\n" if $opt->{verbose};
 			if ( ! truncate($fh, $resume_size) || ! seek($fh, 0, 2) ) {
 				$resuming = 0;
 				close $fh;
@@ -7476,12 +7390,11 @@ sub fetch {
 	}
 	unlink $resume_file unless $resuming;
 	if ( $resuming ) {
-		main::logger "INFO: Resume downloading to file: $file_tmp\n" if $opt->{verbose};
-		main::logger sprintf("INFO: Resume recording at: %.2f MiB (%02d:%02d:%02d) [%d]\n",
+		main::logger sprintf("INFO: Resume downloading at: %.2f MiB (%02d:%02d:%02d) [%d]\n",
 			$resume_size / 1024.0 / 1024.0,
 			(gmtime($resume_elapsed))[2,1,0],
 			$resume_sequence
-		);
+		) if $opt->{verbose};
 	} else {
 		# start download from beginning if not resuming
 		if ( ! open($fh, ">:raw", $file_tmp) ) {
@@ -7490,12 +7403,11 @@ sub fetch {
 		}
 		binmode $fh;
 		$fh->autoflush(1);
-		main::logger sprintf("INFO: Begin recording at: %.2f MiB (%02d:%02d:%02d) [%d]\n",
+		main::logger sprintf("INFO: Begin downloading at: %.2f MiB (%02d:%02d:%02d) [%d]\n",
 			$size / 1024.0 / 1024.0,
 			(gmtime($start_elapsed))[2,1,0],
 			$start_sequence
-		);
-		main::logger "INFO: Begin downloading to file: $file_tmp\n" if $opt->{verbose};
+		) if $opt->{verbose};
 	}
 	unless ( $noresume ) {
 		my $open_mode = $resuming ? ">>" : ">";
@@ -7550,7 +7462,7 @@ sub fetch {
 						main::logger "\nWARNING: File segment not available from server [$sequence]\n";
 						main::logger "WARNING: This is the final file segment of the programme\n";
 						main::logger "WARNING: It may be incorrectly flagged as unavailable due to inaccurate programme data\n";
-						main::logger "WARNING: Check the end of the recording to ensure it is complete\n";
+						main::logger "WARNING: Check the end of the downloaded file to ensure it is complete\n";
 						if ( $opt->{verbose} ) {
 							main::logger "WARNING: File segment URL: $curr_segment_url\n";
 						}
@@ -7612,27 +7524,36 @@ sub fetch {
 
 	# summary stats
 	unless ( $hide_progress || $opt->{logprogress} ) {
-		main::logger "${crlf}".(" " x ($opt->{verbose} ? 120 : 80));
+		main::logger "${crlf}".(" " x ($opt->{verbose} || $opt->{hash} ? 120 : 80));
 	}
 	my $end_time = time() + 0.0001;
-	main::logger sprintf("${crlf}INFO: Recorded: %.2f MiB (%02d:%02d:%02d) [%d] in %02d:%02d:%02d at %.2f Mibit/s\n",
-		($prev_size - $resume_size) / (1024.0 * 1024.0),
-		(gmtime($prev_elapsed - $resume_elapsed))[2,1,0],
-		max($prev_sequence - $resume_sequence + 1, 0),
-		(gmtime($end_time - $begin_time))[2,1,0],
-		($prev_size - $resume_size) / ($end_time - $begin_time) / 1024.0 / 1024.0 * 8.0,
-	);
+	if ( $opt->{verbose} ) {
+		main::logger sprintf("${crlf}INFO: Downloaded: %.2f MiB (%02d:%02d:%02d) [%d] in %02d:%02d:%02d at %.2f Mibit/s\n",
+			($prev_size - $resume_size) / (1024.0 * 1024.0),
+			(gmtime($prev_elapsed - $resume_elapsed))[2,1,0],
+			max($prev_sequence - $resume_sequence + 1, 0),
+			(gmtime($end_time - $begin_time))[2,1,0],
+			($prev_size - $resume_size) / ($end_time - $begin_time) / 1024.0 / 1024.0 * 8.0,
+		);
+	} else {
+		main::logger sprintf("${crlf}INFO: Downloaded: %.2f MiB (%02d:%02d:%02d) \@ %.2f Mibit/s (%s) [%s]\n",
+			($prev_size - $resume_size) / (1024.0 * 1024.0),
+			(gmtime($prev_elapsed - $resume_elapsed))[2,1,0],
+			($prev_size - $resume_size) / ($end_time - $begin_time) / 1024.0 / 1024.0 * 8.0,
+			$streamdata{mode} || $prog->{mode},
+			$streamdata{kind}
+		);
+	}
 
 	# retry if we fail during streaming
 	if ( $return ) {
 		main::logger "WARNING: ".(join "\nWARNING: ", @warnings)."\n" if @warnings;
-		main::logger "WARNING: Stopped recording file: $file_tmp\n";
-		main::logger sprintf("WARNING: Stopped recording at: %.2f MiB (%02d:%02d:%02d) [%d]\n",
-			$prev_size / 1024.0 / 1024.0,
-			(gmtime($prev_elapsed))[2,1,0],
-			$prev_sequence
-		);
 		if ( $opt->{verbose} ) {
+			main::logger sprintf("WARNING: Stopped downloading at: %.2f MiB (%02d:%02d:%02d) [%d]\n",
+				$prev_size / 1024.0 / 1024.0,
+				(gmtime($prev_elapsed))[2,1,0],
+				$prev_sequence
+			);
 			main::logger "WARNING: File segment URL: $curr_segment_url\n";
 		}
 		return $return > 1 ? 'next' : 'retry';
@@ -7643,20 +7564,19 @@ sub fetch {
 
 	if ( $resuming ) {
 		# summary for file
-		main::logger sprintf("INFO: Recorded (total): %.2f MiB (%02d:%02d:%02d) [%d]\n",
+		main::logger sprintf("INFO: Downloaded (total): %.2f MiB (%02d:%02d:%02d) [%d]\n",
 			$prev_size / (1024.0 * 1024.0),
 			(gmtime($prev_elapsed - $start_elapsed))[2,1,0],
 			$prev_sequence - $start_sequence + 1
-		);
+		) if $opt->{verbose};
 	}
 
-	main::logger "INFO: Finished downloading to file: $file_tmp\n" if $opt->{verbose};
+    main::logger "INFO: Finished downloading to file: $file_tmp\n";
 
 	return 0;
 }
 
-
-################### Streamer::dash class #################
+################### DASH Streamer class #################
 package Streamer::dash;
 
 use base 'Streamer::hls';
@@ -7684,7 +7604,7 @@ sub generate_segments {
 }
 
 sub get {
-	my ( $self, $ua, $url, $prog, %streamdata ) = @_;
+	my ( $self, $ua, $url, $prog, $version, %streamdata ) = @_;
 	my $rc;
 
 	# audio files
@@ -7700,8 +7620,6 @@ sub get {
 	my $video_raw = $prog->{rawvideo};
 
 	if ( $opt->{overwrite} ) {
-		main::logger "WARNING: Overwriting DASH audio file: $audio_file\n" if -f $audio_file;
-		main::logger "WARNING: Overwriting DASH video file: $video_file\n" if $prog->{type} eq "tv" && -f $video_file;
 		unlink ( $audio_file, $video_file );
 	} else {
 		my $skip;
@@ -7722,6 +7640,7 @@ sub get {
 		my $audio_media = $streamdata{audio_media};
 		$streamdata{file_size} = $audio_media->{file_size};
 		$streamdata{media_bitrate} = $audio_media->{bitrate};
+		$streamdata{kind} = "audio";
 		my $segments = $self->generate_segments($audio_media);
 		if ( keys %{$segments} <= 1 ) {
 			main::logger "ERROR: No file segments generated from DASH audio media\n";
@@ -7734,7 +7653,6 @@ sub get {
 			main::logger "ERROR: Destination file name: $audio_file\n";
 			return 'skip';
 		}
-		main::logger "INFO: Saved DASH audio file: $audio_file\n" if $opt->{verbose};
 	}
 
 	if ( $prog->{type} eq "tv" ) {
@@ -7742,6 +7660,7 @@ sub get {
 			my $video_media = $streamdata{video_media};
 			$streamdata{file_size} = $video_media->{file_size};
 			$streamdata{media_bitrate} = $video_media->{bitrate};
+			$streamdata{kind} = "video";
 			my $segments = $self->generate_segments($video_media);
 			if ( keys %{$segments} <= 1 ) {
 				main::logger "ERROR: No file segments generated from DASH video media\n";
@@ -7754,7 +7673,6 @@ sub get {
 				main::logger "ERROR: Destination file name: $video_file\n";
 				return 'skip';
 			}
-			main::logger "INFO: Saved DASH video file: $video_file\n" if $opt->{verbose};
 		}
 	} else {
 		unlink ( $video_tmp, $video_file );
@@ -7773,14 +7691,11 @@ sub get {
 				return 'skip';
 			}
 		}
-		main::logger "INFO: Finished recording raw audio file: $audio_raw\n";
-		main::logger "INFO: Finished recording raw video file: $video_raw\n" if $prog->{type} eq "tv";
 		return 0;
 	}
 
-	return $self->remux($audio_file, $video_file, $prog, %streamdata);
+	return $prog->postproc($audio_file, $video_file);
 }
-
 
 ############# PVR Class ##############
 package Pvr;
@@ -7822,7 +7737,6 @@ sub opt_format {
 	};
 }
 
-
 # Constructor
 # Usage: $pvr = Pvr->new();
 sub new {
@@ -7838,7 +7752,6 @@ sub new {
 	$opt_cmdline = $Pvr::opt_cmdlineref;
 	bless $self, $type;
 }
-
 
 # Use to bind a new options ref to the class global $opt_ref var
 sub add_opt_object {
@@ -7856,7 +7769,6 @@ sub add_opt_cmdline_object {
 	$Pvr::opt_cmdlineref = shift;
 }
 
-
 # Use to bind a new options ref to the class global $optref var
 sub setvar {
 	my $self = shift;
@@ -7870,14 +7782,12 @@ sub getvar {
 	return $vars{$varname};
 }
 
-
 # $opt->{<option>} access method
 sub opt {
 	my $self = shift;
 	my $optname = shift;
 	return $opt->{$optname};
 }
-
 
 # Load all PVR searches and run one-by-one
 # Usage: $pvr->run( [pvr search name] )
@@ -7909,14 +7819,16 @@ sub run {
 			next;
 		}
 		main::logger "INFO: PVR Run: '$name'\n";
+		main::print_divider;
 		# Clear then Load options for specified pvr search name
 		my $opt_backup;
-		foreach ( @encoding_opts ) {
-			$opt_backup->{$_} = $opt->{$_} if $opt->{$_};
+		my @backup_opts = grep /^(encoding|myap|myffmpeg|nowarn)/, keys %{$opt};
+		foreach ( @backup_opts ) {
+			$opt_backup->{$_} = $opt->{$_} if defined $opt->{$_};
 		}
 		my @search_args = $pvr->load_options($name);
-		foreach ( @encoding_opts ) {
-			$opt->{$_} = $opt_backup->{$_} if $opt_backup->{$_};
+		foreach ( @backup_opts ) {
+			$opt->{$_} = $opt_backup->{$_} if defined $opt_backup->{$_};
 		}
 
 		## Display all options used for this pvr search
@@ -7952,12 +7864,11 @@ sub run {
 		if ( $failcount ) {
 			main::logger "WARNING: PVR Run: '$name': $failcount download failure(s)\n";
 		}
-		$retcode += $failcount
+		$retcode += $failcount;
 	}
+	main::purge_warning( $hist, 30 );
 	return $retcode;
 }
-
-
 
 sub run_scheduler {
 	my $pvr = shift;
@@ -7983,8 +7894,6 @@ sub run_scheduler {
 		}
 	}
 }
-
-
 
 # If queuing, only add pids because the index number might change by the time the pvr runs
 # If --pid and --type <type> is specified then add this prog also
@@ -8021,8 +7930,6 @@ sub queue {
 	return 0;
 }
 
-
-
 # Save the options on the cmdline as a PVR search with the specified name
 sub add {
 	my $pvr = shift;
@@ -8035,7 +7942,7 @@ sub add {
 		return 1;
 	}
 	# Parse valid options and create array (ignore options from the options files that have not been overriden on the cmdline)
-	for ( grep !/(^cache|profiledir|encoding.*|silent|webrequest|future|nocopyright|^test|metadataonly|subsonly|thumbonly|tagonly|^get|refresh|^save|^prefs|help|expiry|tree|terse|streaminfo|listformat|^list|showoptions|hide|info|pvr.*)$/, sort {lc $a cmp lc $b} keys %{$opt_cmdline} ) {
+	for ( grep !/(^cache|profiledir|encoding.*|silent|webrequest|future|nocopyright|^test|metadataonly|subsonly|thumbonly|tagonly|^get|refresh|^save|^prefs|help|expiry|tree|terse|streaminfo|listformat|^list|showoptions|hide|info|pvr.*|^purge)$/, sort {lc $a cmp lc $b} keys %{$opt_cmdline} ) {
 		if ( defined $opt_cmdline->{$_} ) {
 				push @options, "$_ $opt_cmdline->{$_}";
 				main::logger "DEBUG: Adding option $_ = $opt_cmdline->{$_}\n" if $opt->{debug};
@@ -8050,8 +7957,6 @@ sub add {
 	$pvr->save( $name, @options );
 	return 0;
 }
-
-
 
 # Delete the named PVR search
 sub del {
@@ -8072,8 +7977,6 @@ sub del {
 	}
 	return 0;
 }
-
-
 
 # Display all the PVR searches
 sub display_list {
@@ -8096,8 +7999,6 @@ sub display_list {
 	}
 	return 0;
 }
-
-
 
 # Load all the PVR searches into %{$pvr}
 sub load_list {
@@ -8143,8 +8044,6 @@ sub load_list {
 	return 0;
 }
 
-
-
 # Clear all the PVR searches in %{$pvr}
 sub clear_list {
 	my $pvr = shift;
@@ -8152,8 +8051,6 @@ sub clear_list {
 	delete $pvr->{$_} for keys %{ $pvr };
 	return 0;
 }
-
-
 
 # Save the array options specified as a PVR search
 sub save {
@@ -8178,7 +8075,6 @@ sub save {
 	close PVR;
 	return 0;
 }
-
 
 # Uses globals: $profile_dir, $optfile_system, $optfile_default
 # Uses class globals: %opt, %opt_file, %opt_cmdline
@@ -8225,8 +8121,6 @@ sub load_options {
 	return @search_args;
 }
 
-
-
 # Disable a PVR search by adding 'disable 1' option
 sub disable {
 	my $pvr = shift;
@@ -8241,8 +8135,6 @@ sub disable {
 	$pvr->save( $name, @options );
 	return 0;
 }
-
-
 
 # Re-enable a PVR search by removing 'disable 1' option
 sub enable {
@@ -8259,8 +8151,9 @@ sub enable {
 	return 0;
 }
 
-
+############# Tagger Class ##############
 package Tagger;
+
 use Encode;
 use File::stat;
 use constant FB_EMPTY => sub { '' };
@@ -8409,98 +8302,113 @@ sub tag_prog {
 	}
 }
 
+sub ap_init {
+	return if $ap_check;
+	$bin->{atomicparsley} = $opt->{atomicparsley} || 'AtomicParsley';
+	if ( ! main::exists_in_path( 'atomicparsley' ) ) {
+		if ( $bin->{atomicparsley} ne 'AtomicParsley' ) {
+			$bin->{atomicparsley} = 'AtomicParsley';
+			if ( ! main::exists_in_path( 'atomicparsley' ) ) {
+				$ap_check = 1;
+				return;
+			}
+		} else {
+			$ap_check = 1;
+			return;
+		}
+	}
+	# determine AtomicParsley features
+	my $ap_help = `"$bin->{atomicparsley}" --help 2>&1`;
+	$opt->{myaphdvideo} = 1 if $ap_help =~ /--hdvideo/;
+	$opt->{myaplongdesc} = 1 if $ap_help =~ /--longdesc/;
+	$opt->{myaplongdescription} = 1 if $ap_help =~ /--longDescription/;
+	$opt->{myaputf8} = 1 if ! defined($opt->{tag_utf8}) and ( $^O ne "MSWin32" or $bin->{atomicparsley} =~ /-utf8/i );
+	$ap_check = 1;
+}
+
 # add MP4 tag with atomicparsley
 sub tag_file_mp4 {
 	my ($self, $meta, $tags) = @_;
+	ap_init();
 	# Only tag if the required tool exists
-	if ( main::exists_in_path( 'atomicparsley' ) ) {
-		if ( ! $ap_check ) {
-			# determine AtomicParsley features
-			$ap_check = 1;
-			my $ap_help = `"$bin->{atomicparsley}" --help 2>&1`;
-			$opt->{tag_hdvideo} = 1 if $ap_help =~ /--hdvideo/;
-			$opt->{tag_longdesc} = 1 if $ap_help =~ /--longdesc/;
-			$opt->{tag_longdescription} = 1 if $ap_help =~ /--longDescription/;
-			$opt->{tag_utf8} = 1 if ! defined($opt->{tag_utf8}) and ( $^O ne "MSWin32" or $bin->{atomicparsley} =~ /-utf8/i );
+	if ( ! main::exists_in_path( 'atomicparsley' ) ) {
+		main::logger "WARNING: Required AtomicParsley utility not found - cannot tag \U$meta->{ext}\E file\n";
+		return 1;
+	}
+	main::logger "INFO: Tagging \U$meta->{ext}\E\n";
+	# handle embedded quotes
+	tags_escape_quotes($tags);
+	# encode metadata for atomicparsley
+	tags_encode($tags) unless $opt->{tag_utf8} || $opt->{myaputf8};
+	# build atomicparsley command
+	my @cmd = (
+		$bin->{atomicparsley},
+		$meta->{filename},
+		'--freefree',
+		'--overWrite',
+		'--stik', $tags->{stik},
+		'--advisory', $tags->{advisory},
+		'--copyright', $tags->{copyright},
+		'--title', $tags->{title},
+		'--artist', $tags->{artist},
+		'--albumArtist', $tags->{albumArtist},
+		'--album', $tags->{album},
+		'--grouping', $tags->{grouping},
+		'--composer', $tags->{composer},
+		'--genre', $tags->{genre},
+		'--comment', $tags->{comment},
+		'--year', $tags->{year},
+		'--tracknum', $tags->{tracknum},
+		'--disk', $tags->{disk},
+		'--lyrics', $tags->{lyrics},
+	);
+	# add descriptions to audio podcasts and video
+	if ( $tags->{is_video} || $tags->{is_podcast}) {
+		push @cmd, ('--description', $tags->{description} );
+		if ( $opt->{myaplongdescription} ) {
+			push @cmd, ( '--longDescription', $tags->{longDescription} );
+		} elsif ( $opt->{myaplongdesc} ) {
+			push @cmd, ( '--longdesc', $tags->{longDescription} );
 		}
-		main::logger "INFO: Begin tagging: \U$meta->{ext}\E\n";
-		# handle embedded quotes
-		tags_escape_quotes($tags);
-		# encode metadata for atomicparsley
-		tags_encode($tags) unless $opt->{tag_utf8};
-		# build atomicparsley command
-		my @cmd = (
-			$bin->{atomicparsley},
-			$meta->{filename},
-			'--freefree',
-			'--overWrite',
-			'--stik', $tags->{stik},
-			'--advisory', $tags->{advisory},
-			'--copyright', $tags->{copyright},
-			'--title', $tags->{title},
-			'--artist', $tags->{artist},
-			'--albumArtist', $tags->{albumArtist},
-			'--album', $tags->{album},
-			'--grouping', $tags->{grouping},
-			'--composer', $tags->{composer},
-			'--genre', $tags->{genre},
-			'--comment', $tags->{comment},
-			'--year', $tags->{year},
-			'--tracknum', $tags->{tracknum},
-			'--disk', $tags->{disk},
-			'--lyrics', $tags->{lyrics},
-		);
-		# add descriptions to audio podcasts and video
-		if ( $tags->{is_video} || $tags->{is_podcast}) {
-			push @cmd, ('--description', $tags->{description} );
-			if ( $opt->{tag_longdescription} ) {
-				push @cmd, ( '--longDescription', $tags->{longDescription} );
-			} elsif ( $opt->{tag_longdesc} ) {
-				push @cmd, ( '--longdesc', $tags->{longDescription} );
-			}
-		}
-		# video only
-		if ( $tags->{is_video} ) {
-			# all video
-			push @cmd, ( '--hdvideo', $tags->{hdvideo} ) if $opt->{tag_hdvideo};
-			# tv only
-			if ( $tags->{is_tvshow} ) {
-				push @cmd, (
-					'--TVShowName', $tags->{TVShowName},
-					'--TVEpisode', $tags->{TVEpisode},
-					'--TVSeasonNum', $tags->{TVSeasonNum},
-					'--TVEpisodeNum', $tags->{TVEpisodeNum},
-					'--TVNetwork', $tags->{TVNetwork},
-				);
-			}
-		}
-		# tag iTunes podcast
-		if ( $tags->{is_podcast} ) {
+	}
+	# video only
+	if ( $tags->{is_video} ) {
+		# all video
+		push @cmd, ( '--hdvideo', $tags->{hdvideo} ) if $opt->{myaphdvideo};
+		# tv only
+		if ( $tags->{is_tvshow} ) {
 			push @cmd, (
-				'--podcastFlag', $tags->{podcastFlag},
-				'--category', $tags->{category},
-				'--keyword', $tags->{keyword},
-				'--podcastGUID', $tags->{podcastGUID},
+				'--TVShowName', $tags->{TVShowName},
+				'--TVEpisode', $tags->{TVEpisode},
+				'--TVSeasonNum', $tags->{TVSeasonNum},
+				'--TVEpisodeNum', $tags->{TVEpisodeNum},
+				'--TVNetwork', $tags->{TVNetwork},
 			);
 		}
-		# add artwork if available
-		if ( $opt->{noartwork} ) {
-			push @cmd, ( '--artwork', "REMOVE_ALL" );
-		} else {
-			push @cmd, ( '--artwork', $meta->{thumbfile} ) if -f $meta->{thumbfile};
-		}
-		# run atomicparsley command
-		my $run_mode = main::hide_progress() ? 'QUIET_STDOUT' : 'STDERR';
-		if ( main::run_cmd( $run_mode, @cmd ) ) {
-			main::logger "WARNING: Failed to tag \U$meta->{ext}\E file\n";
-			return 2;
-		}
-		# remove images left behind by AtomicParsley
-		unlink glob qq("$meta->{dir}/$meta->{fileprefix}-resized-*");
-		main::logger "INFO: Finished tagging: \U$meta->{ext}\E\n";
-	} else {
-		main::logger "WARNING: Cannot tag \U$meta->{ext}\E file\n";
 	}
+	# tag iTunes podcast
+	if ( $tags->{is_podcast} ) {
+		push @cmd, (
+			'--podcastFlag', $tags->{podcastFlag},
+			'--category', $tags->{category},
+			'--keyword', $tags->{keyword},
+			'--podcastGUID', $tags->{podcastGUID},
+		);
+	}
+	# add artwork if available
+	if ( $opt->{noartwork} ) {
+		push @cmd, ( '--artwork', "REMOVE_ALL" );
+	} else {
+		push @cmd, ( '--artwork', $meta->{thumbfile} ) if -f $meta->{thumbfile};
+	}
+	# run atomicparsley command
+	my $run_mode = main::hide_progress() || ! $opt->{verbose} ? 'QUIET_STDOUT' : 'STDERR';	
+	if ( main::run_cmd( $run_mode, @cmd ) ) {
+		main::logger "WARNING: Failed to tag \U$meta->{ext}\E file\n";
+		return 2;
+	}
+	# remove images left behind by AtomicParsley
+	unlink glob qq("$meta->{dir}/$meta->{fileprefix}-resized-*");
 }
 
 ############## End OO ##############

@@ -43,20 +43,6 @@
 		D91F9D54187151D600D4388B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D91F9D53187151D600D4388B /* Foundation.framework */; };
 		D91F9D57187151D700D4388B /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D91F9D56187151D700D4388B /* main.m */; };
 		D91F9D5B187151D700D4388B /* GetiPlayerProxyUpdater.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = D91F9D5A187151D700D4388B /* GetiPlayerProxyUpdater.1 */; };
-		D91F9D65187162A800D4388B /* ASIDataCompressor.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9A6149BBE9F004CB558 /* ASIDataCompressor.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		D91F9D67187162A800D4388B /* ASIDataDecompressor.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9A8149BBE9F004CB558 /* ASIDataDecompressor.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		D91F9D69187162A800D4388B /* ASIDownloadCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9AA149BBE9F004CB558 /* ASIDownloadCache.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		D91F9D6B187162A800D4388B /* ASIFormDataRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9AC149BBE9F004CB558 /* ASIFormDataRequest.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		D91F9D6D187162A800D4388B /* ASIHTTPRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9AE149BBE9F004CB558 /* ASIHTTPRequest.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		D91F9D71187162A800D4388B /* ASIInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9B2149BBE9F004CB558 /* ASIInputStream.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		D91F9D73187162A800D4388B /* ASINetworkQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9B4149BBE9F004CB558 /* ASINetworkQueue.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		D921C9B6149BBE9F004CB558 /* ASIDataCompressor.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9A6149BBE9F004CB558 /* ASIDataCompressor.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		D921C9B7149BBE9F004CB558 /* ASIDataDecompressor.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9A8149BBE9F004CB558 /* ASIDataDecompressor.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		D921C9B8149BBE9F004CB558 /* ASIDownloadCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9AA149BBE9F004CB558 /* ASIDownloadCache.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		D921C9B9149BBE9F004CB558 /* ASIFormDataRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9AC149BBE9F004CB558 /* ASIFormDataRequest.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		D921C9BA149BBE9F004CB558 /* ASIHTTPRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9AE149BBE9F004CB558 /* ASIHTTPRequest.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		D921C9BB149BBE9F004CB558 /* ASIInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9B2149BBE9F004CB558 /* ASIInputStream.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		D921C9BC149BBE9F004CB558 /* ASINetworkQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9B4149BBE9F004CB558 /* ASINetworkQueue.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		D921C9E8149BCB16004CB558 /* ITVDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9E7149BCB16004CB558 /* ITVDownload.m */; };
 		D921C9EB149BCDEB004CB558 /* Download.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9EA149BCDEA004CB558 /* Download.m */; };
 		D921C9ED149C4C6F004CB558 /* Body in Resources */ = {isa = PBXBuildFile; fileRef = D921C9EC149C4C6F004CB558 /* Body */; };
@@ -194,24 +180,6 @@
 		D91F9D56187151D700D4388B /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		D91F9D59187151D700D4388B /* GetiPlayerProxyUpdater-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "GetiPlayerProxyUpdater-Prefix.pch"; sourceTree = "<group>"; };
 		D91F9D5A187151D700D4388B /* GetiPlayerProxyUpdater.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = GetiPlayerProxyUpdater.1; sourceTree = "<group>"; };
-		D921C9A4149BBE9F004CB558 /* ASICacheDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASICacheDelegate.h; sourceTree = "<group>"; };
-		D921C9A5149BBE9F004CB558 /* ASIDataCompressor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASIDataCompressor.h; sourceTree = "<group>"; };
-		D921C9A6149BBE9F004CB558 /* ASIDataCompressor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASIDataCompressor.m; sourceTree = "<group>"; };
-		D921C9A7149BBE9F004CB558 /* ASIDataDecompressor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASIDataDecompressor.h; sourceTree = "<group>"; };
-		D921C9A8149BBE9F004CB558 /* ASIDataDecompressor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASIDataDecompressor.m; sourceTree = "<group>"; };
-		D921C9A9149BBE9F004CB558 /* ASIDownloadCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASIDownloadCache.h; sourceTree = "<group>"; };
-		D921C9AA149BBE9F004CB558 /* ASIDownloadCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASIDownloadCache.m; sourceTree = "<group>"; };
-		D921C9AB149BBE9F004CB558 /* ASIFormDataRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASIFormDataRequest.h; sourceTree = "<group>"; };
-		D921C9AC149BBE9F004CB558 /* ASIFormDataRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASIFormDataRequest.m; sourceTree = "<group>"; };
-		D921C9AD149BBE9F004CB558 /* ASIHTTPRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASIHTTPRequest.h; sourceTree = "<group>"; };
-		D921C9AE149BBE9F004CB558 /* ASIHTTPRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASIHTTPRequest.m; sourceTree = "<group>"; };
-		D921C9AF149BBE9F004CB558 /* ASIHTTPRequestConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASIHTTPRequestConfig.h; sourceTree = "<group>"; };
-		D921C9B0149BBE9F004CB558 /* ASIHTTPRequestDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASIHTTPRequestDelegate.h; sourceTree = "<group>"; };
-		D921C9B1149BBE9F004CB558 /* ASIInputStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASIInputStream.h; sourceTree = "<group>"; };
-		D921C9B2149BBE9F004CB558 /* ASIInputStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASIInputStream.m; sourceTree = "<group>"; };
-		D921C9B3149BBE9F004CB558 /* ASINetworkQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASINetworkQueue.h; sourceTree = "<group>"; };
-		D921C9B4149BBE9F004CB558 /* ASINetworkQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASINetworkQueue.m; sourceTree = "<group>"; };
-		D921C9B5149BBE9F004CB558 /* ASIProgressDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASIProgressDelegate.h; sourceTree = "<group>"; };
 		D921C9C1149BBF51004CB558 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = System/Library/Frameworks/CoreServices.framework; sourceTree = SDKROOT; };
 		D921C9E6149BCB16004CB558 /* ITVDownload.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ITVDownload.h; sourceTree = "<group>"; };
 		D921C9E7149BCB16004CB558 /* ITVDownload.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = ITVDownload.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
@@ -303,7 +271,6 @@
 				D9CDC9E9186B906F0003A4E2 /* Applescript */,
 				D9B6DB9B196D9BE600161ECB /* Controllers */,
 				D91787021013803000B82736 /* Models */,
-				D921C9A3149BBE77004CB558 /* ASIHTTPRequest */,
 				D941D9551025DB440012A75F /* JRFeedback */,
 			);
 			name = Classes;
@@ -499,31 +466,6 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		D921C9A3149BBE77004CB558 /* ASIHTTPRequest */ = {
-			isa = PBXGroup;
-			children = (
-				D921C9A4149BBE9F004CB558 /* ASICacheDelegate.h */,
-				D921C9A5149BBE9F004CB558 /* ASIDataCompressor.h */,
-				D921C9A6149BBE9F004CB558 /* ASIDataCompressor.m */,
-				D921C9A7149BBE9F004CB558 /* ASIDataDecompressor.h */,
-				D921C9A8149BBE9F004CB558 /* ASIDataDecompressor.m */,
-				D921C9A9149BBE9F004CB558 /* ASIDownloadCache.h */,
-				D921C9AA149BBE9F004CB558 /* ASIDownloadCache.m */,
-				D921C9AB149BBE9F004CB558 /* ASIFormDataRequest.h */,
-				D921C9AC149BBE9F004CB558 /* ASIFormDataRequest.m */,
-				D921C9AD149BBE9F004CB558 /* ASIHTTPRequest.h */,
-				D921C9AE149BBE9F004CB558 /* ASIHTTPRequest.m */,
-				D921C9AF149BBE9F004CB558 /* ASIHTTPRequestConfig.h */,
-				D921C9B0149BBE9F004CB558 /* ASIHTTPRequestDelegate.h */,
-				D921C9B1149BBE9F004CB558 /* ASIInputStream.h */,
-				D921C9B2149BBE9F004CB558 /* ASIInputStream.m */,
-				D921C9B3149BBE9F004CB558 /* ASINetworkQueue.h */,
-				D921C9B4149BBE9F004CB558 /* ASINetworkQueue.m */,
-				D921C9B5149BBE9F004CB558 /* ASIProgressDelegate.h */,
-			);
-			name = ASIHTTPRequest;
-			sourceTree = "<group>";
-		};
 		D941D9551025DB440012A75F /* JRFeedback */ = {
 			isa = PBXGroup;
 			children = (
@@ -703,22 +645,15 @@
 				D92687C51087F81F000E8132 /* DownloadHistoryController.m in Sources */,
 				D92687CA1087F836000E8132 /* DownloadHistoryEntry.m in Sources */,
 				DFC865E213E96BE200606599 /* ReasonForFailure.m in Sources */,
-				D921C9B6149BBE9F004CB558 /* ASIDataCompressor.m in Sources */,
 				39D7C1C01874AD9D00B78698 /* NilToStringTransformer.m in Sources */,
 				D9B6DB9A196D9AEC00161ECB /* LogController.m in Sources */,
-				D921C9B7149BBE9F004CB558 /* ASIDataDecompressor.m in Sources */,
-				D921C9B8149BBE9F004CB558 /* ASIDownloadCache.m in Sources */,
 				392628B11C999B1A0033CF84 /* EmptyToStringTransformer.m in Sources */,
-				D921C9B9149BBE9F004CB558 /* ASIFormDataRequest.m in Sources */,
 				BF382EDB1D73C2E700BAF106 /* Programme.m in Sources */,
 				D9C1D0F01993BBE00034465E /* GetiPlayerProxy.m in Sources */,
 				39D52EA81DAAFD450033C4ED /* NPHistoryWindowController.m in Sources */,
 				BF382ED41D73C26800BAF106 /* ExtendedShowInformationController.m in Sources */,
-				D921C9BA149BBE9F004CB558 /* ASIHTTPRequest.m in Sources */,
-				D921C9BB149BBE9F004CB558 /* ASIInputStream.m in Sources */,
 				393D1DEE18A5BBB500F27880 /* RSRTVArrayController.m in Sources */,
 				39D7C1BD1874AD7400B78698 /* StringTrimFormatter.m in Sources */,
-				D921C9BC149BBE9F004CB558 /* ASINetworkQueue.m in Sources */,
 				D921C9E8149BCB16004CB558 /* ITVDownload.m in Sources */,
 				D9F97FEC198EBA94006494A3 /* NSFileManager+DirectoryLocations.m in Sources */,
 				D921C9EB149BCDEB004CB558 /* Download.m in Sources */,
@@ -739,16 +674,9 @@
 				D98CC17B18739D1500E29F9E /* HTTPProxy.m in Sources */,
 				D98CC1781873950F00E29F9E /* ITVDownload.m in Sources */,
 				D93FD349187E761800C91E33 /* GTMNSString+HTML.m in Sources */,
-				D91F9D65187162A800D4388B /* ASIDataCompressor.m in Sources */,
-				D91F9D67187162A800D4388B /* ASIDataDecompressor.m in Sources */,
-				D91F9D69187162A800D4388B /* ASIDownloadCache.m in Sources */,
-				D91F9D6B187162A800D4388B /* ASIFormDataRequest.m in Sources */,
-				D91F9D6D187162A800D4388B /* ASIHTTPRequest.m in Sources */,
 				D93FD34B187E76AB00C91E33 /* TVFormat.m in Sources */,
-				D91F9D71187162A800D4388B /* ASIInputStream.m in Sources */,
 				D98CC1791873951800E29F9E /* Download.m in Sources */,
 				D93FD348187E761400C91E33 /* NSString+HTML.m in Sources */,
-				D91F9D73187162A800D4388B /* ASINetworkQueue.m in Sources */,
 				D91F9D57187151D700D4388B /* main.m in Sources */,
 				D98CC17C18739D1800E29F9E /* ITVMediaFileEntry.m in Sources */,
 			);

@@ -83,64 +83,64 @@
     }
 }
 
-- (void)providedProxyDidFinish:(ASIHTTPRequest *)request
-{
-    NSData *urlData = [request responseData];
-    if (request.responseStatusCode != 200 || !urlData)
-    {
-        NSLog(@"WARNING: Provided proxy could not be retrieved. No proxy will be used.");
-        [_logger addToLog:@"WARNING: Provided proxy could not be retrieved. No proxy will be used."];
-        if (!_currentIsSilent)
-        {
-            NSError *error = request.error;
-            NSAlert *alert = [NSAlert alertWithMessageText:@"Provided proxy could not be retrieved.\nDownloads may fail.\nDo you wish to continue?"
-                                             defaultButton:@"No"
-                                           alternateButton:@"Yes"
-                                               otherButton:nil
-                                 informativeTextWithFormat:@"Error: %@", (error ? error.localizedDescription : @"Unknown error")];
-            alert.alertStyle = NSCriticalAlertStyle;
-            if ([alert runModal] == NSAlertDefaultReturn)
-                [self cancelProxyLoad];
-            else
-                [self failProxyLoad];
-        }
-        else
-        {
-            [self failProxyLoad];
-        }
-    }
-    else
-    {
-        NSString *proxyValue = [[[NSString alloc] initWithData:urlData encoding:NSUTF8StringEncoding].lowercaseString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-        if (proxyValue.length == 0)
-        {
-            NSLog(@"WARNING: Provided proxy value was blank. No proxy will be used.");
-            [_logger addToLog:@"WARNING: Provided proxy value was blank. No proxy will be used."];
-            if (!_currentIsSilent)
-            {
-                NSAlert *alert = [NSAlert alertWithMessageText:@"Provided proxy value was blank.\nDownloads may fail.\nDo you wish to continue?"
-                                                 defaultButton:@"No"
-                                               alternateButton:@"Yes"
-                                                   otherButton:nil
-                                     informativeTextWithFormat:@""];
-                alert.alertStyle = NSCriticalAlertStyle;
-                if ([alert runModal] == NSAlertDefaultReturn)
-                    [self cancelProxyLoad];
-                else
-                    [self failProxyLoad];
-            }
-            else
-            {
-                [self failProxyLoad];
-            }
-        }
-        else
-        {
-            _proxyDict[@"proxy"] = [[HTTPProxy alloc] initWithString:proxyValue];
-            [self finishProxyLoad];
-        }
-    }
-}
+//- (void)providedProxyDidFinish:(ASIHTTPRequest *)request
+//{
+//    NSData *urlData = [request responseData];
+//    if (request.responseStatusCode != 200 || !urlData)
+//    {
+//        NSLog(@"WARNING: Provided proxy could not be retrieved. No proxy will be used.");
+//        [_logger addToLog:@"WARNING: Provided proxy could not be retrieved. No proxy will be used."];
+//        if (!_currentIsSilent)
+//        {
+//            NSError *error = request.error;
+//            NSAlert *alert = [NSAlert alertWithMessageText:@"Provided proxy could not be retrieved.\nDownloads may fail.\nDo you wish to continue?"
+//                                             defaultButton:@"No"
+//                                           alternateButton:@"Yes"
+//                                               otherButton:nil
+//                                 informativeTextWithFormat:@"Error: %@", (error ? error.localizedDescription : @"Unknown error")];
+//            alert.alertStyle = NSCriticalAlertStyle;
+//            if ([alert runModal] == NSAlertDefaultReturn)
+//                [self cancelProxyLoad];
+//            else
+//                [self failProxyLoad];
+//        }
+//        else
+//        {
+//            [self failProxyLoad];
+//        }
+//    }
+//    else
+//    {
+//        NSString *proxyValue = [[[NSString alloc] initWithData:urlData encoding:NSUTF8StringEncoding].lowercaseString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+//        if (proxyValue.length == 0)
+//        {
+//            NSLog(@"WARNING: Provided proxy value was blank. No proxy will be used.");
+//            [_logger addToLog:@"WARNING: Provided proxy value was blank. No proxy will be used."];
+//            if (!_currentIsSilent)
+//            {
+//                NSAlert *alert = [NSAlert alertWithMessageText:@"Provided proxy value was blank.\nDownloads may fail.\nDo you wish to continue?"
+//                                                 defaultButton:@"No"
+//                                               alternateButton:@"Yes"
+//                                                   otherButton:nil
+//                                     informativeTextWithFormat:@""];
+//                alert.alertStyle = NSCriticalAlertStyle;
+//                if ([alert runModal] == NSAlertDefaultReturn)
+//                    [self cancelProxyLoad];
+//                else
+//                    [self failProxyLoad];
+//            }
+//            else
+//            {
+//                [self failProxyLoad];
+//            }
+//        }
+//        else
+//        {
+//            _proxyDict[@"proxy"] = [[HTTPProxy alloc] initWithString:proxyValue];
+//            [self finishProxyLoad];
+//        }
+//    }
+//}
 
 - (void)cancelProxyLoad
 {
@@ -168,81 +168,106 @@
 {
     HTTPProxy *proxy = _proxyDict[@"proxy"];
     
-    if (proxy)
-    {
-        if (!proxy.host || (proxy.host).length == 0 || [proxy.host rangeOfString:@"(null)"].location != NSNotFound)
-        {
-            NSLog(@"WARNING: Invalid proxy host: address=%@ length=%ld", proxy.host, (proxy.host).length);
-            [_logger addToLog:[NSString stringWithFormat:@"WARNING: Invalid proxy host: address=%@ length=%ld", proxy.host, (proxy.host).length]];
-            if (!_currentIsSilent)
-            {
-                NSAlert *alert = [NSAlert alertWithMessageText:@"Invalid proxy host.\nDownloads may fail.\nDo you wish to continue?"
-                                                 defaultButton:@"No"
-                                               alternateButton:@"Yes"
-                                                   otherButton:nil
-                                     informativeTextWithFormat:@"Invalid proxy host: address=[%@] length=%ld", proxy.host, (proxy.host).length];
-                alert.alertStyle = NSCriticalAlertStyle;
-                if ([alert runModal] == NSAlertDefaultReturn)
-                    [self cancelProxyLoad];
-                else
-                    [self failProxyTest];
-            }
-            else
-            {
-                [self failProxyLoad];
-            }
-            return;
-        }
-        NSString *testURL = [[NSUserDefaults standardUserDefaults] stringForKey:@"ProxyTestURL"];
-        if (!testURL)
-            testURL = @"http://www.google.com";
-        ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:testURL]];
-        request.delegate = self;
-        request.didFailSelector = @selector(proxyTestDidFinish:);
-        request.didFinishSelector = @selector(proxyTestDidFinish:);
-        request.timeOutSeconds = 30;
-        request.proxyType = proxy.type;
-        request.proxyHost = proxy.host;
-        if (proxy.port) {
-            request.proxyPort = proxy.port;
-        } else {
-            if ([proxy.type isEqualToString:(NSString *)kCFProxyTypeHTTPS]) {
-                request.proxyPort = 443;
-            } else  {
-                request.proxyPort = 80;
-            }
-        }
-        if (proxy.user) {
-            request.proxyUsername = proxy.user;
-            request.proxyPassword = proxy.password;
-        }
-        [self updateProxyLoadStatus:YES message:[NSString stringWithFormat:@"Testing proxy (may take up to %ld seconds)...", (NSInteger)request.timeOutSeconds]];
-        NSLog(@"INFO: Testing proxy (may take up to %ld seconds)...", (NSInteger)request.timeOutSeconds);
-        [_logger addToLog:[NSString stringWithFormat:@"INFO: Testing proxy (may take up to %ld seconds)...", (NSInteger)request.timeOutSeconds]];
-        [request startAsynchronous];
-    }
-    else
-    {
+    if (!proxy) {
         NSLog(@"INFO: No proxy to test");
         [_logger addToLog:@"INFO: No proxy to test"];
         [self finishProxyTest];
+        return;
     }
-}
-
-- (void)proxyTestDidFinish:(ASIHTTPRequest *)request
-{
-    if (request.responseStatusCode != 200)
+    
+    
+    if (!proxy.host || (proxy.host).length == 0 || [proxy.host rangeOfString:@"(null)"].location != NSNotFound)
     {
-        NSLog(@"WARNING: Proxy failed to load test page: %@", request.url);
-        [_logger addToLog:[NSString stringWithFormat:@"WARNING: Proxy failed to load test page: %@", request.url]];
+        NSLog(@"WARNING: Invalid proxy host: address=%@ length=%ld", proxy.host, (proxy.host).length);
+        [_logger addToLog:[NSString stringWithFormat:@"WARNING: Invalid proxy host: address=%@ length=%ld", proxy.host, (proxy.host).length]];
         if (!_currentIsSilent)
         {
-            NSError *error = request.error;
+            NSAlert *alert = [NSAlert alertWithMessageText:@"Invalid proxy host.\nDownloads may fail.\nDo you wish to continue?"
+                                             defaultButton:@"No"
+                                           alternateButton:@"Yes"
+                                               otherButton:nil
+                                 informativeTextWithFormat:@"Invalid proxy host: address=[%@] length=%ld", proxy.host, (proxy.host).length];
+            alert.alertStyle = NSCriticalAlertStyle;
+            if ([alert runModal] == NSAlertDefaultReturn)
+                [self cancelProxyLoad];
+            else
+                [self failProxyTest];
+        }
+        else
+        {
+            [self failProxyLoad];
+        }
+        return;
+    }
+    NSString *testURL = [[NSUserDefaults standardUserDefaults] stringForKey:@"ProxyTestURL"];
+    if (!testURL)
+        testURL = @"http://www.google.com";
+    
+    // ==============================
+    NSUInteger port;
+    if (proxy.port) {
+        port = proxy.port;
+    } else {
+        if ([proxy.type isEqualToString:(NSString *)kCFProxyTypeHTTPS]) {
+            port = 443;
+        } else  {
+            port = 80;
+        }
+    }
+    
+    // Create an NSURLSessionConfiguration that uses the proxy
+    NSMutableDictionary *proxyDict = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                      (__bridge NSString *)kCFProxyTypeHTTP,
+                                      (__bridge NSString *)kCFProxyTypeKey,
+                                      
+                                      @(1),
+                                      (__bridge NSString *)kCFNetworkProxiesHTTPEnable,
+                                      
+                                      proxy.host,
+                                      (__bridge NSString *)kCFStreamPropertyHTTPProxyHost,
+                                      
+                                      @(port),
+                                      (__bridge NSString *)kCFStreamPropertyHTTPProxyPort,
+                                      nil];
+    
+    if (proxy.user) {
+        proxyDict[(NSString *)kCFProxyUsernameKey] = proxy.user;
+        proxyDict[(NSString *)kCFProxyPasswordKey] = proxy.password;
+    }
+    
+    NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration ephemeralSessionConfiguration];
+    configuration.connectionProxyDictionary = proxyDict;
+    configuration.timeoutIntervalForResource = 30;
+    
+    // Create a NSURLSession with our proxy aware configuration
+    NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration delegate:nil delegateQueue:[NSOperationQueue mainQueue]];
+    
+    NSURLSessionDataTask *task = [session dataTaskWithURL:[NSURL URLWithString:testURL] completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+        if ([response isKindOfClass:[NSHTTPURLResponse class]]) {
+            [self proxyTestDidFinish:(NSHTTPURLResponse *)response withError:error];
+        }
+    }];
+    
+    NSString *testingMessage = @"Testing proxy (may take up to 30 seconds)...";
+    [self updateProxyLoadStatus:YES message:testingMessage];
+    NSLog(@"INFO: %@", testingMessage);
+    [_logger addToLog:[NSString stringWithFormat:@"INFO: %@", testingMessage]];
+    [task resume];
+}
+
+- (void)proxyTestDidFinish:(NSHTTPURLResponse *)response withError:(NSError *)error
+{
+    if (response.statusCode != 200)
+    {
+        NSLog(@"WARNING: Proxy failed to load test page: %@", response.URL);
+        [_logger addToLog:[NSString stringWithFormat:@"WARNING: Proxy failed to load test page: %@", response.URL]];
+        if (!_currentIsSilent)
+        {
             NSAlert *alert = [NSAlert alertWithMessageText:@"Proxy failed to load test page.\nDownloads may fail.\nDo you wish to continue?"
                                              defaultButton:@"No"
                                            alternateButton:@"Yes"
                                                otherButton:nil
-                                 informativeTextWithFormat:@"Failed to load %@ within %ld seconds\nUsing proxy: %@\nError: %@", request.url, (NSInteger)request.timeOutSeconds, [_proxyDict[@"proxy"] url], (error ? error.localizedDescription : @"Unknown error")];
+                                 informativeTextWithFormat:@"Failed to load %@ within 30 seconds\nUsing proxy: %@\nError: %@", response.URL, [_proxyDict[@"proxy"] url], (error ? error.localizedDescription : @"Unknown error")];
             alert.alertStyle = NSCriticalAlertStyle;
             if ([alert runModal] == NSAlertDefaultReturn)
                 [self cancelProxyLoad];

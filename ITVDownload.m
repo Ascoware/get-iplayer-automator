@@ -140,10 +140,17 @@
     {
         // Create an NSURLSessionConfiguration that uses the proxy
         NSMutableDictionary *proxyDict = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                          (NSString *)kCFProxyTypeKey, (NSString *)kCFProxyTypeHTTP,
-                                          (NSString *)kCFNetworkProxiesHTTPEnable, @(1),
-                                          (NSString *)kCFNetworkProxiesHTTPProxy, self.proxy.host,
-                                          (NSString *)kCFNetworkProxiesHTTPPort, @(self.proxy.port),
+                                          (__bridge NSString *)kCFProxyTypeHTTP,
+                                          (__bridge NSString *)kCFProxyTypeKey,
+                                          
+                                          @(1),
+                                          (__bridge NSString *)kCFNetworkProxiesHTTPEnable,
+                                          
+                                          self.proxy.host,
+                                          (__bridge NSString *)kCFStreamPropertyHTTPProxyHost,
+                                          
+                                          @(self.proxy.port),
+                                          (__bridge NSString *)kCFStreamPropertyHTTPProxyPort,
                                           nil];
         
         if (self.proxy.user) {
@@ -179,7 +186,7 @@
     if (self.verbose)
         [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata response status code: %ld", request.statusCode] noTag:YES];
     NSString *responseString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-    NSLog(@"DEBUG: Metadata response: %@",responseString);
+//    NSLog(@"DEBUG: Metadata response: %@",responseString);
     if (self.verbose)
         [self addToLog:[NSString stringWithFormat:@"DEBUG: Metadata response: %@", responseString] noTag:YES];
     if (request.statusCode == 0)
@@ -246,6 +253,7 @@
     //Init date formatter
     NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
     dateFormat.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
+    dateFormat.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
     
     //Retrieve Transmission Date
     NSString *dateString = nil;
@@ -253,8 +261,25 @@
     [scanner scanString:@"<TransmissionDate>" intoString:nil];
     [scanner scanUpToString:@"</TransmissionDate>" intoString:&dateString];
     dateFormat.dateFormat = @"dd LLLL yyyy";
-    self.show.dateAired = [dateFormat dateFromString:dateString];
+    NSDate *transmissionDate = [dateFormat dateFromString:dateString];
+
+    NSString *timeString = nil;
+    [scanner scanUpToString:@"<TransmissionTime>" intoString:nil];
+    [scanner scanString:@"<TransmissionTime>" intoString:nil];
+    [scanner scanUpToString:@"</TransmissionTime>" intoString:&timeString];
     
+    if (timeString) {
+        dateFormat.dateFormat = @"HH:mm";
+        NSDate *transmissionTime = [dateFormat dateFromString:timeString];
+        NSCalendar *thisYear = [NSCalendar currentCalendar];
+        thisYear.timeZone = dateFormat.timeZone;
+        
+        NSDateComponents *transmissionTimeComponents = [thisYear components:(NSCalendarUnitHour | NSCalendarUnitMinute) fromDate:transmissionTime];
+        NSDate *airDate = [thisYear dateByAddingComponents:transmissionTimeComponents toDate:transmissionDate options:0];
+        self.show.dateAired = airDate;
+        dateFormat.dateFormat = @"yyyy-MM-dd'T'HH:mm:ssZ";
+        self.show.standardizedAirDate = [dateFormat stringFromDate:self.show.dateAired];
+    }
     //Retrieve Episode Name
     NSString *episodeName = nil;
     [scanner scanUpToString:@"<EpisodeTitle" intoString:nil];
