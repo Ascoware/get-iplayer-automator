@@ -13,9 +13,16 @@
 {
     NSArray *tvFormatKeys = @[@"Best", @"Better", @"Very Good", @"Good", @"Worse", @"Worst"];
     NSArray *tvFormatObjects = @[@"tvbest",@"tvbetter",@"tvvgood",@"tvgood", @"tvworse", @"tvworst"];
+    NSArray *hlsTVFormatObjects = @[@"hlsbest",@"hlsbetter",@"hlsvgood",@"hlsgood", @"hlsworse", @"hlsworst"];
     NSArray *radioFormatKeys = @[@"Best", @"Better", @"Very Good", @"Good", @"Worse", @"Worst"];
     NSArray *radioFormatObjects = @[@"radiobest",@"radiobetter",@"radiovgood",@"radiogood", @"radioworse", @"radioworst"];
-    tvFormats = [[NSDictionary alloc] initWithObjects:tvFormatObjects forKeys:tvFormatKeys];
+    
+    if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"ForceHLSBBCVideo"] boolValue]) {
+        tvFormats = [[NSDictionary alloc] initWithObjects:hlsTVFormatObjects forKeys:tvFormatKeys];
+    } else {
+        tvFormats = [[NSDictionary alloc] initWithObjects:tvFormatObjects forKeys:tvFormatKeys];
+    }
+    
     radioFormats = [[NSDictionary alloc] initWithObjects:radioFormatObjects forKeys:radioFormatKeys];
 }
 #pragma mark Overridden Methods

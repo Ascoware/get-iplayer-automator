@@ -52,8 +52,11 @@ NewProgrammeHistory           *sharedHistoryController;
     _queueArray = [NSMutableArray array];
     
     //Look for Start notifications for ASS
-    [nc addObserver:self selector:@selector(applescriptStartDownloads) name:@"StartDownloads" object:nil];
+    [nc addObserver:self
+           selector:@selector(applescriptStartDownloads) name:@"StartDownloads"
+             object:nil];
     
+
     //Register Default Preferences
     NSMutableDictionary *defaultValues = [[NSMutableDictionary alloc] init];
     
@@ -110,10 +113,15 @@ NewProgrammeHistory           *sharedHistoryController;
     defaultValues[@"SignedNew"] = @NO;
     defaultValues[@"Use50FPSStreams"] = @NO;
     defaultValues[@"GetHigherQualityAudio"] = @YES;
+    defaultValues[@"ForceHLSBBCVideo"] = @NO;
 
     [[NSUserDefaults standardUserDefaults] registerDefaults:defaultValues];
     defaultValues = nil;
     
+    [[NSUserDefaults standardUserDefaults] addObserver:self
+                                            forKeyPath:@"ForceHLSBBCVideo" options:NSKeyValueObservingOptionNew
+                                               context:NULL];
+
     //Migrate old AudioDescribed option
     if ([[NSUserDefaults standardUserDefaults] objectForKey:@"AudioDescribed"]) {
         [[NSUserDefaults standardUserDefaults] setObject:@YES forKey:@"AudioDescribedNew"];
@@ -417,6 +425,19 @@ NewProgrammeHistory           *sharedHistoryController;
         [_logger addToLog:[NSString stringWithFormat:@"ERROR: Growl notification failed (updater): %@: %@", e.name, e.description]];
     }
 }
+
+#pragma mark Preferences changes
+-(void)observeValueForKeyPath:(NSString *)aKeyPath
+                     ofObject:(id)anObject
+                       change:(NSDictionary *)aChange
+                      context:(void *)aContext
+{
+    // Reset TV formats if that option changes, as we need to regenerate it.
+    if ([aKeyPath isEqualToString:@"ForceHLSBBCVideo"]) {
+        [BBCDownload initFormats];
+    }
+}
+
 #pragma mark Cache Update
 - (IBAction)updateCache:(id)sender
 {
@@ -2244,7 +2265,5 @@ NewProgrammeHistory           *sharedHistoryController;
 {
     [[NSNotificationCenter defaultCenter] postNotificationName:@"NewProgrammeDisplayFilterChanged" object:nil];
 }
-
-#pragma mark Properties
 
 @end

@@ -11,10 +11,7 @@
 #import "TVFormat.h"
 #import "RadioFormat.h"
 #import "Download.h"
-
-extern bool runDownloads;
-extern NSDictionary *tvFormats;
-extern NSDictionary *radioFormats;
+#import "AppController.h"
 
 @interface BBCDownload : Download {
 }

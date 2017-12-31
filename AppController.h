@@ -21,6 +21,10 @@
 #import "GetiPlayerArguments.h"
 #import "GetiPlayerProxy.h"
 
+extern bool runDownloads;
+extern NSDictionary *tvFormats;
+extern NSDictionary *radioFormats;
+
 @interface AppController : NSObject <SUUpdaterDelegate>
 //General
 @property (nonatomic, readonly) NSString *getiPlayerPath;
@@ -60,15 +64,12 @@
 //Queue
 @property (nonatomic) IBOutlet NSButton *addToQueue;
 @property (nonatomic) IBOutlet NSArrayController *queueController;
-@property (nonatomic) IBOutlet NSButton *getNamesButton;
 @property (nonatomic) NSMutableArray *queueArray;
 @property (nonatomic) IBOutlet NSTableView *queueTableView;
 @property (nonatomic)  IBOutlet NSToolbarItem *addSeriesLinkToQueueButton;
 
 //Main Window: Status
-@property (nonatomic) IBOutlet NSProgressIndicator *overallIndicator;
 @property (nonatomic) IBOutlet NSProgressIndicator *currentIndicator;
-@property (nonatomic) IBOutlet NSTextField *overallProgress;
 @property (nonatomic) IBOutlet NSTextField *currentProgress;
 
 //Download Controller
