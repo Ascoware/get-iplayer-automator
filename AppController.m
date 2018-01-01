@@ -562,7 +562,12 @@ NewProgrammeHistory           *sharedHistoryController;
     
     if (![typeArgument isEqualToString:@"--type"]) {
         
-        _getiPlayerUpdateArgs = @[_getiPlayerPath,cacheExpiryArg,typeArgument,@"--nopurge",[GetiPlayerArguments sharedController].profileDirArg];
+        _getiPlayerUpdateArgs = @[_getiPlayerPath,
+                                  cacheExpiryArg,
+                                  typeArgument,
+                                  @"--nopurge",
+                                  [GetiPlayerArguments sharedController].profileDirArg,
+                                  @".*"];
         
         if (_proxy && [[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])
         {
