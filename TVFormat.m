@@ -8,24 +8,25 @@
 
 #import "TVFormat.h"
 
-
 @implementation TVFormat
+
 - (instancetype)init
 {
 	if (!(self = [super init])) return nil;
-	format = [[NSString alloc] init];
-	return self;
-}
-- (void) encodeWithCoder: (NSCoder *)coder
-{
-	[coder encodeObject: format forKey:@"format"];
-}
-- (instancetype) initWithCoder: (NSCoder *)coder
-{
-	if (!(self = [super init])) return nil;
-	format = [[NSString alloc] initWithString:[coder decodeObjectForKey:@"format"]];
+    _format = @"";
 	return self;
 }
 
-@synthesize format;
+- (void) encodeWithCoder: (NSCoder *)coder
+{
+	[coder encodeObject: _format forKey:@"format"];
+}
+
+- (instancetype) initWithCoder: (NSCoder *)coder
+{
+	if (!(self = [super init])) return nil;
+	_format = [[NSString alloc] initWithString:[coder decodeObjectForKey:@"format"]];
+	return self;
+}
+
 @end

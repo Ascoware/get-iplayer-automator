@@ -8,12 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
-@interface ITVMediaFileEntry : NSObject {
-    NSString *bitrate;
-    NSString *itvRate;
-    NSString *url;
-}
-@property (readwrite) NSString *bitrate;
-@property (readwrite) NSString *itvRate;
-@property (readwrite) NSString *url;
+@interface ITVMediaFileEntry : NSObject
+@property (nonatomic, copy) NSString *bitrate;
+@property (nonatomic, copy) NSString *itvRate;
+@property (nonatomic, copy) NSString *url;
 @end

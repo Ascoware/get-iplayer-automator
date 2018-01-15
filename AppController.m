@@ -18,6 +18,7 @@
 #import "Chrome.h"
 #import "GetITVListings.h"
 #import "NPHistoryWindowController.h"
+#import "Get_iPlayer_Automator-Swift.h"
 
 static AppController *sharedController;
 bool runDownloads=NO;
@@ -392,7 +393,7 @@ NewProgrammeHistory           *sharedHistoryController;
 {
     //End Downloads if Running
     if (runDownloads)
-        [_currentDownload cancelDownload:nil];
+        [_currentDownload cancelDownload];
     
     [self saveAppData];
 }
@@ -1088,14 +1089,19 @@ NewProgrammeHistory           *sharedHistoryController;
             {
                 if ([show.complete isEqualToNumber:@NO])
                 {
-                    if ([show.tvNetwork hasPrefix:@"ITV"])
-                        _currentDownload = [[ITVDownload alloc] initWithProgramme:show itvFormats:_itvFormatController.arrangedObjects proxy:_proxy logController:_logger];
-                    else
+                    if ([show.tvNetwork hasPrefix:@"ITV"]) {
+                        _currentDownload = [[ITVDownload alloc]
+                                            initWithProgramme:show
+                                            formats:_itvFormatController.arrangedObjects
+                                            proxy:_proxy
+                                            logger:_logger];
+                    } else {
                         _currentDownload = [[BBCDownload alloc] initWithProgramme:show
                                                                        tvFormats:_tvFormatController.arrangedObjects
                                                                     radioFormats:_radioFormatController.arrangedObjects
                                                                            proxy:_proxy
                                                                    logController:_logger];
+                    }
                     break;
                 }
             }
@@ -1132,7 +1138,7 @@ NewProgrammeHistory           *sharedHistoryController;
     
     runDownloads=NO;
     _runScheduled=NO;
-    [_currentDownload cancelDownload:self];
+    [_currentDownload cancelDownload];
     _currentDownload.show.status = @"Cancelled";
     if (!runUpdate)
         [_startButton setEnabled:YES];
@@ -1305,7 +1311,10 @@ NewProgrammeHistory           *sharedHistoryController;
             if ([nextShow.complete isEqualToNumber:@NO])
             {
                 if ([nextShow.tvNetwork hasPrefix:@"ITV"])
-                    _currentDownload = [[ITVDownload alloc] initWithProgramme:nextShow itvFormats:_itvFormatController.arrangedObjects proxy:_proxy logController:_logger];
+                    _currentDownload = [[ITVDownload alloc] initWithProgramme:nextShow
+                                                                         formats:_itvFormatController.arrangedObjects
+                                                                           proxy:_proxy
+                                                                   logger:_logger];
                 else
                     _currentDownload = [[BBCDownload alloc] initWithProgramme:nextShow
                                                                    tvFormats:_tvFormatController.arrangedObjects
@@ -1609,7 +1618,7 @@ NewProgrammeHistory           *sharedHistoryController;
                 {
                     @try {
                         oneFound=YES;
-                        Programme *p = [[Programme alloc] initWithInfo:nil pid:temp_pid programmeName:temp_showName network:temp_tvNetwork logController:_logger];
+                        Programme *p = [[Programme alloc] initWithPid:temp_pid programmeName:temp_showName network:temp_tvNetwork logController:_logger];
                         p.realPID = temp_realPID;
                         p.seriesName = series_Name;
                         p.episodeName = episode_Name;

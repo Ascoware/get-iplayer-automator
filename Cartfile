@@ -1,1 +1,3 @@
 github "sparkle-project/Sparkle" ~> 1.17
+github "tid-kijyun/Kanna" ~> 2.1.0
+

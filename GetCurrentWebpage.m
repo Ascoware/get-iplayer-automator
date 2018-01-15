@@ -244,7 +244,7 @@
       NSScanner *urlScanner = [NSScanner scannerWithString:url];
       [urlScanner scanString:@"http://www.bbc.co.uk/sport/olympics/2012/live-video/" intoString:nil];
       [urlScanner scanUpToString:@"kfejklfjklj" intoString:&pid];
-      return [[Programme alloc] initWithInfo:nil pid:pid programmeName:newShowName network:@"BBC Sport" logController:logger];
+      return [[Programme alloc] initWithPid:pid programmeName:newShowName network:@"BBC Sport" logController:logger];
    }
     else if ([url hasPrefix:@"http://www.itv.com/hub/"] || [url hasPrefix:@"https://www.itv.com/hub/"])
     {

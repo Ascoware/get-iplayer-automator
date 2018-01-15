@@ -472,7 +472,7 @@
         }
     }
 }
-- (void)cancelDownload:(id)sender
+- (void)cancelDownload
 {
     //Some basic cleanup.
     [self.task interrupt];

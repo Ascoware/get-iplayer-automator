@@ -25,7 +25,7 @@
         _defaultsPrefix = @"BBC_";
         
         _log = [[NSMutableString alloc] initWithString:@""];
-        _nc = [NSNotificationCenter defaultCenter];
+//        _nc = [NSNotificationCenter defaultCenter];
         _downloadPath = [[NSString alloc] initWithString:[[NSUserDefaults standardUserDefaults] valueForKey:@"DownloadPath"]];
         _task = [[NSTask alloc] init];
         _pipe = [[NSPipe alloc] init];
@@ -44,6 +44,14 @@
 }
 
 #pragma mark Notification Posters
+- (void)logDebugMessage:(NSString *)message noTag:(BOOL)b {
+    NSLog(@"%@", message);
+    
+    if (self.verbose) {
+        [self addToLog:message noTag:b];
+    }
+}
+
 - (void)addToLog:(NSString *)logMessage noTag:(BOOL)b
 {
 	if (b)
@@ -662,7 +670,7 @@
     filepart = [dateRegex stringByReplacingMatchesInString:filepart options:0 range:NSMakeRange(0, filepart.length) withTemplate:@"$3-$2-$1"];
     _downloadPath = [_downloadPath stringByAppendingPathComponent:filepart];
 }
-- (void)cancelDownload:(id)sender
+- (void)cancelDownload
 {
     [_currentRequest cancel];
 	//Some basic cleanup.

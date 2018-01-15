@@ -21,6 +21,11 @@
 		39D7C1BD1874AD7400B78698 /* StringTrimFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 39D7C1BC1874AD7400B78698 /* StringTrimFormatter.m */; };
 		39D7C1C01874AD9D00B78698 /* NilToStringTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = 39D7C1BF1874AD9D00B78698 /* NilToStringTransformer.m */; };
 		39FD5E9619D370BD006BC47B /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 39FD5E9519D370BD006BC47B /* Images.xcassets */; };
+		7F54B1B01FFBED11006D1325 /* ITVMetadataParseOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F54B1AF1FFBED11006D1325 /* ITVMetadataParseOperation.swift */; };
+		7F54B1B11FFD656C006D1325 /* ITVDownload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F340B5A1FFB063700F415A4 /* ITVDownload.swift */; };
+		7F54B1B31FFF38E8006D1325 /* Kanna.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F54B1B21FFF38E8006D1325 /* Kanna.framework */; };
+		7F54B1B41FFF38F8006D1325 /* Kanna.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7F54B1B21FFF38E8006D1325 /* Kanna.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		7F54B1B61FFF3AB7006D1325 /* GetITVListings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F54B1B51FFF3AB7006D1325 /* GetITVListings.swift */; };
 		7F9DB6131F6340A30020D5D7 /* get_iplayer in Resources */ = {isa = PBXBuildFile; fileRef = 7F9DB6121F6340460020D5D7 /* get_iplayer */; };
 		7F9FE9211EC16ED80058CB1B /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F9FE9201EC16ED80058CB1B /* libz.tbd */; };
 		7F9FE9231EC16F160058CB1B /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F9FE9221EC16F160058CB1B /* IOKit.framework */; };
@@ -43,7 +48,7 @@
 		D91F9D54187151D600D4388B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D91F9D53187151D600D4388B /* Foundation.framework */; };
 		D91F9D57187151D700D4388B /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D91F9D56187151D700D4388B /* main.m */; };
 		D91F9D5B187151D700D4388B /* GetiPlayerProxyUpdater.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = D91F9D5A187151D700D4388B /* GetiPlayerProxyUpdater.1 */; };
-		D921C9E8149BCB16004CB558 /* ITVDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9E7149BCB16004CB558 /* ITVDownload.m */; };
+		D921C9E8149BCB16004CB558 /* OldITVDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9E7149BCB16004CB558 /* OldITVDownload.m */; };
 		D921C9EB149BCDEB004CB558 /* Download.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9EA149BCDEA004CB558 /* Download.m */; };
 		D921C9ED149C4C6F004CB558 /* Body in Resources */ = {isa = PBXBuildFile; fileRef = D921C9EC149C4C6F004CB558 /* Body */; };
 		D92687C51087F81F000E8132 /* DownloadHistoryController.m in Sources */ = {isa = PBXBuildFile; fileRef = D92687C41087F81F000E8132 /* DownloadHistoryController.m */; };
@@ -62,7 +67,7 @@
 		D943D2791B37B1D800452FCD /* AtomicParsley in CopyFiles */ = {isa = PBXBuildFile; fileRef = D961247E10F12C9200046D31 /* AtomicParsley */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		D97D9426106DBB68006ECD39 /* TVFormat.m in Sources */ = {isa = PBXBuildFile; fileRef = D97D9423106DBB68006ECD39 /* TVFormat.m */; };
 		D97D9427106DBB68006ECD39 /* RadioFormat.m in Sources */ = {isa = PBXBuildFile; fileRef = D97D9424106DBB68006ECD39 /* RadioFormat.m */; };
-		D98CC1781873950F00E29F9E /* ITVDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9E7149BCB16004CB558 /* ITVDownload.m */; };
+		D98CC1781873950F00E29F9E /* OldITVDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9E7149BCB16004CB558 /* OldITVDownload.m */; };
 		D98CC1791873951800E29F9E /* Download.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9EA149BCDEA004CB558 /* Download.m */; };
 		D98CC17B18739D1500E29F9E /* HTTPProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 392A41A3169735340053DEA5 /* HTTPProxy.m */; };
 		D98CC17C18739D1800E29F9E /* ITVMediaFileEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = D9D06C6E14BB91C200029340 /* ITVMediaFileEntry.m */; };
@@ -113,6 +118,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				7F54B1B41FFF38F8006D1325 /* Kanna.framework in Copy Frameworks */,
 				39ABB9C017FCCD9300B5D519 /* Growl.framework in Copy Frameworks */,
 				7F9FE9251EC170E60058CB1B /* Sparkle.framework in Copy Frameworks */,
 			);
@@ -150,6 +156,11 @@
 		39D7C1BE1874AD9D00B78698 /* NilToStringTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NilToStringTransformer.h; sourceTree = "<group>"; };
 		39D7C1BF1874AD9D00B78698 /* NilToStringTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NilToStringTransformer.m; sourceTree = "<group>"; };
 		39FD5E9519D370BD006BC47B /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = "Get iPlayer Automator/Images.xcassets"; sourceTree = "<group>"; };
+		7F340B591FFB063700F415A4 /* Get iPlayer Automator-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Get iPlayer Automator-Bridging-Header.h"; sourceTree = "<group>"; };
+		7F340B5A1FFB063700F415A4 /* ITVDownload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ITVDownload.swift; sourceTree = "<group>"; };
+		7F54B1AF1FFBED11006D1325 /* ITVMetadataParseOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ITVMetadataParseOperation.swift; sourceTree = "<group>"; };
+		7F54B1B21FFF38E8006D1325 /* Kanna.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Kanna.framework; path = Carthage/Build/Mac/Kanna.framework; sourceTree = "<group>"; };
+		7F54B1B51FFF3AB7006D1325 /* GetITVListings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetITVListings.swift; sourceTree = "<group>"; };
 		7F9DB6121F6340460020D5D7 /* get_iplayer */ = {isa = PBXFileReference; lastKnownFileType = text; path = get_iplayer; sourceTree = SOURCE_ROOT; };
 		7F9FE91E1EC16E3E0058CB1B /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = Carthage/Build/Mac/Sparkle.framework; sourceTree = "<group>"; };
 		7F9FE9201EC16ED80058CB1B /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
@@ -181,8 +192,8 @@
 		D91F9D59187151D700D4388B /* GetiPlayerProxyUpdater-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "GetiPlayerProxyUpdater-Prefix.pch"; sourceTree = "<group>"; };
 		D91F9D5A187151D700D4388B /* GetiPlayerProxyUpdater.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = GetiPlayerProxyUpdater.1; sourceTree = "<group>"; };
 		D921C9C1149BBF51004CB558 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = System/Library/Frameworks/CoreServices.framework; sourceTree = SDKROOT; };
-		D921C9E6149BCB16004CB558 /* ITVDownload.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ITVDownload.h; sourceTree = "<group>"; };
-		D921C9E7149BCB16004CB558 /* ITVDownload.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = ITVDownload.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		D921C9E6149BCB16004CB558 /* OldITVDownload.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OldITVDownload.h; sourceTree = "<group>"; };
+		D921C9E7149BCB16004CB558 /* OldITVDownload.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = OldITVDownload.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		D921C9E9149BCDEA004CB558 /* Download.h */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.h; path = Download.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; wrapsLines = 1; };
 		D921C9EA149BCDEA004CB558 /* Download.m */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.objc; path = Download.m; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; wrapsLines = 1; };
 		D921C9EC149C4C6F004CB558 /* Body */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Body; sourceTree = "<group>"; };
@@ -245,6 +256,7 @@
 			files = (
 				7F9FE9231EC16F160058CB1B /* IOKit.framework in Frameworks */,
 				7F9FE9211EC16ED80058CB1B /* libz.tbd in Frameworks */,
+				7F54B1B31FFF38E8006D1325 /* Kanna.framework in Frameworks */,
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
 				D914BC59100C9F0100F7E68E /* ScriptingBridge.framework in Frameworks */,
 				7F9FE9241EC170E60058CB1B /* Sparkle.framework in Frameworks */,
@@ -279,6 +291,7 @@
 		1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				7F54B1B21FFF38E8006D1325 /* Kanna.framework */,
 				7F9FE91E1EC16E3E0058CB1B /* Sparkle.framework */,
 				D93AD85317DC9D6E00458B1C /* Growl.framework */,
 				D921C9C1149BBF51004CB558 /* CoreServices.framework */,
@@ -312,6 +325,7 @@
 		29B97314FDCFA39411CA2CEA /* Get_iPlayer GUI */ = {
 			isa = PBXGroup;
 			children = (
+				7F54B1B51FFF3AB7006D1325 /* GetITVListings.swift */,
 				D9B6DB97196D938300161ECB /* Interface2.xib */,
 				D9CCF52E10259DED009205BE /* Features.rtf */,
 				D9F97FE9198EBA73006494A3 /* Categories */,
@@ -331,6 +345,7 @@
 				3975484C1622504F00470DD1 /* ttml2srt.py */,
 				D90EF1361029CB3100290A67 /* Scripting Headers */,
 				32CA4F630368D1EE00C91783 /* Get_iPlayer GUI_Prefix.pch */,
+				7F340B591FFB063700F415A4 /* Get iPlayer Automator-Bridging-Header.h */,
 				29B97316FDCFA39411CA2CEA /* main.m */,
 				D975D7EA19A11D9E00EEF909 /* UpdateBuildNumber.sh */,
 			);
@@ -418,8 +433,9 @@
 				D921C9EA149BCDEA004CB558 /* Download.m */,
 				D914BD27100CBFA900F7E68E /* BBCDownload.h */,
 				D914BD28100CBFA900F7E68E /* BBCDownload.m */,
-				D921C9E6149BCB16004CB558 /* ITVDownload.h */,
-				D921C9E7149BCB16004CB558 /* ITVDownload.m */,
+				D921C9E6149BCB16004CB558 /* OldITVDownload.h */,
+				D921C9E7149BCB16004CB558 /* OldITVDownload.m */,
+				7F340B5A1FFB063700F415A4 /* ITVDownload.swift */,
 				D9F97FE3198E9043006494A3 /* GetCurrentWebpage.h */,
 				D9F97FE4198E9043006494A3 /* GetCurrentWebpage.m */,
 				BF382ED51D73C29B00BAF106 /* GetiPlayerArguments.h */,
@@ -482,6 +498,7 @@
 		D9B6DB9B196D9BE600161ECB /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				7F54B1AF1FFBED11006D1325 /* ITVMetadataParseOperation.swift */,
 				39D52EA61DAAFD450033C4ED /* NPHistoryWindowController.h */,
 				39D52EA71DAAFD450033C4ED /* NPHistoryWindowController.m */,
 				BF382EDC1D73C2FB00BAF106 /* GetITVListings.h */,
@@ -572,6 +589,7 @@
 				ORGANIZATIONNAME = "";
 				TargetAttributes = {
 					8D1107260486CEB800E47090 = {
+						LastSwiftMigration = 0910;
 						ProvisioningStyle = Automatic;
 					};
 					D91F9D51187151D600D4388B = {
@@ -641,12 +659,15 @@
 				D97D9426106DBB68006ECD39 /* TVFormat.m in Sources */,
 				D97D9427106DBB68006ECD39 /* RadioFormat.m in Sources */,
 				D9F97FE5198E9043006494A3 /* GetCurrentWebpage.m in Sources */,
+				7F54B1B11FFD656C006D1325 /* ITVDownload.swift in Sources */,
 				D9CDC9EC186B90A90003A4E2 /* ASDownloadShows.m in Sources */,
 				D92687C51087F81F000E8132 /* DownloadHistoryController.m in Sources */,
+				7F54B1B01FFBED11006D1325 /* ITVMetadataParseOperation.swift in Sources */,
 				D92687CA1087F836000E8132 /* DownloadHistoryEntry.m in Sources */,
 				DFC865E213E96BE200606599 /* ReasonForFailure.m in Sources */,
 				39D7C1C01874AD9D00B78698 /* NilToStringTransformer.m in Sources */,
 				D9B6DB9A196D9AEC00161ECB /* LogController.m in Sources */,
+				7F54B1B61FFF3AB7006D1325 /* GetITVListings.swift in Sources */,
 				392628B11C999B1A0033CF84 /* EmptyToStringTransformer.m in Sources */,
 				BF382EDB1D73C2E700BAF106 /* Programme.m in Sources */,
 				D9C1D0F01993BBE00034465E /* GetiPlayerProxy.m in Sources */,
@@ -654,7 +675,7 @@
 				BF382ED41D73C26800BAF106 /* ExtendedShowInformationController.m in Sources */,
 				393D1DEE18A5BBB500F27880 /* RSRTVArrayController.m in Sources */,
 				39D7C1BD1874AD7400B78698 /* StringTrimFormatter.m in Sources */,
-				D921C9E8149BCB16004CB558 /* ITVDownload.m in Sources */,
+				D921C9E8149BCB16004CB558 /* OldITVDownload.m in Sources */,
 				D9F97FEC198EBA94006494A3 /* NSFileManager+DirectoryLocations.m in Sources */,
 				D921C9EB149BCDEB004CB558 /* Download.m in Sources */,
 				D9D06C6F14BB91C200029340 /* ITVMediaFileEntry.m in Sources */,
@@ -672,7 +693,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D98CC17B18739D1500E29F9E /* HTTPProxy.m in Sources */,
-				D98CC1781873950F00E29F9E /* ITVDownload.m in Sources */,
+				D98CC1781873950F00E29F9E /* OldITVDownload.m in Sources */,
 				D93FD349187E761800C91E33 /* GTMNSString+HTML.m in Sources */,
 				D93FD34B187E76AB00C91E33 /* TVFormat.m in Sources */,
 				D98CC1791873951800E29F9E /* Download.m in Sources */,
@@ -725,6 +746,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
@@ -744,6 +766,7 @@
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_MISSING_PARENTHESES = YES;
 				GCC_WARN_SHADOW = NO;
+				HEADER_SEARCH_PATHS = "$(SDKROOT)/usr/include/libxml2";
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = /Applications;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @loader_path/../Frameworks";
@@ -751,7 +774,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/Binaries\"",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CODE_SIGN_FLAGS = "--no-strict";
 				OTHER_LDFLAGS = "-licucore";
@@ -760,6 +783,9 @@
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
+				SWIFT_OBJC_BRIDGING_HEADER = "Get iPlayer Automator-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 				VALID_ARCHS = x86_64;
 			};
 			name = Debug;
@@ -769,6 +795,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
@@ -783,6 +810,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Get_iPlayer GUI_Prefix.pch";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				HEADER_SEARCH_PATHS = "$(SDKROOT)/usr/include/libxml2";
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = /Applications;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @loader_path/../Frameworks";
@@ -790,7 +818,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/Binaries\"",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CODE_SIGN_FLAGS = "--no-strict";
 				OTHER_LDFLAGS = "-licucore";
@@ -799,6 +827,8 @@
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
+				SWIFT_OBJC_BRIDGING_HEADER = "Get iPlayer Automator-Bridging-Header.h";
+				SWIFT_VERSION = 3.0;
 				VALID_ARCHS = x86_64;
 			};
 			name = Release;
@@ -823,6 +853,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				DEBUG = "";
+				DEFINES_MODULE = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -859,6 +890,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				DEBUG = "";
+				DEFINES_MODULE = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = "";
