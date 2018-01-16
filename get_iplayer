@@ -24,8 +24,8 @@
 #
 #
 package main;
+my $version = 3.12;
 my $version_text;
-my $version = 3.09;
 $version_text = sprintf("v%.2f", $version) unless $version_text;
 #
 # Help:
@@ -856,7 +856,7 @@ sub find_matches {
 	}
 
 	unless ( @search_args ) {
-		if ( grep(/^(exclude|category|excludecategory|channel|excludechannel|availablesince|expiresbefore|since|before|list|tree|fields|future|long)$/, keys %{$opt}) || ( $opt->{type} && ! $opt->{refresh} ) ) {
+		if ( !( $opt->{refresh} || $opt->{cachereset} ) && grep(/^(exclude|category|excludecategory|channel|excludechannel|availablesince|expiresbefore|since|before|list|tree|fields|future|long|type)$/, keys %{$opt}) ) {
 			# force to stderr for web pvr
 			print STDERR "ERROR: Search term(s) required. To list all programmes, use \".*\" (incl. quotes)\n";
 		}
@@ -2242,7 +2242,7 @@ sub usage {
 	my @man;
 	my @dump;
 	push @man,
-		'.TH GET_IPLAYER "1" "December 2017" "Phil Lewis" "get_iplayer Manual"',
+		'.TH GET_IPLAYER "1" "January 2018" "Phil Lewis" "get_iplayer Manual"',
 		'.SH NAME', 'get_iplayer - Stream Recording tool and PVR for BBC iPlayer',
 		'.SH SYNOPSIS',
 		'\fBget_iplayer\fR [<options>] [<regex|index> ...]',
@@ -4518,6 +4518,7 @@ sub get_metadata {
 							my @other_types = grep !/(described|description|sign|open subtitles)/i, @ver_types;
 							next unless @other_types;
 							($type = lc($other_types[0])) =~ s/\s+.*$//;
+							$type =~ s/\W//g;
 						}
 						if ( $type ) {
 							my $version = $type;
@@ -6064,7 +6065,7 @@ use IO::Seekable;
 use IO::Socket;
 use LWP::ConnCache;
 use LWP::UserAgent;
-use POSIX qw(ceil mkfifo strftime);
+use POSIX qw(mkfifo strftime);
 use strict;
 use Time::Local;
 use URI;
@@ -6195,40 +6196,42 @@ sub get_links_schedule {
 	}
 	my @schedule_dates;
 	my $limit = 0;
-	my $one_week = 7 * 86400;
-	my $then = $now - $one_week;
-	my $this_year = (gmtime($now))[5];
-	my $that_year = (gmtime($then))[5];
-	my $this_week = strftime( "%W", gmtime($now) );
-	my $that_week = strftime( "%W", gmtime($then) );
-	my $cache_file = "${profile_dir}/${prog_type}.cache";
-	my ($cache_this_week, $cache_last_week);
-	if ( ! $opt->{cachereset} && -f $cache_file ) {
-		my $cache_time = stat($cache_file)->mtime;
-		my $cache_year = (gmtime($cache_time))[5];
-		my $cache_week = strftime( "%W", gmtime($cache_time) );
-		$cache_this_week = ( $this_year == $cache_year && $this_week == $cache_week );
-		$cache_last_week = ( $that_year == $cache_year && $that_week == $cache_week );
-	}
 	if ( $future ) {
 		push @schedule_dates, "this_week", "next_week";
 	} else {
 		my $limit_days = $opt->{"refreshlimit".${prog_type}} || $opt->{"refreshlimit"};
 		$limit_days = 0 if $limit_days < 0;
 		$limit_days = 30 if $limit_days > 30;
-		$limit = $now - (ceil($limit_days / 7) * 7 * 86400) if $limit_days;
+		$limit = $now - ($limit_days * 86400) if $limit_days;
 		if ( $limit ) {
-			my $limit_time = $limit;
-			my $limit_year = (gmtime($limit_time))[5];
-			my $limit_week = strftime( "%W", gmtime($limit_time) );
-			while ( $limit_time < $then ) {
-				push @schedule_dates, sprintf("%04d/w%02d", $limit_year+1900, $limit_week+1);
-				$limit_time += $one_week;
-				$limit_year = (gmtime($limit_time))[5];
-				$limit_week = strftime( "%W", gmtime($limit_time) );
+			eval "require Time::Piece";
+			if ( $@ ) {
+				main::logger "WARNING: Please download and run latest installer or install the Time::Piece Perl module for --cache-rebuild or --refresh-limit.\n";
+				main::logger "ERROR: Failed to load Time::Piece:\n$@" if $opt->{verbose};
+				return;
+			}
+			my $one_week = 7 * 86400;
+			my $iso8601_year_diff;
+			my $timepiece = Time::Piece::gmtime($limit);
+			my $stop = Time::Piece::gmtime($now);
+			while ( $timepiece->week != $stop->week ) {
+				$iso8601_year_diff = int($timepiece->mon == 12 && $timepiece->week == 1);
+				$iso8601_year_diff = -1 if $timepiece->mon == 1 && $timepiece->week > 51;
+				push @schedule_dates, sprintf("%04d/w%02d", $timepiece->year + $iso8601_year_diff, $timepiece->week);
+				$timepiece += $one_week;
 			}
 			push @schedule_dates, "this_week";
 		} else {
+			my $cache_file = "${profile_dir}/${prog_type}.cache";
+			my $cache_this_week;
+			if ( ! $opt->{cachereset} && -f $cache_file ) {
+				my $this_year = (gmtime($now))[5];
+				my $this_week = strftime( "%W", gmtime($now) );
+				my $cache_time = stat($cache_file)->mtime;
+				my $cache_year = (gmtime($cache_time))[5];
+				my $cache_week = strftime( "%W", gmtime($cache_time) );
+				$cache_this_week = ( $this_year == $cache_year && $this_week == $cache_week );
+			}
 			push @schedule_dates, "last_week" unless $cache_this_week;
 			push @schedule_dates, "this_week";
 		}
@@ -6882,8 +6885,6 @@ sub get_links {
 	# Do nothing here, as Get IPlayer Automator will do it.
 	return 0;
 }
-
-
 
 ################### Radio Programme class #################
 package Programme::radio;
