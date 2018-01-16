@@ -1380,24 +1380,24 @@
         <window title="Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="PreferencesWindow" animationBehavior="default" id="547" userLabel="Preferences" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" utility="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="196" y="16" width="500" height="567"/>
+            <rect key="contentRect" x="196" y="16" width="497" height="626"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1178"/>
             <view key="contentView" misplaced="YES" id="548">
-                <rect key="frame" x="0.0" y="0.0" width="500" height="567"/>
+                <rect key="frame" x="0.0" y="0.0" width="497" height="626"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <tabView misplaced="YES" id="1069">
-                        <rect key="frame" x="14" y="7" width="474" height="546"/>
+                        <rect key="frame" x="13" y="2" width="471" height="610"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <font key="font" metaFont="system"/>
                         <tabViewItems>
                             <tabViewItem label="General" identifier="1" id="1070">
                                 <view key="view" id="1071">
-                                    <rect key="frame" x="10" y="33" width="454" height="500"/>
+                                    <rect key="frame" x="10" y="33" width="451" height="564"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="YES" id="850">
-                                            <rect key="frame" x="14" y="287" width="102" height="17"/>
+                                            <rect key="frame" x="14" y="351" width="102" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Items to Cache:" id="851">
                                                 <font key="font" metaFont="system"/>
@@ -1406,7 +1406,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="YES" id="581">
-                                            <rect key="frame" x="14" y="314" width="238" height="17"/>
+                                            <rect key="frame" x="14" y="378" width="238" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Default Browser (for Retrieving PIDs):" id="582">
                                                 <font key="font" metaFont="system"/>
@@ -1415,7 +1415,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="YES" id="891">
-                                            <rect key="frame" x="215" y="261" width="45" height="17"/>
+                                            <rect key="frame" x="215" y="325" width="45" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Hours" id="892">
                                                 <font key="font" metaFont="system"/>
@@ -1424,7 +1424,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="YES" id="562">
-                                            <rect key="frame" x="142" y="431" width="295" height="22"/>
+                                            <rect key="frame" x="142" y="495" width="295" height="22"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="563">
                                                 <font key="font" metaFont="system"/>
@@ -1440,7 +1440,7 @@
                                             </connections>
                                         </textField>
                                         <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="YES" id="887">
-                                            <rect key="frame" x="14" y="261" width="131" height="17"/>
+                                            <rect key="frame" x="14" y="325" width="131" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Refresh Cache Every" id="888">
                                                 <font key="font" metaFont="system"/>
@@ -1449,7 +1449,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <popUpButton verticalHuggingPriority="750" misplaced="YES" id="583">
-                                            <rect key="frame" x="247" y="309" width="179" height="26"/>
+                                            <rect key="frame" x="247" y="373" width="154" height="26"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <popUpButtonCell key="cell" type="push" title="Chrome" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="1529" id="584">
                                                 <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -1466,7 +1466,7 @@
                                             </connections>
                                         </popUpButton>
                                         <button misplaced="YES" id="852">
-                                            <rect key="frame" x="126" y="285" width="79" height="18"/>
+                                            <rect key="frame" x="126" y="349" width="79" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="BBC TV" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="853">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1478,7 +1478,7 @@
                                             </connections>
                                         </button>
                                         <button horizontalHuggingPriority="750" verticalHuggingPriority="750" misplaced="YES" id="893">
-                                            <rect key="frame" x="266" y="257" width="25" height="25"/>
+                                            <rect key="frame" x="266" y="321" width="25" height="25"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="help" bezelStyle="helpButton" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="894">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1489,7 +1489,7 @@
                                             </connections>
                                         </button>
                                         <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="YES" id="555">
-                                            <rect key="frame" x="14" y="436" width="44" height="17"/>
+                                            <rect key="frame" x="14" y="500" width="44" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Proxy:" id="556">
                                                 <font key="font" metaFont="system"/>
@@ -1498,7 +1498,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <matrix verticalHuggingPriority="750" misplaced="YES" allowsEmptySelection="NO" id="557">
-                                            <rect key="frame" x="60" y="415" width="78" height="38"/>
+                                            <rect key="frame" x="60" y="479" width="78" height="38"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             <size key="cellSize" width="78" height="18"/>
@@ -1524,7 +1524,7 @@
                                             </connections>
                                         </matrix>
                                         <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="YES" id="549">
-                                            <rect key="frame" x="14" y="461" width="103" height="17"/>
+                                            <rect key="frame" x="14" y="525" width="103" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Download Path" id="550">
                                                 <font key="font" metaFont="system"/>
@@ -1533,7 +1533,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="YES" id="551">
-                                            <rect key="frame" x="116" y="458" width="232" height="22"/>
+                                            <rect key="frame" x="116" y="522" width="232" height="22"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="552">
                                                 <font key="font" metaFont="system"/>
@@ -1549,7 +1549,7 @@
                                             </connections>
                                         </textField>
                                         <button misplaced="YES" id="858">
-                                            <rect key="frame" x="313" y="285" width="97" height="18"/>
+                                            <rect key="frame" x="313" y="349" width="97" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="BBC Radio" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="859">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1565,7 +1565,7 @@
                                             </connections>
                                         </button>
                                         <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="YES" id="889">
-                                            <rect key="frame" x="150" y="258" width="60" height="22"/>
+                                            <rect key="frame" x="150" y="322" width="60" height="22"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="890">
                                                 <font key="font" metaFont="system"/>
@@ -1581,7 +1581,7 @@
                                             </connections>
                                         </textField>
                                         <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="YES" id="574">
-                                            <rect key="frame" x="247" y="363" width="48" height="22"/>
+                                            <rect key="frame" x="247" y="427" width="48" height="22"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="575">
                                                 <font key="font" metaFont="system"/>
@@ -1598,7 +1598,7 @@
                                             </connections>
                                         </textField>
                                         <button verticalHuggingPriority="750" misplaced="YES" id="553">
-                                            <rect key="frame" x="345" y="451" width="98" height="32"/>
+                                            <rect key="frame" x="345" y="515" width="98" height="32"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="push" title="Choose..." bezelStyle="rounded" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="554">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1608,19 +1608,8 @@
                                                 <action selector="chooseDownloadPath:" target="621" id="909"/>
                                             </connections>
                                         </button>
-                                        <button verticalHuggingPriority="750" misplaced="YES" id="1279">
-                                            <rect key="frame" x="300" y="6" width="152" height="32"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="push" title="Restore Defaults..." bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1280">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="restoreDefaults:" target="621" id="1281"/>
-                                            </connections>
-                                        </button>
                                         <button misplaced="YES" id="1292">
-                                            <rect key="frame" x="15" y="391" width="187" height="18"/>
+                                            <rect key="frame" x="15" y="455" width="187" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Use Proxy for all Activities" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="1293">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1635,7 +1624,7 @@
                                             </connections>
                                         </button>
                                         <button misplaced="YES" id="1309">
-                                            <rect key="frame" x="14" y="134" width="233" height="18"/>
+                                            <rect key="frame" x="14" y="198" width="233" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Delete old Series-Link entries after" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1310">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1646,7 +1635,7 @@
                                             </connections>
                                         </button>
                                         <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="YES" id="1311">
-                                            <rect key="frame" x="252" y="133" width="37" height="22"/>
+                                            <rect key="frame" x="252" y="197" width="37" height="22"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="days" drawsBackground="YES" id="1312">
                                                 <font key="font" metaFont="system"/>
@@ -1658,7 +1647,7 @@
                                             </connections>
                                         </textField>
                                         <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="YES" id="1472" userLabel="When searching, look for">
-                                            <rect key="frame" x="14" y="112" width="159" height="17"/>
+                                            <rect key="frame" x="14" y="176" width="159" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="When searching, look for:" id="1473">
                                                 <font key="font" metaFont="system"/>
@@ -1667,7 +1656,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <button misplaced="YES" id="bGk-Hx-Mhw">
-                                            <rect key="frame" x="225" y="285" width="83" height="18"/>
+                                            <rect key="frame" x="225" y="349" width="83" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="ITV TV" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="7pT-vJ-dMF">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1679,7 +1668,7 @@
                                             </connections>
                                         </button>
                                         <button horizontalHuggingPriority="750" verticalHuggingPriority="750" misplaced="YES" id="862">
-                                            <rect key="frame" x="414" y="297" width="25" height="25"/>
+                                            <rect key="frame" x="408" y="373" width="25" height="25"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="help" bezelStyle="helpButton" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="863">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1690,7 +1679,7 @@
                                             </connections>
                                         </button>
                                         <button misplaced="YES" id="579">
-                                            <rect key="frame" x="14" y="339" width="245" height="18"/>
+                                            <rect key="frame" x="14" y="403" width="245" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Add Completed Downloads to iTunes" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="580">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1705,7 +1694,7 @@
                                             </connections>
                                         </button>
                                         <button misplaced="YES" id="570">
-                                            <rect key="frame" x="14" y="365" width="228" height="18"/>
+                                            <rect key="frame" x="14" y="429" width="228" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Auto-retry Failed Downloads After" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="571">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1720,7 +1709,7 @@
                                             </connections>
                                         </button>
                                         <button misplaced="YES" id="936">
-                                            <rect key="frame" x="14" y="234" width="110" height="18"/>
+                                            <rect key="frame" x="14" y="298" width="110" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Verbose Mode" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="937">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1731,7 +1720,7 @@
                                             </connections>
                                         </button>
                                         <button misplaced="YES" id="978">
-                                            <rect key="frame" x="14" y="209" width="379" height="18"/>
+                                            <rect key="frame" x="14" y="273" width="379" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Add Available Series-Link Programmes to Queue at Startup" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="979">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1742,7 +1731,7 @@
                                             </connections>
                                         </button>
                                         <button misplaced="YES" id="1286">
-                                            <rect key="frame" x="14" y="184" width="139" height="18"/>
+                                            <rect key="frame" x="14" y="248" width="139" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Download Subtitles" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="1287">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1753,7 +1742,7 @@
                                             </connections>
                                         </button>
                                         <button misplaced="YES" id="1301">
-                                            <rect key="frame" x="14" y="159" width="177" height="18"/>
+                                            <rect key="frame" x="14" y="223" width="177" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Use Kodi (XBMC) Naming" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="1302">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1768,7 +1757,7 @@
                                             </connections>
                                         </button>
                                         <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="YES" id="1322">
-                                            <rect key="frame" x="292" y="136" width="38" height="17"/>
+                                            <rect key="frame" x="292" y="200" width="38" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="days." id="1323">
                                                 <font key="font" metaFont="system"/>
@@ -1777,7 +1766,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <button misplaced="YES" id="1486">
-                                            <rect key="frame" x="14" y="48" width="293" height="18"/>
+                                            <rect key="frame" x="14" y="112" width="293" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Tag Downloaded Programmes with Metadata" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="1487">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1788,7 +1777,7 @@
                                             </connections>
                                         </button>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" id="Bol-Oe-8Ee">
-                                            <rect key="frame" x="301" y="365" width="53" height="17"/>
+                                            <rect key="frame" x="301" y="429" width="53" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Minutes" id="M3t-mW-D8T">
                                                 <font key="font" metaFont="system"/>
@@ -1797,7 +1786,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <button misplaced="YES" id="1474">
-                                            <rect key="frame" x="58" y="88" width="119" height="18"/>
+                                            <rect key="frame" x="58" y="152" width="119" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Signed versions" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="1475">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1808,7 +1797,7 @@
                                             </connections>
                                         </button>
                                         <button misplaced="YES" id="bjS-0F-vwY">
-                                            <rect key="frame" x="58" y="68" width="177" height="18"/>
+                                            <rect key="frame" x="58" y="132" width="177" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Audio Described versions" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="BqQ-Cj-hgl">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1818,29 +1807,40 @@
                                                 <binding destination="668" name="value" keyPath="values.AudioDescribedNew" id="JbU-6S-ZFJ"/>
                                             </connections>
                                         </button>
+                                        <button verticalHuggingPriority="750" misplaced="YES" id="1279">
+                                            <rect key="frame" x="149" y="10" width="152" height="32"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="push" title="Restore Defaults..." bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1280">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="restoreDefaults:" target="621" id="1281"/>
+                                            </connections>
+                                        </button>
                                     </subviews>
                                 </view>
                             </tabViewItem>
                             <tabViewItem label="Download Formats" identifier="2" id="1072">
                                 <view key="view" id="1073">
-                                    <rect key="frame" x="10" y="33" width="454" height="500"/>
+                                    <rect key="frame" x="10" y="33" width="451" height="564"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <scrollView misplaced="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="1075">
-                                            <rect key="frame" x="17" y="388" width="420" height="109"/>
+                                            <rect key="frame" x="17" y="419" width="417" height="142"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <clipView key="contentView" id="iNe-PX-Coi">
-                                                <rect key="frame" x="1" y="0.0" width="403" height="93"/>
-                                                <autoresizingMask key="autoresizingMask"/>
+                                                <rect key="frame" x="1" y="0.0" width="400" height="126"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="1079" id="1078">
-                                                        <rect key="frame" x="0.0" y="0.0" width="403" height="76"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="400" height="109"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <size key="intercellSpacing" width="3" height="2"/>
                                                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                                         <tableColumns>
-                                                            <tableColumn identifier="" width="400" minWidth="40" maxWidth="1000" id="1080">
+                                                            <tableColumn identifier="" width="397" minWidth="40" maxWidth="1000" id="1080">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="BBC TV Show Formats">
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -1889,33 +1889,33 @@
                                                 </subviews>
                                             </clipView>
                                             <scroller key="horizontalScroller" verticalHuggingPriority="750" horizontal="YES" id="1077">
-                                                <rect key="frame" x="1" y="93" width="403" height="15"/>
+                                                <rect key="frame" x="1" y="126" width="400" height="15"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
                                             <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="1076">
-                                                <rect key="frame" x="404" y="17" width="15" height="76"/>
+                                                <rect key="frame" x="401" y="17" width="15" height="109"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
                                             <tableHeaderView key="headerView" id="1079">
-                                                <rect key="frame" x="0.0" y="0.0" width="403" height="17"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="400" height="17"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </tableHeaderView>
                                         </scrollView>
-                                        <scrollView horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="1085">
-                                            <rect key="frame" x="17" y="194" width="420" height="135"/>
+                                        <scrollView misplaced="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="1085">
+                                            <rect key="frame" x="17" y="191" width="417" height="153"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <clipView key="contentView" id="Yo1-zO-Vaa">
-                                                <rect key="frame" x="1" y="0.0" width="403" height="119"/>
-                                                <autoresizingMask key="autoresizingMask"/>
+                                                <rect key="frame" x="1" y="0.0" width="400" height="137"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="1086" id="1087">
-                                                        <rect key="frame" x="0.0" y="0.0" width="403" height="102"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="400" height="120"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <size key="intercellSpacing" width="3" height="2"/>
                                                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                                         <tableColumns>
-                                                            <tableColumn identifier="" width="400" minWidth="40" maxWidth="1000" id="1090">
+                                                            <tableColumn identifier="" width="397" minWidth="40" maxWidth="1000" id="1090">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="BBC Radio Show Formats">
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -1958,20 +1958,20 @@
                                                 </subviews>
                                             </clipView>
                                             <scroller key="horizontalScroller" verticalHuggingPriority="750" horizontal="YES" id="1088">
-                                                <rect key="frame" x="1" y="119" width="403" height="15"/>
+                                                <rect key="frame" x="1" y="137" width="400" height="15"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
                                             <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="1089">
-                                                <rect key="frame" x="404" y="17" width="15" height="102"/>
+                                                <rect key="frame" x="401" y="17" width="15" height="120"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
                                             <tableHeaderView key="headerView" id="1086">
-                                                <rect key="frame" x="0.0" y="0.0" width="403" height="17"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="400" height="17"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </tableHeaderView>
                                         </scrollView>
                                         <button verticalHuggingPriority="750" misplaced="YES" id="1094">
-                                            <rect key="frame" x="17" y="368" width="29" height="23"/>
+                                            <rect key="frame" x="17" y="415" width="29" height="23"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="smallSquare" title="+" bezelStyle="smallSquare" imagePosition="below" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1097">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1982,7 +1982,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" misplaced="YES" id="1095">
-                                            <rect key="frame" x="45" y="368" width="29" height="23"/>
+                                            <rect key="frame" x="45" y="415" width="29" height="23"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="smallSquare" title="-" bezelStyle="smallSquare" imagePosition="below" alignment="center" state="on" borderStyle="border" allowsMixedState="YES" imageScaling="proportionallyDown" inset="2" id="1096">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1993,15 +1993,15 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" misplaced="YES" id="1098">
-                                            <rect key="frame" x="73" y="368" width="364" height="23"/>
+                                            <rect key="frame" x="73" y="415" width="361" height="23"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" imagePosition="below" alignment="center" refusesFirstResponder="YES" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1099">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                         </button>
-                                        <button verticalHuggingPriority="750" id="1100">
-                                            <rect key="frame" x="17" y="175" width="29" height="23"/>
+                                        <button verticalHuggingPriority="750" misplaced="YES" id="1100">
+                                            <rect key="frame" x="17" y="190" width="29" height="23"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="smallSquare" title="+" bezelStyle="smallSquare" imagePosition="below" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1105">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2011,8 +2011,8 @@
                                                 <action selector="add:" target="1134" id="1146"/>
                                             </connections>
                                         </button>
-                                        <button verticalHuggingPriority="750" id="1101">
-                                            <rect key="frame" x="45" y="175" width="29" height="23"/>
+                                        <button verticalHuggingPriority="750" misplaced="YES" id="1101">
+                                            <rect key="frame" x="45" y="190" width="29" height="23"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="smallSquare" title="-" bezelStyle="smallSquare" imagePosition="below" alignment="center" state="on" borderStyle="border" allowsMixedState="YES" imageScaling="proportionallyDown" inset="2" id="1104">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2022,8 +2022,8 @@
                                                 <action selector="remove:" target="1134" id="1147"/>
                                             </connections>
                                         </button>
-                                        <button verticalHuggingPriority="750" id="1102">
-                                            <rect key="frame" x="73" y="175" width="364" height="23"/>
+                                        <button verticalHuggingPriority="750" misplaced="YES" id="1102">
+                                            <rect key="frame" x="73" y="190" width="361" height="23"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" imagePosition="below" alignment="center" refusesFirstResponder="YES" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1103">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2031,20 +2031,20 @@
                                             </buttonCell>
                                         </button>
                                         <scrollView misplaced="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="P0h-W7-YO2">
-                                            <rect key="frame" x="17" y="25" width="420" height="135"/>
+                                            <rect key="frame" x="17" y="19" width="417" height="153"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <clipView key="contentView" id="Xcv-fl-nad">
-                                                <rect key="frame" x="1" y="0.0" width="403" height="119"/>
-                                                <autoresizingMask key="autoresizingMask"/>
+                                                <rect key="frame" x="1" y="0.0" width="400" height="137"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="IKG-gn-2PC" id="gbz-Rl-ARO">
-                                                        <rect key="frame" x="0.0" y="0.0" width="403" height="96"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="400" height="114"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <size key="intercellSpacing" width="3" height="2"/>
                                                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                                         <tableColumns>
-                                                            <tableColumn identifier="" width="400" minWidth="40" maxWidth="1000" id="MbW-0I-Tgw">
+                                                            <tableColumn identifier="" width="397" minWidth="40" maxWidth="1000" id="MbW-0I-Tgw">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="ITV TV Show Formats">
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -2087,20 +2087,20 @@
                                                 </subviews>
                                             </clipView>
                                             <scroller key="horizontalScroller" verticalHuggingPriority="750" horizontal="YES" id="fkg-ES-yOP">
-                                                <rect key="frame" x="1" y="119" width="403" height="15"/>
+                                                <rect key="frame" x="1" y="137" width="400" height="15"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
                                             <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="K7M-kc-9tT">
-                                                <rect key="frame" x="404" y="23" width="15" height="96"/>
+                                                <rect key="frame" x="401" y="23" width="15" height="114"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
                                             <tableHeaderView key="headerView" id="IKG-gn-2PC">
-                                                <rect key="frame" x="0.0" y="0.0" width="403" height="23"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="400" height="23"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </tableHeaderView>
                                         </scrollView>
                                         <button verticalHuggingPriority="750" misplaced="YES" id="3ik-hE-3Me">
-                                            <rect key="frame" x="17" y="4" width="29" height="23"/>
+                                            <rect key="frame" x="17" y="16" width="29" height="23"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="smallSquare" title="+" bezelStyle="smallSquare" imagePosition="below" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="kKG-hL-9vH">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2111,7 +2111,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" misplaced="YES" id="QQh-ET-7Tw">
-                                            <rect key="frame" x="45" y="4" width="29" height="23"/>
+                                            <rect key="frame" x="45" y="16" width="29" height="23"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="smallSquare" title="-" bezelStyle="smallSquare" imagePosition="below" alignment="center" state="on" borderStyle="border" allowsMixedState="YES" imageScaling="proportionallyDown" inset="2" id="pdw-fv-9UN">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2122,7 +2122,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" misplaced="YES" id="EPg-Rn-dtg">
-                                            <rect key="frame" x="73" y="4" width="364" height="23"/>
+                                            <rect key="frame" x="73" y="16" width="361" height="23"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" imagePosition="below" alignment="center" refusesFirstResponder="YES" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="P5s-1g-yFI">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2130,7 +2130,7 @@
                                             </buttonCell>
                                         </button>
                                         <button misplaced="YES" id="0tJ-5h-fyc" userLabel="Use 50 FPS">
-                                            <rect key="frame" x="15" y="340" width="236" height="18"/>
+                                            <rect key="frame" x="15" y="392" width="236" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Prefer 50 FPS streams if available" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="LOo-cl-WiG" userLabel="Prefer 50 FPS streams if available">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2141,7 +2141,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" misplaced="YES" id="kxL-39-lbX">
-                                            <rect key="frame" x="255" y="340" width="184" height="18"/>
+                                            <rect key="frame" x="15" y="372" width="228" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Get higher-quality audio" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="TI0-gA-tf6">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2151,16 +2151,27 @@
                                                 <binding destination="668" name="value" keyPath="values.GetHigherQualityAudio" id="s32-Q2-sP1"/>
                                             </connections>
                                         </button>
+                                        <button verticalHuggingPriority="750" misplaced="YES" id="Zq8-az-pmb">
+                                            <rect key="frame" x="15" y="352" width="254" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Force get_iplayer to fetch HLS video" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="0t5-bG-AgC">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <binding destination="668" name="value" keyPath="values.ForceHLSBBCVideo" id="jDk-63-Oq7"/>
+                                            </connections>
+                                        </button>
                                     </subviews>
                                 </view>
                             </tabViewItem>
                             <tabViewItem label="New Programmes" identifier="3" id="QB0-M0-Stm">
                                 <view key="view" id="LCA-h7-Ip3">
-                                    <rect key="frame" x="10" y="33" width="454" height="500"/>
+                                    <rect key="frame" x="10" y="33" width="451" height="564"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box misplaced="YES" borderType="line" title="BBC TV: New Programmes Channel Filter" id="gmH-x8-UqZ">
-                                            <rect key="frame" x="1" y="342" width="452" height="155"/>
+                                            <rect key="frame" x="1" y="406" width="452" height="155"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="dss-T9-HWQ">
                                                 <rect key="frame" x="1" y="1" width="450" height="139"/>
@@ -2282,7 +2293,7 @@
                                             </view>
                                         </box>
                                         <box misplaced="YES" borderType="line" title="BBC Radio: New Programmes Station Filter" id="utW-FN-7tD">
-                                            <rect key="frame" x="1" y="119" width="452" height="219"/>
+                                            <rect key="frame" x="1" y="183" width="452" height="219"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="cZc-eP-6d4">
                                                 <rect key="frame" x="1" y="1" width="450" height="203"/>
@@ -2460,7 +2471,7 @@
                                             </view>
                                         </box>
                                         <box misplaced="YES" title="Ignore News Programmes" id="IcO-uY-vt0">
-                                            <rect key="frame" x="1" y="30" width="456" height="85"/>
+                                            <rect key="frame" x="1" y="94" width="456" height="85"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="gQ1-Wk-QjY">
                                                 <rect key="frame" x="2" y="2" width="452" height="68"/>
@@ -2498,11 +2509,11 @@
                             </tabViewItem>
                             <tabViewItem label="Advanced" identifier="4" id="1530">
                                 <view key="view" id="1531">
-                                    <rect key="frame" x="10" y="33" width="454" height="500"/>
+                                    <rect key="frame" x="10" y="33" width="451" height="564"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <button misplaced="YES" id="1534">
-                                            <rect key="frame" x="15" y="467" width="200" height="18"/>
+                                            <rect key="frame" x="15" y="531" width="200" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Test Proxy Before Download: " bezelStyle="regularSquare" imagePosition="right" state="on" inset="2" id="1535">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2513,7 +2524,7 @@
                                             </connections>
                                         </button>
                                         <button misplaced="YES" id="MJh-JP-hHq">
-                                            <rect key="frame" x="15" y="434" width="300" height="18"/>
+                                            <rect key="frame" x="15" y="498" width="300" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Include Downloaded Shows in Search Results:" bezelStyle="regularSquare" imagePosition="right" state="on" inset="2" id="EFC-j7-DR2">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2530,7 +2541,7 @@
                     </tabView>
                 </subviews>
             </view>
-            <point key="canvasLocation" x="15" y="-328.5"/>
+            <point key="canvasLocation" x="-22.5" y="-299"/>
         </window>
         <window title="Download History" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="DownloadHistoryWindow" animationBehavior="default" id="1212" userLabel="Download History">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>

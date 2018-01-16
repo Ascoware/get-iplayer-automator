@@ -13,9 +13,16 @@
 {
     NSArray *tvFormatKeys = @[@"Best", @"Better", @"Very Good", @"Good", @"Worse", @"Worst"];
     NSArray *tvFormatObjects = @[@"tvbest",@"tvbetter",@"tvvgood",@"tvgood", @"tvworse", @"tvworst"];
+    NSArray *hlsTVFormatObjects = @[@"hlsbest",@"hlsbetter",@"hlsvgood",@"hlsgood", @"hlsworse", @"hlsworst"];
     NSArray *radioFormatKeys = @[@"Best", @"Better", @"Very Good", @"Good", @"Worse", @"Worst"];
     NSArray *radioFormatObjects = @[@"radiobest",@"radiobetter",@"radiovgood",@"radiogood", @"radioworse", @"radioworst"];
-    tvFormats = [[NSDictionary alloc] initWithObjects:tvFormatObjects forKeys:tvFormatKeys];
+    
+    if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"ForceHLSBBCVideo"] boolValue]) {
+        tvFormats = [[NSDictionary alloc] initWithObjects:hlsTVFormatObjects forKeys:tvFormatKeys];
+    } else {
+        tvFormats = [[NSDictionary alloc] initWithObjects:tvFormatObjects forKeys:tvFormatKeys];
+    }
+    
     radioFormats = [[NSDictionary alloc] initWithObjects:radioFormatObjects forKeys:radioFormatKeys];
 }
 #pragma mark Overridden Methods
@@ -156,8 +163,8 @@
         }
         
         // High quality audio is on by default.
-        if (![[[NSUserDefaults standardUserDefaults] objectForKey:@"GetHigherQualityAudio"] boolValue]) {
-            [args addObject:@"--no-hq-audio"];
+        if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"GetHigherQualityAudio"] boolValue]) {
+            [args addObject:@"--hls-hq-audio"];
         }
         
         //Tagging
@@ -573,6 +580,11 @@
             [scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet]
                                     intoString:nil];
             if(![scanner scanDecimal:&percentage]) percentage = (@0).decimalValue;
+            [self setPercentage:[NSDecimalNumber decimalNumberWithDecimal:percentage].doubleValue];
+
+            // Jump ahead to the ETA field.
+            [scanner scanUpToString:@"ETA: " intoString:nil];
+            [scanner scanString:@"ETA: " intoString:nil];
             [scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet]
                                     intoString:nil];
             if(![scanner scanDecimal:&h]) h = (@0).decimalValue;
@@ -585,12 +597,12 @@
             [scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet]
                                     intoString:nil];
             
-            [self setPercentage:[NSDecimalNumber decimalNumberWithDecimal:percentage].doubleValue];
             NSString *eta = [NSString stringWithFormat:@"%.2ld:%.2ld:%.2ld remaining",
                              [NSDecimalNumber decimalNumberWithDecimal:h].integerValue,
                              [NSDecimalNumber decimalNumberWithDecimal:m].integerValue,
                              [NSDecimalNumber decimalNumberWithDecimal:s].integerValue];
             [self setCurrentProgress:eta];
+
             NSString *format = [output hasSuffix:@"[audio+video]"] ? @"Video downloaded: %ld%%" : @"HQ Audio downloaded: %ld%%";
             [self.show setValue:[NSString stringWithFormat:format,
                                      [NSDecimalNumber decimalNumberWithDecimal:percentage].integerValue]
