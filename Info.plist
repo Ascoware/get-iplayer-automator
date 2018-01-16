@@ -19,7 +19,7 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>20180115002</string>
+	<string>20180115003</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>10.7</string>
 	<key>NSAppTransportSecurity</key>
