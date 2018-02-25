@@ -51,14 +51,14 @@
                                                    object:_errorPipe.fileHandleForReading];
         [_errorPipe.fileHandleForReading readInBackgroundAndNotify];
         
-//        [[NSNotificationCenter defaultCenter] addObserver:self
-//               selector:@selector(searchFinished:)
-//                   name:NSTaskDidTerminateNotification
-//                 object:_task];
         _data = [[NSMutableString alloc] init];
         NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:_task.environment];
         envVariableDictionary[@"HOME"] = (@"~").stringByExpandingTildeInPath;
         envVariableDictionary[@"PERL_UNICODE"] = @"AS";
+        
+        NSString *perlPath = [[NSBundle mainBundle] resourcePath];
+        perlPath = [perlPath stringByAppendingPathComponent:@"perl5"];
+        envVariableDictionary[@"PERL5LIB"] = perlPath;
         _task.environment = envVariableDictionary;
         [_task launch];
     }
