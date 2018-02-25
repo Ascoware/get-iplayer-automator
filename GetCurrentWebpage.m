@@ -206,7 +206,7 @@
 //        [newProg performSelectorInBackground:@selector(getName) withObject:nil];
       return newProg;
 	}
-	else if([url hasPrefix:@"http://www.bbc.co.uk/programmes/"])
+	else if([url hasPrefix:@"http://www.bbc.co.uk/programmes/"] || [url hasPrefix:@"https://www.bbc.co.uk/programmes/"] )
 	{
 		NSString *pid = nil;
 		NSScanner *urlScanner = [[NSScanner alloc] initWithString:url];
