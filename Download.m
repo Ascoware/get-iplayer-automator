@@ -601,7 +601,11 @@
 	_errorFh = _errorPipe.fileHandleForReading;
     
     NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:_task.environment];
+    envVariableDictionary[@"PERL_UNICODE"] = @"AS";
     envVariableDictionary[@"HOME"] = (@"~").stringByExpandingTildeInPath;
+    NSString *perlPath = [[NSBundle mainBundle] resourcePath];
+    perlPath = [perlPath stringByAppendingPathComponent:@"perl5"];
+    envVariableDictionary[@"PERL5LIB"] = perlPath;
     _task.environment = envVariableDictionary;
     
 	
