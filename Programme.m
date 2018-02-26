@@ -133,6 +133,8 @@
     [coder encodeObject:_url forKey:@"url"];
     [coder encodeInteger:_season forKey:@"season"];
     [coder encodeInteger:_episode forKey:@"episode"];
+    [coder encodeObject:_lastBroadcast forKey:@"lastBroadcast"];
+    [coder encodeObject:_lastBroadcastString forKey:@"lastBroadcastString"];
 }
 - (instancetype) initWithCoder: (NSCoder *)coder {
     if (self = [super init]) {
@@ -159,6 +161,8 @@
         _addedByPVR = false;
         _season = [coder decodeIntegerForKey:@"season"];
         _episode = [coder decodeIntegerForKey:@"episode"];
+        _lastBroadcast = [coder decodeObjectOfClass:[NSDate class] forKey:@"lastBroadcast"];
+        _lastBroadcastString = [coder decodeObjectForKey:@"lastBroadcastString"];
     }
     return self;
 }
