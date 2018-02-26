@@ -879,6 +879,8 @@ NewProgrammeHistory           *sharedHistoryController;
     [_resultsController addObjects:results];
     [_resultsController setSelectionIndexes:[NSIndexSet indexSet]];
     [_searchIndicator stopAnimation:nil];
+    [_resultsController rearrangeObjects];
+    
     if (!results.count)
     {
         NSAlert *noneFound = [NSAlert alertWithMessageText:@"No Shows Found"

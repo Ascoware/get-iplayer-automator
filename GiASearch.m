@@ -25,7 +25,7 @@
         _task.launchPath = @"/usr/bin/perl";
         NSString *typeArg  = [[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO andIncludeITV:YES];
         NSString *getiPlayerPath = [[NSBundle mainBundle] pathForResource:@"get_iplayer" ofType:nil];
-        NSArray *args = @[getiPlayerPath, @"--nocopyright", @"-e60480000000000000", typeArg, @"--listformat=SearchResult|<pid>|<timeadded>|<type>|<name>|<episode>|<channel>|<seriesnum>|<episodenum>|<desc>|<thumbnail>|<web>", @"--long",@"--nopurge", @"--search",searchTerms, [GetiPlayerArguments sharedController].profileDirArg];
+        NSArray *args = @[getiPlayerPath, @"--nocopyright", @"-e60480000000000000", typeArg, @"--listformat=SearchResult|<pid>|<available>|<type>|<name>|<episode>|<channel>|<seriesnum>|<episodenum>|<desc>|<thumbnail>|<web>|<available>", @"--long",@"--nopurge", @"--search",searchTerms, [GetiPlayerArguments sharedController].profileDirArg];
         
         if (![[[NSUserDefaults standardUserDefaults] valueForKey:@"ShowDownloadedInSearch"] boolValue] && allowHidingOfDownloadedItems) {
             args=[args arrayByAddingObject:@"--hide"];
@@ -96,12 +96,19 @@
 {
     NSArray *array = [_data componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
     NSMutableArray *resultsArray = [[NSMutableArray alloc] initWithCapacity:array.count];
+    NSDateFormatter *rawDateParser = [[NSDateFormatter alloc]init];
+    NSLocale *enUSPOSIXLocale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
+    
+    rawDateParser.locale = enUSPOSIXLocale;
+    rawDateParser.dateFormat = @"yyyy-MM-dd'T'HH:mm:ssZZZZZ";
+    rawDateParser.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
+
     for (NSString *string in array)
     {
         if ([string hasPrefix:@"SearchResult|"])
         {
             @try {
-                //SearchResult|<pid>|<timeadded>|<type>|<name>|<episode>|<channel>|<seriesnum>|<episodenum>|<desc>|<thumbnail>|<web>
+                //SearchResult|<pid>|<available>|<type>|<name>|<episode>|<channel>|<seriesnum>|<episodenum>|<desc>|<thumbnail>|<web>
                 NSScanner *myScanner = [NSScanner scannerWithString:string];
                 NSString *buffer;
                 Programme *p = [[Programme alloc] initWithLogController:_logger];
@@ -114,8 +121,11 @@
                 
                 [myScanner scanUpToString:@"|" intoString:&buffer];
                 [myScanner scanString:@"|" intoString:nil];
-                p.timeadded = @(buffer.integerValue);
-                
+                NSDate *broadcastDate = [rawDateParser dateFromString:buffer];
+                p.lastBroadcast = broadcastDate;
+                p.lastBroadcastString = [NSDateFormatter localizedStringFromDate:broadcastDate dateStyle:NSDateFormatterMediumStyle timeStyle:NSDateFormatterNoStyle];
+
+
                 [myScanner scanUpToString:@"|" intoString:&buffer];
                 [myScanner scanString:@"|" intoString:nil];
                 if ([buffer isEqualToString:@"radio"])
