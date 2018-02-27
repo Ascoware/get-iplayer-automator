@@ -222,8 +222,11 @@ NewProgrammeHistory           *sharedHistoryController;
     }
     @catch (NSException *e)
     {
+        NSString *error = [NSString stringWithFormat:@"Error restoring queue: %@", e.description];
+        [_logger addToLog:error];
+        [_logger addToLog:@"Unable to load saved application data. Deleted the data file."];
+
         [fileManager removeItemAtPath:filePath error:nil];
-        NSLog(@"Unable to load saved application data. Deleted the data file.");
         rootObject=nil;
     }
     

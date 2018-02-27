@@ -80,7 +80,6 @@
         NSString *downloadPathArg = [[NSString alloc] initWithFormat:@"--output=%@", self.downloadPath];
         NSString *subDirArg = @"--subdir";
         NSString *progressArg = @"--logprogress";
-        //    NSLog(@"ID3V2: %@", id3v2Arg);
         
         NSString *getArg = @"--pid";
         NSString *searchArg = [[NSString alloc] initWithFormat:@"%@", self.show.pid];
