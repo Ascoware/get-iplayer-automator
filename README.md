@@ -1,7 +1,7 @@
 ## What is it?
 The goal of Get iPlayer Automator is to allow iTunes and your Mac to become the hub for your British Television experience regardless of where in the world you are.  Currently, Get iPlayer Automator allows you to download and watch BBC and ITV shows on your Mac. Series-Link/PVR functionality ensures you will never miss your favourite shows. Programmes are fully tagged and added to iTunes automatically upon completion. It is simple and easy to use, and runs on any machine running Mac OS X 10.7 or later *soon to be 10.9*.  And since the shows are in iTunes, it is extremely easy to transfer them to your iPod, iPhone, or Apple TV allowing you to enjoy your shows on the go or on your television.
 
-The current release is 1.9.14. [Download it here.](https://github.com/Ascoware/get-iplayer-automator/releases)
+The current release is 1.9.15. [Download it here.](https://github.com/Ascoware/get-iplayer-automator/releases)
 
 
 ### What if I find a bug?
@@ -9,8 +9,11 @@ The current release is 1.9.14. [Download it here.](https://github.com/Ascoware/g
 
 #### Version history
 
+##### 1.9.15
+- Fixed #110: "Use Current Webpage" should now work again for https-prefixed URLs
+
 ##### 1.9.14
-- Updated get_iplayer to 3.09.
+- Updated get_iplayer to 3.12
 - Added option to force HLS format downloads for BBC. This is off by default, but if you aren't happy with the speed of DASH download and conversion, give it a try.
 - WARNING: This will likely be the last version of Get iPlayer Automator that supports macOS 10.7 or 10.8. I want to start moving parts of the application to Swift, and that requires macOS 10.9.
 
