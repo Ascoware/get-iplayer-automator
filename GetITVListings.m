@@ -679,8 +679,8 @@ AppController           *sharedAppController;
     if (self = [super init]) {
         _programmeName = name;
         [self fixProgrammeName];
-        _productionId = pid;
-        _programmeURL = url;
+        _productionId = pid != nil ? pid : @"";
+        _programmeURL = url != nil ? url : @"";
         self.numberEpisodes = numberEpisodes;
         _seriesNumber = 0;
         _episodeNumber = 0;
