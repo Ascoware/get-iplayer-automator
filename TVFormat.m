@@ -25,7 +25,7 @@
 - (instancetype) initWithCoder: (NSCoder *)coder
 {
 	if (!(self = [super init])) return nil;
-	_format = [[NSString alloc] initWithString:[coder decodeObjectForKey:@"format"]];
+	format = [coder decodeObjectForKey:@"format"];
 	return self;
 }
 

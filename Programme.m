@@ -133,32 +133,36 @@
     [coder encodeObject:_url forKey:@"url"];
     [coder encodeInteger:_season forKey:@"season"];
     [coder encodeInteger:_episode forKey:@"episode"];
+    [coder encodeObject:_lastBroadcast forKey:@"lastBroadcast"];
+    [coder encodeObject:_lastBroadcastString forKey:@"lastBroadcastString"];
 }
 - (instancetype) initWithCoder: (NSCoder *)coder {
     if (self = [super init]) {
-        _pid = [[NSString alloc] initWithString:[coder decodeObjectForKey:@"pid"]];
-        _showName = [[NSString alloc] initWithString:[coder decodeObjectForKey:@"showName"]];
-        _tvNetwork = [[NSString alloc] initWithString:[coder decodeObjectForKey:@"tvNetwork"]];
+        _pid = [coder decodeObjectForKey:@"pid"];
+        _showName = [coder decodeObjectForKey:@"showName"];
+        _tvNetwork = [coder decodeObjectForKey:@"tvNetwork"];
         _status = @"";
         _complete = @NO;
         _successful = @NO;
-        _path = [[NSString alloc] initWithString:[coder decodeObjectForKey:@"path"]];
-        _seriesName = [[NSString alloc] initWithString:[coder decodeObjectForKey:@"seriesName"]];
-        _episodeName = [[NSString alloc] initWithString:[coder decodeObjectForKey:@"episodeName"]];
+        _path = [coder decodeObjectForKey:@"path"];
+        _seriesName = [coder decodeObjectForKey:@"seriesName"];
+        _episodeName = [coder decodeObjectForKey:@"episodeName"];
         _timeadded = [coder decodeObjectForKey:@"timeadded"];
         _processedPID = [coder decodeObjectForKey:@"processedPID"];
         _radio = [coder decodeObjectForKey:@"radio"];
         _realPID = [coder decodeObjectForKey:@"realPID"];
         _url = [coder decodeObjectForKey:@"url"];
-        _subtitlePath=[[NSString alloc] init];
-        _reasonForFailure=[[NSString alloc] init];
-        _availableModes=[[NSString alloc] init];
-        _desc=[[NSString alloc] init];
+        _subtitlePath = @"";
+        _reasonForFailure = @"";
+        _availableModes = @"";
+        _desc = @"";
         _extendedMetadataRetrieved=@NO;
         getNameRunning = false;
         _addedByPVR = false;
         _season = [coder decodeIntegerForKey:@"season"];
         _episode = [coder decodeIntegerForKey:@"episode"];
+        _lastBroadcast = [coder decodeObjectForKey:@"lastBroadcast"];
+        _lastBroadcastString = [coder decodeObjectForKey:@"lastBroadcastString"];
     }
     return self;
 }

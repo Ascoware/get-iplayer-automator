@@ -51,8 +51,9 @@ typedef NS_ENUM(NSInteger, GIA_ProgrammeType) {
 @property (nonatomic) NSString *categories;
 @property (nonatomic) NSDate *firstBroadcast;
 @property (nonatomic) NSDate *lastBroadcast;
+@property (nonatomic) NSString *lastBroadcastString;
 @property (nonatomic) NSArray *modeSizes;
-@property (nonatomic) NSImage *thumbnail;
+@property (nonatomic, copy) NSImage *thumbnail;
     
 @property (nonatomic) NSMutableString *taskOutput;
 @property (nonatomic) NSPipe *pipe;

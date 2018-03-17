@@ -206,7 +206,7 @@
 //        [newProg performSelectorInBackground:@selector(getName) withObject:nil];
       return newProg;
 	}
-	else if([url hasPrefix:@"http://www.bbc.co.uk/programmes/"])
+	else if([url hasPrefix:@"http://www.bbc.co.uk/programmes/"] || [url hasPrefix:@"https://www.bbc.co.uk/programmes/"] )
 	{
 		NSString *pid = nil;
 		NSScanner *urlScanner = [[NSScanner alloc] initWithString:url];
@@ -259,8 +259,8 @@
         [scanner scanUpToString:@"<meta property=\"og:description\" content=\"" intoString:nil];
         [scanner scanString:@"<meta property=\"og:description\" content=\"" intoString:nil];
         [scanner scanUpToString:@"\"" intoString:&desc];
-        [scanner scanUpToString:@"&amp;productionId=" intoString:nil];
-        [scanner scanString:@"&amp;productionId=" intoString:nil];
+        [scanner scanUpToString:@"data-video-production-id=\"" intoString:nil];
+        [scanner scanString:@"data-video-production-id=\"" intoString:nil];
         [scanner scanUpToString:@"\"" intoString:&productionId];
         if (!progname || !productionId) {
             NSAlert *invalidPage = [[NSAlert alloc] init];

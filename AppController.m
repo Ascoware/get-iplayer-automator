@@ -222,8 +222,11 @@ NewProgrammeHistory           *sharedHistoryController;
     }
     @catch (NSException *e)
     {
+        NSString *error = [NSString stringWithFormat:@"Error restoring queue: %@", e.description];
+        [_logger addToLog:error];
+        [_logger addToLog:@"Unable to load saved application data. Deleted the data file."];
+
         [fileManager removeItemAtPath:filePath error:nil];
-        NSLog(@"Unable to load saved application data. Deleted the data file.");
         rootObject=nil;
     }
     
@@ -879,6 +882,8 @@ NewProgrammeHistory           *sharedHistoryController;
     [_resultsController addObjects:results];
     [_resultsController setSelectionIndexes:[NSIndexSet indexSet]];
     [_searchIndicator stopAnimation:nil];
+    [_resultsController rearrangeObjects];
+    
     if (!results.count)
     {
         NSAlert *noneFound = [NSAlert alertWithMessageText:@"No Shows Found"

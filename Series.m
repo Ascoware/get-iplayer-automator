@@ -37,9 +37,9 @@
 - (instancetype) initWithCoder: (NSCoder *)coder
 {
 	if (!(self = [super init])) return nil;
-	_showName = [[NSString alloc] initWithString:[coder decodeObjectForKey:@"showName"]];
+	_showName = [coder decodeObjectForKey:@"showName"];
 	_added = [coder decodeObjectForKey:@"added"];
-	_tvNetwork = [[NSString alloc] initWithString:[coder decodeObjectForKey:@"tvNetwork"]];
+    _tvNetwork = [coder decodeObjectForKey:@"tvNetwork"];
 	_lastFound = [coder decodeObjectForKey:@"lastFound"];
 	return self;
 }

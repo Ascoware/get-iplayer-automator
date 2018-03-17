@@ -1,12 +1,45 @@
 ## What is it?
-The goal of Get iPlayer Automator is to allow iTunes and your Mac to become the hub for your British Television experience regardless of where in the world you are.  Currently, Get iPlayer Automator allows you to download and watch BBC and ITV shows on your Mac. Series-Link/PVR functionality ensures you will never miss your favourite shows. Programmes are fully tagged and added to iTunes automatically upon completion. It is simple and easy to use, and runs on any machine running Mac OS X 10.7 or later.  And since the shows are in iTunes, it is extremely easy to transfer them to your iPod, iPhone, or Apple TV allowing you to enjoy your shows on the go or on your television.
+The goal of Get iPlayer Automator is to allow iTunes and your Mac to become the hub for your British Television experience regardless of where in the world you are.  Currently, Get iPlayer Automator allows you to download and watch BBC and ITV shows on your Mac. Series-Link/PVR functionality ensures you will never miss your favourite shows. Programmes are fully tagged and added to iTunes automatically upon completion. It is simple and easy to use, and runs on any machine running Mac OS X 10.7 or later *soon to be 10.9*.  And since the shows are in iTunes, it is extremely easy to transfer them to your iPod, iPhone, or Apple TV allowing you to enjoy your shows on the go or on your television.
 
-The current release is 1.9.7.
+The current release is 1.9.15. [Download it here.](https://github.com/Ascoware/get-iplayer-automator/releases)
+
 
 ### What if I find a bug?
 [Start here.](https://github.com/Ascoware/get-iplayer-automator/wiki/Reporting-Issues)
 
 #### Version history
+
+##### 1.9.15
+- Fixed #110: "Use Current Webpage" should now work again for https-prefixed URLs
+
+##### 1.9.14
+- Updated get_iplayer to 3.12
+- Added option to force HLS format downloads for BBC. This is off by default, but if you aren't happy with the speed of DASH download and conversion, give it a try.
+- WARNING: This will likely be the last version of Get iPlayer Automator that supports macOS 10.7 or 10.8. I want to start moving parts of the application to Swift, and that requires macOS 10.9.
+
+##### 1.9.13
+- Fixed #88, #85: No need for a --version tag if not explicitly requested
+- Fixed #84: Restored use of tvbest, tvbetter, etc.
+- Note that if get_iplayer picks a DASH format stream (dvfhd, dvfvhigh, etc.) we have to convert it with ffmpeg's libx264 to produce a video that is playable in iTunes/Quicktime Player. Even though it uses the ultrafast preset, it will take some time, especially at HD resolution. Suggestions for speeding this up are welcome.
+- Rewrote the log window code to use a monospace font and not re-scroll the window to the bottom when trying to read messages earlier in the log.
+
+##### 1.9.12
+- v1.9.11 was never released.
+- #81, #80: Reverted ffmpeg to previous version (sorry about that!!). I will look into a better source for getting newer versions of ffmpeg.
+
+##### 1.9.10
+Fixed #79 -- force all BBC downloads to use HLS mode.
+Fixed #74 -- not all ITV episodes have a transmission time.
+
+##### 1.9.9
+- Integrated the rest of get_iplayer 3.06. In non-verbose mode, get_iplayer now generates less information about a download in progress, but Get iPlayer Automator will present what it can from the progress string. Verbose mode will report the amount of data retrieved as it did before.
+GiP 3.06 introduces the ability to get higher-quality (320k) audio for BBC shows. This is on by default, but can be disabled via a checkbox in the BBC section of the 'Download Formats' preferences.
+- Fixed a long-standing issue where ITV shows didn't have a release date when added to iTunes.
+- Removed the now-invalid message about attempting to open iTunes in 32-bit mode. You can get a message telling you that the show wasn't added, but usually this is because iTunes is doing something else when the download finishes, and can't respond to the AppleEvent. Workaround is to drag the file from the Finder to the iTunes library window.
+
+##### 1.9.8
+- Fix for BBC program caching from get_iplayer 3.06 (#70)
+- Fix for bug in earlier version where proxy host information was being set up incorrectly. (#68)
 
 ##### 1.9.7
 - Fixed bug in synchronization of multiple ITV downloads with subtitles.
