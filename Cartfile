@@ -1,3 +1,4 @@
 github "sparkle-project/Sparkle" ~> 1.17
-github "tid-kijyun/Kanna" ~> 2.1.0
+github "tid-kijyun/Kanna" ~> 4.0.0
+git "https://github.com/mattgallagher/CwlUtils.git" "master"
 

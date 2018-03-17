@@ -82,20 +82,20 @@
                             value:logFont
                             range:NSMakeRange(0, current_log.length)];
         
-        [_log.textStorage appendAttributedString:current_log];
+        [self.log.textStorage appendAttributedString:current_log];
 
         //Scroll log to bottom only if it is visible.
-        if (_window.visible) {
-            BOOL shouldAutoScroll = ((int)NSMaxY([_log bounds]) == (int)NSMaxY([_log visibleRect]));
+        if (self.window.visible) {
+            BOOL shouldAutoScroll = ((int)NSMaxY([self.log bounds]) == (int)NSMaxY([self.log visibleRect]));
             if (shouldAutoScroll) {
-                [_log scrollToEndOfDocument:nil];
+                [self.log scrollToEndOfDocument:nil];
             }
         }
         
         //Write log out to file.
-        [_fh writeData:[return_character.string dataUsingEncoding:NSUTF8StringEncoding]];
-        [_fh writeData:[from_string.string dataUsingEncoding:NSUTF8StringEncoding]];
-        [_fh writeData:[string dataUsingEncoding:NSUTF8StringEncoding]];
+        [self.fh writeData:[return_character.string dataUsingEncoding:NSUTF8StringEncoding]];
+        [self.fh writeData:[from_string.string dataUsingEncoding:NSUTF8StringEncoding]];
+        [self.fh writeData:[string dataUsingEncoding:NSUTF8StringEncoding]];
     });
 }
 - (void)addToLogNotification:(NSNotification *)note

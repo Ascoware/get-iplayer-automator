@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="13529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14087.3" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13529"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14087.3"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -590,7 +590,7 @@ Gw
                     <button imageHugsTitle="YES" id="87">
                         <rect key="frame" x="16" y="116" width="246" height="18"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
-                        <buttonCell key="cell" type="check" title="Include details about my computer" bezelStyle="regularSquare" imagePosition="leading" alignment="left" state="on" inset="2" id="88">
+                        <buttonCell key="cell" type="check" title="Include details about my computer" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="88">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
@@ -598,7 +598,7 @@ Gw
                     <button imageHugsTitle="YES" id="96">
                         <rect key="frame" x="16" y="85" width="151" height="18"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
-                        <buttonCell key="cell" type="check" title="Include contact info:" bezelStyle="regularSquare" imagePosition="leading" alignment="left" state="on" inset="2" id="97">
+                        <buttonCell key="cell" type="check" title="Include contact info:" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="97">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>

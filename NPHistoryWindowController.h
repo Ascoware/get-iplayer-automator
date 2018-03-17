@@ -7,7 +7,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
-
+#import "Get_iPlayer_Automator-Swift.h"
 
 @interface NPHistoryTableViewController : NSWindowController  <NSTableViewDataSource>
 {
