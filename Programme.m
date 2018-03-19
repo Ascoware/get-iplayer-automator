@@ -184,12 +184,6 @@
     _pid = [newPID stringByReplacingOccurrencesOfString:@"amp;" withString:@""];
 }
 
--(void)printLongDescription
-{
-    NSLog(@"%@:\n   TV Network: %@\n   Processed PID: %@\n   Real PID: %@\n   Available Modes: %@\n   URL: %@\n",
-          _showName,_tvNetwork,_processedPID,_realPID,_availableModes,_url);
-}
-
 -(void)retrieveExtendedMetadata
 {
     [_logger addToLog:@"Retrieving Extended Metadata" :self];

@@ -6,10 +6,13 @@
 //
 
 import Foundation
+import Kanna
 
 public class ITVDownload : OldITVDownload {
     
     var authURL: String = ""
+    var durationInSeconds: Int = 0
+    var elapsedInSeconds: Int = 0
     
     public override var description: String {
         return "ITV Download (ID=\(show.pid))"
@@ -28,86 +31,41 @@ public class ITVDownload : OldITVDownload {
         self.defaultsPrefix = "ITV_"
         self.running = true
 
-        guard let formats = formats, formats.count > 0 else {
-            print("ERROR: ITV Format List is empty")
-            add(toLog: "ERROR: ITV Format List is empty")
-            show.reasonForFailure = "ITVFormatListEmpty"
-            show.complete = true
-            show.successful = false
-            show.setValue("Download Failed", forKey:"status")
-            NotificationCenter.default.post(name:NSNotification.Name(rawValue: "DownloadFinished"), object:self.show)
-            return
-        }
+//        guard let formats = formats, formats.count > 0 else {
+//            print("ERROR: ITV Format List is empty")
+//            add(toLog: "ERROR: ITV Format List is empty")
+//            show.reasonForFailure = "ITVFormatListEmpty"
+//            show.complete = true
+//            show.successful = false
+//            show.setValue("Download Failed", forKey:"status")
+//            NotificationCenter.default.post(name:NSNotification.Name(rawValue: "DownloadFinished"), object:self.show)
+//            return
+//        }
         
         setCurrentProgress("Retrieving Programme Metadata... \(show.showName)")
         setPercentage(102)
         programme.setValue("Initialising...", forKey: "status")
         
-        formatList = formats
+//        formatList = formats
         add(toLog: "Downloading \(show.showName)")
         add(toLog: "INFO: Preparing Request for Auth Info", noTag: true)
-        programme.printLongDescription()
         
         DispatchQueue.main.async {
             self.launchMetaRequest()
         }
     }
-    
+
     @objc public override func launchMetaRequest() {
         self.errorCache = NSMutableString()
         self.processErrorCache = Timer(timeInterval:0.25, target:self, selector:#selector(processError), userInfo:nil, repeats:true)
         
-        var soapBody = ""
-        let url = show.url
-        if !url.contains("Filter=") {
-            self.show.realPID = self.show.pid
-            soapBody = "Body2"
-            self.downloadParams["UseCurrentWebPage"] = true
-        } else {
-            var pid: NSString? = nil
-            let scanner = Scanner(string:show.url)
-            scanner.scanUpTo("Filter=", into:nil)
-            scanner.scanString("Filter=", into:nil)
-            scanner.scanUpTo("kljkjj", into:&pid)
-            
-            guard let foundPid = pid else {
-                print("ERROR: GiA cannot interpret the ITV URL: \(show.url)")
-                add(toLog:"ERROR: GiA cannot interpret the ITV URL: \(show.url)")
-                self.show.reasonForFailure = "MetadataProcessing"
-                self.show.complete = true
-                self.show.successful = false
-                self.show.setValue("Download Failed", forKey:"status")
-                NotificationCenter.default.post(name: NSNotification.Name(rawValue:"DownloadFinished"), object:self.show)
-                return
-            }
-            
-            self.show.realPID = foundPid as String
-            soapBody = "Body"
-        }
-        
-        var body = ""
-        if let soapPath = Bundle.main.url(forResource: soapBody, withExtension: nil) {
-            body = try! String(contentsOf:soapPath, encoding:.utf8)
-        }
-        
-        body = body.replacingOccurrences(of: "!!!ID!!!", with: self.show.realPID)
-        
-        let requestURL = URL(string: "http://mercury.itv.com/PlaylistService.svc?wsdl")
-        if self.verbose, let url = requestURL {
-            let message = "DEBUG: Metadata URL: \(url)"
-            print(message)
-            add(toLog:message, noTag: true)
+        guard let requestURL = URL(string: show.url) else {
+            return
         }
         
         self.currentRequest.cancel()
-        var downloadRequest = URLRequest(url:requestURL!)
+        var downloadRequest = URLRequest(url:requestURL)
         
-        downloadRequest.addValue("http://www.itv.com/mercury/Mercury_VideoPlayer.swf?v=1.5.309/[[DYNAMIC]]/2", forHTTPHeaderField:"Referer")
-        downloadRequest.addValue("text/xml; charset=utf-8", forHTTPHeaderField:"Content-Type")
-        downloadRequest.addValue("\"http://tempuri.org/PlaylistService/GetPlaylist\"", forHTTPHeaderField:"SOAPAction")
-        downloadRequest.addValue("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", forHTTPHeaderField:"Accept")
-        downloadRequest.httpMethod = "POST"
-        downloadRequest.httpBody = body.data(using: .utf8)
         downloadRequest.timeoutInterval = 10
         self.session = URLSession.shared
         
@@ -154,7 +112,7 @@ public class ITVDownload : OldITVDownload {
             return
         }
         
-        guard let data = data, response.statusCode != 0 || response.statusCode == 200 else {
+        guard response.statusCode != 0 || response.statusCode == 200, let data = data, let responseString = String(data:data, encoding:.utf8) else {
             var message: String = ""
             
             if response.statusCode == 0 {
@@ -175,141 +133,361 @@ public class ITVDownload : OldITVDownload {
             return
         }
         
-        let responseString = String(data:data, encoding:.utf8)
+        
         let message = "DEBUG: Metadata response status code: \(response.statusCode)"
         print(message)
         
         if verbose {
             add(toLog: message, noTag: true)
-            add(toLog:"DEBUG: Metadata response: \(responseString ?? "")", noTag:true)
         }
 
-        var itvRateArray: [String] = []
-        var bitrateArray: [String] = []
-        
-        let formatKeys = ["Flash - Very Low",
-                          "Flash - Low",
-                          "Flash - Standard",
-                          "Flash - High",
-                          "Flash - Very High",
-                          "Flash - HD"]
-        let itvRates = ["400",
-                        "600",
-                        "800",
-                        "1200",
-                        "1500",
-                        "1800"]
-        let bitrates = ["400000",
-                        "600000",
-                        "800000",
-                        "1200000",
-                        "1500000",
-                        "1800000"]
-        
-        var itvRateDictionary = [String : String]()
-        zip(formatKeys, itvRates).forEach { itvRateDictionary[$0.0] = $0.1 }
-        
-        var bitRateDictionary = [String : String]()
-        zip(formatKeys, bitrates).forEach { bitRateDictionary[$0.0] = $0.1 }
+        /*********************
+         <meta property="og:description" content="James ends his epic coast-to-coast exploration of the USA with a visit to New York City.">
 
-        for format in self.formatList {
-            if let mode = itvRateDictionary[format.format] {
-                itvRateArray.append(mode)
+         <div id="video" class="genie-container js-video"
+         data-genie-id="player1"
+         data-video-variants="[[&quot;mpeg-dash&quot;,&quot;clearkey&quot;],[&quot;mpeg-dash&quot;,&quot;clearkey&quot;,&quot;outband-webvtt&quot;],[&quot;hls&quot;,&quot;aes&quot;,&quot;outband-webvtt&quot;],[&quot;hls&quot;,&quot;aes&quot;],[&quot;mpeg-dash&quot;,&quot;playready&quot;],[&quot;mpeg-dash&quot;,&quot;playready&quot;,&quot;outband-webvtt&quot;]]"
+         data-video-channel-id="itv"
+         data-video-id="https://magni.itv.com/playlist/itvonline/ITV/2_5468_0020.001"
+         data-video-production-id="2/5468/0020#001"
+         data-video-autoplay-id="2/5468/0020#001"
+         data-video-type="episode"
+         data-video-on-air-time=""
+         data-video-episode-id="2/5468/0020"
+         data-video-programme-id="2/5468"
+         data-video-validate-region="true"
+         data-video-guidance=""
+         data-video-title="James Martin's American Adventure"
+         data-registration-required="true"
+         data-video-episode="Episode 20"
+         data-video-broadcast-date-time="Friday 9 Mar 2pm"
+         data-base-path="/hub/assets/js/lib/wizard/20180314073308"
+         data-video-hmac="626de090726a57d5085db28bf0f8fa13f29e3809"
+         data-video-posterframe="https://hubimages.itv.com/episode/2_5468_0020?w={width}&amp;h={height}&amp;q={quality}&amp;blur={blur}&amp;bg={bg}"
+         data-playlist-url="https://secure-mercury.itv.com/PlaylistService.svc?wsdl"
+         data-cast-enabled="true"
+         data-moat-tracking-enabled="false"
+         data-meetrics-tracking-enabled="false"
+         data-show-error-messages="false"></div>
+        *******************/
+        
+        var seriesName = ""
+        var playlistURLString: String? = nil
+        var hmac: String? = nil
+        var episode = ""
+        var showDescription = ""
+        var timeString: String? = nil
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.timeZone = TimeZone(secondsFromGMT:0)
+
+        if let htmlPage = try? HTML(html: responseString, encoding: .utf8) {
+            // There should only be one 'video' element.
+            if let videoElement = htmlPage.at_xpath("//div[@id='video']") {
+                hmac = videoElement.at_xpath("//@data-video-hmac")?.text ?? ""
+                playlistURLString = videoElement.at_xpath("//@data-video-id")?.text ?? ""
+                seriesName = videoElement.at_xpath("//@data-video-title")?.text ?? "Unknown"
+                episode = videoElement.at_xpath("//@data-video-episode")?.text ?? ""
             }
-            if let mode = bitRateDictionary[format.format] {
-                bitrateArray.append(mode)
+            
+            if let descriptionElement = htmlPage.at_xpath("//script[@id='json-ld']") {
+                if let descriptionJSON = descriptionElement.content {
+                    if let data = descriptionJSON.data(using: .utf8) {
+                        if let descJSONDict = try? JSONSerialization.jsonObject(with: data) as? [String : Any] {
+                            showDescription = descJSONDict? ["description"] as? String ?? "None available"
+                            
+                            /*******************
+                             "image": {
+                             "@type": "ImageObject",
+                             "height": 576,
+                             "url": "https://hubimages.itv.com/episode/2_5468_0020?w=1024&h=576&q=80&blur=0&bg=false&image_format=jpg",
+                             "width": 1024
+                             },
+                             ************/
+                            if let imageDict = descJSONDict? ["image"] as? [String : Any],
+                                let thumbnailURLString = imageDict["url"] as? String {
+                                self.thumbnailURL = thumbnailURLString
+                            }
+
+                        }
+                    }
+                }
+            }
+            
+            if let timeElement = htmlPage.at_xpath("//li[@class='episode-info__meta-item episode-info__meta-item--broadcast  episode-info__meta-item--pipe-after']/time") {
+                timeString = timeElement.at_xpath("@datetime")?.text ?? ""
             }
         }
 
+        // Save off the pieces we care about.
+        self.show.seriesName = seriesName
+        self.show.desc = showDescription
+        self.show.episodeName = episode        
+        self.thumbnailURL = thumbnailURL ?? nil
         
-        let checkForRealPID = downloadParams["UseCurrentWebPage"] as? Bool ?? false
-        let metadataParseOperation = ITVMetadataParseOperation(data: data, checkForRealPID: checkForRealPID, verbose: verbose, itvRates: itvRateArray, bitRates: bitrateArray)
-        metadataParseOperation.main()
-        
-        if metadataParseOperation.result.faultCode == "InvalidGeoRegion" {
-            add(toLog:"ERROR: Access denied to users outside UK.")
-            self.show.successful = false
-            self.show.complete = true
-            self.show.reasonForFailure = "Outside_UK"
-            self.show.setValue("Failed: Outside UK", forKey:"status")
-            NotificationCenter.default.post(name: Notification.Name(rawValue: "DownloadFinished"), object:self.show)
-            add(toLog:"Download Failed", noTag:false)
-            return
+        if let timeString = timeString {
+            self.show.standardizedAirDate = timeString
         }
+        
+        /*
+         ios_playlist_url = params.get('data-video-playlist') or params.get('data-video-id')
+         hmac = params.get('data-video-hmac')
+         if ios_playlist_url and hmac and re.match(r'https?://', ios_playlist_url):
+         headers = self.geo_verification_headers()
+         headers.update({
+         'Accept': 'application/vnd.itv.vod.playlist.v2+json',
+         'Content-Type': 'application/json',
+         'hmac': hmac.upper(),
+         })
+         ios_playlist = self._download_json(
+         ios_playlist_url, video_id, data=json.dumps({
+         'user': {
+         'itvUserId': '',
+         'entitlements': [],
+         'token': ''
+         },
+         'device': {
+         'manufacturer': 'Safari',
+         'model': '5',
+         'os': {
+         'name': 'Windows NT',
+         'version': '6.1',
+         'type': 'desktop'
+         }
+         },
+         'client': {
+         'version': '4.1',
+         'id': 'browser'
+         },
+         'variantAvailability': {
+         'featureset': {
+         'min': ['hls', 'aes', 'outband-webvtt'],
+         'max': ['hls', 'aes', 'outband-webvtt']
+         },
+         'platformTag': 'dotcom'
+         }
+         }).encode(), headers=headers, fatal=False)
+         */
 
-        guard let playPath = metadataParseOperation.result.playPath, let authURL = metadataParseOperation.result.authURL else {
-            add(toLog:"ERROR: None of the modes in your download format list are available for this show. Try adding more modes if possible.")
-            self.show.reasonForFailure = "NoSpecifiedFormatAvailableITV";
+        add(toLog:"INFO: Metadata processed.", noTag:true)
+        
+        //Create Download Path
+        self.createDownloadPath()
+        self.show.path = self.downloadPath
+
+        var mediaBaseURL: String? = nil, mediaHREF: String? = nil
+        
+        if let playlistURLString = playlistURLString, let playlistURL = URL(string: playlistURLString) {
+            var playlistRequest = URLRequest(url: playlistURL)
+            playlistRequest.setValue("application/vnd.itv.vod.playlist.v2+json", forHTTPHeaderField: "Accept")
+            playlistRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            if let hmac = hmac {
+                playlistRequest.setValue(hmac.uppercased(), forHTTPHeaderField: "hmac")
+            }
+            
+            playlistRequest.httpMethod = "POST"
+
+            let requestBody = "{ \"user\": { \"itvUserId\": \"\", \"entitlements\": [], \"token\": \"\" }, \"device\": { \"manufacturer\": \"Safari\", \"model\": \"11\", \"os\": { \"name\": \"Windows NT\", \"version\": \"6.1\", \"type\": \"desktop\" } }, \"client\": { \"version\": \"4.1\", \"id\": \"browser\" }, \"variantAvailability\": { \"featureset\": { \"min\": [\"aes\", \"hls\", \"outband-webvtt\"], \"max\": [\"hls\", \"aes\", \"outband-webvtt\"] }, \"platformTag\": \"dotcom\" } }"
+
+            let requestData = requestBody.data(using: .utf8)
+            playlistRequest.httpBody = requestData
+            
+            self.currentRequest = self.session.dataTask(with: playlistRequest, completionHandler: {
+                (data: Data?, response: URLResponse?, error: Error?) in
+                guard let httpResponse = response as? HTTPURLResponse, let data = data else {
+                    return
+                }
+                if httpResponse.statusCode != 200 {
+                    if httpResponse.statusCode == 404 {
+                        self.add(toLog:"ERROR: ITV couldn't find a version of the program we can download.")
+                        self.show.reasonForFailure = "ShowNotFound"
+                    } else if httpResponse.statusCode == 403 {
+                        self.add(toLog:"ERROR: ITV has determined you are outside the UK.")
+                        self.show.reasonForFailure = "Outside_UK"
+                    }
+                    
+                    self.show.successful = false
+                    self.show.complete = true
+                    self.show.setValue("Download Failed", forKey:"status")
+                    print(message)
+                    self.add(toLog: message)
+                    NotificationCenter.default.post(name: NSNotification.Name(rawValue:"DownloadFinished"), object:self.show)
+                    self.add(toLog:"Download Failed", noTag:false)
+                    return
+                }
+                if let descJSONDict = try? JSONSerialization.jsonObject(with: data) as? [String : Any] {
+                    if let playlistDict = descJSONDict?["Playlist"] as? [String : Any] {
+                        if let videoDict = playlistDict["Video"] as? [String: Any] {
+                            mediaBaseURL = videoDict["Base"] as? String
+                            if let mediaFilesDict = videoDict["MediaFiles"] as? [[String: Any]] {
+                                mediaHREF = mediaFilesDict[0]["Href"] as? String
+                            }
+                            if let subtitleDict = videoDict["Subtitles"] as? [[String: Any]] {
+                                self.subtitleURL = subtitleDict[0]["Href"] as? String
+                            }
+                        }
+                    }
+                    
+                }
+                
+                guard let mediaBaseURL = mediaBaseURL, let mediaHREF = mediaHREF, let baseURL = URL(string: mediaBaseURL) else {
+                    return
+                }
+                
+                if let mediaURL = URL(string: mediaHREF, relativeTo: baseURL) {
+                    DispatchQueue.main.async {
+                        self.launchFFMPEG(url: mediaURL.absoluteString)
+                    }
+                }
+            })
+            
+            self.currentRequest.resume()
+        } else {
+            add(toLog:"ERROR: Couldn't find playlist information on show page.")
+            self.show.reasonForFailure = "ShowNotFound";
             self.show.complete = true;
             self.show.successful = false;
             self.show.setValue("Download Failed", forKey:"status")
             NotificationCenter.default.post(name: Notification.Name(rawValue: "DownloadFinished"), object:self.show)
             return
         }
-
-        logDebugMessage("DEBUG: playPath = \(playPath)", noTag: true)
-        
-        let result = metadataParseOperation.result
-        self.show.seriesName = result.seriesName ?? "Unknown"
-        self.show.episodeName = result.episodeTitle ?? ""
-
-        add(toLog:"INFO: Metadata processed.", noTag:true)
-
-            //Create Download Path
-            self.createDownloadPath()
-            
-        var swfplayer = UserDefaults.standard.value(forKey: "\(self.defaultsPrefix)SWFURL") as? String
-        if swfplayer == nil {
-            swfplayer = "http://www.itv.com/mediaplayer/ITVMediaPlayer.swf?v=11.20.654"
+    }
+    
+    fileprivate func convertToSeconds(_ timeString: String) -> Int {
+        let timeParts = timeString.split {($0 == ":") || ($0 == ".")}
+        var timeInSeconds = 0
+        for (i, d) in timeParts.enumerated() {
+            if let x = Int(d) {
+                switch (i) {
+                case 0:
+                    timeInSeconds += x * 60 * 60
+                case 1:
+                    timeInSeconds += x * 60
+                case 2:
+                    timeInSeconds += x
+                default:
+                    break
+                    // Don't worry about fractions.
+                }
+            }
         }
         
-        DispatchQueue.main.async {
-            var args: [String] = ["-r",
-                        authURL,
-                        "-W",
-                        swfplayer!,
-                        "-y",
-                        playPath,
-                        "-o",
-                        self.downloadPath]
-            if self.verbose {
-                args.append("--verbose")
-                self.logDebugMessage("DEBUG: RTMPDump args:\(args)", noTag: true)
+        return timeInSeconds
+    }
+    
+    @objc public func ffmpegProgress(progress: Notification?) {
+        if let data = progress?.userInfo?[NSFileHandleNotificationDataItem] as? Data, data.count > 0,
+            let s = String(data: data, encoding: .utf8) {
+            
+            // ffmpeg generates a lot of garbage due to the nature of streaming, so filter out what we care about.
+            if !s.contains("Invalid") {
+                if self.verbose && (s.contains("Duration:") || s.contains("time=")) && !s.hasPrefix("[") {
+                    self.logger.add(toLog: s, self)
+                }
+                // ffmpeg progress line:
+                //   Duration: 00:46:17.16, start: 10.000000, bitrate: 0 kb/s
+                // frame=   61 fps=0.0 q=28.0 size=       0kB time=00:00:02.53 bitrate=   0.2kbits/s speed=4.98x
+                let scanner: Scanner
+                var duration: String? = nil
+                var elapsed: String? = nil
+                if s.contains("Duration:") {
+                    scanner = Scanner(string: s)
+                    scanner.scanUpToString("Duration:")
+                    scanner.scanString("Duration:")
+                    duration = scanner.scanUpToString(",")?.trimmingCharacters(in: .whitespaces)
+                } else if s.contains("time=") {
+                    scanner = Scanner(string: s)
+                    scanner.scanUpToString("time=")
+                    scanner.scanString("time=")
+                    elapsed = scanner.scanUpToString(" ")?.trimmingCharacters(in: .whitespaces)
+                }
+                
+                if let duration = duration {
+                    durationInSeconds = convertToSeconds(duration)
+                }
+                if let elapsed = elapsed {
+                    elapsedInSeconds = convertToSeconds(elapsed)
+                }
+                
+                if elapsedInSeconds != 0 && durationInSeconds != 0 {
+                    setPercentage(100.0 * Double(elapsedInSeconds) / Double(durationInSeconds))
+                }
             }
-            self.launchRTMPDump(withArgs: args)
+            fh?.readInBackgroundAndNotify()
+            errorFh?.readInBackgroundAndNotify()
         }
     }
+    
+    @objc public func ffmpegFinishedDownload() {
+        if let tagOption = UserDefaults.standard.object(forKey: "TagShows") as? Bool, tagOption {
+            self.show.status = "Downloading Thumbnail..."
+            setPercentage(102)
+            setCurrentProgress("Downloading Thumbnail... -- \(show.showName)")
+            if let thumbnailURL = thumbnailURL {
+                add(toLog: "INFO: Downloading thumbnail", noTag: true)
+                thumbnailPath = URL(fileURLWithPath: show.path).appendingPathExtension("jpg").path
+                let downloadTask: URLSessionDownloadTask? = session.downloadTask(with: URL(string: thumbnailURL)!, completionHandler: {(_ location: URL?, _ response: URLResponse?, _ error: Error?) -> Void in
+                    self.thumbnailRequestFinished(location)
+                })
+                downloadTask?.resume()
+            }
+            else {
+                thumbnailRequestFinished(nil)
+            }
+        }
+        else {
+            atomicParsleyFinished(nil)
+        }
+    }
+    
+    private func launchFFMPEG(url: String) {
+        setCurrentProgress("Downloading \(show.showName)")
+        setPercentage(102)
+        show.setValue("Downloading...", forKey: "status")
 
-    // TODO: This URL no longer exists, so don't call it until we figure out how to get the description metadata.
-//        guard let dataURL = URL(string: "http://www.itv.com/_app/Dynamic/CatchUpData.ashx?ViewType=5&Filter=\(self.show.realPID)") else {
-//            self.show.reasonForFailure = "NoSpecifiedFormatAvailableITV";
-//            self.show.complete = true;
-//            self.show.successful = false;
-//            self.show.setValue("Download Failed", forKey:"status")
-//            NotificationCenter.default.post(name: Notification.Name(rawValue: "DownloadFinished"), object:self.show)
-//            return
-//        }
-//        
-//        logDebugMessage("DEBUG: Programme data URL: \(dataURL.absoluteString)", noTag: true)
-//        self.currentRequest.cancel()
-//        
-//        var downloadRequest = URLRequest(url:dataURL)
-//        downloadRequest.addValue("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", forHTTPHeaderField:"Accept")
-//        downloadRequest.timeoutInterval = 10
-//        DispatchQueue.main.async(execute: {
-//            self.add(toLog:"INFO: Requesting programme data.", noTag:true)
-//            self.currentRequest = self.session.dataTask(with: downloadRequest,
-//                                                                   completionHandler: {
-//                                                                    (data: Data?, response: URLResponse?, error: Error?) in
-//                                                                    if let httpResponse = response as? HTTPURLResponse {
-//                                                                        self.dataRequestFinished(httpResponse,
-//                                                                                            data: data,
-//                                                                                            error: error)
-//                                                                    }
-//            })
-//            self.currentRequest.resume()
-//        })
-    
-    
-    
+        task = Process()
+        pipe = Pipe()
+        errorPipe = Pipe()
+        task?.standardInput = FileHandle.nullDevice
+        task?.standardOutput = pipe
+        task?.standardError = errorPipe
+        fh = pipe?.fileHandleForReading
+        errorFh = errorPipe?.fileHandleForReading
+
+        let args: [String] = ["-i",
+                              url,
+                              "-y",
+                              downloadPath]
+        if self.verbose {
+            self.logDebugMessage("DEBUG: ffmpeg args:\(args)", noTag: true)
+        }
+
+        if let executableURL = Bundle.main.executableURL?.deletingLastPathComponent().appendingPathComponent("ffmpeg") {
+            task?.launchPath = executableURL.path
+            task?.arguments = args
+            NotificationCenter.default.addObserver(self, selector: #selector(self.ffmpegProgress), name: FileHandle.readCompletionNotification, object: fh)
+            NotificationCenter.default.addObserver(self, selector: #selector(self.ffmpegProgress), name: FileHandle.readCompletionNotification, object: errorFh)
+
+            task?.terminationHandler = {
+                task in
+                self.add(toLog: "ffmpeg finished downloading")
+                self.processErrorCache.invalidate()
+                
+                let exitCode = task.terminationStatus
+                if exitCode == 0 {
+                    self.show.complete = (true)
+                    self.show.successful = (true)
+                    let info = ["Programme" : self.show]
+                    DispatchQueue.main.async {
+                        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "AddProgToHistory"), object:self, userInfo:info)
+                        self.ffmpegFinishedDownload()
+                    }
+                }
+            }
+
+            task?.launch()
+            fh?.readInBackgroundAndNotify()
+            errorFh?.readInBackgroundAndNotify()
+        }
+    }
 }

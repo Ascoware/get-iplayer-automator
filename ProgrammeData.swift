@@ -10,15 +10,17 @@
     public var seriesNumber: Int = 0
     public var episodeNumber: Int = 0
     public var isNew = false
-    public var programmeName: String?
-    public var productionId: String?
+    public var programmeName = ""
+    public var productionId = ""
     public var programmeURL = ""
     public var numberEpisodes: Int = 0
     public var forceCacheUpdate: Bool = false
-    public var timeDateLastAired: TimeInterval? = nil
-    public var timeAdded: TimeInterval? = nil
+    public var timeDateLastAired: Date? = nil
+    public var timeAdded: Date? = nil
+    public var thumbnailURL = ""
+    public var programDescription = ""
     
-    init(name: String, pid: String, url: String, numberEpisodes: Int, timeDateLastAired: TimeInterval) {
+    init(name: String, pid: String, url: String, numberEpisodes: Int, timeDateLastAired: Date?, programDescription: String, thumbnailURL: String) {
         super.init()
         let programmeName = name.replacingOccurrences(of: "-", with: " ")
         self.programmeName = programmeName.capitalized
@@ -26,6 +28,8 @@
         self.programmeURL = url
         self.numberEpisodes = numberEpisodes
         self.timeDateLastAired = timeDateLastAired
+        self.programDescription = programDescription
+        self.thumbnailURL = thumbnailURL
     }
     
     func addProgrammeSeriesInfo(_ aSeriesNumber: Int, aEpisodeNumber: Int) {
@@ -57,20 +61,13 @@
         episodeNumber = coder.decodeObject(forKey: "episodeNumber") as? Int ?? 0
         isNew = coder.decodeObject(forKey: "isNew") as? Bool ?? false
         forceCacheUpdate = coder.decodeObject(forKey: "forceCacheUpdate") as? Bool ?? false
-        timeDateLastAired =  coder.decodeObject(forKey: "timeIntDateLastAired") as? Double ?? 0.0
-        
-        if coder.containsValue(forKey: "timeAddedInt") {
-            let oldValue = coder.decodeObject(forKey: "timeAddedInt") as? Int ?? 0
-            timeAdded = Double(oldValue)
-        } else {
-            timeAdded = coder.decodeObject(forKey: "timeAdded") as? Double ?? 0.0
-        }
-        
+        timeDateLastAired =  coder.decodeObject(forKey: "timeIntDateLastAired") as? Date
+        timeAdded = coder.decodeObject(forKey: "timeAdded") as? Date
         super.init()
     }
     
     public override var hash: Int {
-        return programmeName?.hashValue ?? 0
+        return programmeName.hashValue
     }
 }
 

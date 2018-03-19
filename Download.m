@@ -302,7 +302,9 @@
             if (_thumbnailURL)
             {
                 [self addToLog:@"INFO: Downloading thumbnail" noTag:YES];
-                _thumbnailPath = [_show.path stringByAppendingPathExtension:@"jpg"];
+                NSURL *filePath = [NSURL fileURLWithPath:_show.path];
+                filePath = [filePath URLByAppendingPathExtension:@"jpg"];
+                _thumbnailPath = [filePath path];
                 NSURLSessionDownloadTask *downloadTask = [self.session downloadTaskWithURL: [NSURL URLWithString:_thumbnailURL] completionHandler:^(NSURL * _Nullable location, NSURLResponse * _Nullable response, NSError * _Nullable error) {
                     [self thumbnailRequestFinished:location];
                 }];
@@ -341,58 +343,55 @@
         if (![fm copyItemAtURL:location toURL:destinationURL error:&error]) {
             NSLog(@"Unable to save downloaded thumbnail: %@", error.description);
             [self addToLog:@"INFO: Thumbnail Download Failed" noTag:YES];
-            return;
         }
     }
 
     dispatch_async(dispatch_get_main_queue(), ^{
-        _apTask = [[NSTask alloc] init];
-        _apPipe = [[NSPipe alloc] init];
-        _apFh = _apPipe.fileHandleForReading;
+        self.apTask = [[NSTask alloc] init];
+        self.apPipe = [[NSPipe alloc] init];
+        self.apFh = self.apPipe.fileHandleForReading;
 
-        _apTask.launchPath = [([NSBundle mainBundle].executablePath).stringByDeletingLastPathComponent stringByAppendingPathComponent:@"AtomicParsley"];
+        self.apTask.launchPath = [([NSBundle mainBundle].executablePath).stringByDeletingLastPathComponent stringByAppendingPathComponent:@"AtomicParsley"];
         
         NSMutableArray *arguments = [NSMutableArray arrayWithObjects:
-                                     [NSString stringWithFormat:@"%@",_show.path],
+                                     [NSString stringWithFormat:@"%@",self.show.path],
                                      @"--stik",@"value=10",
-                                     @"--TVNetwork",_show.tvNetwork,
-                                     @"--TVShowName",_show.seriesName,
-                                     @"--TVSeasonNum",[NSString stringWithFormat:@"%ld",(long)_show.season],
-                                     @"--TVEpisodeNum",[NSString stringWithFormat:@"%ld",(long)_show.episode],
-                                     @"--TVEpisode",_show.episodeName,
-                                     @"--title",_show.showName,
-                                     @"--artwork", _thumbnailPath,
-                                     @"--comment",_show.desc,
-                                     @"--description",_show.desc,
-                                     @"--longdesc",_show.desc,
-                                     @"--lyrics",_show.desc,
-                                     @"--artist",_show.tvNetwork,
+                                     @"--TVNetwork",self.show.tvNetwork,
+                                     @"--TVShowName",self.show.seriesName,
+                                     @"--TVSeasonNum",[NSString stringWithFormat:@"%ld",(long)self.show.season],
+                                     @"--TVEpisodeNum",[NSString stringWithFormat:@"%ld",(long)self.show.episode],
+                                     @"--TVEpisode",self.show.episodeName,
+                                     @"--title",self.show.showName,
+                                     @"--artwork", self.thumbnailPath,
+                                     @"--comment",self.show.desc,
+                                     @"--description",self.show.desc,
+                                     @"--longdesc",self.show.desc,
+                                     @"--lyrics",self.show.desc,
+                                     @"--artist",self.show.tvNetwork,
                                      @"--overWrite",
                                      nil];
        
-        if (_show.standardizedAirDate) {
+        if (self.show.standardizedAirDate) {
             [arguments addObject: @"--year"];
-            [arguments addObject:_show.standardizedAirDate];
+            [arguments addObject:self.show.standardizedAirDate];
         }
             
-        _apTask.arguments = arguments;
+        self.apTask.arguments = arguments;
         
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(DownloadDataReady:)
                                                      name:NSFileHandleReadCompletionNotification
-                                                   object:_apFh];
+                                                   object:self.apFh];
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(atomicParsleyFinished:)
                                                      name:NSTaskDidTerminateNotification
-                                                   object:_apTask];
+                                                   object:self.apTask];
         
         [self addToLog:@"INFO: Beginning AtomicParsley Tagging." noTag:YES];
         
-        [_apTask launch];
-        [_apFh readInBackgroundAndNotify];
-        
-        [self setCurrentProgress:[NSString stringWithFormat:@"Tagging the Programme... -- %@",_show.showName]];
-        
+        [self.apTask launch];
+        [self.apFh readInBackgroundAndNotify];
+        [self setCurrentProgress:[NSString stringWithFormat:@"Tagging the Programme... -- %@",self.show.showName]];
     });
 }
 - (void)atomicParsleyFinished:(NSNotification *)finishedNote
@@ -417,7 +416,12 @@
             [self setCurrentProgress:[NSString stringWithFormat:@"Downloading Subtitles... -- %@",_show.showName]];
             [self addToLog:[NSString stringWithFormat:@"INFO: Downloading subtitles: %@", _subtitleURL] noTag:YES];
             
-            _subtitlePath = [_show.path.stringByDeletingPathExtension stringByAppendingPathExtension:@"ttml"];
+            if (self.show.tvNetwork hasPrefix:@"ITV") {
+                _subtitlePath = [_show.path.stringByDeletingPathExtension stringByAppendingPathExtension:@"webvtt"];
+            } else {
+                _subtitlePath = [_show.path.stringByDeletingPathExtension stringByAppendingPathExtension:@"ttml"];
+            }
+            
             NSURLSessionDownloadTask *downloadSubs = [self.session downloadTaskWithURL:[NSURL URLWithString:_subtitleURL]
                                                                                      completionHandler:^(NSURL * _Nullable location, NSURLResponse * _Nullable response, NSError * _Nullable error) {
                                                                                          [self subtitlesSavedTo: location
@@ -469,22 +473,22 @@
         [self convertSubtitlesFinished:nil];
     } else {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self addToLog:[NSString stringWithFormat:@"INFO: Converting to SubRip: %@", _subtitlePath] noTag:YES];
+            [self addToLog:[NSString stringWithFormat:@"INFO: Converting to SubRip: %@", self.subtitlePath] noTag:YES];
             NSString *ttml2srtPath = [[NSBundle mainBundle] pathForResource:@"ttml2srt.py" ofType:nil];
             NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:ttml2srtPath, nil];
-            BOOL srtIgnoreColors = [[NSUserDefaults standardUserDefaults] boolForKey:[NSString stringWithFormat:@"%@SRTIgnoreColors", _defaultsPrefix]];
+            BOOL srtIgnoreColors = [[NSUserDefaults standardUserDefaults] boolForKey:[NSString stringWithFormat:@"%@SRTIgnoreColors", self.defaultsPrefix]];
             if (srtIgnoreColors)
             {
                 [args addObject:@"--srt-ignore-colors"];
             }
-            [args addObject:_subtitlePath];
-            _subsTask = [[NSTask alloc] init];
-            _subsErrorPipe = [[NSPipe alloc] init];
-            _subsTask.standardError = _subsErrorPipe;
-            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(convertSubtitlesFinished:) name:NSTaskDidTerminateNotification object:_subsTask];
-            _subsTask.launchPath = @"/usr/bin/python";
-            _subsTask.arguments = args;
-            [_subsTask launch];
+            [args addObject:self.subtitlePath];
+            self.subsTask = [[NSTask alloc] init];
+            self.subsErrorPipe = [[NSPipe alloc] init];
+            self.subsTask.standardError = self.subsErrorPipe;
+            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(convertSubtitlesFinished:) name:NSTaskDidTerminateNotification object:self.subsTask];
+            self.subsTask.launchPath = @"/usr/bin/python";
+            self.subsTask.arguments = args;
+            [self.subsTask launch];
         });
     }
 }
@@ -492,6 +496,7 @@
 {
     if (aNotification)
     {
+        // Should not get inside this code for ITV (webvtt) subtitles.
         if ([aNotification.object terminationStatus] == 0)
         {
             BOOL keepRawSubtitles = [[NSUserDefaults standardUserDefaults] boolForKey:[NSString stringWithFormat:@"%@KeepRawSubtitles", _defaultsPrefix]];
@@ -669,7 +674,7 @@
     _downloadPath = [[NSUserDefaults standardUserDefaults] valueForKey:@"DownloadPath"];
     _downloadPath = [_downloadPath stringByAppendingPathComponent:[[dirName stringByReplacingOccurrencesOfString:@"/" withString:@"-"] stringByReplacingOccurrencesOfString:@":" withString:@" -"]];
     [[NSFileManager defaultManager] createDirectoryAtPath:_downloadPath withIntermediateDirectories:YES attributes:nil error:nil];
-    NSString *filepart = [[[NSString stringWithFormat:@"%@.partial.flv",fileName] stringByReplacingOccurrencesOfString:@"/" withString:@"-"] stringByReplacingOccurrencesOfString:@":" withString:@" -"];
+    NSString *filepart = [[[NSString stringWithFormat:@"%@.mp4",fileName] stringByReplacingOccurrencesOfString:@"/" withString:@"-"] stringByReplacingOccurrencesOfString:@":" withString:@" -"];
     NSRegularExpression *dateRegex = [NSRegularExpression regularExpressionWithPattern:@"(\\d{2})[-_](\\d{2})[-_](\\d{4})" options:0 error:nil];
     filepart = [dateRegex stringByReplacingMatchesInString:filepart options:0 range:NSMakeRange(0, filepart.length) withTemplate:@"$3-$2-$1"];
     _downloadPath = [_downloadPath stringByAppendingPathComponent:filepart];
@@ -678,7 +683,9 @@
 {
     [_currentRequest cancel];
 	//Some basic cleanup.
-	[_task terminate];
+    if ([_task isRunning]) {
+        [_task terminate];
+    }
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSFileHandleReadCompletionNotification object:_fh];
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSFileHandleReadCompletionNotification object:_errorFh];
 	[_show setValue:@"Cancelled" forKey:@"status"];

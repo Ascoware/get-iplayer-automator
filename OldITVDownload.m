@@ -27,8 +27,6 @@
         
         self.isTest=true;
         
-        [tempShow printLongDescription];
-        
         [self launchMetaRequest];
     }
     return self;

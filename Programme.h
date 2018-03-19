@@ -40,6 +40,7 @@ typedef NS_ENUM(NSInteger, GIA_ProgrammeType) {
 @property (nonatomic) NSString *reasonForFailure;
 @property (nonatomic) NSString *availableModes;
 @property (nonatomic) NSString *url;
+@property (nonatomic, nullable) NSString *itvVideoUrl;
 @property (nonatomic) NSDate *dateAired;
 @property (nonatomic) NSString *standardizedAirDate;
 @property (nonatomic) NSString *desc;
@@ -65,7 +66,6 @@ typedef NS_ENUM(NSInteger, GIA_ProgrammeType) {
 - (instancetype)initWithPid:(NSString *)PID programmeName:(NSString *)SHOWNAME network:(NSString *)TVNETWORK logController:(LogController *)logger;
 - (instancetype)initWithShow:(Programme *)show;
 - (instancetype)initWithLogController:(LogController *)logger;
-- (void)printLongDescription;
 - (void)retrieveExtendedMetadata;
 - (void)cancelMetadataRetrieval;
 @property (nonatomic, readonly) GIA_ProgrammeType type;
