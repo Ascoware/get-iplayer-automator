@@ -416,7 +416,7 @@
             [self setCurrentProgress:[NSString stringWithFormat:@"Downloading Subtitles... -- %@",_show.showName]];
             [self addToLog:[NSString stringWithFormat:@"INFO: Downloading subtitles: %@", _subtitleURL] noTag:YES];
             
-            if (self.show.tvNetwork hasPrefix:@"ITV") {
+            if ([self.show.tvNetwork hasPrefix:@"ITV"]) {
                 _subtitlePath = [_show.path.stringByDeletingPathExtension stringByAppendingPathExtension:@"webvtt"];
             } else {
                 _subtitlePath = [_show.path.stringByDeletingPathExtension stringByAppendingPathExtension:@"ttml"];
