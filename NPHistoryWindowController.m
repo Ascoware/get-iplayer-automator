@@ -6,9 +6,8 @@
 //
 //
 
-#import "GetITVListings.h"
 #import "NPHistoryWindowController.h"
-#import "GetITVListings.h"
+#import "Get_iPlayer_Automator-Swift.h"
 
 NewProgrammeHistory *sharedHistoryContoller;
 
@@ -24,7 +23,7 @@ NewProgrammeHistory *sharedHistoryContoller;
     /* Load in programme History */
 
     sharedHistoryContoller = [NewProgrammeHistory sharedInstance];
-    programmeHistoryArray =  [sharedHistoryContoller getHistoryArray];
+    programmeHistoryArray =  sharedHistoryContoller.programmeHistoryArray;
     
     historyDisplayArray = [[NSMutableArray alloc]init];
     

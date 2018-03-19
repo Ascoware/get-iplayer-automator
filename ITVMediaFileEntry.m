@@ -10,18 +10,7 @@
 
 @implementation ITVMediaFileEntry
 
-- (instancetype)init
-{
-    self = [super init];
-    if (self) {
-        url = [[NSString alloc] init];
-        bitrate = [[NSString alloc] init];
-        itvRate = [[NSString alloc] init];
-    }
-    
-    return self;
+-(NSString *)description {
+    return [NSString stringWithFormat:@"uri = %@, itvRate = %@, bitrate = %@", self.url, self.itvRate, self.bitrate];
 }
-@synthesize url;
-@synthesize bitrate;
-@synthesize itvRate;
 @end

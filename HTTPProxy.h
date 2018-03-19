@@ -5,6 +5,8 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface HTTPProxy : NSObject
 
 - (instancetype)initWithURL:(NSURL *)aURL;
@@ -14,6 +16,8 @@
 @property (readonly, copy) NSString *type;
 @property (readonly, copy) NSString *host;
 @property (readonly, assign) NSUInteger port;
-@property (readonly, copy) NSString *user;
-@property (readonly, copy) NSString *password;
+@property (readonly, copy, nullable) NSString *user;
+@property (readonly, copy, nullable) NSString *password;
 @end
+
+NS_ASSUME_NONNULL_END

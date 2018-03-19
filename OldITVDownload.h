@@ -11,9 +11,8 @@
 #import "TVFormat.h"
 #import "LogController.h"
 
-@interface ITVDownload : Download
-
-- (instancetype)initWithProgramme:(Programme *)tempShow itvFormats:(NSArray *)itvFormatList proxy:(HTTPProxy *)aProxy logController:(LogController *)logger;
+@interface OldITVDownload : Download
 - (instancetype)initTest:(Programme *)tempShow proxy:(HTTPProxy *)aProxy;
+-(void)dataRequestFinished:(NSHTTPURLResponse *)request data:(NSData *)data error:(NSError *)error;
 
 @end

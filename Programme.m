@@ -25,7 +25,7 @@
     return self;
 }
 
-- (instancetype)initWithInfo:(id)sender pid:(NSString *)PID programmeName:(NSString *)SHOWNAME network:(NSString *)TVNETWORK logController:(LogController *)logger
+- (instancetype)initWithPid:(NSString *)PID programmeName:(NSString *)SHOWNAME network:(NSString *)TVNETWORK logController:(LogController *)logger
 {
     if (self = [super init]) {
         _logger = logger;
@@ -182,12 +182,6 @@
 -(void)setPid:(NSString *)newPID
 {
     _pid = [newPID stringByReplacingOccurrencesOfString:@"amp;" withString:@""];
-}
-
--(void)printLongDescription
-{
-    NSLog(@"%@:\n   TV Network: %@\n   Processed PID: %@\n   Real PID: %@\n   Available Modes: %@\n   URL: %@\n",
-          _showName,_tvNetwork,_processedPID,_realPID,_availableModes,_url);
 }
 
 -(void)retrieveExtendedMetadata
@@ -477,15 +471,15 @@
 - (void)getName
 {
     // skip if pid looks like ITV productionId
-    if ([_pid rangeOfString:@"/"].location != NSNotFound ||
-        [_pid rangeOfString:@"#"].location != NSNotFound) {
-        
-        if ( [[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheITV_TV"] isEqualTo:@YES] )
-            self.status = @"New ITV Cache";
-        else
-            self.status = @"Undetermined-ITV";
-        return;
-    }
+//    if ([_pid rangeOfString:@"/"].location != NSNotFound ||
+//        [_pid rangeOfString:@"#"].location != NSNotFound) {
+//
+//        if ( [[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheITV_TV"] isEqualTo:@YES] )
+//            self.status = @"New ITV Cache";
+//        else
+//            self.status = @"Undetermined-ITV";
+//        return;
+//    }
     @autoreleasepool {
         getNameRunning = true;
         

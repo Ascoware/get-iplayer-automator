@@ -11,7 +11,7 @@
 #import <IOKit/pwr_mgt/IOPMLib.h>
 #import "BBCDownload.h"
 #import "Series.h"
-#import "ITVDownload.h"
+#import "Get iPlayer Automator-Bridging-Header.h"
 #import "Download.h"
 #import "NilToStringTransformer.h"
 #import "EmptyToStringTransformer.h"

@@ -75,69 +75,60 @@
     
     dispatch_async(dispatch_get_main_queue(), ^{
         if (programme.successfulRetrieval.boolValue) {
-            if (programme.thumbnail)
-                imageView.image = programme.thumbnail;
-            else
-                imageView.image = nil;
+            self->imageView.image = programme.thumbnail;
             
             if (programme.seriesName)
-                seriesNameField.stringValue = programme.seriesName;
+                self->seriesNameField.stringValue = programme.seriesName;
             else
-                seriesNameField.stringValue = @"Unable to Retrieve";
+                self->seriesNameField.stringValue = @"Unable to Retrieve";
             
-            if (programme.episodeName)
-                episodeNameField.stringValue = programme.episodeName;
-            else
-                seriesNameField.stringValue = @"";
+            self->episodeNameField.stringValue = programme.episodeName;
             
             if (programme.season && programme.episode)
-                numbersField.stringValue = [NSString stringWithFormat:@"Series: %ld Episode: %ld",(long)programme.season,(long)programme.episode];
+                self->numbersField.stringValue = [NSString stringWithFormat:@"Series: %ld Episode: %ld",(long)programme.season,(long)programme.episode];
             else
-                numbersField.stringValue = @"";
+                self->numbersField.stringValue = @"";
             
             if (programme.duration)
-                durationField.stringValue = [NSString stringWithFormat:@"Duration: %d minutes",programme.duration.intValue];
+                self->durationField.stringValue = [NSString stringWithFormat:@"Duration: %d minutes",programme.duration.intValue];
             else
-                durationField.stringValue = @"";
+                self->durationField.stringValue = @"";
             
             if (programme.categories)
-                categoriesField.stringValue = [NSString stringWithFormat:@"Categories: %@",programme.categories];
+                self->categoriesField.stringValue = [NSString stringWithFormat:@"Categories: %@",programme.categories];
             else
-                categoriesField.stringValue = @"";
+                self->categoriesField.stringValue = @"";
             
             if (programme.firstBroadcast)
-                firstBroadcastField.stringValue = [NSString stringWithFormat:@"First Broadcast: %@",(programme.firstBroadcast).description];
+                self->firstBroadcastField.stringValue = [NSString stringWithFormat:@"First Broadcast: %@",(programme.firstBroadcast).description];
             else
-                firstBroadcastField.stringValue = @"";
+                self->firstBroadcastField.stringValue = @"";
             
             if (programme.lastBroadcast)
-                lastBroadcastField.stringValue = [NSString stringWithFormat:@"Last Broadcast: %@", (programme.lastBroadcast).description];
+                self->lastBroadcastField.stringValue = [NSString stringWithFormat:@"Last Broadcast: %@", (programme.lastBroadcast).description];
             else
-                lastBroadcastField.stringValue = @"";
+                self->lastBroadcastField.stringValue = @"";
             
-            if (programme.desc)
-                descriptionView.string = programme.desc;
-            else
-                descriptionView.string = @"";
+            self->descriptionView.string = programme.desc;
             
             if (programme.modeSizes)
-                modeSizeController.content = programme.modeSizes;
+                self->modeSizeController.content = programme.modeSizes;
             else
-                modeSizeController.content = @[];
+                self->modeSizeController.content = @[];
             
             if ([programme typeDescription])
-                typeField.stringValue = [NSString stringWithFormat:@"Type: %@",[programme typeDescription]];
+                self->typeField.stringValue = [NSString stringWithFormat:@"Type: %@",[programme typeDescription]];
             else
-                typeField.stringValue = @"";
+                self->typeField.stringValue = @"";
             
-            [retrievingInfoIndicator stopAnimation:self];
-            infoView.alphaValue = 1.0;
-            loadingView.alphaValue = 0.0;
+            [self->retrievingInfoIndicator stopAnimation:self];
+            self->infoView.alphaValue = 1.0;
+            self->loadingView.alphaValue = 0.0;
             [[NSNotificationCenter defaultCenter] postNotificationName:@"AddToLog" object:self userInfo:@{@"message":@"Info Retrieved"}];
         }
         else {
-            [retrievingInfoIndicator stopAnimation:self];
-            loadingLabel.stringValue = @"Info could not be retrieved.";
+            [self->retrievingInfoIndicator stopAnimation:self];
+            self->loadingLabel.stringValue = @"Info could not be retrieved.";
             [[NSNotificationCenter defaultCenter] postNotificationName:@"AddToLog" object:self userInfo:@{@"message":@"Info could not be retrieved."}];
         }
     });

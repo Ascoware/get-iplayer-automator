@@ -8,9 +8,6 @@
 
 #import <Foundation/Foundation.h>
 
-
-@interface TVFormat : NSObject <NSCoding> {
-	NSString *format;
-}
-@property (readwrite) NSString *format;
+@interface TVFormat : NSObject <NSCoding>
+@property (nonatomic, nonnull, copy) NSString *format;
 @end

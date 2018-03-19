@@ -10,10 +10,12 @@
 #import "HTTPProxy.h"
 #import "Programme.h"
 #import "LogController.h"
+#import "TVFormat.h"
+
+NS_ASSUME_NONNULL_BEGIN
 
 @interface Download : NSObject
 
-@property (nonatomic) NSNotificationCenter *nc;
 @property (nonatomic) LogController *logger;
 
 @property (nonatomic) Programme *show;
@@ -26,20 +28,20 @@
 @property (nonatomic) NSMutableString *log;
 
 //RTMPDump Task
-@property (nonatomic) NSTask *task;
-@property (nonatomic) NSPipe *pipe;
-@property (nonatomic) NSPipe *errorPipe;
-@property (nonatomic) NSFileHandle *fh;
-@property (nonatomic) NSFileHandle *errorFh;
+@property (nonatomic, nullable) NSTask *task;
+@property (nonatomic, nullable) NSPipe *pipe;
+@property (nonatomic, nullable) NSPipe *errorPipe;
+@property (nonatomic, nullable) NSFileHandle *fh;
+@property (nonatomic, nullable) NSFileHandle *errorFh;
 @property (nonatomic) NSMutableString *errorCache;
 @property (nonatomic) NSTimer *processErrorCache;
 
 //ffmpeg Conversion
-@property (nonatomic) NSTask *ffTask;
-@property (nonatomic) NSPipe *ffPipe;
-@property (nonatomic) NSPipe *ffErrorPipe;
-@property (nonatomic) NSFileHandle *ffFh;
-@property (nonatomic) NSFileHandle *ffErrorFh;
+@property (nullable, nonatomic) NSTask *ffTask;
+@property (nullable, nonatomic) NSPipe *ffPipe;
+@property (nullable, nonatomic) NSPipe *ffErrorPipe;
+@property (nullable, nonatomic) NSFileHandle *ffFh;
+@property (nullable, nonatomic) NSFileHandle *ffErrorFh;
 
 //AtomicParsley Tagging
 @property (nonatomic) NSTask *apTask;
@@ -47,8 +49,8 @@
 @property (nonatomic) NSFileHandle *apFh;
 
 //Download Information
-@property (nonatomic) NSString *subtitleURL;
-@property (nonatomic) NSString *thumbnailURL;
+@property (nonatomic, nullable) NSString *subtitleURL;
+@property (nonatomic, nullable) NSString *thumbnailURL;
 @property (nonatomic) NSString *downloadPath;
 @property (nonatomic) NSString *thumbnailPath;
 @property (nonatomic) NSString *subtitlePath;
@@ -58,24 +60,24 @@
 @property (nonatomic) NSPipe *subsErrorPipe;
 @property (nonatomic) NSString *defaultsPrefix;
 
-@property (nonatomic) NSArray *formatList;
-@property (nonatomic) BOOL running;
+@property (nonatomic) NSArray<TVFormat *> *formatList;
+@property (nonatomic, assign) BOOL running;
 
-@property (nonatomic)NSInteger attemptNumber;
+@property (nonatomic, assign) NSInteger attemptNumber;
 
 //Verbose Logging
-@property (nonatomic) BOOL verbose;
+@property (nonatomic, assign) BOOL verbose;
 
 //Download Parameters
 @property (nonatomic) NSMutableDictionary *downloadParams;
 
 //Proxy Info
-@property (nonatomic) HTTPProxy *proxy;
+@property (nonatomic, nullable) HTTPProxy *proxy;
 
 // If proxy is set, this will be a session configured with the set proxy.
 // Otherwise, it uses the system (shared) session information.
 @property (nonatomic) NSURLSession *session;
-@property (nonatomic) BOOL isFilm;
+@property (nonatomic, assign) BOOL isFilm;
 
 @property (nonatomic) NSURLSessionDataTask *currentRequest;
 
@@ -85,7 +87,9 @@
 - (instancetype)initWithLogController:(LogController *)logger;
 - (void)setCurrentProgress:(NSString *)string;
 - (void)setPercentage:(double)d;
-- (void)cancelDownload:(id)sender;
+- (void)cancelDownload;
+
+- (void)logDebugMessage:(NSString *)message noTag:(BOOL)b;
 - (void)addToLog:(NSString *)logMessage noTag:(BOOL)b;
 - (void)addToLog:(NSString *)logMessage;
 - (void)processFLVStreamerMessage:(NSString *)message;
@@ -96,4 +100,10 @@
 - (void)createDownloadPath;
 - (void)processError;
 
+- (void)thumbnailRequestFinished:(nullable NSURL *)location;
+- (void)atomicParsleyFinished:(nullable NSNotification *)finishedNote;
+
 @end
+
+NS_ASSUME_NONNULL_END
+

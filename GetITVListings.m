@@ -5,6 +5,7 @@
 //  Created by LFS on 6/25/16.
 //
 
+@import Kanna;
 #import <Foundation/Foundation.h>
 #import "GetITVListings.h"
 
@@ -99,7 +100,7 @@ AppController           *sharedAppController;
     
     [[_mySession dataTaskWithURL:[NSURL URLWithString:@"https://www.itv.com/hub/shows"] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
     {
-        _htmlData = [[NSString alloc]initWithData:data encoding:NSASCIIStringEncoding];
+        _htmlData = [[NSString alloc]initWithData:data encoding:NSUTF8StringEncoding];
         if ( ![self createTodayProgrammeArray] )
             [self endOfRun];
         else
@@ -126,7 +127,7 @@ AppController           *sharedAppController;
             [[NSAlert alertWithMessageText:@"GetITVShows: Unable to retreive programme episode data" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"If problem persists, please submit a bug report and include the log file."] runModal];
           }
           else {
-              NSString *myHtmlData = [[NSString alloc]initWithData:data encoding:NSASCIIStringEncoding];
+              NSString *myHtmlData = [[NSString alloc]initWithData:data encoding:NSUTF8StringEncoding];
               [self processProgrammeEpisodesData:myProgramme : myHtmlData];
           }
       }
@@ -140,7 +141,6 @@ AppController           *sharedAppController;
 -(void)processProgrammeEpisodesData:(ProgrammeData *)aProgramme :(NSString *)myHtmlData
 {
     /*  Scan through episode page and create carried forward programme entries for each eipsode of aProgramme */
-
     NSScanner *scanner = [NSScanner scannerWithString:myHtmlData];
     NSScanner *fullProgrammeScanner;
     NSString *programmeURL = nil;

@@ -16,8 +16,8 @@
 #import "JRFeedbackController.h"
 #import "ReasonForFailure.h"
 #import "Chrome.h"
-#import "GetITVListings.h"
 #import "NPHistoryWindowController.h"
+#import "Get_iPlayer_Automator-Swift.h"
 
 static AppController *sharedController;
 bool runDownloads=NO;
@@ -395,7 +395,7 @@ NewProgrammeHistory           *sharedHistoryController;
 {
     //End Downloads if Running
     if (runDownloads)
-        [_currentDownload cancelDownload:nil];
+        [_currentDownload cancelDownload];
     
     [self saveAppData];
 }
@@ -546,7 +546,7 @@ NewProgrammeHistory           *sharedHistoryController;
         [self.itvProgressIndicator setHidden:false];
         [_itvProgressText setHidden:false];
 
-        [newITVListing itvUpdateWithLogger:_logger];
+        [newITVListing itvUpdateWithNewLogger:_logger];
     }
     
     _updatingBBCIndex = true;
@@ -1093,14 +1093,19 @@ NewProgrammeHistory           *sharedHistoryController;
             {
                 if ([show.complete isEqualToNumber:@NO])
                 {
-                    if ([show.tvNetwork hasPrefix:@"ITV"])
-                        _currentDownload = [[ITVDownload alloc] initWithProgramme:show itvFormats:_itvFormatController.arrangedObjects proxy:_proxy logController:_logger];
-                    else
+                    if ([show.tvNetwork hasPrefix:@"ITV"]) {
+                        _currentDownload = [[ITVDownload alloc]
+                                            initWithProgramme:show
+                                            formats:_itvFormatController.arrangedObjects
+                                            proxy:_proxy
+                                            logger:_logger];
+                    } else {
                         _currentDownload = [[BBCDownload alloc] initWithProgramme:show
                                                                        tvFormats:_tvFormatController.arrangedObjects
                                                                     radioFormats:_radioFormatController.arrangedObjects
                                                                            proxy:_proxy
                                                                    logController:_logger];
+                    }
                     break;
                 }
             }
@@ -1137,7 +1142,7 @@ NewProgrammeHistory           *sharedHistoryController;
     
     runDownloads=NO;
     _runScheduled=NO;
-    [_currentDownload cancelDownload:self];
+    [_currentDownload cancelDownload];
     _currentDownload.show.status = @"Cancelled";
     if (!runUpdate)
         [_startButton setEnabled:YES];
@@ -1310,7 +1315,10 @@ NewProgrammeHistory           *sharedHistoryController;
             if ([nextShow.complete isEqualToNumber:@NO])
             {
                 if ([nextShow.tvNetwork hasPrefix:@"ITV"])
-                    _currentDownload = [[ITVDownload alloc] initWithProgramme:nextShow itvFormats:_itvFormatController.arrangedObjects proxy:_proxy logController:_logger];
+                    _currentDownload = [[ITVDownload alloc] initWithProgramme:nextShow
+                                                                         formats:_itvFormatController.arrangedObjects
+                                                                           proxy:_proxy
+                                                                   logger:_logger];
                 else
                     _currentDownload = [[BBCDownload alloc] initWithProgramme:nextShow
                                                                    tvFormats:_tvFormatController.arrangedObjects
@@ -1528,15 +1536,15 @@ NewProgrammeHistory           *sharedHistoryController;
         NSLog(@"Thread Finished Notification Received");
         if (!runDownloads)
         {
-            _currentProgress.stringValue = @"";
-            [_currentIndicator setIndeterminate:NO];
-            [_currentIndicator stopAnimation:self];
-            [_startButton setEnabled:YES];
+            self.currentProgress.stringValue = @"";
+            [self.currentIndicator setIndeterminate:NO];
+            [self.currentIndicator stopAnimation:self];
+            [self.startButton setEnabled:YES];
         }
         [[NSNotificationCenter defaultCenter] removeObserver:self name:@"NSThreadWillExitNotification" object:nil];
         
         //If this is an update initiated by the scheduler, run the downloads.
-        if (_runScheduled && !_scheduleTimer)
+        if (self.runScheduled && !self.scheduleTimer)
         {
             [self performSelectorOnMainThread:@selector(startDownloads:) withObject:self waitUntilDone:NO];
         }
@@ -1614,7 +1622,7 @@ NewProgrammeHistory           *sharedHistoryController;
                 {
                     @try {
                         oneFound=YES;
-                        Programme *p = [[Programme alloc] initWithInfo:nil pid:temp_pid programmeName:temp_showName network:temp_tvNetwork logController:_logger];
+                        Programme *p = [[Programme alloc] initWithPid:temp_pid programmeName:temp_showName network:temp_tvNetwork logController:_logger];
                         p.realPID = temp_realPID;
                         p.seriesName = series_Name;
                         p.episodeName = episode_Name;
@@ -2164,6 +2172,7 @@ NewProgrammeHistory           *sharedHistoryController;
     else
         firstTimeBuild = false;
     
+    [NSKeyedUnarchiver setClass:[ProgrammeHistoryObject class] forClassName:@"ProgrammeHistoryObject"];
     NSMutableArray *oldProgrammesArray = [NSKeyedUnarchiver unarchiveObjectWithFile:oldProgrammesFile];
    
     if ( oldProgrammesArray == nil )
@@ -2206,8 +2215,8 @@ NewProgrammeHistory           *sharedHistoryController;
         
         if ( programmeName.length == 0 || channel.length == 0)
             continue;
-        
-        ProgrammeHistoryObject *p = [[ProgrammeHistoryObject alloc]initWithName:programmeName andTVChannel:channel andDateFound:@"" andSortKey:0 andNetworkName:networkName];
+
+        ProgrammeHistoryObject *p = [[ProgrammeHistoryObject alloc] initWithSortKey:0 programmeName:programmeName dateFound:@"" tvChannel:channel networkName:networkName];
         [todayProgrammes addObject:p];
     }
     
@@ -2224,10 +2233,11 @@ NewProgrammeHistory           *sharedHistoryController;
 
     /* and update history file with new programmes */
     
-    if ( !firstTimeBuild )
-        for ( ProgrammeHistoryObject *p in newProgrammesArray )
-            [sharedHistoryController addToNewProgrammeHistory:p.programmeName andTVChannel:p.tvChannel andNetworkName:networkName];
-
+    if ( !firstTimeBuild ) {
+        for (ProgrammeHistoryObject *p in newProgrammesArray ) {
+            [sharedHistoryController addWithName:p.programmeName tvChannel:p.tvChannel networkName:networkName];
+        }
+    }
 
 }
 -(NSString *)getItemNumber:(int)itemLocation fromString:(NSString *)string

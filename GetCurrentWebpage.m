@@ -244,11 +244,11 @@
       NSScanner *urlScanner = [NSScanner scannerWithString:url];
       [urlScanner scanString:@"http://www.bbc.co.uk/sport/olympics/2012/live-video/" intoString:nil];
       [urlScanner scanUpToString:@"kfejklfjklj" intoString:&pid];
-      return [[Programme alloc] initWithInfo:nil pid:pid programmeName:newShowName network:@"BBC Sport" logController:logger];
+      return [[Programme alloc] initWithPid:pid programmeName:newShowName network:@"BBC Sport" logController:logger];
    }
     else if ([url hasPrefix:@"http://www.itv.com/hub/"] || [url hasPrefix:@"https://www.itv.com/hub/"])
     {
-        NSString *progname = nil, *productionId = nil, *title = nil, *desc = nil;
+        NSString *progname = nil, *productionId = nil, *title = nil, *desc = nil, *videoURL = nil;
         NSInteger seriesnum = 0, episodenum = 0;
         progname = newShowName;
         NSScanner *scanner = [NSScanner scannerWithString:source];
@@ -259,10 +259,14 @@
         [scanner scanUpToString:@"<meta property=\"og:description\" content=\"" intoString:nil];
         [scanner scanString:@"<meta property=\"og:description\" content=\"" intoString:nil];
         [scanner scanUpToString:@"\"" intoString:&desc];
-        [scanner scanUpToString:@"data-video-production-id=\"" intoString:nil];
-        [scanner scanString:@"data-video-production-id=\"" intoString:nil];
-        [scanner scanUpToString:@"\"" intoString:&productionId];
-        if (!progname || !productionId) {
+
+        productionId = [[NSURL URLWithString:url] lastPathComponent];
+        
+        [scanner scanUpToString:@"data-video-id=\"" intoString:nil];
+        [scanner scanString:@"data-video-id=\"" intoString:nil];
+        [scanner scanUpToString:@"\"" intoString:&videoURL];
+
+        if (!progname || (!productionId && !videoURL)) {
             NSAlert *invalidPage = [[NSAlert alloc] init];
             [invalidPage addButtonWithTitle:@"OK"];
             invalidPage.messageText = [NSString stringWithFormat:@"Invalid Page: %@",url];
@@ -279,6 +283,7 @@
         newProg.tvNetwork = @"ITV";
         newProg.processedPID = @YES;
         newProg.url = url;
+        newProg.itvVideoUrl = videoURL;
         scanner = [NSScanner scannerWithString:title];
         [scanner scanUpToString:@"Series " intoString:nil];
         [scanner scanString:@"Series " intoString:nil];

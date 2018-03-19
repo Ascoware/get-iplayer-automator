@@ -11,15 +11,15 @@
 #import "LogController.h"
 #import "GetiPlayerProxy.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 typedef NS_ENUM(NSInteger, GIA_ProgrammeType) {
     GiA_ProgrammeTypeBBC_TV,
     GiA_ProgrammeTypeBBC_Radio,
     GIA_ProgrammeTypeITV
 };
 
-
-@interface Programme : NSObject <NSCoding> {
-}
+@interface Programme : NSObject <NSCoding>
 @property (nonatomic) LogController *logger;
 @property (nonatomic) NSString *tvNetwork;
 @property (nonatomic) NSString *showName;
@@ -40,6 +40,7 @@ typedef NS_ENUM(NSInteger, GIA_ProgrammeType) {
 @property (nonatomic) NSString *reasonForFailure;
 @property (nonatomic) NSString *availableModes;
 @property (nonatomic) NSString *url;
+@property (nonatomic, nullable) NSString *itvVideoUrl;
 @property (nonatomic) NSDate *dateAired;
 @property (nonatomic) NSString *standardizedAirDate;
 @property (nonatomic) NSString *desc;
@@ -62,10 +63,9 @@ typedef NS_ENUM(NSInteger, GIA_ProgrammeType) {
 @property (nonatomic) GetiPlayerProxy *getiPlayerProxy;
 @property (nonatomic, assign) BOOL addedByPVR;
 
-- (instancetype)initWithInfo:(id)sender pid:(NSString *)PID programmeName:(NSString *)SHOWNAME network:(NSString *)TVNETWORK logController:(LogController *)logger;
+- (instancetype)initWithPid:(NSString *)PID programmeName:(NSString *)SHOWNAME network:(NSString *)TVNETWORK logController:(LogController *)logger;
 - (instancetype)initWithShow:(Programme *)show;
 - (instancetype)initWithLogController:(LogController *)logger;
-- (void)printLongDescription;
 - (void)retrieveExtendedMetadata;
 - (void)cancelMetadataRetrieval;
 @property (nonatomic, readonly) GIA_ProgrammeType type;
@@ -75,3 +75,6 @@ typedef NS_ENUM(NSInteger, GIA_ProgrammeType) {
 - (void)getNameSynchronous;
 
 @end
+
+NS_ASSUME_NONNULL_END
+
