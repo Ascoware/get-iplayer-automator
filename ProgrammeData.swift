@@ -22,8 +22,7 @@
     
     init(name: String, pid: String, url: String, numberEpisodes: Int, timeDateLastAired: Date?, programDescription: String, thumbnailURL: String) {
         super.init()
-        let programmeName = name.replacingOccurrences(of: "-", with: " ")
-        self.programmeName = programmeName.capitalized
+        self.programmeName = name
         self.productionId = pid
         self.programmeURL = url
         self.numberEpisodes = numberEpisodes

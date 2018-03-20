@@ -453,9 +453,14 @@ public class ITVDownload : OldITVDownload {
         task?.standardError = errorPipe
         fh = pipe?.fileHandleForReading
         errorFh = errorPipe?.fileHandleForReading
-
         let args: [String] = ["-i",
                               url,
+                              "-acodec",
+                              "copy",
+                              "-bsf:a",
+                              "aac_adtstoasc",
+                              "-vcodec",
+                              "copy",
                               "-y",
                               downloadPath]
         if self.verbose {

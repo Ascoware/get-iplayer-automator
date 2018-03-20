@@ -416,11 +416,7 @@
             [self setCurrentProgress:[NSString stringWithFormat:@"Downloading Subtitles... -- %@",_show.showName]];
             [self addToLog:[NSString stringWithFormat:@"INFO: Downloading subtitles: %@", _subtitleURL] noTag:YES];
             
-            if ([self.show.tvNetwork hasPrefix:@"ITV"]) {
-                _subtitlePath = [_show.path.stringByDeletingPathExtension stringByAppendingPathExtension:@"webvtt"];
-            } else {
-                _subtitlePath = [_show.path.stringByDeletingPathExtension stringByAppendingPathExtension:@"ttml"];
-            }
+            _subtitlePath = [_show.path.stringByDeletingPathExtension stringByAppendingPathExtension:@"vtt"];
             
             NSURLSessionDownloadTask *downloadSubs = [self.session downloadTaskWithURL:[NSURL URLWithString:_subtitleURL]
                                                                                      completionHandler:^(NSURL * _Nullable location, NSURLResponse * _Nullable response, NSError * _Nullable error) {
@@ -474,19 +470,26 @@
     } else {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self addToLog:[NSString stringWithFormat:@"INFO: Converting to SubRip: %@", self.subtitlePath] noTag:YES];
-            NSString *ttml2srtPath = [[NSBundle mainBundle] pathForResource:@"ttml2srt.py" ofType:nil];
-            NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:ttml2srtPath, nil];
-            BOOL srtIgnoreColors = [[NSUserDefaults standardUserDefaults] boolForKey:[NSString stringWithFormat:@"%@SRTIgnoreColors", self.defaultsPrefix]];
-            if (srtIgnoreColors)
-            {
-                [args addObject:@"--srt-ignore-colors"];
-            }
+            
+            NSURL *outputURL = [NSURL fileURLWithPath:self.subtitlePath];
+            outputURL = [[outputURL URLByDeletingPathExtension] URLByAppendingPathExtension:@"srt"];
+            NSMutableArray *args = [[NSMutableArray alloc] init];
+//            BOOL srtIgnoreColors = [[NSUserDefaults standardUserDefaults] boolForKey:[NSString stringWithFormat:@"%@SRTIgnoreColors", self.defaultsPrefix]];
+//            if (srtIgnoreColors)
+//            {
+//                [args addObject:@"--srt-ignore-colors"];
+//            }
+            [args addObject:@"-i"];
             [args addObject:self.subtitlePath];
+            [args addObject:[outputURL path]];
+
             self.subsTask = [[NSTask alloc] init];
             self.subsErrorPipe = [[NSPipe alloc] init];
             self.subsTask.standardError = self.subsErrorPipe;
             [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(convertSubtitlesFinished:) name:NSTaskDidTerminateNotification object:self.subsTask];
-            self.subsTask.launchPath = @"/usr/bin/python";
+            
+            NSURL *ffmpegURL = [[[[NSBundle mainBundle] executableURL] URLByDeletingLastPathComponent] URLByAppendingPathComponent:@"ffmpeg"];
+            self.subsTask.launchPath = [ffmpegURL path];
             self.subsTask.arguments = args;
             [self.subsTask launch];
         });
