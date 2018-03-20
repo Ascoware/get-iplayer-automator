@@ -10,8 +10,8 @@ The current release is 1.11.1. [Download it here.](https://github.com/Ascoware/g
 #### Version history
 
 ##### 1.11.1
-WebVTT subtitles are now converted to SubRip via ffmpeg. (#130)
-Used a better combination of arguments for downloading ITV streams. (#129)
+- WebVTT subtitles are now converted to SubRip via ffmpeg. (#130)
+- Used a better combination of arguments for downloading ITV streams. (#129)
 
 ##### 1.11.0
 - Caching of ITV listings now works again. You can also select programs from a search and add them to the queue. (#121, #122, #126)
