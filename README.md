@@ -1,13 +1,32 @@
 ## What is it?
-The goal of Get iPlayer Automator is to allow iTunes and your Mac to become the hub for your British Television experience regardless of where in the world you are.  Currently, Get iPlayer Automator allows you to download and watch BBC and ITV shows on your Mac. Series-Link/PVR functionality ensures you will never miss your favourite shows. Programmes are fully tagged and added to iTunes automatically upon completion. It is simple and easy to use, and runs on any machine running Mac OS X 10.7 or later *soon to be 10.9*.  And since the shows are in iTunes, it is extremely easy to transfer them to your iPod, iPhone, or Apple TV allowing you to enjoy your shows on the go or on your television.
+The goal of Get iPlayer Automator is to allow iTunes and your Mac to become the hub for your British Television experience regardless of where in the world you are. Get iPlayer Automator allows you to download and watch BBC and ITV shows on your Mac. Series-Link/PVR functionality ensures you will never miss your favourite shows. Programmes are fully tagged and added to iTunes automatically upon completion. It is simple and easy to use, and runs on any machine running Mac OS X 10.9 or later. And since the shows are in iTunes, it is extremely easy to transfer them to your iPod, iPhone, or Apple TV allowing you to enjoy your shows on the go or on your television.
 
-The current release is 1.9.15. [Download it here.](https://github.com/Ascoware/get-iplayer-automator/releases)
+The current release is 1.11.1. [Download it here.](https://github.com/Ascoware/get-iplayer-automator/releases)
 
 
 ### What if I find a bug?
 [Start here.](https://github.com/Ascoware/get-iplayer-automator/wiki/Reporting-Issues)
 
 #### Version history
+
+##### 1.11.1
+WebVTT subtitles are now converted to SubRip via ffmpeg. (#130)
+Used a better combination of arguments for downloading ITV streams. (#129)
+
+##### 1.11.0
+- Caching of ITV listings now works again. You can also select programs from a search and add them to the queue. (#121, #122, #126)
+- ITV downloads are now implemented by fetching the m3u8 playlist and handing it off to ffmpeg to stream and save the file. No more "Show not available" for ITV programs! (#95)
+- ITV subtitle files are now in WebVTT format. They are just downloaded and left alone next to the video file.
+
+##### 1.10.2
+- Fixed #121 - ITV shows can now be downloaded if you select Get Current Webpage with an ITV Hub show's episode page frontmost in your browser.
+
+##### 1.10.1
+- Fix for #118. I'm not entirely sure what has changed on ITV's end, but I can at least guard against it.
+
+##### 1.10.0
+- Fix for #104: restoring the queue was failing and deleting the file
+- Implemented #90: Put the last broadcast date in the search results and queue.
 
 ##### 1.9.15
 - Fixed #110: "Use Current Webpage" should now work again for https-prefixed URLs
@@ -28,8 +47,8 @@ The current release is 1.9.15. [Download it here.](https://github.com/Ascoware/g
 - #81, #80: Reverted ffmpeg to previous version (sorry about that!!). I will look into a better source for getting newer versions of ffmpeg.
 
 ##### 1.9.10
-Fixed #79 -- force all BBC downloads to use HLS mode.
-Fixed #74 -- not all ITV episodes have a transmission time.
+- Fixed #79 -- force all BBC downloads to use HLS mode.
+- Fixed #74 -- not all ITV episodes have a transmission time.
 
 ##### 1.9.9
 - Integrated the rest of get_iplayer 3.06. In non-verbose mode, get_iplayer now generates less information about a download in progress, but Get iPlayer Automator will present what it can from the progress string. Verbose mode will report the amount of data retrieved as it did before.
