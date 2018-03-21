@@ -72,10 +72,12 @@ public class ITVDownload : OldITVDownload {
         if let proxy = self.proxy {
             // Create an NSURLSessionConfiguration that uses the proxy
             var proxyDict: [String: Any] = [kCFProxyTypeKey as String : kCFProxyTypeHTTP as String,
-                                            kCFNetworkProxiesHTTPEnable as String : 1,
-                                            kCFStreamPropertyHTTPProxyHost as String : proxy.host,
-                                            kCFStreamPropertyHTTPProxyPort as String : proxy.port
-            ]
+                                            kCFNetworkProxiesHTTPEnable as String : true,
+                                            kCFNetworkProxiesHTTPProxy as String : proxy.host,
+                                            kCFStreamPropertyHTTPProxyPort as String : proxy.port,
+                                            kCFNetworkProxiesHTTPSEnable as String : true,
+                                            kCFNetworkProxiesHTTPSProxy as String : proxy.host,
+                                            kCFStreamPropertyHTTPSProxyPort as String : proxy.port]
             
             if let user = proxy.user, let password = proxy.password {
                 proxyDict[kCFProxyUsernameKey as String] = user
@@ -455,12 +457,12 @@ public class ITVDownload : OldITVDownload {
         errorFh = errorPipe?.fileHandleForReading
         let args: [String] = ["-i",
                               url,
-                              "-acodec",
+                              "-c",
                               "copy",
                               "-bsf:a",
                               "aac_adtstoasc",
-                              "-vcodec",
-                              "copy",
+                              "-f",
+                              "mp4",
                               "-y",
                               downloadPath]
         if self.verbose {
@@ -470,6 +472,16 @@ public class ITVDownload : OldITVDownload {
         if let executableURL = Bundle.main.executableURL?.deletingLastPathComponent().appendingPathComponent("ffmpeg") {
             task?.launchPath = executableURL.path
             task?.arguments = args
+            
+            if let proxyHost = self.proxy?.host {
+                var proxyString = proxyHost
+                if let port = self.proxy?.port {
+                    proxyString += ":\(port)"
+                }
+                
+                task?.environment = ["http_proxy": proxyString, "https_proxy": proxyString]
+            }
+            
             NotificationCenter.default.addObserver(self, selector: #selector(self.ffmpegProgress), name: FileHandle.readCompletionNotification, object: fh)
             NotificationCenter.default.addObserver(self, selector: #selector(self.ffmpegProgress), name: FileHandle.readCompletionNotification, object: errorFh)
 
@@ -496,3 +508,4 @@ public class ITVDownload : OldITVDownload {
         }
     }
 }
+
