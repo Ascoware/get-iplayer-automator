@@ -8,9 +8,8 @@
 import Foundation
 import Kanna
 
-public class ITVDownload : OldITVDownload {
+public class ITVDownload : Download {
     
-    var authURL: String = ""
     var durationInSeconds: Int = 0
     var elapsedInSeconds: Int = 0
     
@@ -54,7 +53,6 @@ public class ITVDownload : OldITVDownload {
             self.launchMetaRequest()
         }
     }
-
     @objc public override func launchMetaRequest() {
         self.errorCache = NSMutableString()
         self.processErrorCache = Timer(timeInterval:0.25, target:self, selector:#selector(processError), userInfo:nil, repeats:true)
@@ -174,8 +172,6 @@ public class ITVDownload : OldITVDownload {
         *******************/
         
         var seriesName = ""
-        var playlistURLString: String? = nil
-        var hmac: String? = nil
         var episode = ""
         var showDescription = ""
         var timeString: String? = nil
@@ -186,8 +182,6 @@ public class ITVDownload : OldITVDownload {
         if let htmlPage = try? HTML(html: responseString, encoding: .utf8) {
             // There should only be one 'video' element.
             if let videoElement = htmlPage.at_xpath("//div[@id='video']") {
-                hmac = videoElement.at_xpath("//@data-video-hmac")?.text ?? ""
-                playlistURLString = videoElement.at_xpath("//@data-video-id")?.text ?? ""
                 seriesName = videoElement.at_xpath("//@data-video-title")?.text ?? "Unknown"
                 episode = videoElement.at_xpath("//@data-video-episode")?.text ?? ""
             }
@@ -231,127 +225,14 @@ public class ITVDownload : OldITVDownload {
             self.show.standardizedAirDate = timeString
         }
         
-        /*
-         ios_playlist_url = params.get('data-video-playlist') or params.get('data-video-id')
-         hmac = params.get('data-video-hmac')
-         if ios_playlist_url and hmac and re.match(r'https?://', ios_playlist_url):
-         headers = self.geo_verification_headers()
-         headers.update({
-         'Accept': 'application/vnd.itv.vod.playlist.v2+json',
-         'Content-Type': 'application/json',
-         'hmac': hmac.upper(),
-         })
-         ios_playlist = self._download_json(
-         ios_playlist_url, video_id, data=json.dumps({
-         'user': {
-         'itvUserId': '',
-         'entitlements': [],
-         'token': ''
-         },
-         'device': {
-         'manufacturer': 'Safari',
-         'model': '5',
-         'os': {
-         'name': 'Windows NT',
-         'version': '6.1',
-         'type': 'desktop'
-         }
-         },
-         'client': {
-         'version': '4.1',
-         'id': 'browser'
-         },
-         'variantAvailability': {
-         'featureset': {
-         'min': ['hls', 'aes', 'outband-webvtt'],
-         'max': ['hls', 'aes', 'outband-webvtt']
-         },
-         'platformTag': 'dotcom'
-         }
-         }).encode(), headers=headers, fatal=False)
-         */
-
         add(toLog:"INFO: Metadata processed.", noTag:true)
         
         //Create Download Path
         self.createDownloadPath()
         self.show.path = self.downloadPath
 
-        var mediaBaseURL: String? = nil, mediaHREF: String? = nil
-        
-        if let playlistURLString = playlistURLString, let playlistURL = URL(string: playlistURLString) {
-            var playlistRequest = URLRequest(url: playlistURL)
-            playlistRequest.setValue("application/vnd.itv.vod.playlist.v2+json", forHTTPHeaderField: "Accept")
-            playlistRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            if let hmac = hmac {
-                playlistRequest.setValue(hmac.uppercased(), forHTTPHeaderField: "hmac")
-            }
-            
-            playlistRequest.httpMethod = "POST"
-
-            let requestBody = "{ \"user\": { \"itvUserId\": \"\", \"entitlements\": [], \"token\": \"\" }, \"device\": { \"manufacturer\": \"Safari\", \"model\": \"11\", \"os\": { \"name\": \"Windows NT\", \"version\": \"6.1\", \"type\": \"desktop\" } }, \"client\": { \"version\": \"4.1\", \"id\": \"browser\" }, \"variantAvailability\": { \"featureset\": { \"min\": [\"aes\", \"hls\", \"outband-webvtt\"], \"max\": [\"hls\", \"aes\", \"outband-webvtt\"] }, \"platformTag\": \"dotcom\" } }"
-
-            let requestData = requestBody.data(using: .utf8)
-            playlistRequest.httpBody = requestData
-            
-            self.currentRequest = self.session.dataTask(with: playlistRequest, completionHandler: {
-                (data: Data?, response: URLResponse?, error: Error?) in
-                guard let httpResponse = response as? HTTPURLResponse, let data = data else {
-                    return
-                }
-                if httpResponse.statusCode != 200 {
-                    if httpResponse.statusCode == 404 {
-                        self.add(toLog:"ERROR: ITV couldn't find a version of the program we can download.")
-                        self.show.reasonForFailure = "ShowNotFound"
-                    } else if httpResponse.statusCode == 403 {
-                        self.add(toLog:"ERROR: ITV has determined you are outside the UK.")
-                        self.show.reasonForFailure = "Outside_UK"
-                    }
-                    
-                    self.show.successful = false
-                    self.show.complete = true
-                    self.show.setValue("Download Failed", forKey:"status")
-                    print(message)
-                    self.add(toLog: message)
-                    NotificationCenter.default.post(name: NSNotification.Name(rawValue:"DownloadFinished"), object:self.show)
-                    self.add(toLog:"Download Failed", noTag:false)
-                    return
-                }
-                if let descJSONDict = try? JSONSerialization.jsonObject(with: data) as? [String : Any] {
-                    if let playlistDict = descJSONDict?["Playlist"] as? [String : Any] {
-                        if let videoDict = playlistDict["Video"] as? [String: Any] {
-                            mediaBaseURL = videoDict["Base"] as? String
-                            if let mediaFilesDict = videoDict["MediaFiles"] as? [[String: Any]] {
-                                mediaHREF = mediaFilesDict[0]["Href"] as? String
-                            }
-                            if let subtitleDict = videoDict["Subtitles"] as? [[String: Any]] {
-                                self.subtitleURL = subtitleDict[0]["Href"] as? String
-                            }
-                        }
-                    }
-                    
-                }
-                
-                guard let mediaBaseURL = mediaBaseURL, let mediaHREF = mediaHREF, let baseURL = URL(string: mediaBaseURL) else {
-                    return
-                }
-                
-                if let mediaURL = URL(string: mediaHREF, relativeTo: baseURL) {
-                    DispatchQueue.main.async {
-                        self.launchFFMPEG(url: mediaURL.absoluteString)
-                    }
-                }
-            })
-            
-            self.currentRequest.resume()
-        } else {
-            add(toLog:"ERROR: Couldn't find playlist information on show page.")
-            self.show.reasonForFailure = "ShowNotFound";
-            self.show.complete = true;
-            self.show.successful = false;
-            self.show.setValue("Download Failed", forKey:"status")
-            NotificationCenter.default.post(name: Notification.Name(rawValue: "DownloadFinished"), object:self.show)
-            return
+        DispatchQueue.main.async {
+            self.launchYoutubeDL()
         }
     }
     
@@ -377,7 +258,7 @@ public class ITVDownload : OldITVDownload {
         return timeInSeconds
     }
     
-    @objc public func ffmpegProgress(progress: Notification?) {
+    @objc public func youtubeDLProgress(progress: Notification?) {
         if let data = progress?.userInfo?[NSFileHandleNotificationDataItem] as? Data, data.count > 0,
             let s = String(data: data, encoding: .utf8) {
             
@@ -402,7 +283,17 @@ public class ITVDownload : OldITVDownload {
                     scanner.scanUpToString("time=")
                     scanner.scanString("time=")
                     elapsed = scanner.scanUpToString(" ")?.trimmingCharacters(in: .whitespaces)
+                } else if s.contains("Writing video subtitles") {
+                    //ITV Download (ID=2a4910a0046): [info] Writing video subtitles to: /Users/skovatch/Movies/TV Shows/LA Story/LA Story - Just Friends - 2a4910a0046.en.vtt
+                    scanner = Scanner(string: s)
+                    scanner.scanUpToString("to: ")
+                    scanner.scanString("to: ")
+                    subtitlePath = scanner.scanUpToString("\n") ?? ""
+                    if self.verbose {
+                        self.add(toLog: "Subtitle path = \(subtitlePath)")
+                    }
                 }
+                
                 
                 if let duration = duration {
                     durationInSeconds = convertToSeconds(duration)
@@ -420,7 +311,7 @@ public class ITVDownload : OldITVDownload {
         }
     }
     
-    @objc public func ffmpegFinishedDownload() {
+    @objc public func youtubeDLFinishedDownload() {
         if let tagOption = UserDefaults.standard.object(forKey: "TagShows") as? Bool, tagOption {
             self.show.status = "Downloading Thumbnail..."
             setPercentage(102)
@@ -442,11 +333,12 @@ public class ITVDownload : OldITVDownload {
         }
     }
     
-    private func launchFFMPEG(url: String) {
+    
+    private func launchYoutubeDL() {
         setCurrentProgress("Downloading \(show.showName)")
         setPercentage(102)
         show.setValue("Downloading...", forKey: "status")
-
+        
         task = Process()
         pipe = Pipe()
         errorPipe = Pipe()
@@ -455,53 +347,65 @@ public class ITVDownload : OldITVDownload {
         task?.standardError = errorPipe
         fh = pipe?.fileHandleForReading
         errorFh = errorPipe?.fileHandleForReading
-        let args: [String] = ["-i",
-                              url,
-                              "-c",
-                              "copy",
-                              "-bsf:a",
-                              "aac_adtstoasc",
+        
+        var args: [String] = [show.url,
                               "-f",
                               "mp4",
-                              "-y",
+                              "--external-downloader-args",
+                              "-hide_banner",
+                              "-o",
                               downloadPath]
-        if self.verbose {
-            self.logDebugMessage("DEBUG: ffmpeg args:\(args)", noTag: true)
+        
+        if let downloadSubs = UserDefaults.standard.object(forKey: "DownloadSubtitles") as? Bool, downloadSubs {
+            args.append("--write-sub")
         }
-
-        if let executableURL = Bundle.main.executableURL?.deletingLastPathComponent().appendingPathComponent("ffmpeg") {
+        
+        if let proxyHost = self.proxy?.host {
+            var proxyString = proxyHost
+            if let port = self.proxy?.port {
+                proxyString += ":\(port)"
+            }
+            
+            args.append("--proxy")
+            args.append(proxyString)
+        }
+        
+        if self.verbose {
+            self.logDebugMessage("DEBUG: youtube-dl args:\(args)", noTag: true)
+        }
+        
+        if let executableURL = Bundle.main.executableURL?.deletingLastPathComponent().appendingPathComponent("youtube-dl") {
             task?.launchPath = executableURL.path
             task?.arguments = args
             
-            if let proxyHost = self.proxy?.host {
-                var proxyString = proxyHost
-                if let port = self.proxy?.port {
-                    proxyString += ":\(port)"
-                }
-                
-                task?.environment = ["http_proxy": proxyString, "https_proxy": proxyString]
-            }
+            var envVariableDictionary = [String : String]()
+            envVariableDictionary["PATH"] = "\(executableURL.deletingLastPathComponent().path):/usr/bin"
+            task?.environment = envVariableDictionary
+            self.logDebugMessage("DEBUG: youtube-dl environment: \(envVariableDictionary)", noTag: true)
             
-            NotificationCenter.default.addObserver(self, selector: #selector(self.ffmpegProgress), name: FileHandle.readCompletionNotification, object: fh)
-            NotificationCenter.default.addObserver(self, selector: #selector(self.ffmpegProgress), name: FileHandle.readCompletionNotification, object: errorFh)
-
+            NotificationCenter.default.addObserver(self, selector: #selector(self.youtubeDLProgress), name: FileHandle.readCompletionNotification, object: fh)
+            NotificationCenter.default.addObserver(self, selector: #selector(self.youtubeDLProgress), name: FileHandle.readCompletionNotification, object: errorFh)
+            
             task?.terminationHandler = {
                 task in
-                self.add(toLog: "ffmpeg finished downloading")
+                self.add(toLog: "youtube-dl finished downloading")
                 self.processErrorCache.invalidate()
-                
                 let exitCode = task.terminationStatus
                 if exitCode == 0 {
-                    self.show.complete = (true)
-                    self.show.successful = (true)
+                    self.show.complete = true
+                    self.show.successful = true
                     let info = ["Programme" : self.show]
                     DispatchQueue.main.async {
                         NotificationCenter.default.post(name: NSNotification.Name(rawValue: "AddProgToHistory"), object:self, userInfo:info)
-                        self.ffmpegFinishedDownload()
+                        self.youtubeDLFinishedDownload()
                     }
+                } else {
+                    // We can't be sure we were terminated or that youtube-dl died.
+                    NotificationCenter.default.removeObserver(self)
+                    NotificationCenter.default.post(name: NSNotification.Name(rawValue:"DownloadFinished"), object:self.show)
                 }
             }
-
+            
             task?.launch()
             fh?.readInBackgroundAndNotify()
             errorFh?.readInBackgroundAndNotify()

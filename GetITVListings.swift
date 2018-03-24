@@ -7,13 +7,6 @@
 import Foundation
 import Kanna
 
-extension Sequence where Iterator.Element: Hashable {
-    func uniq() -> [Iterator.Element] {
-        var seen = Set<Iterator.Element>()
-        return filter { seen.update(with: $0) == nil }
-    }
-}
-
 public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, URLSessionDataDelegate {
     var myQueueSize: Int = 0
     var myQueueLeft: Int = 0
@@ -341,29 +334,19 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
                     numberEpisodes = 0
                 }
 
-                /* Create ProgrammeData Object and store in array */
-//                print("Show name: \(showName ?? "")")
-//                print("Prod ID: \(productionID ?? "")")
-//                print("Show URL: \(showPageURLString ?? "")")
-//                print("Number Episodes: \(numberEpisodes)")
-//                print("=================")
-                
                 if numberEpisodes > 0 {
-                    
                     // Check for duplicate show listings.
                     let existingProgram = programmes.filter { $0.productionId == productionID }
                     
                     if existingProgram.count == 0 {
                         let myProgramme = ProgrammeData(name: showName ?? "<None>", pid: productionID ?? "", url: showPageURLString ?? "", numberEpisodes: numberEpisodes, timeDateLastAired: currentTime, programDescription:"", thumbnailURL: "")
                         programmes.append(myProgramme)
-                    } else {
-                        self.logger?.add(toLog: "Duplicate show entry: \(showName ?? "")\n")
                     }
                 }
             }
         }
         
-        /* Now we sort the programmes and the drop duplicates */
+        /* Now we sort the programmes and drop the duplicates */
         if programmes.count == 0 {
             self.logger?.add(toLog: "No programmes found on www.itv.com/hub/shows")
             showAlert(message: "No programmes were found on www.itv.com/hub/shows",
@@ -372,10 +355,7 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
         }
         
         programmes.sort { $0.programmeName < $1.programmeName }
-        programmes = programmes.uniq()
         return true
     }
 }
-
-
 

@@ -248,7 +248,7 @@
    }
     else if ([url hasPrefix:@"http://www.itv.com/hub/"] || [url hasPrefix:@"https://www.itv.com/hub/"])
     {
-        NSString *progname = nil, *productionId = nil, *title = nil, *desc = nil, *videoURL = nil;
+        NSString *progname = nil, *productionId = nil, *title = nil, *desc = nil, *timeString = nil;
         NSInteger seriesnum = 0, episodenum = 0;
         progname = newShowName;
         NSScanner *scanner = [NSScanner scannerWithString:source];
@@ -259,14 +259,22 @@
         [scanner scanUpToString:@"<meta property=\"og:description\" content=\"" intoString:nil];
         [scanner scanString:@"<meta property=\"og:description\" content=\"" intoString:nil];
         [scanner scanUpToString:@"\"" intoString:&desc];
-
-        productionId = [[NSURL URLWithString:url] lastPathComponent];
+ 
+        NSString *dateTimePrefix = @"episode-info__meta-item--pipe-after\"><time datetime=\"";
+        [scanner scanUpToString:dateTimePrefix intoString:nil];
+        [scanner scanString:dateTimePrefix intoString:nil];
+        [scanner scanUpToString:@"\"" intoString:&timeString];
+        NSDateFormatter *dateFormatter = [NSDateFormatter new];
+        dateFormatter.dateFormat = @"yyyy-MM-dd'T'HH:mmZ";
+        dateFormatter.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
+        NSDate *parsedDate = [dateFormatter dateFromString:timeString];
+        NSString *shortDate = [NSDateFormatter localizedStringFromDate:parsedDate
+                                                             dateStyle:NSDateFormatterMediumStyle
+                                                             timeStyle:NSDateFormatterNoStyle];
         
-        [scanner scanUpToString:@"data-video-id=\"" intoString:nil];
-        [scanner scanString:@"data-video-id=\"" intoString:nil];
-        [scanner scanUpToString:@"\"" intoString:&videoURL];
+        productionId = [[NSURL URLWithString:url] lastPathComponent];
 
-        if (!progname || (!productionId && !videoURL)) {
+        if (!progname || !productionId) {
             NSAlert *invalidPage = [[NSAlert alloc] init];
             [invalidPage addButtonWithTitle:@"OK"];
             invalidPage.messageText = [NSString stringWithFormat:@"Invalid Page: %@",url];
@@ -280,10 +288,13 @@
         Programme *newProg = [[Programme alloc] init];
         newProg.pid = pid;
         newProg.showName = showName;
-        newProg.tvNetwork = @"ITV";
+        newProg.tvNetwork = @"ITV Player";
         newProg.processedPID = @YES;
         newProg.url = url;
-        newProg.itvVideoUrl = videoURL;
+        newProg.lastBroadcastString = shortDate;
+        newProg.lastBroadcast = parsedDate;
+        newProg.episodeName = shortDate;
+        
         scanner = [NSScanner scannerWithString:title];
         [scanner scanUpToString:@"Series " intoString:nil];
         [scanner scanString:@"Series " intoString:nil];

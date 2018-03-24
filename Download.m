@@ -409,55 +409,18 @@
     
     if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"DownloadSubtitles"] boolValue])
     {
-        if (_subtitleURL)
-        {
-            [_show setValue:@"Downloading Subtitles..." forKey:@"status"];
-            [self setPercentage:102];
-            [self setCurrentProgress:[NSString stringWithFormat:@"Downloading Subtitles... -- %@",_show.showName]];
-            [self addToLog:[NSString stringWithFormat:@"INFO: Downloading subtitles: %@", _subtitleURL] noTag:YES];
-            
-            _subtitlePath = [_show.path.stringByDeletingPathExtension stringByAppendingPathExtension:@"vtt"];
-            
-            NSURLSessionDownloadTask *downloadSubs = [self.session downloadTaskWithURL:[NSURL URLWithString:_subtitleURL]
-                                                                                     completionHandler:^(NSURL * _Nullable location, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-                                                                                         [self subtitlesSavedTo: location
-                                                                                                      withError: error];
-                                                                                     }];
-            
-            [downloadSubs resume];
+        if (_subtitlePath && [[NSFileManager defaultManager] fileExistsAtPath:_subtitlePath]) {
+            if (![_subtitlePath.pathExtension isEqual: @"srt"])
+            {
+                [_show setValue:@"Converting Subtitles..." forKey:@"status"];
+                [self setPercentage:102];
+                [self setCurrentProgress:[NSString stringWithFormat:@"Converting Subtitles... -- %@",_show.showName]];
+                [self addToLog:@"INFO: Converting Subtitles..." noTag:YES];
+                [self convertSubtitles];
+            } else {
+                [self convertSubtitlesFinished:nil];
+            }
         }
-        else
-        {
-            [self subtitlesSavedTo:nil withError:nil];
-        }
-    }
-    else
-    {
-        [self convertSubtitlesFinished:nil];
-    }
-}
-- (void)subtitlesSavedTo:(NSURL *)location withError:(NSError *)error
-{
-    if (location) {
-        NSFileManager *fm = [NSFileManager defaultManager];
-        NSURL *destinationURL = [NSURL fileURLWithPath:_subtitlePath];
-        NSError *error = nil;
-        [fm removeItemAtPath:_subtitlePath error:&error];
-        if (![fm copyItemAtURL:location toURL:destinationURL error:&error]) {
-            NSLog(@"Unable to save downloaded subtitles: %@", error.description);
-            [self addToLog:@"INFO: Subtitles Download Failed" noTag:YES];
-            return;
-        }
-    }
-    
-    [self addToLog:@"INFO: Subtitles Download Completed" noTag:YES];
-    if (![_subtitlePath.pathExtension isEqual: @"srt"])
-    {
-        [_show setValue:@"Converting Subtitles..." forKey:@"status"];
-        [self setPercentage:102];
-        [self setCurrentProgress:[NSString stringWithFormat:@"Converting Subtitles... -- %@",_show.showName]];
-        [self addToLog:@"INFO: Converting Subtitles..." noTag:YES];
-        [self convertSubtitles];
     } else {
         [self convertSubtitlesFinished:nil];
     }
@@ -474,11 +437,14 @@
             NSURL *outputURL = [NSURL fileURLWithPath:self.subtitlePath];
             outputURL = [[outputURL URLByDeletingPathExtension] URLByAppendingPathExtension:@"srt"];
             NSMutableArray *args = [[NSMutableArray alloc] init];
+
+            // TODO: Figure out if I can bring this back. ffmpeg doesn't support it.
 //            BOOL srtIgnoreColors = [[NSUserDefaults standardUserDefaults] boolForKey:[NSString stringWithFormat:@"%@SRTIgnoreColors", self.defaultsPrefix]];
 //            if (srtIgnoreColors)
 //            {
 //                [args addObject:@"--srt-ignore-colors"];
 //            }
+            
             [args addObject:@"-i"];
             [args addObject:self.subtitlePath];
             [args addObject:[outputURL path]];
