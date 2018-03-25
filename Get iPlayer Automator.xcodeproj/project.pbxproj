@@ -29,17 +29,15 @@
 		7F54B1B11FFD656C006D1325 /* ITVDownload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F340B5A1FFB063700F415A4 /* ITVDownload.swift */; };
 		7F54B1B31FFF38E8006D1325 /* Kanna.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F54B1B21FFF38E8006D1325 /* Kanna.framework */; };
 		7F54B1B41FFF38F8006D1325 /* Kanna.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7F54B1B21FFF38E8006D1325 /* Kanna.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		7F65AA92205DD3CB00EF572E /* ffmpeg in Resources */ = {isa = PBXBuildFile; fileRef = 7F65AA91205DD3CB00EF572E /* ffmpeg */; };
 		7F65AA93205DD41E00EF572E /* ffmpeg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7F65AA91205DD3CB00EF572E /* ffmpeg */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		7F9DB6131F6340A30020D5D7 /* get_iplayer in Resources */ = {isa = PBXBuildFile; fileRef = 7F9DB6121F6340460020D5D7 /* get_iplayer */; };
 		7F9FE9211EC16ED80058CB1B /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F9FE9201EC16ED80058CB1B /* libz.tbd */; };
 		7F9FE9231EC16F160058CB1B /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F9FE9221EC16F160058CB1B /* IOKit.framework */; };
 		7F9FE9241EC170E60058CB1B /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F9FE91E1EC16E3E0058CB1B /* Sparkle.framework */; };
 		7F9FE9251EC170E60058CB1B /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7F9FE91E1EC16E3E0058CB1B /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7FA4E50A1F6DCC45008CF604 /* perl5 in Resources */ = {isa = PBXBuildFile; fileRef = 7FA4E5091F6DCC3F008CF604 /* perl5 */; };
-		7FC8F70E2065E73500DC158C /* youtube-dl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7FC8F70D2065E70E00DC158C /* youtube-dl */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		7FC8F7102066E9B600DC158C /* ffprobe in Resources */ = {isa = PBXBuildFile; fileRef = 7FC8F70F2066E9B500DC158C /* ffprobe */; };
 		7FC8F7112066E9C800DC158C /* ffprobe in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7FC8F70F2066E9B500DC158C /* ffprobe */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		7FC8F71C20674B7600DC158C /* youtube-dl in Resources */ = {isa = PBXBuildFile; fileRef = 7FC8F71B20674B6700DC158C /* youtube-dl */; };
+		7FC8F71E20674D6D00DC158C /* get_iplayer in Resources */ = {isa = PBXBuildFile; fileRef = 7F9DB6121F6340460020D5D7 /* get_iplayer */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
@@ -91,7 +89,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 6;
 			files = (
-				7FC8F70E2065E73500DC158C /* youtube-dl in CopyFiles */,
 				39AE5F5E1D329E390019E5EF /* rtmpdump in CopyFiles */,
 				D943D2791B37B1D800452FCD /* AtomicParsley in CopyFiles */,
 				7F65AA93205DD41E00EF572E /* ffmpeg in CopyFiles */,
@@ -157,8 +154,8 @@
 		7F9FE9201EC16ED80058CB1B /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		7F9FE9221EC16F160058CB1B /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		7FA4E5091F6DCC3F008CF604 /* perl5 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = perl5; sourceTree = "<group>"; };
-		7FC8F70D2065E70E00DC158C /* youtube-dl */ = {isa = PBXFileReference; lastKnownFileType = file; path = "youtube-dl"; sourceTree = "<group>"; };
 		7FC8F70F2066E9B500DC158C /* ffprobe */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = ffprobe; sourceTree = "<group>"; };
+		7FC8F71B20674B6700DC158C /* youtube-dl */ = {isa = PBXFileReference; lastKnownFileType = file; path = "youtube-dl"; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* Get iPlayer Automator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Get iPlayer Automator.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BF382ED01D73C21500BAF106 /* AppController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppController.h; sourceTree = "<group>"; };
@@ -363,8 +360,8 @@
 		D904F04D1009F28400D60BBF /* Binaries */ = {
 			isa = PBXGroup;
 			children = (
+				7FC8F71B20674B6700DC158C /* youtube-dl */,
 				7FC8F70F2066E9B500DC158C /* ffprobe */,
-				7FC8F70D2065E70E00DC158C /* youtube-dl */,
 				7F65AA91205DD3CB00EF572E /* ffmpeg */,
 				39AE5F5C1D3294C40019E5EF /* rtmpdump */,
 				D961247E10F12C9200046D31 /* AtomicParsley */,
@@ -556,16 +553,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7F9DB6131F6340A30020D5D7 /* get_iplayer in Resources */,
 				39FD5E9619D370BD006BC47B /* Images.xcassets in Resources */,
 				D9F66963102C5DC500A9449B /* GetOperaURL.applescript in Resources */,
 				D9F668DB102C560500A9449B /* GetFireFoxURL.applescript in Resources */,
-				7F65AA92205DD3CB00EF572E /* ffmpeg in Resources */,
 				D9F66955102C5D1200A9449B /* GetCaminoURL.applescript in Resources */,
 				7FA4E50A1F6DCC45008CF604 /* perl5 in Resources */,
 				396FDA611DA98179003F3F57 /* MainMenu.xib in Resources */,
 				8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */,
-				7FC8F7102066E9B600DC158C /* ffprobe in Resources */,
 				D9CCF3CC1023485A009205BE /* dsa_pub.pem in Resources */,
 				D9CCF54C1025AAF9009205BE /* Growl Registration Ticket.growlRegDict in Resources */,
 				D941D9511025DB2B0012A75F /* JRFeedbackProvider.strings in Resources */,
@@ -578,6 +572,8 @@
 				D921C9ED149C4C6F004CB558 /* Body in Resources */,
 				3975484D1622504F00470DD1 /* ttml2srt.py in Resources */,
 				398516A716D1A02500EBB4CE /* Body2 in Resources */,
+				7FC8F71E20674D6D00DC158C /* get_iplayer in Resources */,
+				7FC8F71C20674B7600DC158C /* youtube-dl in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

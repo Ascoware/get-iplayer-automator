@@ -374,12 +374,12 @@ public class ITVDownload : Download {
             self.logDebugMessage("DEBUG: youtube-dl args:\(args)", noTag: true)
         }
         
-        if let executableURL = Bundle.main.executableURL?.deletingLastPathComponent().appendingPathComponent("youtube-dl") {
+        if let executableURL = Bundle.main.url(forResource: "youtube-dl", withExtension:nil),
+            let binaryPath = Bundle.main.executableURL?.deletingLastPathComponent().path {
             task?.launchPath = executableURL.path
             task?.arguments = args
-            
             var envVariableDictionary = [String : String]()
-            envVariableDictionary["PATH"] = "\(executableURL.deletingLastPathComponent().path):/usr/bin"
+            envVariableDictionary["PATH"] = "\(binaryPath):/usr/bin"
             task?.environment = envVariableDictionary
             self.logDebugMessage("DEBUG: youtube-dl environment: \(envVariableDictionary)", noTag: true)
             
