@@ -409,6 +409,7 @@
     
     if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"DownloadSubtitles"] boolValue])
     {
+        // youtube-dl should try to download a subtitle file, but if there isn't one log it and continue.
         if (_subtitlePath && [[NSFileManager defaultManager] fileExistsAtPath:_subtitlePath]) {
             if (![_subtitlePath.pathExtension isEqual: @"srt"])
             {
@@ -420,6 +421,10 @@
             } else {
                 [self convertSubtitlesFinished:nil];
             }
+        } else {
+            NSString *message = [NSString stringWithFormat:@"INFO: No subtitles were found for %@", _show.showName];
+            [self addToLog:message noTag:YES];
+            [self convertSubtitlesFinished:nil];
         }
     } else {
         [self convertSubtitlesFinished:nil];
