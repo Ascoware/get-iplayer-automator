@@ -173,17 +173,25 @@ public class ITVDownload : Download {
         
         var seriesName = ""
         var episode = ""
+        var episodeID = ""
         var showDescription = ""
-        var timeString: String? = nil
-        
-        let dateFormatter = DateFormatter()
-        dateFormatter.timeZone = TimeZone(secondsFromGMT:0)
+        var timeAired: Date? = nil
+        var episodeNumber = 0
+        var seriesNumber = 0
+        let longDateFormatter = DateFormatter()
+        longDateFormatter.timeZone = TimeZone(secondsFromGMT:0)
+        longDateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mmZ"
+
+        let shortDateFormatter = DateFormatter()
+        shortDateFormatter.dateFormat = "EEE MMM dd"
+        shortDateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
 
         if let htmlPage = try? HTML(html: responseString, encoding: .utf8) {
             // There should only be one 'video' element.
             if let videoElement = htmlPage.at_xpath("//div[@id='video']") {
                 seriesName = videoElement.at_xpath("//@data-video-title")?.text ?? "Unknown"
                 episode = videoElement.at_xpath("//@data-video-episode")?.text ?? ""
+                episodeID = videoElement.at_xpath("//@data-video-episode-id")?.text ?? ""
             }
             
             if let descriptionElement = htmlPage.at_xpath("//script[@id='json-ld']") {
@@ -191,38 +199,53 @@ public class ITVDownload : Download {
                     if let data = descriptionJSON.data(using: .utf8) {
                         if let descJSONDict = try? JSONSerialization.jsonObject(with: data) as? [String : Any] {
                             showDescription = descJSONDict? ["description"] as? String ?? "None available"
+                            episodeNumber = descJSONDict?["episodeNumber"] as? Int ?? 0
+                            if let seriesDict = descJSONDict?["partOfSeason"] as? [String: Any] {
+                                seriesNumber = seriesDict["seasonNumber"] as? Int ?? 0
+                            }
                             
-                            /*******************
-                             "image": {
-                             "@type": "ImageObject",
-                             "height": 576,
-                             "url": "https://hubimages.itv.com/episode/2_5468_0020?w=1024&h=576&q=80&blur=0&bg=false&image_format=jpg",
-                             "width": 1024
-                             },
-                             ************/
+                            episode = descJSONDict? ["name"] as? String ?? ""
+
                             if let imageDict = descJSONDict? ["image"] as? [String : Any],
                                 let thumbnailURLString = imageDict["url"] as? String {
                                 self.thumbnailURL = thumbnailURLString
                             }
 
+                            if let potentialActionDict = descJSONDict?["potentialAction"] as? [[String: Any]],
+                                let expectsAcceptanceDict = potentialActionDict[0]["expectsAcceptanceOf"] as? [[String: Any]],
+                                let availabilityTime = expectsAcceptanceDict[0]["availabilityStarts"] as? String {
+                                timeAired = longDateFormatter.date(from:availabilityTime)
+                            }
                         }
                     }
                 }
             }
             
-            if let timeElement = htmlPage.at_xpath("//li[@class='episode-info__meta-item episode-info__meta-item--broadcast  episode-info__meta-item--pipe-after']/time") {
-                timeString = timeElement.at_xpath("@datetime")?.text ?? ""
-            }
         }
 
+        if episodeNumber == 0 && seriesNumber == 0 && !episodeID.isEmpty {
+            // At this point all we have left is the production ID.
+            // A series number doesn't make much sense, so just parse out an episode number.
+            let programIDElements = episodeID.split(separator: "/")
+            episodeNumber = Int(programIDElements[2]) ?? 0
+        }
+        
         // Save off the pieces we care about.
+        self.show.episode = episodeNumber
+        self.show.season = seriesNumber
         self.show.seriesName = seriesName
         self.show.desc = showDescription
-        self.show.episodeName = episode        
+        
+        if !episode.isEmpty {
+            self.show.episodeName = episode
+        } else if let timeAired = timeAired {
+            let shortDate = shortDateFormatter.string(from: timeAired)
+            self.show.episodeName = shortDate
+        }
         self.thumbnailURL = thumbnailURL ?? nil
         
-        if let timeString = timeString {
-            self.show.standardizedAirDate = timeString
+        if let timeAired = timeAired {
+            self.show.standardizedAirDate = longDateFormatter.string(from: timeAired)
         }
         
         add(toLog:"INFO: Metadata processed.", noTag:true)

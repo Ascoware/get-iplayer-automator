@@ -626,8 +626,9 @@
 - (void)createDownloadPath
 {
     NSString *fileName = _show.showName;
-    // XBMC naming
-	if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"XBMC_naming"] boolValue]) {
+    
+    // XBMC naming is always used on ITV shows to ensure unique names.
+    if ([_show.tvNetwork hasPrefix:@"ITV"] || [[[NSUserDefaults standardUserDefaults] valueForKey:@"XBMC_naming"] boolValue]) {
         if (_show.seriesName)
             fileName = _show.seriesName;
         if (!_isFilm) {
