@@ -35,6 +35,7 @@
 		7F9FE9241EC170E60058CB1B /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F9FE91E1EC16E3E0058CB1B /* Sparkle.framework */; };
 		7F9FE9251EC170E60058CB1B /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7F9FE91E1EC16E3E0058CB1B /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7FA4E50A1F6DCC45008CF604 /* perl5 in Resources */ = {isa = PBXBuildFile; fileRef = 7FA4E5091F6DCC3F008CF604 /* perl5 */; };
+		7FAA6A25206F36B800B6B50C /* Crypto in Resources */ = {isa = PBXBuildFile; fileRef = 7FAA6A24206F36B800B6B50C /* Crypto */; };
 		7FC8F7112066E9C800DC158C /* ffprobe in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7FC8F70F2066E9B500DC158C /* ffprobe */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		7FC8F71C20674B7600DC158C /* youtube-dl in Resources */ = {isa = PBXBuildFile; fileRef = 7FC8F71B20674B6700DC158C /* youtube-dl */; };
 		7FC8F71E20674D6D00DC158C /* get_iplayer in Resources */ = {isa = PBXBuildFile; fileRef = 7F9DB6121F6340460020D5D7 /* get_iplayer */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
@@ -154,6 +155,7 @@
 		7F9FE9201EC16ED80058CB1B /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		7F9FE9221EC16F160058CB1B /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		7FA4E5091F6DCC3F008CF604 /* perl5 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = perl5; sourceTree = "<group>"; };
+		7FAA6A24206F36B800B6B50C /* Crypto */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Crypto; sourceTree = "<group>"; };
 		7FC8F70F2066E9B500DC158C /* ffprobe */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = ffprobe; sourceTree = "<group>"; };
 		7FC8F71B20674B6700DC158C /* youtube-dl */ = {isa = PBXFileReference; lastKnownFileType = file; path = "youtube-dl"; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -360,6 +362,7 @@
 		D904F04D1009F28400D60BBF /* Binaries */ = {
 			isa = PBXGroup;
 			children = (
+				7FAA6A24206F36B800B6B50C /* Crypto */,
 				7FC8F71B20674B6700DC158C /* youtube-dl */,
 				7FC8F70F2066E9B500DC158C /* ffprobe */,
 				7F65AA91205DD3CB00EF572E /* ffmpeg */,
@@ -568,6 +571,7 @@
 				D9A4509D102FF8090011E175 /* Credits.html in Resources */,
 				D9A450A4102FFDC00011E175 /* LICENSE.txt in Resources */,
 				DFFF196713E96288007B52AC /* ReasonsForFailure.plist in Resources */,
+				7FAA6A25206F36B800B6B50C /* Crypto in Resources */,
 				D9CDC9E8186B8F2B0003A4E2 /* GetiPlayerAutomator.sdef in Resources */,
 				D921C9ED149C4C6F004CB558 /* Body in Resources */,
 				3975484D1622504F00470DD1 /* ttml2srt.py in Resources */,

@@ -10,6 +10,7 @@ import Kanna
 
 public class ITVDownload : Download {
     
+    // Only used for ffmpeg downloads to track progress.
     var durationInSeconds: Int = 0
     var elapsedInSeconds: Int = 0
     
@@ -227,7 +228,9 @@ public class ITVDownload : Download {
             // At this point all we have left is the production ID.
             // A series number doesn't make much sense, so just parse out an episode number.
             let programIDElements = episodeID.split(separator: "/")
-            episodeNumber = Int(programIDElements[2]) ?? 0
+            if let lastElement = programIDElements.last, let intLastElement = Int(lastElement) {
+                episodeNumber = intLastElement
+            }
         }
         
         // Save off the pieces we care about.
@@ -290,57 +293,89 @@ public class ITVDownload : Download {
         return timeInSeconds
     }
     
-    @objc public func youtubeDLProgress(progress: Notification?) {
-        if let data = progress?.userInfo?[NSFileHandleNotificationDataItem] as? Data, data.count > 0,
-            let s = String(data: data, encoding: .utf8) {
-            
-            // ffmpeg generates a lot of garbage due to the nature of streaming, so filter out what we care about.
-            if self.verbose {
-                if !s.hasPrefix("[") && (s.contains("Duration:") || s.contains("time=")) && !s.contains("Invalid") {
-                    self.logger.add(toLog: s, self)
-                }
-            }
-            // ffmpeg progress line:
-            //   Duration: 00:46:17.16, start: 10.000000, bitrate: 0 kb/s
-            // frame=   61 fps=0.0 q=28.0 size=       0kB time=00:00:02.53 bitrate=   0.2kbits/s speed=4.98x
-            let scanner: Scanner
-            var duration: String? = nil
-            var elapsed: String? = nil
-            if s.contains("Duration:") {
-                scanner = Scanner(string: s)
-                scanner.scanUpToString("Duration:")
-                scanner.scanString("Duration:")
-                duration = scanner.scanUpToString(",")?.trimmingCharacters(in: .whitespaces)
-            } else if s.contains("time=") {
-                scanner = Scanner(string: s)
-                scanner.scanUpToString("time=")
-                scanner.scanString("time=")
-                elapsed = scanner.scanUpToString(" ")?.trimmingCharacters(in: .whitespaces)
-            } else if s.contains("Writing video subtitles") {
-                //ITV Download (ID=2a4910a0046): [info] Writing video subtitles to: /Users/skovatch/Movies/TV Shows/LA Story/LA Story - Just Friends - 2a4910a0046.en.vtt
-                scanner = Scanner(string: s)
-                scanner.scanUpToString("to: ")
-                scanner.scanString("to: ")
-                subtitlePath = scanner.scanUpToString("\n") ?? ""
-                if self.verbose {
-                    self.add(toLog: "Subtitle path = \(subtitlePath)")
-                }
+    @objc public func youtubeDLProgress(progressNotification: Notification?) {
+        guard let data = progressNotification?.userInfo?[NSFileHandleNotificationDataItem] as? Data, data.count > 0,
+            let s = String(data: data, encoding: .utf8) else {
+                fh?.readInBackgroundAndNotify()
+                errorFh?.readInBackgroundAndNotify()
+                return
+        }
+        
+        if self.verbose {
+            // Handle ffmpeg output
+            if !s.hasPrefix("[") && (s.contains("Duration:") || s.contains("time=")) && !s.contains("Invalid") {
+                self.logger.add(toLog: s)
             }
             
-            if let duration = duration {
-                durationInSeconds = convertToSeconds(duration)
-            }
-            if let elapsed = elapsed {
-                elapsedInSeconds = convertToSeconds(elapsed)
-            }
-            
-            if elapsedInSeconds != 0 && durationInSeconds != 0 {
-                setPercentage(100.0 * Double(elapsedInSeconds) / Double(durationInSeconds))
-                let formattedElapsed = stringFromTimeInterval(elapsedInSeconds)
-                let formattedDuration = stringFromTimeInterval(durationInSeconds)
-                setCurrentProgress("Downloading \(show.showName) -- \(formattedElapsed) of \(formattedDuration)")
+            // Handle youtube-dl hlsnative download output
+            if s.contains("[download]") || s.contains("[ITV]") {
+                self.logger.add(toLog: s)
             }
         }
+        
+        if s.contains("Writing video subtitles") {
+            //ITV Download (ID=2a4910a0046): [info] Writing video subtitles to: /Users/skovatch/Movies/TV Shows/LA Story/LA Story - Just Friends - 2a4910a0046.en.vtt
+            let scanner = Scanner(string: s)
+            scanner.scanUpToString("to: ")
+            scanner.scanString("to: ")
+            subtitlePath = scanner.scanUpToString("\n") ?? ""
+            if self.verbose {
+                self.add(toLog: "Subtitle path = \(subtitlePath)")
+            }
+        }
+        
+        // youtube-dl native download generates a percentage complete and ETA remaining
+        var progress: String? = nil
+        var remaining: String? = nil
+        
+        // ffmpeg download outputs how much of the show was downloaded.
+        // At the beginning of the download it prints the duration of the show.
+        var duration: String? = nil
+        var elapsed: String? = nil
+        
+        if s.contains("[download]") {
+            let scanner = Scanner(string: s)
+            scanner.scanUpToString("[download]")
+            scanner.scanString("[download]")
+            progress = scanner.scanUpToString("%")?.trimmingCharacters(in: .whitespaces)
+            scanner.scanUpToString("ETA ")
+            scanner.scanString("ETA ")
+            remaining = scanner.scanUpToCharactersFromSet(set: .whitespacesAndNewlines)
+            
+            if let progress = progress, let progressVal = Double(progress) {
+                setPercentage(progressVal)
+            }
+            
+            if let remaining = remaining {
+                setCurrentProgress("Downloading \(show.showName) -- \(remaining) until done")
+            }
+        } else if s.contains("Duration:") {
+            let scanner = Scanner(string: s)
+            scanner.scanUpToString("Duration:")
+            scanner.scanString("Duration:")
+            duration = scanner.scanUpToString(",")?.trimmingCharacters(in: .whitespaces)
+        } else if s.contains("time=") {
+            let scanner = Scanner(string: s)
+            scanner.scanUpToString("time=")
+            scanner.scanString("time=")
+            elapsed = scanner.scanUpToString(" ")?.trimmingCharacters(in: .whitespaces)
+        }
+        
+        if let duration = duration {
+            durationInSeconds = convertToSeconds(duration)
+        }
+        if let elapsed = elapsed {
+            elapsedInSeconds = convertToSeconds(elapsed)
+        }
+        
+        // This code should only be run for ffmpeg downloads.
+        if elapsedInSeconds != 0 && durationInSeconds != 0 {
+            setPercentage(100.0 * Double(elapsedInSeconds) / Double(durationInSeconds))
+            let formattedElapsed = stringFromTimeInterval(elapsedInSeconds)
+            let formattedDuration = stringFromTimeInterval(durationInSeconds)
+            setCurrentProgress("Downloading \(show.showName) -- \(formattedElapsed) of \(formattedDuration)")
+        }
+
         fh?.readInBackgroundAndNotify()
         errorFh?.readInBackgroundAndNotify()
     }
