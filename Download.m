@@ -417,7 +417,11 @@
                 [self setPercentage:102];
                 [self setCurrentProgress:[NSString stringWithFormat:@"Converting Subtitles... -- %@",_show.showName]];
                 [self addToLog:@"INFO: Converting Subtitles..." noTag:YES];
-                [self convertSubtitles];
+                if ([_subtitlePath.pathExtension isEqualToString:@"ttml"]) {
+                    [self convertTTMLToSRT];
+                } else {
+                    [self convertWebVTTToSRT];
+                }
             } else {
                 [self convertSubtitlesFinished:nil];
             }
@@ -431,7 +435,7 @@
     }
 }
 
-- (void)convertSubtitles
+- (void)convertWebVTTToSRT
 {
     if (!_subtitlePath) {
         [self convertSubtitlesFinished:nil];
@@ -466,6 +470,37 @@
         });
     }
 }
+
+- (void)convertTTMLToSRT
+{
+    if (!_subtitlePath) {
+        [self convertSubtitlesFinished:nil];
+    } else {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self addToLog:[NSString stringWithFormat:@"INFO: Converting to SubRip: %@", self.subtitlePath] noTag:YES];
+            NSString *ttml2srtPath = [[NSBundle mainBundle] pathForResource:@"ttml2srt.py" ofType:nil];
+            NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:ttml2srtPath, nil];
+            
+            BOOL srtIgnoreColors = [[NSUserDefaults standardUserDefaults] boolForKey:[NSString stringWithFormat:@"%@SRTIgnoreColors", self.defaultsPrefix]];
+            if (srtIgnoreColors)
+            {
+                [args addObject:@"--srt-ignore-colors"];
+            }
+            
+            [args addObject:self.subtitlePath];
+            
+            self.subsTask = [[NSTask alloc] init];
+            self.subsErrorPipe = [[NSPipe alloc] init];
+            self.subsTask.standardError = self.subsErrorPipe;
+            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(convertSubtitlesFinished:) name:NSTaskDidTerminateNotification object:self.subsTask];
+            
+            self.subsTask.launchPath = @"/usr/bin/python";
+            self.subsTask.arguments = args;
+            [self.subsTask launch];
+        });
+    }
+}
+
 - (void)convertSubtitlesFinished:(NSNotification *)aNotification
 {
     if (aNotification)
