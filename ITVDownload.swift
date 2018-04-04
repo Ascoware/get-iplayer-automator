@@ -444,11 +444,13 @@ public class ITVDownload : Download {
         }
         
         if let executableURL = Bundle.main.url(forResource: "youtube-dl", withExtension:nil),
-            let binaryPath = Bundle.main.executableURL?.deletingLastPathComponent().path {
+            let binaryPath = Bundle.main.executableURL?.deletingLastPathComponent().path,
+            let resourcePath = Bundle.main.resourcePath {
             task?.launchPath = executableURL.path
             task?.arguments = args
             var envVariableDictionary = [String : String]()
             envVariableDictionary["PATH"] = "\(binaryPath):/usr/bin"
+            envVariableDictionary["PYTHONPATH"] = "\(resourcePath)"
             task?.environment = envVariableDictionary
             self.logDebugMessage("DEBUG: youtube-dl environment: \(envVariableDictionary)", noTag: true)
             
@@ -469,6 +471,8 @@ public class ITVDownload : Download {
                         self.youtubeDLFinishedDownload()
                     }
                 } else {
+                    self.show.complete = true
+                    self.show.successful = false
                     // We can't be sure we were terminated or that youtube-dl died.
                     NotificationCenter.default.removeObserver(self)
                     NotificationCenter.default.post(name: NSNotification.Name(rawValue:"DownloadFinished"), object:self.show)

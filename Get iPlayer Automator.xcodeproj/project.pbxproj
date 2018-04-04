@@ -36,6 +36,7 @@
 		7F9FE9251EC170E60058CB1B /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7F9FE91E1EC16E3E0058CB1B /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7FA4E50A1F6DCC45008CF604 /* perl5 in Resources */ = {isa = PBXBuildFile; fileRef = 7FA4E5091F6DCC3F008CF604 /* perl5 */; };
 		7FAA6A25206F36B800B6B50C /* Crypto in Resources */ = {isa = PBXBuildFile; fileRef = 7FAA6A24206F36B800B6B50C /* Crypto */; };
+		7FAA6A2720744A5D00B6B50C /* pycrypto-2.6.1-py2.7.egg-info in Resources */ = {isa = PBXBuildFile; fileRef = 7FAA6A2620744A5C00B6B50C /* pycrypto-2.6.1-py2.7.egg-info */; };
 		7FC8F7112066E9C800DC158C /* ffprobe in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7FC8F70F2066E9B500DC158C /* ffprobe */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		7FC8F71C20674B7600DC158C /* youtube-dl in Resources */ = {isa = PBXBuildFile; fileRef = 7FC8F71B20674B6700DC158C /* youtube-dl */; };
 		7FC8F71E20674D6D00DC158C /* get_iplayer in Resources */ = {isa = PBXBuildFile; fileRef = 7F9DB6121F6340460020D5D7 /* get_iplayer */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
@@ -156,6 +157,7 @@
 		7F9FE9221EC16F160058CB1B /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		7FA4E5091F6DCC3F008CF604 /* perl5 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = perl5; sourceTree = "<group>"; };
 		7FAA6A24206F36B800B6B50C /* Crypto */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Crypto; sourceTree = "<group>"; };
+		7FAA6A2620744A5C00B6B50C /* pycrypto-2.6.1-py2.7.egg-info */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "pycrypto-2.6.1-py2.7.egg-info"; sourceTree = "<group>"; };
 		7FC8F70F2066E9B500DC158C /* ffprobe */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = ffprobe; sourceTree = "<group>"; };
 		7FC8F71B20674B6700DC158C /* youtube-dl */ = {isa = PBXFileReference; lastKnownFileType = file; path = "youtube-dl"; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -362,6 +364,7 @@
 		D904F04D1009F28400D60BBF /* Binaries */ = {
 			isa = PBXGroup;
 			children = (
+				7FAA6A2620744A5C00B6B50C /* pycrypto-2.6.1-py2.7.egg-info */,
 				7FAA6A24206F36B800B6B50C /* Crypto */,
 				7FC8F71B20674B6700DC158C /* youtube-dl */,
 				7FC8F70F2066E9B500DC158C /* ffprobe */,
@@ -556,6 +559,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7FAA6A2720744A5D00B6B50C /* pycrypto-2.6.1-py2.7.egg-info in Resources */,
 				39FD5E9619D370BD006BC47B /* Images.xcassets in Resources */,
 				D9F66963102C5DC500A9449B /* GetOperaURL.applescript in Resources */,
 				D9F668DB102C560500A9449B /* GetFireFoxURL.applescript in Resources */,
