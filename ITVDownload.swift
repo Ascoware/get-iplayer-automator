@@ -324,6 +324,18 @@ public class ITVDownload : Download {
             }
         }
         
+        if s.contains("Converting video") {
+            setPercentage(102.0)
+            setCurrentProgress("Converting \(show.showName) to MP4")
+            let scanner = Scanner(string: s)
+            scanner.scanUpToString("Destination: ")
+            scanner.scanString("Destination: ")
+            self.show.path = scanner.scanUpToString("\n") ?? ""
+            if self.verbose {
+                self.add(toLog: "Converting to \(self.show.path)")
+            }
+        }
+        
         // youtube-dl native download generates a percentage complete and ETA remaining
         var progress: String? = nil
         var remaining: String? = nil
@@ -419,9 +431,9 @@ public class ITVDownload : Download {
         
         var args: [String] = [show.url,
                               "-f",
+                              "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
+                              "--recode-video",
                               "mp4",
-                              "--external-downloader-args",
-                              "-hide_banner",
                               "-o",
                               downloadPath]
         
@@ -429,6 +441,9 @@ public class ITVDownload : Download {
             args.append("--write-sub")
         }
         
+        if verbose {
+            args.append("--verbose")
+        }
         if let proxyHost = self.proxy?.host {
             var proxyString = proxyHost
             if let port = self.proxy?.port {
@@ -463,6 +478,19 @@ public class ITVDownload : Download {
                 self.processErrorCache.invalidate()
                 let exitCode = task.terminationStatus
                 if exitCode == 0 {
+                    if !self.show.path.hasSuffix("mp4") {
+                        let oldURL = URL(fileURLWithPath: self.show.path)
+                        let newURL = oldURL.appendingPathExtension("mp4")
+                        do {
+                            try FileManager.default.moveItem(at: oldURL, to: newURL)
+                            self.show.path = newURL.path
+                        } catch {
+                            self.show.complete = true
+                            self.show.successful = false
+                            NotificationCenter.default.removeObserver(self)
+                            NotificationCenter.default.post(name: NSNotification.Name(rawValue:"DownloadFinished"), object:self.show)
+                        }
+                    }
                     self.show.complete = true
                     self.show.successful = true
                     let info = ["Programme" : self.show]
