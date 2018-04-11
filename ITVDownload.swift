@@ -14,6 +14,9 @@ public class ITVDownload : Download {
     var durationInSeconds: Int = 0
     var elapsedInSeconds: Int = 0
     
+    // Used when ffmpeg converts from flv to mp4
+    var downloadedFileURL: URL? = nil
+    
     public override var description: String {
         return "ITV Download (ID=\(show.pid))"
     }
@@ -44,7 +47,7 @@ public class ITVDownload : Download {
         
         setCurrentProgress("Retrieving Programme Metadata... \(show.showName)")
         setPercentage(102)
-        programme.setValue("Initialising...", forKey: "status")
+        programme.status = "Initialising..."
         
 //        formatList = formats
         add(toLog: "Downloading \(show.showName)")
@@ -119,10 +122,10 @@ public class ITVDownload : Download {
             if response.statusCode == 0 {
                 message = "ERROR: No response received (probably a proxy issue): \(error?.localizedDescription ?? "Unknown error")"
                 self.show.reasonForFailure = "Internet_Connection"
-                self.show.setValue("Failed: Bad Proxy", forKey:"status")
+                self.show.status = "Failed: Bad Proxy"
             } else {
                 message = "ERROR: Could not retrieve programme metadata: \(error?.localizedDescription ?? "Unknown error")"
-                self.show.setValue("Download Failed", forKey:"status")
+                self.show.status = "Download Failed"
             }
             
             self.show.successful = false
@@ -142,36 +145,6 @@ public class ITVDownload : Download {
             add(toLog: message, noTag: true)
         }
 
-        /*********************
-         <meta property="og:description" content="James ends his epic coast-to-coast exploration of the USA with a visit to New York City.">
-
-         <div id="video" class="genie-container js-video"
-         data-genie-id="player1"
-         data-video-variants="[[&quot;mpeg-dash&quot;,&quot;clearkey&quot;],[&quot;mpeg-dash&quot;,&quot;clearkey&quot;,&quot;outband-webvtt&quot;],[&quot;hls&quot;,&quot;aes&quot;,&quot;outband-webvtt&quot;],[&quot;hls&quot;,&quot;aes&quot;],[&quot;mpeg-dash&quot;,&quot;playready&quot;],[&quot;mpeg-dash&quot;,&quot;playready&quot;,&quot;outband-webvtt&quot;]]"
-         data-video-channel-id="itv"
-         data-video-id="https://magni.itv.com/playlist/itvonline/ITV/2_5468_0020.001"
-         data-video-production-id="2/5468/0020#001"
-         data-video-autoplay-id="2/5468/0020#001"
-         data-video-type="episode"
-         data-video-on-air-time=""
-         data-video-episode-id="2/5468/0020"
-         data-video-programme-id="2/5468"
-         data-video-validate-region="true"
-         data-video-guidance=""
-         data-video-title="James Martin's American Adventure"
-         data-registration-required="true"
-         data-video-episode="Episode 20"
-         data-video-broadcast-date-time="Friday 9 Mar 2pm"
-         data-base-path="/hub/assets/js/lib/wizard/20180314073308"
-         data-video-hmac="626de090726a57d5085db28bf0f8fa13f29e3809"
-         data-video-posterframe="https://hubimages.itv.com/episode/2_5468_0020?w={width}&amp;h={height}&amp;q={quality}&amp;blur={blur}&amp;bg={bg}"
-         data-playlist-url="https://secure-mercury.itv.com/PlaylistService.svc?wsdl"
-         data-cast-enabled="true"
-         data-moat-tracking-enabled="false"
-         data-meetrics-tracking-enabled="false"
-         data-show-error-messages="false"></div>
-        *******************/
-        
         var seriesName = ""
         var episode = ""
         var episodeID = ""
@@ -255,7 +228,8 @@ public class ITVDownload : Download {
         
         //Create Download Path
         self.createDownloadPath()
-        self.show.path = self.downloadPath
+        
+        // show.path will be set when youtube-dl tells us the destination.
 
         DispatchQueue.main.async {
             self.launchYoutubeDL()
@@ -302,15 +276,7 @@ public class ITVDownload : Download {
         }
         
         if self.verbose {
-            // Handle ffmpeg output
-            if !s.hasPrefix("[") && (s.contains("Duration:") || s.contains("time=")) && !s.contains("Invalid") {
-                self.logger.add(toLog: s)
-            }
-            
-            // Handle youtube-dl hlsnative download output
-            if s.contains("[download]") || s.contains("[ITV]") {
-                self.logger.add(toLog: s)
-            }
+            self.logger.add(toLog: s)
         }
         
         if s.contains("Writing video subtitles") {
@@ -324,15 +290,13 @@ public class ITVDownload : Download {
             }
         }
         
-        if s.contains("Converting video") {
-            setPercentage(102.0)
-            setCurrentProgress("Converting \(show.showName) to MP4")
+        if s.contains("Destination: ") {
             let scanner = Scanner(string: s)
             scanner.scanUpToString("Destination: ")
             scanner.scanString("Destination: ")
             self.show.path = scanner.scanUpToString("\n") ?? ""
             if self.verbose {
-                self.add(toLog: "Converting to \(self.show.path)")
+                self.add(toLog: "Downloading to \(self.show.path)")
             }
         }
         
@@ -392,6 +356,37 @@ public class ITVDownload : Download {
         errorFh?.readInBackgroundAndNotify()
     }
     
+    public func youtubeDLTaskFinished(_ proc: Process) {
+        self.add(toLog: "youtube-dl finished downloading")
+        processErrorCache.invalidate()
+        self.processErrorCache.invalidate()
+        let exitCode = proc.terminationStatus
+        if exitCode == 0 {
+            if self.show.path.hasSuffix("flv") {
+                // Need to convert to MP4
+                DispatchQueue.main.async {
+                    self.convertToMP4()
+                }
+            } else {
+                self.show.complete = true
+                self.show.successful = true
+                let info = ["Programme" : self.show]
+                DispatchQueue.main.async {
+                    NotificationCenter.default.post(name: NSNotification.Name(rawValue: "AddProgToHistory"), object:self, userInfo:info)
+                    self.youtubeDLFinishedDownload()
+                }
+            }
+        } else {
+            self.show.complete = true
+            self.show.successful = false
+            self.show.status = "Download Failed"
+            
+            // We can't be sure we were terminated or that youtube-dl died.
+            NotificationCenter.default.removeObserver(self)
+            NotificationCenter.default.post(name: NSNotification.Name(rawValue:"DownloadFinished"), object:self.show)        
+        }
+    }
+    
     @objc public func youtubeDLFinishedDownload() {
         if let tagOption = UserDefaults.standard.object(forKey: "TagShows") as? Bool, tagOption {
             self.show.status = "Downloading Thumbnail..."
@@ -418,7 +413,7 @@ public class ITVDownload : Download {
     private func launchYoutubeDL() {
         setCurrentProgress("Downloading \(show.showName)")
         setPercentage(102)
-        show.setValue("Downloading...", forKey: "status")
+        show.status = "Downloading..."
         
         task = Process()
         pipe = Pipe()
@@ -431,9 +426,7 @@ public class ITVDownload : Download {
         
         var args: [String] = [show.url,
                               "-f",
-                              "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
-                              "--recode-video",
-                              "mp4",
+                              "mp4/best",
                               "-o",
                               downloadPath]
         
@@ -471,46 +464,77 @@ public class ITVDownload : Download {
             
             NotificationCenter.default.addObserver(self, selector: #selector(self.youtubeDLProgress), name: FileHandle.readCompletionNotification, object: fh)
             NotificationCenter.default.addObserver(self, selector: #selector(self.youtubeDLProgress), name: FileHandle.readCompletionNotification, object: errorFh)
-            
-            task?.terminationHandler = {
-                task in
-                self.add(toLog: "youtube-dl finished downloading")
-                self.processErrorCache.invalidate()
-                let exitCode = task.terminationStatus
-                if exitCode == 0 {
-                    if !self.show.path.hasSuffix("mp4") {
-                        let oldURL = URL(fileURLWithPath: self.show.path)
-                        let newURL = oldURL.appendingPathExtension("mp4")
-                        do {
-                            try FileManager.default.moveItem(at: oldURL, to: newURL)
-                            self.show.path = newURL.path
-                        } catch {
-                            self.show.complete = true
-                            self.show.successful = false
-                            NotificationCenter.default.removeObserver(self)
-                            NotificationCenter.default.post(name: NSNotification.Name(rawValue:"DownloadFinished"), object:self.show)
-                        }
-                    }
-                    self.show.complete = true
-                    self.show.successful = true
-                    let info = ["Programme" : self.show]
-                    DispatchQueue.main.async {
-                        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "AddProgToHistory"), object:self, userInfo:info)
-                        self.youtubeDLFinishedDownload()
-                    }
-                } else {
-                    self.show.complete = true
-                    self.show.successful = false
-                    // We can't be sure we were terminated or that youtube-dl died.
-                    NotificationCenter.default.removeObserver(self)
-                    NotificationCenter.default.post(name: NSNotification.Name(rawValue:"DownloadFinished"), object:self.show)
-                }
-            }
+
+            task?.terminationHandler = youtubeDLTaskFinished
             
             task?.launch()
             fh?.readInBackgroundAndNotify()
             errorFh?.readInBackgroundAndNotify()
         }
     }
+    
+    func convertToMP4() {
+        ffTask = Process()
+        ffPipe = Pipe()
+        ffErrorPipe = Pipe()
+        
+        guard let ffTask = self.ffTask, let ffPipe = self.ffPipe, let ffErrorPipe = self.ffErrorPipe else {
+            assert(false, "Help? Can't create a process or pipe?")
+        }
+        
+        ffTask.standardOutput = ffPipe
+        ffTask.standardError = ffErrorPipe
+        ffFh = ffPipe.fileHandleForReading
+        ffErrorFh = ffErrorPipe.fileHandleForReading
+        downloadedFileURL = URL(fileURLWithPath: self.show.path)
+        let convertedFileURL = downloadedFileURL!.deletingPathExtension().appendingPathExtension("mp4")
+        show.path = convertedFileURL.path
+        let binaryPath = Bundle.main.executableURL?.deletingLastPathComponent().appendingPathComponent("ffmpeg")
+
+        ffTask.launchPath = binaryPath?.path
+        ffTask.arguments = ["-i",
+                            "\(downloadedFileURL!.path)",
+                            "-c:a",
+                            "copy",
+                            "-c:v",
+                            "copy",
+                            "\(convertedFileURL.path)"]
+        NotificationCenter.default.addObserver(self, selector: #selector(ffmpegFinished), name: Process.didTerminateNotification, object: ffTask)
+        ffTask.launch()
+        ffFh?.readInBackgroundAndNotify()
+        ffErrorFh?.readInBackgroundAndNotify()
+        setCurrentProgress("Converting... -- \(show.showName)")
+        show.status = "Converting..."
+        add(toLog: "INFO: Converting FLV File to MP4", noTag: true)
+        self.setPercentage(102)
+    }
+
+    
+    @objc func ffmpegFinished(_ finishedNote: Notification) {
+        print("Conversion Finished")
+        add(toLog: "INFO: Finished Converting.", noTag: true)
+        if let process = finishedNote.object as? Process {
+            if process.terminationStatus != 0 {
+                add(toLog: "INFO: Exit Code = \(process.terminationStatus)", noTag: true)
+                self.show.status = "Download Complete"
+                show.path = downloadPath
+                NotificationCenter.default.removeObserver(self)
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue:"DownloadFinished"), object:self.show)
+            } else {
+                
+                if let downloadedFile = downloadedFileURL {
+                    try? FileManager.default.removeItem(at: downloadedFile)
+                }
+
+                self.show.complete = true
+                self.show.successful = true
+                let info = ["Programme" : self.show]
+                DispatchQueue.main.async {
+                    NotificationCenter.default.post(name: NSNotification.Name(rawValue: "AddProgToHistory"), object:self, userInfo:info)
+                    self.youtubeDLFinishedDownload()
+                }
+            }
+        }
+}
 }
 
