@@ -13,7 +13,7 @@
 {
     NSArray *tvFormatKeys = @[@"Best", @"Better", @"Very Good", @"Good", @"Worse", @"Worst"];
     NSArray *tvFormatObjects = @[@"tvbest",@"tvbetter",@"tvvgood",@"tvgood", @"tvworse", @"tvworst"];
-    NSArray *hlsTVFormatObjects = @[@"hlsbest",@"hlsbetter",@"hlsvgood",@"hlsgood", @"hlsworse", @"hlsworst"];
+    NSArray *hlsTVFormatObjects = @[@"hlsbest,hvfbest",@"hlsbetter,hvfbetter",@"hlsvgood,hvfvgood",@"hlsgood,hvfgood", @"hlsworse,hvfworse", @"hlsworst,hvfworst"];
     NSArray *radioFormatKeys = @[@"Best", @"Better", @"Very Good", @"Good", @"Worse", @"Worst"];
     NSArray *radioFormatObjects = @[@"radiobest",@"radiobetter",@"radiovgood",@"radiogood", @"radioworse", @"radioworst"];
     
@@ -170,6 +170,11 @@
         if (![[[NSUserDefaults standardUserDefaults] objectForKey:@"TagShows"] boolValue])
             [args addObject:@"--no-tag"];
         
+        if (self.verbose) {
+            for (NSString *arg in args) {
+                [self logDebugMessage:arg noTag:YES];
+            }
+        }
         self.task.arguments = args;
         self.task.launchPath = @"/usr/bin/perl";
         self.task.standardOutput = self.pipe;
@@ -602,7 +607,14 @@
                              [NSDecimalNumber decimalNumberWithDecimal:s].integerValue];
             [self setCurrentProgress:eta];
 
-            NSString *format = [output hasSuffix:@"[audio+video]"] ? @"Video downloaded: %ld%%" : @"HQ Audio downloaded: %ld%%";
+            NSString *format = @"Video downloaded: %ld%%";
+            
+            if ([output hasSuffix:@"[audio+video]"]) {
+                format = @"Downloaded %ld%%";
+            } else if ([output hasSuffix:@"[audio]"]) {
+                format = @"Audio download: %ld%%";
+            }
+            
             [self.show setValue:[NSString stringWithFormat:format,
                                      [NSDecimalNumber decimalNumberWithDecimal:percentage].integerValue]
                              forKey:@"status"];
