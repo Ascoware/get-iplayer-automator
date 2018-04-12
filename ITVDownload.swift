@@ -480,6 +480,7 @@ public class ITVDownload : Download {
         
         guard let ffTask = self.ffTask, let ffPipe = self.ffPipe, let ffErrorPipe = self.ffErrorPipe else {
             assert(false, "Help? Can't create a process or pipe?")
+            return
         }
         
         ffTask.standardOutput = ffPipe
