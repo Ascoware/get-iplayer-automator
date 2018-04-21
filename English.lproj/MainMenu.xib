@@ -1707,7 +1707,7 @@
                                             </connections>
                                         </button>
                                         <button horizontalHuggingPriority="750" verticalHuggingPriority="750" misplaced="YES" id="862">
-                                            <rect key="frame" x="408" y="373" width="25" height="25"/>
+                                            <rect key="frame" x="411" y="346" width="25" height="25"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="help" bezelStyle="helpButton" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="863">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1825,7 +1825,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <button misplaced="YES" id="1474">
-                                            <rect key="frame" x="58" y="152" width="119" height="18"/>
+                                            <rect key="frame" x="35" y="152" width="119" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Signed versions" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="1475">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1836,7 +1836,7 @@
                                             </connections>
                                         </button>
                                         <button misplaced="YES" id="bjS-0F-vwY">
-                                            <rect key="frame" x="58" y="132" width="177" height="18"/>
+                                            <rect key="frame" x="35" y="132" width="177" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Audio Described versions" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="BqQ-Cj-hgl">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1855,6 +1855,18 @@
                                             </buttonCell>
                                             <connections>
                                                 <action selector="restoreDefaults:" target="621" id="1281"/>
+                                            </connections>
+                                        </button>
+                                        <button verticalHuggingPriority="750" misplaced="YES" id="vNk-4U-kR1">
+                                            <rect key="frame" x="35" y="92" width="249" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Tag Radio Programmes as Podcasts" bezelStyle="regularSquare" imagePosition="left" inset="2" id="gaB-I2-iRP">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <binding destination="668" name="enabled" keyPath="values.TagShows" id="kc6-DJ-h7t"/>
+                                                <binding destination="668" name="value" keyPath="values.TagRadioAsPodcast" id="6xp-zH-zO8"/>
                                             </connections>
                                         </button>
                                     </subviews>

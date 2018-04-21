@@ -21,7 +21,7 @@
 #import "GetiPlayerArguments.h"
 #import "GetiPlayerProxy.h"
 
-extern bool runDownloads;
+extern BOOL runDownloads;
 extern NSDictionary *tvFormats;
 extern NSDictionary *radioFormats;
 
@@ -113,25 +113,25 @@ extern NSDictionary *radioFormats;
 @property (nonatomic) IBOutlet LogController *logger;
 
 //Proxy
-@property (nonatomic)   GetiPlayerProxy *getiPlayerProxy;
+@property (nonatomic) GetiPlayerProxy *getiPlayerProxy;
 @property (nonatomic) HTTPProxy *proxy;
 
 // Misc Menu Items / Buttons
-@property (nonatomic)    IBOutlet NSToolbarItem *refreshCacheButton;
+@property (nonatomic) IBOutlet NSToolbarItem *refreshCacheButton;
 @property (nonatomic) IBOutlet NSMenuItem *forceCacheUpdateMenuItem;
 @property (nonatomic) IBOutlet NSMenuItem *checkForCacheUpdateMenuItem;
 
 //ITV Cache
-@property (nonatomic) BOOL                         updatingITVIndex;
-@property (nonatomic) BOOL                         updatingBBCIndex;
-@property (nonatomic) BOOL                          forceITVUpdateInProgress;
+@property (nonatomic) BOOL updatingITVIndex;
+@property (nonatomic) BOOL updatingBBCIndex;
+@property (nonatomic) BOOL forceITVUpdateInProgress;
 @property (nonatomic) IBOutlet NSMenuItem          *showNewProgrammesMenuItem;
 @property (nonatomic) IBOutlet NSTextField         *itvProgressText;
 @property (nonatomic) IBOutlet NSMenuItem          *forceITVUpdateMenuItem;
 
 //New Programmes History
 @property (nonatomic) NSWindow *newestProgrammesWindow;
-@property   IBOutlet NSProgressIndicator *itvProgressIndicator;
+@property IBOutlet NSProgressIndicator *itvProgressIndicator;
 
 //Update
 - (void)getiPlayerUpdateFinished;

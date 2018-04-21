@@ -167,7 +167,7 @@
         }
         
         //Tagging
-        if (![[[NSUserDefaults standardUserDefaults] objectForKey:@"TagShows"] boolValue])
+        if (![[NSUserDefaults standardUserDefaults] boolForKey:@"TagShows"])
             [args addObject:@"--no-tag"];
         
         if (self.verbose) {
@@ -175,6 +175,11 @@
                 [self logDebugMessage:arg noTag:YES];
             }
         }
+
+        if ([[NSUserDefaults standardUserDefaults] boolForKey:@"TagRadioAsPodcast"]) {
+            [args addObject:@"--tag-podcast-radio"];
+        }
+
         self.task.arguments = args;
         self.task.launchPath = @"/usr/bin/perl";
         self.task.standardOutput = self.pipe;

@@ -20,8 +20,8 @@
 #import "Get_iPlayer_Automator-Swift.h"
 
 static AppController *sharedController;
-bool runDownloads=NO;
-bool runUpdate=NO;
+BOOL runDownloads = NO;
+BOOL runUpdate = NO;
 NSDictionary *tvFormats;
 NSDictionary *radioFormats;
 
@@ -32,10 +32,7 @@ NewProgrammeHistory           *sharedHistoryController;
 
 @implementation AppController
 #pragma mark Overriden Methods
-- (id)description
-{
-    return @"AppController";
-}
+
 - (instancetype)init {
     //Initialization
     if (!(self = [super init])) return nil;
@@ -80,6 +77,7 @@ NewProgrammeHistory           *sharedHistoryController;
     defaultValues[@"KeepSeriesFor"] = @"30";
     defaultValues[@"RemoveOldSeries"] = @NO;
     defaultValues[@"TagShows"] = @YES;
+    defaultValues[@"TagRadioAsPodcast"] = @NO;
     defaultValues[@"BBCOne"] = @YES;
     defaultValues[@"BBCTwo"] = @YES;
     defaultValues[@"BBCFour"] = @YES;
@@ -1938,6 +1936,7 @@ NewProgrammeHistory           *sharedHistoryController;
     [sharedDefaults removeObjectForKey:@"RemoveOldSeries"];
     [sharedDefaults removeObjectForKey:@"QuickCache"];
     [sharedDefaults removeObjectForKey:@"TagShows"];
+    [sharedDefaults removeObjectForKey:@"TagRadioAsPodcast"];
     [sharedDefaults removeObjectForKey:@"BBCOne"];
     [sharedDefaults removeObjectForKey:@"BBCTwo"];
     [sharedDefaults removeObjectForKey:@"BBCThree"];
