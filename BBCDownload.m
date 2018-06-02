@@ -579,7 +579,7 @@
             [self setPercentage:102];
             [self setCurrentProgress:[NSString stringWithFormat:@"Downloading Artwork.. -- %@", self.show.showName]];
         }
-        else if ([output hasSuffix:@"[audio+video]"] || [output hasSuffix:@"[audio]"]) {
+        else if ([output hasSuffix:@"[audio+video]"] || [output hasSuffix:@"[audio]"] || [output hasSuffix:@"[video]"]) {
             if (self.verbose) {
                 [self addToLog:output noTag:YES];
         }
@@ -618,6 +618,8 @@
                 format = @"Downloaded %ld%%";
             } else if ([output hasSuffix:@"[audio]"]) {
                 format = @"Audio download: %ld%%";
+            } else if ([output hasSuffix:@"[video]"]) {
+                format = @"Video download: %ld%%";
             }
             
             [self.show setValue:[NSString stringWithFormat:format,
