@@ -1911,13 +1911,7 @@
                                                                             <menuItem title="Better" id="QPv-lH-1Bk" userLabel="Better">
                                                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                                                             </menuItem>
-                                                                            <menuItem title="Very Good" id="tY8-Gc-9rQ" userLabel="Very Good">
-                                                                                <modifierMask key="keyEquivalentModifierMask"/>
-                                                                            </menuItem>
                                                                             <menuItem title="Good" id="1gB-ry-erP" userLabel="Good">
-                                                                                <modifierMask key="keyEquivalentModifierMask"/>
-                                                                            </menuItem>
-                                                                            <menuItem title="Worse" id="d8c-cU-VWY">
                                                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                                                             </menuItem>
                                                                             <menuItem title="Worst" id="MNn-oe-AHd">
