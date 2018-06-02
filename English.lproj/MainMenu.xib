@@ -1865,8 +1865,8 @@
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
-                                                <binding destination="668" name="enabled" keyPath="values.TagShows" id="kc6-DJ-h7t"/>
                                                 <binding destination="668" name="value" keyPath="values.TagRadioAsPodcast" id="6xp-zH-zO8"/>
+                                                <binding destination="668" name="enabled" keyPath="values.TagShows" id="kc6-DJ-h7t"/>
                                             </connections>
                                         </button>
                                     </subviews>
@@ -2183,12 +2183,12 @@
                                         <button misplaced="YES" id="0tJ-5h-fyc" userLabel="Use 50 FPS">
                                             <rect key="frame" x="15" y="392" width="236" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Prefer 50 FPS streams if available" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="LOo-cl-WiG" userLabel="Prefer 50 FPS streams if available">
+                                            <buttonCell key="cell" type="check" title="Prefer 25 FPS streams if available" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="LOo-cl-WiG" userLabel="Prefer 50 FPS streams if available">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
-                                                <binding destination="668" name="value" keyPath="values.Use50FPSStreams" id="hPH-Rs-gFO"/>
+                                                <binding destination="668" name="value" keyPath="values.Use25FPSStreams" id="Lw5-cC-i4J"/>
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" misplaced="YES" id="kxL-39-lbX">

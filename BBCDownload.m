@@ -11,11 +11,11 @@
 @implementation BBCDownload
 + (void)initFormats
 {
-    NSArray *tvFormatKeys = @[@"Best", @"Better", @"Very Good", @"Good", @"Worse", @"Worst"];
-    NSArray *tvFormatObjects = @[@"tvbest",@"tvbetter",@"tvvgood",@"tvgood", @"tvworse", @"tvworst"];
-    NSArray *hlsTVFormatObjects = @[@"hlsbest,hvfbest",@"hlsbetter,hvfbetter",@"hlsvgood,hvfvgood",@"hlsgood,hvfgood", @"hlsworse,hvfworse", @"hlsworst,hvfworst"];
-    NSArray *radioFormatKeys = @[@"Best", @"Better", @"Very Good", @"Good", @"Worse", @"Worst"];
-    NSArray *radioFormatObjects = @[@"radiobest",@"radiobetter",@"radiovgood",@"radiogood", @"radioworse", @"radioworst"];
+    NSArray *tvFormatKeys = @[@"Best", @"Better", @"Good", @"Worst"];
+    NSArray *tvFormatObjects = @[@"tvbest",@"tvbetter",@"tvgood", @"tvworst"];
+    NSArray *hlsTVFormatObjects = @[@"hvfbest", @"hvfbetter", @"hvfgood", @"hvfworst"];
+    NSArray *radioFormatKeys = @[@"Best", @"Better", @"Good", @"Worst"];
+    NSArray *radioFormatObjects = @[@"radiobest", @"radiobetter", @"radiogood", @"radioworst"];
     
     if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"ForceHLSBBCVideo"] boolValue]) {
         tvFormats = [[NSDictionary alloc] initWithObjects:hlsTVFormatObjects forKeys:tvFormatKeys];
@@ -157,8 +157,8 @@
         }
         
         // 50 FPS frames?
-        if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"Use50FPSStreams"] boolValue]) {
-            [args addObject:@"--fps50"];
+        if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"Use25FPSStreams"] boolValue]) {
+            [args addObject:@"--fps25"];
         }
         
         // High quality audio is on by default.

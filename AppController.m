@@ -109,7 +109,7 @@ NewProgrammeHistory           *sharedHistoryController;
     defaultValues[@"ShowDownloadedInSearch"] = @YES;
     defaultValues[@"AudioDescribedNew"] = @NO;
     defaultValues[@"SignedNew"] = @NO;
-    defaultValues[@"Use50FPSStreams"] = @NO;
+    defaultValues[@"Use25FPSStreams"] = @NO;
     defaultValues[@"GetHigherQualityAudio"] = @YES;
     defaultValues[@"ForceHLSBBCVideo"] = @NO;
 
@@ -1971,6 +1971,7 @@ NewProgrammeHistory           *sharedHistoryController;
     [sharedDefaults removeObjectForKey:@"AudiodescribedNew"];
     [sharedDefaults removeObjectForKey:@"SignedNew"];
     [sharedDefaults removeObjectForKey:@"Use50FPSStreams"];
+    [sharedDefaults removeObjectForKey:@"Use25FPSStreams"];
     [sharedDefaults removeObjectForKey:@"GetHigherQualityAudio"];
 }
 - (void)applescriptStartDownloads
