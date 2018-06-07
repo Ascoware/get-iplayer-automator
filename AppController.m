@@ -111,15 +111,10 @@ NewProgrammeHistory           *sharedHistoryController;
     defaultValues[@"SignedNew"] = @NO;
     defaultValues[@"Use25FPSStreams"] = @NO;
     defaultValues[@"GetHigherQualityAudio"] = @YES;
-    defaultValues[@"ForceHLSBBCVideo"] = @NO;
 
     [[NSUserDefaults standardUserDefaults] registerDefaults:defaultValues];
     defaultValues = nil;
     
-    [[NSUserDefaults standardUserDefaults] addObserver:self
-                                            forKeyPath:@"ForceHLSBBCVideo" options:NSKeyValueObservingOptionNew
-                                               context:NULL];
-
     //Migrate old AudioDescribed option
     if ([[NSUserDefaults standardUserDefaults] objectForKey:@"AudioDescribed"]) {
         [[NSUserDefaults standardUserDefaults] setObject:@YES forKey:@"AudioDescribedNew"];
@@ -132,6 +127,7 @@ NewProgrammeHistory           *sharedHistoryController;
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"AlternateFormat"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"Cache4oD_TV"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CacheBBC_Podcasts"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"ForceHLSBBCVideo"];
 
     //Make sure Application Support folder exists
     NSString *folder = @"~/Library/Application Support/Get iPlayer Automator/";
@@ -424,18 +420,6 @@ NewProgrammeHistory           *sharedHistoryController;
     @catch (NSException *e) {
         NSLog(@"ERROR: Growl notification failed (updater): %@: %@", e.name, e.description);
         [_logger addToLog:[NSString stringWithFormat:@"ERROR: Growl notification failed (updater): %@: %@", e.name, e.description]];
-    }
-}
-
-#pragma mark Preferences changes
--(void)observeValueForKeyPath:(NSString *)aKeyPath
-                     ofObject:(id)anObject
-                       change:(NSDictionary *)aChange
-                      context:(void *)aContext
-{
-    // Reset TV formats if that option changes, as we need to regenerate it.
-    if ([aKeyPath isEqualToString:@"ForceHLSBBCVideo"]) {
-        [BBCDownload initFormats];
     }
 }
 
