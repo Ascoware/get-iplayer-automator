@@ -554,10 +554,22 @@
             if ([wantedID isEqualToString:pid] || [wantedID isEqualToString:index])
             {
                 found=YES;
+                if (showName.length > 0) {
                 [p setValue:showName forKey:@"showName"];
+                }
+                
+                if (pid.length > 0) {
                 [p setValue:pid forKey:@"pid"];
+                }
+                
+                if (tvNetwork.length > 0) {
                 [p setValue:tvNetwork forKey:@"tvNetwork"];
+                }
+                
+                if (url) {
                 p.url = url;
+                }
+
                 p.status = @"Available";
                 if ([type isEqualToString:@"radio"]) [p setValue:@YES forKey:@"radio"];
             }
@@ -616,6 +628,17 @@
             }
             
         }
+
+        // Leave this commented out for now in case I need to debug it later.
+        //        BOOL verbose = [[NSUserDefaults standardUserDefaults] boolForKey:@"Verbose"];
+        //
+        //        if (verbose) {
+        //            [args addObject:@"--verbose"];
+        //            for (NSString *arg in args) {
+        //                [[NSNotificationCenter defaultCenter] postNotificationName:@"AddToLog" object:nil userInfo:@{@"message": arg}];
+        //            }
+        //        }
+        
         getNameTask.arguments = args;
         getNameTask.launchPath = @"/usr/bin/perl";
         
@@ -626,6 +649,10 @@
         NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:getNameTask.environment];
         envVariableDictionary[@"HOME"] = (@"~").stringByExpandingTildeInPath;
         envVariableDictionary[@"PERL_UNICODE"] = @"AS";
+        NSString *perlPath = [[NSBundle mainBundle] resourcePath];
+        perlPath = [perlPath stringByAppendingPathComponent:@"perl5"];
+        envVariableDictionary[@"PERL5LIB"] = perlPath;
+
         getNameTask.environment = envVariableDictionary;
         [getNameTask launch];
         
@@ -642,65 +669,71 @@
 {
     NSArray *array = [getNameData componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
     Programme *p = self;
-    int i = 0;
     NSString *available = nil, *versions = nil, *title = nil;
+    NSDate *broadcastDate = nil;
+    
     for (NSString *string in array)
     {
-        i++;
-        if (i>1 && i<array.count-1)
-        {
-            NSString *tmp_info = nil, *tmp_title = nil;
-            @try{
+        // get_iplayer reports back "(available versions: none)" if a PID is invalid or unavailable for any reason.
+        // If we don't find that string we can assume it's available in some format.
+        if ([string containsString:@"(available versions: "]) {
                 NSScanner *scanner = [NSScanner scannerWithString:string];
-                [scanner scanString:@"INFO:" intoString:&tmp_info];
-                if (tmp_info) {
-                    if (!available) {
-                        [scanner scanUpToString:@"(available versions:" intoString:nil];
-                        [scanner scanString:@"(available versions:" intoString:&available];
-                        if (available) {
-                            [scanner scanUpToString:@")" intoString:&versions];
-                        }
+            [scanner scanString:@"(available versions: " intoString:nil];
+            [scanner scanUpToString:@")" intoString:&available];
+            available = [available stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
                     }
-                } else {
-                    scanner.scanLocation = 0;
-                    if (!title) {
-                        [scanner scanString:@"title:" intoString:&tmp_title];
-                        if (tmp_title) {
-                            [scanner scanUpToString:@"asdfasdf" intoString:&title];
-                        }
-                    }
-                    scanner = nil;
-                    if (title) {
-                        break;
-                    }
+
+        if ([string hasPrefix:@"title:"]) {
+            NSScanner *scanner = [NSScanner scannerWithString:string];
+            [scanner scanString:@"title:" intoString:nil];
+            [scanner scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet] intoString:&title];
+            title = [title stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
                 }
+
+        if ([string hasPrefix:@"versions:"]) {
+            NSScanner *scanner = [NSScanner scannerWithString:string];
+            [scanner scanString:@"versions:" intoString:nil];
+            [scanner scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet] intoString:&versions];
+            versions = [versions stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
             }
-            @catch (NSException *e) {
-                NSAlert *getNameException = [[NSAlert alloc] init];
-                [getNameException addButtonWithTitle:@"OK"];
-                getNameException.messageText = [NSString stringWithFormat:@"Unknown Error!"];
-                getNameException.informativeText = @"An unknown error occured whilst trying to parse Get_iPlayer output (processGetNameDataFromPID).";
-                getNameException.alertStyle = NSWarningAlertStyle;
-                [getNameException runModal];
-                getNameException = nil;
+        // firstbcastdate: 2005-04-09
+        
+        if ([string hasPrefix:@"firstbcastdate:"]) {
+            NSString *dateString = nil;
+            NSScanner *scanner = [NSScanner scannerWithString:string];
+            [scanner scanString:@"firstbcastdate:" intoString:nil];
+            [scanner scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet] intoString:&dateString];
+            dateString = [dateString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+            NSDateFormatter *shortDateFormatter = [[NSDateFormatter alloc] init];
+            shortDateFormatter.dateFormat = @"yyyy-MM-dd";
+            broadcastDate = [shortDateFormatter dateFromString:dateString];
+            
             }
         }
         
-    }
-    if (available) {
-        if (versions) {
-            [p setValue:[NSString stringWithFormat:@"Available: %@", versions] forKey:@"status"];
+    if ([available isEqualToString:@"none"]) {
+        p.status = @"Not Available";
         } else {
-            [p setValue:@"Not Available" forKey:@"status"];
+        if (versions.length > 0) {
+            p.status = [NSString stringWithFormat: @"Available: %@", versions];
+    } else {
+            p.status = @"Available";
         }
-    } else {
-        [p setValue:@"Available" forKey:@"status"];
     }
+    
+    if (broadcastDate) {
+        p.lastBroadcast = broadcastDate;
+        p.lastBroadcastString = [NSDateFormatter localizedStringFromDate:broadcastDate
+                                                               dateStyle:NSDateFormatterMediumStyle
+                                                               timeStyle:NSDateFormatterNoStyle];
+    }
+    
     if (title) {
-        [p setValue:title forKey:@"showName"];
+        p.showName = title;
     } else {
-        [p setValue:@"Unknown: PID Not Found" forKey:@"showName"];
+        p.showName = @"Unknown: PID Not Found";
     }
+    
     p.processedPID = @NO;
 }
 
