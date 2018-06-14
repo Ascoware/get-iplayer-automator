@@ -555,31 +555,36 @@
             {
                 found=YES;
                 if (showName.length > 0) {
-                [p setValue:showName forKey:@"showName"];
+                    p.showName = showName;
                 }
                 
                 if (pid.length > 0) {
-                [p setValue:pid forKey:@"pid"];
+                    p.pid = pid;
                 }
                 
                 if (tvNetwork.length > 0) {
-                [p setValue:tvNetwork forKey:@"tvNetwork"];
+                    p.tvNetwork = tvNetwork;
                 }
                 
                 if (url) {
-                p.url = url;
+                    p.url = url;
                 }
 
                 p.status = @"Available";
-                if ([type isEqualToString:@"radio"]) [p setValue:@YES forKey:@"radio"];
+                
+                if ([type isEqualToString:@"radio"]) {
+                    p.radio = @YES;
+                }
             }
         }
         
     }
     if (!found)
     {
-        if ([p.showName isEqualToString:@""] || [p.showName isEqualToString:@"Unknown: Not in Cache"])
-            [p setValue:@"Unknown: Not in Cache" forKey:@"showName"];
+        if ([p.showName isEqualToString:@""] || [p.showName isEqualToString:@"Unknown: Not in Cache"]) {
+            p.showName = @"Unknown: Not in Cache";
+        }
+        
         p.processedPID = @NO;
         [p getNameFromPID];
     }

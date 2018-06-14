@@ -190,7 +190,7 @@
         [urlScanner scanString:@"/" intoString:nil];
         [urlScanner scanUpToString:@"/" intoString:&pid];
         Programme *newProg = [[Programme alloc] initWithLogController:logger];
-        [newProg setValue:pid forKey:@"pid"];
+        newProg.pid = pid;
         if (newShowName) newProg.showName = newShowName;
         newProg.status = @"Processing...";
         [newProg performSelectorInBackground:@selector(getName) withObject:nil];
@@ -221,7 +221,7 @@
             return nil;
         }
         Programme *newProg = [[Programme alloc] init];
-        [newProg setValue:pid forKey:@"pid"];
+        newProg.pid = pid;
         if (newShowName) newProg.showName = newShowName;
         newProg.status = @"Processing...";
         [newProg performSelectorInBackground:@selector(getName) withObject:nil];

@@ -1,6 +1,6 @@
 //
 //  Download.m
-//  
+//
 //
 //  Created by Thomas Willson on 12/16/11.
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
@@ -23,14 +23,14 @@
         _processErrorCache = [NSTimer scheduledTimerWithTimeInterval:.25 target:self selector:@selector(processError) userInfo:nil repeats:YES];
         _isTest=false;
         _defaultsPrefix = @"BBC_";
-        
+
         _log = [[NSMutableString alloc] initWithString:@""];
 //        _nc = [NSNotificationCenter defaultCenter];
         _downloadPath = [[NSString alloc] initWithString:[[NSUserDefaults standardUserDefaults] valueForKey:@"DownloadPath"]];
         _task = [[NSTask alloc] init];
         _pipe = [[NSPipe alloc] init];
         _errorPipe = [[NSPipe alloc] init];
-        
+
 
 
     }
@@ -46,7 +46,7 @@
 #pragma mark Notification Posters
 - (void)logDebugMessage:(NSString *)message noTag:(BOOL)b {
     NSLog(@"%@", message);
-    
+
     if (self.verbose) {
         [self addToLog:message noTag:b];
     }
@@ -102,13 +102,13 @@
         if (downloaded>0 && percent>0 && percent!=102) total = ((downloaded/1024)/(percent/100));
         else total=0;
         if (percent != 102) {
-            [_show setValue:[NSString stringWithFormat:@"Downloading: %.1f%%", percent] forKey:@"status"];
+            _show.status = [NSString stringWithFormat:@"Downloading: %.1f%%", percent];
         }
         else {
-            [_show setValue:@"Downloading..." forKey:@"status"];
+            _show.status = @"Downloading...";
         }
         [self setPercentage:percent];
-        
+
         //Calculate Time Remaining
         downloaded/=1024;
         if (total>0 && downloaded>0 && percent>0)
@@ -126,7 +126,7 @@
                     rateSum= (_oldRateAverage*50)-oldestRate+rate;
                     rateAverage = _oldRateAverage = rateSum/50;
                 }
-                else 
+                else
                 {
                     _outOfRange++;
                     rateAverage = _oldRateAverage;
@@ -136,17 +136,17 @@
                         _outOfRange=0;
                     }
                 }
-                
+
                 _lastDownloaded=downloaded;
                 _lastDate = [NSDate date];
                 NSDate *predictedFinished = [NSDate dateWithTimeIntervalSinceNow:(total-downloaded)/rateAverage];
-                
+
                 unsigned int unitFlags = NSHourCalendarUnit | NSMinuteCalendarUnit;
                 NSDateComponents *conversionInfo = [[NSCalendar currentCalendar] components:unitFlags fromDate:_lastDate toDate:predictedFinished options:0];
-                
+
                 [self setCurrentProgress:[NSString stringWithFormat:@"%.1f%% - (%.2f MB/~%.0f MB) - %02ld:%02ld Remaining -- %@",percent,downloaded,total,(long)conversionInfo.hour,(long)conversionInfo.minute,[_show valueForKey:@"showName"]]];
             }
-            else 
+            else
             {
                 if (_lastDownloaded>0 && _lastDate)
                 {
@@ -167,7 +167,7 @@
                         _oldRateAverage = rateSum/_rateEntries.count;
                     }
                 }
-                else 
+                else
                 {
                     _lastDownloaded=downloaded;
                     _lastDate = [NSDate date];
@@ -190,7 +190,7 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self name:NSFileHandleReadCompletionNotification object:self.fh];
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSFileHandleReadCompletionNotification object:self.errorFh];
     [self.processErrorCache invalidate];
-    
+
     NSInteger exitCode=[finishedNote.object terminationStatus];
     NSLog(@"Exit Code = %ld",(long)exitCode);
     if (exitCode==0) //RTMPDump is successful
@@ -199,45 +199,45 @@
         _show.successful = @YES;
         NSDictionary *info = @{@"Programme": _show};
         [[NSNotificationCenter defaultCenter] postNotificationName:@"AddProgToHistory" object:self userInfo:info];
-        
+
         _ffTask = [[NSTask alloc] init];
         _ffPipe = [[NSPipe alloc] init];
         _ffErrorPipe = [[NSPipe alloc] init];
-        
+
         _ffTask.standardOutput = _ffPipe;
         _ffTask.standardError = _ffErrorPipe;
-        
+
         _ffFh = _ffPipe.fileHandleForReading;
         _ffErrorFh = _ffErrorPipe.fileHandleForReading;
-        
+
         NSString *completeDownloadPath = _downloadPath.stringByDeletingPathExtension.stringByDeletingPathExtension;
         completeDownloadPath = [completeDownloadPath stringByAppendingPathExtension:@"mp4"];
         _show.path = completeDownloadPath;
-        
+
         _ffTask.launchPath = [([NSBundle mainBundle].executablePath).stringByDeletingLastPathComponent stringByAppendingPathComponent:@"ffmpeg"];
-        
+
         _ffTask.arguments = @[@"-i",[NSString stringWithFormat:@"%@", _downloadPath],
                               @"-vcodec",@"copy",
                               @"-acodec",@"copy",
                               [NSString stringWithFormat:@"%@",completeDownloadPath]];
-        
+
         [[NSNotificationCenter defaultCenter] addObserver:self
                selector:@selector(DownloadDataReady:)
                    name:NSFileHandleReadCompletionNotification
                  object:_ffFh];
-        [[NSNotificationCenter defaultCenter] addObserver:self 
-               selector:@selector(DownloadDataReady:) 
-                   name:NSFileHandleReadCompletionNotification 
+        [[NSNotificationCenter defaultCenter] addObserver:self
+               selector:@selector(DownloadDataReady:)
+                   name:NSFileHandleReadCompletionNotification
                  object:_ffErrorFh];
-        [[NSNotificationCenter defaultCenter] addObserver:self 
-               selector:@selector(ffmpegFinished:) 
-                   name:NSTaskDidTerminateNotification 
+        [[NSNotificationCenter defaultCenter] addObserver:self
+               selector:@selector(ffmpegFinished:)
+                   name:NSTaskDidTerminateNotification
                  object:_ffTask];
-        
+
         [_ffTask launch];
         [_ffFh readInBackgroundAndNotify];
         [_ffErrorFh readInBackgroundAndNotify];
-        
+
         [self setCurrentProgress:[NSString stringWithFormat:@"Converting... -- %@",_show.showName]];
         _show.status = @"Converting...";
         [self addToLog:@"INFO: Converting FLV File to MP4" noTag:YES];
@@ -266,7 +266,7 @@
             _show.reasonForFailure = @"Unknown";
             [[NSNotificationCenter defaultCenter] removeObserver:self];
             [[NSNotificationCenter defaultCenter] postNotificationName:@"DownloadFinished" object:_show];
-            [_show setValue:@"Download Failed" forKey:@"status"];
+            self.show.status = @"Download Failed";
         }
     }
     else if (exitCode==2 && _attemptNumber<4 && _running) //RTMPDump lost connection but should be able to resume.
@@ -282,7 +282,7 @@
         _show.reasonForFailure = @"Unknown";
         [[NSNotificationCenter defaultCenter] removeObserver:self];
         [[NSNotificationCenter defaultCenter] postNotificationName:@"DownloadFinished" object:_show];
-        [_show setValue:@"Download Failed" forKey:@"status"];
+        self.show.status = @"Download Failed";
     }
     [_processErrorCache invalidate];
 }
@@ -295,7 +295,7 @@
         [[NSFileManager defaultManager] removeItemAtPath:_downloadPath error:nil];
         if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"TagShows"] boolValue])
         {
-            [_show setValue:@"Tagging..." forKey:@"status"];
+            _show.status = @"Tagging...";
             [self setPercentage:102];
             [self setCurrentProgress:[NSString stringWithFormat:@"Downloading Thumbnail... -- %@",_show.showName]];
             [self addToLog:@"INFO: Tagging the Show" noTag:YES];
@@ -308,7 +308,7 @@
                 NSURLSessionDownloadTask *downloadTask = [self.session downloadTaskWithURL: [NSURL URLWithString:_thumbnailURL] completionHandler:^(NSURL * _Nullable location, NSURLResponse * _Nullable response, NSError * _Nullable error) {
                     [self thumbnailRequestFinished:location];
                 }];
-                
+
                 [downloadTask resume];
             }
             else
@@ -324,7 +324,7 @@
     else
     {
         [self addToLog:[NSString stringWithFormat:@"INFO: Exit Code = %ld",(long)[finishedNote.object terminationStatus]] noTag:YES];
-        [_show setValue:@"Download Complete" forKey:@"status"];
+        self.show.status = @"Download Complete";
         _show.path = _downloadPath;
         [[NSNotificationCenter defaultCenter] removeObserver:self];
         [[NSNotificationCenter defaultCenter] postNotificationName:@"DownloadFinished" object:_show];
@@ -334,7 +334,7 @@
 - (void)thumbnailRequestFinished:(NSURL *)location
 {
     [self addToLog:@"INFO: Thumbnail Download Completed" noTag:YES];
-   
+
     if (location) {
         NSFileManager *fm = [NSFileManager defaultManager];
         NSURL *destinationURL = [NSURL fileURLWithPath:_thumbnailPath];
@@ -352,7 +352,7 @@
         self.apFh = self.apPipe.fileHandleForReading;
 
         self.apTask.launchPath = [([NSBundle mainBundle].executablePath).stringByDeletingLastPathComponent stringByAppendingPathComponent:@"AtomicParsley"];
-        
+
         NSMutableArray *arguments = [NSMutableArray arrayWithObjects:
                                      [NSString stringWithFormat:@"%@",self.show.path],
                                      @"--stik",@"value=10",
@@ -370,14 +370,14 @@
                                      @"--artist",self.show.tvNetwork,
                                      @"--overWrite",
                                      nil];
-       
+
         if (self.show.standardizedAirDate) {
             [arguments addObject: @"--year"];
             [arguments addObject:self.show.standardizedAirDate];
         }
-            
+
         self.apTask.arguments = arguments;
-        
+
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(DownloadDataReady:)
                                                      name:NSFileHandleReadCompletionNotification
@@ -386,9 +386,9 @@
                                                  selector:@selector(atomicParsleyFinished:)
                                                      name:NSTaskDidTerminateNotification
                                                    object:self.apTask];
-        
+
         [self addToLog:@"INFO: Beginning AtomicParsley Tagging." noTag:YES];
-        
+
         [self.apTask launch];
         [self.apFh readInBackgroundAndNotify];
         [self setCurrentProgress:[NSString stringWithFormat:@"Tagging the Programme... -- %@",self.show.showName]];
@@ -406,14 +406,14 @@
         else
             [self addToLog:@"INFO: Tagging failed." noTag:YES];
     }
-    
+
     if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"DownloadSubtitles"] boolValue])
     {
         // youtube-dl should try to download a subtitle file, but if there isn't one log it and continue.
         if (_subtitlePath && [[NSFileManager defaultManager] fileExistsAtPath:_subtitlePath]) {
             if (![_subtitlePath.pathExtension isEqual: @"srt"])
             {
-                [_show setValue:@"Converting Subtitles..." forKey:@"status"];
+                _show.status = @"Converting Subtitles...";
                 [self setPercentage:102];
                 [self setCurrentProgress:[NSString stringWithFormat:@"Converting Subtitles... -- %@",_show.showName]];
                 [self addToLog:@"INFO: Converting Subtitles..." noTag:YES];
@@ -442,7 +442,7 @@
     } else {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self addToLog:[NSString stringWithFormat:@"INFO: Converting to SubRip: %@", self.subtitlePath] noTag:YES];
-            
+
             NSURL *outputURL = [NSURL fileURLWithPath:self.subtitlePath];
             outputURL = [[outputURL URLByDeletingPathExtension] URLByAppendingPathExtension:@"srt"];
             NSMutableArray *args = [[NSMutableArray alloc] init];
@@ -453,7 +453,7 @@
 //            {
 //                [args addObject:@"--srt-ignore-colors"];
 //            }
-            
+
             [args addObject:@"-i"];
             [args addObject:self.subtitlePath];
             [args addObject:[outputURL path]];
@@ -462,7 +462,7 @@
             self.subsErrorPipe = [[NSPipe alloc] init];
             self.subsTask.standardError = self.subsErrorPipe;
             [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(convertSubtitlesFinished:) name:NSTaskDidTerminateNotification object:self.subsTask];
-            
+
             NSURL *ffmpegURL = [[[[NSBundle mainBundle] executableURL] URLByDeletingLastPathComponent] URLByAppendingPathComponent:@"ffmpeg"];
             self.subsTask.launchPath = [ffmpegURL path];
             self.subsTask.arguments = args;
@@ -480,20 +480,20 @@
             [self addToLog:[NSString stringWithFormat:@"INFO: Converting to SubRip: %@", self.subtitlePath] noTag:YES];
             NSString *ttml2srtPath = [[NSBundle mainBundle] pathForResource:@"ttml2srt.py" ofType:nil];
             NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:ttml2srtPath, nil];
-            
+
             BOOL srtIgnoreColors = [[NSUserDefaults standardUserDefaults] boolForKey:[NSString stringWithFormat:@"%@SRTIgnoreColors", self.defaultsPrefix]];
             if (srtIgnoreColors)
             {
                 [args addObject:@"--srt-ignore-colors"];
             }
-            
+
             [args addObject:self.subtitlePath];
-            
+
             self.subsTask = [[NSTask alloc] init];
             self.subsErrorPipe = [[NSPipe alloc] init];
             self.subsTask.standardError = self.subsErrorPipe;
             [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(convertSubtitlesFinished:) name:NSTaskDidTerminateNotification object:self.subsTask];
-            
+
             self.subsTask.launchPath = @"/usr/bin/python";
             self.subsTask.arguments = args;
             [self.subsTask launch];
@@ -526,7 +526,7 @@
             }
         }
     }
-    [_show setValue:@"Download Complete" forKey:@"status"];
+    self.show.status = @"Download Complete";
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"DownloadFinished" object:_show];
 }
@@ -583,7 +583,7 @@
         [self addToLog:@"ERROR: Destination file already exists." noTag:YES];
         _show.complete = @YES;
         _show.successful = @NO;
-        [_show setValue:@"Download Failed" forKey:@"status"];
+        self.show.status = @"Download Failed";
         _show.reasonForFailure = @"FileExists";
         [[NSNotificationCenter defaultCenter] removeObserver:self];
         [[NSNotificationCenter defaultCenter] postNotificationName:@"DownloadFinished" object:_show];
@@ -606,22 +606,22 @@
     NSLog(@"DEBUG: RTMPDump command: %@", cmd);
     if (_verbose)
         [self addToLog:[NSString stringWithFormat:@"DEBUG: RTMPDump command: %@", cmd] noTag:YES];
-    
+
     _task = [[NSTask alloc] init];
     _pipe = [[NSPipe alloc] init];
     _errorPipe = [[NSPipe alloc] init];
     _task.launchPath = [([NSBundle mainBundle].executablePath).stringByDeletingLastPathComponent stringByAppendingPathComponent:@"rtmpdump"];
-    
+
     /* rtmpdump -r "rtmpe://cp72511.edgefcs.net/ondemand?auth=eaEc.b4aodIcdbraJczd.aKchaza9cbdTc0cyaUc2aoblaLc3dsdkd5d9cBduczdLdn-bo64cN-eS-6ys1GDrlysDp&aifp=v002&slist=production/" -W http://www.itv.com/mediaplayer/ITVMediaPlayer.swf?v=11.20.654 -y "mp4:production/priority/CATCHUP/e48ab1e2/1a73/4620/adea/dda6f21f45ee/1-6178-0002-001_THE-ROYAL-VARIETY-PERFORMANCE-2011_TX141211_ITV1200_16X9.mp4" -o test2 */
-    
+
     _task.arguments = [NSArray arrayWithArray:args];
-    
-    
+
+
     _task.standardOutput = _pipe;
     _task.standardError = _errorPipe;
     _fh = _pipe.fileHandleForReading;
 	_errorFh = _errorPipe.fileHandleForReading;
-    
+
     NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:_task.environment];
     envVariableDictionary[@"PERL_UNICODE"] = @"AS";
     envVariableDictionary[@"HOME"] = (@"~").stringByExpandingTildeInPath;
@@ -629,8 +629,8 @@
     perlPath = [perlPath stringByAppendingPathComponent:@"perl5"];
     envVariableDictionary[@"PERL5LIB"] = perlPath;
     _task.environment = envVariableDictionary;
-    
-	
+
+
 	[[NSNotificationCenter defaultCenter] addObserver:self
 		   selector:@selector(DownloadDataReady:)
 			   name:NSFileHandleReadCompletionNotification
@@ -643,13 +643,13 @@
            selector:@selector(rtmpdumpFinished:)
                name:NSTaskDidTerminateNotification
              object:_task];
-    
+
     [self addToLog:@"INFO: Launching RTMPDUMP..." noTag:YES];
 	[_task launch];
 	[_fh readInBackgroundAndNotify];
 	[_errorFh readInBackgroundAndNotify];
-	[_show setValue:@"Initialising..." forKey:@"status"];
-	
+    _show.status = @"Initialising...";
+
 	//Prepare UI
 	[self setCurrentProgress:[NSString stringWithFormat:@"Initialising RTMPDump... -- %@",_show.showName]];
     [self setPercentage:102];
@@ -661,7 +661,7 @@
 - (void)createDownloadPath
 {
     NSString *fileName = _show.showName;
-    
+
     // XBMC naming is always used on ITV shows to ensure unique names.
     if ([_show.tvNetwork hasPrefix:@"ITV"] || [[[NSUserDefaults standardUserDefaults] valueForKey:@"XBMC_naming"] boolValue]) {
         if (_show.seriesName)
@@ -698,7 +698,7 @@
     }
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSFileHandleReadCompletionNotification object:_fh];
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSFileHandleReadCompletionNotification object:_errorFh];
-	[_show setValue:@"Cancelled" forKey:@"status"];
+	self.show.status = @"Cancelled";
     _show.complete = @NO;
     _show.successful = @NO;
 	[self addToLog:@"Download Cancelled"];
