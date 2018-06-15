@@ -151,7 +151,6 @@ extern NSDictionary *radioFormats;
 - (void)seasonEpisodeInfo:(Programme *)show;
 - (IBAction)chooseDownloadPath:(id)sender;
 - (IBAction)restoreDefaults:(id)sender;
-- (IBAction)showFeedback:(id)sender;
 - (IBAction)closeWindow:(id)sender;
 + (AppController*)sharedController;
 

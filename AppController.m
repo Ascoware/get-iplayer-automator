@@ -13,7 +13,6 @@
 #import "Safari.h"
 #import "iTunes.h"
 #import <Growl/Growl.h>
-#import "JRFeedbackController.h"
 #import "ReasonForFailure.h"
 #import "Chrome.h"
 #import "NPHistoryWindowController.h"
@@ -734,6 +733,11 @@ NewProgrammeHistory           *sharedHistoryController;
             NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:pipeTask.environment];
             envVariableDictionary[@"HOME"] = (@"~").stringByExpandingTildeInPath;
             envVariableDictionary[@"PERL_UNICODE"] = @"AS";
+
+            NSString *perlPath = [[NSBundle mainBundle] resourcePath];
+            perlPath = [perlPath stringByAppendingPathComponent:@"perl5"];
+            envVariableDictionary[@"PERL5LIB"] = perlPath;
+            
             pipeTask.environment = envVariableDictionary;
             [pipeTask launch];
             while ((someData = readHandle2.availableData) && someData.length) {
@@ -742,6 +746,9 @@ NewProgrammeHistory           *sharedHistoryController;
             }
             NSString *string = [NSString stringWithString:taskData];
             NSArray *array = [string componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+            dateFormatter.dateFormat = @"yyyy'-'MM'-'dd'T'HH':'mm':'ssZZZZZ";
+
             for (NSString *string in array)
             {
                 if (![string isEqualToString:@"Matches:"] && ![string hasPrefix:@"INFO:"] && ![string hasPrefix:@"WARNING:"]
@@ -750,17 +757,16 @@ NewProgrammeHistory           *sharedHistoryController;
                 {
                     @try
                     {
-                        NSScanner *myScanner = [NSScanner scannerWithString:string];
+                        NSArray *matchElements = [string componentsSeparatedByString:@"|"];
+
                         Programme *p = [[Programme alloc] init];
-                        NSString *temp_pid, *temp_showName, *temp_tvNetwork, *temp_type, *url;
-                        [myScanner scanUpToString:@":" intoString:&temp_pid];
-                        [myScanner scanUpToString:@"," intoString:&temp_type];
-                        [myScanner scanString:@", ~" intoString:NULL];
-                        [myScanner scanUpToString:@"~," intoString:&temp_showName];
-                        [myScanner scanString:@"~," intoString:NULL];
-                        [myScanner scanUpToString:@"," intoString:&temp_tvNetwork];
-                        [myScanner scanString:@"," intoString:nil];
-                        [myScanner scanUpToString:@"kljkjkj" intoString:&url];
+                        NSString *temp_pid, *temp_showName, *temp_tvNetwork, *temp_type, *url, *temp_date;
+                        temp_pid = matchElements[0];
+                        temp_type = matchElements[1];
+                        temp_showName = matchElements[2];
+                        temp_tvNetwork = matchElements[3];
+                        url = matchElements[4];
+                        temp_date = matchElements[5];
 
                         if ([temp_showName hasSuffix:@" - -"])
                         {
@@ -774,6 +780,8 @@ NewProgrammeHistory           *sharedHistoryController;
                         p.showName = temp_showName;
                         p.tvNetwork = temp_tvNetwork;
                         p.url = url;
+                        p.lastBroadcast = [dateFormatter dateFromString:temp_date];
+                        p.lastBroadcastString = [NSDateFormatter localizedStringFromDate:p.lastBroadcast dateStyle:NSDateFormatterMediumStyle timeStyle:NSDateFormatterNoStyle];
 
 
                         if ([temp_type isEqualToString:@"radio"])  {
@@ -784,6 +792,8 @@ NewProgrammeHistory           *sharedHistoryController;
                         {
                             show.pid = p.pid;
                             show.status = @"Available";
+                            show.lastBroadcastString = p.lastBroadcastString;
+                            show.lastBroadcast = p.lastBroadcast;
                             foundMatch=YES;
                             break;
                         }
@@ -1483,7 +1493,7 @@ NewProgrammeHistory           *sharedHistoryController;
 
             NSMutableArray *autoRecordArgs = [[NSMutableArray alloc] initWithObjects:_getiPlayerPath,
                                               [GetiPlayerArguments sharedController].noWarningArg,@"--nopurge",
-                                              @"--listformat=<pid>: <type>, ~<name> - <episode>~, <channel>, <timeadded>, <pid>,<web>",
+                                              @"--listformat=<pid>|<type>|<name>|<episode>|<channel>|<timeadded>|<web>|<available>",
                                               cacheExpiryArgument,
                                               typeArgument,
                                               [GetiPlayerArguments sharedController].profileDirArg,
@@ -1503,6 +1513,10 @@ NewProgrammeHistory           *sharedHistoryController;
             NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:autoRecordTask.environment];
             envVariableDictionary[@"HOME"] = (@"~").stringByExpandingTildeInPath;
             envVariableDictionary[@"PERL_UNICODE"] = @"AS";
+            NSString *perlPath = [[NSBundle mainBundle] resourcePath];
+            perlPath = [perlPath stringByAppendingPathComponent:@"perl5"];
+            envVariableDictionary[@"PERL5LIB"] = perlPath;
+            
             autoRecordTask.environment = envVariableDictionary;
             [autoRecordTask launch];
 
@@ -1559,6 +1573,10 @@ NewProgrammeHistory           *sharedHistoryController;
 - (BOOL)processAutoRecordData:(NSString *)autoRecordData2 forSeries:(Series *)series2
 {
     BOOL oneFound=NO;
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    dateFormatter.dateFormat = @"yyyy'-'MM'-'dd'T'HH':'mm':'ssZZZZZ";
+
+    NSArray *currentQueue = _queueController.arrangedObjects;
     NSArray *array = [autoRecordData2 componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
     for (NSString *string in array)
     {
@@ -1566,38 +1584,22 @@ NewProgrammeHistory           *sharedHistoryController;
             && ![string hasPrefix:@"reading"] )
         {
             @try {
-                NSScanner *myScanner = [NSScanner scannerWithString:string];
-                NSArray *currentQueue = _queueController.arrangedObjects;
-                NSString *temp_pid, *temp_showName, *temp_tvNetwork, *temp_type, *temp_realPID, *url;
-                NSInteger timeadded;
-                [myScanner scanUpToString:@":" intoString:&temp_pid];
-                [myScanner scanUpToCharactersFromSet:[NSCharacterSet alphanumericCharacterSet] intoString:NULL];
-                [myScanner scanUpToString:@", ~" intoString:&temp_type];
-                [myScanner scanString:@", ~" intoString:nil];
-                [myScanner scanUpToString:@"~," intoString:&temp_showName];
-                [myScanner scanUpToCharactersFromSet:[NSCharacterSet alphanumericCharacterSet] intoString:NULL];
-                [myScanner scanUpToString:@"," intoString:&temp_tvNetwork];
-                [myScanner scanString:@"," intoString:nil];
-                [myScanner scanInteger:&timeadded];
-                [myScanner scanUpToString:@", " intoString:nil];
-                [myScanner scanString:@", " intoString:nil];
-                [myScanner scanUpToString:@"," intoString:&temp_realPID];
-                [myScanner scanString:@"," intoString:nil];
-                [myScanner scanUpToString:@"kjkjkj" intoString:&url];
-
-                NSScanner *seriesEpisodeScanner = [NSScanner scannerWithString:temp_showName];
+                NSArray *matchElements = [string componentsSeparatedByString:@"|"];
+                
+                NSString *temp_pid, *temp_tvNetwork, *temp_type, *url, *temp_date, *temp_timeAdded;
                 NSString *series_Name, *episode_Name;
-                [seriesEpisodeScanner scanUpToString:@" - " intoString:&series_Name];
-                [seriesEpisodeScanner scanString:@"-" intoString:nil];
-                [seriesEpisodeScanner scanUpToString:@"kjkljfdg" intoString:&episode_Name];
-                if ([temp_showName hasSuffix:@" - -"])
-                {
-                    NSString *temp_showName2;
-                    NSScanner *dashScanner = [NSScanner scannerWithString:temp_showName];
-                    [dashScanner scanUpToString:@" - -" intoString:&temp_showName2];
-                    temp_showName = temp_showName2;
-                    temp_showName = [temp_showName stringByAppendingFormat:@" - %@", temp_showName2];
-                }
+
+                temp_pid = matchElements[0];
+                temp_type = matchElements[1];
+                series_Name = matchElements[2];
+                episode_Name = matchElements[3];
+                temp_tvNetwork = matchElements[4];
+                temp_timeAdded = matchElements[5];
+                url = matchElements[6];
+                temp_date = matchElements[7];
+
+                NSInteger timeadded = [temp_timeAdded integerValue];
+
                 if ((series2.added.integerValue > timeadded) &&
                     ([temp_tvNetwork isEqualToString:series2.tvNetwork] || [[series2.tvNetwork stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] isEqualToString:@"*"] || series2.tvNetwork.length == 0))
                 {
@@ -1607,15 +1609,27 @@ NewProgrammeHistory           *sharedHistoryController;
                     ([temp_tvNetwork isEqualToString:series2.tvNetwork] || [[series2.tvNetwork stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] isEqualToString:@"*"] || series2.tvNetwork.length == 0))
                 {
                     @try {
+                        NSString *seriesAndEpisode = nil;
+                        if (series_Name.length > 0 && episode_Name.length > 0) {
+                            seriesAndEpisode = [NSString stringWithFormat:@"%@ - %@", series_Name ?: @"", episode_Name ?: @""];
+                        } else if (series_Name) {
+                            seriesAndEpisode = series_Name;
+                        } else {
+                            seriesAndEpisode = episode_Name;
+                        }
+                        
+                        if (seriesAndEpisode)
                         oneFound=YES;
-                        Programme *p = [[Programme alloc] initWithPid:temp_pid programmeName:temp_showName network:temp_tvNetwork logController:_logger];
-                        p.realPID = temp_realPID;
+                        Programme *p = [[Programme alloc] initWithPid:temp_pid programmeName:seriesAndEpisode network:temp_tvNetwork logController:_logger];
+                        p.realPID = temp_pid;
                         p.seriesName = series_Name;
                         p.episodeName = episode_Name;
                         p.url = url;
                         if ([temp_type isEqualToString:@"radio"]) p.radio = @YES;
                         p.status = @"Added by Series-Link";
                         p.addedByPVR = true;
+                        p.lastBroadcast = [dateFormatter dateFromString:temp_date];
+                        p.lastBroadcastString = [NSDateFormatter localizedStringFromDate:p.lastBroadcast dateStyle:NSDateFormatterMediumStyle timeStyle:NSDateFormatterNoStyle];
                         BOOL inQueue=NO;
                         for (Programme *show in currentQueue)  {
                             if ( [show.pid isEqualToString:p.pid])
@@ -1897,10 +1911,7 @@ NewProgrammeHistory           *sharedHistoryController;
     NSArray *urls = openPanel.URLs;
     [[NSUserDefaults standardUserDefaults] setValue:[urls[0] path] forKey:@"DownloadPath"];
 }
-- (IBAction)showFeedback:(id)sender
-{
-    [JRFeedbackController showFeedback];
-}
+
 - (IBAction)restoreDefaults:(id)sender
 {
     NSUserDefaults *sharedDefaults = [NSUserDefaults standardUserDefaults];
