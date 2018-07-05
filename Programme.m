@@ -486,7 +486,7 @@
         NSTask *getNameTask = [[NSTask alloc] init];
         NSPipe *getNamePipe = [[NSPipe alloc] init];
         NSMutableString *getNameData = [[NSMutableString alloc] initWithString:@""];
-        NSString *listArgument = @"--listformat=<index> <pid> <type> <name> - <episode>,<channel>|<web>|";
+        NSString *listArgument = @"--listformat=<index>|<pid>|<type>|<name> - <episode>|<channel>|<web>|";
         NSString *fieldsArgument = @"--fields=index,pid";
         NSString *wantedID = _pid;
         NSString *cacheExpiryArg = [[GetiPlayerArguments sharedController] cacheExpiryArgument:nil];
@@ -528,19 +528,13 @@
             // TODO: remove use of index in future version
             NSString *pid, *showName, *index, *type, *tvNetwork, *url;
             @try{
-                NSScanner *scanner = [NSScanner scannerWithString:string];
-                [scanner scanUpToCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:&index];
-                [scanner scanUpToCharactersFromSet:[NSCharacterSet alphanumericCharacterSet] intoString:NULL];
-                [scanner scanUpToCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:&pid];
-                [scanner scanUpToCharactersFromSet:[NSCharacterSet alphanumericCharacterSet] intoString:NULL];
-                [scanner scanUpToCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:&type];
-                [scanner scanUpToCharactersFromSet:[NSCharacterSet alphanumericCharacterSet] intoString:NULL];
-                [scanner scanUpToString:@","  intoString:&showName];
-                [scanner scanString:@"," intoString:nil];
-                [scanner scanUpToString:@"|" intoString:&tvNetwork];
-                [scanner scanString:@"|" intoString:nil];
-                [scanner scanUpToString:@"|" intoString:&url];
-                scanner = nil;
+                NSArray *elements = [string componentsSeparatedByString:@"|"];
+                index = elements[0];
+                pid = elements[1];
+                type = elements[2];
+                showName = elements[3];
+                tvNetwork = elements[4];
+                url = elements[5];
             }
             @catch (NSException *e) {
                 NSAlert *getNameException = [[NSAlert alloc] init];

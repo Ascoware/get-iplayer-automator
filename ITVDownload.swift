@@ -320,6 +320,7 @@ public class ITVDownload : Download {
             
             if let progress = progress, let progressVal = Double(progress) {
                 setPercentage(progressVal)
+                show.status = "Downloaded \(progress)%"
             }
             
             if let remaining = remaining {
