@@ -192,7 +192,8 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
         NSKeyedArchiver.archiveRootObject(episodes, toFile: programmesFilePath)
         
         /* Now create the cache file that used to be created by get_iplayer */
-        let cacheFileHeader = "#index|type|name|pid|available|expires|episode|seriesnum|episodenum|versions|duration|desc|channel|categories|thumbnail|timeadded|guidance|web\n"
+        //    my @cache_format = qw/index type name episode seriesnum episodenum pid channel available expires duration desc web thumbnail timeadded/;
+        let cacheFileHeader = "#index|type|name|episode|seriesnum|episodenum|pid|channel|available|expires|duration|desc|web|thumbnail|timeadded\n"
         var cacheIndexNumber: Int = 100000
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "EEE MMM dd"
@@ -221,24 +222,28 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
                 dateAddedInteger = Date().timeIntervalSince1970
             }
             
+            //    my @cache_format = qw/index type name episode seriesnum episodenum pid channel available expires duration desc web thumbnail timeadded/;
             cacheFileContentString += String(format: "%06d|", cacheIndexNumber)
             cacheIndexNumber += 1
             cacheFileContentString += "itv|"
             cacheFileContentString += episode.programmeName
             cacheFileContentString += "|"
-            cacheFileContentString += episode.productionId
-            cacheFileContentString += "|"
-            if let aString = dateAiredString {
-                cacheFileContentString += aString
-            }
-            cacheFileContentString += "||"
+            
             if let aString = episodeString {
                 cacheFileContentString += aString
             }
-            cacheFileContentString += "|||default||\(episode.programDescription)|ITV Player|||"
-            cacheFileContentString += "\(Int(dateAddedInteger))||"
+            
+            cacheFileContentString += "|\(episode.seriesNumber)|\(episode.episodeNumber)|"
+            cacheFileContentString += episode.productionId
+            cacheFileContentString += "|ITV Player|"
+            if let aString = dateAiredString {
+                cacheFileContentString += aString
+            }
+            
+            cacheFileContentString += "|||\(episode.programDescription)"
+            cacheFileContentString += "|"
             cacheFileContentString += episode.programmeURL
-            cacheFileContentString += "|\n"
+            cacheFileContentString += "||\(Int(dateAddedInteger))|\n"
             cacheFileEntries.append(cacheFileContentString)
         }
         

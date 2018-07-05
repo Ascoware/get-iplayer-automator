@@ -36,7 +36,7 @@
             @try
             {
                 SBElementArray *windows = [Safari windows];
-                if ((@(windows.count)).intValue)
+                if (windows.count > 0)
                 {
                     for (SafariWindow *window in windows)
                     {
