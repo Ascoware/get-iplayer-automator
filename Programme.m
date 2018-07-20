@@ -486,7 +486,7 @@
         NSTask *getNameTask = [[NSTask alloc] init];
         NSPipe *getNamePipe = [[NSPipe alloc] init];
         NSMutableString *getNameData = [[NSMutableString alloc] initWithString:@""];
-        NSString *listArgument = @"--listformat=<index>|<pid>|<type>|<name> - <episode>|<channel>|<web>|";
+        NSString *listArgument = @"--listformat=<index>|<pid>|<type>|<name> - <episode>|<channel>|<web>";
         NSString *fieldsArgument = @"--fields=index,pid";
         NSString *wantedID = _pid;
         NSString *cacheExpiryArg = [[GetiPlayerArguments sharedController] cacheExpiryArgument:nil];
@@ -501,6 +501,9 @@
         NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:getNameTask.environment];
         envVariableDictionary[@"HOME"] = (@"~").stringByExpandingTildeInPath;
         envVariableDictionary[@"PERL_UNICODE"] = @"AS";
+        NSString *perlPath = [[NSBundle mainBundle] resourcePath];
+        perlPath = [perlPath stringByAppendingPathComponent:@"perl5"];
+        envVariableDictionary[@"PERL5LIB"] = perlPath;
         getNameTask.environment = envVariableDictionary;
         [getNameTask launch];
         
@@ -517,61 +520,59 @@
 {
     NSArray *array = [getNameData componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
     Programme *p = self;
-    int i = 0;
-    NSString *wantedID = [p valueForKey:@"pid"];
-    BOOL found=NO;
+    NSString *wantedID = p.pid;
+    BOOL found = NO;
     for (NSString *string in array)
     {
-        i++;
-        if (i>1 && i<array.count-1)
-        {
-            // TODO: remove use of index in future version
-            NSString *pid, *showName, *index, *type, *tvNetwork, *url;
-            @try{
-                NSArray *elements = [string componentsSeparatedByString:@"|"];
-                index = elements[0];
-                pid = elements[1];
-                type = elements[2];
-                showName = elements[3];
-                tvNetwork = elements[4];
-                url = elements[5];
-            }
-            @catch (NSException *e) {
-                NSAlert *getNameException = [[NSAlert alloc] init];
-                [getNameException addButtonWithTitle:@"OK"];
-                getNameException.messageText = [NSString stringWithFormat:@"Unknown Error!"];
-                getNameException.informativeText = @"An unknown error occured whilst trying to parse Get_iPlayer output (processGetNameData).";
-                getNameException.alertStyle = NSWarningAlertStyle;
-                [getNameException runModal];
-                getNameException = nil;
-            }
-            if ([wantedID isEqualToString:pid] || [wantedID isEqualToString:index])
-            {
-                found=YES;
-                if (showName.length > 0) {
-                    p.showName = showName;
-                }
-                
-                if (pid.length > 0) {
-                    p.pid = pid;
-                }
-                
-                if (tvNetwork.length > 0) {
-                    p.tvNetwork = tvNetwork;
-                }
-                
-                if (url) {
-                    p.url = url;
-                }
+        // TODO: remove use of index in future version
+        NSArray *elements = [string componentsSeparatedByString:@"|"];
+        if (elements.count < 6) {
+            continue;
+        }
 
-                p.status = @"Available";
-                
-                if ([type isEqualToString:@"radio"]) {
-                    p.radio = @YES;
-                }
+        NSString *pid, *showName, *index, *type, *tvNetwork, *url;
+        @try{
+            index = elements[0];
+            pid = elements[1];
+            type = elements[2];
+            showName = elements[3];
+            tvNetwork = elements[4];
+            url = elements[5];
+        }
+        @catch (NSException *e) {
+            NSAlert *getNameException = [[NSAlert alloc] init];
+            [getNameException addButtonWithTitle:@"OK"];
+            getNameException.messageText = [NSString stringWithFormat:@"Unknown Error!"];
+            getNameException.informativeText = @"An unknown error occured whilst trying to parse Get_iPlayer output (processGetNameData).";
+            getNameException.alertStyle = NSWarningAlertStyle;
+            [getNameException runModal];
+            getNameException = nil;
+        }
+        if ([wantedID isEqualToString:pid] || [wantedID isEqualToString:index])
+        {
+            found=YES;
+            if (showName.length > 0) {
+                p.showName = showName;
+            }
+            
+            if (pid.length > 0) {
+                p.pid = pid;
+            }
+            
+            if (tvNetwork.length > 0) {
+                p.tvNetwork = tvNetwork;
+            }
+            
+            if (url) {
+                p.url = url;
+            }
+            
+            p.status = @"Available";
+            
+            if ([type isEqualToString:@"radio"]) {
+                p.radio = @YES;
             }
         }
-        
     }
     if (!found)
     {
@@ -651,7 +652,6 @@
         NSString *perlPath = [[NSBundle mainBundle] resourcePath];
         perlPath = [perlPath stringByAppendingPathComponent:@"perl5"];
         envVariableDictionary[@"PERL5LIB"] = perlPath;
-
         getNameTask.environment = envVariableDictionary;
         [getNameTask launch];
         
