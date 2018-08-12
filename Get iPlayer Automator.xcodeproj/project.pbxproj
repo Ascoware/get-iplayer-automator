@@ -15,7 +15,6 @@
 		398516A716D1A02500EBB4CE /* Body2 in Resources */ = {isa = PBXBuildFile; fileRef = 398516A616D1A02500EBB4CE /* Body2 */; };
 		39879DAF16904B9F0050CA7D /* GTMNSString+HTML.m in Sources */ = {isa = PBXBuildFile; fileRef = 39879DAC16904B9F0050CA7D /* GTMNSString+HTML.m */; };
 		39879DB016904B9F0050CA7D /* NSString+HTML.m in Sources */ = {isa = PBXBuildFile; fileRef = 39879DAE16904B9F0050CA7D /* NSString+HTML.m */; };
-		39ABB9C017FCCD9300B5D519 /* Growl.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = D93AD85317DC9D6E00458B1C /* Growl.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		39AE5F5E1D329E390019E5EF /* rtmpdump in CopyFiles */ = {isa = PBXBuildFile; fileRef = 39AE5F5C1D3294C40019E5EF /* rtmpdump */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		39D52EA81DAAFD450033C4ED /* NPHistoryWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 39D52EA71DAAFD450033C4ED /* NPHistoryWindowController.m */; };
 		39D7C1BD1874AD7400B78698 /* StringTrimFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 39D7C1BC1874AD7400B78698 /* StringTrimFormatter.m */; };
@@ -56,7 +55,6 @@
 		D921C9ED149C4C6F004CB558 /* Body in Resources */ = {isa = PBXBuildFile; fileRef = D921C9EC149C4C6F004CB558 /* Body */; };
 		D92687C51087F81F000E8132 /* DownloadHistoryController.m in Sources */ = {isa = PBXBuildFile; fileRef = D92687C41087F81F000E8132 /* DownloadHistoryController.m */; };
 		D92687CA1087F836000E8132 /* DownloadHistoryEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = D92687C91087F836000E8132 /* DownloadHistoryEntry.m */; };
-		D93AD85417DC9D6E00458B1C /* Growl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D93AD85317DC9D6E00458B1C /* Growl.framework */; };
 		D941D9A01025DDCF0012A75F /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D941D99F1025DDCF0012A75F /* SystemConfiguration.framework */; };
 		D943D2791B37B1D800452FCD /* AtomicParsley in CopyFiles */ = {isa = PBXBuildFile; fileRef = D961247E10F12C9200046D31 /* AtomicParsley */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		D97D9426106DBB68006ECD39 /* TVFormat.m in Sources */ = {isa = PBXBuildFile; fileRef = D97D9423106DBB68006ECD39 /* TVFormat.m */; };
@@ -100,7 +98,6 @@
 			dstSubfolderSpec = 10;
 			files = (
 				7F54B1B41FFF38F8006D1325 /* Kanna.framework in Copy Frameworks */,
-				39ABB9C017FCCD9300B5D519 /* Growl.framework in Copy Frameworks */,
 				7F9FE9251EC170E60058CB1B /* Sparkle.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
@@ -181,10 +178,8 @@
 		D92687C41087F81F000E8132 /* DownloadHistoryController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DownloadHistoryController.m; sourceTree = "<group>"; };
 		D92687C81087F836000E8132 /* DownloadHistoryEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DownloadHistoryEntry.h; sourceTree = "<group>"; };
 		D92687C91087F836000E8132 /* DownloadHistoryEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DownloadHistoryEntry.m; sourceTree = "<group>"; };
-		D93AD85317DC9D6E00458B1C /* Growl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Growl.framework; sourceTree = "<group>"; };
 		D941D99F1025DDCF0012A75F /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = /System/Library/Frameworks/SystemConfiguration.framework; sourceTree = "<absolute>"; };
 		D961247E10F12C9200046D31 /* AtomicParsley */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = AtomicParsley; sourceTree = "<group>"; };
-		D975D7EA19A11D9E00EEF909 /* UpdateBuildNumber.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; name = UpdateBuildNumber.sh; path = scripts/UpdateBuildNumber.sh; sourceTree = "<group>"; };
 		D97D9422106DBB68006ECD39 /* TVFormat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TVFormat.h; sourceTree = "<group>"; };
 		D97D9423106DBB68006ECD39 /* TVFormat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TVFormat.m; sourceTree = "<group>"; };
 		D97D9424106DBB68006ECD39 /* RadioFormat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RadioFormat.m; sourceTree = "<group>"; };
@@ -233,7 +228,6 @@
 				D914BC59100C9F0100F7E68E /* ScriptingBridge.framework in Frameworks */,
 				7F9FE9241EC170E60058CB1B /* Sparkle.framework in Frameworks */,
 				D941D9A01025DDCF0012A75F /* SystemConfiguration.framework in Frameworks */,
-				D93AD85417DC9D6E00458B1C /* Growl.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -255,7 +249,6 @@
 			children = (
 				7F54B1B21FFF38E8006D1325 /* Kanna.framework */,
 				7F9FE91E1EC16E3E0058CB1B /* Sparkle.framework */,
-				D93AD85317DC9D6E00458B1C /* Growl.framework */,
 				D921C9C1149BBF51004CB558 /* CoreServices.framework */,
 				D941D99F1025DDCF0012A75F /* SystemConfiguration.framework */,
 				D914BC58100C9F0100F7E68E /* ScriptingBridge.framework */,
@@ -295,7 +288,6 @@
 				32CA4F630368D1EE00C91783 /* Get_iPlayer GUI_Prefix.pch */,
 				7F340B591FFB063700F415A4 /* Get iPlayer Automator-Bridging-Header.h */,
 				29B97316FDCFA39411CA2CEA /* main.m */,
-				D975D7EA19A11D9E00EEF909 /* UpdateBuildNumber.sh */,
 			);
 			name = "Other Sources";
 			sourceTree = "<group>";

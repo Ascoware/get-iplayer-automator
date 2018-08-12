@@ -7,12 +7,12 @@
 //
 
 #import "AppController.h"
+#import <UserNotifications/UserNotifications.h>
 #import <Sparkle/Sparkle.h>
 #import "HTTPProxy.h"
 #import "Programme.h"
 #import "Safari.h"
 #import "iTunes.h"
-#import <Growl/Growl.h>
 #import "ReasonForFailure.h"
 #import "Chrome.h"
 #import "NPHistoryWindowController.h"
@@ -300,15 +300,6 @@ NewProgrammeHistory           *sharedHistoryController;
         [_itvFormatController addObjects:@[format0, format1, format2]];
     }
 
-    //Growl Initialization
-    @try {
-        [GrowlApplicationBridge setGrowlDelegate:(id<GrowlApplicationBridgeDelegate>)@""];
-    }
-    @catch (NSException *e) {
-        NSLog(@"ERROR: Growl initialisation failed: %@: %@", e.name, e.description);
-        [_logger addToLog:[NSString stringWithFormat:@"ERROR: Growl initialisation failed: %@: %@", e.name, e.description]];
-    }
-
     //Remove SWFinfo
     NSString *infoPath = @"~/.swfinfo";
     infoPath = infoPath.stringByExpandingTildeInPath;
@@ -405,21 +396,10 @@ NewProgrammeHistory           *sharedHistoryController;
 
 - (void)updater:(SUUpdater *)updater didFindValidUpdate:(SUAppcastItem *)update
 {
-    @try
-    {
-
-        [GrowlApplicationBridge notifyWithTitle:@"Update Available!"
-                                    description:[NSString stringWithFormat:@"Get iPlayer Automator %@ is available.",update.displayVersionString]
-                               notificationName:@"New Version Available"
-                                       iconData:nil
-                                       priority:0
-                                       isSticky:NO
-                                   clickContext:nil];
-    }
-    @catch (NSException *e) {
-        NSLog(@"ERROR: Growl notification failed (updater): %@: %@", e.name, e.description);
-        [_logger addToLog:[NSString stringWithFormat:@"ERROR: Growl notification failed (updater): %@: %@", e.name, e.description]];
-    }
+    NSUserNotification *notification = [[NSUserNotification alloc] init];
+    notification.informativeText = [NSString stringWithFormat:@"Get iPlayer Automator %@ is available.",update.displayVersionString];
+    notification.title = @"Update Available!";
+    [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
 }
 
 #pragma mark Cache Update
@@ -681,20 +661,12 @@ NewProgrammeHistory           *sharedHistoryController;
 
     if (_didUpdate)
     {
-        @try
-        {
-            [GrowlApplicationBridge notifyWithTitle:@"Index Updated"
-                                        description:@"The program index was updated."
-                                   notificationName:@"Index Updating Completed"
-                                           iconData:nil
-                                           priority:0
-                                           isSticky:NO
-                                       clickContext:nil];
-        }
-        @catch (NSException *e) {
-            NSLog(@"ERROR: Growl notification failed (getiPlayerUpdateFinished): %@: %@", e.name, e.description);
-            [_logger addToLog:[NSString stringWithFormat:@"ERROR: Growl notification failed (getiPlayerUpdateFinished): %@: %@", e.name, e.description]];
-        }
+        NSUserNotification *indexUpdated = [[NSUserNotification alloc] init];
+        indexUpdated.title = @"Index Updated";
+        indexUpdated.informativeText = @"The program index was updated.";
+        indexUpdated.identifier = @"Index Updating Completed";
+        
+        [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:indexUpdated];
         [_logger addToLog:@"Index Updated." :self];
         _lastUpdate=[NSDate date];
         [self updateHistory];
@@ -1237,38 +1209,18 @@ NewProgrammeHistory           *sharedHistoryController;
                 [NSThread detachNewThreadSelector:@selector(addToiTunesThread:) toTarget:self withObject:finishedShow];
             else
                 finishedShow.status = @"Download Complete";
-
-            @try
-            {
-                [GrowlApplicationBridge notifyWithTitle:@"Download Finished"
-                                            description:[NSString stringWithFormat:@"%@ Completed Successfully",finishedShow.showName]
-                                       notificationName:@"Download Finished"
-                                               iconData:nil
-                                               priority:0
-                                               isSticky:NO
-                                           clickContext:nil];
-            }
-            @catch (NSException *e) {
-                NSLog(@"ERROR: Growl notification failed (nextDownload - finished): %@: %@", e.name, e.description);
-                [_logger addToLog:[NSString stringWithFormat:@"ERROR: Growl notification failed (nextDownload - finished): %@: %@", e.name, e.description]];
-            }
+            
+            NSUserNotification *notification = [[NSUserNotification alloc] init];
+            notification.informativeText = [NSString stringWithFormat:@"%@ Completed Successfully",finishedShow.showName];
+            notification.title = @"Download Finished";
+            [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
         }
         else
         {
-            @try
-            {
-                [GrowlApplicationBridge notifyWithTitle:@"Download Failed"
-                                            description:[NSString stringWithFormat:@"%@ failed. See log for details.",finishedShow.showName]
-                                       notificationName:@"Download Failed"
-                                               iconData:nil
-                                               priority:0
-                                               isSticky:NO
-                                           clickContext:nil];
-            }
-            @catch (NSException *e) {
-                NSLog(@"ERROR: Growl notification failed (nextDownload - failed): %@: %@", e.name, e.description);
-                [_logger addToLog:[NSString stringWithFormat:@"ERROR: Growl notification failed (nextDownload - failed): %@: %@", e.name, e.description]];
-            }
+            NSUserNotification *notification = [[NSUserNotification alloc] init];
+            notification.informativeText = [NSString stringWithFormat:@"%@ failed. See log for details.",finishedShow.showName];
+            notification.title = @"Download Failed";
+            [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
 
             ReasonForFailure *showSolution = [[ReasonForFailure alloc] init];
             showSolution.showName = finishedShow.showName;
@@ -1358,22 +1310,13 @@ NewProgrammeHistory           *sharedHistoryController;
                 }
             }
             tempQueue=nil;
-            @try
-            {
-                [GrowlApplicationBridge notifyWithTitle:@"Downloads Finished"
-                                            description:[NSString stringWithFormat:@"Downloads Successful = %lu\nDownload Failed = %lu",
-                                                         (unsigned long)downloadsSuccessful,(unsigned long)downloadsFailed]
-                                       notificationName:@"Downloads Finished"
-                                               iconData:nil
-                                               priority:0
-                                               isSticky:NO
-                                           clickContext:nil];
-            }
-            @catch (NSException *e) {
-                NSLog(@"ERROR: Growl notification failed (nextDownload - complete): %@: %@", e.name, e.description);
-                [_logger addToLog:[NSString stringWithFormat:@"ERROR: Growl notification failed (nextDownload - complete): %@: %@", e.name, e.description]];
-            }
 
+            NSUserNotification *notification = [[NSUserNotification alloc] init];
+            notification.informativeText = [NSString stringWithFormat:@"Downloads Successful = %lu\nDownload Failed = %lu",
+                                            (unsigned long)downloadsSuccessful,(unsigned long)downloadsFailed];
+            notification.title = @"Downloads Finished";
+            [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
+            
             [[SUUpdater sharedUpdater] checkForUpdatesInBackground];
 
             if (downloadsFailed>0)
