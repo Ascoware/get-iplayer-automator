@@ -192,7 +192,7 @@
                             <autoresizingMask key="autoresizingMask"/>
                             <clipView key="contentView" id="LYx-5P-gHI">
                                 <rect key="frame" x="1" y="1" width="309" height="133"/>
-                                <autoresizingMask key="autoresizingMask"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <textView editable="NO" importsGraphics="NO" verticallyResizable="YES" usesFontPanel="YES" findStyle="panel" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" spellingCorrection="YES" smartInsertDelete="YES" id="7Pi-tT-G0Q" userLabel="Description View">
                                         <rect key="frame" x="0.0" y="0.0" width="309" height="133"/>
@@ -226,9 +226,9 @@
                         <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="8Hw-GY-zDc">
                             <rect key="frame" x="374" y="20" width="311" height="135"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                            <clipView key="contentView" id="jHT-Hr-sFJ">
+                            <clipView key="contentView" drawsBackground="NO" id="jHT-Hr-sFJ">
                                 <rect key="frame" x="1" y="0.0" width="309" height="134"/>
-                                <autoresizingMask key="autoresizingMask"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="jeg-8F-HB4" id="MRJ-oM-h7R">
                                         <rect key="frame" x="0.0" y="0.0" width="309" height="117"/>
@@ -295,6 +295,7 @@
                                         </connections>
                                     </tableView>
                                 </subviews>
+                                <nil key="backgroundColor"/>
                             </clipView>
                             <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="0Xb-mP-dGw">
                                 <rect key="frame" x="1" y="119" width="384" height="15"/>
@@ -2196,11 +2197,11 @@
                                             <rect key="frame" x="1" y="406" width="452" height="155"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="dss-T9-HWQ">
-                                                <rect key="frame" x="1" y="1" width="450" height="139"/>
+                                                <rect key="frame" x="3" y="3" width="446" height="137"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <button misplaced="YES" id="Wk6-ae-0Ab">
-                                                        <rect key="frame" x="13" y="103" width="77" height="18"/>
+                                                        <rect key="frame" x="13" y="101" width="77" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC One" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="e6W-Fp-His">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2212,7 +2213,7 @@
                                                         </connections>
                                                     </button>
                                                     <button misplaced="YES" id="EQj-uS-ifA">
-                                                        <rect key="frame" x="124" y="103" width="77" height="18"/>
+                                                        <rect key="frame" x="124" y="101" width="77" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC Two" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="zhN-8d-7Aq">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2224,7 +2225,7 @@
                                                         </connections>
                                                     </button>
                                                     <button misplaced="YES" id="kTz-fz-PyE">
-                                                        <rect key="frame" x="236" y="103" width="80" height="18"/>
+                                                        <rect key="frame" x="236" y="101" width="80" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC Four" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="wbk-x4-9tX">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2236,11 +2237,11 @@
                                                         </connections>
                                                     </button>
                                                     <box verticalHuggingPriority="750" misplaced="YES" boxType="separator" id="Wha-sr-x29">
-                                                        <rect key="frame" x="15" y="91" width="419" height="5"/>
+                                                        <rect key="frame" x="15" y="89" width="419" height="5"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                     </box>
                                                     <button misplaced="YES" id="bln-wr-bzP">
-                                                        <rect key="frame" x="13" y="63" width="79" height="18"/>
+                                                        <rect key="frame" x="13" y="61" width="79" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC Alba" bezelStyle="regularSquare" imagePosition="left" inset="2" id="A6D-xE-f82">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2252,7 +2253,7 @@
                                                         </connections>
                                                     </button>
                                                     <button misplaced="YES" id="NsB-KC-X8M">
-                                                        <rect key="frame" x="124" y="63" width="48" height="18"/>
+                                                        <rect key="frame" x="124" y="61" width="48" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="S4C" bezelStyle="regularSquare" imagePosition="left" inset="2" id="JHF-ml-yAm">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2264,7 +2265,7 @@
                                                         </connections>
                                                     </button>
                                                     <button misplaced="YES" id="ZiX-yu-Iok">
-                                                        <rect key="frame" x="236" y="63" width="58" height="18"/>
+                                                        <rect key="frame" x="236" y="61" width="58" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="CBBC" bezelStyle="regularSquare" imagePosition="left" inset="2" id="HKZ-dZ-UA6">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2276,7 +2277,7 @@
                                                         </connections>
                                                     </button>
                                                     <button misplaced="YES" id="wC5-OD-X8R">
-                                                        <rect key="frame" x="355" y="63" width="80" height="18"/>
+                                                        <rect key="frame" x="355" y="61" width="80" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="CBeebies" bezelStyle="regularSquare" imagePosition="left" inset="2" id="t1o-go-rn7">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2288,7 +2289,7 @@
                                                         </connections>
                                                     </button>
                                                     <button misplaced="YES" id="Gr2-CY-l5j">
-                                                        <rect key="frame" x="13" y="23" width="86" height="18"/>
+                                                        <rect key="frame" x="13" y="21" width="86" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC News" bezelStyle="regularSquare" imagePosition="left" inset="2" id="6gb-yG-qRl">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2300,7 +2301,7 @@
                                                         </connections>
                                                     </button>
                                                     <button misplaced="YES" id="mVv-B8-5yS">
-                                                        <rect key="frame" x="124" y="23" width="116" height="18"/>
+                                                        <rect key="frame" x="124" y="21" width="116" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC Parliament" bezelStyle="regularSquare" imagePosition="left" inset="2" id="SkP-JZ-c30">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2318,11 +2319,11 @@
                                             <rect key="frame" x="1" y="183" width="452" height="219"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="cZc-eP-6d4">
-                                                <rect key="frame" x="1" y="1" width="450" height="203"/>
+                                                <rect key="frame" x="3" y="3" width="446" height="201"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <button misplaced="YES" id="HJk-bU-Rxk">
-                                                        <rect key="frame" x="12" y="177" width="96" height="18"/>
+                                                        <rect key="frame" x="12" y="175" width="96" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC Radio 1" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="1JW-iw-ETU">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2334,7 +2335,7 @@
                                                         </connections>
                                                     </button>
                                                     <button misplaced="YES" id="6Lw-33-guR" userLabel="BBC Radio 2">
-                                                        <rect key="frame" x="154" y="177" width="106" height="18"/>
+                                                        <rect key="frame" x="154" y="175" width="106" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC Radio 2" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="4f6-Ln-1Bq">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2346,7 +2347,7 @@
                                                         </connections>
                                                     </button>
                                                     <button misplaced="YES" id="8jP-di-hni">
-                                                        <rect key="frame" x="299" y="177" width="105" height="18"/>
+                                                        <rect key="frame" x="299" y="175" width="105" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC Radio 3" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="jhb-jr-N7a">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2358,7 +2359,7 @@
                                                         </connections>
                                                     </button>
                                                     <button misplaced="YES" id="4lJ-eV-Tty">
-                                                        <rect key="frame" x="12" y="139" width="109" height="18"/>
+                                                        <rect key="frame" x="12" y="137" width="109" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC Radio 4" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="hNr-CF-J0S">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2370,7 +2371,7 @@
                                                         </connections>
                                                     </button>
                                                     <button misplaced="YES" id="9ma-sa-of7">
-                                                        <rect key="frame" x="154" y="139" width="133" height="18"/>
+                                                        <rect key="frame" x="154" y="137" width="133" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC Radio 4 Extra" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Uwz-Vs-tux">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2382,7 +2383,7 @@
                                                         </connections>
                                                     </button>
                                                     <button misplaced="YES" id="tZy-hd-UhF">
-                                                        <rect key="frame" x="299" y="139" width="138" height="18"/>
+                                                        <rect key="frame" x="299" y="137" width="138" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC Radio 6 Music" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Vjh-iO-Mds">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2394,11 +2395,11 @@
                                                         </connections>
                                                     </button>
                                                     <box verticalHuggingPriority="750" misplaced="YES" boxType="separator" id="bVl-5G-Xmc">
-                                                        <rect key="frame" x="14" y="40" width="419" height="5"/>
+                                                        <rect key="frame" x="14" y="38" width="419" height="5"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                     </box>
                                                     <button misplaced="YES" id="YWn-u3-Kmr" userLabel="BBC World Service">
-                                                        <rect key="frame" x="12" y="97" width="136" height="18"/>
+                                                        <rect key="frame" x="12" y="95" width="136" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC World Service" bezelStyle="regularSquare" imagePosition="left" inset="2" id="ZUN-Md-u59">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2414,7 +2415,7 @@
                                                         </connections>
                                                     </button>
                                                     <button misplaced="YES" id="e2T-sc-7gQ">
-                                                        <rect key="frame" x="154" y="97" width="126" height="18"/>
+                                                        <rect key="frame" x="154" y="95" width="126" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC Radio 5 Live" bezelStyle="regularSquare" imagePosition="left" inset="2" id="rak-Wt-HaP">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2426,7 +2427,7 @@
                                                         </connections>
                                                     </button>
                                                     <button misplaced="YES" id="2k2-DB-89d">
-                                                        <rect key="frame" x="299" y="97" width="121" height="18"/>
+                                                        <rect key="frame" x="299" y="95" width="121" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC Radio 1Xtra" bezelStyle="regularSquare" imagePosition="left" inset="2" id="2jG-m4-i4e">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2438,7 +2439,7 @@
                                                         </connections>
                                                     </button>
                                                     <button misplaced="YES" id="bqc-BZ-buH">
-                                                        <rect key="frame" x="12" y="60" width="204" height="18"/>
+                                                        <rect key="frame" x="12" y="58" width="204" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC Radio 5 Live Sports Extra" bezelStyle="regularSquare" imagePosition="left" inset="2" id="5h4-0M-nCM">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2450,7 +2451,7 @@
                                                         </connections>
                                                     </button>
                                                     <button misplaced="YES" id="gxa-Sy-vru">
-                                                        <rect key="frame" x="261" y="60" width="177" height="18"/>
+                                                        <rect key="frame" x="261" y="58" width="177" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC Radio Asian Network" bezelStyle="regularSquare" imagePosition="left" inset="2" id="3DI-gT-BDA">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2462,11 +2463,11 @@
                                                         </connections>
                                                     </button>
                                                     <box verticalHuggingPriority="750" misplaced="YES" boxType="separator" id="LdH-mP-1ip">
-                                                        <rect key="frame" x="14" y="122" width="419" height="5"/>
+                                                        <rect key="frame" x="14" y="120" width="419" height="5"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                     </box>
                                                     <button misplaced="YES" id="Owy-ED-RS0" userLabel="Show Regional Radio Programmes">
-                                                        <rect key="frame" x="12" y="14" width="171" height="18"/>
+                                                        <rect key="frame" x="12" y="12" width="171" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Show Regional Stations" bezelStyle="regularSquare" imagePosition="left" inset="2" id="VSC-t4-Xdt" userLabel="Show Regional Stations">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2478,7 +2479,7 @@
                                                         </connections>
                                                     </button>
                                                     <button misplaced="YES" id="hnU-Bj-KCY" userLabel="Show Local Radio Programmes">
-                                                        <rect key="frame" x="261" y="14" width="144" height="18"/>
+                                                        <rect key="frame" x="261" y="12" width="144" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Show Local Stations" bezelStyle="regularSquare" imagePosition="left" inset="2" id="f1V-QT-BjD" userLabel="Show Local Stations">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2496,11 +2497,11 @@
                                             <rect key="frame" x="1" y="94" width="456" height="85"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="gQ1-Wk-QjY">
-                                                <rect key="frame" x="2" y="2" width="452" height="68"/>
+                                                <rect key="frame" x="3" y="3" width="450" height="67"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <button misplaced="YES" id="ID4-f2-23a" userLabel="Ignore Radio All News">
-                                                        <rect key="frame" x="11" y="10" width="341" height="18"/>
+                                                        <rect key="frame" x="11" y="9" width="341" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Ignore all radio programmes with &quot;news&quot; in the title" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="idt-2N-NKM">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2512,7 +2513,7 @@
                                                         </connections>
                                                     </button>
                                                     <button misplaced="YES" id="Hc3-nT-3zv" userLabel="Ignore TV All News">
-                                                        <rect key="frame" x="11" y="42" width="341" height="18"/>
+                                                        <rect key="frame" x="11" y="41" width="341" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Ignore all TV programmes with &quot;news&quot; in the title" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="O3S-RU-Vau">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2761,50 +2762,52 @@
                 </subviews>
             </view>
         </window>
-        <window title="Cache Info" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="CacheInfoWindow" animationBehavior="default" id="882" userLabel="Help Panel: CacheInfo" customClass="NSPanel">
-            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" utility="YES" HUD="YES"/>
+        <window title="Cache Info" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="CacheInfoWindow" animationBehavior="default" titlebarAppearsTransparent="YES" id="882" userLabel="Help Panel: CacheInfo" customClass="NSPanel">
+            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="196" y="300" width="397" height="210"/>
+            <rect key="contentRect" x="196" y="300" width="397" height="198"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1178"/>
-            <view key="contentView" id="883">
-                <rect key="frame" x="0.0" y="0.0" width="397" height="210"/>
+            <view key="contentView" misplaced="YES" id="883">
+                <rect key="frame" x="0.0" y="0.0" width="397" height="198"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="884">
-                        <rect key="frame" x="17" y="20" width="363" height="170"/>
+                    <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="YES" id="884">
+                        <rect key="frame" x="17" y="8" width="363" height="181"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" id="885">
                             <font key="font" metaFont="system"/>
                             <string key="title">Select the types of items you would like cached. An item must be cached in order for it to show up in search or be downloaded. However, the more types of items you choose to be cached, the longer it will take for the cache to be updated.
 
 Please Note: The searchable/downloadable types will not be updated until the cache has been updated either manually by selecting the menu item or automatically by restarting the application.</string>
-                            <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.0" colorSpace="calibratedRGB"/>
                         </textFieldCell>
                     </textField>
                 </subviews>
             </view>
+            <point key="canvasLocation" x="131.5" y="141"/>
         </window>
-        <window title="Cache Refresh Info" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="CacheRefreshInfoWindow" animationBehavior="default" id="895" userLabel="Help Panel: CacheRefresh" customClass="NSPanel">
-            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" utility="YES" HUD="YES"/>
+        <window title="Cache Refresh Info" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="CacheRefreshInfoWindow" animationBehavior="default" titlebarAppearsTransparent="YES" id="895" userLabel="Help Panel: CacheRefresh" customClass="NSPanel">
+            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="196" y="419" width="397" height="91"/>
+            <rect key="contentRect" x="196" y="419" width="397" height="68"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1178"/>
-            <view key="contentView" id="896">
-                <rect key="frame" x="0.0" y="0.0" width="397" height="91"/>
+            <view key="contentView" misplaced="YES" id="896">
+                <rect key="frame" x="0.0" y="0.0" width="397" height="68"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="897">
-                        <rect key="frame" x="17" y="20" width="363" height="51"/>
+                    <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="YES" id="897">
+                        <rect key="frame" x="17" y="10" width="363" height="51"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" title="Specify how often the cache should be refreshed. If the limit has been exceeded the cache will be refreshed at launch." id="898">
                             <font key="font" metaFont="system"/>
-                            <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.0" colorSpace="calibratedRGB"/>
                         </textFieldCell>
                     </textField>
                 </subviews>
             </view>
+            <point key="canvasLocation" x="131.5" y="361"/>
         </window>
         <window title="Search Help" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="SearchHelpWindow" animationBehavior="default" id="782" userLabel="Help Panel: Search" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" utility="YES" HUD="YES"/>

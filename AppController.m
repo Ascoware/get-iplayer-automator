@@ -11,10 +11,8 @@
 #import <Sparkle/Sparkle.h>
 #import "HTTPProxy.h"
 #import "Programme.h"
-#import "Safari.h"
 #import "iTunes.h"
 #import "ReasonForFailure.h"
-#import "Chrome.h"
 #import "NPHistoryWindowController.h"
 #import "Get_iPlayer_Automator-Swift.h"
 
