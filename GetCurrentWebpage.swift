@@ -65,9 +65,13 @@ import ScriptingBridge
                     }
                     else if url.hasPrefix("http://www.itv.com/hub/") || url.hasPrefix("https://www.itv.com/hub/") {
                         source = tab.source
-                        newShowName = name.replacingOccurrences(of: " - The ITV Hub", with: "")
+                        newShowName = name.replacingOccurrences(of: " - ITV Hub", with: "")
                         showURL = url
                     }
+                }
+                
+                if showURL != nil {
+                    break
                 }
             }
             
@@ -105,10 +109,14 @@ import ScriptingBridge
                         source = tab.executeJavascript?("document.documentElement.outerHTML") as? String
                     }
                     else if url.hasPrefix("http://www.itv.com/hub/") || url.hasPrefix("https://www.itv.com/hub/") {
-                        source = tab.executeJavascript?("document.documentElement.outerHTML") as? String
-                        newShowName = title.replacingOccurrences(of: " - The ITV Hub", with: "")
+                        source = tab.executeJavascript?("document.getElementsByTagName('html')[0].innerHTML") as? String
+                        newShowName = title.replacingOccurrences(of: " - ITV Hub", with: "")
                         showURL = url
                     }
+                }
+
+                if showURL != nil {
+                    break
                 }
             }
             
@@ -231,6 +239,8 @@ import ScriptingBridge
                 
             }
             
+            let productionId = URL(string: url)?.lastPathComponent
+            
             if episodeNumber == 0 && seriesNumber == 0 && !episodeID.isEmpty {
                 // At this point all we have left is the production ID.
                 // A series number doesn't make much sense, so just parse out an episode number.
@@ -242,20 +252,27 @@ import ScriptingBridge
             
             // Save off the pieces we care about.
             let programme = Programme()
+            programme.pid = productionId ?? ""
+            programme.processedPID = true
+            programme.showName = newShowName ?? ""
             programme.episode = episodeNumber
             programme.season = seriesNumber
             programme.seriesName = seriesName
             programme.desc = showDescription
-            
+            programme.url = url
+            programme.tvNetwork = "ITV Player"
+
             if !episode.isEmpty {
                 programme.episodeName = episode
             } else if let timeAired = timeAired {
                 let shortDate = shortDateFormatter.string(from: timeAired)
+                programme.lastBroadcastString = shortDate
                 programme.episodeName = shortDate
             }
             
             if let timeAired = timeAired {
                 programme.standardizedAirDate = longDateFormatter.string(from: timeAired)
+                programme.lastBroadcast = timeAired
             }
             
             return programme
@@ -289,7 +306,6 @@ import ScriptingBridge
 //            dateFormatter.timeZone = NSTimeZone(forSecondsFromGMT: 0) as? TimeZone ?? TimeZone()
 //            let parsedDate: Date? = dateFormatter.date(from: timeString!)
 //            let shortDate = DateFormatter.localizedString(from: parsedDate!, dateStyle: .medium, timeStyle: .none)
-//            productionId = URL(string: url!)?.lastPathComponent
 //            if !(progname || !productionId) {
 //                let invalidPage = NSAlert()
 //                invalidPage.addButton(withTitle: "OK")

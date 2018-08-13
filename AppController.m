@@ -7,7 +7,6 @@
 //
 
 #import "AppController.h"
-#import <UserNotifications/UserNotifications.h>
 #import <Sparkle/Sparkle.h>
 #import "HTTPProxy.h"
 #import "Programme.h"
