@@ -10,7 +10,12 @@
 import Kanna
 import ScriptingBridge
 
-@objcMembers public class GetCurrentWebpage : NSObject {
+@objcMembers public class GetCurrentWebpage : NSObject, SBApplicationDelegate {
+    
+    public func eventDidFail(_ event: UnsafePointer<AppleEvent>, withError error: Error) -> Any? {
+        print("error handling event \(error)")
+        return nil
+    }
     
     public class func getCurrentWebpage(_ logger: LogController) -> Programme? {
         //Get Default Browser
@@ -36,10 +41,14 @@ import ScriptingBridge
         
         //Get URL
         if (browser == "Safari") {
-            guard let safari: SafariApplication = SBApplication(bundleIdentifier: "com.apple.Safari"),
-            safari.isRunning,
-            let safariWindows = safari.windows?()
-            else {
+            
+            guard let safari: SafariApplication = SBApplication(bundleIdentifier: "com.apple.Safari") else {
+                return nil
+            }
+            
+            safari.delegate = GetCurrentWebpage()
+            
+            guard safari.isRunning, let safariWindows = safari.windows?() else {
                 browserNotOpen.runModal()
                 return nil
             }
@@ -83,10 +92,14 @@ import ScriptingBridge
             }
             
         } else if (browser == "Chrome") {
-            guard let chrome : ChromeApplication = SBApplication(bundleIdentifier: "com.google.Chrome"),
-            chrome.isRunning,
-                let chromeWindows = chrome.windows?().compactMap({ $0 as? ChromeWindow })
-            else {
+            
+            guard let chrome : ChromeApplication = SBApplication(bundleIdentifier: "com.google.Chrome") else {
+                return nil
+            }
+            
+            chrome.delegate = GetCurrentWebpage()
+           
+            guard chrome.isRunning, let chromeWindows = chrome.windows?().compactMap({ $0 as? ChromeWindow }) else {
                 browserNotOpen.runModal()
                 return nil
             }

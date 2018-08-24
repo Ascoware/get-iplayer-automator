@@ -27,8 +27,8 @@ import ScriptingBridge
 @objc public protocol SafariApplication: SBApplicationProtocol {
     @objc optional func documents() -> SBElementArray
     @objc optional func windows() -> SBElementArray
-    @objc optional var name: Int { get } // The name of the application.
-    @objc optional var frontmost: Int { get } // Is this the active application?
+    @objc optional var name: String { get } // The name of the application.
+    @objc optional var frontmost: Bool { get } // Is this the active application?
     @objc optional var version: Int { get } // The version number of the application.
     @objc optional func `open`(_ x: Any!) -> Any // Open a document.
     @objc optional func print(_ x: Any!, withProperties: Any!, printDialog: Any!) // Print a document.
