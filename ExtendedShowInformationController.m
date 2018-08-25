@@ -33,7 +33,7 @@
             NSAlert *notNewITV = [[NSAlert alloc] init];
             [notNewITV addButtonWithTitle:@"OK"];
             notNewITV.messageText = [NSString stringWithFormat:@"This feature is not available for ITV programmes"];
-            notNewITV.alertStyle = NSWarningAlertStyle;
+            notNewITV.alertStyle = NSAlertStyleWarning;
             [notNewITV runModal];
             notNewITV = nil;
             return;

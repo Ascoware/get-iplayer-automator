@@ -544,7 +544,7 @@
             [getNameException addButtonWithTitle:@"OK"];
             getNameException.messageText = [NSString stringWithFormat:@"Unknown Error!"];
             getNameException.informativeText = @"An unknown error occured whilst trying to parse Get_iPlayer output (processGetNameData).";
-            getNameException.alertStyle = NSWarningAlertStyle;
+            getNameException.alertStyle = NSAlertStyleWarning;
             [getNameException runModal];
             getNameException = nil;
         }

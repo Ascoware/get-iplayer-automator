@@ -193,7 +193,7 @@
                 [searchException addButtonWithTitle:@"OK"];
                 searchException.messageText = [NSString stringWithFormat:@"Invalid Output!"];
                 searchException.informativeText = @"Please check your query. Your query must not alter the output format of Get_iPlayer. (searchFinished)";
-                searchException.alertStyle = NSWarningAlertStyle;
+                searchException.alertStyle = NSAlertStyleWarning;
                 [searchException runModal];
                 searchException = nil;
             }

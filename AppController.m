@@ -318,7 +318,7 @@ NewProgrammeHistory           *sharedHistoryController;
                                                    otherButton:nil
                                      informativeTextWithFormat:@"You are currently downloading shows. If you quit, they will be cancelled."];
         NSInteger response = [downloadAlert runModal];
-        if (response == NSAlertDefaultReturn) return NSTerminateCancel;
+        if (response == NSAlertFirstButtonReturn) return NSTerminateCancel;
     }
     else if (runUpdate)
     {
@@ -330,7 +330,7 @@ NewProgrammeHistory           *sharedHistoryController;
                                 @"If you proceed with quiting, some series-link information will be lost."
                                 @"It is not reccommended to quit during an update. Are you sure you wish to quit?"];
         NSInteger response = [updateAlert runModal];
-        if (response == NSAlertDefaultReturn) return NSTerminateCancel;
+        if (response == NSAlertFirstButtonReturn) return NSTerminateCancel;
     }
 
     return NSTerminateNow;
@@ -349,8 +349,8 @@ NewProgrammeHistory           *sharedHistoryController;
                                     @"If you proceed with quiting, some series-link information will be lost."
                                     @"It is not reccommended to quit during an update. Are you sure you wish to quit?"];
             NSInteger response = [updateAlert runModal];
-            if (response == NSAlertDefaultReturn) return NO;
-            else if (response == NSAlertAlternateReturn) return YES;
+            if (response == NSAlertFirstButtonReturn) return NO;
+            else return YES;
         }
         else if (runDownloads)
         {
@@ -360,7 +360,7 @@ NewProgrammeHistory           *sharedHistoryController;
                                                        otherButton:nil
                                          informativeTextWithFormat:@"You are currently downloading shows. If you quit, they will be cancelled."];
             NSInteger response = [downloadAlert runModal];
-            if (response == NSAlertDefaultReturn) return NO;
+            if (response == NSAlertFirstButtonReturn) return NO;
             else return YES;
 
         }
@@ -772,7 +772,7 @@ NewProgrammeHistory           *sharedHistoryController;
                         [searchException addButtonWithTitle:@"OK"];
                         searchException.messageText = [NSString stringWithFormat:@"Invalid Output!"];
                         searchException.informativeText = @"Please check your query. Your query must not alter the output format of Get_iPlayer. (getiPlayerUpdateFinished)";
-                        searchException.alertStyle = NSWarningAlertStyle;
+                        searchException.alertStyle = NSAlertStyleWarning;
                         [searchException runModal];
                         searchException = nil;
                     }
@@ -1586,7 +1586,7 @@ NewProgrammeHistory           *sharedHistoryController;
                         [queueException addButtonWithTitle:@"OK"];
                         queueException.messageText = [NSString stringWithFormat:@"Series-Link to Queue Transfer Failed"];
                         queueException.informativeText = @"The recording queue is in an unknown state.  Please restart GiA and clear the recording queue.";
-                        queueException.alertStyle = NSWarningAlertStyle;
+                        queueException.alertStyle = NSAlertStyleWarning;
                         [queueException runModal];
                         queueException = nil;
                     }
@@ -1597,7 +1597,7 @@ NewProgrammeHistory           *sharedHistoryController;
                 [searchException addButtonWithTitle:@"OK"];
                 searchException.messageText = [NSString stringWithFormat:@"Invalid Output!"];
                 searchException.informativeText = @"Please check your query. Your query must not alter the output format of Get_iPlayer. (processAutoRecordData)";
-                searchException.alertStyle = NSWarningAlertStyle;
+                searchException.alertStyle = NSAlertStyleWarning;
                 [searchException runModal];
                 searchException = nil;
             }
@@ -1702,7 +1702,7 @@ NewProgrammeHistory           *sharedHistoryController;
                                                    otherButton:nil
                                      informativeTextWithFormat:@""];
         NSInteger response = [downloadAlert runModal];
-        if (response == NSAlertDefaultReturn) [_mainWindow performClose:self];
+        if (response == NSAlertFirstButtonReturn) [_mainWindow performClose:self];
     }
 }
 - (NSString *)escapeSpecialCharactersInString:(NSString *)string
@@ -1987,7 +1987,7 @@ NewProgrammeHistory           *sharedHistoryController;
     NSDate *startTime = _scheduleTimer.fireDate;
     NSDate *currentTime = [NSDate date];
 
-    unsigned int unitFlags = NSHourCalendarUnit | NSMinuteCalendarUnit | NSDayCalendarUnit | NSSecondCalendarUnit;
+    unsigned int unitFlags = NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitDay | NSCalendarUnitSecond;
     NSDateComponents *conversionInfo = [[NSCalendar currentCalendar] components:unitFlags fromDate:currentTime toDate:startTime options:0];
 
     NSString *status = [NSString stringWithFormat:@"Time until Start (DD:HH:MM:SS): %02ld:%02ld:%02ld:%02ld",
@@ -2023,7 +2023,7 @@ NewProgrammeHistory           *sharedHistoryController;
                                  informativeTextWithFormat:@"This will take a few minutes to complete - do NOT abandon"];
     NSInteger response = [downloadAlert runModal];
 
-    if (response == NSAlertAlternateReturn)
+    if (response == NSAlertSecondButtonReturn)
         [self forceITVUpdate1];
 
 }

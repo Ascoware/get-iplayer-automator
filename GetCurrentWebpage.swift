@@ -9,6 +9,7 @@
 
 import Kanna
 import ScriptingBridge
+import SafariServices
 
 @objcMembers public class GetCurrentWebpage : NSObject, SBApplicationDelegate {
     
@@ -42,19 +43,20 @@ import ScriptingBridge
         //Get URL
         if (browser == "Safari") {
             
+
             guard let safari: SafariApplication = SBApplication(bundleIdentifier: "com.apple.Safari") else {
                 return nil
             }
-            
+
             safari.delegate = GetCurrentWebpage()
-            
+
             guard safari.isRunning, let safariWindows = safari.windows?() else {
                 browserNotOpen.runModal()
                 return nil
             }
-            
+
             let orderedWindows = safariWindows.compactMap { $0 as? SafariWindow }.sorted { $0.index! < $1.index! }
-            
+
             for window: SafariWindow in orderedWindows {
                 if let tab = window.currentTab, let url = tab.URL, let name = tab.name {
                     if url.hasPrefix("http://www.bbc.co.uk/iplayer/episode/") || url.hasPrefix("http://bbc.co.uk/iplayer/episode/") || url.hasPrefix("http://bbc.co.uk/sport") || url.hasPrefix("https://www.bbc.co.uk/iplayer/episode/") || url.hasPrefix("https://bbc.co.uk/iplayer/episode/") || url.hasPrefix("https://bbc.co.uk/sport") {
@@ -78,12 +80,12 @@ import ScriptingBridge
                         showURL = url
                     }
                 }
-                
+
                 if showURL != nil {
                     break
                 }
             }
-            
+
             // If we didn't find a page that conforms to our expectations, try the front-most tab of the
             // front-most page. It might have something we can use.
             if showURL == nil, orderedWindows.count > 0 {
@@ -165,7 +167,7 @@ import ScriptingBridge
             urlScanner.scanUpTo("/", into: nil)
             urlScanner.scanString("/", into: nil)
             if let pid = urlScanner.scanUpToString("/"), let newShowName = newShowName {
-                let newProg = Programme(logController: logger)
+                let newProg = Programme()
                 newProg.pid = pid
                 newProg.showName = newShowName
                 newProg.status = "Processing..."

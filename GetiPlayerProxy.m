@@ -49,13 +49,13 @@
             [_logger addToLog:@"WARNING: Custom proxy setting was blank. No proxy will be used."];
             if (!_currentIsSilent)
             {
-                NSAlert *alert = [NSAlert alertWithMessageText:@"Custom proxy setting was blank.\nDownloads may fail.\nDo you wish to continue?"
-                                                 defaultButton:@"No"
-                                               alternateButton:@"Yes"
-                                                   otherButton:nil
-                                     informativeTextWithFormat:@""];
-                alert.alertStyle = NSCriticalAlertStyle;
-                if ([alert runModal] == NSAlertDefaultReturn)
+                NSAlert *alert = [[NSAlert alloc] init];
+                alert.messageText = @"Custom proxy setting was blank.\nDownloads may fail.\nDo you wish to continue?";
+                [alert addButtonWithTitle:@"No"];
+                [alert addButtonWithTitle:@"Yes"];
+                alert.alertStyle = NSAlertStyleCritical;
+
+                if ([alert runModal] == NSAlertFirstButtonReturn)
                 {
                     [self cancelProxyLoad];
                 }
@@ -187,8 +187,8 @@
                                            alternateButton:@"Yes"
                                                otherButton:nil
                                  informativeTextWithFormat:@"Invalid proxy host: address=[%@] length=%ld", proxy.host, (proxy.host).length];
-            alert.alertStyle = NSCriticalAlertStyle;
-            if ([alert runModal] == NSAlertDefaultReturn)
+            alert.alertStyle = NSAlertStyleCritical;
+            if ([alert runModal] == NSAlertFirstButtonReturn)
                 [self cancelProxyLoad];
             else
                 [self failProxyTest];
@@ -268,8 +268,8 @@
                                            alternateButton:@"Yes"
                                                otherButton:nil
                                  informativeTextWithFormat:@"Failed to load %@ within 30 seconds\nUsing proxy: %@\nError: %@", response.URL, [_proxyDict[@"proxy"] url], (error ? error.localizedDescription : @"Unknown error")];
-            alert.alertStyle = NSCriticalAlertStyle;
-            if ([alert runModal] == NSAlertDefaultReturn)
+            alert.alertStyle = NSAlertStyleCritical;
+            if ([alert runModal] == NSAlertFirstButtonReturn)
                 [self cancelProxyLoad];
             else
                 [self failProxyTest];
