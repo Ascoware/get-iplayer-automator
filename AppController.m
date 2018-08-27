@@ -165,8 +165,6 @@ NewProgrammeHistory           *sharedHistoryController;
     _verbose = [[NSUserDefaults standardUserDefaults] boolForKey:@"Verbose"];
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(itvUpdateFinished) name:@"ITVUpdateFinished" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(forceITVUpdateFinished) name:@"ForceITVUpdateFinished" object:nil];
-    _forceITVUpdateInProgress = NO;
     newITVListing =  [[GetITVShows alloc] init];
 
 
@@ -304,6 +302,7 @@ NewProgrammeHistory           *sharedHistoryController;
 
     [self updateCache:nil];
 }
+
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)application
 {
     return YES;
@@ -312,23 +311,21 @@ NewProgrammeHistory           *sharedHistoryController;
 {
     if (runDownloads)
     {
-        NSAlert *downloadAlert = [NSAlert alertWithMessageText:@"Are you sure you wish to quit?"
-                                                 defaultButton:@"No"
-                                               alternateButton:@"Yes"
-                                                   otherButton:nil
-                                     informativeTextWithFormat:@"You are currently downloading shows. If you quit, they will be cancelled."];
+        NSAlert *downloadAlert = [NSAlert new];
+        downloadAlert.messageText = @"Are you sure you wish to quit?";
+        [downloadAlert addButtonWithTitle:@"No"];
+        [downloadAlert addButtonWithTitle:@"Yes"];
+        downloadAlert.informativeText = @"You are currently downloading shows. If you quit, they will be cancelled.";
         NSInteger response = [downloadAlert runModal];
         if (response == NSAlertFirstButtonReturn) return NSTerminateCancel;
     }
     else if (runUpdate)
     {
-        NSAlert *updateAlert = [NSAlert alertWithMessageText:@"Are you sure?"
-                                               defaultButton:@"No"
-                                             alternateButton:@"Yes"
-                                                 otherButton:nil
-                                   informativeTextWithFormat:@"Get iPlayer Automator is currently updating the cache."
-                                @"If you proceed with quiting, some series-link information will be lost."
-                                @"It is not reccommended to quit during an update. Are you sure you wish to quit?"];
+        NSAlert *updateAlert = [NSAlert new];
+        updateAlert.messageText = @"Are you sure?";
+        [updateAlert addButtonWithTitle:@"No"];
+        [updateAlert addButtonWithTitle:@"Yes"];
+        updateAlert.informativeText = @"Get iPlayer Automator is currently updating the cache. If you proceed with quiting, some series-link information will be lost. It is not reccommended to quit during an update. Are you sure you wish to quit?";
         NSInteger response = [updateAlert runModal];
         if (response == NSAlertFirstButtonReturn) return NSTerminateCancel;
     }
@@ -341,24 +338,22 @@ NewProgrammeHistory           *sharedHistoryController;
     {
         if (runUpdate)
         {
-            NSAlert *updateAlert = [NSAlert alertWithMessageText:@"Are you sure?"
-                                                   defaultButton:@"No"
-                                                 alternateButton:@"Yes"
-                                                     otherButton:nil
-                                       informativeTextWithFormat:@"Get iPlayer Automator is currently updating the cache."
-                                    @"If you proceed with quiting, some series-link information will be lost."
-                                    @"It is not reccommended to quit during an update. Are you sure you wish to quit?"];
+            NSAlert *updateAlert = [NSAlert new];
+            updateAlert.messageText = @"Are you sure?";
+            [updateAlert addButtonWithTitle:@"No"];
+            [updateAlert addButtonWithTitle:@"Yes"];
+            updateAlert.informativeText = @"Get iPlayer Automator is currently updating the cache. If you proceed with quiting, some series-link information will be lost. It is not reccommended to quit during an update. Are you sure you wish to quit?";
             NSInteger response = [updateAlert runModal];
             if (response == NSAlertFirstButtonReturn) return NO;
             else return YES;
         }
         else if (runDownloads)
         {
-            NSAlert *downloadAlert = [NSAlert alertWithMessageText:@"Are you sure you wish to quit?"
-                                                     defaultButton:@"No"
-                                                   alternateButton:@"Yes"
-                                                       otherButton:nil
-                                         informativeTextWithFormat:@"You are currently downloading shows. If you quit, they will be cancelled."];
+            NSAlert *downloadAlert = [NSAlert new];
+            downloadAlert.messageText = @"Are you sure you wish to quit?";
+            [downloadAlert addButtonWithTitle:@"No"];
+            [downloadAlert addButtonWithTitle:@"Yes"];
+            downloadAlert.informativeText = @"You are currently downloading shows. If you quit, they will be cancelled.";
             NSInteger response = [downloadAlert runModal];
             if (response == NSAlertFirstButtonReturn) return NO;
             else return YES;
@@ -851,11 +846,10 @@ NewProgrammeHistory           *sharedHistoryController;
 
     if (!results.count)
     {
-        NSAlert *noneFound = [NSAlert alertWithMessageText:@"No Shows Found"
-                                             defaultButton:@"OK"
-                                           alternateButton:nil
-                                               otherButton:nil
-                                 informativeTextWithFormat:@"0 shows were found for your search terms. Please check your spelling!"];
+        NSAlert *noneFound = [NSAlert new];
+        noneFound.messageText = @"No Shows Found";
+        [noneFound addButtonWithTitle:@"OK"];
+        noneFound.informativeText = @"0 shows were found for your search terms. Please check your spelling!";
         [noneFound runModal];
     }
     _currentSearch = nil;
@@ -917,12 +911,10 @@ NewProgrammeHistory           *sharedHistoryController;
         }
         if (downloading)
         {
-            NSAlert *cantRemove = [NSAlert alertWithMessageText:@"A Selected Show is Currently Downloading."
-                                                  defaultButton:@"OK"
-                                                alternateButton:nil
-                                                    otherButton:nil
-                                      informativeTextWithFormat:@"You can not remove a show that is currently downloading. "
-                                   @"Please stop the downloads then remove the download if you wish to cancel it."];
+            NSAlert *cantRemove = [NSAlert new];
+            cantRemove.messageText = @"A Selected Show is Currently Downloading.";
+            [cantRemove addButtonWithTitle:@"OK"];
+            cantRemove.informativeText = @"You can not remove a show that is currently downloading. Please stop the downloads then remove the download if you wish to cancel it.";
             [cantRemove runModal];
         }
         else
@@ -985,12 +977,9 @@ NewProgrammeHistory           *sharedHistoryController;
         _proxy = proxyDict[@"proxy"];
     }
 
-    NSAlert *whatAnIdiot = [NSAlert alertWithMessageText:@"No Shows in Queue!"
-                                           defaultButton:nil
-                                         alternateButton:nil
-                                             otherButton:nil
-                               informativeTextWithFormat:@"Try adding shows to the queue before clicking start; "
-                            @"Get iPlayer Automator needs to know what to download."];
+    NSAlert *whatAnIdiot = [NSAlert new];
+    whatAnIdiot.messageText = @"No Shows in Queue!";
+    whatAnIdiot.informativeText = @"Try adding shows to the queue before clicking Start. Get iPlayer Automator needs to know what to download.";
     if ([_queueController.arrangedObjects count] > 0)
     {
         NSLog(@"Initialising Failure Dictionary");
@@ -1354,11 +1343,10 @@ NewProgrammeHistory           *sharedHistoryController;
     [_pvrSearchField setEnabled:YES];
     if (!results.count)
     {
-        NSAlert *noneFound = [NSAlert alertWithMessageText:@"No Shows Found"
-                                             defaultButton:@"OK"
-                                           alternateButton:nil
-                                               otherButton:nil
-                                 informativeTextWithFormat:@"0 shows were found for your search terms. Please check your spelling!"];
+        NSAlert *noneFound = [NSAlert new];
+        noneFound.messageText = @"No Shows Found";
+        [noneFound addButtonWithTitle:@"OK"];
+        noneFound.informativeText = @"0 shows were found for your search terms. Please check your spelling!";
         [noneFound runModal];
     }
     _currentPVRSearch = nil;
@@ -1696,11 +1684,10 @@ NewProgrammeHistory           *sharedHistoryController;
     else if (_newestProgrammesWindow.keyWindow) [_newestProgrammesWindow performClose:self];
     else if (_mainWindow.keyWindow)
     {
-        NSAlert *downloadAlert = [NSAlert alertWithMessageText:@"Are you sure you wish to quit?"
-                                                 defaultButton:@"Yes"
-                                               alternateButton:@"No"
-                                                   otherButton:nil
-                                     informativeTextWithFormat:@""];
+        NSAlert *downloadAlert = [NSAlert new];
+        downloadAlert.messageText = @"Are you sure you wish to quit?";
+        [downloadAlert addButtonWithTitle:@"Yes"];
+        [downloadAlert addButtonWithTitle:@"No"];
         NSInteger response = [downloadAlert runModal];
         if (response == NSAlertFirstButtonReturn) [_mainWindow performClose:self];
     }
@@ -1934,11 +1921,10 @@ NewProgrammeHistory           *sharedHistoryController;
     }
     else
     {
-        NSAlert *alert = [NSAlert alertWithMessageText:@"Downloads are already running."
-                                         defaultButton:@"OK"
-                                       alternateButton:nil
-                                           otherButton:nil
-                             informativeTextWithFormat:@"You cannot schedule downloads to start if they are already running."];
+        NSAlert *alert = [NSAlert new];
+        alert.messageText = @"Downloads are already running.";
+        [alert addButtonWithTitle:@"OK"];
+        alert.informativeText = @"You cannot schedule downloads to start if they are already running.";
         [alert runModal];
     }
 }
@@ -2011,53 +1997,6 @@ NewProgrammeHistory           *sharedHistoryController;
     [_currentIndicator stopAnimation:self];
     [_mainWindow setDocumentEdited:NO];
     _runScheduled=NO;
-}
-
-#pragma mark ITV Cache Reset
-- (IBAction)forceITVUpdate:(id)sender
-{
-    NSAlert *downloadAlert = [NSAlert alertWithMessageText:@"Are you sure you want to reset the ITV cache?"
-                                             defaultButton:@"No"
-                                           alternateButton:@"Yes"
-                                               otherButton:nil
-                                 informativeTextWithFormat:@"This will take a few minutes to complete - do NOT abandon"];
-    NSInteger response = [downloadAlert runModal];
-
-    if (response == NSAlertSecondButtonReturn)
-        [self forceITVUpdate1];
-
-}
-
-- (void)forceITVUpdate1
-{
-    _forceITVUpdateInProgress = YES;
-    _forceITVUpdateMenuItem.enabled = NO;
-
-    [_pvrSearchField setEnabled:NO];
-    [_stopButton setEnabled:NO];
-    [_startButton setEnabled:NO];
-    [_searchField setEnabled:NO];
-    [_addSeriesLinkToQueueButton setEnabled:NO];
-    [_refreshCacheButton setEnabled:NO];
-    [_forceCacheUpdateMenuItem setEnabled:NO];
-    [_checkForCacheUpdateMenuItem setEnabled:NO];
-
-    [self.itvProgressIndicator startAnimation:self];
-    self.itvProgressIndicator.doubleValue = 0.0;
-    [self.itvProgressIndicator setHidden:false];
-    [_itvProgressText setHidden:false];
-    _updatingITVIndex=true;
-
-    [newITVListing forceITVUpdateWithLogger:_logger];
-
-}
-
--(void)forceITVUpdateFinished
-{
-    _forceITVUpdateInProgress = NO;
-    _forceITVUpdateMenuItem.enabled = YES;
-
-    [self itvUpdateFinished];
 }
 
 #pragma mark New Programmes History

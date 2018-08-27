@@ -24,7 +24,7 @@ extern BOOL runDownloads;
 extern NSDictionary *tvFormats;
 extern NSDictionary *radioFormats;
 
-@interface AppController : NSObject <SUUpdaterDelegate>
+@interface AppController : NSObject <SUUpdaterDelegate, NSApplicationDelegate>
 //General
 @property (nonatomic, readonly) NSString *getiPlayerPath;
 @property (nonatomic) IBOutlet NSWindow *mainWindow;
@@ -180,8 +180,6 @@ extern NSDictionary *radioFormats;
 -(void)updateHistoryForType:(NSString *)chanelType andProgFile:(NSString *)oldProgrammesFile andCacheFile:(NSString *)newCacheFile;
 -(NSScanner *)skip:(NSScanner *)s andDelimiter:(NSString *)d andTimes:(int)times;
 -(void)itvUpdateFinished;
--(void)forceITVUpdate1;
--(void)forceITVUpdateFinished;
 -(int)findItemNumberFor:(NSString *)key inString:(NSString *)string;
 -(NSString *)getItemNumber:(int)itemLocation fromString:(NSString *)string;
 

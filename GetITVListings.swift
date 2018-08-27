@@ -15,7 +15,6 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
     var programmes = [ProgrammeData]()
     var episodes = [ProgrammeData]()
     var getITVShowRunning = false
-    var forceUpdateAllProgrammes = false
     let currentTime = Date()
     var logger: LogController?
     var myOpQueue = OperationQueue()
@@ -36,15 +35,7 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
     
     public override init() {
         super.init()
-        forceUpdateAllProgrammes = false
         getITVShowRunning = false
-    }
-    
-    @objc public func forceITVUpdate(logger: LogController) {
-        self.logger = logger
-        logger.add(toLog: "GetITVShows: Force all programmes update ")
-        forceUpdateAllProgrammes = true
-        itvUpdate(newLogger: logger)
     }
     
     @objc public func itvUpdate(newLogger: LogController) {
@@ -279,13 +270,7 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
         /* Notify finish and invaliate the NSURLSession */
         getITVShowRunning = false
         mySession?.finishTasksAndInvalidate()
-        if forceUpdateAllProgrammes {
-            NotificationCenter.default.post(name: NSNotification.Name("ForceITVUpdateFinished"), object: nil)
-        }
-        else {
-            NotificationCenter.default.post(name: NSNotification.Name("ITVUpdateFinished"), object: nil)
-        }
-        forceUpdateAllProgrammes = false
+        NotificationCenter.default.post(name: NSNotification.Name("ITVUpdateFinished"), object: nil)
         self.logger?.add(toLog: "GetITVShows: Update Finished")
     }
     
