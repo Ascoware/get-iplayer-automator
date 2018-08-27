@@ -1691,7 +1691,7 @@ NewProgrammeHistory           *sharedHistoryController;
         [downloadAlert addButtonWithTitle:@"Yes"];
         [downloadAlert addButtonWithTitle:@"No"];
         NSInteger response = [downloadAlert runModal];
-        if (response == NSAlertDefaultReturn) [_mainWindow performClose:self];
+        if (response == NSAlertFirstButtonReturn) [_mainWindow performClose:self];
     }
 }
 - (NSString *)escapeSpecialCharactersInString:(NSString *)string
@@ -1975,7 +1975,7 @@ NewProgrammeHistory           *sharedHistoryController;
     NSDate *startTime = _scheduleTimer.fireDate;
     NSDate *currentTime = [NSDate date];
 
-    unsigned int unitFlags = NSHourCalendarUnit | NSMinuteCalendarUnit | NSDayCalendarUnit | NSSecondCalendarUnit;
+    unsigned int unitFlags = NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitDay | NSCalendarUnitSecond;
     NSDateComponents *conversionInfo = [[NSCalendar currentCalendar] components:unitFlags fromDate:currentTime toDate:startTime options:0];
 
     NSString *status = [NSString stringWithFormat:@"Time until Start (DD:HH:MM:SS): %02ld:%02ld:%02ld:%02ld",

@@ -141,7 +141,7 @@
                 _lastDate = [NSDate date];
                 NSDate *predictedFinished = [NSDate dateWithTimeIntervalSinceNow:(total-downloaded)/rateAverage];
 
-                unsigned int unitFlags = NSHourCalendarUnit | NSMinuteCalendarUnit;
+                unsigned int unitFlags = NSCalendarUnitHour | NSCalendarUnitMinute;
                 NSDateComponents *conversionInfo = [[NSCalendar currentCalendar] components:unitFlags fromDate:_lastDate toDate:predictedFinished options:0];
 
                 [self setCurrentProgress:[NSString stringWithFormat:@"%.1f%% - (%.2f MB/~%.0f MB) - %02ld:%02ld Remaining -- %@",percent,downloaded,total,(long)conversionInfo.hour,(long)conversionInfo.minute,[_show valueForKey:@"showName"]]];

@@ -95,7 +95,11 @@
         {
 			if (![fileManager createFileAtPath:historyPath contents:historyData attributes:nil])
             {
-                [[NSAlert alertWithMessageText:@"Could not create history file!" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Please submit a bug report saying that the history file could not be created."] runModal];
+                NSAlert *alert = [[NSAlert alloc] init];
+                alert.informativeText = @"Please submit a bug report saying that the history file could not be created.";
+                alert.messageText = @"Could not create history file!";
+                [alert addButtonWithTitle:@"OK"];
+                [alert runModal];
                 [self addToLog:@"Could not create history file!"];
             }
         }
@@ -104,15 +108,21 @@
             NSError *writeToFileError;
 			if (![historyData writeToFile:historyPath options:NSDataWritingAtomic error:&writeToFileError])
             {
-                [[NSAlert alertWithMessageText:@"Could not write to history file!" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Please submit a bug report saying that the history file could not be written to."] runModal];                [self addToLog:@"Could not write to history file!"];
+                NSAlert *alert = [[NSAlert alloc] init];
+                alert.informativeText = @"Please submit a bug report saying that the history file could not be written to.";
+                alert.messageText = @"Could not write to history file!";
+                [alert addButtonWithTitle:@"OK"];
+                [alert runModal];
             }
         }
 	}
 	else
 	{
-		NSAlert *alert = [NSAlert alertWithMessageText:@"Download History cannot be edited while downloads are running." 
-										 defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Your changes have been discarded."];
-		[alert runModal];
+        NSAlert *alert = [[NSAlert alloc] init];
+        alert.informativeText = @"Your changes have been discarded.";
+        alert.messageText = @"Download History cannot be edited while downloads are running.";
+        [alert addButtonWithTitle:@"OK"];
+        [alert runModal];
 		[historyWindow close];
 	}
 	[saveButton setEnabled:NO];
@@ -145,8 +155,8 @@
 	}
 	else
 	{
-		NSAlert *alert = [NSAlert alertWithMessageText:@"Download History cannot be edited while downloads are running." 
-										 defaultButton:nil alternateButton:nil otherButton:nil informativeTextWithFormat:@"This window will now close."];
+        NSAlert *alert = [NSAlert new];
+        alert.messageText = @"Download History cannot be edited while downloads are running.";
 		[alert runModal];
 		[historyWindow close];
 	}

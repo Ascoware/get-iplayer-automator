@@ -169,11 +169,6 @@
         }
         
     }
-    else
-    {
-        [[NSAlert alertWithMessageText:@"Get iPlayer Automator currently only supports Safari and Chrome." defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Please change your preferred browser in the preferences and try again."] runModal];
-        return nil;
-    }
     
     //Process URL
     if([url hasPrefix:@"http://www.bbc.co.uk/iplayer/episode/"] || [url hasPrefix:@"https://www.bbc.co.uk/iplayer/episode/"])
