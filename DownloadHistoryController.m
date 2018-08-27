@@ -155,8 +155,8 @@
 	}
 	else
 	{
-		NSAlert *alert = [NSAlert alertWithMessageText:@"Download History cannot be edited while downloads are running." 
-										 defaultButton:nil alternateButton:nil otherButton:nil informativeTextWithFormat:@"This window will now close."];
+        NSAlert *alert = [NSAlert new];
+        alert.messageText = @"Download History cannot be edited while downloads are running.";
 		[alert runModal];
 		[historyWindow close];
 	}
