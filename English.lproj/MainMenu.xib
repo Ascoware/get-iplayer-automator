@@ -26,7 +26,6 @@
                 <outlet property="currentProgress" destination="508" id="796"/>
                 <outlet property="datePicker" destination="1150" id="1161"/>
                 <outlet property="forceCacheUpdateMenuItem" destination="1026" id="9lH-fR-fdc"/>
-                <outlet property="forceITVUpdateMenuItem" destination="YHY-fr-yTm" id="5ER-ok-Otq"/>
                 <outlet property="historyWindow" destination="1212" id="1468"/>
                 <outlet property="itvFormatController" destination="1432" id="1439"/>
                 <outlet property="itvProgressIndicator" destination="e7O-Z3-UPb" id="fr7-dg-PeT"/>
@@ -537,35 +536,6 @@
                                 <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
                                 <connections>
                                     <action selector="forceUpdate:" target="621" id="1027"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Force ITV Cache Reset" id="YHY-fr-yTm" userLabel="Force ITV Cache Reset Menu Item">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="forceITVUpdate:" target="621" id="eXX-Gi-PTP"/>
-                                    <binding destination="668" name="hidden" keyPath="values.AltCacheITV_TV" previousBinding="qNO-Ig-X9i" id="3Go-c3-c1X">
-                                        <dictionary key="options">
-                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                        </dictionary>
-                                    </binding>
-                                    <binding destination="668" name="enabled" keyPath="values.AltCacheITV_TV" id="VfD-s6-6oe"/>
-                                    <binding destination="668" name="hidden2" keyPath="values.CacheITV_TV" previousBinding="3Go-c3-c1X" id="nQE-yc-2CG">
-                                        <dictionary key="options">
-                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
-                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                            <integer key="NSNullPlaceholder" value="-1"/>
-                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                        </dictionary>
-                                    </binding>
-                                    <binding destination="668" name="enabled2" keyPath="values.CacheITV_TV" previousBinding="VfD-s6-6oe" id="qNO-Ig-X9i">
-                                        <dictionary key="options">
-                                            <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
-                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                            <integer key="NSNullPlaceholder" value="-1"/>
-                                        </dictionary>
-                                    </binding>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="1256"/>
@@ -2478,7 +2448,11 @@
                                                         </connections>
                                                     </button>
                                                     <button misplaced="YES" id="hnU-Bj-KCY" userLabel="Show Local Radio Programmes">
+<<<<<<< Updated upstream:English.lproj/MainMenu.xib
                                                         <rect key="frame" x="261" y="14" width="144" height="18"/>
+=======
+                                                        <rect key="frame" x="261" y="12" width="176" height="18"/>
+>>>>>>> Stashed changes:Base.lproj/MainMenu.xib
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Show Local Stations" bezelStyle="regularSquare" imagePosition="left" inset="2" id="f1V-QT-BjD" userLabel="Show Local Stations">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
