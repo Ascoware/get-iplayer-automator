@@ -9,7 +9,6 @@
 
 import Kanna
 import ScriptingBridge
-import SafariServices
 
 @objcMembers public class GetCurrentWebpage : NSObject, SBApplicationDelegate {
     

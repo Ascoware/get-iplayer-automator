@@ -20,7 +20,7 @@ import ScriptingBridge
     @objc optional func redo() // Redo the last change.
     @objc optional func stop() // Stop the current tab from loading.
     @objc optional func viewSource() // View the HTML source of the tab.
-    @objc optional func executeJavascript(_ javascript: Any!) -> Any // Execute a piece of javascript.
+    @objc optional func executeJavascript(_ javascript: String) -> Any // Execute a piece of javascript.
 }
 
 // MARK: ChromeApplication
