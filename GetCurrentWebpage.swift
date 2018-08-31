@@ -58,18 +58,17 @@ import ScriptingBridge
 
             for window: SafariWindow in orderedWindows {
                 if let tab = window.currentTab, let url = tab.URL, let name = tab.name {
-                    if url.hasPrefix("http://www.bbc.co.uk/iplayer/episode/") || url.hasPrefix("http://bbc.co.uk/iplayer/episode/") || url.hasPrefix("http://bbc.co.uk/sport") || url.hasPrefix("https://www.bbc.co.uk/iplayer/episode/") || url.hasPrefix("https://bbc.co.uk/iplayer/episode/") || url.hasPrefix("https://bbc.co.uk/sport") {
+                    if url.hasPrefix("https://www.bbc.co.uk/iplayer/episode/") || url.hasPrefix("https://www.bbc.co.uk/sport") {
                         let nameScanner = Scanner(string: name)
                         nameScanner.scanString("BBC iPlayer - ", into: nil)
                         nameScanner.scanString("BBC Sport - ", into: nil)
-                        newShowName = nameScanner.scanUpToString("kjklgfdjfgkdlj")
+                        newShowName = nameScanner.scanUpToCharactersFromSet(set: .newlines)
                         showURL = url
                     }
-                    else if url.hasPrefix("http://www.bbc.co.uk/programmes/") || url.hasPrefix("https://www.bbc.co.uk/programmes/") {
+                    else if url.hasPrefix("https://www.bbc.co.uk/programmes/") || url.hasPrefix("https://www.bbc.co.uk/radio/play/") {
                         let nameScanner = Scanner(string: name)
-                        nameScanner.scanUpTo("- ", into: nil)
-                        nameScanner.scanString("- ", into: nil)
-                        newShowName = nameScanner.scanUpToString("kjklgfdjfgkdlj")
+                        nameScanner.scanUpToString("- ")
+                        newShowName = nameScanner.scanUpToCharactersFromSet(set: .newlines)
                         showURL = url
                         source = tab.source
                     }
