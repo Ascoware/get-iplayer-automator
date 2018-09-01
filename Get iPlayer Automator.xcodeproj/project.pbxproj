@@ -31,7 +31,6 @@
 		7F2387362131082C00FA4588 /* SafariExtensionViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7F2387342131082C00FA4588 /* SafariExtensionViewController.xib */; };
 		7F2387392131082C00FA4588 /* script.js in Resources */ = {isa = PBXBuildFile; fileRef = 7F2387382131082C00FA4588 /* script.js */; };
 		7F23873B2131082C00FA4588 /* ToolbarItemIcon.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 7F23873A2131082C00FA4588 /* ToolbarItemIcon.pdf */; };
-		7F23873F2131082C00FA4588 /* Get iPlayer Programme.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 7F23872D2131082C00FA4588 /* Get iPlayer Programme.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		7F54B1B11FFD656C006D1325 /* ITVDownload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F340B5A1FFB063700F415A4 /* ITVDownload.swift */; };
 		7F54B1B31FFF38E8006D1325 /* Kanna.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F54B1B21FFF38E8006D1325 /* Kanna.framework */; };
 		7F54B1B41FFF38F8006D1325 /* Kanna.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7F54B1B21FFF38E8006D1325 /* Kanna.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -89,28 +88,7 @@
 		DFFF196713E96288007B52AC /* ReasonsForFailure.plist in Resources */ = {isa = PBXBuildFile; fileRef = DFFF196613E96288007B52AC /* ReasonsForFailure.plist */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXContainerItemProxy section */
-		7F23873D2131082C00FA4588 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 7F23872C2131082C00FA4588;
-			remoteInfo = "Get iPlayer Programme";
-		};
-/* End PBXContainerItemProxy section */
-
 /* Begin PBXCopyFilesBuildPhase section */
-		7F2387432131082C00FA4588 /* Embed App Extensions */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 13;
-			files = (
-				7F23873F2131082C00FA4588 /* Get iPlayer Programme.appex in Embed App Extensions */,
-			);
-			name = "Embed App Extensions";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		D943D2721B37B19D00452FCD /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -553,12 +531,10 @@
 				8D11072C0486CEB800E47090 /* Sources */,
 				D943D2721B37B19D00452FCD /* CopyFiles */,
 				8D11072E0486CEB800E47090 /* Frameworks */,
-				7F2387432131082C00FA4588 /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				7F23873E2131082C00FA4588 /* PBXTargetDependency */,
 			);
 			name = "Get iPlayer Automator";
 			productInstallPath = "$(HOME)/Applications";
@@ -709,14 +685,6 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
-/* Begin PBXTargetDependency section */
-		7F23873E2131082C00FA4588 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 7F23872C2131082C00FA4588 /* Get iPlayer Programme */;
-			targetProxy = 7F23873D2131082C00FA4588 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
-
 /* Begin PBXVariantGroup section */
 		089C165CFE840E0CC02AAC07 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
@@ -830,7 +798,6 @@
 		C01FCF4B08A954540054247B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -883,7 +850,6 @@
 		C01FCF4C08A954540054247B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
