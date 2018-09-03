@@ -107,8 +107,7 @@ NewProgrammeHistory           *sharedHistoryController;
     defaultValues[@"SignedNew"] = @NO;
     defaultValues[@"Use25FPSStreams"] = @NO;
     defaultValues[@"GetHigherQualityAudio"] = @YES;
-    defaultValues[@"UseHTTPStreaming"] = @NO;
-    
+
     [[NSUserDefaults standardUserDefaults] registerDefaults:defaultValues];
     defaultValues = nil;
 
@@ -1900,7 +1899,6 @@ NewProgrammeHistory           *sharedHistoryController;
     [sharedDefaults removeObjectForKey:@"Use50FPSStreams"];
     [sharedDefaults removeObjectForKey:@"Use25FPSStreams"];
     [sharedDefaults removeObjectForKey:@"GetHigherQualityAudio"];
-    [sharedDefaults removeObjectForKey:@"UseHTTPStreaming"];
 }
 - (void)applescriptStartDownloads
 {
