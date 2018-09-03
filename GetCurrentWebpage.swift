@@ -12,7 +12,7 @@ import ScriptingBridge
 
 @objcMembers public class GetCurrentWebpage : NSObject {
     
-    private class func extractMetadata(url: String, tabTitle: String, pageSource: String) -> (pid: String?, showName: String?) {
+    private class func extractMetadata(url: String, tabTitle: String, pageSource: String?) -> (pid: String?, showName: String?) {
         var pid: String?
         var showName: String?
         
@@ -40,7 +40,7 @@ import ScriptingBridge
                 pid = nsUrl.lastPathComponent
             }
             
-            if let pid = pid {
+            if let pid = pid, let pageSource = pageSource {
                 // Search the page to see if it is an episode or a series page. If we don't the PID inside
                 // a bbcProgrammes element, it's a series page and we can't use it (though we might want to try
                 // adding it with recursive-pid)
@@ -110,7 +110,8 @@ import ScriptingBridge
             }
 
             let orderedWindows = chromeWindows.sorted { $0.index! < $1.index! }
-            if let frontWindow = orderedWindows.first, let tab = frontWindow.activeTab, let url = tab.URL, let title = tab.title, let source = tab.executeJavascript?("document.documentElement.outerHTML") as? String {
+            if let frontWindow = orderedWindows.first, let tab = frontWindow.activeTab, let url = tab.URL, let title = tab.title {
+                let source = tab.executeJavascript?("document.documentElement.outerHTML") as? String
                 (pid, newShowName) = extractMetadata(url: url, tabTitle: title, pageSource: source)
             }
         } else {
