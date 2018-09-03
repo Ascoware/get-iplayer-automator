@@ -120,10 +120,20 @@
                                 @"--attempts=5",
                                 @"--thumbsize=640",
                                 ffmpegArg,
-                                proxyArg,
-                                partialProxyArg,
                                 @"--log-progress",
                                 nil];
+        
+        if (proxyArg) {
+            [args addObject:proxyArg];
+        }
+        
+        if (partialProxyArg) {
+            [args addObject:partialProxyArg];
+        }
+        
+        if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"UseHTTPStreaming"] isEqualTo:@YES]) {
+            [args addObject:@"--stream-http"];
+        }
         
         // Only add a --versions parameter for audio described or signed. Otherwise, let get_iplayer figure it out.
         if (needVersions) {
