@@ -45,10 +45,14 @@ import ScriptingBridge
                 // a bbcProgrammes element, it's a series page and we can't use it (though we might want to try
                 // adding it with recursive-pid)
                 let scanner = Scanner(string: pageSource)
-                scanner.scanUpTo("bbcProgrammes.programme = { pid : '\(pid)', type : 'episode' }", into: nil)
+                scanner.scanUpTo("\"@type\":\"TVEpisode\",\"identifier\":\"\(pid)\"", into: nil)
                 if scanner.isAtEnd {
                     scanner.scanLocation = 0
-                    scanner.scanUpTo("bbcProgrammes.programme = { pid : '\(pid)', type : 'clip' }", into: nil)
+                    scanner.scanUpTo("\"@type\":\"RadioEpisode\",\"identifier\":\"\(pid)\"", into: nil)
+                    if scanner.isAtEnd {
+                        scanner.scanLocation = 0
+                        scanner.scanUpTo("bbcProgrammes.programme = { pid : '\(pid)', type : 'clip' }", into: nil)
+                    }
                 }
                 
                 if scanner.isAtEnd {
