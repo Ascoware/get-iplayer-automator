@@ -191,7 +191,8 @@
         NSString *perlPath = [[NSBundle mainBundle] resourcePath];
         perlPath = [perlPath stringByAppendingPathComponent:@"perl5"];
         envVariableDictionary[@"PERL5LIB"] = perlPath;
-        
+        envVariableDictionary[@"SSL_CERT_DIR"] = perlPath;
+
         self.task.environment = envVariableDictionary;
         
         self.fh = self.pipe.fileHandleForReading;
