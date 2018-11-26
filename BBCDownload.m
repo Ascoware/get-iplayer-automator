@@ -142,8 +142,13 @@
         //Verbose?
         if (self.verbose)
             [args addObject:@"--verbose"];
-        if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"DownloadSubtitles"] isEqualTo:@YES])
-            [args addObject:@"--subtitles"];
+        if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"DownloadSubtitles"] isEqualTo:@YES]) {
+            if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"EmbedSubtitles"] isEqualTo:@YES]) {
+                [args addObject:@"--subsembed"];
+            } else {
+                [args addObject:@"--subtitles"];
+            }
+        }
         
         //Naming Convention
         if (![[[NSUserDefaults standardUserDefaults] valueForKey:@"XBMC_naming"] boolValue])
@@ -190,9 +195,10 @@
         envVariableDictionary[@"PERL_UNICODE"] = @"AS";
         NSString *perlPath = [[NSBundle mainBundle] resourcePath];
         perlPath = [perlPath stringByAppendingPathComponent:@"perl5"];
+        NSString *cacertPath = [perlPath stringByAppendingPathComponent:@"Mozilla/CA/cacert.pem"];
         envVariableDictionary[@"PERL5LIB"] = perlPath;
         envVariableDictionary[@"SSL_CERT_DIR"] = perlPath;
-
+        envVariableDictionary[@"MOJO_CA_FILE"] = cacertPath;
         self.task.environment = envVariableDictionary;
         
         self.fh = self.pipe.fileHandleForReading;

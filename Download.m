@@ -627,7 +627,10 @@
     envVariableDictionary[@"HOME"] = (@"~").stringByExpandingTildeInPath;
     NSString *perlPath = [[NSBundle mainBundle] resourcePath];
     perlPath = [perlPath stringByAppendingPathComponent:@"perl5"];
+    NSString *cacertPath = [perlPath stringByAppendingPathComponent:@"Mozilla/CA/cacert.pem"];
     envVariableDictionary[@"PERL5LIB"] = perlPath;
+    envVariableDictionary[@"SSL_CERT_DIR"] = perlPath;
+    envVariableDictionary[@"MOJO_CA_FILE"] = cacertPath;
     _task.environment = envVariableDictionary;
 
 

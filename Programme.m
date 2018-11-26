@@ -234,6 +234,12 @@
     NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:_metadataTask.environment];
     envVariableDictionary[@"HOME"] = (@"~").stringByExpandingTildeInPath;
     envVariableDictionary[@"PERL_UNICODE"] = @"AS";
+    NSString *perlPath = [[NSBundle mainBundle] resourcePath];
+    perlPath = [perlPath stringByAppendingPathComponent:@"perl5"];
+    NSString *cacertPath = [perlPath stringByAppendingPathComponent:@"Mozilla/CA/cacert.pem"];
+    envVariableDictionary[@"PERL5LIB"] = perlPath;
+    envVariableDictionary[@"SSL_CERT_DIR"] = perlPath;
+    envVariableDictionary[@"MOJO_CA_FILE"] = cacertPath;
     _metadataTask.environment = envVariableDictionary;
     [_metadataTask launch];
     [fh readInBackgroundAndNotify];
@@ -329,8 +335,7 @@
         NSString *newSizesString;
         [sizeScanner scanCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:nil];
         [sizeScanner scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet] intoString:&newSizesString];
-        // TODO: adjust with switch to HLS
-        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"flash[a-z]+[1-9]=[0-9]+MB" options:0 error:nil];
+        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"hvf[a-z]+[1-9]=[0-9]+MB" options:0 error:nil];
         NSArray *matches = [regex matchesInString:newSizesString options:0 range:NSMakeRange(0, newSizesString.length)];
         if (matches.count > 0) {
             for (NSTextCheckingResult *modesizeResult in matches) {
@@ -354,10 +359,8 @@
         [sizeScanner scanUpToString:@"modesizes:" intoString:nil];
     }
     _modeSizes = array;
-    NSString *thumbURL = [self scanField:@"thumbnail4" fromList:_taskOutput];
-    if (!thumbURL) {
-        thumbURL = [self scanField:@"thumbnail" fromList:_taskOutput];
-    }
+    NSString *thumbURL = [self scanField:@"thumbnail" fromList:_taskOutput];
+    
     if (thumbURL) {
         NSLog(@"URL: %@", thumbURL);
         NSURLSessionDownloadTask *downloadTask = [[NSURLSession sharedSession] downloadTaskWithURL:[NSURL URLWithString:thumbURL]
@@ -400,22 +403,11 @@
 -(NSDate *)processDate:(NSString *)date
 {
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    if (NSAppKitVersionNumber >= NSAppKitVersionNumber10_8) //10.8, 10.9
-        dateFormatter.dateFormat = @"yyyy'-'MM'-'dd'T'HH':'mm':'ssZZZZZ";
-    else //10.7
-        dateFormatter.dateFormat = @"yyyy'-'MM'-'dd'T'HH':'mm':'ssZZ";
+    dateFormatter.dateFormat = @"yyyy'-'MM'-'dd'T'HH':'mm':'ssZZZZZ";
     
     if (date) {
         date = [self scanField:@"default" fromList:date];
         if (date) {
-            if (floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_8) { //Before 10.9 doesn't recognize the Z
-                if ([date hasSuffix:@"Z"]) {
-                    date = [date stringByReplacingOccurrencesOfString:@"Z" withString:@"+00:00"];
-                }
-            }
-            if (floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_7) {
-                date = [date stringByReplacingCharactersInRange:NSMakeRange(date.length - 3, 1) withString:@""];
-            }
             return [dateFormatter dateFromString:date];
         }
     }
@@ -503,7 +495,10 @@
         envVariableDictionary[@"PERL_UNICODE"] = @"AS";
         NSString *perlPath = [[NSBundle mainBundle] resourcePath];
         perlPath = [perlPath stringByAppendingPathComponent:@"perl5"];
+        NSString *cacertPath = [perlPath stringByAppendingPathComponent:@"Mozilla/CA/cacert.pem"];
         envVariableDictionary[@"PERL5LIB"] = perlPath;
+        envVariableDictionary[@"SSL_CERT_DIR"] = perlPath;
+        envVariableDictionary[@"MOJO_CA_FILE"] = cacertPath;
         getNameTask.environment = envVariableDictionary;
         [getNameTask launch];
         
@@ -652,7 +647,10 @@
         envVariableDictionary[@"PERL_UNICODE"] = @"AS";
         NSString *perlPath = [[NSBundle mainBundle] resourcePath];
         perlPath = [perlPath stringByAppendingPathComponent:@"perl5"];
+        NSString *cacertPath = [perlPath stringByAppendingPathComponent:@"Mozilla/CA/cacert.pem"];
         envVariableDictionary[@"PERL5LIB"] = perlPath;
+        envVariableDictionary[@"SSL_CERT_DIR"] = perlPath;
+        envVariableDictionary[@"MOJO_CA_FILE"] = cacertPath;
         getNameTask.environment = envVariableDictionary;
         [getNameTask launch];
         
@@ -677,25 +675,25 @@
         // get_iplayer reports back "(available versions: none)" if a PID is invalid or unavailable for any reason.
         // If we don't find that string we can assume it's available in some format.
         if ([string containsString:@"(available versions: "]) {
-                NSScanner *scanner = [NSScanner scannerWithString:string];
+            NSScanner *scanner = [NSScanner scannerWithString:string];
             [scanner scanString:@"(available versions: " intoString:nil];
             [scanner scanUpToString:@")" intoString:&available];
             available = [available stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-                    }
-
+        }
+        
         if ([string hasPrefix:@"title:"]) {
             NSScanner *scanner = [NSScanner scannerWithString:string];
             [scanner scanString:@"title:" intoString:nil];
             [scanner scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet] intoString:&title];
             title = [title stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-                }
-
+        }
+        
         if ([string hasPrefix:@"versions:"]) {
             NSScanner *scanner = [NSScanner scannerWithString:string];
             [scanner scanString:@"versions:" intoString:nil];
             [scanner scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet] intoString:&versions];
             versions = [versions stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-            }
+        }
         // firstbcastdate: 2005-04-09
         
         if ([string hasPrefix:@"firstbcastdate:"]) {
@@ -708,17 +706,13 @@
             shortDateFormatter.dateFormat = @"yyyy-MM-dd";
             broadcastDate = [shortDateFormatter dateFromString:dateString];
             
-            }
         }
-        
+    }
+    
     if ([available isEqualToString:@"none"]) {
         p.status = @"Not Available";
-        } else {
-        if (versions.length > 0) {
-            p.status = [NSString stringWithFormat: @"Available: %@", versions];
     } else {
-            p.status = @"Available";
-        }
+        p.status = @"Available";
     }
     
     if (broadcastDate) {

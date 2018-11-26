@@ -68,6 +68,7 @@ NewProgrammeHistory           *sharedHistoryController;
     defaultValues[@"Verbose"] = @NO;
     defaultValues[@"SeriesLinkStartup"] = @YES;
     defaultValues[@"DownloadSubtitles"] = @NO;
+    defaultValues[@"EmbedSubtitles"] = @YES;
     defaultValues[@"AlwaysUseProxy"] = @NO;
     defaultValues[@"XBMC_naming"] = @NO;
     defaultValues[@"KeepSeriesFor"] = @"30";
@@ -554,7 +555,10 @@ NewProgrammeHistory           *sharedHistoryController;
 
         NSString *perlPath = [[NSBundle mainBundle] resourcePath];
         perlPath = [perlPath stringByAppendingPathComponent:@"perl5"];
+        NSString *cacertPath = [perlPath stringByAppendingPathComponent:@"Mozilla/CA/cacert.pem"];
         envVariableDictionary[@"PERL5LIB"] = perlPath;
+        envVariableDictionary[@"SSL_CERT_DIR"] = perlPath;
+        envVariableDictionary[@"MOJO_CA_FILE"] = cacertPath;
 
         _updatingBBCIndex = true;
         _getiPlayerUpdateTask.environment = envVariableDictionary;
@@ -700,8 +704,11 @@ NewProgrammeHistory           *sharedHistoryController;
 
             NSString *perlPath = [[NSBundle mainBundle] resourcePath];
             perlPath = [perlPath stringByAppendingPathComponent:@"perl5"];
+            NSString *cacertPath = [perlPath stringByAppendingPathComponent:@"Mozilla/CA/cacert.pem"];
             envVariableDictionary[@"PERL5LIB"] = perlPath;
-            
+            envVariableDictionary[@"SSL_CERT_DIR"] = perlPath;
+            envVariableDictionary[@"MOJO_CA_FILE"] = cacertPath;
+
             pipeTask.environment = envVariableDictionary;
             [pipeTask launch];
             while ((someData = readHandle2.availableData) && someData.length) {
@@ -1441,10 +1448,14 @@ NewProgrammeHistory           *sharedHistoryController;
             NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:autoRecordTask.environment];
             envVariableDictionary[@"HOME"] = (@"~").stringByExpandingTildeInPath;
             envVariableDictionary[@"PERL_UNICODE"] = @"AS";
+
             NSString *perlPath = [[NSBundle mainBundle] resourcePath];
             perlPath = [perlPath stringByAppendingPathComponent:@"perl5"];
+            NSString *cacertPath = [perlPath stringByAppendingPathComponent:@"Mozilla/CA/cacert.pem"];
             envVariableDictionary[@"PERL5LIB"] = perlPath;
-            
+            envVariableDictionary[@"SSL_CERT_DIR"] = perlPath;
+            envVariableDictionary[@"MOJO_CA_FILE"] = cacertPath;
+
             autoRecordTask.environment = envVariableDictionary;
             [autoRecordTask launch];
 
@@ -1856,6 +1867,7 @@ NewProgrammeHistory           *sharedHistoryController;
     [sharedDefaults removeObjectForKey:@"Verbose"];
     [sharedDefaults removeObjectForKey:@"SeriesLinkStartup"];
     [sharedDefaults removeObjectForKey:@"DownloadSubtitles"];
+    [sharedDefaults removeObjectForKey:@"EmbedSubtitles"];
     [sharedDefaults removeObjectForKey:@"AlwaysUseProxy"];
     [sharedDefaults removeObjectForKey:@"XBMC_naming"];
     [sharedDefaults removeObjectForKey:@"KeepSeriesFor"];
