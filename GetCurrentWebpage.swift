@@ -26,7 +26,7 @@ import ScriptingBridge
             nameScanner.scanString("BBC iPlayer - ")
             showName = nameScanner.scanUpToString( " - ")
             // TODO: Get the series/episode info from the tail.
-        } else if url.hasPrefix("https://www.bbc.co.uk/radio/play/") {
+        } else if url.hasPrefix("https://www.bbc.co.uk/radio/play/") || url.hasPrefix("https://www.bbc.co.uk/sounds/play/") {
             // PID is always the last element in the URL.
             if let nsUrl = URL(string: url) {
                 pid = nsUrl.lastPathComponent
