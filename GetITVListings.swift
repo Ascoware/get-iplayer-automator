@@ -54,8 +54,8 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
         let myCache = URLCache(memoryCapacity: 16384, diskCapacity: 268435456, diskPath: cachePath)
         defaultConfigObject.urlCache = myCache
         defaultConfigObject.requestCachePolicy = .useProtocolCachePolicy
-        defaultConfigObject.timeoutIntervalForResource = 10
-        defaultConfigObject.timeoutIntervalForRequest = 10
+        defaultConfigObject.timeoutIntervalForResource = 30
+        defaultConfigObject.timeoutIntervalForRequest = 30
         mySession = URLSession(configuration: defaultConfigObject, delegate: self, delegateQueue: OperationQueue.main)
         
         /* Load in all shows for itv.com */
@@ -73,7 +73,6 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
                     self.logger?.add(toLog: errorMessage)
                 }
                 guard let data = data else {
-                    self.endOfRun()
                     return
                 }
                 
