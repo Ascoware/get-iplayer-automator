@@ -167,8 +167,8 @@
         }
         
         // High quality audio is on by default.
-        if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"GetHigherQualityAudio"] boolValue]) {
-            [args addObject:@"--hls-hq-audio"];
+        if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"GetLowerQualityAudio"] boolValue]) {
+            [args addObject:@"--hls-lq-audio"];
         }
         
         //Tagging

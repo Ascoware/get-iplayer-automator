@@ -107,7 +107,7 @@ NewProgrammeHistory           *sharedHistoryController;
     defaultValues[@"AudioDescribedNew"] = @NO;
     defaultValues[@"SignedNew"] = @NO;
     defaultValues[@"Use25FPSStreams"] = @NO;
-    defaultValues[@"GetHigherQualityAudio"] = @YES;
+    defaultValues[@"GetLowerQualityAudio"] = @NO;
 
     [[NSUserDefaults standardUserDefaults] registerDefaults:defaultValues];
     defaultValues = nil;
@@ -117,6 +117,13 @@ NewProgrammeHistory           *sharedHistoryController;
         [[NSUserDefaults standardUserDefaults] setObject:@YES forKey:@"AudioDescribedNew"];
         [[NSUserDefaults standardUserDefaults] setObject:@YES forKey:@"SignedNew"];
         [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"AudioDescribed"];
+    }
+    
+    // Migrate Higher-quality option; HQ audio is default, option will fetch lower bitrate audio.
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@"GetHigherQualityAudio"]) {
+        BOOL oldSetting = [[[NSUserDefaults standardUserDefaults] objectForKey:@"GetHigherQualityAudio"] boolValue];
+        [[NSUserDefaults standardUserDefaults] setObject: @(!oldSetting) forKey:@"GetLowerQualityAudio"];
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"GetHigherQualityAudio"];
     }
 
     // remove obsolete preferences
@@ -1911,6 +1918,7 @@ NewProgrammeHistory           *sharedHistoryController;
     [sharedDefaults removeObjectForKey:@"Use50FPSStreams"];
     [sharedDefaults removeObjectForKey:@"Use25FPSStreams"];
     [sharedDefaults removeObjectForKey:@"GetHigherQualityAudio"];
+    [sharedDefaults removeObjectForKey:@"GetLowerQualityAudio"];
 }
 - (void)applescriptStartDownloads
 {
