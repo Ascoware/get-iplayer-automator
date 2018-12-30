@@ -21,12 +21,11 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
     
     func supportPath(_ fileName: String) -> String
     {
-        if let applicationSupportURL = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first?.absoluteURL {
-            let historyFile = applicationSupportURL.appendingPathComponent("Get iPlayer Automator").appendingPathComponent(fileName)
-            return historyFile.path
+        if let applicationSupportDir = FileManager.default.applicationSupportDirectory() {
+            return applicationSupportDir.appending("/").appending(fileName)
         }
         
-        return NSHomeDirectory().appending("/").appending(fileName)
+        return NSHomeDirectory().appending("/.get_iplayer/").appending(fileName)
     }
     
     var programmesFilePath: String {

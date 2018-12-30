@@ -26,14 +26,16 @@
 // directoriess.
 //
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface NSFileManager (DirectoryLocations)
 
-- (NSString *)findOrCreateDirectory:(NSSearchPathDirectory)searchPathDirectory
+- (nullable NSString *)findOrCreateDirectory:(NSSearchPathDirectory)searchPathDirectory
                            inDomain:(NSSearchPathDomainMask)domainMask
                 appendPathComponent:(NSString *)appendComponent
                               error:(NSError **)errorOut;
-- (NSString *)applicationSupportDirectory;
-
-@property (readonly) NSString *applicationSupportDirectory;
+- (nullable NSString *)applicationSupportDirectory;
 
 @end
+
+NS_ASSUME_NONNULL_END

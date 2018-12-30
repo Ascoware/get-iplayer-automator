@@ -19,12 +19,11 @@ public class NewProgrammeHistory: NSObject {
     }
 
     var historyFile: String {
-        if let applicationSupportURL = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first?.absoluteURL {
-            let historyFile = applicationSupportURL.appendingPathComponent("Get iPlayer Automator").appendingPathComponent("history.gia")
-            return historyFile.absoluteString
+        if let applicationSupportPath = FileManager.default.applicationSupportDirectory() {
+            return applicationSupportPath.appending("/").appending("history.gia")
         }
         
-        return NSHomeDirectory().appending("/.history.gia")
+        return NSHomeDirectory().appending("/.get_iplayer/history.gia")
     }
 
     private override init() {
