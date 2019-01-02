@@ -2043,8 +2043,7 @@ NewProgrammeHistory           *sharedHistoryController;
     if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheITV_TV"] boolValue])
         active[2]=@true;
 
-    NSString *filePath = @"~/Library/Application Support/Get iPlayer Automator";
-    filePath= filePath.stringByExpandingTildeInPath;
+    NSString *filePath = [[NSFileManager defaultManager] applicationSupportDirectory];
 
     for (int i = 0; i < types.count; i++ )
     {
@@ -2063,18 +2062,22 @@ NewProgrammeHistory           *sharedHistoryController;
     /* Load old Programmes file */
 
     NSFileManager *fileManager = [NSFileManager defaultManager];
-    BOOL firstTimeBuild;
+    BOOL firstTimeBuild = NO;
 
-    if ( [fileManager fileExistsAtPath:newCacheFile] && ![fileManager fileExistsAtPath:oldProgrammesFile] )
-        firstTimeBuild = true;
-    else
-        firstTimeBuild = false;
+    if ([fileManager fileExistsAtPath:newCacheFile] && ![fileManager fileExistsAtPath:oldProgrammesFile]) {
+        firstTimeBuild = YES;
+    }
 
     [NSKeyedUnarchiver setClass:[ProgrammeHistoryObject class] forClassName:@"ProgrammeHistoryObject"];
-    NSMutableArray *oldProgrammesArray = [NSKeyedUnarchiver unarchiveObjectWithFile:oldProgrammesFile];
-
-    if ( oldProgrammesArray == nil )
-        oldProgrammesArray = [[NSMutableArray alloc]init];
+    NSMutableArray *oldProgrammesArray = nil;
+    
+    // Guard against bad data in the archive. If the un-archive fails ignore it and just make an empty array.
+    @try {
+        oldProgrammesArray = [NSKeyedUnarchiver unarchiveObjectWithFile:oldProgrammesFile];
+    } @catch (NSException *exception) {
+        firstTimeBuild = YES;
+        oldProgrammesArray = [NSMutableArray new];
+    }
 
     /* Load in todays shows cached by get_iplayer or getITVListings and create a dictionary of show names */
 
@@ -2125,14 +2128,14 @@ NewProgrammeHistory           *sharedHistoryController;
 
     /* subtract bought forward from today to create new programmes list */
 
-    NSSet *oldProgrammeSet  = [NSSet setWithArray:oldProgrammesArray];
+    NSSet *oldProgrammeSet = [NSSet setWithArray:oldProgrammesArray];
     [todayProgrammes minusSet:oldProgrammeSet];
     NSArray *newProgrammesArray = todayProgrammes.allObjects;
 
     /* and update history file with new programmes */
 
-    if ( !firstTimeBuild ) {
-        for (ProgrammeHistoryObject *p in newProgrammesArray ) {
+    if (!firstTimeBuild) {
+        for (ProgrammeHistoryObject *p in newProgrammesArray) {
             [sharedHistoryController addWithName:p.programmeName tvChannel:p.tvChannel networkName:networkName];
         }
     }

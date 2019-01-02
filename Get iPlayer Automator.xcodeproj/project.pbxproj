@@ -31,6 +31,7 @@
 		7F2387362131082C00FA4588 /* SafariExtensionViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7F2387342131082C00FA4588 /* SafariExtensionViewController.xib */; };
 		7F2387392131082C00FA4588 /* script.js in Resources */ = {isa = PBXBuildFile; fileRef = 7F2387382131082C00FA4588 /* script.js */; };
 		7F23873B2131082C00FA4588 /* ToolbarItemIcon.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 7F23873A2131082C00FA4588 /* ToolbarItemIcon.pdf */; };
+		7F382EF721DD110400CCB64F /* SafeArchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F382EF621DD110400CCB64F /* SafeArchiver.m */; };
 		7F54B1B11FFD656C006D1325 /* ITVDownload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F340B5A1FFB063700F415A4 /* ITVDownload.swift */; };
 		7F54B1B31FFF38E8006D1325 /* Kanna.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F54B1B21FFF38E8006D1325 /* Kanna.framework */; };
 		7F54B1B41FFF38F8006D1325 /* Kanna.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7F54B1B21FFF38E8006D1325 /* Kanna.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -160,6 +161,8 @@
 		7F2868D320D34BA100220825 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = ../../../../System/Library/Frameworks/Cocoa.framework; sourceTree = "<group>"; };
 		7F340B591FFB063700F415A4 /* Get iPlayer Automator-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Get iPlayer Automator-Bridging-Header.h"; sourceTree = "<group>"; };
 		7F340B5A1FFB063700F415A4 /* ITVDownload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ITVDownload.swift; sourceTree = "<group>"; };
+		7F382EF521DD110400CCB64F /* SafeArchiver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SafeArchiver.h; sourceTree = "<group>"; };
+		7F382EF621DD110400CCB64F /* SafeArchiver.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SafeArchiver.m; sourceTree = "<group>"; };
 		7F54B1B21FFF38E8006D1325 /* Kanna.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Kanna.framework; path = Carthage/Build/Mac/Kanna.framework; sourceTree = "<group>"; };
 		7F5B1C4A211F9E2D00BF7E99 /* Safari.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Safari.swift; sourceTree = "<group>"; };
 		7F5B1C4B211F9E2D00BF7E99 /* Chrome.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Chrome.swift; sourceTree = "<group>"; };
@@ -316,6 +319,8 @@
 		29B97315FDCFA39411CA2CEA /* Other Sources */ = {
 			isa = PBXGroup;
 			children = (
+				7F382EF521DD110400CCB64F /* SafeArchiver.h */,
+				7F382EF621DD110400CCB64F /* SafeArchiver.m */,
 				3975484C1622504F00470DD1 /* ttml2srt.py */,
 				D90EF1361029CB3100290A67 /* Scripting Headers */,
 				32CA4F630368D1EE00C91783 /* Get_iPlayer GUI_Prefix.pch */,
@@ -664,6 +669,7 @@
 				D9C1D0F01993BBE00034465E /* GetiPlayerProxy.m in Sources */,
 				7F5B1C50211F9E2E00BF7E99 /* ChromeScripting.swift in Sources */,
 				39D52EA81DAAFD450033C4ED /* NPHistoryWindowController.m in Sources */,
+				7F382EF721DD110400CCB64F /* SafeArchiver.m in Sources */,
 				BF382ED41D73C26800BAF106 /* ExtendedShowInformationController.m in Sources */,
 				7F165A10205B92F9005BB78A /* GetITVListings.swift in Sources */,
 				393D1DEE18A5BBB500F27880 /* RSRTVArrayController.m in Sources */,

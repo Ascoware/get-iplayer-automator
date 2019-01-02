@@ -36,7 +36,8 @@ public class NewProgrammeHistory: NSObject {
 
         super.init()
 
-        if let unarchivedHistory = NSKeyedUnarchiver.unarchiveObject(withFile: historyFile) as? [ProgrammeHistoryObject] {
+        if let historyData = FileManager.default.contents(atPath: historyFile),
+            let unarchivedHistory = SafeArchiver.unarchive(historyData) as? [ProgrammeHistoryObject] {
             programmeHistoryArray = unarchivedHistory
         }
         
