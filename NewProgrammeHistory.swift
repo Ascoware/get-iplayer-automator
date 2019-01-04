@@ -33,7 +33,7 @@ public class NewProgrammeHistory: NSObject {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "EEE MMM dd"
         dateFound = dateFormatter.string(from: Date())
-
+        NSKeyedUnarchiver.setClass(ProgrammeHistoryObject.self, forClassName: "ProgrammeHistoryObject")
         super.init()
 
         if let historyData = FileManager.default.contents(atPath: historyFile),

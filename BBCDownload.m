@@ -143,10 +143,9 @@
         if (self.verbose)
             [args addObject:@"--verbose"];
         if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"DownloadSubtitles"] isEqualTo:@YES]) {
+            [args addObject:@"--subtitles"];
             if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"EmbedSubtitles"] isEqualTo:@YES]) {
-                [args addObject:@"--subsembed"];
-            } else {
-                [args addObject:@"--subtitles"];
+                [args addObject:@"--subs-embed"];
             }
         }
         
