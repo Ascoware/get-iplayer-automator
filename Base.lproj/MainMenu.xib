@@ -1738,10 +1738,10 @@
                                                 <binding destination="668" name="value" keyPath="values.DownloadSubtitles" id="1291"/>
                                             </connections>
                                         </button>
-                                        <button id="21y-4s-wnc">
-                                            <rect key="frame" x="35" y="212" width="270" height="18"/>
+                                        <button id="21y-4s-wnc" userLabel="Embed Subtitles In Download">
+                                            <rect key="frame" x="35" y="212" width="253" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Embed Subtitles In Download (BBC Only)" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="tSk-jt-JHb">
+                                            <buttonCell key="cell" type="check" title="Embed Subtitles In Downloaded Video" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="tSk-jt-JHb" userLabel="Embed Subtitles In Download">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>

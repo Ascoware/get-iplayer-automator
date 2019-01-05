@@ -426,8 +426,12 @@
                 [self convertSubtitlesFinished:nil];
             }
         } else {
-            NSString *message = [NSString stringWithFormat:@"INFO: No subtitles were found for %@", _show.showName];
-            [self addToLog:message noTag:YES];
+            // If youtube-dl embeds subtitles for us it deletes the raw subtitle file. When that happens
+            // we don't know if it was subtitled or not, so don't report an error when embedding is on.
+            if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"EmbedSubtitles"] boolValue]) {
+                NSString *message = [NSString stringWithFormat:@"INFO: No subtitles were found for %@", _show.showName];
+                [self addToLog:message noTag:YES];
+            }
             [self convertSubtitlesFinished:nil];
         }
     } else {

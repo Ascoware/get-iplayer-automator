@@ -402,7 +402,7 @@ public class ITVDownload : Download {
                 downloadTask?.resume()
             }
             else {
-                thumbnailRequestFinished(nil)
+            thumbnailRequestFinished(nil)
             }
         }
         else {
@@ -433,8 +433,12 @@ public class ITVDownload : Download {
         
         if let downloadSubs = UserDefaults.standard.object(forKey: "DownloadSubtitles") as? Bool, downloadSubs {
             args.append("--write-sub")
+            
+            if let embedSubs = UserDefaults.standard.object(forKey: "EmbedSubtitles") as? Bool, embedSubs {
+                args.append("--embed-subs")
+            }
         }
-        
+
         if verbose {
             args.append("--verbose")
         }
