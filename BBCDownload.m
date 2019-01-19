@@ -95,12 +95,7 @@
         
         //We don't want this to refresh now!
         NSString *cacheExpiryArg = @"-e604800000000";
-        NSString *appSupportFolder = (@"~/Library/Application Support/Get iPlayer Automator/").stringByExpandingTildeInPath;
-        NSFileManager *fileManager = [NSFileManager defaultManager];
-        if (![fileManager fileExistsAtPath: appSupportFolder])
-        {
-            [fileManager createDirectoryAtPath:appSupportFolder withIntermediateDirectories:NO attributes:nil error:nil];
-        }
+        NSString *appSupportFolder = [[NSFileManager defaultManager] applicationSupportDirectory];
         _profileDirArg = [[NSString alloc] initWithFormat:@"--profile-dir=%@", appSupportFolder];
         
         //Add Arguments that can't be NULL

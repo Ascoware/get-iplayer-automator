@@ -134,26 +134,17 @@ NewProgrammeHistory           *sharedHistoryController;
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"ForceHLSBBCVideo"];
 
     //Make sure Application Support folder exists
-    NSString *folder = @"~/Library/Application Support/Get iPlayer Automator/";
-    folder = folder.stringByExpandingTildeInPath;
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    if (![fileManager fileExistsAtPath:folder])
-    {
-        [fileManager createDirectoryAtPath:folder withIntermediateDirectories:NO attributes:nil error:nil];
-    }
-    [fileManager changeCurrentDirectoryPath:folder];
+    NSString *appSupportDirectory = [[NSFileManager defaultManager] applicationSupportDirectory];
+    [[NSFileManager defaultManager] changeCurrentDirectoryPath:appSupportDirectory];
 
     //Install Plugins If Needed
-    NSString *pluginPath = [folder stringByAppendingPathComponent:@"plugins"];
-    if (/*![fileManager fileExistsAtPath:pluginPath]*/TRUE)
-    {
-        [_logger addToLog:@"Installing/Updating Get_iPlayer Plugins..." :self];
-        NSString *providedPath = [NSBundle mainBundle].bundlePath;
-        if ([fileManager fileExistsAtPath:pluginPath]) [fileManager removeItemAtPath:pluginPath error:NULL];
-        providedPath = [providedPath stringByAppendingPathComponent:@"/Contents/Resources/plugins"];
-        [fileManager copyItemAtPath:providedPath toPath:pluginPath error:nil];
-    }
-
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSString *pluginPath = [appSupportDirectory stringByAppendingPathComponent:@"plugins"];
+    [_logger addToLog:@"Installing/Updating Get_iPlayer Plugins..." :self];
+    NSString *providedPath = [NSBundle mainBundle].bundlePath;
+    if ([fileManager fileExistsAtPath:pluginPath]) [fileManager removeItemAtPath:pluginPath error:NULL];
+    providedPath = [providedPath stringByAppendingPathComponent:@"/Contents/Resources/plugins"];
+    [fileManager copyItemAtPath:providedPath toPath:pluginPath error:nil];
 
     //Initialize Arguments
     _getiPlayerPath = [[NSString alloc] initWithString:[NSBundle mainBundle].bundlePath];
@@ -192,19 +183,14 @@ NewProgrammeHistory           *sharedHistoryController;
     //Read Queue & Series-Link from File
     NSFileManager *fileManager = [NSFileManager defaultManager];
 
-    NSString *folder = @"~/Library/Application Support/Get iPlayer Automator/";
-    folder = folder.stringByExpandingTildeInPath;
-    if ([fileManager fileExistsAtPath: folder] == NO)
-    {
-        [fileManager createDirectoryAtPath:folder withIntermediateDirectories:NO attributes:nil error:nil];
-    }
+    NSString *appSupportFolder = [[NSFileManager defaultManager] applicationSupportDirectory];
 
     // remove obsolete cache files
-    [fileManager removeItemAtPath:[folder stringByAppendingPathComponent:@"ch4.cache"] error:nil];
-    [fileManager removeItemAtPath:[folder stringByAppendingPathComponent:@"podcast.cache"] error:nil];
+    [fileManager removeItemAtPath:[appSupportFolder stringByAppendingPathComponent:@"ch4.cache"] error:nil];
+    [fileManager removeItemAtPath:[appSupportFolder stringByAppendingPathComponent:@"podcast.cache"] error:nil];
 
     NSString *filename = @"Queue.automatorqueue";
-    NSString *filePath = [folder stringByAppendingPathComponent:filename];
+    NSString *filePath = [appSupportFolder stringByAppendingPathComponent:filename];
 
     NSDictionary * rootObject;
     @try
@@ -229,7 +215,7 @@ NewProgrammeHistory           *sharedHistoryController;
     //Read Format Preferences
 
     filename = @"Formats.automatorqueue";
-    filePath = [folder stringByAppendingPathComponent:filename];
+    filePath = [appSupportFolder stringByAppendingPathComponent:filename];
 
     @try
     {
@@ -261,7 +247,7 @@ NewProgrammeHistory           *sharedHistoryController;
     }
 
     filename = @"ITVFormats.automator";
-    filePath = [folder stringByAppendingPathComponent:filename];
+    filePath = [appSupportFolder stringByAppendingPathComponent:filename];
     @try {
         rootObject = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
         [_itvFormatController addObjects:[rootObject valueForKey:@"itvFormats"]];
@@ -1656,16 +1642,9 @@ NewProgrammeHistory           *sharedHistoryController;
         }
 
     }
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-
-    NSString *folder = @"~/Library/Application Support/Get iPlayer Automator/";
-    folder = folder.stringByExpandingTildeInPath;
-    if ([fileManager fileExistsAtPath: folder] == NO)
-    {
-        [fileManager createDirectoryAtPath:folder withIntermediateDirectories:NO attributes:nil error:nil];
-    }
+    NSString *appSupportFolder = [[NSFileManager defaultManager] applicationSupportDirectory];
     NSString *filename = @"Queue.automatorqueue";
-    NSString *filePath = [folder stringByAppendingPathComponent:filename];
+    NSString *filePath = [appSupportFolder stringByAppendingPathComponent:filename];
 
     NSMutableDictionary * rootObject;
     rootObject = [NSMutableDictionary dictionary];
@@ -1676,7 +1655,7 @@ NewProgrammeHistory           *sharedHistoryController;
     [NSKeyedArchiver archiveRootObject: rootObject toFile: filePath];
 
     filename = @"Formats.automatorqueue";
-    filePath = [folder stringByAppendingPathComponent:filename];
+    filePath = [appSupportFolder stringByAppendingPathComponent:filename];
 
     rootObject = [NSMutableDictionary dictionary];
 
@@ -1685,7 +1664,7 @@ NewProgrammeHistory           *sharedHistoryController;
     [NSKeyedArchiver archiveRootObject:rootObject toFile:filePath];
 
     filename = @"ITVFormats.automator";
-    filePath = [folder stringByAppendingPathComponent:filename];
+    filePath = [appSupportFolder stringByAppendingPathComponent:filename];
     rootObject = [NSMutableDictionary dictionary];
     rootObject[@"itvFormats"] = _itvFormatController.arrangedObjects;
     [NSKeyedArchiver archiveRootObject:rootObject toFile:filePath];

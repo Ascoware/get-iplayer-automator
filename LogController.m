@@ -7,6 +7,7 @@
 //
 
 #import "LogController.h"
+#import "NSFileManager+DirectoryLocations.h"
 
 @implementation LogController
 
@@ -19,8 +20,8 @@
         NSString *initialLog = [NSString stringWithFormat:@"Get iPlayer Automator %@ Initialized.", version];
         [self addToLog:initialLog :nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(addToLogNotification:) name:@"AddToLog" object:nil];
-        
-        NSString *filePath = (@"~/Library/Application Support/Get iPlayer Automator/log.txt").stringByExpandingTildeInPath;
+        NSString *filePath = [[[NSFileManager defaultManager] applicationSupportDirectory] stringByAppendingPathComponent:@"log.txt"];
+
         [[NSFileManager defaultManager] createFileAtPath:filePath
                                                 contents:nil
                                               attributes:nil];

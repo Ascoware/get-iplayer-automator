@@ -9,6 +9,7 @@
 #import "DownloadHistoryController.h"
 #import "DownloadHistoryEntry.h"
 #import "Programme.h"
+#import "NSFileManager+DirectoryLocations.h"
 
 
 @implementation DownloadHistoryController
@@ -25,8 +26,8 @@
 	if ([historyArrayController.arrangedObjects count] > 0)
 		[historyArrayController removeObjectsAtArrangedObjectIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, [historyArrayController.arrangedObjects count])]];
 	
-	NSString *historyFilePath = @"~/Library/Application Support/Get iPlayer Automator/download_history";
-	NSFileHandle *historyFile = [NSFileHandle fileHandleForReadingAtPath:historyFilePath.stringByExpandingTildeInPath];
+    NSString *historyFilePath = [[[NSFileManager defaultManager] applicationSupportDirectory] stringByAppendingPathComponent:@"download_history"];
+	NSFileHandle *historyFile = [NSFileHandle fileHandleForReadingAtPath:historyFilePath];
 	NSData *historyFileData = [historyFile readDataToEndOfFile];
 	NSString *historyFileInfo = [[NSString alloc] initWithData:historyFileData encoding:NSUTF8StringEncoding];
 	
@@ -87,8 +88,7 @@
 		{
 			[historyString appendFormat:@"%@\n", [entry entryString]];
 		}
-		NSString *historyPath = @"~/Library/Application Support/Get iPlayer Automator/download_history";
-		historyPath = historyPath.stringByExpandingTildeInPath;
+        NSString *historyPath = [[[NSFileManager defaultManager] applicationSupportDirectory] stringByAppendingPathComponent:@"download_history"];
 		NSData *historyData = [historyString dataUsingEncoding:NSUTF8StringEncoding];
 		NSFileManager *fileManager = [NSFileManager defaultManager];
 		if (![fileManager fileExistsAtPath:historyPath])

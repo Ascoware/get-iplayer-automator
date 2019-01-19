@@ -202,7 +202,7 @@
     _pipe = [[NSPipe alloc] init];
     
     _metadataTask.launchPath = @"/usr/bin/perl";
-    NSString *profileDirPath = [@"~/Library/Application Support/Get iPlayer Automator/" stringByExpandingTildeInPath];
+    NSString *profileDirPath = [[NSFileManager defaultManager] applicationSupportDirectory];
     NSString *profileArg = [NSString stringWithFormat:@"--profile-dir=%@", profileDirPath];
     
     NSMutableArray *args = [NSMutableArray arrayWithArray:@[[[NSBundle mainBundle] pathForResource:@"get_iplayer" ofType:nil],
