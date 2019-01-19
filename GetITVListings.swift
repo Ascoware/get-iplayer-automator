@@ -101,18 +101,23 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
         return
     }
     
-    func processProgramDataElement(program: ProgrammeData, show: Kanna.XMLElement) {
+    func dateForTimeString(_ time:String) -> Date? {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mmZ"
         dateFormatter.timeZone = TimeZone(secondsFromGMT:0)
+        return dateFormatter.date(from: time)
+    }
         
-        var dateAiredUTC: Date? = nil
+    func processProgramDataElement(program: ProgrammeData, show: Kanna.XMLElement) {
         let dateTimeString = show.at_xpath(".//@datetime")?.text
         
-        if let dateTimeString = dateTimeString{
-            dateAiredUTC = dateFormatter.date(from: dateTimeString)
+        var dateAiredUTC: Date? = nil
+        if let dateTimeString = dateTimeString {
+            dateAiredUTC = dateForTimeString(dateTimeString)
         }
         
+        let programURL = URL(string: program.programmeURL)?.deletingLastPathComponent()
+
         let description = show.at_xpath(".//p[@class='tout__summary theme__subtle']")?.content?.trimmingCharacters(in: .whitespacesAndNewlines)
         
         var episodeNumber: Int? = 0
@@ -136,13 +141,13 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
             productionID = showURL?.lastPathComponent
         }
         
-        print("Program: \(program.programmeName)")
-        print("Show URL: \(showURL?.absoluteString ?? "")")
-        print("Episode number: \(episodeNumber ?? 0)")
-        print("Series number: \(seriesNumber ?? 0)")
-        print("productionID: \(productionID ?? "")")
-        print("Date aired: \(dateTimeString ?? "Unknown")")
-        print("=================")
+//        print("Program: \(program.programmeName)")
+//        print("Show URL: \(showURL?.absoluteString ?? "")")
+//        print("Episode number: \(episodeNumber ?? 0)")
+//        print("Series number: \(seriesNumber ?? 0)")
+//        print("productionID: \(productionID ?? "")")
+//        print("Date aired: \(dateTimeString ?? "Unknown")")
+//        print("=================")
         
         // Make sure the URL matches the show listing -- ITV likes to sneak other shows on a program page.
         if let showURLBase = showURL?.deletingLastPathComponent(), showURLBase.absoluteString == programURL?.absoluteString {
@@ -156,69 +161,60 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
 
     }
     
+    func processSingleEpisode(_ aProgramme: ProgrammeData, html: HTMLDocument) {
+        let showDataElement = html.xpath("//script[@id=\"json-ld\"]")
+
+        if let nodeContent = showDataElement.first?.text {
+            let data = nodeContent.data(using: String.Encoding.utf8, allowLossyConversion: false)!
+            
+            do {
+                let json = try JSONSerialization.jsonObject(with: data, options: []) as! [String: AnyObject]
+                if let description = json["description"] as? String {
+                    aProgramme.programDescription = description
+                }
+                
+                if let url = json["@id"] as? String {
+                    aProgramme.programmeURL = url
+                    aProgramme.productionId = URL(string: url)?.lastPathComponent ?? ""
+                }
+                
+                if let showName = json["partOfSeries"]?["name"] as? String {
+                    aProgramme.programmeName = showName
+                }
+                
+                if let thumbnailURL = json["image"]?["url"] as? String {
+                    aProgramme.thumbnailURL = thumbnailURL
+                }
+            } catch let error as NSError {
+                print("Failed to load: \(error.localizedDescription)")
+            }
+        }
+        
+        if let dateElement = html.at_xpath(".//li[@class='episode-info__meta-item episode-info__meta-item--broadcast']") {
+            if let dateTimeElement = dateElement.at_xpath(".//@datetime")?.text {
+                aProgramme.timeDateLastAired = dateForTimeString(dateTimeElement)
+            }
+        }
+        
+        let myProgramme = ProgrammeData(name: aProgramme.programmeName, pid: aProgramme.productionId, url: aProgramme.programmeURL, numberEpisodes: 1 , timeDateLastAired: aProgramme.timeDateLastAired, programDescription: aProgramme.programDescription, thumbnailURL: aProgramme.thumbnailURL)
+        
+        self.episodes.append(myProgramme)
+    }
+    
     func processProgrammeEpisodesData(_ aProgramme: ProgrammeData, pageData: Data) {
         
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mmZ"
-        dateFormatter.timeZone = TimeZone(secondsFromGMT:0)
-        
-        var programURL: URL? = nil
-        if let programURLString = aProgramme.programmeURL {
-            programURL = URL(string: programURLString)?.deletingLastPathComponent()
-        }
-            
         if let showPageHTML = try? HTML(html: pageData, encoding: .utf8) {
-            let showElements = showPageHTML.xpath("//a[@data-content-type=\"episode\"]")
-print("page has \(showElements.count) elements for \(aProgramme.programmeURL)")
-            for show in showElements {
-                processProgramDataElement(program: aProgramme, show: show)
-                var dateAiredUTC: Date? = nil
-                let dateTimeString = show.at_xpath(".//@datetime")?.text
-                
-                if let dateTimeString = dateTimeString{
-                    dateAiredUTC = dateFormatter.date(from: dateTimeString)
-                }
+            let programmeShowElements = showPageHTML.xpath("//a[@data-content-type=\"episode\"]")
 
-                let description = show.at_xpath(".//p[@class='tout__summary theme__subtle']")?.content?.trimmingCharacters(in: .whitespacesAndNewlines)
-                
-                var episodeNumber: Int? = 0
-                if let episode = show.at_xpath(".//h3[@class='tout__title complex-link__target theme__target ']")?.content?.trimmingCharacters(in: .whitespacesAndNewlines) {
-                    let episodeScanner = Scanner(string: episode)
-                    episodeScanner.scanString("Episode ")
-                    episodeNumber = episodeScanner.scanInteger()
+            if programmeShowElements.count > 0 {
+                // This is a series, so find information about all episodes here.
+                for show in programmeShowElements {
+                    processProgramDataElement(program: aProgramme, show: show)
                 }
-                
-                var seriesNumber: Int? = 0
-                if let series = show.at_xpath(".//h2[@class='module__heading']")?.content?.trimmingCharacters(in: .whitespacesAndNewlines) {
-                    let seriesScanner = Scanner(string: series)
-                    seriesScanner.scanString("Series ")
-                    seriesNumber = seriesScanner.scanInteger()
-                }
-
-                var productionID: String? = ""
-                var showURL: URL? = nil
-                if let showURLString = show.at_xpath("@href")?.text {
-                    showURL = URL(string: showURLString)
-                    productionID = showURL?.lastPathComponent
-                }
-                
-                print("Program: \(aProgramme.programmeName)")
-                print("Show URL: \(showURL?.absoluteString ?? "")")
-                print("Episode number: \(episodeNumber ?? 0)")
-                print("Series number: \(seriesNumber ?? 0)")
-                print("productionID: \(productionID ?? "")")
-                print("Date aired: \(dateTimeString ?? "Unknown")")
-                print("=================")
-                
-                // Make sure the URL matches the show listing -- ITV likes to sneak other shows on a program page.
-                if let showURLBase = showURL?.deletingLastPathComponent(), showURLBase.absoluteString == programURL?.absoluteString {
-                    
-                    /* Create ProgrammeData Object and store in array */
-                    let myProgramme = ProgrammeData(name: aProgramme.programmeName, pid: productionID ?? "", url: showURL?.absoluteString ?? "", numberEpisodes: aProgramme.numberEpisodes, timeDateLastAired: dateAiredUTC, programDescription: description ?? "", thumbnailURL: "")
-                    
-                    myProgramme.addProgrammeSeriesInfo(seriesNumber ?? 0, aEpisodeNumber: episodeNumber ?? 0)
-                    self.episodes.append(myProgramme)
-                }
+            } else {
+                // If there are no program elements ('programme'), this page is itself a program,
+                // typically a movie.
+                processSingleEpisode(aProgramme, html: showPageHTML)
             }
         }
         
