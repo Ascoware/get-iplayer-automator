@@ -59,12 +59,7 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
         
         /* Load in all shows for itv.com */
         myOpQueue.maxConcurrentOperationCount = 1
-        myOpQueue.addOperation {
-            self.requestShowListing()
-        }
-    }
-    
-    func requestShowListing() {
+
         if let aString = URL(string: "https://www.itv.com/hub/shows") {
             mySession?.dataTask(with: aString, completionHandler: {(_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void in
                 if let error = error {
@@ -75,30 +70,88 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
                     return
                 }
                 
-                if !self.createProgrammes(data: data) {
-                    self.endOfRun()
+                if self.createProgrammes(data: data) {
+                    self.myQueueSize = self.programmes.count
+                    self.myQueueLeft = self.myQueueSize
+
+                    if self.myQueueSize >= 0 {
+                        for todayProgramme in self.programmes {
+                            self.myOpQueue.addOperation {
+                                self.requestProgrammeEpisodes(todayProgramme)
+                            }
+                        }
+                    } else {
+                        self.writeEpisodeCacheFile()
+                    }
+                    
                 } else {
-                    self.mergeAllProgrammes()
+                    self.endOfRun()
                 }
             }).resume()
         }
     }
     
+    func createProgrammes(data: Data) -> Bool {
+        /* Scan itv.com/shows to create full listing of programmes (not episodes) that are available today */
+        programmes.removeAll()
+        
+        if let showsPage = try? HTML(html: data, encoding: .utf8) {
+            let shows = showsPage.xpath("//a[@class='complex-link']")
+            
+            for show in shows {
+                guard let showPage = show.at_xpath("@href")?.text,
+                    let showPageURL = URL(string: showPage) else {
+                        continue
+                }
+                
+                let showName: String?
+                let numberEpisodes: Int
+                let productionID: String?
+                let showPageURLString: String?
+                
+                showPageURLString = showPage
+                productionID = showPageURL.lastPathComponent
+                
+                showName = show.at_xpath(".//h3[@class='tout__title complex-link__target theme__target']")?.content?.trimmingCharacters(in: .whitespacesAndNewlines)
+                
+                if let numberEpisodesString = show.at_xpath(".//p[@class='tout__meta theme__meta']")?.content?.trimmingCharacters(in: .whitespacesAndNewlines) {
+                    let scanner = Scanner(string: numberEpisodesString)
+                    numberEpisodes = scanner.scanInteger() ?? 0
+                } else {
+                    numberEpisodes = 0
+                }
+                
+                if numberEpisodes > 0 {
+                    // Check for duplicate show listings.
+                    let existingProgram = programmes.filter { $0.productionId == productionID }
+                    
+                    if existingProgram.count == 0 {
+                        let myProgramme = ProgrammeData(name: showName ?? "<None>", pid: productionID ?? "", url: showPageURLString ?? "", numberEpisodes: numberEpisodes, timeDateLastAired: currentTime, programDescription:"", thumbnailURL: "")
+                        programmes.append(myProgramme)
+                    }
+                }
+            }
+        }
+        
+        /* Now we sort the programmes and drop the duplicates */
+        if programmes.count == 0 {
+            self.logger?.add(toLog: "No programmes found on www.itv.com/hub/shows")
+            showAlert(message: "No programmes were found on www.itv.com/hub/shows",
+                      informative: "Try again later. If the problem persists please file a bug.")
+            return false
+        }
+        
+        programmes.sort { $0.programmeName < $1.programmeName }
+        return true
+    }
+
     func requestProgrammeEpisodes(_ myProgramme: ProgrammeData) {
         /* Get all episodes for the programme name identified in MyProgramme */
-        usleep(1)
         if let url = URL(string: myProgramme.programmeURL) {
             mySession?.dataTask(with: url, completionHandler: {(_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void in
-                if let error = error {
-                    let errorMessage = "GetITVListings (Error(\(error))): Unable to retreive programme episodes for \(myProgramme.programmeURL)"
-                    self.logger?.add(toLog: errorMessage)
-                    //                    NSAlert(messageText: "GetITVShows: Unable to retreive programme episode data", defaultButton: "OK", alternateButton: nil, otherButton: nil, informativeTextWithFormat: "If problem persists, please submit a bug report and include the log file.").runModal()
-                } else if let data = data {
-                    self.processProgrammeEpisodesData(myProgramme, pageData: data)
-                }
+                self.processEpisodesForProgram(myProgramme, pageData: data, error: error)
             }).resume()
         }
-        return
     }
     
     func dateForTimeString(_ time:String) -> Date? {
@@ -108,7 +161,7 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
         return dateFormatter.date(from: time)
     }
         
-    func processProgramDataElement(program: ProgrammeData, show: Kanna.XMLElement) {
+    func processEpisodeElement(program: ProgrammeData, show: Kanna.XMLElement) {
         let dateTimeString = show.at_xpath(".//@datetime")?.text
         
         var dateAiredUTC: Date? = nil
@@ -200,35 +253,50 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
         
         self.episodes.append(myProgramme)
     }
+
+    fileprivate func operationCompleted() {
+        let increment = Double(myQueueSize - 1) > 0 ? 100.0 / Double(myQueueSize - 1) : 100.0
+        AppController.shared().itvProgressIndicator.increment(by: increment)
+        
+        /* Check if there is any outstanding work before processing the carried forward programme list */
+        myQueueLeft -= 1
+        if (myQueueLeft == 0) {
+            writeEpisodeCacheFile()
+        }
+    }
     
-    func processProgrammeEpisodesData(_ aProgramme: ProgrammeData, pageData: Data) {
+    func processEpisodesForProgram(_ aProgramme: ProgrammeData, pageData: Data?, error: Error?) {
+        if let error = error {
+            let errorMessage = "GetITVListings (Error(\(error))): Unable to retreive programme episodes for \(aProgramme.programmeURL)"
+            self.logger?.add(toLog: errorMessage)
+            operationCompleted()
+            return
+        }
+
+        guard let pageData = pageData else {
+            operationCompleted()
+            return
+        }
         
         if let showPageHTML = try? HTML(html: pageData, encoding: .utf8) {
-            let programmeShowElements = showPageHTML.xpath("//a[@data-content-type=\"episode\"]")
+            let episodeElements = showPageHTML.xpath("//a[@data-content-type=\"episode\"]")
 
-            if programmeShowElements.count > 0 {
-                // This is a series, so find information about all episodes here.
-                for show in programmeShowElements {
-                    processProgramDataElement(program: aProgramme, show: show)
+            if episodeElements.count > 0 {
+                // This is a series, so create a ProgrammeData for each episode.
+                for episode in episodeElements {
+                    processEpisodeElement(program: aProgramme, show: episode)
                 }
             } else {
-                // If there are no program elements ('programme'), this page is itself a program,
-                // typically a movie.
+                // This page is itself a program (most likely a movie.)
+                // Extract its metadata and create a ProgrammeData for it.
                 processSingleEpisode(aProgramme, html: showPageHTML)
             }
         }
         
-        let increment = Double(myQueueSize - 1) > 0 ? 100.0 / Double(myQueueSize - 1) : 100.0
-        AppController.shared().itvProgressIndicator.increment(by: increment)
-
-        /* Check if there is any outstanding work before processing the carried forward programme list */
-        myQueueLeft -= 1
-        if (myQueueLeft == 0) {
-            processEpisodes()
-        }
+        operationCompleted()
     }
     
-    func processEpisodes() {
+    func writeEpisodeCacheFile() {
         self.logger?.add(toLog: "GetITVShows (Info): Episodes: \(episodes.count) Today Programmes: \(programmes.count) ")
         
         /* First we update datetimeadded for the carried forward programmes */
@@ -331,78 +399,5 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
         self.logger?.add(toLog: "GetITVShows: Update Finished")
     }
     
-    func mergeAllProgrammes() {
-        
-        myQueueSize = programmes.count
-        myQueueLeft = myQueueSize
-
-        for todayProgramme in programmes {
-            myOpQueue.addOperation {
-                self.requestProgrammeEpisodes(todayProgramme)
-            }
-        }
-        
-        if myQueueSize < 2 {
-            AppController.shared()?.itvProgressIndicator.increment(by: 100.0)
-        }
-        
-        if myQueueSize == 0 {
-            processEpisodes()
-        }
-    }
-    
-    func createProgrammes(data: Data) -> Bool {
-        /* Scan itv.com/shows to create full listing of programmes (not episodes) that are available today */
-        programmes.removeAll()
-        
-        if let showsPage = try? HTML(html: data, encoding: .utf8) {
-            let shows = showsPage.xpath("//a[@class='complex-link']")
-            
-            for show in shows {
-                guard let showPage = show.at_xpath("@href")?.text,
-                    let showPageURL = URL(string: showPage) else {
-                    continue
-                }
-                
-                let showName: String?
-                let numberEpisodes: Int
-                let productionID: String?
-                let showPageURLString: String?
-
-                showPageURLString = showPage
-                productionID = showPageURL.lastPathComponent
-
-                showName = show.at_xpath(".//h3[@class='tout__title complex-link__target theme__target']")?.content?.trimmingCharacters(in: .whitespacesAndNewlines)
-                
-                if let numberEpisodesString = show.at_xpath(".//p[@class='tout__meta theme__meta']")?.content?.trimmingCharacters(in: .whitespacesAndNewlines) {
-                    let scanner = Scanner(string: numberEpisodesString)
-                    numberEpisodes = scanner.scanInteger() ?? 0
-                } else {
-                    numberEpisodes = 0
-                }
-
-                if numberEpisodes > 0 {
-                    // Check for duplicate show listings.
-                    let existingProgram = programmes.filter { $0.productionId == productionID }
-                    
-                    if existingProgram.count == 0 {
-                        let myProgramme = ProgrammeData(name: showName ?? "<None>", pid: productionID ?? "", url: showPageURLString ?? "", numberEpisodes: numberEpisodes, timeDateLastAired: currentTime, programDescription:"", thumbnailURL: "")
-                        programmes.append(myProgramme)
-                    }
-                }
-            }
-        }
-        
-        /* Now we sort the programmes and drop the duplicates */
-        if programmes.count == 0 {
-            self.logger?.add(toLog: "No programmes found on www.itv.com/hub/shows")
-            showAlert(message: "No programmes were found on www.itv.com/hub/shows",
-                      informative: "Try again later. If the problem persists please file a bug.")
-            return false
-        }
-        
-        programmes.sort { $0.programmeName < $1.programmeName }
-        return true
-    }
 }
 
