@@ -171,21 +171,22 @@ public class ITVDownload : Download {
             if let descriptionElement = htmlPage.at_xpath("//script[@id='json-ld']") {
                 if let descriptionJSON = descriptionElement.content {
                     if let data = descriptionJSON.data(using: .utf8) {
-                        if let descJSONDict = try? JSONSerialization.jsonObject(with: data) as? [String : Any] {
-                            showDescription = descJSONDict? ["description"] as? String ?? "None available"
-                            episodeNumber = descJSONDict?["episodeNumber"] as? Int ?? 0
-                            if let seriesDict = descJSONDict?["partOfSeason"] as? [String: Any] {
+                        if let descJSONDict = try? JSONSerialization.jsonObject(with: data) as? [String : Any],
+                            let descriptionData = descJSONDict {
+                            showDescription = descriptionData ["description"] as? String ?? "None available"
+                            episodeNumber = descriptionData["episodeNumber"] as? Int ?? 0
+                            if let seriesDict = descriptionData["partOfSeason"] as? [String: Any] {
                                 seriesNumber = seriesDict["seasonNumber"] as? Int ?? 0
                             }
                             
                             episode = descJSONDict? ["name"] as? String ?? ""
 
-                            if let imageDict = descJSONDict? ["image"] as? [String : Any],
+                            if let imageDict = descriptionData["image"] as? [String : Any],
                                 let thumbnailURLString = imageDict["url"] as? String {
                                 self.thumbnailURL = thumbnailURLString
                             }
 
-                            if let potentialActionDict = descJSONDict?["potentialAction"] as? [[String: Any]],
+                            if let potentialActionDict = descriptionData["potentialAction"] as? [[String: Any]],
                                 let expectsAcceptanceDict = potentialActionDict[0]["expectsAcceptanceOf"] as? [[String: Any]],
                                 let availabilityTime = expectsAcceptanceDict[0]["availabilityStarts"] as? String {
                                 timeAired = longDateFormatter.date(from:availabilityTime)
