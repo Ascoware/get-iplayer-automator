@@ -106,7 +106,19 @@ import ScriptingBridge
         
         //Get URL
         if (browser == "Safari") {
-            guard let safari: SafariApplication = SBApplication(bundleIdentifier: "com.apple.Safari"), safari.isRunning, let safariWindows = safari.windows?().compactMap({ $0 as? SafariWindow }) else {
+            var safariRunning: SafariApplication? = nil
+            let safariTechPreview = SBApplication(bundleIdentifier: "com.apple.SafariTechnologyPreview")
+            
+            if safariTechPreview?.isRunning ?? false {
+                safariRunning = safariTechPreview
+            } else {
+                let safariDefault = SBApplication(bundleIdentifier: "com.apple.Safari")
+                if safariDefault?.isRunning ?? false {
+                    safariRunning = safariDefault
+                }
+            }
+            
+            guard let safari = safariRunning, let safariWindows = safari.windows?().compactMap({ $0 as? SafariWindow }) else {
                 browserNotOpen.runModal()
                 return nil
             }
