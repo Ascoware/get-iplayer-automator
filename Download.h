@@ -95,7 +95,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)processFLVStreamerMessage:(NSString *)message;
 
 - (void)launchMetaRequest;
-- (void)launchRTMPDumpWithArgs:(NSArray *)args;
 - (void)processGetiPlayerOutput:(NSString *)outp;
 - (void)createDownloadPath;
 - (void)processError;

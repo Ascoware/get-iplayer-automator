@@ -12,7 +12,6 @@
 		393D1DEE18A5BBB500F27880 /* RSRTVArrayController.m in Sources */ = {isa = PBXBuildFile; fileRef = 393D1DED18A5BBB500F27880 /* RSRTVArrayController.m */; };
 		396FDA611DA98179003F3F57 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 396FDA5F1DA98179003F3F57 /* MainMenu.xib */; };
 		3975484D1622504F00470DD1 /* ttml2srt.py in Resources */ = {isa = PBXBuildFile; fileRef = 3975484C1622504F00470DD1 /* ttml2srt.py */; };
-		398516A716D1A02500EBB4CE /* Body2 in Resources */ = {isa = PBXBuildFile; fileRef = 398516A616D1A02500EBB4CE /* Body2 */; };
 		39879DAF16904B9F0050CA7D /* GTMNSString+HTML.m in Sources */ = {isa = PBXBuildFile; fileRef = 39879DAC16904B9F0050CA7D /* GTMNSString+HTML.m */; };
 		39879DB016904B9F0050CA7D /* NSString+HTML.m in Sources */ = {isa = PBXBuildFile; fileRef = 39879DAE16904B9F0050CA7D /* NSString+HTML.m */; };
 		39AE5F5E1D329E390019E5EF /* rtmpdump in CopyFiles */ = {isa = PBXBuildFile; fileRef = 39AE5F5C1D3294C40019E5EF /* rtmpdump */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
@@ -65,7 +64,6 @@
 		D914BD29100CBFA900F7E68E /* BBCDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = D914BD28100CBFA900F7E68E /* BBCDownload.m */; };
 		D9178595101345D700B82736 /* Series.m in Sources */ = {isa = PBXBuildFile; fileRef = D9178594101345D700B82736 /* Series.m */; };
 		D921C9EB149BCDEB004CB558 /* Download.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9EA149BCDEA004CB558 /* Download.m */; };
-		D921C9ED149C4C6F004CB558 /* Body in Resources */ = {isa = PBXBuildFile; fileRef = D921C9EC149C4C6F004CB558 /* Body */; };
 		D92687C51087F81F000E8132 /* DownloadHistoryController.m in Sources */ = {isa = PBXBuildFile; fileRef = D92687C41087F81F000E8132 /* DownloadHistoryController.m */; };
 		D92687CA1087F836000E8132 /* DownloadHistoryEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = D92687C91087F836000E8132 /* DownloadHistoryEntry.m */; };
 		D941D9A01025DDCF0012A75F /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D941D99F1025DDCF0012A75F /* SystemConfiguration.framework */; };
@@ -77,10 +75,8 @@
 		D9B6DB9A196D9AEC00161ECB /* LogController.m in Sources */ = {isa = PBXBuildFile; fileRef = D9B6DB99196D9AEC00161ECB /* LogController.m */; };
 		D9C1D0F01993BBE00034465E /* GetiPlayerProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = D9C1D0EF1993BBE00034465E /* GetiPlayerProxy.m */; };
 		D9CCF3CC1023485A009205BE /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = D9CCF3CB1023485A009205BE /* dsa_pub.pem */; };
-		D9CCF54C1025AAF9009205BE /* Growl Registration Ticket.growlRegDict in Resources */ = {isa = PBXBuildFile; fileRef = D9CCF54B1025AAF9009205BE /* Growl Registration Ticket.growlRegDict */; };
 		D9CDC9E8186B8F2B0003A4E2 /* GetiPlayerAutomator.sdef in Resources */ = {isa = PBXBuildFile; fileRef = D9CDC9E7186B8F2B0003A4E2 /* GetiPlayerAutomator.sdef */; };
 		D9CDC9EC186B90A90003A4E2 /* ASDownloadShows.m in Sources */ = {isa = PBXBuildFile; fileRef = D9CDC9EB186B90A90003A4E2 /* ASDownloadShows.m */; };
-		D9D06C6F14BB91C200029340 /* ITVMediaFileEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = D9D06C6E14BB91C200029340 /* ITVMediaFileEntry.m */; };
 		D9F668DB102C560500A9449B /* GetFireFoxURL.applescript in Resources */ = {isa = PBXBuildFile; fileRef = D9F668BF102C53D700A9449B /* GetFireFoxURL.applescript */; };
 		D9F66963102C5DC500A9449B /* GetOperaURL.applescript in Resources */ = {isa = PBXBuildFile; fileRef = D9F66962102C5DB800A9449B /* GetOperaURL.applescript */; };
 		D9F97FE5198E9043006494A3 /* GetCurrentWebpage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9F97FE4198E9043006494A3 /* GetCurrentWebpage.swift */; };
@@ -128,7 +124,6 @@
 		393D1DEC18A5BBB500F27880 /* RSRTVArrayController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSRTVArrayController.h; sourceTree = "<group>"; };
 		393D1DED18A5BBB500F27880 /* RSRTVArrayController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSRTVArrayController.m; sourceTree = "<group>"; };
 		3975484C1622504F00470DD1 /* ttml2srt.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = ttml2srt.py; sourceTree = "<group>"; };
-		398516A616D1A02500EBB4CE /* Body2 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Body2; sourceTree = "<group>"; };
 		39879DAB16904B9F0050CA7D /* GTMNSString+HTML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "GTMNSString+HTML.h"; sourceTree = "<group>"; };
 		39879DAC16904B9F0050CA7D /* GTMNSString+HTML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "GTMNSString+HTML.m"; sourceTree = "<group>"; };
 		39879DAD16904B9F0050CA7D /* NSString+HTML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+HTML.h"; sourceTree = "<group>"; };
@@ -201,7 +196,6 @@
 		D921C9C1149BBF51004CB558 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = System/Library/Frameworks/CoreServices.framework; sourceTree = SDKROOT; };
 		D921C9E9149BCDEA004CB558 /* Download.h */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.h; path = Download.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; wrapsLines = 1; };
 		D921C9EA149BCDEA004CB558 /* Download.m */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.objc; path = Download.m; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; wrapsLines = 1; };
-		D921C9EC149C4C6F004CB558 /* Body */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Body; sourceTree = "<group>"; };
 		D92687C31087F81F000E8132 /* DownloadHistoryController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DownloadHistoryController.h; sourceTree = "<group>"; };
 		D92687C41087F81F000E8132 /* DownloadHistoryController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DownloadHistoryController.m; sourceTree = "<group>"; };
 		D92687C81087F836000E8132 /* DownloadHistoryEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DownloadHistoryEntry.h; sourceTree = "<group>"; };
@@ -224,12 +218,9 @@
 		D9CCF3CB1023485A009205BE /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
 		D9CCF4C310256E82009205BE /* iTunes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iTunes.h; sourceTree = "<group>"; };
 		D9CCF52E10259DED009205BE /* Features.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = Features.rtf; sourceTree = "<group>"; };
-		D9CCF54B1025AAF9009205BE /* Growl Registration Ticket.growlRegDict */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "Growl Registration Ticket.growlRegDict"; sourceTree = "<group>"; };
 		D9CDC9E7186B8F2B0003A4E2 /* GetiPlayerAutomator.sdef */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = GetiPlayerAutomator.sdef; sourceTree = "<group>"; };
 		D9CDC9EA186B90A90003A4E2 /* ASDownloadShows.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASDownloadShows.h; sourceTree = "<group>"; };
 		D9CDC9EB186B90A90003A4E2 /* ASDownloadShows.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASDownloadShows.m; sourceTree = "<group>"; };
-		D9D06C6D14BB91C200029340 /* ITVMediaFileEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ITVMediaFileEntry.h; sourceTree = "<group>"; };
-		D9D06C6E14BB91C200029340 /* ITVMediaFileEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ITVMediaFileEntry.m; sourceTree = "<group>"; };
 		D9F668BF102C53D700A9449B /* GetFireFoxURL.applescript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.applescript; path = GetFireFoxURL.applescript; sourceTree = "<group>"; };
 		D9F66954102C5D0D00A9449B /* GetCaminoURL.applescript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.applescript; path = GetCaminoURL.applescript; sourceTree = "<group>"; };
 		D9F66962102C5DB800A9449B /* GetOperaURL.applescript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.applescript; path = GetOperaURL.applescript; sourceTree = "<group>"; };
@@ -334,8 +325,6 @@
 			isa = PBXGroup;
 			children = (
 				39FD5E9519D370BD006BC47B /* Images.xcassets */,
-				398516A616D1A02500EBB4CE /* Body2 */,
-				D921C9EC149C4C6F004CB558 /* Body */,
 				D9A450A3102FFDC00011E175 /* LICENSE.txt */,
 				D9A4509C102FF8090011E175 /* Credits.html */,
 				D90EF2A7102B5D6300290A67 /* Scripts */,
@@ -345,7 +334,6 @@
 				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
 				396FDA5F1DA98179003F3F57 /* MainMenu.xib */,
 				BF382EE21D73C36300BAF106 /* NPHistoryWindow.xib */,
-				D9CCF54B1025AAF9009205BE /* Growl Registration Ticket.growlRegDict */,
 				DFFF196613E96288007B52AC /* ReasonsForFailure.plist */,
 				D9CDC9E7186B8F2B0003A4E2 /* GetiPlayerAutomator.sdef */,
 			);
@@ -443,8 +431,6 @@
 				D92687C91087F836000E8132 /* DownloadHistoryEntry.m */,
 				DFC865E013E96BE200606599 /* ReasonForFailure.h */,
 				DFC865E113E96BE200606599 /* ReasonForFailure.m */,
-				D9D06C6D14BB91C200029340 /* ITVMediaFileEntry.h */,
-				D9D06C6E14BB91C200029340 /* ITVMediaFileEntry.m */,
 				392A41A2169735340053DEA5 /* HTTPProxy.h */,
 				392A41A3169735340053DEA5 /* HTTPProxy.m */,
 				D9B6DB9C196DBD4600161ECB /* GiASearch.h */,
@@ -613,16 +599,13 @@
 				396FDA611DA98179003F3F57 /* MainMenu.xib in Resources */,
 				8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */,
 				D9CCF3CC1023485A009205BE /* dsa_pub.pem in Resources */,
-				D9CCF54C1025AAF9009205BE /* Growl Registration Ticket.growlRegDict in Resources */,
 				BF382EE31D73C36300BAF106 /* NPHistoryWindow.xib in Resources */,
 				D9A4509D102FF8090011E175 /* Credits.html in Resources */,
 				D9A450A4102FFDC00011E175 /* LICENSE.txt in Resources */,
 				DFFF196713E96288007B52AC /* ReasonsForFailure.plist in Resources */,
 				7FAA6A25206F36B800B6B50C /* Crypto in Resources */,
 				D9CDC9E8186B8F2B0003A4E2 /* GetiPlayerAutomator.sdef in Resources */,
-				D921C9ED149C4C6F004CB558 /* Body in Resources */,
 				3975484D1622504F00470DD1 /* ttml2srt.py in Resources */,
-				398516A716D1A02500EBB4CE /* Body2 in Resources */,
 				7FC8F71E20674D6D00DC158C /* get_iplayer in Resources */,
 				7FC8F71C20674B7600DC158C /* youtube-dl in Resources */,
 			);
@@ -675,7 +658,6 @@
 				39D7C1BD1874AD7400B78698 /* StringTrimFormatter.m in Sources */,
 				D9F97FEC198EBA94006494A3 /* NSFileManager+DirectoryLocations.m in Sources */,
 				D921C9EB149BCDEB004CB558 /* Download.m in Sources */,
-				D9D06C6F14BB91C200029340 /* ITVMediaFileEntry.m in Sources */,
 				7F165A16205C1F8C005BB78A /* NewProgrammeHistory.swift in Sources */,
 				7F5B1C54211F9EE600BF7E99 /* SBObjectProtocol.swift in Sources */,
 				BF382ED91D73C2C700BAF106 /* GiASearch.m in Sources */,

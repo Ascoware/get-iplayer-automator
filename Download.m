@@ -580,91 +580,12 @@
             if(output.length > 1) [self addToLog:output noTag:YES];
     }
 }
--(void)launchRTMPDumpWithArgs:(NSArray *)args
-{
-    if ([[NSFileManager defaultManager] fileExistsAtPath:[_downloadPath.stringByDeletingPathExtension.stringByDeletingPathExtension stringByAppendingPathExtension:@"mp4"]])
-    {
-        [self addToLog:@"ERROR: Destination file already exists." noTag:YES];
-        _show.complete = @YES;
-        _show.successful = @NO;
-        self.show.status = @"Download Failed";
-        _show.reasonForFailure = @"FileExists";
-        [[NSNotificationCenter defaultCenter] removeObserver:self];
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"DownloadFinished" object:_show];
-        return;
-    }
-    else if ([[NSFileManager defaultManager] fileExistsAtPath:_downloadPath])
-    {
-        [self addToLog:@"WARNING: Partial file already exists...attempting to resume" noTag:YES];
-        args = [args arrayByAddingObject:@"--resume"];
-    }
 
-    NSMutableString *cmd = [NSMutableString stringWithCapacity:0];
-    [cmd appendString:[NSString stringWithFormat:@"\"%@\"", [([NSBundle mainBundle].executablePath).stringByDeletingLastPathComponent stringByAppendingPathComponent:@"rtmpdump"]]];
-    for (NSString *arg in args) {
-        if ([arg hasPrefix:@"-"] || [arg hasPrefix:@"\""])
-            [cmd appendString:[NSString stringWithFormat:@" %@", arg]];
-        else
-            [cmd appendString:[NSString stringWithFormat:@" \"%@\"", arg]];
-    }
-    NSLog(@"DEBUG: RTMPDump command: %@", cmd);
-    if (_verbose)
-        [self addToLog:[NSString stringWithFormat:@"DEBUG: RTMPDump command: %@", cmd] noTag:YES];
-
-    _task = [[NSTask alloc] init];
-    _pipe = [[NSPipe alloc] init];
-    _errorPipe = [[NSPipe alloc] init];
-    _task.launchPath = [([NSBundle mainBundle].executablePath).stringByDeletingLastPathComponent stringByAppendingPathComponent:@"rtmpdump"];
-
-    /* rtmpdump -r "rtmpe://cp72511.edgefcs.net/ondemand?auth=eaEc.b4aodIcdbraJczd.aKchaza9cbdTc0cyaUc2aoblaLc3dsdkd5d9cBduczdLdn-bo64cN-eS-6ys1GDrlysDp&aifp=v002&slist=production/" -W http://www.itv.com/mediaplayer/ITVMediaPlayer.swf?v=11.20.654 -y "mp4:production/priority/CATCHUP/e48ab1e2/1a73/4620/adea/dda6f21f45ee/1-6178-0002-001_THE-ROYAL-VARIETY-PERFORMANCE-2011_TX141211_ITV1200_16X9.mp4" -o test2 */
-
-    _task.arguments = [NSArray arrayWithArray:args];
-
-
-    _task.standardOutput = _pipe;
-    _task.standardError = _errorPipe;
-    _fh = _pipe.fileHandleForReading;
-	_errorFh = _errorPipe.fileHandleForReading;
-
-    NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:_task.environment];
-    envVariableDictionary[@"PERL_UNICODE"] = @"AS";
-    envVariableDictionary[@"HOME"] = (@"~").stringByExpandingTildeInPath;
-    NSString *perlPath = [[NSBundle mainBundle] resourcePath];
-    perlPath = [perlPath stringByAppendingPathComponent:@"perl5"];
-    NSString *cacertPath = [perlPath stringByAppendingPathComponent:@"Mozilla/CA/cacert.pem"];
-    envVariableDictionary[@"PERL5LIB"] = perlPath;
-    envVariableDictionary[@"SSL_CERT_DIR"] = perlPath;
-    envVariableDictionary[@"MOJO_CA_FILE"] = cacertPath;
-    _task.environment = envVariableDictionary;
-
-
-	[[NSNotificationCenter defaultCenter] addObserver:self
-		   selector:@selector(DownloadDataReady:)
-			   name:NSFileHandleReadCompletionNotification
-			 object:_fh];
-	[[NSNotificationCenter defaultCenter] addObserver:self
-		   selector:@selector(ErrorDataReady:)
-			   name:NSFileHandleReadCompletionNotification
-			 object:_errorFh];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-           selector:@selector(rtmpdumpFinished:)
-               name:NSTaskDidTerminateNotification
-             object:_task];
-
-    [self addToLog:@"INFO: Launching RTMPDUMP..." noTag:YES];
-	[_task launch];
-	[_fh readInBackgroundAndNotify];
-	[_errorFh readInBackgroundAndNotify];
-    _show.status = @"Initialising...";
-
-	//Prepare UI
-	[self setCurrentProgress:[NSString stringWithFormat:@"Initialising RTMPDump... -- %@",_show.showName]];
-    [self setPercentage:102];
-}
 - (void)launchMetaRequest
 {
     [[NSException exceptionWithName:@"InvalidDownload" reason:@"Launch Meta Request shouldn't be called on base class." userInfo:nil] raise];
 }
+
 - (void)createDownloadPath
 {
     NSString *fileName = _show.showName;
