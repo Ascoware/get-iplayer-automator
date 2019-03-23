@@ -319,7 +319,7 @@ NewProgrammeHistory           *sharedHistoryController;
         updateAlert.messageText = @"Are you sure?";
         [updateAlert addButtonWithTitle:@"No"];
         [updateAlert addButtonWithTitle:@"Yes"];
-        updateAlert.informativeText = @"Get iPlayer Automator is currently updating the cache. If you proceed with quiting, some series-link information will be lost. It is not reccommended to quit during an update. Are you sure you wish to quit?";
+        updateAlert.informativeText = @"Get iPlayer Automator is currently updating the cache. If you proceed with quiting, some series-link information will be lost. It is not recommended to quit during an update. Are you sure you wish to quit?";
         NSInteger response = [updateAlert runModal];
         if (response == NSAlertFirstButtonReturn) return NSTerminateCancel;
     }
@@ -336,7 +336,7 @@ NewProgrammeHistory           *sharedHistoryController;
             updateAlert.messageText = @"Are you sure?";
             [updateAlert addButtonWithTitle:@"No"];
             [updateAlert addButtonWithTitle:@"Yes"];
-            updateAlert.informativeText = @"Get iPlayer Automator is currently updating the cache. If you proceed with quiting, some series-link information will be lost. It is not reccommended to quit during an update. Are you sure you wish to quit?";
+            updateAlert.informativeText = @"Get iPlayer Automator is currently updating the cache. If you proceed with quiting, some series-link information will be lost. It is not recommended to quit during an update. Are you sure you wish to quit?";
             NSInteger response = [updateAlert runModal];
             if (response == NSAlertFirstButtonReturn) return NO;
             else return YES;
