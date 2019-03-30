@@ -67,6 +67,7 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
                     self.logger?.add(toLog: errorMessage)
                 }
                 guard let data = data else {
+                    self.endOfRun()
                     return
                 }
                 
