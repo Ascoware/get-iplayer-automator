@@ -99,15 +99,11 @@ public class ITVDownload : Download {
             add(toLog:message, noTag:true)
         }
         
-        self.currentRequest = self.session.dataTask(with: downloadRequest, completionHandler: {
-            (data: Data?, response: URLResponse?, error: Error?) in
+        self.currentRequest = self.session.dataTask(with: downloadRequest) { (data, response, error) in
             if let httpResponse = response as? HTTPURLResponse {
-                self.metaRequestFinished(response: httpResponse,
-                                         data: data,
-                                         error: error)
-                
+                self.metaRequestFinished(response: httpResponse, data: data, error: error)
             }
-        })
+        }
         self.currentRequest.resume()
     }
     
@@ -397,9 +393,9 @@ public class ITVDownload : Download {
             if let thumbnailURL = thumbnailURL {
                 add(toLog: "INFO: Downloading thumbnail", noTag: true)
                 thumbnailPath = URL(fileURLWithPath: show.path).appendingPathExtension("jpg").path
-                let downloadTask: URLSessionDownloadTask? = session.downloadTask(with: URL(string: thumbnailURL)!, completionHandler: {(_ location: URL?, _ response: URLResponse?, _ error: Error?) -> Void in
+                let downloadTask: URLSessionDownloadTask? = session.downloadTask(with: URL(string: thumbnailURL)!) { (location, _, _) in
                     self.thumbnailRequestFinished(location)
-                })
+                }
                 downloadTask?.resume()
             }
             else {

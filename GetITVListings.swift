@@ -61,9 +61,9 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
         myOpQueue.maxConcurrentOperationCount = 1
 
         if let aString = URL(string: "https://www.itv.com/hub/shows") {
-            mySession?.dataTask(with: aString, completionHandler: {(_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void in
+            mySession?.dataTask(with: aString) {(_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void in
                 if let error = error {
-                    let errorMessage = "GetITVListings (Error(\(error))): Unable to retreive show listings from ITV"
+                    let errorMessage = "GetITVListings (Error: \(error.localizedDescription)): Unable to retreive show listings from ITV"
                     self.logger?.add(toLog: errorMessage)
                 }
                 guard let data = data else {
@@ -87,7 +87,7 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
                 } else {
                     self.endOfRun()
                 }
-            }).resume()
+            }.resume()
         }
     }
     
@@ -148,9 +148,9 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
     func requestProgrammeEpisodes(_ myProgramme: ProgrammeData) {
         /* Get all episodes for the programme name identified in MyProgramme */
         if let url = URL(string: myProgramme.programmeURL) {
-            mySession?.dataTask(with: url, completionHandler: {(_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void in
+            mySession?.dataTask(with: url) {(data, _, error) in
                 self.processEpisodesForProgram(myProgramme, pageData: data, error: error)
-            }).resume()
+            }.resume()
         }
     }
     
