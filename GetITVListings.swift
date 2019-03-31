@@ -46,6 +46,7 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
         logger?.add(toLog: "GetITVShows: ITV Cache Update Starting ")
         getITVShowRunning = true
         myQueueSize = 0
+        episodes = []
         
         /* Create the NUSRLSession */
         let defaultConfigObject = URLSessionConfiguration.default
