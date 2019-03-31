@@ -78,8 +78,6 @@ NewProgrammeHistory           *sharedHistoryController;
     defaultValues[@"BBCOne"] = @YES;
     defaultValues[@"BBCTwo"] = @YES;
     defaultValues[@"BBCFour"] = @YES;
-    defaultValues[@"BBCAlba"] = @NO;
-    defaultValues[@"S4C"] = @NO;
     defaultValues[@"CBBC"] = @NO;
     defaultValues[@"CBeebies"] = @NO;
     defaultValues[@"BBCNews"] = @NO;
@@ -97,6 +95,8 @@ NewProgrammeHistory           *sharedHistoryController;
     defaultValues[@"RadioAsianNetwork"] = @NO;
     defaultValues[@"ShowRegionalRadioStations"] = @NO;
     defaultValues[@"ShowLocalRadioStations"] = @NO;
+    defaultValues[@"ShowRegionalTVStations"] = @NO;
+    defaultValues[@"ShowLocalTVStations"] = @NO;
     defaultValues[@"IgnoreAllTVNews"] = @YES;
     defaultValues[@"IgnoreAllRadioNews"] = @YES;
     defaultValues[@"ShowBBCTV"] = @YES;
@@ -109,29 +109,38 @@ NewProgrammeHistory           *sharedHistoryController;
     defaultValues[@"Use25FPSStreams"] = @NO;
     defaultValues[@"GetLowerQualityAudio"] = @NO;
 
-    [[NSUserDefaults standardUserDefaults] registerDefaults:defaultValues];
-    defaultValues = nil;
+    NSUserDefaults *stdDefaults = [NSUserDefaults standardUserDefaults];
 
+    [stdDefaults registerDefaults:defaultValues];
+    defaultValues = nil;
+    
     //Migrate old AudioDescribed option
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:@"AudioDescribed"]) {
-        [[NSUserDefaults standardUserDefaults] setObject:@YES forKey:@"AudioDescribedNew"];
-        [[NSUserDefaults standardUserDefaults] setObject:@YES forKey:@"SignedNew"];
-        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"AudioDescribed"];
+    if ([stdDefaults objectForKey:@"AudioDescribed"]) {
+        [stdDefaults setObject:@YES forKey:@"AudioDescribedNew"];
+        [stdDefaults setObject:@YES forKey:@"SignedNew"];
+        [stdDefaults removeObjectForKey:@"AudioDescribed"];
     }
     
     // Migrate Higher-quality option; HQ audio is default, option will fetch lower bitrate audio.
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:@"GetHigherQualityAudio"]) {
-        BOOL oldSetting = [[[NSUserDefaults standardUserDefaults] objectForKey:@"GetHigherQualityAudio"] boolValue];
-        [[NSUserDefaults standardUserDefaults] setObject: @(!oldSetting) forKey:@"GetLowerQualityAudio"];
-        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"GetHigherQualityAudio"];
+    if ([stdDefaults objectForKey:@"GetHigherQualityAudio"]) {
+        BOOL oldSetting = [[stdDefaults objectForKey:@"GetHigherQualityAudio"] boolValue];
+        [stdDefaults setObject: @(!oldSetting) forKey:@"GetLowerQualityAudio"];
+        [stdDefaults removeObjectForKey:@"GetHigherQualityAudio"];
+    }
+
+    // Migrate Regionals
+    if ([[stdDefaults objectForKey:@"BBCAlba"] isEqualToValue:@YES] || [[stdDefaults objectForKey:@"S4C"] isEqualToValue:@YES]) {
+        [stdDefaults setObject:@YES forKey:@"ShowRegionalTVStations"];
+        [stdDefaults removeObjectForKey:@"BBCAlba"];
+        [stdDefaults removeObjectForKey:@"S4C"];
     }
 
     // remove obsolete preferences
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"DefaultFormat"];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"AlternateFormat"];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"Cache4oD_TV"];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CacheBBC_Podcasts"];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"ForceHLSBBCVideo"];
+    [stdDefaults removeObjectForKey:@"DefaultFormat"];
+    [stdDefaults removeObjectForKey:@"AlternateFormat"];
+    [stdDefaults removeObjectForKey:@"Cache4oD_TV"];
+    [stdDefaults removeObjectForKey:@"CacheBBC_Podcasts"];
+    [stdDefaults removeObjectForKey:@"ForceHLSBBCVideo"];
 
     //Make sure Application Support folder exists
     NSString *appSupportDirectory = [[NSFileManager defaultManager] applicationSupportDirectory];
@@ -161,7 +170,7 @@ NewProgrammeHistory           *sharedHistoryController;
     [NSValueTransformer setValueTransformer:_tvFormatTransformer forName:@"TVFormatTransformer"];
     [NSValueTransformer setValueTransformer:_radioFormatTransformer forName:@"RadioFormatTransformer"];
     [NSValueTransformer setValueTransformer:_itvFormatTransformer forName:@"ITVFormatTransformer"];
-    _verbose = [[NSUserDefaults standardUserDefaults] boolForKey:@"Verbose"];
+    _verbose = [stdDefaults boolForKey:@"Verbose"];
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(itvUpdateFinished) name:@"ITVUpdateFinished" object:nil];
     newITVListing =  [[GetITVShows alloc] init];
@@ -501,7 +510,7 @@ NewProgrammeHistory           *sharedHistoryController;
     NSString *cacheExpiryArg;
     if ([[sender class] isEqualTo:[@"" class]])
     {
-        cacheExpiryArg = @"-e1";
+        cacheExpiryArg = @"--cache-rebuild";
     }
     else
     {
@@ -515,6 +524,7 @@ NewProgrammeHistory           *sharedHistoryController;
         _getiPlayerUpdateArgs = @[_getiPlayerPath,
                                   cacheExpiryArg,
                                   typeArgument,
+                                  @"--refresh",
                                   @"--nopurge",
                                   [GetiPlayerArguments sharedController].profileDirArg,
                                   @".*"];
@@ -534,6 +544,12 @@ NewProgrammeHistory           *sharedHistoryController;
         _getiPlayerUpdateTask.standardOutput = _getiPlayerUpdatePipe;
         _getiPlayerUpdateTask.standardError =_getiPlayerUpdatePipe;
 
+        if (_verbose) {
+            for (NSString *arg in _getiPlayerUpdateArgs) {
+                [_logger addToLog:arg];
+            }
+        }
+        
         NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
 
         [nc addObserver:self

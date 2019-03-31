@@ -150,6 +150,42 @@ NewProgrammeHistory *sharedHistoryContoller;
 }
 -(BOOL)showBBCTVProgramme:(ProgrammeHistoryObject *)np
 {
+/*
+    'p00fzl6b' => 'BBC Four', # bbcfour/programmes/schedules
+    'p00fzl6g' => 'BBC News', # bbcnews/programmes/schedules
+    'p00fzl6n' => 'BBC One', # bbcone/programmes/schedules/hd
+    'p00fzl73' => 'BBC Parliament', # bbcparliament/programmes/schedules
+    'p015pksy' => 'BBC Two', # bbctwo/programmes/schedules/hd
+    'p00fzl9r' => 'CBBC', # cbbc/programmes/schedules
+    'p00fzl9s' => 'CBeebies', # cbeebies/programmes/schedules
+*/
+/*
+ 'p00fzl67' => 'BBC Alba', # bbcalba/programmes/schedules
+ 'p00fzl6q' => 'BBC One Northern Ireland', # bbcone/programmes/schedules/ni
+ 'p00zskxc' => 'BBC One Northern Ireland', # bbcone/programmes/schedules/ni_hd
+ 'p00fzl6v' => 'BBC One Scotland', # bbcone/programmes/schedules/scotland
+ 'p013blmc' => 'BBC One Scotland', # bbcone/programmes/schedules/scotland_hd
+ 'p00fzl6z' => 'BBC One Wales', # bbcone/programmes/schedules/wales
+ 'p013bkc7' => 'BBC One Wales', # bbcone/programmes/schedules/wales_hd
+ 'p06kvypx' => 'BBC Scotland', # bbcscotland/programmes/schedules
+ 'p06p396y' => 'BBC Scotland', # bbcscotland/programmes/schedules/hd
+ 'p00fzl97' => 'BBC Two England', # bbctwo/programmes/schedules/england
+ 'p00fzl99' => 'BBC Two Northern Ireland', # bbctwo/programmes/schedules/ni
+ 'p06ngcbm' => 'BBC Two Northern Ireland', # bbctwo/programmes/schedules/ni_hd
+ 'p00fzl9d' => 'BBC Two Wales', # bbctwo/programmes/schedules/wales
+ 'p06ngc52' => 'BBC Two Wales', # bbctwo/programmes/schedules/wales_hd
+ 'p020dmkf' => 'S4C', # s4c/programmes/schedules
+*/
+    NSArray *regionalChannels = @[
+                                 @"BBC Alba",
+                                 @"BBC One Northern Ireland",
+                                 @"BBC One Scotland",
+                                 @"BBC One Wales",
+                                 @"BBC Scotland",
+                                 @"BBC Two England",
+                                 @"BBC Two Northern Ireland",
+                                 @"BBC Two Wales",
+                                 @"S4C"];
     
     if ( [[[NSUserDefaults standardUserDefaults] valueForKey:@"ShowBBCTV"]isEqualTo:@NO] )
         return NO;
@@ -163,24 +199,79 @@ NewProgrammeHistory *sharedHistoryContoller;
         }
     }
 
-    if (([[[NSUserDefaults standardUserDefaults] valueForKey:@"BBCOne"]isEqualTo:@YES] && [np.tvChannel hasPrefix:@"BBC One"]) ||
-         ([[[NSUserDefaults standardUserDefaults] valueForKey:@"BBCTwo"]isEqualTo:@YES] && [np.tvChannel hasPrefix:@"BBC Two"]) ||
-         ([[[NSUserDefaults standardUserDefaults] valueForKey:@"BBCThree"]isEqualTo:@YES] && [np.tvChannel hasPrefix:@"BBC Three"]) ||
-         ([[[NSUserDefaults standardUserDefaults] valueForKey:@"BBCFour"]isEqualTo:@YES] && [np.tvChannel hasPrefix:@"BBC Four"]) ||
-         ([[[NSUserDefaults standardUserDefaults] valueForKey:@"BBCNews"]isEqualTo:@YES] && [np.tvChannel isEqualToString:@"BBC News"]) ||
-         ([[[NSUserDefaults standardUserDefaults] valueForKey:@"BBCParliament"]isEqualTo:@YES] && [np.tvChannel isEqualToString:@"BBC Parliament"]) ||
-         ([[[NSUserDefaults standardUserDefaults] valueForKey:@"S4C"]isEqualTo:@YES] && [np.tvChannel isEqualToString:@"S4C"]) ||
-         ([[[NSUserDefaults standardUserDefaults] valueForKey:@"BBCAlba"]isEqualTo:@YES] && [np.tvChannel isEqualToString:@"BBC Alba"]) ||
-         ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CBeebies"]isEqualTo:@YES] && [np.tvChannel isEqualToString:@"CBeebies"]) ||
-         ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CBBC"]isEqualTo:@YES] && [np.tvChannel isEqualToString:@"CBBC"])
-        )
-        return YES;
+    if ([np.tvChannel isEqualToString:@"BBC Four"]) {
+        return [[[NSUserDefaults standardUserDefaults] valueForKey:@"BBCFour"]isEqualTo:@YES];
+    }
     
-    return NO;
+    if ([np.tvChannel isEqualToString:@"BBC News"]) {
+        return [[[NSUserDefaults standardUserDefaults] valueForKey:@"BBCNews"]isEqualTo:@YES];
+    }
+    
+    if ([np.tvChannel isEqualToString:@"BBC One"]) {
+        return [[[NSUserDefaults standardUserDefaults] valueForKey:@"BBCOne"]isEqualTo:@YES];
+    }
+    
+    if ([np.tvChannel isEqualToString:@"BBC Parliament"]) {
+        return [[[NSUserDefaults standardUserDefaults] valueForKey:@"BBCParliament"]isEqualTo:@YES];
+    }
+    
+    if ([np.tvChannel isEqualToString:@"BBC Two"]) {
+        return [[[NSUserDefaults standardUserDefaults] valueForKey:@"BBCTwo"]isEqualTo:@YES];
+    }
+    
+    if ([np.tvChannel isEqualToString:@"CBBC"]) {
+        return [[[NSUserDefaults standardUserDefaults] valueForKey:@"CBBC"]isEqualTo:@YES];
+    }
+    
+    if ([np.tvChannel isEqualToString:@"CBeebies"]) {
+        return [[[NSUserDefaults standardUserDefaults] valueForKey:@"CBeebies"]isEqualTo:@YES];
+    }
+    
+    // Next, filter out regional channels
+    BOOL showRegionalTV = [[[NSUserDefaults standardUserDefaults] valueForKey:@"ShowRegionalTVStations"]isEqualTo:@YES];
+    for (NSString *region in regionalChannels) {
+        if ([np.tvChannel containsString:region]) {
+            return showRegionalTV;
+        }
+    }
+    
+    /* Otherwise must be local */
+    return [[[NSUserDefaults standardUserDefaults] valueForKey:@"ShowLocalTVStations"]isEqualTo:@YES];
 }
+
 -(BOOL)showBBCRadioProgramme:(ProgrammeHistoryObject *)np
 {
-    NSArray *regions = @[@"Radio Scotland", @"Radio Nan", @"Radio Shetland", @"Radio Orkney", @"Radio Wales", @"Radio Cymru", @"Radio Ulster", @"Radio Foyle" ];
+/*
+ 'p00fzl7b' => 'BBC Radio Cymru', # radiocymru/programmes/schedules
+ 'p00fzl7m' => 'BBC Radio Foyle', # radiofoyle/programmes/schedules
+ 'p00fzl81' => 'BBC Radio Nan Gaidheal', # radionangaidheal/programmes/schedules
+ 'p00fzl8d' => 'BBC Radio Scotland', # radioscotland/programmes/schedules/fm
+ 'p00fzl8g' => 'BBC Radio Scotland', # radioscotland/programmes/schedules/mw
+ 'p00fzl8b' => 'BBC Radio Scotland', # radioscotland/programmes/schedules/orkney
+ 'p00fzl8j' => 'BBC Radio Scotland', # radioscotland/programmes/schedules/shetland
+ 'p00fzl8w' => 'BBC Radio Ulster', # radioulster/programmes/schedules
+ 'p00fzl8y' => 'BBC Radio Wales', # radiowales/programmes/schedules/fm
+ 'p00fzl8x' => 'BBC Radio Wales', # radiowales/programmes/schedules/mw
+*/
+    
+/*
+ 'national' => {
+ 'p00fzl64' => 'BBC Radio 1Xtra', # 1xtra/programmes/schedules
+ 'p00fzl7g' => 'BBC Radio 5 live', # 5live/programmes/schedules
+ 'p00fzl7h' => 'BBC Radio 5 live sports extra', # 5livesportsextra/programmes/schedules
+ 'p00fzl65' => 'BBC Radio 6 Music', # 6music/programmes/schedules
+ 'p00fzl68' => 'BBC Asian Network', # asiannetwork/programmes/schedules
+ 'p00fzl86' => 'BBC Radio 1', # radio1/programmes/schedules
+ 'p00fzl8v' => 'BBC Radio 2', # radio2/programmes/schedules
+ 'p00fzl8t' => 'BBC Radio 3', # radio3/programmes/schedules
+ 'p00fzl7j' => 'BBC Radio 4', # radio4/programmes/schedules/fm
+ 'p00fzl7k' => 'BBC Radio 4', # radio4/programmes/schedules/lw
+ 'p00fzl7l' => 'BBC Radio 4 Extra', # radio4extra/programmes/schedules
+ 'p02zbmb3' => 'BBC World Service', # worldserviceradio/programmes/schedules/uk
+ },
+ */
+
+    NSArray *regions = @[@"BBC Radio Cymru", @"BBC Radio Foyle", @"BBC Radio Nan Gaidheal", @"BBC Radio Scotland", @"BBC Radio Ulster", @"BBC Radio Wales"];
    
     /* Filter out if not radio or news and news not wanted */
     
@@ -198,48 +289,60 @@ NewProgrammeHistory *sharedHistoryContoller;
 
     /* Filter each of the nationals in turn */
     
-    if  ([np.tvChannel isEqualToString:@"BBC Radio 1"])
-        return [[[NSUserDefaults standardUserDefaults] valueForKey:@"Radio1"]isEqualTo:@YES] ? YES:NO;
+    if ([np.tvChannel isEqualToString:@"BBC Radio 1Xtra"]) {
+        return [[[NSUserDefaults standardUserDefaults] valueForKey:@"Radio1Xtra"]isEqualTo:@YES];
+    }
+    
+    if ([np.tvChannel isEqualToString:@"BBC Radio 1"]) {
+        return [[[NSUserDefaults standardUserDefaults] valueForKey:@"Radio1"]isEqualTo:@YES];
+    }
 
-    if ([np.tvChannel isEqualToString:@"BBC Radio 2"])
-        return [[[NSUserDefaults standardUserDefaults] valueForKey:@"Radio2"]isEqualTo:@YES] ? YES:NO;
+    if ([np.tvChannel isEqualToString:@"BBC Radio 2"]) {
+        return [[[NSUserDefaults standardUserDefaults] valueForKey:@"Radio2"]isEqualTo:@YES];
+    }
     
-    if ([np.tvChannel isEqualToString:@"BBC Radio 3"])
-        return [[[NSUserDefaults standardUserDefaults] valueForKey:@"Radio3"]isEqualTo:@YES] ? YES:NO;
+    if ([np.tvChannel isEqualToString:@"BBC Radio 3"]) {
+        return [[[NSUserDefaults standardUserDefaults] valueForKey:@"Radio3"]isEqualTo:@YES];
+    }
     
-    if ([np.tvChannel isEqualToString:@"BBC Radio 4"])
-        return [[[NSUserDefaults standardUserDefaults] valueForKey:@"Radio4"]isEqualTo:@YES] ? YES:NO;
+    if ([np.tvChannel isEqualToString:@"BBC Radio 4"]) {
+        return [[[NSUserDefaults standardUserDefaults] valueForKey:@"Radio4"]isEqualTo:@YES];
+    }
     
-    if ([np.tvChannel isEqualToString:@"BBC Radio 1Xtra"])
-        return [[[NSUserDefaults standardUserDefaults] valueForKey:@"Radio1Xtra"]isEqualTo:@YES] ? YES:NO;
+    if ([np.tvChannel isEqualToString:@"BBC Radio 4 Extra"]) {
+        return [[[NSUserDefaults standardUserDefaults] valueForKey:@"Radio4Extra"]isEqualTo:@YES];
+    }
     
-    if ([np.tvChannel isEqualToString:@"BBC Radio 4 Extra"])
-        return [[[NSUserDefaults standardUserDefaults] valueForKey:@"Radio4Extra"]isEqualTo:@YES] ? YES:NO;
+    if ([np.tvChannel isEqualToString:@"BBC Radio 5 live"]) {
+        return [[[NSUserDefaults standardUserDefaults] valueForKey:@"Radio5Live"]isEqualTo:@YES];
+    }
     
-    if ([np.tvChannel isEqualToString:@"BBC Radio 5 live"])
-        return [[[NSUserDefaults standardUserDefaults] valueForKey:@"Radio5Live"]isEqualTo:@YES] ? YES:NO;
+    if ([np.tvChannel isEqualToString:@"BBC 5 live sports extra"]) {
+        return [[[NSUserDefaults standardUserDefaults] valueForKey:@"Radio5LiveSportsExtra"]isEqualTo:@YES];
+    }
     
-    if ([np.tvChannel isEqualToString:@"BBC 5 live sports extra"])
-        return [[[NSUserDefaults standardUserDefaults] valueForKey:@"Radio5LiveSportsExtra"]isEqualTo:@YES]  ? YES:NO;
-    
-    if ([np.tvChannel isEqualToString:@"BBC 6 Music"])
-        return [[[NSUserDefaults standardUserDefaults] valueForKey:@"Radio6Music"]isEqualTo:@YES] ? YES:NO;
+    if ([np.tvChannel isEqualToString:@"BBC Radio 6 Music"]) {
+        return [[[NSUserDefaults standardUserDefaults] valueForKey:@"Radio6Music"]isEqualTo:@YES];
+    }
 
-    if ([np.tvChannel isEqualToString:@"BBC Asian Network"])
-        return [[[NSUserDefaults standardUserDefaults] valueForKey:@"RadioAsianNetwork"]isEqualTo:@YES] ? YES:NO;
+    if ([np.tvChannel isEqualToString:@"BBC Asian Network"]) {
+        return [[[NSUserDefaults standardUserDefaults] valueForKey:@"RadioAsianNetwork"]isEqualTo:@YES];
+    }
     
-    if ([np.tvChannel isEqualToString:@"BBC World Service"])
-        return [[[NSUserDefaults standardUserDefaults] valueForKey:@"BBCWorldService"]isEqualTo:@YES]  ? YES:NO;
+    if ([np.tvChannel isEqualToString:@"BBC World Service"]) {
+        return [[[NSUserDefaults standardUserDefaults] valueForKey:@"BBCWorldService"]isEqualTo:@YES];
+    }
     
     /* Filter for regionals */
     
-    for (int i=0; i<regions.count;i++)
-        if ([np.tvChannel containsString:regions[i]])
-            return [[[NSUserDefaults standardUserDefaults] valueForKey:@"ShowRegionalRadioStations"]isEqualTo:@YES] ? YES:NO;
+    for (int i=0; i<regions.count;i++) {
+        if ([np.tvChannel containsString:regions[i]]) {
+            return [[[NSUserDefaults standardUserDefaults] valueForKey:@"ShowRegionalRadioStations"]isEqualTo:@YES];
+        }
+    }
     
     /* Otherwise must be local */
-    
-    return [[[NSUserDefaults standardUserDefaults] valueForKey:@"ShowLocalRadioStations"]isEqualTo:@YES] ? YES:NO;
+    return [[[NSUserDefaults standardUserDefaults] valueForKey:@"ShowLocalRadioStations"]isEqualTo:@YES];
 
 }
 
