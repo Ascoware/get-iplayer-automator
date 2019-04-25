@@ -439,12 +439,20 @@ public class ITVDownload : Download {
         if verbose {
             args.append("--verbose")
         }
+        
         if let proxyHost = self.proxy?.host {
-            var proxyString = proxyHost
+            var proxyString = ""
+
+            if let user = self.proxy?.user, let password = self.proxy?.password {
+                proxyString += "\(user):\(password)@"
+            }
+
+            proxyString += proxyHost
+            
             if let port = self.proxy?.port {
                 proxyString += ":\(port)"
             }
-            
+        
             args.append("--proxy")
             args.append(proxyString)
         }
