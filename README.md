@@ -1,13 +1,155 @@
 ## What is it?
 The goal of Get iPlayer Automator is to allow iTunes and your Mac to become the hub for your British Television experience regardless of where in the world you are. Get iPlayer Automator allows you to download and watch BBC and ITV shows on your Mac. Series-Link/PVR functionality ensures you will never miss your favourite shows. Programmes are fully tagged and added to iTunes automatically upon completion. It is simple and easy to use, and runs on any machine running Mac OS X 10.9 or later. And since the shows are in iTunes, it is extremely easy to transfer them to your iPod, iPhone, or Apple TV allowing you to enjoy your shows on the go or on your television.
 
-The current release is 1.11.2. [Download it here.](https://github.com/Ascoware/get-iplayer-automator/releases)
+The current release is 1.16.1. [Download it here.](https://github.com/Ascoware/get-iplayer-automator/releases)
 
 
 ### What if I find a bug?
 [Start here.](https://github.com/Ascoware/get-iplayer-automator/wiki/Reporting-Issues)
 
 #### Version history
+
+Latest release
+##### 1.16.1
+Get iPlayer Automator is now ready for use on macOS Catalina (10.15)! TV programs will be added to TV.app, and radio programs will be added to Music.app. Due to a bug in macOS shows tagged as podcasts will open in Music.app but can't be played. Also, because it was ported from iOS, Podcasts.app is not scriptable and cannot accept externally created m4a files. As a result, if you use the "Tag radio programmes as podcasts" your only option right now is to use QuickTime Player.app, or turn off this checkbox and play them through Music.app. We hope this bug is fixed in a future version of macOS.
+
+##### 1.16
+Updated to get_iplayer 3.22. See the release notes for more information.
+Most notably, BBC program metadata caching will work after the 19-August bbc.co.uk iPlayer web site changes.
+
+##### 1.15.2
+Proxy server support for ITV downloads
+
+##### 1.15.1
+Updated the channel names used for new program filtering to match what's in get_iplayer.
+Fixed memory leak when caching ITV programs
+If ITV caching fails for some reason (ITV down, bad network, etc.) app is no longer stuck. (#210)
+
+##### 1.15.0
+Updated to get_iplayer 3.20. See the release notes for more information.
+If you have Safari selected as your browser for "Get Current Webpage", Safari Technology Preview.app will be checked as well, if it is running.
+
+##### 1.14.3
+Movies shown on ITV and other one-off programs weren't being cached, and therefore not downloadable. This is fixed. (#220)
+
+##### 1.14.2
+Fixed a regression that caused BBC subtitles to not be downloaded, due to a change in get_iplayer's subtitle command semantics. (#219)
+Added support for embedding subtitles in ITV downloads, already supported in youtube-dl! (#216 )
+
+##### 1.14.1
+Preemptive fix for #218, by guarding against corrupted archives.
+
+##### 1.14
+Happy New Year! Thanks for your continued support in 2019.
+Starting with this release, the minor version will now increment whenever get_iplayer is updated. The bug fix version will reflect Get iPlayer Automator-only changes.
+Merged in get_iplayer 3.18, which necessitated some option changes. "Get higher-quality audio" is now the default, so if you want lower-bitrate audio the option is now "Get lower quality HLS audio". If you had the old option unchecked, it is now checked in this version for consistency. The new default value for this option is unchecked. For more information see https://github.com/get-iplayer/get_iplayer/wiki/release310to319#release318
+Timeout for getting ITV listings is now 30 seconds. This feature still needs some tweaking, but the application won't hang anymore if ITV Hub is unavailable, or your network connection is having problems.
+
+##### 1.13.19
+Small fix to add support for using Get Current Webpage with BBC Sounds pages.
+
+##### 1.13.18
+Added option for embedding subtitles into BBC videos (#192, #213)
+If subtitle downloading is selected, they are embedded into the converted MP4 by default. If you don't want that, and want a standalone subtitle file, uncheck the "Embed Subtitles in Download" option.
+This option works only for BBC shows. ITV support will be added in a future release.
+Made sure certificates were set for all invocations of get_iplayer. This will fix showing the extended metadata for a program.
+
+##### 1.13.17
+Updated the root certificates used by Mozilla::CA. This should address the 500 errors when starting a BBC download.
+This will most likely NOT fix 403 errors if you are using a VPN outside of the UK as that is the BBC blocking your connection.
+
+##### 1.13.16
+BBC changed their page structure for radio and TV programs, so the Get Current Webpage scraping changed slightly to handle it.
+
+##### 1.13.15
+Updated Perl support libraries to match get_iplayer distribution
+Fixed: Get Current Webpage will work with Chrome if the page source can't be accessed. (#201)
+Minimum macOS version is now 10.10, to match get_iplayer.
+
+##### 1.13.14
+BBC Radio show pages have a new URL format. GiA now recognizes the new URL and will parse out the program ID. (#199)
+Rewrote 'Get Current Webpage' functionality in Swift, and cleaned out code for non-existent BBC pages. Now,only the frontmost window and tab will be checked for an ITV or BBC program page. No more checking random open web pages. (#123)
+Added necessary Info.plist entries so that Get Current Webpage and adding to iTunes works on macOS Mojave again.
+
+##### 1.13.13
+Updated to get_iplayer 3.17. No major functionality changes, but there are more clarifying messages about 403 errors while downloading.
+Removed Growl. All of its functionality is available in macOS 10.9, so no need to have the extra library.
+Made some cleanup changes that won't affect the behavior, but will get the app ready for macOS Mojave.
+BBC is getting more aggressive about VPN blocking! Keep that in mind before filing new bugs.
+
+##### 1.13.12
+Picked up get_iplayer 3.16
+Fixed search result parsing (#191)
+
+##### 1.13.11
+New version of get_iplayer (3.15)
+Updated perl library dependencies
+Updated ITV caching to match new format
+
+##### 1.13.10
+Includes newest version of youtube-dl to address #189
+
+##### 1.13.9
+Auto-record now shows the date of broadcast for found programs. (#174)
+Behind-the-scenes cleanup.
+
+##### 1.13.8
+Removed 'Ignore DASH' flag for real
+
+##### 1.13.7
+Removed the 'Ignore DASH streams' option, as it's no longer necessary with get_iplayer fixes. The option is completely ignored now, so don't worry if you had it set.
+Fixed fetching of metadata when using 'Get Current Webpage' for un-cached shows. (#182)
+
+##### 1.13.6
+Updated to latest youtube-dl (2018.06.04)
+Fixed handling of DASH output which separates audio and video.
+
+##### 1.13.5
+Updated to get_iplayer 3.14. This has some implications for your downloads, as 50 FPS streams are now the default. I added a checkbox to force 25 FPS streams, which will result in a smaller download. This setting is off by default.
+There are now only 4 levels of download: Best, Better, Good, Worst. I did not attempt to map the old values into the new ones, so check your settings to make sure they are what you want.
+
+##### 1.13.4
+Updated to latest youtube-dl to handle ITV errors (#168, #170)
+Added option to tag audio downloads as podcasts. This means that when the audio is added to iTunes, it will now appear in the Podcasts section with the series thumbnail. (#153)
+
+##### 1.13.3
+"Force get_iplayer to download HLS" is now "Force get_iplayer to ignore DASH". This means HLS or HVF streams can be fetched. (#163, #165)
+Let youtube-dl determine the extension of the download. If it is FLV, use ffmpeg to copy into an MP4 instead of letting youtube-dl re-encode the video. (#161, #164)
+Updated PyCrypto to hopefully avoid crashes (#162)
+Updated youtube-dl (4/8/18 release)
+Verbose mode now dumps everything from youtube-dl.
+
+##### 1.13.2
+ITV downloads now try for the best MP4 available, and if that fails, they fall back to the best available, which is FLV. The resulting download is converted to MP4 if needed.
+The upshot of this is that Lethal Weapon and other shows should now download even if the web page for the show on ITV Hub says 'not available on your platform.'
+
+##### 1.13.1
+Fixed startup of youtube-dl so it can find PyCrypto, and added important file identifying the package. (#151)
+Fixed handling of ttml files when used as the subtitle format on ITV shows. Call ttml2srt when that happens. (#155)
+
+##### 1.13
+Better handling of ITV shows that don't use a 3-part program ID (#150)
+Added PyCrypto so youtube-dl can do its own MP4 downloads. As a bonus, youtube-dl can now resume cancelled or interrupted ITV downloads! (#148)
+
+##### 1.12.2
+ITV downloads now always use XBMC naming to avoid conflicts for downloaded shows. (#143)
+Better parsing of show metadata for season, episode, and episode title
+
+##### 1.12.1
+Fixed #142: Requesting subtitles for ITV shows that don't have them stalled the download queue.
+Fixed #145: Fixed parsing of youtube-dl output so the duration is now available. Also added amount downloaded/duration to progress.
+Fixed #144(?): Added necessary perl libraries for SSL connections when caching BBC shows.
+
+##### 1.12.0
+youtube-dl is now the engine for getting ITV shows, subtitles and thumbnails. (#132, #136)
+Upgraded to get_iplayer 3.13 to address BBC TV and radio cache issues (#139)
+Fixed NSAlerts trying to present on a non-main thread (#131)
+Back to "ITV Player", though at some point it needs to be named just ITV. (#135)
+
+##### 1.11.3
+Fixed #138: ITV Cache was being corrupted due to bad inherited code.
+Fixed #139: Cache searching works again for BBC and ITV.
+NOTE: BBC Radio programs cannot be cached right now due to a change on BBC's part. This will require a change to get_iplayer.
 
 ##### 1.11.2
 - Included an official 3.4.2 build of ffmpeg that works on OS X 10.9 and later (#133)
