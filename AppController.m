@@ -1720,10 +1720,19 @@ NewProgrammeHistory           *sharedHistoryController;
     @autoreleasepool {
         NSString *path = [[NSString alloc] initWithString:show.path];
         NSString *ext = path.pathExtension;
+        NSString *appName = nil;
+        
+        // Thankfully, TV.app supports the same AppleEvents as iTunes. Use TV.app if present, but if not
+        // try iTunes.app.
+        iTunesApplication *iTunes = [SBApplication applicationWithBundleIdentifier:@"com.apple.TV"];
+        appName = @"TV";
+        
+        if (iTunes == nil) {
+            iTunes = [SBApplication applicationWithBundleIdentifier:@"com.apple.iTunes"];
+            appName = @"iTunes";
+        }
 
-        [_logger performSelectorOnMainThread:@selector(addToLog:) withObject:[NSString stringWithFormat:@"Adding %@ to iTunes",show.showName] waitUntilDone:NO];
-
-        iTunesApplication *iTunes = [SBApplication applicationWithBundleIdentifier:@"com.apple.iTunes"];
+        [_logger performSelectorOnMainThread:@selector(addToLog:) withObject:[NSString stringWithFormat:@"Adding %@ to %@", show.showName, appName] waitUntilDone:NO];
 
         NSArray *fileToAdd = @[[NSURL fileURLWithPath:path]];
         if (!iTunes.running) [iTunes activate];
@@ -1745,33 +1754,33 @@ NewProgrammeHistory           *sharedHistoryController;
                         if (show.episode>0) track.episodeNumber = show.episode;
                     }
                     [track setUnplayed:YES];
-                    show.status = @"Complete & in iTunes";
+                    show.status = [NSString stringWithFormat:@"Complete & in %@", appName];
                 }
                 else if ([track exists] && ([ext isEqualToString:@"mp3"] || [ext isEqualToString:@"m4a"]))
                 {
                     [track setBookmarkable:YES];
                     [track setUnplayed:YES];
-                    show.status = @"Complete & in iTunes";
+                    show.status = [NSString stringWithFormat:@"Complete & in %@", appName];
                 }
                 else
                 {
-                    [_logger performSelectorOnMainThread:@selector(addToLog:) withObject:@"iTunes did not accept file." waitUntilDone:YES];
-                    [_logger performSelectorOnMainThread:@selector(addToLog:) withObject:@"Try dragging the file from the Finder into iTunes." waitUntilDone:YES];
-                    show.status = @"Complete: Not in iTunes";
+                    [_logger performSelectorOnMainThread:@selector(addToLog:) withObject:@"Media app did not accept file." waitUntilDone:YES];
+                    [_logger performSelectorOnMainThread:@selector(addToLog:) withObject:@"Try dragging the file from the Finder into TV or iTunes." waitUntilDone:YES];
+                    show.status = [NSString stringWithFormat:@"Complete: Not in %@", appName];
                 }
             }
             else
             {
-                NSString *message = [NSString stringWithFormat:@"Can't add %@ file to iTunes -- incompatible format.", ext];
+                NSString *message = [NSString stringWithFormat:@"Can't add %@ file to %@ -- incompatible format.", ext, appName];
                 [_logger performSelectorOnMainThread:@selector(addToLog:) withObject:message waitUntilDone:YES];
                 show.status = @"Download Complete";
             }
         }
         @catch (NSException *e)
         {
-            NSString *message = [NSString stringWithFormat:@"Unable to add %@ to iTunes", show];
+            NSString *message = [NSString stringWithFormat:@"Unable to add %@ to %@", show, appName];
             [_logger performSelectorOnMainThread:@selector(addToLog:) withObject:message waitUntilDone:YES];
-            show.status = @"Complete: Not in iTunes";
+            show.status = [NSString stringWithFormat:@"Complete: Not in %@", appName];
         }
     }
 }

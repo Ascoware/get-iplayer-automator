@@ -59,7 +59,7 @@ typedef NS_ENUM(NSInteger, GIA_ProgrammeType) {
 @property (nonatomic) NSPipe *pipe;
 @property (nonatomic, assign) BOOL taskRunning;
 @property (nonatomic) NSTask *metadataTask;
-@property (nonatomic) GetiPlayerProxy *getiPlayerProxy;
+@property (nonatomic, nullable) GetiPlayerProxy *getiPlayerProxy;
 @property (nonatomic, assign) BOOL addedByPVR;
 
 - (instancetype)initWithPid:(NSString *)PID programmeName:(NSString *)SHOWNAME network:(NSString *)TVNETWORK logController:(LogController *)logger;
