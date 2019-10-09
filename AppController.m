@@ -1724,14 +1724,33 @@ NewProgrammeHistory           *sharedHistoryController;
         
         // Thankfully, TV.app supports the same AppleEvents as iTunes. Use TV.app if present, but if not
         // try iTunes.app.
-        iTunesApplication *iTunes = [SBApplication applicationWithBundleIdentifier:@"com.apple.TV"];
-        appName = @"TV";
+        iTunesApplication *iTunes;
         
+        switch (show.type) {
+            case GiA_ProgrammeTypeBBC_Radio:
+                if (!show.podcast) {
+                    iTunes = [SBApplication applicationWithBundleIdentifier:@"com.apple.Music"];
+                    appName = @"Music";
+                }
+                break;
+                
+            default:
+                iTunes = [SBApplication applicationWithBundleIdentifier:@"com.apple.TV"];
+                appName = @"TV";
+                break;
+        }
+
         if (iTunes == nil) {
             iTunes = [SBApplication applicationWithBundleIdentifier:@"com.apple.iTunes"];
             appName = @"iTunes";
         }
 
+        // In this case it's a podcast and we're on Catalina. Can't do much with it, unfortuantely.
+        if (iTunes == nil) {
+            show.status = @"Complete: No media app available";
+            return;
+        }
+        
         [_logger performSelectorOnMainThread:@selector(addToLog:) withObject:[NSString stringWithFormat:@"Adding %@ to %@", show.showName, appName] waitUntilDone:NO];
 
         NSArray *fileToAdd = @[[NSURL fileURLWithPath:path]];
