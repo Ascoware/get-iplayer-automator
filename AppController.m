@@ -568,6 +568,7 @@ NewProgrammeHistory           *sharedHistoryController;
         envVariableDictionary[@"PERL5LIB"] = perlPath;
         envVariableDictionary[@"SSL_CERT_DIR"] = perlPath;
         envVariableDictionary[@"MOJO_CA_FILE"] = cacertPath;
+        envVariableDictionary[@"MOJO_INSECURE"] = @"1";
 
         _updatingBBCIndex = true;
         _getiPlayerUpdateTask.environment = envVariableDictionary;
@@ -717,6 +718,7 @@ NewProgrammeHistory           *sharedHistoryController;
             envVariableDictionary[@"PERL5LIB"] = perlPath;
             envVariableDictionary[@"SSL_CERT_DIR"] = perlPath;
             envVariableDictionary[@"MOJO_CA_FILE"] = cacertPath;
+            envVariableDictionary[@"MOJO_INSECURE"] = @"1";
 
             pipeTask.environment = envVariableDictionary;
             [pipeTask launch];
@@ -1464,6 +1466,7 @@ NewProgrammeHistory           *sharedHistoryController;
             envVariableDictionary[@"PERL5LIB"] = perlPath;
             envVariableDictionary[@"SSL_CERT_DIR"] = perlPath;
             envVariableDictionary[@"MOJO_CA_FILE"] = cacertPath;
+            envVariableDictionary[@"MOJO_INSECURE"] = @"1";
 
             autoRecordTask.environment = envVariableDictionary;
             [autoRecordTask launch];

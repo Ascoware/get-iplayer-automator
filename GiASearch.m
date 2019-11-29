@@ -62,6 +62,7 @@
         envVariableDictionary[@"PERL5LIB"] = perlPath;
         envVariableDictionary[@"SSL_CERT_DIR"] = perlPath;
         envVariableDictionary[@"MOJO_CA_FILE"] = cacertPath;
+        envVariableDictionary[@"MOJO_INSECURE"] = @"1";
 
         _task.environment = envVariableDictionary;
         [_task launch];

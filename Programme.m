@@ -240,6 +240,7 @@
     envVariableDictionary[@"PERL5LIB"] = perlPath;
     envVariableDictionary[@"SSL_CERT_DIR"] = perlPath;
     envVariableDictionary[@"MOJO_CA_FILE"] = cacertPath;
+    envVariableDictionary[@"MOJO_INSECURE"] = @"1";
     _metadataTask.environment = envVariableDictionary;
     [_metadataTask launch];
     [fh readInBackgroundAndNotify];
@@ -499,6 +500,7 @@
         envVariableDictionary[@"PERL5LIB"] = perlPath;
         envVariableDictionary[@"SSL_CERT_DIR"] = perlPath;
         envVariableDictionary[@"MOJO_CA_FILE"] = cacertPath;
+        envVariableDictionary[@"MOJO_INSECURE"] = @"1";
         getNameTask.environment = envVariableDictionary;
         [getNameTask launch];
         
@@ -651,6 +653,7 @@
         envVariableDictionary[@"PERL5LIB"] = perlPath;
         envVariableDictionary[@"SSL_CERT_DIR"] = perlPath;
         envVariableDictionary[@"MOJO_CA_FILE"] = cacertPath;
+        envVariableDictionary[@"MOJO_INSECURE"] = @"1";
         getNameTask.environment = envVariableDictionary;
         [getNameTask launch];
         
