@@ -166,7 +166,7 @@
 		7F5B1C53211F9EE500BF7E99 /* SBApplicationProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SBApplicationProtocol.swift; sourceTree = "<group>"; };
 		7F65AA91205DD3CB00EF572E /* ffmpeg */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = ffmpeg; sourceTree = "<group>"; };
 		7F6B2B2B20EE87D800E4BBDF /* Get iPlayer Automator.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = "Get iPlayer Automator.entitlements"; path = "Get iPlayer Automator/Get iPlayer Automator.entitlements"; sourceTree = "<group>"; };
-		7F9DB6121F6340460020D5D7 /* get_iplayer */ = {isa = PBXFileReference; lastKnownFileType = text; path = get_iplayer; sourceTree = SOURCE_ROOT; };
+		7F9DB6121F6340460020D5D7 /* get_iplayer */ = {isa = PBXFileReference; explicitFileType = text.script.perl; path = get_iplayer; sourceTree = SOURCE_ROOT; };
 		7F9FE91E1EC16E3E0058CB1B /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = Carthage/Build/Mac/Sparkle.framework; sourceTree = "<group>"; };
 		7F9FE9201EC16ED80058CB1B /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		7F9FE9221EC16F160058CB1B /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
