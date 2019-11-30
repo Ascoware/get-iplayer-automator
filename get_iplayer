@@ -6714,13 +6714,6 @@ sub postproc {
     my @stream_opts;
     push @stream_opts, ( '-map', '0:a:0', '-map', '1:v:0' ) if $audio_ok && $video_ok;
     my @filter_opts;
-    if ( $audio_file =~ /\.ts$/ || $video_file =~ /\.ts$/ ) {
-        if ( ! $opt->{ffmpegobsolete} ) {
-            push @filter_opts, ( '-bsf:a', 'aac_adtstoasc' );
-        } else {
-            push @filter_opts, ( '-absf', 'aac_adtstoasc' );
-        }
-    }
     my @other_opts;
     if ( ! $opt->{ffmpegobsolete} && $opt->{notag} ) {
         push @other_opts, ( '-movflags', 'faststart' );
