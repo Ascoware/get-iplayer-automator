@@ -6677,29 +6677,13 @@ sub postproc {
 	push @input_opts, ( '-i', $video_file ) if $video_ok;
 	my @codec_opts;
 	if ( ! $opt->{ffmpegobsolete} ) {
-        # For DASH video, need to convert to H.264
-        if ( $prog->{mode} =~ /(dvf)/ ) {
-            push @codec_opts, ( '-c:v', 'libx264', '-c:a', 'copy', '-preset', 'ultrafast', '-movflags', '+faststart' );
-        } else {
-		push @codec_opts, ( '-c:v', 'copy', '-c:a', 'copy' );
-        }
+        push @codec_opts, ( '-c:v', 'copy', '-c:a', 'copy' );
 	} else {
-        if ( $prog->{mode} =~ /(dvf)/ ) {
-            push @codec_opts, ( '-vcodec', 'libx264', '-acodec', 'copy', '-preset', 'ultrafast', '-movflags', '+faststart' );
-	} else {
-		push @codec_opts, ( '-vcodec', 'copy', '-acodec', 'copy' );
-	}
+        push @codec_opts, ( '-vcodec', 'copy', '-acodec', 'copy' );
 	}
 	my @stream_opts;
 	push @stream_opts, ( '-map', '0:a:0', '-map', '1:v:0' ) if $audio_ok && $video_ok;
 	my @filter_opts;
-	if ( $audio_file =~ /\.ts$/ || $video_file =~ /\.ts$/ ) {
-		if ( ! $opt->{ffmpegobsolete} ) {
-			push @filter_opts, ( '-bsf:a', 'aac_adtstoasc' );
-		} else {
-			push @filter_opts, ( '-absf', 'aac_adtstoasc' );
-		}
-	}
 	my @other_opts;
 	if ( ! $opt->{ffmpegobsolete} && $opt->{notag} ) {
 		push @other_opts, ( '-movflags', 'faststart' );
