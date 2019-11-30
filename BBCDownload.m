@@ -160,11 +160,6 @@
             [args addObject:@"--fps25"];
         }
         
-        // High quality audio is on by default.
-        if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"GetLowerQualityAudio"] boolValue]) {
-            [args addObject:@"--hls-lq-audio"];
-        }
-        
         //Tagging
         if (![[NSUserDefaults standardUserDefaults] boolForKey:@"TagShows"])
             [args addObject:@"--no-tag"];

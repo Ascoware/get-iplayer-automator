@@ -107,7 +107,6 @@ NewProgrammeHistory           *sharedHistoryController;
     defaultValues[@"AudioDescribedNew"] = @NO;
     defaultValues[@"SignedNew"] = @NO;
     defaultValues[@"Use25FPSStreams"] = @NO;
-    defaultValues[@"GetLowerQualityAudio"] = @NO;
 
     NSUserDefaults *stdDefaults = [NSUserDefaults standardUserDefaults];
 
@@ -119,13 +118,6 @@ NewProgrammeHistory           *sharedHistoryController;
         [stdDefaults setObject:@YES forKey:@"AudioDescribedNew"];
         [stdDefaults setObject:@YES forKey:@"SignedNew"];
         [stdDefaults removeObjectForKey:@"AudioDescribed"];
-    }
-    
-    // Migrate Higher-quality option; HQ audio is default, option will fetch lower bitrate audio.
-    if ([stdDefaults objectForKey:@"GetHigherQualityAudio"]) {
-        BOOL oldSetting = [[stdDefaults objectForKey:@"GetHigherQualityAudio"] boolValue];
-        [stdDefaults setObject: @(!oldSetting) forKey:@"GetLowerQualityAudio"];
-        [stdDefaults removeObjectForKey:@"GetHigherQualityAudio"];
     }
 
     // Migrate Regionals
