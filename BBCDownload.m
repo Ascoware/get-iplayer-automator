@@ -7,6 +7,7 @@
 //
 
 #import "BBCDownload.h"
+#import "AppController.h"
 
 @implementation BBCDownload
 + (void)initFormats
@@ -32,8 +33,8 @@
         _noDataCount=0;
         
         //Initialize Paths
-        NSBundle *bundle = [NSBundle mainBundle];
-        NSString *getiPlayerPath = [bundle pathForResource:@"get_iplayer" ofType:nil];
+        NSString *getiPlayerPath = [[NSString alloc] initWithString:[NSBundle mainBundle].bundlePath];
+        getiPlayerPath = [getiPlayerPath stringByAppendingString:@"/Contents/Resources/get_iplayer/perl-darwin-2level/bin/get_iplayer"];
         
         //Initialize Formats
         if (!tvFormats || !radioFormats) {
@@ -65,12 +66,10 @@
             }
         }
         //Initialize the rest of the arguments
-        NSString *executablesPath = (bundle.executablePath).stringByDeletingLastPathComponent;
-        
         NSString *noWarningArg = @"--nocopyright";
         NSString *noPurgeArg = @"--nopurge";
-        NSString *atomicParsleyArg = [[NSString alloc] initWithFormat:@"--atomicparsley=%@", [executablesPath stringByAppendingPathComponent:@"AtomicParsley"]];
-        NSString *ffmpegArg = [[NSString alloc] initWithFormat:@"--ffmpeg=%@", [executablesPath stringByAppendingPathComponent:@"ffmpeg"]];
+        NSString *atomicParsleyArg = [[NSString alloc] initWithFormat:@"--atomicparsley=%@", [[[AppController sharedController] extraBinariesPath] stringByAppendingPathComponent:@"AtomicParsley"]];
+        NSString *ffmpegArg = [[NSString alloc] initWithFormat:@"--ffmpeg=%@", [[[AppController sharedController] extraBinariesPath] stringByAppendingPathComponent:@"ffmpeg"]];
         NSString *downloadPathArg = [[NSString alloc] initWithFormat:@"--output=%@", self.downloadPath];
         NSString *subDirArg = @"--subdir";
         NSString *progressArg = @"--logprogress";
@@ -99,7 +98,8 @@
         _profileDirArg = [[NSString alloc] initWithFormat:@"--profile-dir=%@", appSupportFolder];
         
         //Add Arguments that can't be NULL
-        NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:getiPlayerPath,
+        NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:
+                                [[AppController sharedController] getiPlayerPath],
                                 _profileDirArg,
                                 noWarningArg,
                                 noPurgeArg,
@@ -176,20 +176,14 @@
         }
         
         self.task.arguments = args;
-        self.task.launchPath = @"/usr/bin/perl";
+        self.task.launchPath = [[AppController sharedController] perlBinaryPath];
         self.task.standardOutput = self.pipe;
         self.task.standardError = self.errorPipe;
         
         NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:self.task.environment];
         envVariableDictionary[@"HOME"] = (@"~").stringByExpandingTildeInPath;
         envVariableDictionary[@"PERL_UNICODE"] = @"AS";
-        NSString *perlPath = [[NSBundle mainBundle] resourcePath];
-        perlPath = [perlPath stringByAppendingPathComponent:@"perl5"];
-        NSString *cacertPath = [perlPath stringByAppendingPathComponent:@"Mozilla/CA/cacert.pem"];
-        envVariableDictionary[@"PERL5LIB"] = perlPath;
-        envVariableDictionary[@"SSL_CERT_DIR"] = perlPath;
-        envVariableDictionary[@"MOJO_CA_FILE"] = cacertPath;
-        envVariableDictionary[@"MOJO_INSECURE"] = @"1";
+        envVariableDictionary[@"PATH"] = [[AppController sharedController] perlEnvironmentPath];
         self.task.environment = envVariableDictionary;
         
         self.fh = self.pipe.fileHandleForReading;

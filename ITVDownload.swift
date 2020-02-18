@@ -500,9 +500,9 @@ public class ITVDownload : Download {
         downloadedFileURL = URL(fileURLWithPath: self.show.path)
         let convertedFileURL = downloadedFileURL!.deletingPathExtension().appendingPathExtension("mp4")
         show.path = convertedFileURL.path
-        let binaryPath = Bundle.main.executableURL?.deletingLastPathComponent().appendingPathComponent("ffmpeg")
+        let binaryPath = AppController.shared().extraBinariesPath.appending("/ffmpeg")
 
-        ffTask.launchPath = binaryPath?.path
+        ffTask.launchPath = binaryPath
         ffTask.arguments = ["-i",
                             "\(downloadedFileURL!.path)",
                             "-c:a",

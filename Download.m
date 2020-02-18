@@ -7,6 +7,7 @@
 //
 
 #import "Download.h"
+#import "AppController.h"
 
 @implementation Download
 
@@ -184,108 +185,7 @@
         }
     }
 }
-- (void)rtmpdumpFinished:(NSNotification *)finishedNote
-{
-    [self addToLog:@"RTMPDUMP finished"];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSFileHandleReadCompletionNotification object:self.fh];
-	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSFileHandleReadCompletionNotification object:self.errorFh];
-    [self.processErrorCache invalidate];
 
-    NSInteger exitCode=[finishedNote.object terminationStatus];
-    NSLog(@"Exit Code = %ld",(long)exitCode);
-    if (exitCode==0) //RTMPDump is successful
-    {
-        _show.complete = @YES;
-        _show.successful = @YES;
-        NSDictionary *info = @{@"Programme": _show};
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"AddProgToHistory" object:self userInfo:info];
-
-        _ffTask = [[NSTask alloc] init];
-        _ffPipe = [[NSPipe alloc] init];
-        _ffErrorPipe = [[NSPipe alloc] init];
-
-        _ffTask.standardOutput = _ffPipe;
-        _ffTask.standardError = _ffErrorPipe;
-
-        _ffFh = _ffPipe.fileHandleForReading;
-        _ffErrorFh = _ffErrorPipe.fileHandleForReading;
-
-        NSString *completeDownloadPath = _downloadPath.stringByDeletingPathExtension.stringByDeletingPathExtension;
-        completeDownloadPath = [completeDownloadPath stringByAppendingPathExtension:@"mp4"];
-        _show.path = completeDownloadPath;
-
-        _ffTask.launchPath = [([NSBundle mainBundle].executablePath).stringByDeletingLastPathComponent stringByAppendingPathComponent:@"ffmpeg"];
-
-        _ffTask.arguments = @[@"-i",[NSString stringWithFormat:@"%@", _downloadPath],
-                              @"-vcodec",@"copy",
-                              @"-acodec",@"copy",
-                              [NSString stringWithFormat:@"%@",completeDownloadPath]];
-
-        [[NSNotificationCenter defaultCenter] addObserver:self
-               selector:@selector(DownloadDataReady:)
-                   name:NSFileHandleReadCompletionNotification
-                 object:_ffFh];
-        [[NSNotificationCenter defaultCenter] addObserver:self
-               selector:@selector(DownloadDataReady:)
-                   name:NSFileHandleReadCompletionNotification
-                 object:_ffErrorFh];
-        [[NSNotificationCenter defaultCenter] addObserver:self
-               selector:@selector(ffmpegFinished:)
-                   name:NSTaskDidTerminateNotification
-                 object:_ffTask];
-
-        [_ffTask launch];
-        [_ffFh readInBackgroundAndNotify];
-        [_ffErrorFh readInBackgroundAndNotify];
-
-        [self setCurrentProgress:[NSString stringWithFormat:@"Converting... -- %@",_show.showName]];
-        _show.status = @"Converting...";
-        [self addToLog:@"INFO: Converting FLV File to MP4" noTag:YES];
-        [self setPercentage:102];
-    }
-    else if (exitCode==1 && _running) //RTMPDump could not resume
-    {
-        if ([_task.arguments.lastObject isEqualTo:@"--resume"])
-        {
-            [[NSFileManager defaultManager] removeItemAtPath:_downloadPath error:nil];
-            [self addToLog:@"WARNING: Download couldn't be resumed. Overwriting partial file." noTag:YES];
-            [self addToLog:@"INFO: Preparing Request for Auth Info" noTag:YES];
-            [self launchMetaRequest];
-            return;
-        }
-        else if (_attemptNumber < 4) //some other reason, so retry
-        {
-            _attemptNumber++;
-            [self addToLog:[NSString stringWithFormat:@"WARNING: Trying download again. Attempt %ld/4",(long)_attemptNumber] noTag:YES];
-            [self launchMetaRequest];
-        }
-        else // give up
-        {
-            _show.successful = @NO;
-            _show.complete = @YES;
-            _show.reasonForFailure = @"Unknown";
-            [[NSNotificationCenter defaultCenter] removeObserver:self];
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"DownloadFinished" object:_show];
-            self.show.status = @"Download Failed";
-        }
-    }
-    else if (exitCode==2 && _attemptNumber<4 && _running) //RTMPDump lost connection but should be able to resume.
-    {
-        _attemptNumber++;
-        [self addToLog:[NSString stringWithFormat:@"WARNING: Trying download again. Attempt %ld/4",(long)_attemptNumber] noTag:YES];
-        [self launchMetaRequest];
-    }
-    else //Some undocumented exit code or too many attempts
-    {
-        _show.successful = @NO;
-        _show.complete = @YES;
-        _show.reasonForFailure = @"Unknown";
-        [[NSNotificationCenter defaultCenter] removeObserver:self];
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"DownloadFinished" object:_show];
-        self.show.status = @"Download Failed";
-    }
-    [_processErrorCache invalidate];
-}
 - (void)ffmpegFinished:(NSNotification *)finishedNote
 {
     NSLog(@"Conversion Finished");
@@ -467,8 +367,8 @@
             self.subsTask.standardError = self.subsErrorPipe;
             [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(convertSubtitlesFinished:) name:NSTaskDidTerminateNotification object:self.subsTask];
 
-            NSURL *ffmpegURL = [[[[NSBundle mainBundle] executableURL] URLByDeletingLastPathComponent] URLByAppendingPathComponent:@"ffmpeg"];
-            self.subsTask.launchPath = [ffmpegURL path];
+            NSString *ffmpegURL = [[[AppController sharedController] extraBinariesPath] stringByAppendingPathComponent:@"ffmpeg"];
+            self.subsTask.launchPath = ffmpegURL;
             self.subsTask.arguments = args;
             [self.subsTask launch];
         });

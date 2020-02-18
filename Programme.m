@@ -201,11 +201,11 @@
     _metadataTask = [[NSTask alloc] init];
     _pipe = [[NSPipe alloc] init];
     
-    _metadataTask.launchPath = @"/usr/bin/perl";
+    _metadataTask.launchPath = [[AppController sharedController] perlBinaryPath];
     NSString *profileDirPath = [[NSFileManager defaultManager] applicationSupportDirectory];
     NSString *profileArg = [NSString stringWithFormat:@"--profile-dir=%@", profileDirPath];
     
-    NSMutableArray *args = [NSMutableArray arrayWithArray:@[[[NSBundle mainBundle] pathForResource:@"get_iplayer" ofType:nil],
+    NSMutableArray *args = [NSMutableArray arrayWithArray:@[[[AppController sharedController] getiPlayerPath],
                                                             @"--nopurge",
                                                             @"--nocopyright",
                                                             @"-e60480000000000000",
@@ -234,13 +234,7 @@
     NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:_metadataTask.environment];
     envVariableDictionary[@"HOME"] = (@"~").stringByExpandingTildeInPath;
     envVariableDictionary[@"PERL_UNICODE"] = @"AS";
-    NSString *perlPath = [[NSBundle mainBundle] resourcePath];
-    perlPath = [perlPath stringByAppendingPathComponent:@"perl5"];
-    NSString *cacertPath = [perlPath stringByAppendingPathComponent:@"Mozilla/CA/cacert.pem"];
-    envVariableDictionary[@"PERL5LIB"] = perlPath;
-    envVariableDictionary[@"SSL_CERT_DIR"] = perlPath;
-    envVariableDictionary[@"MOJO_CA_FILE"] = cacertPath;
-    envVariableDictionary[@"MOJO_INSECURE"] = @"1";
+    envVariableDictionary[@"PATH"] = [[AppController sharedController] perlEnvironmentPath];
     _metadataTask.environment = envVariableDictionary;
     [_metadataTask launch];
     [fh readInBackgroundAndNotify];
@@ -483,9 +477,17 @@
         NSString *fieldsArgument = @"--fields=index,pid";
         NSString *wantedID = _pid;
         NSString *cacheExpiryArg = [[GetiPlayerArguments sharedController] cacheExpiryArgument:nil];
-        NSArray *args = @[[[NSBundle mainBundle] pathForResource:@"get_iplayer" ofType:nil],@"--nocopyright",@"--nopurge",cacheExpiryArg,[[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO andIncludeITV:YES],listArgument,[GetiPlayerArguments sharedController].profileDirArg,fieldsArgument,wantedID];
+        NSArray *args = @[[[AppController sharedController] getiPlayerPath],
+                          @"--nocopyright",
+                          @"--nopurge",
+                          cacheExpiryArg,
+                          [[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO andIncludeITV:YES],
+                          listArgument,
+                          [GetiPlayerArguments sharedController].profileDirArg,
+                          fieldsArgument,
+                          wantedID];
         getNameTask.arguments = args;
-        getNameTask.launchPath = @"/usr/bin/perl";
+        getNameTask.launchPath = [[AppController sharedController] perlBinaryPath];
         
         getNameTask.standardOutput = getNamePipe;
         NSFileHandle *getNameFh = getNamePipe.fileHandleForReading;
@@ -494,13 +496,7 @@
         NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:getNameTask.environment];
         envVariableDictionary[@"HOME"] = (@"~").stringByExpandingTildeInPath;
         envVariableDictionary[@"PERL_UNICODE"] = @"AS";
-        NSString *perlPath = [[NSBundle mainBundle] resourcePath];
-        perlPath = [perlPath stringByAppendingPathComponent:@"perl5"];
-        NSString *cacertPath = [perlPath stringByAppendingPathComponent:@"Mozilla/CA/cacert.pem"];
-        envVariableDictionary[@"PERL5LIB"] = perlPath;
-        envVariableDictionary[@"SSL_CERT_DIR"] = perlPath;
-        envVariableDictionary[@"MOJO_CA_FILE"] = cacertPath;
-        envVariableDictionary[@"MOJO_INSECURE"] = @"1";
+        envVariableDictionary[@"PATH"] = [[AppController sharedController] perlEnvironmentPath];
         getNameTask.environment = envVariableDictionary;
         [getNameTask launch];
         
@@ -618,7 +614,16 @@
         NSString *infoArgument = @"--info";
         NSString *pidArgument = [NSString stringWithFormat:@"--pid=%@", _pid];
         NSString *cacheExpiryArg = [[GetiPlayerArguments sharedController] cacheExpiryArgument:nil];
-        NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:[[NSBundle mainBundle] pathForResource:@"get_iplayer" ofType:nil],@"--nocopyright",@"--nopurge",versionArg,cacheExpiryArg,[GetiPlayerArguments sharedController].profileDirArg,infoArgument,pidArgument,nil];
+        NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:
+                                [[AppController sharedController] getiPlayerPath],
+                                @"--nocopyright",
+                                @"--nopurge",versionArg,
+                                cacheExpiryArg,
+                                [GetiPlayerArguments sharedController].profileDirArg,
+                                infoArgument,
+                                pidArgument,
+                                nil];
+        
         if (proxyDict[@"proxy"]) {
             if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue]) //Don't need proxy
             {
@@ -638,7 +643,7 @@
         //        }
         
         getNameTask.arguments = args;
-        getNameTask.launchPath = @"/usr/bin/perl";
+        getNameTask.launchPath = [[AppController sharedController] perlBinaryPath];
         
         getNameTask.standardOutput = getNamePipe;
         NSFileHandle *getNameFh = getNamePipe.fileHandleForReading;
@@ -647,13 +652,7 @@
         NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:getNameTask.environment];
         envVariableDictionary[@"HOME"] = (@"~").stringByExpandingTildeInPath;
         envVariableDictionary[@"PERL_UNICODE"] = @"AS";
-        NSString *perlPath = [[NSBundle mainBundle] resourcePath];
-        perlPath = [perlPath stringByAppendingPathComponent:@"perl5"];
-        NSString *cacertPath = [perlPath stringByAppendingPathComponent:@"Mozilla/CA/cacert.pem"];
-        envVariableDictionary[@"PERL5LIB"] = perlPath;
-        envVariableDictionary[@"SSL_CERT_DIR"] = perlPath;
-        envVariableDictionary[@"MOJO_CA_FILE"] = cacertPath;
-        envVariableDictionary[@"MOJO_INSECURE"] = @"1";
+        envVariableDictionary[@"PATH"] = [[AppController sharedController] perlEnvironmentPath];
         getNameTask.environment = envVariableDictionary;
         [getNameTask launch];
         

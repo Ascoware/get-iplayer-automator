@@ -148,8 +148,13 @@ NewProgrammeHistory           *sharedHistoryController;
     [fileManager copyItemAtPath:providedPath toPath:pluginPath error:nil];
 
     //Initialize Arguments
-    _getiPlayerPath = [[NSString alloc] initWithString:[NSBundle mainBundle].bundlePath];
-    _getiPlayerPath = [_getiPlayerPath stringByAppendingString:@"/Contents/Resources/get_iplayer"];
+    NSString *getiPlayerInstallation = [[NSString alloc] initWithString:[NSBundle mainBundle].bundlePath];
+    getiPlayerInstallation = [getiPlayerInstallation stringByAppendingString:@"/Contents/Resources/get_iplayer"];
+    _extraBinariesPath = [getiPlayerInstallation stringByAppendingPathComponent:@"bin"];
+    _getiPlayerPath = [getiPlayerInstallation stringByAppendingString:@"/perl-darwin-2level/bin/get_iplayer"];
+    _perlBinaryPath = [getiPlayerInstallation stringByAppendingString:@"/perl-darwin-2level/bin/perl"];
+    _perlEnvironmentPath = [getiPlayerInstallation stringByAppendingString:@"/perl-darwin-2levelbin"];
+    
     _runScheduled=NO;
 
     _nilToEmptyStringTransformer = [[NilToStringTransformer alloc] init];
@@ -530,7 +535,7 @@ NewProgrammeHistory           *sharedHistoryController;
         _currentProgress.stringValue = @"Updating Programme Index Feeds...";
 
         _getiPlayerUpdateTask = [[NSTask alloc] init];
-        _getiPlayerUpdateTask.launchPath = @"/usr/bin/perl";
+        _getiPlayerUpdateTask.launchPath = _perlBinaryPath;
         _getiPlayerUpdateTask.arguments = _getiPlayerUpdateArgs;
         _getiPlayerUpdatePipe = [[NSPipe alloc] init];
         _getiPlayerUpdateTask.standardOutput = _getiPlayerUpdatePipe;
@@ -553,14 +558,7 @@ NewProgrammeHistory           *sharedHistoryController;
         NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:_getiPlayerUpdateTask.environment];
         envVariableDictionary[@"HOME"] = (@"~").stringByExpandingTildeInPath;
         envVariableDictionary[@"PERL_UNICODE"] = @"AS";
-
-        NSString *perlPath = [[NSBundle mainBundle] resourcePath];
-        perlPath = [perlPath stringByAppendingPathComponent:@"perl5"];
-        NSString *cacertPath = [perlPath stringByAppendingPathComponent:@"Mozilla/CA/cacert.pem"];
-        envVariableDictionary[@"PERL5LIB"] = perlPath;
-        envVariableDictionary[@"SSL_CERT_DIR"] = perlPath;
-        envVariableDictionary[@"MOJO_CA_FILE"] = cacertPath;
-        envVariableDictionary[@"MOJO_INSECURE"] = @"1";
+        envVariableDictionary[@"PATH"] = _perlEnvironmentPath;
 
         _updatingBBCIndex = true;
         _getiPlayerUpdateTask.environment = envVariableDictionary;
@@ -696,22 +694,14 @@ NewProgrammeHistory           *sharedHistoryController;
             // write handle is closed to this process
             pipeTask.standardOutput = newPipe;
             pipeTask.standardError = newPipe;
-            pipeTask.launchPath = @"/usr/bin/perl";
-            pipeTask.arguments = @[_getiPlayerPath,[GetiPlayerArguments sharedController].profileDirArg,@"--nopurge",[GetiPlayerArguments sharedController].noWarningArg,[[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO andIncludeITV:YES],[[GetiPlayerArguments sharedController] cacheExpiryArgument:nil],[GetiPlayerArguments sharedController].standardListFormat,
+            pipeTask.launchPath = _perlBinaryPath;
+            pipeTask.arguments = @[_getiPlayerPath, [GetiPlayerArguments sharedController].profileDirArg,@"--nopurge",[GetiPlayerArguments sharedController].noWarningArg,[[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO andIncludeITV:YES],[[GetiPlayerArguments sharedController] cacheExpiryArgument:nil],[GetiPlayerArguments sharedController].standardListFormat,
                                      searchArgument];
             NSMutableString *taskData = [[NSMutableString alloc] initWithString:@""];
             NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:pipeTask.environment];
             envVariableDictionary[@"HOME"] = (@"~").stringByExpandingTildeInPath;
             envVariableDictionary[@"PERL_UNICODE"] = @"AS";
-
-            NSString *perlPath = [[NSBundle mainBundle] resourcePath];
-            perlPath = [perlPath stringByAppendingPathComponent:@"perl5"];
-            NSString *cacertPath = [perlPath stringByAppendingPathComponent:@"Mozilla/CA/cacert.pem"];
-            envVariableDictionary[@"PERL5LIB"] = perlPath;
-            envVariableDictionary[@"SSL_CERT_DIR"] = perlPath;
-            envVariableDictionary[@"MOJO_CA_FILE"] = cacertPath;
-            envVariableDictionary[@"MOJO_INSECURE"] = @"1";
-
+            envVariableDictionary[@"PATH"] = _perlBinaryPath;
             pipeTask.environment = envVariableDictionary;
             [pipeTask launch];
             while ((someData = readHandle2.availableData) && someData.length) {
@@ -1429,7 +1419,8 @@ NewProgrammeHistory           *sharedHistoryController;
             NSString *cacheExpiryArgument = [[GetiPlayerArguments sharedController] cacheExpiryArgument:nil];
             NSString *typeArgument = [[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO andIncludeITV:YES];
 
-            NSMutableArray *autoRecordArgs = [[NSMutableArray alloc] initWithObjects:_getiPlayerPath,
+            NSMutableArray *autoRecordArgs = [[NSMutableArray alloc] initWithObjects:
+                                              _getiPlayerPath,
                                               [GetiPlayerArguments sharedController].noWarningArg,@"--nopurge",
                                               @"--listformat=<pid>|<type>|<name>|<episode>|<channel>|<timeadded>|<web>|<available>",
                                               cacheExpiryArgument,
@@ -1445,7 +1436,7 @@ NewProgrammeHistory           *sharedHistoryController;
             NSFileHandle *readHandle = autoRecordPipe.fileHandleForReading;
             NSData *inData = nil;
 
-            autoRecordTask.launchPath = @"/usr/bin/perl";
+            autoRecordTask.launchPath = _perlBinaryPath;
             autoRecordTask.arguments = autoRecordArgs;
             autoRecordTask.standardOutput = autoRecordPipe;
             NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:autoRecordTask.environment];
@@ -1453,13 +1444,9 @@ NewProgrammeHistory           *sharedHistoryController;
             envVariableDictionary[@"PERL_UNICODE"] = @"AS";
 
             NSString *perlPath = [[NSBundle mainBundle] resourcePath];
-            perlPath = [perlPath stringByAppendingPathComponent:@"perl5"];
-            NSString *cacertPath = [perlPath stringByAppendingPathComponent:@"Mozilla/CA/cacert.pem"];
-            envVariableDictionary[@"PERL5LIB"] = perlPath;
-            envVariableDictionary[@"SSL_CERT_DIR"] = perlPath;
-            envVariableDictionary[@"MOJO_CA_FILE"] = cacertPath;
-            envVariableDictionary[@"MOJO_INSECURE"] = @"1";
-
+            perlPath = [perlPath stringByAppendingPathComponent:@"get_iplayer"];
+            perlPath = [perlPath stringByAppendingPathComponent:@"bin"];
+            envVariableDictionary[@"PATH"] = _perlEnvironmentPath;
             autoRecordTask.environment = envVariableDictionary;
             [autoRecordTask launch];
 

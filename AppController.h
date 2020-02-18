@@ -20,6 +20,8 @@
 #import "GetiPlayerArguments.h"
 #import "GetiPlayerProxy.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 extern BOOL runDownloads;
 extern NSDictionary *tvFormats;
 extern NSDictionary *radioFormats;
@@ -27,6 +29,9 @@ extern NSDictionary *radioFormats;
 @interface AppController : NSObject <SUUpdaterDelegate, NSApplicationDelegate>
 //General
 @property (nonatomic, readonly) NSString *getiPlayerPath;
+@property (nonatomic, readonly) NSString *perlBinaryPath;
+@property (nonatomic, readonly) NSString *perlEnvironmentPath;
+@property (nonatomic, readonly) NSString *extraBinariesPath;
 @property (nonatomic) IBOutlet NSWindow *mainWindow;
 @property (nonatomic) IBOutlet NSApplication *application;
 @property (nonatomic) IBOutlet NSWindow *historyWindow;
@@ -134,7 +139,7 @@ extern NSDictionary *radioFormats;
 
 //Update
 - (void)getiPlayerUpdateFinished;
-- (IBAction)updateCache:(id)sender;
+- (IBAction)updateCache:(nullable id)sender;
 - (IBAction)forceUpdate:(id)sender;
 
 //Search
@@ -151,7 +156,7 @@ extern NSDictionary *radioFormats;
 - (IBAction)chooseDownloadPath:(id)sender;
 - (IBAction)restoreDefaults:(id)sender;
 - (IBAction)closeWindow:(id)sender;
-+ (AppController*)sharedController;
++ (nonnull AppController*)sharedController;
 
 //Queue
 - (IBAction)addToQueue:(id)sender;
@@ -184,3 +189,5 @@ extern NSDictionary *radioFormats;
 -(NSString *)getItemNumber:(int)itemLocation fromString:(NSString *)string;
 
 @end
+
+NS_ASSUME_NONNULL_END

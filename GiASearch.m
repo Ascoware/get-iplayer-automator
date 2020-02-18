@@ -7,6 +7,7 @@
 //
 
 #import "GiASearch.h"
+#import "AppController.h"
 
 @implementation GiASearch
 - (instancetype)initWithSearchTerms:(NSString *)searchTerms allowHidingOfDownloadedItems:(BOOL)allowHidingOfDownloadedItems logController:(LogController *)logger selector:(SEL)selector withTarget:(id)target
@@ -22,10 +23,17 @@
         _target = target;
         _logger = logger;
         
-        _task.launchPath = @"/usr/bin/perl";
-        NSString *typeArg  = [[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO andIncludeITV:YES];
-        NSString *getiPlayerPath = [[NSBundle mainBundle] pathForResource:@"get_iplayer" ofType:nil];
-        NSArray *args = @[getiPlayerPath, @"--nocopyright", @"-e60480000000000000", typeArg, @"--listformat=SearchResult|<pid>|<available>|<type>|<name>|<episode>|<channel>|<seriesnum>|<episodenum>|<desc>|<thumbnail>|<web>|<available>", @"--long",@"--nopurge", @"--search",searchTerms, [GetiPlayerArguments sharedController].profileDirArg];
+        _task.launchPath = [[AppController sharedController] perlBinaryPath];
+        NSString *typeArg = [[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO andIncludeITV:YES];
+        NSArray *args = @[
+            [[AppController sharedController] getiPlayerPath],
+            @"--nocopyright",
+            @"-e60480000000000000",
+            typeArg, @"--listformat=SearchResult|<pid>|<available>|<type>|<name>|<episode>|<channel>|<seriesnum>|<episodenum>|<desc>|<thumbnail>|<web>|<available>", @"--long",
+            @"--nopurge",
+            @"--search",
+            searchTerms,
+            [GetiPlayerArguments sharedController].profileDirArg];
         
         if (![[[NSUserDefaults standardUserDefaults] valueForKey:@"ShowDownloadedInSearch"] boolValue] && allowHidingOfDownloadedItems) {
             args=[args arrayByAddingObject:@"--hide"];
@@ -55,15 +63,7 @@
         NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:_task.environment];
         envVariableDictionary[@"HOME"] = (@"~").stringByExpandingTildeInPath;
         envVariableDictionary[@"PERL_UNICODE"] = @"AS";
-        
-        NSString *perlPath = [[NSBundle mainBundle] resourcePath];
-        perlPath = [perlPath stringByAppendingPathComponent:@"perl5"];
-        NSString *cacertPath = [perlPath stringByAppendingPathComponent:@"Mozilla/CA/cacert.pem"];
-        envVariableDictionary[@"PERL5LIB"] = perlPath;
-        envVariableDictionary[@"SSL_CERT_DIR"] = perlPath;
-        envVariableDictionary[@"MOJO_CA_FILE"] = cacertPath;
-        envVariableDictionary[@"MOJO_INSECURE"] = @"1";
-
+        envVariableDictionary[@"PATH"] = [[AppController sharedController] perlEnvironmentPath];
         _task.environment = envVariableDictionary;
         [_task launch];
     }

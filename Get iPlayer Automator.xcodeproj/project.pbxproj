@@ -40,17 +40,14 @@
 		7F5B1C51211F9E2E00BF7E99 /* SafariScripting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F5B1C4D211F9E2E00BF7E99 /* SafariScripting.swift */; };
 		7F5B1C54211F9EE600BF7E99 /* SBObjectProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F5B1C52211F9EE500BF7E99 /* SBObjectProtocol.swift */; };
 		7F5B1C55211F9EE600BF7E99 /* SBApplicationProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F5B1C53211F9EE500BF7E99 /* SBApplicationProtocol.swift */; };
-		7F65AA93205DD41E00EF572E /* ffmpeg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7F65AA91205DD3CB00EF572E /* ffmpeg */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		7F748E3423FB416B00626A77 /* get_iplayer in Resources */ = {isa = PBXBuildFile; fileRef = 7F748E3323FB416B00626A77 /* get_iplayer */; };
 		7F9FE9211EC16ED80058CB1B /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F9FE9201EC16ED80058CB1B /* libz.tbd */; };
 		7F9FE9231EC16F160058CB1B /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F9FE9221EC16F160058CB1B /* IOKit.framework */; };
 		7F9FE9241EC170E60058CB1B /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F9FE91E1EC16E3E0058CB1B /* Sparkle.framework */; };
 		7F9FE9251EC170E60058CB1B /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7F9FE91E1EC16E3E0058CB1B /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		7FA4E50A1F6DCC45008CF604 /* perl5 in Resources */ = {isa = PBXBuildFile; fileRef = 7FA4E5091F6DCC3F008CF604 /* perl5 */; };
 		7FAA6A25206F36B800B6B50C /* Crypto in Resources */ = {isa = PBXBuildFile; fileRef = 7FAA6A24206F36B800B6B50C /* Crypto */; };
 		7FAA6A2720744A5D00B6B50C /* pycrypto-2.6.1-py2.7.egg-info in Resources */ = {isa = PBXBuildFile; fileRef = 7FAA6A2620744A5C00B6B50C /* pycrypto-2.6.1-py2.7.egg-info */; };
-		7FC8F7112066E9C800DC158C /* ffprobe in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7FC8F70F2066E9B500DC158C /* ffprobe */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		7FC8F71C20674B7600DC158C /* youtube-dl in Resources */ = {isa = PBXBuildFile; fileRef = 7FC8F71B20674B6700DC158C /* youtube-dl */; };
-		7FC8F71E20674D6D00DC158C /* get_iplayer in Resources */ = {isa = PBXBuildFile; fileRef = 7F9DB6121F6340460020D5D7 /* get_iplayer */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
@@ -67,7 +64,6 @@
 		D92687C51087F81F000E8132 /* DownloadHistoryController.m in Sources */ = {isa = PBXBuildFile; fileRef = D92687C41087F81F000E8132 /* DownloadHistoryController.m */; };
 		D92687CA1087F836000E8132 /* DownloadHistoryEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = D92687C91087F836000E8132 /* DownloadHistoryEntry.m */; };
 		D941D9A01025DDCF0012A75F /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D941D99F1025DDCF0012A75F /* SystemConfiguration.framework */; };
-		D943D2791B37B1D800452FCD /* AtomicParsley in CopyFiles */ = {isa = PBXBuildFile; fileRef = D961247E10F12C9200046D31 /* AtomicParsley */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		D97D9426106DBB68006ECD39 /* TVFormat.m in Sources */ = {isa = PBXBuildFile; fileRef = D97D9423106DBB68006ECD39 /* TVFormat.m */; };
 		D97D9427106DBB68006ECD39 /* RadioFormat.m in Sources */ = {isa = PBXBuildFile; fileRef = D97D9424106DBB68006ECD39 /* RadioFormat.m */; };
 		D9A4509D102FF8090011E175 /* Credits.html in Resources */ = {isa = PBXBuildFile; fileRef = D9A4509C102FF8090011E175 /* Credits.html */; };
@@ -93,9 +89,6 @@
 			dstSubfolderSpec = 6;
 			files = (
 				39AE5F5E1D329E390019E5EF /* rtmpdump in CopyFiles */,
-				D943D2791B37B1D800452FCD /* AtomicParsley in CopyFiles */,
-				7F65AA93205DD41E00EF572E /* ffmpeg in CopyFiles */,
-				7FC8F7112066E9C800DC158C /* ffprobe in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -164,8 +157,8 @@
 		7F5B1C4D211F9E2E00BF7E99 /* SafariScripting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SafariScripting.swift; sourceTree = "<group>"; };
 		7F5B1C52211F9EE500BF7E99 /* SBObjectProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SBObjectProtocol.swift; sourceTree = "<group>"; };
 		7F5B1C53211F9EE500BF7E99 /* SBApplicationProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SBApplicationProtocol.swift; sourceTree = "<group>"; };
-		7F65AA91205DD3CB00EF572E /* ffmpeg */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = ffmpeg; sourceTree = "<group>"; };
 		7F6B2B2B20EE87D800E4BBDF /* Get iPlayer Automator.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = "Get iPlayer Automator.entitlements"; path = "Get iPlayer Automator/Get iPlayer Automator.entitlements"; sourceTree = "<group>"; };
+		7F748E3323FB416B00626A77 /* get_iplayer */ = {isa = PBXFileReference; lastKnownFileType = folder; path = get_iplayer; sourceTree = "<group>"; };
 		7F9DB6121F6340460020D5D7 /* get_iplayer */ = {isa = PBXFileReference; explicitFileType = text.script.perl; path = get_iplayer; sourceTree = SOURCE_ROOT; };
 		7F9FE91E1EC16E3E0058CB1B /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = Carthage/Build/Mac/Sparkle.framework; sourceTree = "<group>"; };
 		7F9FE9201EC16ED80058CB1B /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
@@ -173,7 +166,6 @@
 		7FA4E5091F6DCC3F008CF604 /* perl5 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = perl5; sourceTree = "<group>"; };
 		7FAA6A24206F36B800B6B50C /* Crypto */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Crypto; sourceTree = "<group>"; };
 		7FAA6A2620744A5C00B6B50C /* pycrypto-2.6.1-py2.7.egg-info */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "pycrypto-2.6.1-py2.7.egg-info"; sourceTree = "<group>"; };
-		7FC8F70F2066E9B500DC158C /* ffprobe */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = ffprobe; sourceTree = "<group>"; };
 		7FC8F71B20674B6700DC158C /* youtube-dl */ = {isa = PBXFileReference; lastKnownFileType = file; path = "youtube-dl"; sourceTree = "<group>"; };
 		7FF4174321FC02AE004FF8CE /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -201,7 +193,6 @@
 		D92687C81087F836000E8132 /* DownloadHistoryEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DownloadHistoryEntry.h; sourceTree = "<group>"; };
 		D92687C91087F836000E8132 /* DownloadHistoryEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DownloadHistoryEntry.m; sourceTree = "<group>"; };
 		D941D99F1025DDCF0012A75F /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = /System/Library/Frameworks/SystemConfiguration.framework; sourceTree = "<absolute>"; };
-		D961247E10F12C9200046D31 /* AtomicParsley */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = AtomicParsley; sourceTree = "<group>"; };
 		D97D9422106DBB68006ECD39 /* TVFormat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TVFormat.h; sourceTree = "<group>"; };
 		D97D9423106DBB68006ECD39 /* TVFormat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TVFormat.m; sourceTree = "<group>"; };
 		D97D9424106DBB68006ECD39 /* RadioFormat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RadioFormat.m; sourceTree = "<group>"; };
@@ -372,12 +363,10 @@
 			isa = PBXGroup;
 			children = (
 				7FAA6A2620744A5C00B6B50C /* pycrypto-2.6.1-py2.7.egg-info */,
+				7F748E3323FB416B00626A77 /* get_iplayer */,
 				7FAA6A24206F36B800B6B50C /* Crypto */,
 				7FC8F71B20674B6700DC158C /* youtube-dl */,
-				7FC8F70F2066E9B500DC158C /* ffprobe */,
-				7F65AA91205DD3CB00EF572E /* ffmpeg */,
 				39AE5F5C1D3294C40019E5EF /* rtmpdump */,
-				D961247E10F12C9200046D31 /* AtomicParsley */,
 				7FA4E5091F6DCC3F008CF604 /* perl5 */,
 				7F9DB6121F6340460020D5D7 /* get_iplayer */,
 			);
@@ -595,7 +584,6 @@
 				39FD5E9619D370BD006BC47B /* Images.xcassets in Resources */,
 				D9F66963102C5DC500A9449B /* GetOperaURL.applescript in Resources */,
 				D9F668DB102C560500A9449B /* GetFireFoxURL.applescript in Resources */,
-				7FA4E50A1F6DCC45008CF604 /* perl5 in Resources */,
 				396FDA611DA98179003F3F57 /* MainMenu.xib in Resources */,
 				8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */,
 				D9CCF3CC1023485A009205BE /* dsa_pub.pem in Resources */,
@@ -605,8 +593,8 @@
 				DFFF196713E96288007B52AC /* ReasonsForFailure.plist in Resources */,
 				7FAA6A25206F36B800B6B50C /* Crypto in Resources */,
 				D9CDC9E8186B8F2B0003A4E2 /* GetiPlayerAutomator.sdef in Resources */,
+				7F748E3423FB416B00626A77 /* get_iplayer in Resources */,
 				3975484D1622504F00470DD1 /* ttml2srt.py in Resources */,
-				7FC8F71E20674D6D00DC158C /* get_iplayer in Resources */,
 				7FC8F71C20674B7600DC158C /* youtube-dl in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -821,7 +809,7 @@
 					"\"$(SRCROOT)/Binaries\"",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
-				MARKETING_VERSION = 1.17;
+				MARKETING_VERSION = 1.18;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CODE_SIGN_FLAGS = "--no-strict";
 				OTHER_LDFLAGS = "-licucore";
@@ -869,7 +857,7 @@
 					"\"$(SRCROOT)/Binaries\"",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
-				MARKETING_VERSION = 1.17;
+				MARKETING_VERSION = 1.18;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CODE_SIGN_FLAGS = "--no-strict";
 				OTHER_LDFLAGS = "-licucore";
