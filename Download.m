@@ -251,7 +251,7 @@
         self.apPipe = [[NSPipe alloc] init];
         self.apFh = self.apPipe.fileHandleForReading;
 
-        self.apTask.launchPath = [([NSBundle mainBundle].executablePath).stringByDeletingLastPathComponent stringByAppendingPathComponent:@"AtomicParsley"];
+        self.apTask.launchPath = [[[AppController sharedController] extraBinariesPath] stringByAppendingPathComponent:@"AtomicParsley"];
 
         NSMutableArray *arguments = [NSMutableArray arrayWithObjects:
                                      [NSString stringWithFormat:@"%@",self.show.path],

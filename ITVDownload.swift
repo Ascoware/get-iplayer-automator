@@ -463,18 +463,20 @@ public class ITVDownload : Download {
         
         if let executableURL = Bundle.main.url(forResource: "youtube-dl", withExtension:nil),
             let binaryPath = Bundle.main.executableURL?.deletingLastPathComponent().path,
-            let resourcePath = Bundle.main.resourcePath {
+            let resourcePath = Bundle.main.resourcePath
+        {
             task?.launchPath = executableURL.path
             task?.arguments = args
+            let extraBinaryPath = AppController.shared().extraBinariesPath
             var envVariableDictionary = [String : String]()
-            envVariableDictionary["PATH"] = "\(binaryPath):/usr/bin"
+            envVariableDictionary["PATH"] = "\(binaryPath):\(extraBinaryPath):/usr/bin"
             envVariableDictionary["PYTHONPATH"] = "\(resourcePath)"
             task?.environment = envVariableDictionary
             self.logDebugMessage("DEBUG: youtube-dl environment: \(envVariableDictionary)", noTag: true)
             
             NotificationCenter.default.addObserver(self, selector: #selector(self.youtubeDLProgress), name: FileHandle.readCompletionNotification, object: fh)
             NotificationCenter.default.addObserver(self, selector: #selector(self.youtubeDLProgress), name: FileHandle.readCompletionNotification, object: errorFh)
-
+            
             task?.terminationHandler = youtubeDLTaskFinished
             
             task?.launch()
