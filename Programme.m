@@ -669,7 +669,7 @@
 {
     NSArray *array = [getNameData componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
     Programme *p = self;
-    NSString *available = nil, *versions = nil, *title = nil;
+    NSString *available = nil, *versions = nil, *title = nil, *type = nil;
     NSDate *broadcastDate = nil;
     
     for (NSString *string in array)
@@ -695,6 +695,13 @@
             [scanner scanString:@"versions:" intoString:nil];
             [scanner scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet] intoString:&versions];
             versions = [versions stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+        }
+        
+        if ([string hasPrefix:@"type:"]) {
+            NSScanner *scanner = [NSScanner scannerWithString:string];
+            [scanner scanString:@"radio:" intoString:nil];
+            [scanner scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet] intoString:&type];
+            type = [versions stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
         }
         // firstbcastdate: 2005-04-09
         
@@ -722,6 +729,10 @@
         p.lastBroadcastString = [NSDateFormatter localizedStringFromDate:broadcastDate
                                                                dateStyle:NSDateFormatterMediumStyle
                                                                timeStyle:NSDateFormatterNoStyle];
+    }
+    
+    if ([type isEqualToString:@"radio"]) {
+        p.radio = @YES;
     }
     
     if (title) {

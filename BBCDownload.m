@@ -32,10 +32,6 @@
         [self addToLog:[NSString stringWithFormat:@"Downloading %@", tempShow.showName]];
         _noDataCount=0;
         
-        //Initialize Paths
-        NSString *getiPlayerPath = [[NSString alloc] initWithString:[NSBundle mainBundle].bundlePath];
-        getiPlayerPath = [getiPlayerPath stringByAppendingString:@"/Contents/Resources/get_iplayer/perl-darwin-2level/bin/get_iplayer"];
-        
         //Initialize Formats
         if (!tvFormats || !radioFormats) {
             [BBCDownload initFormats];

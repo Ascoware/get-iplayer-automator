@@ -38,7 +38,7 @@ extern NSDictionary *radioFormats;
 @property (nonatomic) IOPMAssertionID powerAssertionID;
 
 //Update Components
-@property (nonatomic) NSTask *getiPlayerUpdateTask;
+@property (nonatomic, nullable) NSTask *getiPlayerUpdateTask;
 @property (nonatomic) NSPipe *getiPlayerUpdatePipe;
 @property (nonatomic) NSArray *getiPlayerUpdateArgs;
 @property (nonatomic) NSMutableArray *typesToCache;
@@ -54,7 +54,7 @@ extern NSDictionary *radioFormats;
 @property (nonatomic) IBOutlet NSArrayController *resultsController;
 @property (nonatomic) IBOutlet NSTableView *searchResultsTable;
 @property (nonatomic) NSMutableArray *searchResultsArray;
-@property (nonatomic) GiASearch *currentSearch;
+@property (nonatomic, nullable) GiASearch *currentSearch;
 
 //PVR
 @property (nonatomic) IBOutlet NSTextField *pvrSearchField;
@@ -64,7 +64,7 @@ extern NSDictionary *radioFormats;
 @property (nonatomic) IBOutlet NSPanel *pvrPanel;
 @property (nonatomic) NSMutableArray *pvrSearchResultsArray;
 @property (nonatomic) NSMutableArray *pvrQueueArray;
-@property (nonatomic) GiASearch *currentPVRSearch;
+@property (nonatomic, nullable) GiASearch *currentPVRSearch;
 //Queue
 @property (nonatomic) IBOutlet NSButton *addToQueue;
 @property (nonatomic) IBOutlet NSArrayController *queueController;
@@ -77,8 +77,8 @@ extern NSDictionary *radioFormats;
 @property (nonatomic) IBOutlet NSTextField *currentProgress;
 
 //Download Controller
-@property (nonatomic) Download *currentDownload;
-@property (nonatomic) IBOutlet NSToolbarItem *stopButton;
+@property (nonatomic, nullable) Download *currentDownload;
+@property (nonatomic, nullable) IBOutlet NSToolbarItem *stopButton;
 @property (nonatomic) IBOutlet NSToolbarItem *startButton;
 
 //Preferences
@@ -94,7 +94,7 @@ extern NSDictionary *radioFormats;
 @property (nonatomic) IBOutlet NSPanel *scheduleWindow;
 @property (nonatomic) IBOutlet NSDatePicker *datePicker;
 @property (nonatomic) NSTimer *interfaceTimer;
-@property (nonatomic) NSTimer *scheduleTimer;
+@property (nonatomic, nullable) NSTimer *scheduleTimer;
 @property (nonatomic) BOOL runScheduled;
 
 //Download Solutions

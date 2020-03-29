@@ -758,6 +758,7 @@ NewProgrammeHistory           *sharedHistoryController;
                             show.status = @"Available";
                             show.lastBroadcastString = p.lastBroadcastString;
                             show.lastBroadcast = p.lastBroadcast;
+                            show.radio = p.radio;
                             foundMatch=YES;
                             break;
                         }
@@ -1443,9 +1444,6 @@ NewProgrammeHistory           *sharedHistoryController;
             envVariableDictionary[@"HOME"] = (@"~").stringByExpandingTildeInPath;
             envVariableDictionary[@"PERL_UNICODE"] = @"AS";
 
-            NSString *perlPath = [[NSBundle mainBundle] resourcePath];
-            perlPath = [perlPath stringByAppendingPathComponent:@"get_iplayer"];
-            perlPath = [perlPath stringByAppendingPathComponent:@"bin"];
             envVariableDictionary[@"PATH"] = _perlEnvironmentPath;
             autoRecordTask.environment = envVariableDictionary;
             [autoRecordTask launch];
