@@ -9,7 +9,26 @@ The current release is 1.16.1. [Download it here.](https://github.com/Ascoware/g
 
 #### Version history
 
-Latest release
+##### 1.19.0
+Fixed detection of radio/BBC Sounds programs when using 'Use Current Webpage' (#263)
+Merged get_iplayer 3.26
+Merged youtube-dl 2010.07.28
+
+##### v1.18.2
+Fixed crash due to ffmpeg and related binaries being moved to a new location
+Actually update to get_iplayer 3.25
+
+##### v1.18.1
+Update to get_iplayer 3.25. This should address errors when downloading subtitles. (#272, #278)
+Get iPlayer Automator now includes its own perl environment to ensure consistency across platforms.
+(note: version 1.18 was never released.)
+
+##### v1.17
+ Updated get_iplayer to 3.23 to address 403 errors for HLS streams
+Removed "Get lower quality HLS audio" as it's now ignored by get_iplayer
+Removed unnecessary recoding of DASH streams (#256)
+Set MOJO_INSECURE option that may fix 500 errors when downloading (#233, #254)
+
 ##### 1.16.1
 Get iPlayer Automator is now ready for use on macOS Catalina (10.15)! TV programs will be added to TV.app, and radio programs will be added to Music.app. Due to a bug in macOS shows tagged as podcasts will open in Music.app but can't be played. Also, because it was ported from iOS, Podcasts.app is not scriptable and cannot accept externally created m4a files. As a result, if you use the "Tag radio programmes as podcasts" your only option right now is to use QuickTime Player.app, or turn off this checkbox and play them through Music.app. We hope this bug is fixed in a future version of macOS.
 
