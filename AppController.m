@@ -153,7 +153,7 @@ NewProgrammeHistory           *sharedHistoryController;
     _extraBinariesPath = [getiPlayerInstallation stringByAppendingPathComponent:@"bin"];
     _getiPlayerPath = [getiPlayerInstallation stringByAppendingString:@"/perl-darwin-2level/bin/get_iplayer"];
     _perlBinaryPath = [getiPlayerInstallation stringByAppendingString:@"/perl-darwin-2level/bin/perl"];
-    _perlEnvironmentPath = [getiPlayerInstallation stringByAppendingString:@"/perl-darwin-2levelbin"];
+    _perlEnvironmentPath = [getiPlayerInstallation stringByAppendingString:@"/perl-darwin-2level/bin"];
     
     _runScheduled=NO;
 

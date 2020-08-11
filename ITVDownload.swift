@@ -357,7 +357,6 @@ public class ITVDownload : Download {
     public func youtubeDLTaskFinished(_ proc: Process) {
         self.add(toLog: "youtube-dl finished downloading")
         processErrorCache.invalidate()
-        self.processErrorCache.invalidate()
         let exitCode = proc.terminationStatus
         if exitCode == 0 {
             if self.show.path.hasSuffix("flv") {
