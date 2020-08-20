@@ -13,5 +13,5 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:@"StartDownloads" object:self];
     return nil;
 }
-@end
+@end. 
 
