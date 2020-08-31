@@ -146,6 +146,18 @@ import ScriptingBridge
                 let source = tab.executeJavascript?("document.documentElement.outerHTML") as? String
                 (pid, newShowName, network, isRadio) = extractMetadata(url: url, tabTitle: title, pageSource: source)
             }
+        } else if (browser == "Microsoft Edge") {
+            guard let edge : MicrosoftEdgeApplication = SBApplication(bundleIdentifier: "com.microsoft.edgemac"), edge.isRunning, let edgeWindows =
+                edge.windows?().compactMap({ $0 as? MicrosoftEdgeWindow }) else {
+                browserNotOpen.runModal()
+                return nil
+            }
+
+            let orderedWindows = edgeWindows.sorted { $0.index! < $1.index! }
+            if let frontWindow = orderedWindows.first, let tab = frontWindow.activeTab, let url = tab.URL, let title = tab.title {
+                let source = tab.executeJavascript?("document.documentElement.outerHTML") as? String
+                (pid, newShowName, network, isRadio) = extractMetadata(url: url, tabTitle: title, pageSource: source)
+            }
         } else {
             let unsupportedBrowser = NSAlert()
             unsupportedBrowser.messageText = "Uh, something went horribly wrong."

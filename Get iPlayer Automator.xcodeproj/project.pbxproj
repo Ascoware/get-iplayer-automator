@@ -48,6 +48,8 @@
 		7FAA6A25206F36B800B6B50C /* Crypto in Resources */ = {isa = PBXBuildFile; fileRef = 7FAA6A24206F36B800B6B50C /* Crypto */; };
 		7FAA6A2720744A5D00B6B50C /* pycrypto-2.6.1-py2.7.egg-info in Resources */ = {isa = PBXBuildFile; fileRef = 7FAA6A2620744A5C00B6B50C /* pycrypto-2.6.1-py2.7.egg-info */; };
 		7FC8F71C20674B7600DC158C /* youtube-dl in Resources */ = {isa = PBXBuildFile; fileRef = 7FC8F71B20674B6700DC158C /* youtube-dl */; };
+		7FEDA8ED24FC982200189D37 /* MicrosoftEdge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FEDA8EB24FC982200189D37 /* MicrosoftEdge.swift */; };
+		7FEDA8EE24FC982200189D37 /* MicrosoftEdgeScripting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FEDA8EC24FC982200189D37 /* MicrosoftEdgeScripting.swift */; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
@@ -167,6 +169,8 @@
 		7FAA6A24206F36B800B6B50C /* Crypto */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Crypto; sourceTree = "<group>"; };
 		7FAA6A2620744A5C00B6B50C /* pycrypto-2.6.1-py2.7.egg-info */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "pycrypto-2.6.1-py2.7.egg-info"; sourceTree = "<group>"; };
 		7FC8F71B20674B6700DC158C /* youtube-dl */ = {isa = PBXFileReference; lastKnownFileType = file; path = "youtube-dl"; sourceTree = "<group>"; };
+		7FEDA8EB24FC982200189D37 /* MicrosoftEdge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MicrosoftEdge.swift; sourceTree = "<group>"; };
+		7FEDA8EC24FC982200189D37 /* MicrosoftEdgeScripting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MicrosoftEdgeScripting.swift; sourceTree = "<group>"; };
 		7FF4174321FC02AE004FF8CE /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* Get iPlayer Automator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Get iPlayer Automator.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -437,6 +441,8 @@
 				7F5B1C52211F9EE500BF7E99 /* SBObjectProtocol.swift */,
 				7F5B1C4B211F9E2D00BF7E99 /* Chrome.swift */,
 				7F5B1C4C211F9E2D00BF7E99 /* ChromeScripting.swift */,
+				7FEDA8EB24FC982200189D37 /* MicrosoftEdge.swift */,
+				7FEDA8EC24FC982200189D37 /* MicrosoftEdgeScripting.swift */,
 				7F5B1C4A211F9E2D00BF7E99 /* Safari.swift */,
 				7F5B1C4D211F9E2E00BF7E99 /* SafariScripting.swift */,
 				7F165A15205C1F8C005BB78A /* NewProgrammeHistory.swift */,
@@ -622,6 +628,7 @@
 				7F165A14205C1F15005BB78A /* ProgrammeHistoryEntry.swift in Sources */,
 				D97D9426106DBB68006ECD39 /* TVFormat.m in Sources */,
 				D97D9427106DBB68006ECD39 /* RadioFormat.m in Sources */,
+				7FEDA8EE24FC982200189D37 /* MicrosoftEdgeScripting.swift in Sources */,
 				7F165A12205C1ED2005BB78A /* ProgrammeData.swift in Sources */,
 				D9F97FE5198E9043006494A3 /* GetCurrentWebpage.swift in Sources */,
 				7F165A18205C4051005BB78A /* NSScanner+Swift.swift in Sources */,
@@ -630,6 +637,7 @@
 				D9CDC9EC186B90A90003A4E2 /* ASDownloadShows.m in Sources */,
 				D92687C51087F81F000E8132 /* DownloadHistoryController.m in Sources */,
 				D92687CA1087F836000E8132 /* DownloadHistoryEntry.m in Sources */,
+				7FEDA8ED24FC982200189D37 /* MicrosoftEdge.swift in Sources */,
 				DFC865E213E96BE200606599 /* ReasonForFailure.m in Sources */,
 				39D7C1C01874AD9D00B78698 /* NilToStringTransformer.m in Sources */,
 				7F5B1C55211F9EE600BF7E99 /* SBApplicationProtocol.swift in Sources */,
@@ -781,7 +789,7 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_ENTITLEMENTS = "Get iPlayer Automator/Get iPlayer Automator.entitlements";
-				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEVELOPMENT_TEAM = TN555EKVJS;
@@ -834,7 +842,7 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_ENTITLEMENTS = "Get iPlayer Automator/Get iPlayer Automator.entitlements";
-				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = TN555EKVJS;
