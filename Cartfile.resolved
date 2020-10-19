@@ -1,2 +1,3 @@
+github "SwiftyJSON/SwiftyJSON" "4.3.0"
 github "sparkle-project/Sparkle" "v1.23.0"
 github "tid-kijyun/Kanna" "4.0.3"

@@ -7,6 +7,7 @@
 
 import Foundation
 import Kanna
+import SwiftyJSON
 
 public class ITVDownload : Download {
     
@@ -149,12 +150,15 @@ public class ITVDownload : Download {
         var episodeNumber = 0
         var seriesNumber = 0
         let longDateFormatter = DateFormatter()
+        let enUSPOSIXLocale = Locale(identifier:"en_US_POSIX")
         longDateFormatter.timeZone = TimeZone(secondsFromGMT:0)
         longDateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mmZ"
+        longDateFormatter.locale = enUSPOSIXLocale
 
         let shortDateFormatter = DateFormatter()
         shortDateFormatter.dateFormat = "EEE MMM dd"
         shortDateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+        shortDateFormatter.locale = enUSPOSIXLocale
 
         if let htmlPage = try? HTML(html: responseString, encoding: .utf8) {
             // There should only be one 'video' element.
@@ -166,32 +170,35 @@ public class ITVDownload : Download {
             
             if let descriptionElement = htmlPage.at_xpath("//script[@id='json-ld']") {
                 if let descriptionJSON = descriptionElement.content {
-                    if let data = descriptionJSON.data(using: .utf8) {
-                        if let descJSONDict = try? JSONSerialization.jsonObject(with: data) as? [String : Any],
-                            let descriptionData = descJSONDict {
-                            showDescription = descriptionData ["description"] as? String ?? "None available"
-                            episodeNumber = descriptionData["episodeNumber"] as? Int ?? 0
-                            if let seriesDict = descriptionData["partOfSeason"] as? [String: Any] {
-                                seriesNumber = seriesDict["seasonNumber"] as? Int ?? 0
+                    let descriptionData = JSON(parseJSON: descriptionJSON)
+                    let breadcrumbs = descriptionData["itemListElement:"].arrayValue
+                    for item in breadcrumbs {
+                        if item["item:"]["@type"] == "TVEpisode" {
+                            let showMetadata = item["item:"]
+                            showDescription = showMetadata["description"].string ?? "None available"
+                            episodeNumber = showMetadata["episodeNumber"].intValue
+                            seriesNumber = showMetadata["partOfSeason"]["seasonNumber"].intValue
+                            episode = showMetadata["name"].stringValue
+                            thumbnailURL = showMetadata["image"].dictionaryValue["url"]?.stringValue
+
+                            let potentialActions = showMetadata["potentialAction"].arrayValue
+
+                            if potentialActions.count > 0 {
+                                let potentialAction = potentialActions[0]
+                                let expectActions = potentialAction["expectsAcceptanceOf"].arrayValue
+
+                                if expectActions.count > 0 {
+                                    let expectAction = expectActions[0]
+                                    let availabilityTime = expectAction["availabilityStarts"].stringValue
+                                    timeAired = longDateFormatter.date(from:availabilityTime)
+                                }
                             }
                             
-                            episode = descJSONDict? ["name"] as? String ?? ""
-
-                            if let imageDict = descriptionData["image"] as? [String : Any],
-                                let thumbnailURLString = imageDict["url"] as? String {
-                                self.thumbnailURL = thumbnailURLString
-                            }
-
-                            if let potentialActionDict = descriptionData["potentialAction"] as? [[String: Any]],
-                                let expectsAcceptanceDict = potentialActionDict[0]["expectsAcceptanceOf"] as? [[String: Any]],
-                                let availabilityTime = expectsAcceptanceDict[0]["availabilityStarts"] as? String {
-                                timeAired = longDateFormatter.date(from:availabilityTime)
-                            }
+                            break
                         }
                     }
                 }
             }
-            
         }
 
         if episodeNumber == 0 && seriesNumber == 0 && !episodeID.isEmpty {
