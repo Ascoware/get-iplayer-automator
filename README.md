@@ -3,7 +3,6 @@ The goal of Get iPlayer Automator is to allow iTunes and your Mac to become the 
 
 The current release is 1.19.2. [Download it here.](https://github.com/Ascoware/get-iplayer-automator/releases)
 
-
 ### What if I find a bug?
 [Start here.](https://github.com/Ascoware/get-iplayer-automator/wiki/Reporting-Issues)
 
@@ -30,7 +29,7 @@ Get iPlayer Automator now includes its own perl environment to ensure consistenc
 (note: version 1.18 was never released.)
 
 ##### v1.17
- Updated get_iplayer to 3.23 to address 403 errors for HLS streams
+Updated get_iplayer to 3.23 to address 403 errors for HLS streams
 Removed "Get lower quality HLS audio" as it's now ignored by get_iplayer
 Removed unnecessary recoding of DASH streams (#256)
 Set MOJO_INSECURE option that may fix 500 errors when downloading (#233, #254)
