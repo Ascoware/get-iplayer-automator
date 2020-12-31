@@ -92,7 +92,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)logDebugMessage:(NSString *)message noTag:(BOOL)b;
 - (void)addToLog:(NSString *)logMessage noTag:(BOOL)b;
 - (void)addToLog:(NSString *)logMessage;
-- (void)processFLVStreamerMessage:(NSString *)message;
 
 - (void)launchMetaRequest;
 - (void)processGetiPlayerOutput:(NSString *)outp;

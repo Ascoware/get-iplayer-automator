@@ -59,9 +59,6 @@ public class ITVDownload : Download {
         }
     }
     @objc public override func launchMetaRequest() {
-        self.errorCache = NSMutableString()
-        self.processErrorCache = Timer(timeInterval:0.25, target:self, selector:#selector(processError), userInfo:nil, repeats:true)
-        
         guard let requestURL = URL(string: show.url) else {
             return
         }
@@ -240,37 +237,6 @@ public class ITVDownload : Download {
         }
     }
 
-    // This seems inefficient, because we already got a string. Unfortunately it has a fraction of a second
-    // which makes it more complicated to parse. This is faster.
-    func stringFromTimeInterval(_ interval: Int) -> String {
-        let seconds = interval % 60
-        let minutes = (interval / 60) % 60
-        let hours = (interval / 3600)
-        return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
-    }
-
-    fileprivate func convertToSeconds(_ timeString: String) -> Int {
-        let timeParts = timeString.split {($0 == ":") || ($0 == ".")}
-        var timeInSeconds = 0
-        for (i, d) in timeParts.enumerated() {
-            if let x = Int(d) {
-                switch (i) {
-                case 0:
-                    timeInSeconds += x * 60 * 60
-                case 1:
-                    timeInSeconds += x * 60
-                case 2:
-                    timeInSeconds += x
-                default:
-                    break
-                    // Don't worry about fractions.
-                }
-            }
-        }
-        
-        return timeInSeconds
-    }
-    
     @objc public func youtubeDLProgress(progressNotification: Notification?) {
         guard let data = progressNotification?.userInfo?[NSFileHandleNotificationDataItem] as? Data, data.count > 0,
             let s = String(data: data, encoding: .utf8) else {
@@ -278,9 +244,13 @@ public class ITVDownload : Download {
                 errorFh?.readInBackgroundAndNotify()
                 return
         }
-        
-        if self.verbose {
-            self.logger.add(toLog: s)
+
+        let splitStrings = s.split(separator: "\n")
+
+        for substring in splitStrings {
+            if self.verbose && !substring.isEmpty {
+                self.logger.add(toLog: String(substring))
+            }
         }
         
         if s.contains("Writing video subtitles") {
@@ -308,11 +278,6 @@ public class ITVDownload : Download {
         var progress: String? = nil
         var remaining: String? = nil
         
-        // ffmpeg download outputs how much of the show was downloaded.
-        // At the beginning of the download it prints the duration of the show.
-        var duration: String? = nil
-        var elapsed: String? = nil
-        
         if s.contains("[download]") {
             let scanner = Scanner(string: s)
             scanner.scanUpToString("[download]")
@@ -330,31 +295,6 @@ public class ITVDownload : Download {
             if let remaining = remaining {
                 setCurrentProgress("Downloading \(show.showName) -- \(remaining) until done")
             }
-        } else if s.contains("Duration:") {
-            let scanner = Scanner(string: s)
-            scanner.scanUpToString("Duration:")
-            scanner.scanString("Duration:")
-            duration = scanner.scanUpToString(",")?.trimmingCharacters(in: .whitespaces)
-        } else if s.contains("time=") {
-            let scanner = Scanner(string: s)
-            scanner.scanUpToString("time=")
-            scanner.scanString("time=")
-            elapsed = scanner.scanUpToString(" ")?.trimmingCharacters(in: .whitespaces)
-        }
-        
-        if let duration = duration {
-            durationInSeconds = convertToSeconds(duration)
-        }
-        if let elapsed = elapsed {
-            elapsedInSeconds = convertToSeconds(elapsed)
-        }
-        
-        // This code should only be run for ffmpeg downloads.
-        if elapsedInSeconds != 0 && durationInSeconds != 0 {
-            setPercentage(100.0 * Double(elapsedInSeconds) / Double(durationInSeconds))
-            let formattedElapsed = stringFromTimeInterval(elapsedInSeconds)
-            let formattedDuration = stringFromTimeInterval(durationInSeconds)
-            setCurrentProgress("Downloading \(show.showName) -- \(formattedElapsed) of \(formattedDuration)")
         }
 
         fh?.readInBackgroundAndNotify()
@@ -363,22 +303,14 @@ public class ITVDownload : Download {
     
     public func youtubeDLTaskFinished(_ proc: Process) {
         self.add(toLog: "youtube-dl finished downloading")
-        processErrorCache.invalidate()
         let exitCode = proc.terminationStatus
         if exitCode == 0 {
-            if self.show.path.hasSuffix("flv") {
-                // Need to convert to MP4
-                DispatchQueue.main.async {
-                    self.convertToMP4()
-                }
-            } else {
-                self.show.complete = true
-                self.show.successful = true
-                let info = ["Programme" : self.show]
-                DispatchQueue.main.async {
-                    NotificationCenter.default.post(name: NSNotification.Name(rawValue: "AddProgToHistory"), object:self, userInfo:info)
-                    self.youtubeDLFinishedDownload()
-                }
+            self.show.complete = true
+            self.show.successful = true
+            let info = ["Programme" : self.show]
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: "AddProgToHistory"), object:self, userInfo:info)
+                self.youtubeDLFinishedDownload()
             }
         } else {
             self.show.complete = true
@@ -387,7 +319,7 @@ public class ITVDownload : Download {
             
             // We can't be sure we were terminated or that youtube-dl died.
             NotificationCenter.default.removeObserver(self)
-            NotificationCenter.default.post(name: NSNotification.Name(rawValue:"DownloadFinished"), object:self.show)        
+            NotificationCenter.default.post(name: NSNotification.Name(rawValue:"DownloadFinished"), object:self.show)
         }
     }
     
@@ -399,13 +331,15 @@ public class ITVDownload : Download {
             if let thumbnailURL = thumbnailURL {
                 add(toLog: "INFO: Downloading thumbnail", noTag: true)
                 thumbnailPath = URL(fileURLWithPath: show.path).appendingPathExtension("jpg").path
+                
                 let downloadTask: URLSessionDownloadTask? = session.downloadTask(with: URL(string: thumbnailURL)!) { (location, _, _) in
                     self.thumbnailRequestFinished(location)
                 }
                 downloadTask?.resume()
             }
             else {
-            thumbnailRequestFinished(nil)
+                self.add(toLog: "No thumbnail URL, skipping")
+                thumbnailRequestFinished(nil)
             }
         }
         else {
@@ -439,6 +373,8 @@ public class ITVDownload : Download {
             
             if let embedSubs = UserDefaults.standard.object(forKey: "EmbedSubtitles") as? Bool, embedSubs {
                 args.append("--embed-subs")
+            } else {
+                args.append("-k")
             }
         }
 
@@ -490,70 +426,5 @@ public class ITVDownload : Download {
             errorFh?.readInBackgroundAndNotify()
         }
     }
-    
-    func convertToMP4() {
-        ffTask = Process()
-        ffPipe = Pipe()
-        ffErrorPipe = Pipe()
-        
-        guard let ffTask = self.ffTask, let ffPipe = self.ffPipe, let ffErrorPipe = self.ffErrorPipe else {
-            assert(false, "Help? Can't create a process or pipe?")
-            return
-        }
-        
-        ffTask.standardOutput = ffPipe
-        ffTask.standardError = ffErrorPipe
-        ffFh = ffPipe.fileHandleForReading
-        ffErrorFh = ffErrorPipe.fileHandleForReading
-        downloadedFileURL = URL(fileURLWithPath: self.show.path)
-        let convertedFileURL = downloadedFileURL!.deletingPathExtension().appendingPathExtension("mp4")
-        show.path = convertedFileURL.path
-        let binaryPath = AppController.shared().extraBinariesPath.appending("/ffmpeg")
-
-        ffTask.launchPath = binaryPath
-        ffTask.arguments = ["-i",
-                            "\(downloadedFileURL!.path)",
-                            "-c:a",
-                            "copy",
-                            "-c:v",
-                            "copy",
-                            "\(convertedFileURL.path)"]
-        NotificationCenter.default.addObserver(self, selector: #selector(ffmpegFinished), name: Process.didTerminateNotification, object: ffTask)
-        ffTask.launch()
-        ffFh?.readInBackgroundAndNotify()
-        ffErrorFh?.readInBackgroundAndNotify()
-        setCurrentProgress("Converting... -- \(show.showName)")
-        show.status = "Converting..."
-        add(toLog: "INFO: Converting FLV File to MP4", noTag: true)
-        self.setPercentage(102)
-    }
-
-    
-    @objc func ffmpegFinished(_ finishedNote: Notification) {
-        print("Conversion Finished")
-        add(toLog: "INFO: Finished Converting.", noTag: true)
-        if let process = finishedNote.object as? Process {
-            if process.terminationStatus != 0 {
-                add(toLog: "INFO: Exit Code = \(process.terminationStatus)", noTag: true)
-                self.show.status = "Download Complete"
-                show.path = downloadPath
-                NotificationCenter.default.removeObserver(self)
-                NotificationCenter.default.post(name: NSNotification.Name(rawValue:"DownloadFinished"), object:self.show)
-            } else {
-                
-                if let downloadedFile = downloadedFileURL {
-                    try? FileManager.default.removeItem(at: downloadedFile)
-                }
-
-                self.show.complete = true
-                self.show.successful = true
-                let info = ["Programme" : self.show]
-                DispatchQueue.main.async {
-                    NotificationCenter.default.post(name: NSNotification.Name(rawValue: "AddProgToHistory"), object:self, userInfo:info)
-                    self.youtubeDLFinishedDownload()
-                }
-            }
-        }
-}
 }
 

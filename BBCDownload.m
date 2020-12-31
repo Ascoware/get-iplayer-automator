@@ -424,12 +424,6 @@
                 if (message.length == 0){
                     continue;
                 }
-                else if ([scanner scanFloat:nil]) //RTMPDump
-                {
-                    [self processFLVStreamerMessage:message];
-                    continue;
-                }
-                else if ([message hasPrefix:@"frame="]) shortStatus= @"Converting.."; //FFMpeg
                 else if ([message hasPrefix:@" Progress"]) shortStatus= @"Processing Download.."; //Download Artwork
                 else if ([message hasPrefix:@"ERROR:"] || [message hasPrefix:@"\rERROR:"] || [message hasPrefix:@"\nERROR:"]) //Could be unresumable.
                 {
