@@ -6,6 +6,7 @@
 
 import Foundation
 import Kanna
+import SwiftyJSON
 
 public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, URLSessionDataDelegate {
     var myQueueSize: Int = 0
@@ -217,31 +218,28 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
     }
     
     func processSingleEpisode(_ aProgramme: ProgrammeData, html: HTMLDocument) {
-        let showDataElement = html.xpath("//script[@id=\"json-ld\"]")
+        if let descriptionElement = html.at_xpath("//script[@id=\"json-ld\"]"), let descriptionJSON = descriptionElement.content {
+            let descriptionData = JSON(parseJSON: descriptionJSON)
+            let breadcrumbs = descriptionData["itemListElement:"].arrayValue
+            for item in breadcrumbs {
+                if item["item:"]["@type"] == "TVEpisode" {
+                    let showMetadata = item["item:"]
+                    aProgramme.programDescription = showMetadata["description"].string ?? "None available"
 
-        if let nodeContent = showDataElement.first?.text {
-            let data = nodeContent.data(using: String.Encoding.utf8, allowLossyConversion: false)!
-            
-            do {
-                let json = try JSONSerialization.jsonObject(with: data, options: []) as! [String: AnyObject]
-                if let description = json["description"] as? String {
-                    aProgramme.programDescription = description
-                }
-                
-                if let url = json["@id"] as? String {
+                    if let title = showMetadata["partOfSeries"].dictionaryValue["name"]?.stringValue {
+                        aProgramme.programmeName = title
+                    }
+                    
+                    let url = showMetadata["@id"].stringValue
                     aProgramme.programmeURL = url
                     aProgramme.productionId = URL(string: url)?.lastPathComponent ?? ""
+
+                    if let thumbnailURL = showMetadata["image"].dictionaryValue["url"]?.stringValue {
+                        aProgramme.thumbnailURL = thumbnailURL
+                    }
+
+                    break
                 }
-                
-                if let showName = json["partOfSeries"]?["name"] as? String {
-                    aProgramme.programmeName = showName
-                }
-                
-                if let thumbnailURL = json["image"]?["url"] as? String {
-                    aProgramme.thumbnailURL = thumbnailURL
-                }
-            } catch let error as NSError {
-                print("Failed to load: \(error.localizedDescription)")
             }
         }
         
