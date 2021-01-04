@@ -1958,19 +1958,30 @@ NewProgrammeHistory           *sharedHistoryController;
 - (IBAction)scheduleStart:(id)sender
 {
     NSDate *startTime = _datePicker.dateValue;
+
+    if (self.scheduleTimer) {
+        [self.scheduleTimer invalidate];
+    }
+
     _scheduleTimer = [[NSTimer alloc] initWithFireDate:startTime
                                              interval:1
                                                target:self
                                              selector:@selector(runScheduledDownloads:)
                                              userInfo:nil
                                               repeats:NO];
-    _interfaceTimer = [NSTimer scheduledTimerWithTimeInterval:1
-                                                      target:self
-                                                    selector:@selector(updateScheduleStatus:)
-                                                    userInfo:nil
-                                                     repeats:YES];
+
+
+    if (!_interfaceTimer) {
+        _interfaceTimer = [NSTimer scheduledTimerWithTimeInterval:1
+                                                           target:self
+                                                         selector:@selector(updateScheduleStatus:)
+                                                         userInfo:nil
+                                                          repeats:YES];
+    }
+
     if (_scheduleWindow.visible)
         [_scheduleWindow close];
+
     [_startButton setEnabled:NO];
     _stopButton.label = @"Cancel Timer";
     _stopButton.action = @selector(stopTimer:);
@@ -1983,6 +1994,7 @@ NewProgrammeHistory           *sharedHistoryController;
 - (void)runScheduledDownloads:(NSTimer *)theTimer
 {
     [_interfaceTimer invalidate];
+    _interfaceTimer = nil;
     [_mainWindow setDocumentEdited:NO];
     [_startButton setEnabled:YES];
     [_stopButton setEnabled:NO];
@@ -2010,7 +2022,9 @@ NewProgrammeHistory           *sharedHistoryController;
 - (void)stopTimer:(id)sender
 {
     [_interfaceTimer invalidate];
+    _interfaceTimer = nil;
     [_scheduleTimer invalidate];
+    _scheduleTimer = nil;
     [_startButton setEnabled:YES];
     [_stopButton setEnabled:NO];
     _stopButton.label = @"Stop";
