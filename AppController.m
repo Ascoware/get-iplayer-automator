@@ -26,6 +26,8 @@ GetITVShows                   *newITVListing;
 NPHistoryTableViewController *npHistoryTableViewController;
 NewProgrammeHistory           *sharedHistoryController;
 
+static NSString *FORCE_RELOAD = @"ForceReload";
+
 @implementation AppController
 #pragma mark Overriden Methods
 
@@ -1085,7 +1087,7 @@ NewProgrammeHistory           *sharedHistoryController;
         {
             NSDate *scheduledDate = [NSDate dateWithTimeIntervalSinceNow:60*[[[NSUserDefaults standardUserDefaults] valueForKey:@"AutoRetryTime"] doubleValue]];
             _datePicker.dateValue = scheduledDate;
-            [self scheduleStart:self];
+            [self scheduleStartWithCacheUpdate:NO];
         }
         else if (_runScheduled)
             _runScheduled=NO;
@@ -1312,7 +1314,7 @@ NewProgrammeHistory           *sharedHistoryController;
             {
                 NSDate *scheduledDate = [NSDate dateWithTimeIntervalSinceNow:60*[[[NSUserDefaults standardUserDefaults] valueForKey:@"AutoRetryTime"] doubleValue]];
                 _datePicker.dateValue = scheduledDate;
-                [self scheduleStart:self];
+                [self scheduleStartWithCacheUpdate:NO];
             }
 
             return;
@@ -1955,7 +1957,13 @@ NewProgrammeHistory           *sharedHistoryController;
 {
     [_scheduleWindow close];
 }
+
 - (IBAction)scheduleStart:(id)sender
+{
+    [self scheduleStartWithCacheUpdate:YES];
+}
+
+- (void)scheduleStartWithCacheUpdate:(BOOL)cache
 {
     NSDate *startTime = _datePicker.dateValue;
 
@@ -1963,11 +1971,15 @@ NewProgrammeHistory           *sharedHistoryController;
         [self.scheduleTimer invalidate];
     }
 
+    NSDictionary *userInfo = @{
+        FORCE_RELOAD : @(cache)
+    };
+
     _scheduleTimer = [[NSTimer alloc] initWithFireDate:startTime
                                              interval:1
                                                target:self
                                              selector:@selector(runScheduledDownloads:)
-                                             userInfo:nil
+                                             userInfo:userInfo
                                               repeats:NO];
 
 
@@ -1991,6 +2003,7 @@ NewProgrammeHistory           *sharedHistoryController;
     _runScheduled=YES;
     [_mainWindow setDocumentEdited:YES];
 }
+
 - (void)runScheduledDownloads:(NSTimer *)theTimer
 {
     [_interfaceTimer invalidate];
@@ -2001,8 +2014,14 @@ NewProgrammeHistory           *sharedHistoryController;
     _stopButton.label = @"Stop";
     _stopButton.action = @selector(stopDownloads:);
     _scheduleTimer=nil;
-    [self forceUpdate:self];
+
+    if ([[theTimer userInfo] boolForKey:FORCE_RELOAD]) {
+        [self forceUpdate:self];
+    } else {
+        [self startDownloads:self];
+    }
 }
+
 - (void)updateScheduleStatus:(NSTimer *)theTimer
 {
     NSDate *startTime = _scheduleTimer.fireDate;
