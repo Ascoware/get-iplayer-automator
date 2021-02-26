@@ -58,6 +58,7 @@ public class ITVDownload : Download {
             self.launchMetaRequest()
         }
     }
+
     @objc public override func launchMetaRequest() {
         guard let requestURL = URL(string: show.url) else {
             return
@@ -238,12 +239,16 @@ public class ITVDownload : Download {
     }
 
     @objc public func youtubeDLProgress(progressNotification: Notification?) {
-        guard let data = progressNotification?.userInfo?[NSFileHandleNotificationDataItem] as? Data, data.count > 0,
-            let s = String(data: data, encoding: .utf8) else {
-                fh?.readInBackgroundAndNotify()
-                errorFh?.readInBackgroundAndNotify()
-                return
+        guard let fileHandle = progressNotification?.object as? FileHandle else {
+            return
         }
+        guard let data = progressNotification?.userInfo?[NSFileHandleNotificationDataItem] as? Data,
+              data.count > 0,
+              let s = String(data: data, encoding: .utf8) else {
+            return
+        }
+
+        fileHandle.readInBackgroundAndNotify()
 
         let splitStrings = s.split(separator: "\n")
 
@@ -296,13 +301,15 @@ public class ITVDownload : Download {
                 setCurrentProgress("Downloading \(show.showName) -- \(remaining) until done")
             }
         }
-
-        fh?.readInBackgroundAndNotify()
-        errorFh?.readInBackgroundAndNotify()
     }
     
     public func youtubeDLTaskFinished(_ proc: Process) {
         self.add(toLog: "youtube-dl finished downloading")
+
+        self.task = nil
+        self.pipe = nil
+        self.errorPipe = nil
+        
         let exitCode = proc.terminationStatus
         if exitCode == 0 {
             self.show.complete = true
@@ -359,8 +366,8 @@ public class ITVDownload : Download {
         task?.standardInput = FileHandle.nullDevice
         task?.standardOutput = pipe
         task?.standardError = errorPipe
-        fh = pipe?.fileHandleForReading
-        errorFh = errorPipe?.fileHandleForReading
+        let fh = pipe?.fileHandleForReading
+        let errorFh = errorPipe?.fileHandleForReading
         
         var args: [String] = [show.url,
                               "-f",

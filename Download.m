@@ -20,20 +20,11 @@
         _outOfRange=0;
         _verbose = [[NSUserDefaults standardUserDefaults] boolForKey:@"Verbose"];
         _downloadParams = [[NSMutableDictionary alloc] init];
-        _errorCache = [[NSMutableString alloc] init];
-        _processErrorCache = [NSTimer scheduledTimerWithTimeInterval:.25 target:self selector:@selector(processError) userInfo:nil repeats:YES];
         _isTest=false;
         _defaultsPrefix = @"BBC_";
 
         _log = [[NSMutableString alloc] initWithString:@""];
-//        _nc = [NSNotificationCenter defaultCenter];
         _downloadPath = [[NSString alloc] initWithString:[[NSUserDefaults standardUserDefaults] valueForKey:@"DownloadPath"]];
-        _task = [[NSTask alloc] init];
-        _pipe = [[NSPipe alloc] init];
-        _errorPipe = [[NSPipe alloc] init];
-
-
-
     }
     return self;
 }
@@ -126,7 +117,6 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         self.apTask = [[NSTask alloc] init];
         self.apPipe = [[NSPipe alloc] init];
-        self.apFh = self.apPipe.fileHandleForReading;
 
         self.apTask.launchPath = [[[AppController sharedController] extraBinariesPath] stringByAppendingPathComponent:@"AtomicParsley"];
 
@@ -151,10 +141,6 @@
         self.apTask.arguments = arguments;
 
         [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(DownloadDataReady:)
-                                                     name:NSFileHandleReadCompletionNotification
-                                                   object:self.apFh];
-        [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(atomicParsleyFinished:)
                                                      name:NSTaskDidTerminateNotification
                                                    object:self.apTask];
@@ -162,22 +148,22 @@
         [self addToLog:@"INFO: Beginning AtomicParsley Tagging." noTag:YES];
 
         [self.apTask launch];
-        [self.apFh readInBackgroundAndNotify];
         [self setCurrentProgress:[NSString stringWithFormat:@"Tagging the Programme... -- %@",self.show.showName]];
     });
 }
 - (void)atomicParsleyFinished:(NSNotification *)finishedNote
 {
-    if (finishedNote)
-    {
-        if ([finishedNote.object terminationStatus] == 0)
-        {
+    if (finishedNote) {
+        if ([finishedNote.object terminationStatus] == 0) {
             [[NSFileManager defaultManager] removeItemAtPath:_thumbnailPath error:nil];
             [self addToLog:@"INFO: AtomicParsley Tagging finished." noTag:YES];
-        }
-        else
+        } else {
             [self addToLog:@"INFO: Tagging failed." noTag:YES];
+        }
     }
+
+    self.apTask = nil;
+    self.apPipe = nil;
 
     if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"DownloadSubtitles"] boolValue]) {
         // youtube-dl should try to download a subtitle file, but if there isn't one log it and continue.
@@ -323,19 +309,6 @@
             [self addToLog:outputLine noTag:YES];
     }
 }
-- (void)processError
-{
-	//Separate the output by line.
-	NSString *string = [[NSString alloc] initWithString:_errorCache];
-    _errorCache = [NSMutableString stringWithString:@""];
-	NSArray *array = [string componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
-	//Parse each line individually.
-	for (NSString *output in array) {
-        if (output.length > 1) {
-            [self addToLog:output noTag:YES];
-        }
-    }
-}
 
 - (void)launchMetaRequest
 {
@@ -377,16 +350,19 @@
 {
     [_currentRequest cancel];
 	//Some basic cleanup.
-    if ([_task isRunning]) {
-        [_task terminate];
+    if ([self.task isRunning]) {
+        [self.task terminate];
     }
-	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSFileHandleReadCompletionNotification object:_fh];
-	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSFileHandleReadCompletionNotification object:_errorFh];
+
+    self.task = nil;
+    self.pipe = nil;
+    self.errorPipe = nil;
+    
+	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSFileHandleReadCompletionNotification object:nil];
 	self.show.status = @"Cancelled";
     _show.complete = @NO;
     _show.successful = @NO;
 	[self addToLog:@"Download Cancelled"];
-    [_processErrorCache invalidate];
     _running=FALSE;
 }
 

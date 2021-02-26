@@ -518,66 +518,69 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 
     NSString *typeArgument = [[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:YES andIncludeITV:NO];
 
-    if (![typeArgument isEqualToString:@"--type"]) {
-
-        _getiPlayerUpdateArgs = @[_getiPlayerPath,
-                                  cacheExpiryArg,
-                                  typeArgument,
-                                  @"--refresh",
-                                  @"--nopurge",
-                                  [GetiPlayerArguments sharedController].profileDirArg,
-                                  @".*"];
-
-        if (_proxy && [[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])
-        {
-            _getiPlayerUpdateArgs = [_getiPlayerUpdateArgs arrayByAddingObject:[[NSString alloc] initWithFormat:@"-p%@", _proxy.url]];
-        }
-
-        [_logger addToLog:@"Updating Programme Index Feeds...\n" :self];
-        _currentProgress.stringValue = @"Updating Programme Index Feeds...";
-
-        _getiPlayerUpdateTask = [[NSTask alloc] init];
-        _getiPlayerUpdateTask.launchPath = _perlBinaryPath;
-        _getiPlayerUpdateTask.arguments = _getiPlayerUpdateArgs;
-        _getiPlayerUpdatePipe = [[NSPipe alloc] init];
-        _getiPlayerUpdateTask.standardOutput = _getiPlayerUpdatePipe;
-        _getiPlayerUpdateTask.standardError =_getiPlayerUpdatePipe;
-
-        if (_verbose) {
-            for (NSString *arg in _getiPlayerUpdateArgs) {
-                [_logger addToLog:arg];
-            }
-        }
-        
-        NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-
-        [nc addObserver:self
-               selector:@selector(dataReady:)
-                   name:NSFileHandleReadCompletionNotification
-                 object:_getiPlayerUpdatePipe.fileHandleForReading];
-        [_getiPlayerUpdatePipe.fileHandleForReading readInBackgroundAndNotify];
-
-        NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:_getiPlayerUpdateTask.environment];
-        envVariableDictionary[@"HOME"] = (@"~").stringByExpandingTildeInPath;
-        envVariableDictionary[@"PERL_UNICODE"] = @"AS";
-        envVariableDictionary[@"PATH"] = _perlEnvironmentPath;
-
-        _updatingBBCIndex = true;
-        _getiPlayerUpdateTask.environment = envVariableDictionary;
-        [_getiPlayerUpdateTask launch];
-    }
-    else
-    {
+    if (!typeArgument) {
         _updatingBBCIndex = false;
         [self getiPlayerUpdateFinished];
+        return;
     }
+
+    NSArray *getiPlayerUpdateArgs = @[_getiPlayerPath,
+                                      cacheExpiryArg,
+                                      typeArgument,
+                                      @"--refresh",
+                                      @"--nopurge",
+                                      [GetiPlayerArguments sharedController].profileDirArg,
+                                      @".*"];
+
+    if (_proxy && [[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])
+    {
+        getiPlayerUpdateArgs = [getiPlayerUpdateArgs arrayByAddingObject:[[NSString alloc] initWithFormat:@"-p%@", _proxy.url]];
+    }
+
+    [_logger addToLog:@"Updating Programme Index Feeds...\n" :self];
+    _currentProgress.stringValue = @"Updating Programme Index Feeds...";
+
+    self.getiPlayerUpdateTask = [NSTask new];
+    self.getiPlayerUpdateTask.launchPath = _perlBinaryPath;
+    self.getiPlayerUpdateTask.arguments = getiPlayerUpdateArgs;
+    self.getiPlayerUpdatePipe = [NSPipe new];
+    self.getiPlayerUpdateTask.standardOutput = _getiPlayerUpdatePipe;
+    self.getiPlayerUpdateTask.standardError =_getiPlayerUpdatePipe;
+
+    if (_verbose) {
+        for (NSString *arg in getiPlayerUpdateArgs) {
+            [_logger addToLog:arg];
+        }
+    }
+
+    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+
+    [nc addObserver:self
+           selector:@selector(dataReady:)
+               name:NSFileHandleReadCompletionNotification
+             object:_getiPlayerUpdatePipe.fileHandleForReading];
+    [_getiPlayerUpdatePipe.fileHandleForReading readInBackgroundAndNotify];
+
+    [nc addObserver:self
+           selector:@selector(getiPlayerUpdateTerminated:)
+               name:NSTaskDidTerminateNotification
+             object:self.getiPlayerUpdateTask];
+
+    NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:self.getiPlayerUpdateTask.environment];
+    envVariableDictionary[@"HOME"] = (@"~").stringByExpandingTildeInPath;
+    envVariableDictionary[@"PERL_UNICODE"] = @"AS";
+    envVariableDictionary[@"PATH"] = _perlEnvironmentPath;
+
+    _updatingBBCIndex = true;
+    self.getiPlayerUpdateTask.environment = envVariableDictionary;
+    [self.getiPlayerUpdateTask launch];
 }
 
 - (void)dataReady:(NSNotification *)n
 {
     NSData *d;
     d = [[n userInfo] valueForKey:NSFileHandleNotificationDataItem];
-    BOOL matches=NO;
+
     if (d.length > 0) {
         NSString *s = [[NSString alloc] initWithData:d
                                             encoding:NSUTF8StringEncoding];
@@ -601,27 +604,18 @@ static NSString *FORCE_RELOAD = @"ForceReload";
                 _currentProgress.stringValue = infomessage;
                 _didUpdate = YES;
             }
-            else if ([line hasPrefix:@"Matches:"])
-            {
-                matches=YES;
-                _getiPlayerUpdateTask=nil;
-                _updatingBBCIndex = false;
-                [self getiPlayerUpdateFinished];
-            }
         }
     }
-    else
-    {
-        _getiPlayerUpdateTask = nil;
-        _updatingBBCIndex = false;
-        [self getiPlayerUpdateFinished];
-    }
 
-    // If the task is running, start reading again
-    if (_getiPlayerUpdateTask && !matches) {
-        [_getiPlayerUpdatePipe.fileHandleForReading readInBackgroundAndNotify];
-    }
+    [_getiPlayerUpdatePipe.fileHandleForReading readInBackgroundAndNotify];
 }
+
+- (void)getiPlayerUpdateTerminated:(NSNotification *)n
+{
+    _updatingBBCIndex = false;
+    [self getiPlayerUpdateFinished];
+}
+
 - (void)itvUpdateFinished
 {
     //  ITV Cache Update Finished - turn off progress display and process data
@@ -633,6 +627,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     [_itvProgressText setHidden:true];
     [self getiPlayerUpdateFinished];
 }
+
 - (void)getiPlayerUpdateFinished
 {
     if (_updatingITVIndex || _updatingBBCIndex)
@@ -641,8 +636,8 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     runUpdate=NO;
     [_mainWindow setDocumentEdited:NO];
 
-    _getiPlayerUpdatePipe = nil;
-    _getiPlayerUpdateTask = nil;
+    self.getiPlayerUpdatePipe = nil;
+    self.getiPlayerUpdateTask = nil;
     _currentProgress.stringValue = @"";
     [_currentIndicator setIndeterminate:NO];
     [_currentIndicator stopAnimation:nil];
@@ -1435,9 +1430,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 
             NSTask *autoRecordTask = [[NSTask alloc] init];
             NSPipe *autoRecordPipe = [[NSPipe alloc] init];
-            NSMutableString *autoRecordData = [[NSMutableString alloc] initWithString:@""];
             NSFileHandle *readHandle = autoRecordPipe.fileHandleForReading;
-            NSData *inData = nil;
 
             autoRecordTask.launchPath = _perlBinaryPath;
             autoRecordTask.arguments = autoRecordArgs;
@@ -1449,13 +1442,13 @@ static NSString *FORCE_RELOAD = @"ForceReload";
             envVariableDictionary[@"PATH"] = _perlEnvironmentPath;
             autoRecordTask.environment = envVariableDictionary;
             [autoRecordTask launch];
+            [autoRecordTask waitUntilExit];
 
-            while ((inData = readHandle.availableData) && inData.length) {
-                NSString *tempData = [[NSString alloc] initWithData:inData encoding:NSUTF8StringEncoding];
-                [autoRecordData appendString:tempData];
-            }
-            if (![self processAutoRecordData:[autoRecordData copy] forSeries:series])
+            NSData *data = [readHandle readDataToEndOfFile];
+            NSString *autoRecordData = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+            if (![self processAutoRecordData:autoRecordData forSeries:series]) {
                 [seriesToBeRemoved addObject:series];
+            }
         }
         [_pvrQueueController performSelectorOnMainThread:@selector(removeObjects:) withObject:seriesToBeRemoved waitUntilDone:NO];
     }
@@ -1583,13 +1576,15 @@ static NSString *FORCE_RELOAD = @"ForceReload";
                 }
             }
             @catch (NSException *e) {
-                NSAlert *searchException = [[NSAlert alloc] init];
-                [searchException addButtonWithTitle:@"OK"];
-                searchException.messageText = [NSString stringWithFormat:@"Invalid Output!"];
-                searchException.informativeText = @"Please check your query. Your query must not alter the output format of Get_iPlayer. (processAutoRecordData)";
-                searchException.alertStyle = NSAlertStyleWarning;
-                [searchException runModal];
-                searchException = nil;
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    NSAlert *searchException = [[NSAlert alloc] init];
+                    [searchException addButtonWithTitle:@"OK"];
+                    searchException.messageText = [NSString stringWithFormat:@"Invalid Output!"];
+                    searchException.informativeText = @"Please check your query. Your query must not alter the output format of Get_iPlayer. (processAutoRecordData)";
+                    searchException.alertStyle = NSAlertStyleWarning;
+                    [searchException runModal];
+                    searchException = nil;
+                });
             }
         }
         else

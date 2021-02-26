@@ -15,13 +15,7 @@
 
 @interface BBCDownload : Download {
 }
-@property (nonatomic) NSString *profileDirArg;
-	
-@property (nonatomic, assign) BOOL runAgain;
-@property (nonatomic, assign) NSInteger noDataCount;
-	
-@property (nonatomic, assign) BOOL foundLastLine;
-@property (nonatomic) NSString *LastLine;
+
 @property (nonatomic) NSString *reasonForFailure;
 
 + (void)initFormats;

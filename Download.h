@@ -27,26 +27,13 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) int outOfRange;
 @property (nonatomic) NSMutableString *log;
 
-//RTMPDump Task
 @property (nonatomic, nullable) NSTask *task;
 @property (nonatomic, nullable) NSPipe *pipe;
 @property (nonatomic, nullable) NSPipe *errorPipe;
-@property (nonatomic, nullable) NSFileHandle *fh;
-@property (nonatomic, nullable) NSFileHandle *errorFh;
-@property (nonatomic) NSMutableString *errorCache;
-@property (nonatomic) NSTimer *processErrorCache;
-
-//ffmpeg Conversion
-@property (nullable, nonatomic) NSTask *ffTask;
-@property (nullable, nonatomic) NSPipe *ffPipe;
-@property (nullable, nonatomic) NSPipe *ffErrorPipe;
-@property (nullable, nonatomic) NSFileHandle *ffFh;
-@property (nullable, nonatomic) NSFileHandle *ffErrorFh;
 
 //AtomicParsley Tagging
-@property (nonatomic) NSTask *apTask;
-@property (nonatomic) NSPipe *apPipe;
-@property (nonatomic) NSFileHandle *apFh;
+@property (nonatomic, nullable) NSTask *apTask;
+@property (nonatomic, nullable) NSPipe *apPipe;
 
 //Download Information
 @property (nonatomic, nullable) NSString *subtitleURL;
@@ -96,7 +83,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)launchMetaRequest;
 - (void)processGetiPlayerOutput:(NSString *)outp;
 - (void)createDownloadPath;
-- (void)processError;
 
 - (void)thumbnailRequestFinished:(nullable NSURL *)location;
 - (void)atomicParsleyFinished:(nullable NSNotification *)finishedNote;

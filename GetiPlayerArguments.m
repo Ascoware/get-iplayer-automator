@@ -38,21 +38,25 @@ static GetiPlayerArguments *sharedController = nil;
    
 	if (runCacheUpdateSinceChange || !currentTypeArgument)
 	{
-		NSMutableString *typeArgument = [[NSMutableString alloc] initWithString:@"--type="];
-		if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheBBC_TV"] isEqualTo:@YES])
-         [typeArgument appendString:@"tv,"];
-		if ( [[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheITV_TV"] isEqualTo:@YES] && includeITV )
-         [typeArgument appendString:@"itv,"];
-		if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheBBC_Radio"] isEqualTo:@YES])
-         [typeArgument appendString:@"radio,"];
-		[typeArgument deleteCharactersInRange:NSMakeRange(typeArgument.length-1,1)];
-		currentTypeArgument = [typeArgument copy];
-		return [NSString stringWithString:typeArgument];
+        currentTypeArgument = @"";
+        NSMutableString *cacheTypes = [[NSMutableString alloc] initWithString:@""];
+
+		if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheBBC_TV"] isEqualTo:@YES] || !forCacheUpdate)
+         [cacheTypes appendString:@"tv,"];
+		if (([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheITV_TV"] isEqualTo:@YES] && includeITV) || !forCacheUpdate)
+         [cacheTypes appendString:@"itv,"];
+		if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheBBC_Radio"] isEqualTo:@YES] || !forCacheUpdate)
+         [cacheTypes appendString:@"radio,"];
+
+        if (cacheTypes.length > 0) {
+            [cacheTypes deleteCharactersInRange:NSMakeRange(cacheTypes.length-1,1)];
+            currentTypeArgument = [NSString stringWithFormat:@"--type=%@", cacheTypes];
+        }
 	}
-	else {
-		return currentTypeArgument;
-   }
+
+    return currentTypeArgument;
 }
+
 - (IBAction)typeChanged:(id)sender
 {
     runCacheUpdateSinceChange=YES;

@@ -39,8 +39,7 @@ extern NSDictionary *radioFormats;
 
 //Update Components
 @property (nonatomic, nullable) NSTask *getiPlayerUpdateTask;
-@property (nonatomic) NSPipe *getiPlayerUpdatePipe;
-@property (nonatomic) NSArray *getiPlayerUpdateArgs;
+@property (nonatomic, nullable) NSPipe *getiPlayerUpdatePipe;
 @property (nonatomic) NSMutableArray *typesToCache;
 @property (nonatomic) BOOL didUpdate;
 @property (nonatomic) BOOL runSinceChange;

@@ -113,6 +113,11 @@
 	[pb setString:unattributedLog forType:NSStringPboardType];
 }
 
+- (IBAction)clearLog:(id)sender
+{
+    self.log.string = @"";
+}
+
 - (void)dealloc
 {
    [_fh closeFile];

@@ -17,6 +17,7 @@
 - (instancetype)init;
 - (IBAction)showLog:(id)sender;
 - (IBAction)copyLog:(id)sender;
+- (IBAction)clearLog:(id)sender;
 - (void)addToLog:(NSString *)string :(id)sender;
 - (void)addToLog:(NSString *)string;
 

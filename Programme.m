@@ -35,7 +35,7 @@
         _status = [[NSString alloc] init];
         _complete = @NO;
         _successful = @NO;
-        _path = @"Unknown";
+        _path = nil;
         _seriesName = [[NSString alloc] init];
         _episodeName = [[NSString alloc] init];
         _timeadded = [[NSNumber alloc] init];
@@ -98,7 +98,7 @@
         _complete = @NO;
         _successful = @NO;
         _timeadded = [[NSNumber alloc] init];
-        _path = @"Unknown";
+        _path = nil;
         _processedPID = @NO;
         _radio = @NO;
         _url = [[NSString alloc] init];

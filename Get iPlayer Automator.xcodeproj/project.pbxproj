@@ -14,7 +14,6 @@
 		3975484D1622504F00470DD1 /* ttml2srt.py in Resources */ = {isa = PBXBuildFile; fileRef = 3975484C1622504F00470DD1 /* ttml2srt.py */; };
 		39879DAF16904B9F0050CA7D /* GTMNSString+HTML.m in Sources */ = {isa = PBXBuildFile; fileRef = 39879DAC16904B9F0050CA7D /* GTMNSString+HTML.m */; };
 		39879DB016904B9F0050CA7D /* NSString+HTML.m in Sources */ = {isa = PBXBuildFile; fileRef = 39879DAE16904B9F0050CA7D /* NSString+HTML.m */; };
-		39AE5F5E1D329E390019E5EF /* rtmpdump in CopyFiles */ = {isa = PBXBuildFile; fileRef = 39AE5F5C1D3294C40019E5EF /* rtmpdump */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		39D52EA81DAAFD450033C4ED /* NPHistoryWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 39D52EA71DAAFD450033C4ED /* NPHistoryWindowController.m */; };
 		39D7C1BD1874AD7400B78698 /* StringTrimFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 39D7C1BC1874AD7400B78698 /* StringTrimFormatter.m */; };
 		39D7C1C01874AD9D00B78698 /* NilToStringTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = 39D7C1BF1874AD9D00B78698 /* NilToStringTransformer.m */; };
@@ -90,7 +89,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 6;
 			files = (
-				39AE5F5E1D329E390019E5EF /* rtmpdump in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -123,7 +121,6 @@
 		39879DAC16904B9F0050CA7D /* GTMNSString+HTML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "GTMNSString+HTML.m"; sourceTree = "<group>"; };
 		39879DAD16904B9F0050CA7D /* NSString+HTML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+HTML.h"; sourceTree = "<group>"; };
 		39879DAE16904B9F0050CA7D /* NSString+HTML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+HTML.m"; sourceTree = "<group>"; };
-		39AE5F5C1D3294C40019E5EF /* rtmpdump */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = rtmpdump; sourceTree = "<group>"; };
 		39D52EA61DAAFD450033C4ED /* NPHistoryWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NPHistoryWindowController.h; sourceTree = "<group>"; };
 		39D52EA71DAAFD450033C4ED /* NPHistoryWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NPHistoryWindowController.m; sourceTree = "<group>"; };
 		39D7C1BB1874AD7400B78698 /* StringTrimFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StringTrimFormatter.h; sourceTree = "<group>"; };
@@ -162,7 +159,6 @@
 		7F6B2B2B20EE87D800E4BBDF /* Get iPlayer Automator.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = "Get iPlayer Automator.entitlements"; path = "Get iPlayer Automator/Get iPlayer Automator.entitlements"; sourceTree = "<group>"; };
 		7F748E3323FB416B00626A77 /* get_iplayer */ = {isa = PBXFileReference; lastKnownFileType = folder; path = get_iplayer; sourceTree = "<group>"; };
 		7F905919253B90320094099B /* SwiftyJSON.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftyJSON.framework; path = Carthage/Build/Mac/SwiftyJSON.framework; sourceTree = "<group>"; };
-		7F9DB6121F6340460020D5D7 /* get_iplayer */ = {isa = PBXFileReference; explicitFileType = text.script.perl; path = get_iplayer; sourceTree = SOURCE_ROOT; };
 		7F9FE91E1EC16E3E0058CB1B /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = Carthage/Build/Mac/Sparkle.framework; sourceTree = "<group>"; };
 		7F9FE9201EC16ED80058CB1B /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		7F9FE9221EC16F160058CB1B /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
@@ -368,8 +364,6 @@
 				7F748E3323FB416B00626A77 /* get_iplayer */,
 				7FAA6A24206F36B800B6B50C /* Crypto */,
 				7FC8F71B20674B6700DC158C /* youtube-dl */,
-				39AE5F5C1D3294C40019E5EF /* rtmpdump */,
-				7F9DB6121F6340460020D5D7 /* get_iplayer */,
 			);
 			path = Binaries;
 			sourceTree = "<group>";
