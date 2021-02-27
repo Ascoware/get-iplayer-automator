@@ -129,7 +129,7 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
                     let existingProgram = programmes.filter { $0.productionId == productionID }
                     
                     if existingProgram.count == 0 {
-                        let myProgramme = ProgrammeData(name: showName ?? "<None>", pid: productionID ?? "", url: showPageURLString ?? "", numberEpisodes: numberEpisodes, timeDateLastAired: currentTime, programDescription:"", thumbnailURL: "")
+                        let myProgramme = ProgrammeData(name: showName ?? "<None>", pid: productionID ?? "", url: showPageURLString ?? "", numberEpisodes: numberEpisodes, timeDateLastAired: currentTime, programDescription:"", thumbnailURL: "", episode: "")
                         programmes.append(myProgramme)
                     }
                 }
@@ -177,10 +177,42 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
         let description = show.at_xpath(".//p[@class='tout__summary theme__subtle']")?.content?.trimmingCharacters(in: .whitespacesAndNewlines)
         
         var episodeNumber: Int? = 0
-        if let episode = show.at_xpath(".//h3[@class='tout__title complex-link__target theme__target ']")?.content?.trimmingCharacters(in: .whitespacesAndNewlines) {
-            let episodeScanner = Scanner(string: episode)
-            episodeScanner.scanString("Episode ")
-            episodeNumber = episodeScanner.scanInteger()
+        var episodeTitle: String?
+
+        let episodeContent = show.at_xpath(".//h3[@class='tout__title complex-link__target theme__target']")?.content?.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        if let episodeContent = episodeContent {
+            if episodeContent.hasPrefix("Episode ") {
+                let pattern = #"Episode (\d+)"#;
+                let episodeRegex = try! NSRegularExpression(pattern: pattern, options: [])
+                let nsrange = NSRange(episodeContent.startIndex..<episodeContent.endIndex,
+                                      in: episodeContent)
+                episodeRegex.enumerateMatches(in: episodeContent,
+                                              options: [],
+                                              range: nsrange) { (match, _, stop) in
+                    guard let match = match else { return }
+                    if let numberRange = Range(match.range(at: 1), in: episodeContent) {
+                        episodeNumber = Int(episodeContent[numberRange])
+                    }
+                }
+                episodeTitle = episodeContent
+            } else {
+                let pattern = #"(\d+)\. (.+)"#
+                let episodeRegex = try! NSRegularExpression(pattern: pattern, options: [])
+                let nsrange = NSRange(episodeContent.startIndex..<episodeContent.endIndex,
+                                      in: episodeContent)
+                episodeRegex.enumerateMatches(in: episodeContent,
+                                              options: [],
+                                              range: nsrange) { (match, _, stop) in
+                    guard let match = match else { return }
+                    if let numberRange = Range(match.range(at: 1), in: episodeContent) {
+                        episodeNumber = Int(episodeContent[numberRange])
+                    }
+                    if let epNameRange = Range(match.range(at: 2), in: episodeContent) {
+                        episodeTitle = String(episodeContent[epNameRange])
+                    }
+                }
+            }
         }
         
         var seriesNumber: Int? = 0
@@ -209,7 +241,7 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
         if let showURLBase = showURL?.deletingLastPathComponent(), showURLBase.absoluteString == programURL?.absoluteString {
             
             /* Create ProgrammeData Object and store in array */
-            let myProgramme = ProgrammeData(name: program.programmeName, pid: productionID ?? "", url: showURL?.absoluteString ?? "", numberEpisodes: program.numberEpisodes , timeDateLastAired: dateAiredUTC, programDescription: description ?? "", thumbnailURL: "")
+            let myProgramme = ProgrammeData(name: program.programmeName, pid: productionID ?? "", url: showURL?.absoluteString ?? "", numberEpisodes: program.numberEpisodes , timeDateLastAired: dateAiredUTC, programDescription: description ?? "", thumbnailURL: "", episode: episodeTitle ?? "")
             
             myProgramme.addProgrammeSeriesInfo(seriesNumber ?? 0, aEpisodeNumber: episodeNumber ?? 0)
             self.episodes.append(myProgramme)
@@ -229,6 +261,9 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
                     if let title = showMetadata["partOfSeries"].dictionaryValue["name"]?.stringValue {
                         aProgramme.programmeName = title
                     }
+
+                    let episodeTitle = showMetadata["name"].stringValue
+                    aProgramme.episodeTitle = episodeTitle
                     
                     let url = showMetadata["@id"].stringValue
                     aProgramme.programmeURL = url
@@ -249,7 +284,7 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
             }
         }
         
-        let myProgramme = ProgrammeData(name: aProgramme.programmeName, pid: aProgramme.productionId, url: aProgramme.programmeURL, numberEpisodes: 1 , timeDateLastAired: aProgramme.timeDateLastAired, programDescription: aProgramme.programDescription, thumbnailURL: aProgramme.thumbnailURL)
+        let myProgramme = ProgrammeData(name: aProgramme.programmeName, pid: aProgramme.productionId, url: aProgramme.programmeURL, numberEpisodes: 1 , timeDateLastAired: aProgramme.timeDateLastAired, programDescription: aProgramme.programDescription, thumbnailURL: aProgramme.thumbnailURL, episode: aProgramme.episodeTitle)
         
         self.episodes.append(myProgramme)
     }
@@ -313,7 +348,7 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
         var cacheIndexNumber: Int = 100000
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "EEE MMM dd"
-        var episodeString: String? = nil
+        var cachedEpisodeTitle: String = ""
         let dateFormatter1 = DateFormatter()
         dateFormatter1.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZZ"
         dateFormatter1.timeZone = TimeZone(secondsFromGMT: 0)
@@ -323,14 +358,20 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
         
         for episode: ProgrammeData in episodes {
             var cacheFileContentString = ""
+
             if let timeDateLastAired = episode.timeDateLastAired {
-                episodeString = dateFormatter.string(from: timeDateLastAired)
                 dateAiredString = dateFormatter1.string(from: timeDateLastAired)
             } else {
-                episodeString = ""
                 dateAiredString = dateFormatter1.string(from: Date())
             }
-            
+
+            if !episode.episodeTitle.isEmpty {
+                cachedEpisodeTitle = episode.episodeTitle
+            } else {
+                cachedEpisodeTitle = dateAiredString ?? ""
+            }
+
+
             let dateAddedInteger: TimeInterval
             if let timeAdded = episode.timeAdded {
                 dateAddedInteger = timeAdded.timeIntervalSince1970
@@ -344,11 +385,7 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
             cacheFileContentString += "itv|"
             cacheFileContentString += episode.programmeName
             cacheFileContentString += "|"
-            
-            if let aString = episodeString {
-                cacheFileContentString += aString
-            }
-            
+            cacheFileContentString += cachedEpisodeTitle
             cacheFileContentString += "|\(episode.seriesNumber)|\(episode.episodeNumber)|"
             cacheFileContentString += episode.productionId
             cacheFileContentString += "|ITV Player|"

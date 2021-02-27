@@ -20,13 +20,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic) Programme *show;
 
-@property (nonatomic) double lastDownloaded;
-@property (nonatomic) NSDate *lastDate;
-@property (nonatomic) NSMutableArray *rateEntries;
-@property (nonatomic) double oldRateAverage;
-@property (nonatomic) int outOfRange;
-@property (nonatomic) NSMutableString *log;
-
 @property (nonatomic, nullable) NSTask *task;
 @property (nonatomic, nullable) NSPipe *pipe;
 @property (nonatomic, nullable) NSPipe *errorPipe;
@@ -43,20 +36,14 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) NSString *subtitlePath;
 
 //Subtitle Conversion
-@property (nonatomic) NSTask *subsTask;
-@property (nonatomic) NSPipe *subsErrorPipe;
+@property (nonatomic, nullable) NSTask *subsTask;
+@property (nonatomic, nullable) NSPipe *subsErrorPipe;
+
 @property (nonatomic) NSString *defaultsPrefix;
-
-@property (nonatomic) NSArray<TVFormat *> *formatList;
 @property (nonatomic, assign) BOOL running;
-
-@property (nonatomic, assign) NSInteger attemptNumber;
 
 //Verbose Logging
 @property (nonatomic, assign) BOOL verbose;
-
-//Download Parameters
-@property (nonatomic) NSMutableDictionary *downloadParams;
 
 //Proxy Info
 @property (nonatomic, nullable) HTTPProxy *proxy;
@@ -68,9 +55,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic) NSURLSessionDataTask *currentRequest;
 
-//Download Test
-@property (nonatomic) BOOL isTest;
-
 - (instancetype)initWithLogController:(LogController *)logger;
 - (void)setCurrentProgress:(NSString *)string;
 - (void)setPercentage:(double)d;
@@ -80,7 +64,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)addToLog:(NSString *)logMessage noTag:(BOOL)b;
 - (void)addToLog:(NSString *)logMessage;
 
-- (void)launchMetaRequest;
 - (void)processGetiPlayerOutput:(NSString *)outp;
 - (void)createDownloadPath;
 

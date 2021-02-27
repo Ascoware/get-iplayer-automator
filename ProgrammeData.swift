@@ -11,6 +11,7 @@
     public var episodeNumber: Int = 0
     public var isNew = false
     public var programmeName = ""
+    public var episodeTitle = ""
     public var productionId = ""
     public var programmeURL = ""
     public var numberEpisodes: Int = 0
@@ -20,9 +21,10 @@
     public var thumbnailURL = ""
     public var programDescription = ""
     
-    init(name: String, pid: String, url: String, numberEpisodes: Int, timeDateLastAired: Date?, programDescription: String, thumbnailURL: String) {
+    init(name: String, pid: String, url: String, numberEpisodes: Int, timeDateLastAired: Date?, programDescription: String, thumbnailURL: String, episode: String) {
         super.init()
         self.programmeName = name
+        self.episodeTitle = episode
         self.productionId = pid
         self.programmeURL = url
         self.numberEpisodes = numberEpisodes
@@ -39,6 +41,7 @@
     public func encode(with encoder: NSCoder) {
         NSKeyedArchiver.setClassName("ProgrammeData", for: ProgrammeData.self)
         encoder.encode(programmeName, forKey: "programmeName")
+        encoder.encode(episodeTitle, forKey: "episodeTitle")
         encoder.encode(productionId, forKey: "productionId")
         encoder.encode(programmeURL, forKey: "programmeURL")
         encoder.encode(numberEpisodes, forKey: "numberEpisodes")
@@ -53,6 +56,7 @@
     required public init?(coder: NSCoder) {
         NSKeyedUnarchiver.setClass(ProgrammeData.self, forClassName: "ProgrammeData")
         programmeName = coder.decodeObject(forKey: "programmeName") as? String ?? ""
+        episodeTitle = coder.decodeObject(forKey: "episodeTitle") as? String ?? ""
         productionId = coder.decodeObject(forKey: "productionId") as? String ?? ""
         programmeURL = coder.decodeObject(forKey: "programmeURL") as? String ?? ""
         numberEpisodes = coder.decodeObject(forKey: "numberEpisodes") as? Int ?? 0

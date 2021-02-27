@@ -13,17 +13,9 @@
 
 - (instancetype)init {
     if (self = [super init]) {
-        //Prepare Time Remaining
-        _rateEntries = [[NSMutableArray alloc] initWithCapacity:50];
         _running=YES;
-        _lastDownloaded=0;
-        _outOfRange=0;
         _verbose = [[NSUserDefaults standardUserDefaults] boolForKey:@"Verbose"];
-        _downloadParams = [[NSMutableDictionary alloc] init];
-        _isTest=false;
         _defaultsPrefix = @"BBC_";
-
-        _log = [[NSMutableString alloc] initWithString:@""];
         _downloadPath = [[NSString alloc] initWithString:[[NSUserDefaults standardUserDefaults] valueForKey:@"DownloadPath"]];
     }
     return self;
@@ -44,27 +36,21 @@
     }
 }
 
-- (void)addToLog:(NSString *)logMessage noTag:(BOOL)b
+- (void)addToLog:(NSString *)logMessage noTag:(BOOL)noTag
 {
-	if (b)
-	{
-		[[NSNotificationCenter defaultCenter] postNotificationName:@"AddToLog" object:nil userInfo:@{@"message": logMessage}];
-	}
-	else
-	{
-		[[NSNotificationCenter defaultCenter] postNotificationName:@"AddToLog" object:self userInfo:@{@"message": logMessage}];
-	}
-    [self.log appendFormat:@"%@\n", logMessage];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"AddToLog" object:(noTag ? nil : self) userInfo:@{@"message": logMessage}];
 }
+
 - (void)addToLog:(NSString *)logMessage
 {
-	[[NSNotificationCenter defaultCenter] postNotificationName:@"AddToLog" object:self userInfo:@{@"message": logMessage}];
-    [self.log appendFormat:@"%@\n", logMessage];
+    [self addToLog: logMessage noTag:YES];
 }
+
 - (void)setCurrentProgress:(NSString *)string
 {
 	[[NSNotificationCenter defaultCenter] postNotificationName:@"setCurrentProgress" object:self userInfo:@{@"string": string}];
 }
+
 - (void)setPercentage:(double)d
 {
 	if (d<=100.0)
@@ -290,6 +276,8 @@
     self.show.status = @"Download Complete";
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"DownloadFinished" object:_show];
+    self.subsTask = nil;
+    self.subsErrorPipe = nil;
 }
 - (void)DownloadDataReady:(NSNotification *)note
 {
@@ -308,11 +296,6 @@
         if (![outputLine hasPrefix:@"frame="])
             [self addToLog:outputLine noTag:YES];
     }
-}
-
-- (void)launchMetaRequest
-{
-    [[NSException exceptionWithName:@"InvalidDownload" reason:@"Launch Meta Request shouldn't be called on base class." userInfo:nil] raise];
 }
 
 - (void)createDownloadPath
