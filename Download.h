@@ -30,7 +30,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 //Download Information
 @property (nonatomic, nullable) NSString *subtitleURL;
-@property (nonatomic, nullable) NSString *thumbnailURL;
 @property (nonatomic) NSString *downloadPath;
 @property (nonatomic) NSString *thumbnailPath;
 @property (nonatomic) NSString *subtitlePath;

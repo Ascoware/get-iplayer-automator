@@ -114,78 +114,30 @@
         {
             @try {
                 //SearchResult|<pid>|<available>|<type>|<name>|<episode>|<channel>|<seriesnum>|<episodenum>|<desc>|<thumbnail>|<web>
-                NSScanner *myScanner = [NSScanner scannerWithString:string];
-                NSString *buffer;
+                NSArray<NSString *> *fields = [string componentsSeparatedByString:@"|"];
                 Programme *p = [[Programme alloc] initWithLogController:_logger];
                 p.processedPID = @YES;
-                
-                [myScanner scanString:@"SearchResult|" intoString:nil];
-                [myScanner scanUpToString:@"|" intoString:&buffer];
-                [myScanner scanString:@"|" intoString:nil];
-                p.pid = buffer;
-                
-                [myScanner scanUpToString:@"|" intoString:&buffer];
-                [myScanner scanString:@"|" intoString:nil];
-                NSDate *broadcastDate = [rawDateParser dateFromString:buffer];
+                p.pid = fields[1];
+                NSDate *broadcastDate = [rawDateParser dateFromString:fields[2]];
                 p.lastBroadcast = broadcastDate;
                 p.lastBroadcastString = [NSDateFormatter localizedStringFromDate:broadcastDate dateStyle:NSDateFormatterMediumStyle timeStyle:NSDateFormatterNoStyle];
+                p.radio = [NSNumber numberWithBool:[fields[3] isEqualToString:@"radio"]];
+                p.seriesName = fields[4];
+                p.episodeName = fields[5];
 
-
-                [myScanner scanUpToString:@"|" intoString:&buffer];
-                [myScanner scanString:@"|" intoString:nil];
-                if ([buffer isEqualToString:@"radio"])
-                    p.radio = @YES;
-                
-                [myScanner scanUpToString:@"|" intoString:&buffer];
-                [myScanner scanString:@"|" intoString:nil];
-                p.seriesName = buffer;
-                
-                [myScanner scanUpToString:@"|" intoString:&buffer];
-                [myScanner scanString:@"|" intoString:nil];
-                p.episodeName = buffer;
-                
-                if (p.episodeName) {
-                    p.showName = [NSString stringWithFormat:@"%@ - %@", p.seriesName, p.episodeName];
-                }
-                else {
+                if (p.seriesName.length > 0) {
+                    p.showName = p.seriesName;
+                } else {
                     p.showName = p.episodeName;
                 }
-                
-                [myScanner scanUpToString:@"|" intoString:&buffer];
-                [myScanner scanString:@"|" intoString:nil];
-                p.tvNetwork = buffer;
-                
-                [myScanner scanUpToString:@"|" intoString:&buffer];
-                [myScanner scanString:@"|" intoString:nil];
-                if (buffer) {
-                    p.season = buffer.integerValue;
-                }
-                else {
-                    p.season = 0;
-                }
-                
-                [myScanner scanUpToString:@"|" intoString:&buffer];
-                [myScanner scanString:@"|" intoString:nil];
-                if (buffer) {
-                    p.episode = buffer.integerValue;
-                }
-                else {
-                    p.season = 0;
-                }
-                
-                [myScanner scanUpToString:@"|" intoString:&buffer];
-                [myScanner scanString:@"|" intoString:nil];
-                p.desc = buffer;
-                
-                [myScanner scanUpToString:@"|" intoString:&buffer];
-                [myScanner scanString:@"|" intoString:nil];
-                p.thumbnail = [[NSImage alloc] initByReferencingURL:[NSURL URLWithString:buffer]];
-                
-                [myScanner scanUpToString:@"|" intoString:&buffer];
-                [myScanner scanString:@"|" intoString:nil];
-                p.url = buffer;
-                
-                
+
+                p.tvNetwork = fields[6];
+                p.season = fields[7].integerValue;
+                p.episode = fields[8].integerValue;
+                p.desc = fields[9];
+                p.thumbnail = [[NSImage alloc] initByReferencingURL:[NSURL URLWithString:fields[10]]];
+                p.url = fields[11];
+
                 if (p.pid == nil || p.showName == nil || p.tvNetwork == nil || p.url == nil) {
                     [_logger addToLog: [NSString stringWithFormat:@"WARNING: Skipped invalid search result: %@", string]];
                     continue;

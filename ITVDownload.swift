@@ -10,7 +10,9 @@ import Kanna
 import SwiftyJSON
 
 public class ITVDownload : Download {
-    
+
+    var thumbnailURLString: String?
+
     public override var description: String {
         return "ITV Download (ID=\(show.pid))"
     }
@@ -129,13 +131,8 @@ public class ITVDownload : Download {
             add(toLog: message, noTag: true)
         }
 
-        var seriesName = ""
-        var episode = ""
         var episodeID = ""
-        var showDescription = ""
         var timeAired: Date? = nil
-        var episodeNumber = 0
-        var seriesNumber = 0
         let longDateFormatter = DateFormatter()
         let enUSPOSIXLocale = Locale(identifier:"en_US_POSIX")
         longDateFormatter.timeZone = TimeZone(secondsFromGMT:0)
@@ -150,8 +147,8 @@ public class ITVDownload : Download {
         if let htmlPage = try? HTML(html: responseString, encoding: .utf8) {
             // There should only be one 'video' element.
             if let videoElement = htmlPage.at_xpath("//div[@id='video']") {
-                seriesName = videoElement.at_xpath("//@data-video-title")?.text ?? "Unknown"
-                episode = videoElement.at_xpath("//@data-video-episode")?.text ?? ""
+                self.show.seriesName = videoElement.at_xpath("//@data-video-title")?.text ?? "Unknown"
+                self.show.episodeName = videoElement.at_xpath("//@data-video-episode")?.text ?? ""
                 episodeID = videoElement.at_xpath("//@data-video-episode-id")?.text ?? ""
             }
             
@@ -162,11 +159,11 @@ public class ITVDownload : Download {
                     for item in breadcrumbs {
                         if item["item:"]["@type"] == "TVEpisode" {
                             let showMetadata = item["item:"]
-                            showDescription = showMetadata["description"].string ?? "None available"
-                            episodeNumber = showMetadata["episodeNumber"].intValue
-                            seriesNumber = showMetadata["partOfSeason"]["seasonNumber"].intValue
-                            episode = showMetadata["name"].stringValue
-                            thumbnailURL = showMetadata["image"].dictionaryValue["url"]?.stringValue
+                            self.show.desc = showMetadata["description"].string ?? "None available"
+                            self.show.episode = showMetadata["episodeNumber"].intValue
+                            self.show.season = showMetadata["partOfSeason"]["seasonNumber"].intValue
+                            self.show.episodeName = showMetadata["name"].stringValue
+                            thumbnailURLString = showMetadata["image"].dictionaryValue["url"]?.stringValue
 
                             let potentialActions = showMetadata["potentialAction"].arrayValue
 
@@ -188,29 +185,21 @@ public class ITVDownload : Download {
             }
         }
 
-        if episodeNumber == 0 && seriesNumber == 0 && !episodeID.isEmpty {
+        if self.show.episode == 0 && self.show.season == 0 && !episodeID.isEmpty {
             // At this point all we have left is the production ID.
             // A series number doesn't make much sense, so just parse out an episode number.
             let programIDElements = episodeID.split(separator: "/")
             if let lastElement = programIDElements.last, let intLastElement = Int(lastElement) {
-                episodeNumber = intLastElement
+                self.show.episode = intLastElement
             }
         }
         
-        // Save off the pieces we care about.
-        self.show.episode = episodeNumber
-        self.show.season = seriesNumber
-        self.show.seriesName = seriesName
-        self.show.desc = showDescription
-        
-        if !episode.isEmpty {
-            self.show.episodeName = episode
-        } else if let timeAired = timeAired {
-            let shortDate = shortDateFormatter.string(from: timeAired)
-            self.show.episodeName = shortDate
+        if self.show.episodeName.isEmpty {
+            if let timeAired = timeAired {
+                let shortDate = shortDateFormatter.string(from: timeAired)
+                self.show.episodeName = shortDate
+            }
         }
-        self.thumbnailURL = thumbnailURL ?? nil
-        
         if let timeAired = timeAired {
             self.show.standardizedAirDate = longDateFormatter.string(from: timeAired)
         }
@@ -239,55 +228,62 @@ public class ITVDownload : Download {
 
         fileHandle.readInBackgroundAndNotify()
 
-        let splitStrings = s.split(separator: "\n")
+        let lines = s.components(separatedBy: .newlines)
 
-        for substring in splitStrings {
-            if self.verbose && !substring.isEmpty {
-                self.logger.add(toLog: String(substring))
+        for line in lines {
+            if self.verbose && !line.isEmpty {
+                self.logger.add(toLog: line)
             }
-        }
-        
-        if s.contains("Writing video subtitles") {
-            //ITV Download (ID=2a4910a0046): [info] Writing video subtitles to: /Users/skovatch/Movies/TV Shows/LA Story/LA Story - Just Friends - 2a4910a0046.en.vtt
-            let scanner = Scanner(string: s)
-            scanner.scanUpToString("to: ")
-            scanner.scanString("to: ")
-            subtitlePath = scanner.scanUpToString("\n") ?? ""
-            if self.verbose {
-                self.add(toLog: "Subtitle path = \(subtitlePath)")
+
+            if line.contains("Writing video subtitles") {
+                //ITV Download (ID=2a4910a0046): [info] Writing video subtitles to: /Users/skovatch/Movies/TV Shows/LA Story/LA Story - Just Friends - 2a4910a0046.en.vtt
+                let scanner = Scanner(string: line)
+                scanner.scanUpToString("to: ")
+                scanner.scanString("to: ")
+                subtitlePath = scanner.scanUpToString("\n") ?? ""
+                if self.verbose {
+                    self.add(toLog: "Subtitle path = \(subtitlePath)")
+                }
             }
-        }
-        
-        if s.contains("Destination: ") {
-            let scanner = Scanner(string: s)
-            scanner.scanUpToString("Destination: ")
-            scanner.scanString("Destination: ")
-            self.show.path = scanner.scanUpToString("\n") ?? ""
-            if self.verbose {
-                self.add(toLog: "Downloading to \(self.show.path)")
+
+            if line.contains("Destination: ") {
+                let scanner = Scanner(string: line)
+                scanner.scanUpToString("Destination: ")
+                scanner.scanString("Destination: ")
+                self.show.path = scanner.scanUpToString("\n") ?? ""
+                if self.verbose {
+                    self.add(toLog: "Downloading to \(self.show.path)")
+                }
             }
-        }
-        
-        // youtube-dl native download generates a percentage complete and ETA remaining
-        var progress: String? = nil
-        var remaining: String? = nil
-        
-        if s.contains("[download]") {
-            let scanner = Scanner(string: s)
-            scanner.scanUpToString("[download]")
-            scanner.scanString("[download]")
-            progress = scanner.scanUpToString("%")?.trimmingCharacters(in: .whitespaces)
-            scanner.scanUpToString("ETA ")
-            scanner.scanString("ETA ")
-            remaining = scanner.scanUpToCharactersFromSet(set: .whitespacesAndNewlines)
-            
-            if let progress = progress, let progressVal = Double(progress) {
-                setPercentage(progressVal)
-                show.status = "Downloaded \(progress)%"
+
+            // youtube-dl native download generates a percentage complete and ETA remaining
+            var progress: String? = nil
+            var remaining: String? = nil
+
+            if line.contains("[download]") {
+                let scanner = Scanner(string: line)
+                scanner.scanUpToString("[download]")
+                scanner.scanString("[download]")
+                progress = scanner.scanUpToString("%")?.trimmingCharacters(in: .whitespaces)
+                scanner.scanUpToString("ETA ")
+                scanner.scanString("ETA ")
+                remaining = scanner.scanUpToCharactersFromSet(set: .whitespacesAndNewlines)
+
+                if let progress = progress, let progressVal = Double(progress) {
+                    setPercentage(progressVal)
+                    show.status = "Downloaded \(progress)%"
+                }
+
+                if let remaining = remaining {
+                    setCurrentProgress("Downloading \(show.showName) -- \(remaining) until done")
+                }
             }
-            
-            if let remaining = remaining {
-                setCurrentProgress("Downloading \(show.showName) -- \(remaining) until done")
+
+            if line.hasSuffix("has already been downloaded") {
+                let scanner = Scanner(string: line)
+                scanner.scanUpToString("[download]")
+                scanner.scanString("[download]")
+                self.show.path = scanner.scanUpToString("has already been downloaded")?.trimmingCharacters(in: .whitespaces) ?? ""
             }
         }
     }
@@ -313,7 +309,7 @@ public class ITVDownload : Download {
             self.show.successful = false
             self.show.status = "Download Failed"
             
-            // We can't be sure we were terminated or that youtube-dl died.
+            // Something went wrong inside youtube-dl.
             NotificationCenter.default.removeObserver(self)
             NotificationCenter.default.post(name: NSNotification.Name(rawValue:"DownloadFinished"), object:self.show)
         }
@@ -324,16 +320,20 @@ public class ITVDownload : Download {
             self.show.status = "Downloading Thumbnail..."
             setPercentage(102)
             setCurrentProgress("Downloading Thumbnail... -- \(show.showName)")
-            if let thumbnailURL = thumbnailURL {
+            if let thumbnailURLString = thumbnailURLString {
                 add(toLog: "INFO: Downloading thumbnail", noTag: true)
                 thumbnailPath = URL(fileURLWithPath: show.path).appendingPathExtension("jpg").path
                 
-                let downloadTask: URLSessionDownloadTask? = session.downloadTask(with: URL(string: thumbnailURL)!) { (location, _, _) in
-                    self.thumbnailRequestFinished(location)
+                if let thumbnailURL = URL(string: thumbnailURLString) {
+                    let downloadTask = session.downloadTask(with: thumbnailURL) { (location, _, _) in
+                        self.thumbnailRequestFinished(location)
+                    }
+                    downloadTask.resume()
+                } else {
+                    self.add(toLog: "Bad URL for thumbnail")
+                    self.thumbnailRequestFinished(nil)
                 }
-                downloadTask?.resume()
-            }
-            else {
+            } else {
                 self.add(toLog: "No thumbnail URL, skipping")
                 thumbnailRequestFinished(nil)
             }

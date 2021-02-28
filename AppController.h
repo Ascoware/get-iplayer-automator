@@ -150,8 +150,6 @@ extern NSDictionary *radioFormats;
 
 //Misc.
 - (void)addToiTunesThread:(Programme *)show;
-- (void)cleanUpPath:(Programme *)show;
-- (void)seasonEpisodeInfo:(Programme *)show;
 - (IBAction)chooseDownloadPath:(id)sender;
 - (IBAction)restoreDefaults:(id)sender;
 - (IBAction)closeWindow:(id)sender;

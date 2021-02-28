@@ -114,11 +114,8 @@
         [self safeAppend:arguments key:@"--TVSeasonNum" value: @(self.show.season)];
         [self safeAppend:arguments key:@"--TVEpisodeNum" value: @(self.show.episode)];
         [self safeAppend:arguments key:@"--TVEpisode" value:self.show.episodeName];
-        [self safeAppend:arguments key:@"--title" value:self.show.showName];
-        [self safeAppend:arguments key:@"--comment" value:self.show.desc];
+        [self safeAppend:arguments key:@"--title" value:self.show.episodeName];
         [self safeAppend:arguments key:@"--description" value:self.show.desc];
-        [self safeAppend:arguments key:@"--longdesc" value:self.show.desc];
-        [self safeAppend:arguments key:@"--lyrics" value:self.show.desc];
         [self safeAppend:arguments key:@"--artist" value:self.show.tvNetwork];
         [self safeAppend:arguments key:@"--artwork" value: self.thumbnailPath];
         [self safeAppend:arguments key:@"--year" value: self.show.standardizedAirDate];
@@ -143,8 +140,10 @@
         if ([finishedNote.object terminationStatus] == 0) {
             [[NSFileManager defaultManager] removeItemAtPath:_thumbnailPath error:nil];
             [self addToLog:@"INFO: AtomicParsley Tagging finished." noTag:YES];
+            self.show.successful = @YES;
         } else {
             [self addToLog:@"INFO: Tagging failed." noTag:YES];
+            self.show.successful = @NO;
         }
     }
 

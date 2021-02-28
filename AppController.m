@@ -1184,11 +1184,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         if (finishedShow.successful.boolValue)
         {
             finishedShow.status = @"Processing...";
-            if ([finishedShow.tvNetwork hasPrefix:@"ITV"])
-            {
-                [self cleanUpPath:finishedShow];
-                [self seasonEpisodeInfo:finishedShow];
-            }
+
             if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"AddCompletedToiTunes"] isEqualTo:@YES])
                 [NSThread detachNewThreadSelector:@selector(addToiTunesThread:) toTarget:self withObject:finishedShow];
             else
@@ -1207,7 +1203,15 @@ static NSString *FORCE_RELOAD = @"ForceReload";
             [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
 
             ReasonForFailure *showSolution = [[ReasonForFailure alloc] init];
-            showSolution.showName = finishedShow.showName;
+
+            NSString *displayedName = @"";
+            if (finishedShow.showName.length > 0 && finishedShow.episodeName.length > 0) {
+                displayedName = [NSString stringWithFormat:@"%@ - %@", finishedShow.showName, finishedShow.episodeName];
+            } else {
+                displayedName = finishedShow.seriesName.length > 0 ? finishedShow.seriesName : finishedShow.episodeName;
+            }
+
+            showSolution.showName = displayedName;
             showSolution.solution = _solutionsDictionary[finishedShow.reasonForFailure];
             if (!showSolution.solution)
                 showSolution.solution = @"Problem Unknown.\nPlease submit a bug report from the application menu.";
@@ -1780,71 +1784,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         }
     }
 }
-- (void)cleanUpPath:(Programme *)show
-{
 
-    //Process Show Name into Parts
-    NSString *originalShowName, *originalEpisodeName;
-    NSScanner *nameScanner = [NSScanner scannerWithString:show.showName];
-    [nameScanner scanUpToString:@" - " intoString:&originalShowName];
-    [nameScanner scanString:@"-" intoString:nil];
-    [nameScanner scanUpToString:@"Scan to End" intoString:&originalEpisodeName];
-
-
-    //Replace :'s with -'s
-    NSString *showName = [originalShowName stringByReplacingOccurrencesOfString:@":" withString:@" -"];
-    NSString *episodeName = [originalEpisodeName stringByReplacingOccurrencesOfString:@":" withString:@" -"];
-
-    //Replace /'s with _'s
-    showName = [showName stringByReplacingOccurrencesOfString:@"/" withString:@"-"];
-    episodeName = [episodeName stringByReplacingOccurrencesOfString:@"/" withString:@"-"];
-
-    //Save Data to Programme for Later Use
-    show.seriesName = showName;
-    show.episodeName = episodeName;
-}
-
-- (void)seasonEpisodeInfo:(Programme *)show
-{
-    NSInteger episode=0, season=0;
-    @try
-    {
-        NSString *episodeName = show.episodeName;
-        NSString *seriesName = show.seriesName;
-
-        NSScanner *episodeScanner = [NSScanner scannerWithString:episodeName];
-        NSScanner *seasonScanner = [NSScanner scannerWithString:seriesName];
-
-        [episodeScanner scanUpToString:@"Episode" intoString:nil];
-        if ([episodeScanner scanString:@"Episode" intoString:nil])
-        {
-            [episodeScanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:nil];
-            [episodeScanner scanInteger:&episode];
-        }
-
-        [seasonScanner scanUpToString:@"Series" intoString:nil];
-        if ([seasonScanner scanString:@"Series" intoString:nil])
-        {
-            [seasonScanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:nil];
-            [seasonScanner scanInteger:&season];
-        }
-
-        //Remove Series Number from Series Name
-        //Showname is now Top Gear instead of Top Gear - Series 12
-        NSString *show2;
-        seasonScanner.scanLocation = 0;
-        [seasonScanner scanUpToString:@" - " intoString:&show2];
-        show.seriesName = show2;
-    }
-    @catch (NSException *e) {
-        NSLog(@"Error occured while retrieving Season/Episode info");
-    }
-    @finally
-    {
-        show.episode = episode;
-        show.season = season;
-    }
-}
 - (IBAction)chooseDownloadPath:(id)sender
 {
     NSOpenPanel *openPanel = [[NSOpenPanel alloc] init];

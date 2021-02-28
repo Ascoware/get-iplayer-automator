@@ -190,7 +190,7 @@
                             <autoresizingMask key="autoresizingMask"/>
                             <clipView key="contentView" drawsBackground="NO" id="LYx-5P-gHI">
                                 <rect key="frame" x="1" y="1" width="309" height="133"/>
-                                <autoresizingMask key="autoresizingMask"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <textView editable="NO" importsGraphics="NO" verticallyResizable="YES" usesFontPanel="YES" findStyle="panel" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" spellingCorrection="YES" smartInsertDelete="YES" id="7Pi-tT-G0Q" userLabel="Description View">
                                         <rect key="frame" x="0.0" y="0.0" width="309" height="133"/>
@@ -226,7 +226,7 @@
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <clipView key="contentView" drawsBackground="NO" id="jHT-Hr-sFJ">
                                 <rect key="frame" x="1" y="1" width="309" height="133"/>
-                                <autoresizingMask key="autoresizingMask"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="jeg-8F-HB4" id="MRJ-oM-h7R">
                                         <rect key="frame" x="0.0" y="0.0" width="309" height="116"/>
@@ -742,7 +742,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                         <clipView key="contentView" id="EvP-AM-m82">
                             <rect key="frame" x="1" y="1" width="753" height="130"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" autosaveColumns="NO" headerView="494" id="493">
                                     <rect key="frame" x="0.0" y="0.0" width="753" height="113"/>
@@ -751,8 +751,8 @@
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                     <tableColumns>
-                                        <tableColumn editable="NO" width="446.3984375" minWidth="40" maxWidth="1000" id="495">
-                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Show Name - Episode Name">
+                                        <tableColumn editable="NO" width="176.8984375" minWidth="40" maxWidth="1000" id="495" userLabel="Show">
+                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Show">
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
                                             </tableHeaderCell>
@@ -764,6 +764,21 @@
                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                             <connections>
                                                 <binding destination="683" name="value" keyPath="arrangedObjects.showName" id="697"/>
+                                            </connections>
+                                        </tableColumn>
+                                        <tableColumn editable="NO" width="226" minWidth="10" maxWidth="3.4028234663852886e+38" id="IYc-LA-l2p" userLabel="Episode">
+                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Episode">
+                                                <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            </tableHeaderCell>
+                                            <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" alignment="left" title="Text Cell" id="aEM-ks-HYj">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                            <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                            <connections>
+                                                <binding destination="683" name="value" keyPath="arrangedObjects.episodeName" id="OtM-9C-C5a"/>
                                             </connections>
                                         </tableColumn>
                                         <tableColumn editable="NO" width="102" minWidth="10" maxWidth="3.4028234663852886e+38" id="Ven-9I-Ggq">
@@ -779,10 +794,9 @@
                                             <sortDescriptor key="sortDescriptorPrototype" selector="compare:" sortKey="lastBroadcast"/>
                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                             <connections>
-                                                <binding destination="683" name="value" keyPath="arrangedObjects.lastBroadcastString" id="tGa-N1-7v2">
+                                                <binding destination="683" name="value" keyPath="arrangedObjects.lastBroadcastString" id="qXW-6Z-bGC">
                                                     <dictionary key="options">
                                                         <bool key="NSConditionallySetsEditable" value="YES"/>
-                                                        <bool key="NSCreatesSortDescriptor" value="NO"/>
                                                     </dictionary>
                                                 </binding>
                                             </connections>
@@ -945,7 +959,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" copiesOnScroll="NO" id="qBj-Iv-0lY">
                             <rect key="frame" x="0.0" y="0.0" width="755" height="187"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" autosaveColumns="NO" headerView="470" id="469">
                                     <rect key="frame" x="0.0" y="0.0" width="755" height="170"/>
@@ -954,7 +968,7 @@
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                     <tableColumns>
-                                        <tableColumn width="156.28515625" minWidth="40" maxWidth="1000" id="471">
+                                        <tableColumn editable="NO" width="99.78515625" minWidth="40" maxWidth="1000" id="471">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="PID">
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
@@ -969,14 +983,14 @@
                                             </textFieldCell>
                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                             <connections>
-                                                <binding destination="700" name="value" keyPath="arrangedObjects.pid" id="702">
+                                                <binding destination="700" name="value" keyPath="arrangedObjects.pid" id="CPA-Y3-bvT">
                                                     <dictionary key="options">
-                                                        <integer key="NSConditionallySetsEditable" value="1"/>
+                                                        <bool key="NSConditionallySetsEditable" value="NO"/>
                                                     </dictionary>
                                                 </binding>
                                             </connections>
                                         </tableColumn>
-                                        <tableColumn editable="NO" width="162" minWidth="40" maxWidth="1000" id="472">
+                                        <tableColumn editable="NO" width="70.5" minWidth="40" maxWidth="1000" id="472">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Status">
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
@@ -988,15 +1002,11 @@
                                             </textFieldCell>
                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                             <connections>
-                                                <binding destination="700" name="value" keyPath="arrangedObjects.status" id="704">
-                                                    <dictionary key="options">
-                                                        <integer key="NSConditionallySetsEditable" value="1"/>
-                                                    </dictionary>
-                                                </binding>
+                                                <binding destination="700" name="value" keyPath="arrangedObjects.status" id="nKo-Iq-50a"/>
                                             </connections>
                                         </tableColumn>
-                                        <tableColumn width="311.5" minWidth="10" maxWidth="3.4028229999999999e+38" id="503">
-                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Show Name - Episode Name">
+                                        <tableColumn width="178" minWidth="10" maxWidth="3.4028229999999999e+38" id="503" userLabel="Show">
+                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Show">
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                             </tableHeaderCell>
@@ -1007,14 +1017,33 @@
                                             </textFieldCell>
                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                             <connections>
-                                                <binding destination="700" name="value" keyPath="arrangedObjects.showName" id="706">
+                                                <binding destination="700" name="value" keyPath="arrangedObjects.showName" id="49f-76-bCT">
                                                     <dictionary key="options">
-                                                        <integer key="NSConditionallySetsEditable" value="1"/>
+                                                        <bool key="NSConditionallySetsEditable" value="NO"/>
                                                     </dictionary>
                                                 </binding>
                                             </connections>
                                         </tableColumn>
-                                        <tableColumn width="84" minWidth="10" maxWidth="3.4028234663852886e+38" id="P0q-Ie-8GE">
+                                        <tableColumn width="275" minWidth="10" maxWidth="3.4028234663852886e+38" id="B4p-fs-k3z" userLabel="Episode">
+                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Episode">
+                                                <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            </tableHeaderCell>
+                                            <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" alignment="left" title="Text Cell" id="XiL-QV-msg">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                            <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                            <connections>
+                                                <binding destination="700" name="value" keyPath="arrangedObjects.episodeName" id="4WS-Cb-0e5">
+                                                    <dictionary key="options">
+                                                        <bool key="NSConditionallySetsEditable" value="NO"/>
+                                                    </dictionary>
+                                                </binding>
+                                            </connections>
+                                        </tableColumn>
+                                        <tableColumn editable="NO" width="87.5" minWidth="10" maxWidth="3.4028234663852886e+38" id="P0q-Ie-8GE">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Last Broadcast">
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -1027,7 +1056,11 @@
                                             <sortDescriptor key="sortDescriptorPrototype" selector="compare:" sortKey="lastBroadcast"/>
                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                             <connections>
-                                                <binding destination="700" name="value" keyPath="arrangedObjects.lastBroadcastString" id="E2d-sF-Mso"/>
+                                                <binding destination="700" name="value" keyPath="arrangedObjects.lastBroadcastString" id="W73-Fn-nKl">
+                                                    <dictionary key="options">
+                                                        <bool key="NSConditionallySetsEditable" value="NO"/>
+                                                    </dictionary>
+                                                </binding>
                                             </connections>
                                         </tableColumn>
                                     </tableColumns>
@@ -2840,7 +2873,7 @@ Note: Only the types of shows you select in the preferences will show up here.</
                     </textField>
                 </subviews>
             </view>
-            <point key="canvasLocation" x="131" y="484"/>
+            <point key="canvasLocation" x="-874" y="442"/>
         </window>
         <window title="Show Name" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="ShowNameWindow" animationBehavior="default" id="1271" userLabel="Show Name Dialog Box">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
