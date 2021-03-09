@@ -7,7 +7,6 @@
 //
 
 #import "Programme.h"
-#import "NSString+HTML.h"
 #import "AppController.h"
 #import "HTTPProxy.h"
 //extern bool runDownloads;
@@ -17,102 +16,14 @@
     bool getNameRunning;
 }
 
-- (instancetype)initWithLogController:(LogController *)logger
-{
-    if (self = [self init]) {
-        _logger = logger;
-    }
-    return self;
-}
-
-- (instancetype)initWithPid:(NSString *)PID programmeName:(NSString *)SHOWNAME network:(NSString *)TVNETWORK logController:(LogController *)logger
-{
-    if (self = [super init]) {
-        _logger = logger;
-        _pid = [PID stringByReplacingOccurrencesOfString:@";amp" withString:@""];
-        _showName = [[[NSString alloc] initWithString:SHOWNAME] stringByDecodingHTMLEntities];
-        _tvNetwork = [[NSString alloc] initWithString:TVNETWORK];
-        _status = [[NSString alloc] init];
-        _complete = @NO;
-        _successful = @NO;
-        _path = nil;
-        _seriesName = [[NSString alloc] init];
-        _episodeName = [[NSString alloc] init];
-        _timeadded = [[NSNumber alloc] init];
-        _processedPID = @YES;
-        _radio = @NO;
-        _subtitlePath=[[NSString alloc] init];
-        _realPID=[[NSString alloc] init];
-        _reasonForFailure=[[NSString alloc] init];
-        _availableModes=[[NSString alloc] init];
-        _desc=[[NSString alloc] init];
-        _extendedMetadataRetrieved=@NO;
-        getNameRunning = false;
-        _addedByPVR = false;
-    }
-    return self;
-}
-- (instancetype)initWithShow:(Programme *)show
-{
-    if (self = [super init]) {
-        _pid = [[NSString alloc] initWithString:show.pid];
-        _showName = [[[NSString alloc] initWithString:show.showName] stringByDecodingHTMLEntities];
-        _tvNetwork = [[NSString alloc] initWithString:show.tvNetwork];
-        _status = [[NSString alloc] initWithString:show.status];
-        _complete = @NO;
-        _successful = @NO;
-        _path = [[NSString alloc] initWithString:show.path];
-        _seriesName = [[NSString alloc] init];
-        _episodeName = [[NSString alloc] init];
-        _timeadded = [[NSNumber alloc] init];
-        _processedPID = @YES;
-        _radio = show.radio;
-        _realPID = show.realPID;
-        _subtitlePath = show.subtitlePath;
-        _reasonForFailure=show.reasonForFailure;
-        _availableModes=[[NSString alloc] init];
-        _desc=[[NSString alloc] init];
-        _extendedMetadataRetrieved=@NO;
-        getNameRunning = false;
-        _addedByPVR = false;
-    }
-    return self;
-}
-
 - (instancetype)init
 {
     if (self = [super init]) {
-        _pid = [[NSString alloc] init];
-        _showName = [[NSString alloc] init];
-        _tvNetwork = [[NSString alloc] init];
-        if (runDownloads)
-        {
-            _status = @"Waiting...";
-        }
-        else
-        {
-            _status = [[NSString alloc] init];
-        }
-        _seriesName = [[NSString alloc] init];
-        _episodeName = [[NSString alloc] init];
-        _complete = @NO;
-        _successful = @NO;
-        _timeadded = [[NSNumber alloc] init];
-        _path = nil;
-        _processedPID = @NO;
-        _radio = @NO;
-        _url = [[NSString alloc] init];
-        _realPID=[[NSString alloc] init];
-        _subtitlePath=[[NSString alloc] init];
-        _reasonForFailure=[[NSString alloc] init];
-        _availableModes=[[NSString alloc] init];
-        _desc=[[NSString alloc] init];
-        _extendedMetadataRetrieved=@NO;
-        getNameRunning = false;
-        _addedByPVR = false;
+        _status = runDownloads ? @"Waiting..." : @"";
     }
     return self;
 }
+
 - (id)description
 {
     return [NSString stringWithFormat:@"%@: %@",_pid, _showName];
@@ -121,42 +32,42 @@
 {
     [coder encodeObject: _showName forKey:@"showName"];
     [coder encodeObject: _pid     forKey:@"pid"];
-    [coder encodeObject:_tvNetwork forKey:@"tvNetwork"];
-    [coder encodeObject:_status forKey:@"status"];
-    [coder encodeObject:_path forKey:@"path"];
-    [coder encodeObject:_seriesName forKey:@"seriesName"];
-    [coder encodeObject:_episodeName forKey:@"episodeName"];
-    [coder encodeObject:_timeadded forKey:@"timeadded"];
-    [coder encodeObject:_processedPID forKey:@"processedPID"];
-    [coder encodeObject:_radio forKey:@"radio"];
-    [coder encodeObject:_realPID forKey:@"realPID"];
-    [coder encodeObject:_url forKey:@"url"];
-    [coder encodeInteger:_season forKey:@"season"];
-    [coder encodeInteger:_episode forKey:@"episode"];
-    [coder encodeObject:_lastBroadcast forKey:@"lastBroadcast"];
-    [coder encodeObject:_lastBroadcastString forKey:@"lastBroadcastString"];
+    [coder encodeObject: _tvNetwork forKey:@"tvNetwork"];
+    [coder encodeObject: _status forKey:@"status"];
+    [coder encodeObject: _path forKey:@"path"];
+    [coder encodeObject: _seriesName forKey:@"seriesName"];
+    [coder encodeObject: _episodeName forKey:@"episodeName"];
+    [coder encodeObject: _timeadded forKey:@"timeadded"];
+    [coder encodeBool: _processedPID forKey:@"processedPID"];
+    [coder encodeBool: _radio forKey:@"radio"];
+    [coder encodeObject: _realPID forKey:@"realPID"];
+    [coder encodeObject: _url forKey:@"url"];
+    [coder encodeInteger: _season forKey:@"season"];
+    [coder encodeInteger: _episode forKey:@"episode"];
+    [coder encodeObject: _lastBroadcast forKey:@"lastBroadcast"];
+    [coder encodeObject: _lastBroadcastString forKey:@"lastBroadcastString"];
 }
+
 - (instancetype) initWithCoder: (NSCoder *)coder {
     if (self = [super init]) {
         _pid = [coder decodeObjectForKey:@"pid"];
         _showName = [coder decodeObjectForKey:@"showName"];
         _tvNetwork = [coder decodeObjectForKey:@"tvNetwork"];
-        _status = @"";
-        _complete = @NO;
-        _successful = @NO;
+        _status = [coder decodeObjectForKey:@"status"];
+        _complete = NO;
+        _successful = NO;
         _path = [coder decodeObjectForKey:@"path"];
         _seriesName = [coder decodeObjectForKey:@"seriesName"];
         _episodeName = [coder decodeObjectForKey:@"episodeName"];
         _timeadded = [coder decodeObjectForKey:@"timeadded"];
-        _processedPID = [coder decodeObjectForKey:@"processedPID"];
-        _radio = [coder decodeObjectForKey:@"radio"];
+        _processedPID = [coder decodeBoolForKey:@"processedPID"];
+        _radio = [coder decodeBoolForKey:@"radio"];
         _realPID = [coder decodeObjectForKey:@"realPID"];
         _url = [coder decodeObjectForKey:@"url"];
         _subtitlePath = @"";
         _reasonForFailure = @"";
         _availableModes = @"";
         _desc = @"";
-        _extendedMetadataRetrieved=@NO;
         getNameRunning = false;
         _addedByPVR = false;
         _season = [coder decodeIntegerForKey:@"season"];
@@ -165,23 +76,6 @@
         _lastBroadcastString = [coder decodeObjectForKey:@"lastBroadcastString"];
     }
     return self;
-}
-/*
- - (id)pasteboardPropertyListForType:(NSString *)type
- {
- if ([type isEqualToString:@"com.thomaswillson.programme"])
- {
- return [NSKeyedArchiver archivedDataWithRootObject:self];
- }
- }
- - (NSArray *)writableTypesForPasteboard:(NSPasteboard *)pasteboard
- {
- return [NSArray arrayWithObject:@"com.thomaswillson.programme"];
- }
- */
--(void)setPid:(NSString *)newPID
-{
-    _pid = [newPID stringByReplacingOccurrencesOfString:@"amp;" withString:@""];
 }
 
 -(void)retrieveExtendedMetadata
@@ -196,12 +90,15 @@
     _getiPlayerProxy = nil;
     if (proxyDict && [proxyDict[@"error"] code] == kProxyLoadCancelled)
         return;
+
+    // Cancel any pending request.
+    [self cancelMetadataRetrieval];
+    self.taskOutput = [NSMutableString new];
+    self.metadataTask = [NSTask new];
+    self.pipe = [NSPipe new];
+    self.errorPipe = [NSPipe new];
     
-    _taskOutput = [[NSMutableString alloc] init];
-    _metadataTask = [[NSTask alloc] init];
-    _pipe = [[NSPipe alloc] init];
-    
-    _metadataTask.launchPath = [[AppController sharedController] perlBinaryPath];
+    self.metadataTask.launchPath = [[AppController sharedController] perlBinaryPath];
     NSString *profileDirPath = [[NSFileManager defaultManager] applicationSupportDirectory];
     NSString *profileArg = [NSString stringWithFormat:@"--profile-dir=%@", profileDirPath];
     
@@ -209,7 +106,7 @@
                                                             @"--nopurge",
                                                             @"--nocopyright",
                                                             @"-e60480000000000000",
-                                                            @"-i",
+                                                            @"--info",
                                                             profileArg,
                                                             @"--pid",
                                                             _pid]];
@@ -223,74 +120,82 @@
         
     }
     
-    _metadataTask.arguments = args;
+    self.metadataTask.arguments = args;
+
+    BOOL verbose = [[NSUserDefaults standardUserDefaults] boolForKey:@"Verbose"];
+
+    if (verbose) {
+        NSLog(@"get metadata args: %@", args);
+    }
+
+    self.metadataTask.standardOutput = self.pipe;
+    self.metadataTask.standardOutput = self.errorPipe;
+
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(metadataRetrievalDataReady:) name:NSFileHandleReadCompletionNotification object:self.pipe.fileHandleForReading];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(metadataRetrievalDataReady:) name:NSFileHandleReadCompletionNotification object:self.errorPipe.fileHandleForReading];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(metadataRetrievalFinished:) name:NSTaskDidTerminateNotification object:self.metadataTask];
     
-    _metadataTask.standardOutput = _pipe;
-    NSFileHandle *fh = _pipe.fileHandleForReading;
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(metadataRetrievalDataReady:) name:NSFileHandleReadCompletionNotification object:fh];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(metadataRetrievalFinished:) name:NSTaskDidTerminateNotification object:_metadataTask];
-    
-    NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:_metadataTask.environment];
+    NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:self.metadataTask.environment];
     envVariableDictionary[@"HOME"] = (@"~").stringByExpandingTildeInPath;
     envVariableDictionary[@"PERL_UNICODE"] = @"AS";
     envVariableDictionary[@"PATH"] = [[AppController sharedController] perlEnvironmentPath];
-    _metadataTask.environment = envVariableDictionary;
-    [_metadataTask launch];
-    [fh readInBackgroundAndNotify];
+    self.metadataTask.environment = envVariableDictionary;
+    [self.metadataTask launch];
+
+    [self.pipe.fileHandleForReading readInBackgroundAndNotify];
+    [self.errorPipe.fileHandleForReading readInBackgroundAndNotify];
 }
 
 -(void)metadataRetrievalDataReady:(NSNotification *)n
 {
     NSData *d = [n.userInfo valueForKey:NSFileHandleNotificationDataItem];
-    
-    if (d.length > 0) {
-        NSString *s = [[NSString alloc] initWithData:d
-                                            encoding:NSUTF8StringEncoding];
-        
+    NSString *s = [[NSString alloc] initWithData:d
+                                        encoding:NSUTF8StringEncoding];
+
+    // Log, but don't parse error output.
+    if (![s hasPrefix:@"INFO:"] && ![s hasPrefix:@"ERROR:"]) {
         [_taskOutput appendString:s];
-        [_logger addToLog:s :self];
-        [_pipe.fileHandleForReading readInBackgroundAndNotify];
     }
-    else {
-        [self metadataRetrievalFinished:nil];
-    }
+
+    [_logger addToLog:s :self];
+    NSFileHandle *fh = [n.userInfo valueForKey:NSFileHandleNotificationFileHandleItem];
+    [fh readInBackgroundAndNotify];
 }
 
 -(void)metadataRetrievalFinished:(NSNotification *)n
 {
-    _taskRunning=NO;
+    self.metadataTask = nil;
+    self.pipe = nil;
+    self.errorPipe = nil;
+
     _categories = [self scanField:@"categories" fromList:_taskOutput];
     
-    NSString *descTemp = [self scanField:@"desc" fromList:_taskOutput];
-    if (descTemp) {
-        _desc = descTemp;
-    }
-    
+    self.desc = [self scanField:@"desc" fromList:_taskOutput];
+
     NSString *durationTemp = [self scanField:@"duration" fromList:_taskOutput];
     if (durationTemp) {
         if ([durationTemp hasSuffix:@"min"])
-            _duration = @(durationTemp.integerValue);
+            self.duration = @(durationTemp.integerValue);
         else
-            _duration = @(durationTemp.integerValue/60);
+            self.duration = @(durationTemp.integerValue/60);
     }
     
-    _firstBroadcast = [self processDate:[self scanField:@"firstbcast" fromList:_taskOutput]];
-    _lastBroadcast = [self processDate:[self scanField:@"lastbcast" fromList:_taskOutput]];
+    self.firstBroadcast = [self processDate:[self scanField:@"firstbcast" fromList:_taskOutput]];
+    self.lastBroadcast = [self processDate:[self scanField:@"lastbcast" fromList:_taskOutput]];
     
-    _seriesName = [self scanField:@"longname" fromList:_taskOutput];
-    
-    _episodeName = [self scanField:@"episode" fromList:_taskOutput];
+    self.seriesName = [self scanField:@"longname" fromList:_taskOutput];
+    self.episodeName = [self scanField:@"episode" fromList:_taskOutput];
     
     NSString *seasonNumber = [self scanField:@"seriesnum" fromList:_taskOutput];
     if (seasonNumber) {
-        _season = seasonNumber.integerValue;
+        self.season = seasonNumber.integerValue;
     }
     
     NSString *episodeNumber = [self scanField:@"episodenum" fromList:_taskOutput];
     if (episodeNumber) {
-        _episode = episodeNumber.integerValue;
+        self.episode = episodeNumber.integerValue;
     }
+
     // determine default version
     NSString *default_version = nil;
     NSString *info_versions = [self scanField:@"versions" fromList:_taskOutput];
@@ -302,6 +207,7 @@
             default_version = version;
         }
     }
+
     // parse mode sizes
     NSMutableArray *array = [NSMutableArray array];
     NSScanner *sizeScanner = [NSScanner scannerWithString:_taskOutput];
@@ -353,7 +259,8 @@
         }
         [sizeScanner scanUpToString:@"modesizes:" intoString:nil];
     }
-    _modeSizes = array;
+
+    self.modeSizes = array;
     NSString *thumbURL = [self scanField:@"thumbnail" fromList:_taskOutput];
     
     if (thumbURL) {
@@ -374,25 +281,23 @@
 - (void)thumbnailRequestFinished:(nullable NSData *)thumbnailData
 {
     if (thumbnailData) {
-        _thumbnail = [[NSImage alloc] initWithData:thumbnailData];
+        self.thumbnail = [[NSImage alloc] initWithData:thumbnailData];
     }
-    _successfulRetrieval = @YES;
-    _extendedMetadataRetrieved = @YES;
+    self.successfulRetrieval = YES;
+    self.extendedMetadataRetrieved = YES;
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ExtendedInfoRetrieved" object:self];
     
 }
 
 -(NSString *)scanField:(NSString *)field fromList:(NSString *)list
 {
-    NSString __autoreleasing *buffer;
-    
+    NSString *buffer;
     NSScanner *scanner = [NSScanner scannerWithString:list];
     [scanner scanUpToString:[NSString stringWithFormat:@"%@:",field] intoString:nil];
     [scanner scanString:[NSString stringWithFormat:@"%@:",field] intoString:nil];
     [scanner scanCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:nil];
     [scanner scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet] intoString:&buffer];
-    
-    return [buffer copy];
+    return buffer;
 }
 
 -(NSDate *)processDate:(NSString *)date
@@ -411,15 +316,19 @@
 
 -(void)cancelMetadataRetrieval
 {
-    if (_metadataTask.running) {
-        [_metadataTask interrupt];
+    if (self.metadataTask.running) {
+        [self.metadataTask interrupt];
+        [self.logger addToLog:@"Metadata Retrieval Cancelled" :self];
     }
-    [_logger addToLog:@"Metadata Retrieval Cancelled" :self];
+
+    self.metadataTask = nil;
+    self.pipe = nil;
+    self.errorPipe = nil;
 }
 
 - (GIA_ProgrammeType)type
 {
-    if (_radio.boolValue)
+    if (_radio)
         return GiA_ProgrammeTypeBBC_Radio;
     else if ([_tvNetwork hasPrefix:@"ITV"])
         return GIA_ProgrammeTypeITV;
@@ -473,7 +382,7 @@
         NSTask *getNameTask = [[NSTask alloc] init];
         NSPipe *getNamePipe = [[NSPipe alloc] init];
         NSMutableString *getNameData = [[NSMutableString alloc] initWithString:@""];
-        NSString *listArgument = @"--listformat=<index>|<pid>|<type>|<name> - <episode>|<channel>|<web>";
+        NSString *listArgument = @"--listformat=<index>|<pid>|<type>|<name>|<episode>|<channel>|<available>|<web>";
         NSString *fieldsArgument = @"--fields=index,pid";
         NSString *wantedID = _pid;
         NSString *cacheExpiryArg = [[GetiPlayerArguments sharedController] cacheExpiryArgument:nil];
@@ -512,25 +421,30 @@
 - (void)processGetNameData:(NSString *)getNameData
 {
     NSArray *array = [getNameData componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
-    Programme *p = self;
-    NSString *wantedID = p.pid;
+    NSString *wantedID = self.pid;
     BOOL found = NO;
+
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    dateFormatter.dateFormat = @"yyyy'-'MM'-'dd'T'HH':'mm':'ssZZZZZ";
+
     for (NSString *string in array)
     {
         // TODO: remove use of index in future version
         NSArray *elements = [string componentsSeparatedByString:@"|"];
-        if (elements.count < 6) {
+        if (elements.count < 8) {
             continue;
         }
 
-        NSString *pid, *showName, *index, *type, *tvNetwork, *url;
+        NSString *pid, *showName, *episode, *index, *type, *tvNetwork, *url, *dateAired;
         @try{
             index = elements[0];
             pid = elements[1];
             type = elements[2];
             showName = elements[3];
-            tvNetwork = elements[4];
-            url = elements[5];
+            episode = elements[4];
+            tvNetwork = elements[5];
+            dateAired = elements[6];
+            url = elements[7];
         }
         @catch (NSException *e) {
             NSAlert *getNameException = [[NSAlert alloc] init];
@@ -541,47 +455,47 @@
             [getNameException runModal];
             getNameException = nil;
         }
-        if ([wantedID isEqualToString:pid] || [wantedID isEqualToString:index])
-        {
+
+        if ([wantedID isEqualToString:pid] || [wantedID isEqualToString:index]) {
             found=YES;
-            if (showName.length > 0) {
-                p.showName = showName;
-            }
-            
+            self.showName = showName;
+            self.episodeName = episode;
+            self.lastBroadcast = [dateFormatter dateFromString:dateAired];
+            self.lastBroadcastString = [NSDateFormatter localizedStringFromDate:self.lastBroadcast dateStyle:NSDateFormatterMediumStyle timeStyle:NSDateFormatterNoStyle];
+
             if (pid.length > 0) {
-                p.pid = pid;
+                self.pid = pid;
             }
             
             if (tvNetwork.length > 0) {
-                p.tvNetwork = tvNetwork;
+                self.tvNetwork = tvNetwork;
             }
             
             if (url) {
-                p.url = url;
+                self.url = url;
             }
             
-            p.status = runDownloads ? @"Waiting..." : @"Available";
+            self.status = runDownloads ? @"Waiting..." : @"Available";
             
             if ([type isEqualToString:@"radio"]) {
-                p.radio = @YES;
+                self.radio = YES;
             }
         }
+
+        break;
     }
-    if (!found)
-    {
-        if ([p.showName isEqualToString:@""] || [p.showName isEqualToString:@"Unknown: Not in Cache"]) {
-            p.showName = @"Retrieving Metadata...";
-            p.status = @"Unknown";
+
+    self.processedPID = found;
+
+    if (!found) {
+        if ([self.showName isEqualToString:@""]) {
+            self.showName = @"Retrieving Metadata...";
+            self.status = @"Unknown: Not in cache";
         }
         
-        p.processedPID = @NO;
-        [p getNameFromPID];
+        self.processedPID = NO;
+        [self getNameFromPID];
     }
-    else
-    {
-        p.processedPID = @YES;
-    }
-    
 }
 
 - (void)getNameFromPID
@@ -612,16 +526,18 @@
             [versionArg appendString:@"signed,"];
         [versionArg  appendString:@"default"];
         NSString *infoArgument = @"--info";
-        NSString *pidArgument = [NSString stringWithFormat:@"--pid=%@", _pid];
+        NSString *pidArgument = @"--pid";
         NSString *cacheExpiryArg = [[GetiPlayerArguments sharedController] cacheExpiryArgument:nil];
         NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:
                                 [[AppController sharedController] getiPlayerPath],
                                 @"--nocopyright",
-                                @"--nopurge",versionArg,
+                                @"--nopurge",
+                                versionArg,
                                 cacheExpiryArg,
                                 [GetiPlayerArguments sharedController].profileDirArg,
                                 infoArgument,
                                 pidArgument,
+                                self.pid,
                                 nil];
         
         if (proxyDict[@"proxy"]) {
@@ -662,13 +578,14 @@
         }
         [self performSelectorOnMainThread:@selector(processGetNameDataFromPID:) withObject:getNameData waitUntilDone:YES];
         getNameRunning = false;
+        getNameTask = nil;
+        getNamePipe = nil;
     }
 }
 
 - (void)processGetNameDataFromPID:(NSString *)getNameData
 {
     NSArray *array = [getNameData componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
-    Programme *p = self;
     NSString *available = nil, *versions = nil, *title = nil, *type = nil;
     NSDate *broadcastDate = nil;
     
@@ -719,29 +636,29 @@
     }
     
     if ([available isEqualToString:@"none"]) {
-        p.status = @"Not Available";
+        self.status = @"Not Available";
     } else {
-        p.status = @"Available";
+        self.status = @"Available";
     }
     
     if (broadcastDate) {
-        p.lastBroadcast = broadcastDate;
-        p.lastBroadcastString = [NSDateFormatter localizedStringFromDate:broadcastDate
+        self.lastBroadcast = broadcastDate;
+        self.lastBroadcastString = [NSDateFormatter localizedStringFromDate:broadcastDate
                                                                dateStyle:NSDateFormatterMediumStyle
                                                                timeStyle:NSDateFormatterNoStyle];
     }
     
     if ([type isEqualToString:@"radio"]) {
-        p.radio = @YES;
+        self.radio = YES;
     }
     
     if (title) {
-        p.showName = title;
+        self.showName = title;
     } else {
-        p.showName = @"Unknown: PID Not Found";
+        self.showName = @"Unknown: PID Not Found";
     }
     
-    p.processedPID = @NO;
+    self.processedPID = NO;
 }
 
 @end

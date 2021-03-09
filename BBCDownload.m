@@ -247,15 +247,15 @@
 
     // If we have a path it was successful. Note that and return.
     if (self.show.path.length > 0) {
-        self.show.complete = @YES;
-        self.show.successful = @YES;
+        self.show.complete = YES;
+        self.show.successful = YES;
         self.show.status = @"Download Complete";
         return;
     }
 
     // Handle all other error cases.
-    self.show.complete = @YES;
-    self.show.successful = @NO;
+    self.show.complete = YES;
+    self.show.successful = NO;
 
     if (self.reasonForFailure) {
         self.show.reasonForFailure = self.reasonForFailure;

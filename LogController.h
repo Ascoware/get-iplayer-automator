@@ -10,9 +10,9 @@
 
 @interface LogController : NSObject
 
-@property (nonatomic) IBOutlet NSTextView *log;
-@property (nonatomic, weak) IBOutlet NSWindow *window;
-@property (nonatomic) NSFileHandle *fh;
+@property IBOutlet NSTextView *log;
+@property (weak) IBOutlet NSWindow *window;
+@property NSFileHandle *fh;
 
 - (instancetype)init;
 - (IBAction)showLog:(id)sender;

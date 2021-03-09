@@ -140,10 +140,10 @@
         if ([finishedNote.object terminationStatus] == 0) {
             [[NSFileManager defaultManager] removeItemAtPath:_thumbnailPath error:nil];
             [self addToLog:@"INFO: AtomicParsley Tagging finished." noTag:YES];
-            self.show.successful = @YES;
+            self.show.successful = YES;
         } else {
             [self addToLog:@"INFO: Tagging failed." noTag:YES];
-            self.show.successful = @NO;
+            self.show.successful = NO;
         }
     }
 
@@ -342,8 +342,8 @@
     
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSFileHandleReadCompletionNotification object:nil];
 	self.show.status = @"Cancelled";
-    _show.complete = @NO;
-    _show.successful = @NO;
+    _show.complete = NO;
+    _show.successful = NO;
 	[self addToLog:@"Download Cancelled"];
     _running=FALSE;
 }

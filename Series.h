@@ -11,10 +11,10 @@
 
 @interface Series : NSObject <NSCoding> {
 }
-@property (nonatomic) NSString *showName;
-@property (nonatomic) NSNumber *added;
-@property (nonatomic) NSString *tvNetwork;
-@property (nonatomic) NSDate *lastFound;
 
-- (instancetype)initWithShowname:(NSString *)SHOWNAME;
+@property (copy) NSString *showName;
+@property NSNumber *added;
+@property (copy) NSString *tvNetwork;
+@property NSDate *lastFound;
+
 @end

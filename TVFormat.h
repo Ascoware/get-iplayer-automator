@@ -9,5 +9,5 @@
 #import <Foundation/Foundation.h>
 
 @interface TVFormat : NSObject <NSCoding>
-@property (nonatomic, nonnull, copy) NSString *format;
+@property (nonnull, copy) NSString *format;
 @end

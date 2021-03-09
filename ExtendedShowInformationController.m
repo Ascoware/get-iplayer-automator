@@ -51,7 +51,7 @@
             NSLog(@"%@",searchResultsTable);
             return;
         }
-        if (!programme.extendedMetadataRetrieved.boolValue) {
+        if (!programme.extendedMetadataRetrieved) {
             [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(informationRetrieved:) name:@"ExtendedInfoRetrieved" object:programme];
             [programme retrieveExtendedMetadata];
             [NSTimer scheduledTimerWithTimeInterval:60 target:self selector:@selector(timeoutTimer:) userInfo:nil repeats:NO];
@@ -64,7 +64,7 @@
 - (void)timeoutTimer:(NSTimer *)timer
 {
     Programme *programme = searchResultsArrayController.arrangedObjects[searchResultsTable.selectedRow];
-    if (!programme.extendedMetadataRetrieved.boolValue) {
+    if (!programme.extendedMetadataRetrieved) {
         [[NSNotificationCenter defaultCenter] postNotificationName:@"AddToLog" object:self userInfo:@{@"message":@"Metadata Retrieval Timed Out"}];
         [programme cancelMetadataRetrieval];
         loadingLabel.stringValue = @"Programme Information Retrieval Timed Out";
@@ -74,7 +74,7 @@
     Programme *programme = note.object;
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (programme.successfulRetrieval.boolValue) {
+        if (programme.successfulRetrieval) {
             self->imageView.image = programme.thumbnail;
             
             if (programme.seriesName)

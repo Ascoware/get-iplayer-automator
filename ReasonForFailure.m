@@ -10,13 +10,4 @@
 
 @implementation ReasonForFailure
 
-- (instancetype)init
-{
-	if (!(self = [super init])) return nil;
-	showName = [[NSString alloc] init];
-    solution = [[NSString alloc] init];
-	return self;
-}
-@synthesize showName;
-@synthesize solution;
 @end

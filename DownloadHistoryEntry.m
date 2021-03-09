@@ -13,13 +13,13 @@
 - (instancetype)initWithPID:(NSString *)temp_pid showName:(NSString *)temp_showName episodeName:(NSString *)temp_episodeName type:(NSString *)temp_type someNumber:(NSString *)temp_someNumber downloadFormat:(NSString *)temp_downloadFormat downloadPath:(NSString *)temp_downloadPath
 {
 	if (!(self = [super init])) return nil;
-	_pid=[temp_pid copy];
-	_showName=[temp_showName copy];
-	_episodeName=[temp_episodeName copy];
-	_type=[temp_type copy];
-	_someNumber=[temp_someNumber copy];
-	_downloadFormat=[temp_downloadFormat copy];
-	_downloadPath=[temp_downloadPath copy];
+	self.pid = temp_pid;
+	self.showName = temp_showName;
+	self.episodeName = temp_episodeName;
+    self.type = temp_type;
+	self.someNumber = temp_someNumber;
+	self.downloadFormat = temp_downloadFormat;
+	self.downloadPath = temp_downloadPath;
 	return self;
 }
 - (NSString *)entryString

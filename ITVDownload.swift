@@ -131,79 +131,13 @@ public class ITVDownload : Download {
             add(toLog: message, noTag: true)
         }
 
-        var episodeID = ""
-        var timeAired: Date? = nil
-        let longDateFormatter = DateFormatter()
-        let enUSPOSIXLocale = Locale(identifier:"en_US_POSIX")
-        longDateFormatter.timeZone = TimeZone(secondsFromGMT:0)
-        longDateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mmZ"
-        longDateFormatter.locale = enUSPOSIXLocale
+        let showMetadata = ITVMetadataExtractor.getShowMetadata(htmlPageContent: responseString)
+        self.show.desc = showMetadata.desc
+        self.show.episode = showMetadata.episode
+        self.show.season = showMetadata.season
+        self.show.episodeName = showMetadata.episodeName
+        self.show.thumbnailURLString = showMetadata.thumbnailURLString
 
-        let shortDateFormatter = DateFormatter()
-        shortDateFormatter.dateFormat = "EEE MMM dd"
-        shortDateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
-        shortDateFormatter.locale = enUSPOSIXLocale
-
-        if let htmlPage = try? HTML(html: responseString, encoding: .utf8) {
-            // There should only be one 'video' element.
-            if let videoElement = htmlPage.at_xpath("//div[@id='video']") {
-                self.show.seriesName = videoElement.at_xpath("//@data-video-title")?.text ?? "Unknown"
-                self.show.episodeName = videoElement.at_xpath("//@data-video-episode")?.text ?? ""
-                episodeID = videoElement.at_xpath("//@data-video-episode-id")?.text ?? ""
-            }
-            
-            if let descriptionElement = htmlPage.at_xpath("//script[@id='json-ld']") {
-                if let descriptionJSON = descriptionElement.content {
-                    let descriptionData = JSON(parseJSON: descriptionJSON)
-                    let breadcrumbs = descriptionData["itemListElement:"].arrayValue
-                    for item in breadcrumbs {
-                        if item["item:"]["@type"] == "TVEpisode" {
-                            let showMetadata = item["item:"]
-                            self.show.desc = showMetadata["description"].string ?? "None available"
-                            self.show.episode = showMetadata["episodeNumber"].intValue
-                            self.show.season = showMetadata["partOfSeason"]["seasonNumber"].intValue
-                            self.show.episodeName = showMetadata["name"].stringValue
-                            thumbnailURLString = showMetadata["image"].dictionaryValue["url"]?.stringValue
-
-                            let potentialActions = showMetadata["potentialAction"].arrayValue
-
-                            if potentialActions.count > 0 {
-                                let potentialAction = potentialActions[0]
-                                let expectActions = potentialAction["expectsAcceptanceOf"].arrayValue
-
-                                if expectActions.count > 0 {
-                                    let expectAction = expectActions[0]
-                                    let availabilityTime = expectAction["availabilityStarts"].stringValue
-                                    timeAired = longDateFormatter.date(from:availabilityTime)
-                                }
-                            }
-                            
-                            break
-                        }
-                    }
-                }
-            }
-        }
-
-        if self.show.episode == 0 && self.show.season == 0 && !episodeID.isEmpty {
-            // At this point all we have left is the production ID.
-            // A series number doesn't make much sense, so just parse out an episode number.
-            let programIDElements = episodeID.split(separator: "/")
-            if let lastElement = programIDElements.last, let intLastElement = Int(lastElement) {
-                self.show.episode = intLastElement
-            }
-        }
-        
-        if self.show.episodeName.isEmpty {
-            if let timeAired = timeAired {
-                let shortDate = shortDateFormatter.string(from: timeAired)
-                self.show.episodeName = shortDate
-            }
-        }
-        if let timeAired = timeAired {
-            self.show.standardizedAirDate = longDateFormatter.string(from: timeAired)
-        }
-        
         add(toLog:"INFO: Metadata processed.", noTag:true)
         
         //Create Download Path

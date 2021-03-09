@@ -115,13 +115,14 @@
             @try {
                 //SearchResult|<pid>|<available>|<type>|<name>|<episode>|<channel>|<seriesnum>|<episodenum>|<desc>|<thumbnail>|<web>
                 NSArray<NSString *> *fields = [string componentsSeparatedByString:@"|"];
-                Programme *p = [[Programme alloc] initWithLogController:_logger];
-                p.processedPID = @YES;
+                Programme *p = [Programme new];
+                p.logger = _logger;
+                p.processedPID = YES;
                 p.pid = fields[1];
                 NSDate *broadcastDate = [rawDateParser dateFromString:fields[2]];
                 p.lastBroadcast = broadcastDate;
                 p.lastBroadcastString = [NSDateFormatter localizedStringFromDate:broadcastDate dateStyle:NSDateFormatterMediumStyle timeStyle:NSDateFormatterNoStyle];
-                p.radio = [NSNumber numberWithBool:[fields[3] isEqualToString:@"radio"]];
+                p.radio = [fields[3] isEqualToString:@"radio"];
                 p.seriesName = fields[4];
                 p.episodeName = fields[5];
 

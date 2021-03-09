@@ -44,35 +44,25 @@
 			currentRange = NSMakeRange(paraStart, contentsEnd - paraStart);
 			[array addObject:[string substringWithRange:currentRange]];
 		}
-		for (NSString *entry in array)
-		{
-			if (entry.length >0)
-			{
-				NSScanner *scanner = [NSScanner scannerWithString:entry];
-				NSString *pidtwo, *showNametwo, *episodeNametwo, *typetwo, *someNumbertwo, *downloadFormattwo, *downloadPathtwo;
-				[scanner scanUpToString:@"|" intoString:&pidtwo];
-				[scanner scanString:@"|" intoString:nil];
-				[scanner scanUpToString:@"|" intoString:&showNametwo];
-				[scanner scanString:@"|" intoString:nil];
-				[scanner scanUpToString:@"|" intoString:&episodeNametwo];
-				[scanner scanString:@"|" intoString:nil];
-				[scanner scanUpToString:@"|" intoString:&typetwo];
-				[scanner scanString:@"|" intoString:nil];
-				[scanner scanUpToString:@"|" intoString:&someNumbertwo];
-				[scanner scanString:@"|" intoString:nil];
-				[scanner scanUpToString:@"|" intoString:&downloadFormattwo];
-				[scanner scanString:@"|" intoString:nil];
-				[scanner scanUpToString:@"|" intoString:&downloadPathtwo];
-				DownloadHistoryEntry *historyEntry = [[DownloadHistoryEntry alloc] initWithPID:pidtwo 
-																					  showName:showNametwo 
-																				   episodeName:episodeNametwo 
-																						  type:typetwo 
-																					someNumber:someNumbertwo 
-																				downloadFormat:downloadFormattwo 
-																				  downloadPath:downloadPathtwo];
-				[historyArrayController addObject:historyEntry];
-			}
-		}
+		for (NSString *entry in array) {
+            NSArray *components = [entry componentsSeparatedByString:@"|"];
+            NSString *pid = components[0];
+            NSString *showName = components[1];
+            NSString *episodeName = components[2];
+            NSString *type = components[3];
+            NSString *someNumber = components[4];
+            NSString *downloadFormat = components[5];
+            NSString *downloadPath = components[6];
+
+            DownloadHistoryEntry *historyEntry = [[DownloadHistoryEntry alloc] initWithPID:pid
+                                                                                  showName:showName
+                                                                               episodeName:episodeName
+                                                                                      type:type
+                                                                                someNumber:someNumber
+                                                                            downloadFormat:downloadFormat
+                                                                              downloadPath:downloadPath];
+            [historyArrayController addObject:historyEntry];
+        }
 	}
 	NSLog(@"end read history");
 }

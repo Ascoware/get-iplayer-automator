@@ -460,7 +460,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     NSArray *tempQueue = _queueController.arrangedObjects;
     for (Programme *show in tempQueue)
     {
-        if (show.successful.boolValue)
+        if (show.successful)
         {
             [_queueController removeObject:show];
         }
@@ -692,8 +692,15 @@ static NSString *FORCE_RELOAD = @"ForceReload";
             pipeTask.standardOutput = newPipe;
             pipeTask.standardError = newPipe;
             pipeTask.launchPath = _perlBinaryPath;
-            pipeTask.arguments = @[_getiPlayerPath, [GetiPlayerArguments sharedController].profileDirArg,@"--nopurge",[GetiPlayerArguments sharedController].noWarningArg,[[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO andIncludeITV:YES],[[GetiPlayerArguments sharedController] cacheExpiryArgument:nil],[GetiPlayerArguments sharedController].standardListFormat,
-                                     searchArgument];
+            pipeTask.arguments = @[
+                _getiPlayerPath,
+                [GetiPlayerArguments sharedController].profileDirArg,
+                @"--nopurge",
+                [GetiPlayerArguments sharedController].noWarningArg,
+                [[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO andIncludeITV:YES],
+                [[GetiPlayerArguments sharedController] cacheExpiryArgument:nil],
+                [GetiPlayerArguments sharedController].standardListFormat,
+                searchArgument];
             NSMutableString *taskData = [[NSMutableString alloc] initWithString:@""];
             NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:pipeTask.environment];
             envVariableDictionary[@"HOME"] = (@"~").stringByExpandingTildeInPath;
@@ -725,18 +732,10 @@ static NSString *FORCE_RELOAD = @"ForceReload";
                         temp_pid = matchElements[0];
                         temp_type = matchElements[1];
                         temp_showName = matchElements[2];
-                        temp_tvNetwork = matchElements[3];
-                        url = matchElements[4];
-                        temp_date = matchElements[5];
-
-                        if ([temp_showName hasSuffix:@" - -"])
-                        {
-                            NSString *temp_showName2;
-                            NSScanner *dashScanner = [NSScanner scannerWithString:temp_showName];
-                            [dashScanner scanUpToString:@" - -" intoString:&temp_showName2];
-                            temp_showName = temp_showName2;
-                            temp_showName = [temp_showName stringByAppendingFormat:@" - %@", temp_showName2];
-                        }
+                        p.episodeName = matchElements[3];
+                        temp_tvNetwork = matchElements[4];
+                        url = matchElements[5];
+                        temp_date = matchElements[6];
                         p.pid =  temp_pid;
                         p.showName = temp_showName;
                         p.tvNetwork = temp_tvNetwork;
@@ -746,7 +745,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 
 
                         if ([temp_type isEqualToString:@"radio"])  {
-                            p.radio = @YES;
+                            p.radio = YES;
                         }
 
                         if (  [p.url isEqualToString:show.url] && show.url )
@@ -902,7 +901,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         NSArray *selected = _queueController.selectedObjects;
         for (Programme *show in selected)
         {
-            if (![show.status isEqualToString:@"Waiting..."] && ![show.complete isEqualToNumber:@YES])
+            if (![show.status isEqualToString:@"Waiting..."] && !show.complete)
             {
                 downloading = YES;
             }
@@ -995,11 +994,11 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         NSArray *tempQueue = _queueController.arrangedObjects;
         for (Programme *show in tempQueue)
         {
-            if ([show.successful isEqualToNumber:@NO])
+            if (!show.successful)
             {
-                if (show.processedPID.boolValue)
+                if (show.processedPID)
                 {
-                    show.complete = @NO;
+                    show.complete = NO;
                     show.status = @"Waiting...";
                     foundOne=YES;
                 }
@@ -1008,14 +1007,14 @@ static NSString *FORCE_RELOAD = @"ForceReload";
                     [show getNameSynchronous];
                     if ([show.showName isEqualToString:@"Unknown - Not in Cache"])
                     {
-                        show.complete = @YES;
-                        show.successful = @NO;
+                        show.complete = YES;
+                        show.successful = NO;
                         show.status = @"Failed: Please set the show name";
                         [_logger addToLog:@"Could not download. Please set a show name first." :self];
                     }
                     else
                     {
-                        show.complete = @NO;
+                        show.complete = NO;
                         show.status = @"Waiting...";
                         foundOne=YES;
                     }
@@ -1043,7 +1042,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
                             :nil];
             for (Programme *show in tempQueue)
             {
-                if ([show.complete isEqualToNumber:@NO])
+                if (!show.complete)
                 {
                     if ([show.tvNetwork hasPrefix:@"ITV"]) {
                         _currentDownload = [[ITVDownload alloc]
@@ -1181,7 +1180,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     if (runDownloads)
     {
         Programme *finishedShow = note.object;
-        if (finishedShow.successful.boolValue)
+        if (finishedShow.successful)
         {
             finishedShow.status = @"Processing...";
 
@@ -1233,7 +1232,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
             for (Programme *show in tempQueue)
             {
                 showNum++;
-                if (!show.complete.boolValue)
+                if (!show.complete)
                 {
                     nextShow = show;
                     break;
@@ -1248,7 +1247,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
                               (unsigned long)([tempQueue indexOfObject:nextShow]+1),
                               (unsigned long)tempQueue.count]
                             :nil];
-            if ([nextShow.complete isEqualToNumber:@NO])
+            if (!nextShow.complete)
             {
                 if ([nextShow.tvNetwork hasPrefix:@"ITV"])
                     _currentDownload = [[ITVDownload alloc] initWithProgramme:nextShow
@@ -1288,7 +1287,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
             NSUInteger downloadsSuccessful=0, downloadsFailed=0;
             for (Programme *show in tempQueue)
             {
-                if (show.successful.boolValue)
+                if (show.successful)
                 {
                     downloadsSuccessful++;
                 }
@@ -1358,11 +1357,8 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     NSArray *selected = [[NSArray alloc] initWithArray:_pvrResultsController.selectedObjects];
     for (Programme *programme in selected)
     {
-        NSString *episodeName = [[NSString alloc] initWithString:programme.showName];
-        NSScanner *scanner = [NSScanner scannerWithString:episodeName];
-        NSString *tempName;
-        [scanner scanUpToString:@" - " intoString:&tempName];
-        Series *show = [[Series alloc] initWithShowname:tempName];
+        Series *show = [Series new];
+        show.showName = programme.showName;
         show.added = programme.timeadded;
         show.tvNetwork = programme.tvNetwork;
         show.lastFound = [NSDate date];
@@ -1408,10 +1404,10 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         if (!runDownloads)
             [_currentProgress performSelectorOnMainThread:@selector(setStringValue:) withObject:@"Updating Series Link..." waitUntilDone:YES];
         NSMutableArray *seriesToBeRemoved = [[NSMutableArray alloc] init];
-        for (Series *series in seriesLink)
-        {
-            if (!runDownloads)
+        for (Series *series in seriesLink) {
+            if (!runDownloads) {
                 [_currentProgress performSelectorOnMainThread:@selector(setStringValue:) withObject:[NSString stringWithFormat:@"Updating Series Link - %lu/%lu - %@",(unsigned long)[seriesLink indexOfObject:series]+1,(unsigned long)seriesLink.count,series.showName] waitUntilDone:YES];
+            }
             if (series.showName.length == 0) {
                 [seriesToBeRemoved addObject:series];
                 continue;
@@ -1536,23 +1532,20 @@ static NSString *FORCE_RELOAD = @"ForceReload";
                     ([temp_tvNetwork isEqualToString:series2.tvNetwork] || [[series2.tvNetwork stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] isEqualToString:@"*"] || series2.tvNetwork.length == 0))
                 {
                     @try {
-                        NSString *seriesAndEpisode = nil;
-                        if (series_Name.length > 0 && episode_Name.length > 0) {
-                            seriesAndEpisode = [NSString stringWithFormat:@"%@ - %@", series_Name ?: @"", episode_Name ?: @""];
-                        } else if (series_Name) {
-                            seriesAndEpisode = series_Name;
-                        } else {
-                            seriesAndEpisode = episode_Name;
+                        if (temp_pid) {
+                            oneFound = YES;
                         }
-                        
-                        if (seriesAndEpisode)
-                        oneFound=YES;
-                        Programme *p = [[Programme alloc] initWithPid:temp_pid programmeName:seriesAndEpisode network:temp_tvNetwork logController:_logger];
+
+                        Programme *p = [Programme new];
+                        p.logger = _logger;
+                        p.pid = temp_pid;
+                        p.showName = series_Name;
+                        p.tvNetwork = temp_tvNetwork;
                         p.realPID = temp_pid;
                         p.seriesName = series_Name;
                         p.episodeName = episode_Name;
                         p.url = url;
-                        if ([temp_type isEqualToString:@"radio"]) p.radio = @YES;
+                        p.radio = [temp_type isEqualToString:@"radio"];
                         p.status = @"Added by Series-Link";
                         p.addedByPVR = true;
                         p.lastBroadcast = [dateFormatter dateFromString:temp_date];
@@ -1625,7 +1618,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     NSMutableArray *temptempQueue = [[NSMutableArray alloc] initWithArray:tempQueue];
     for (Programme *show in temptempQueue)
     {
-        if (([show.complete isEqualToNumber:@YES] && [show.successful isEqualToNumber:@YES])
+        if ((show.complete && show.successful)
             || [show.status isEqualToString:@"Added by Series-Link"]
             || show.addedByPVR ) [tempQueue removeObject:show];
     }

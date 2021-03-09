@@ -8,12 +8,9 @@
 
 #import <Foundation/Foundation.h>
 
-@interface ReasonForFailure : NSObject {
-    NSString *showName;
-    NSString *solution;
-}
+@interface ReasonForFailure : NSObject 
 
-@property (readwrite) NSString *showName;
-@property (readwrite) NSString *solution;
+@property (copy) NSString *showName;
+@property (copy) NSString *solution;
 
 @end

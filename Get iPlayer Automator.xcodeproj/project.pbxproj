@@ -12,12 +12,11 @@
 		393D1DEE18A5BBB500F27880 /* RSRTVArrayController.m in Sources */ = {isa = PBXBuildFile; fileRef = 393D1DED18A5BBB500F27880 /* RSRTVArrayController.m */; };
 		396FDA611DA98179003F3F57 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 396FDA5F1DA98179003F3F57 /* MainMenu.xib */; };
 		3975484D1622504F00470DD1 /* ttml2srt.py in Resources */ = {isa = PBXBuildFile; fileRef = 3975484C1622504F00470DD1 /* ttml2srt.py */; };
-		39879DAF16904B9F0050CA7D /* GTMNSString+HTML.m in Sources */ = {isa = PBXBuildFile; fileRef = 39879DAC16904B9F0050CA7D /* GTMNSString+HTML.m */; };
-		39879DB016904B9F0050CA7D /* NSString+HTML.m in Sources */ = {isa = PBXBuildFile; fileRef = 39879DAE16904B9F0050CA7D /* NSString+HTML.m */; };
 		39D52EA81DAAFD450033C4ED /* NPHistoryWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 39D52EA71DAAFD450033C4ED /* NPHistoryWindowController.m */; };
 		39D7C1BD1874AD7400B78698 /* StringTrimFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 39D7C1BC1874AD7400B78698 /* StringTrimFormatter.m */; };
 		39D7C1C01874AD9D00B78698 /* NilToStringTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = 39D7C1BF1874AD9D00B78698 /* NilToStringTransformer.m */; };
 		39FD5E9619D370BD006BC47B /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 39FD5E9519D370BD006BC47B /* Images.xcassets */; };
+		7F01382625F0A7520014703C /* ITVMetadataExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F01382525F0A7520014703C /* ITVMetadataExtractor.swift */; };
 		7F165A10205B92F9005BB78A /* GetITVListings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F165A0F205B92F9005BB78A /* GetITVListings.swift */; };
 		7F165A12205C1ED2005BB78A /* ProgrammeData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F165A11205C1ED2005BB78A /* ProgrammeData.swift */; };
 		7F165A14205C1F15005BB78A /* ProgrammeHistoryEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F165A13205C1F15005BB78A /* ProgrammeHistoryEntry.swift */; };
@@ -117,10 +116,6 @@
 		393D1DEC18A5BBB500F27880 /* RSRTVArrayController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSRTVArrayController.h; sourceTree = "<group>"; };
 		393D1DED18A5BBB500F27880 /* RSRTVArrayController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSRTVArrayController.m; sourceTree = "<group>"; };
 		3975484C1622504F00470DD1 /* ttml2srt.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = ttml2srt.py; sourceTree = "<group>"; };
-		39879DAB16904B9F0050CA7D /* GTMNSString+HTML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "GTMNSString+HTML.h"; sourceTree = "<group>"; };
-		39879DAC16904B9F0050CA7D /* GTMNSString+HTML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "GTMNSString+HTML.m"; sourceTree = "<group>"; };
-		39879DAD16904B9F0050CA7D /* NSString+HTML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+HTML.h"; sourceTree = "<group>"; };
-		39879DAE16904B9F0050CA7D /* NSString+HTML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+HTML.m"; sourceTree = "<group>"; };
 		39D52EA61DAAFD450033C4ED /* NPHistoryWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NPHistoryWindowController.h; sourceTree = "<group>"; };
 		39D52EA71DAAFD450033C4ED /* NPHistoryWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NPHistoryWindowController.m; sourceTree = "<group>"; };
 		39D7C1BB1874AD7400B78698 /* StringTrimFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StringTrimFormatter.h; sourceTree = "<group>"; };
@@ -128,6 +123,7 @@
 		39D7C1BE1874AD9D00B78698 /* NilToStringTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NilToStringTransformer.h; sourceTree = "<group>"; };
 		39D7C1BF1874AD9D00B78698 /* NilToStringTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NilToStringTransformer.m; sourceTree = "<group>"; };
 		39FD5E9519D370BD006BC47B /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = "Get iPlayer Automator/Images.xcassets"; sourceTree = "<group>"; };
+		7F01382525F0A7520014703C /* ITVMetadataExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ITVMetadataExtractor.swift; sourceTree = "<group>"; };
 		7F165A0F205B92F9005BB78A /* GetITVListings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GetITVListings.swift; sourceTree = "<group>"; };
 		7F165A11205C1ED2005BB78A /* ProgrammeData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgrammeData.swift; sourceTree = "<group>"; };
 		7F165A13205C1F15005BB78A /* ProgrammeHistoryEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgrammeHistoryEntry.swift; sourceTree = "<group>"; };
@@ -164,7 +160,7 @@
 		7F9FE9221EC16F160058CB1B /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		7FAA6A24206F36B800B6B50C /* Crypto */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Crypto; sourceTree = "<group>"; };
 		7FAA6A2620744A5C00B6B50C /* pycrypto-2.6.1-py2.7.egg-info */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "pycrypto-2.6.1-py2.7.egg-info"; sourceTree = "<group>"; };
-		7FC8F71B20674B6700DC158C /* youtube-dl */ = {isa = PBXFileReference; lastKnownFileType = file; path = "youtube-dl"; sourceTree = "<group>"; };
+		7FC8F71B20674B6700DC158C /* youtube-dl */ = {isa = PBXFileReference; lastKnownFileType = text; path = "youtube-dl"; sourceTree = "<group>"; };
 		7FEDA8EB24FC982200189D37 /* MicrosoftEdge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MicrosoftEdge.swift; sourceTree = "<group>"; };
 		7FEDA8EC24FC982200189D37 /* MicrosoftEdgeScripting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MicrosoftEdgeScripting.swift; sourceTree = "<group>"; };
 		7FF4174321FC02AE004FF8CE /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -283,6 +279,7 @@
 		29B97314FDCFA39411CA2CEA /* Get_iPlayer GUI */ = {
 			isa = PBXGroup;
 			children = (
+				7F01382525F0A7520014703C /* ITVMetadataExtractor.swift */,
 				7F6B2B2B20EE87D800E4BBDF /* Get iPlayer Automator.entitlements */,
 				D9B6DB97196D938300161ECB /* Interface2.xib */,
 				D9CCF52E10259DED009205BE /* Features.rtf */,
@@ -468,10 +465,6 @@
 			children = (
 				D9F97FEA198EBA94006494A3 /* NSFileManager+DirectoryLocations.h */,
 				D9F97FEB198EBA94006494A3 /* NSFileManager+DirectoryLocations.m */,
-				39879DAB16904B9F0050CA7D /* GTMNSString+HTML.h */,
-				39879DAC16904B9F0050CA7D /* GTMNSString+HTML.m */,
-				39879DAD16904B9F0050CA7D /* NSString+HTML.h */,
-				39879DAE16904B9F0050CA7D /* NSString+HTML.m */,
 			);
 			name = Categories;
 			sourceTree = "<group>";
@@ -628,6 +621,7 @@
 				39D7C1C01874AD9D00B78698 /* NilToStringTransformer.m in Sources */,
 				7F5B1C55211F9EE600BF7E99 /* SBApplicationProtocol.swift in Sources */,
 				D9B6DB9A196D9AEC00161ECB /* LogController.m in Sources */,
+				7F01382625F0A7520014703C /* ITVMetadataExtractor.swift in Sources */,
 				392628B11C999B1A0033CF84 /* EmptyToStringTransformer.m in Sources */,
 				BF382EDB1D73C2E700BAF106 /* Programme.m in Sources */,
 				D9C1D0F01993BBE00034465E /* GetiPlayerProxy.m in Sources */,
@@ -643,8 +637,6 @@
 				7F165A16205C1F8C005BB78A /* NewProgrammeHistory.swift in Sources */,
 				7F5B1C54211F9EE600BF7E99 /* SBObjectProtocol.swift in Sources */,
 				BF382ED91D73C2C700BAF106 /* GiASearch.m in Sources */,
-				39879DAF16904B9F0050CA7D /* GTMNSString+HTML.m in Sources */,
-				39879DB016904B9F0050CA7D /* NSString+HTML.m in Sources */,
 				BF382ED21D73C23400BAF106 /* AppController.m in Sources */,
 				7F5B1C4F211F9E2E00BF7E99 /* Chrome.swift in Sources */,
 				392A41A4169735340053DEA5 /* HTTPProxy.m in Sources */,

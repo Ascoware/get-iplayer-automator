@@ -10,23 +10,7 @@
 
 
 @implementation Series
- - (instancetype)init
-{
-	if (!(self = [super init])) return nil;
-	_showName = [[NSString alloc] init];
-	_tvNetwork = [[NSString alloc] init];
-	_lastFound = [[NSDate alloc] init];
-    _added = @([[NSDate alloc] init].timeIntervalSince1970);
-	return self;
-}
-- (instancetype)initWithShowname:(NSString *)SHOWNAME
-{
-	if (!(self = [super init])) return nil;
-	_showName = [[NSString alloc] initWithString:SHOWNAME];
-	_tvNetwork = [[NSString alloc] init];
-	_lastFound = [NSDate date];
-	return self;
-}
+
 - (void) encodeWithCoder: (NSCoder *)coder
 {
 	[coder encodeObject: _showName forKey:@"showName"];
@@ -34,6 +18,7 @@
 	[coder encodeObject: _tvNetwork forKey:@"tvNetwork"];
 	[coder encodeObject: _lastFound  forKey:@"lastFound"];
 }
+
 - (instancetype) initWithCoder: (NSCoder *)coder
 {
 	if (!(self = [super init])) return nil;
@@ -43,6 +28,7 @@
 	_lastFound = [coder decodeObjectForKey:@"lastFound"];
 	return self;
 }
+
 - (id)description
 {
 	return [NSString stringWithFormat:@"%@ (%@)", _showName,_tvNetwork];

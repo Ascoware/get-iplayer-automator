@@ -28,112 +28,111 @@ extern NSDictionary *radioFormats;
 
 @interface AppController : NSObject <SUUpdaterDelegate, NSApplicationDelegate>
 //General
-@property (nonatomic, readonly) NSString *getiPlayerPath;
-@property (nonatomic, readonly) NSString *perlBinaryPath;
-@property (nonatomic, readonly) NSString *perlEnvironmentPath;
-@property (nonatomic, readonly) NSString *extraBinariesPath;
-@property (nonatomic) IBOutlet NSWindow *mainWindow;
-@property (nonatomic) IBOutlet NSApplication *application;
-@property (nonatomic) IBOutlet NSWindow *historyWindow;
-@property (nonatomic) IOPMAssertionID powerAssertionID;
+@property (readonly) NSString *getiPlayerPath;
+@property (readonly) NSString *perlBinaryPath;
+@property (readonly) NSString *perlEnvironmentPath;
+@property (readonly) NSString *extraBinariesPath;
+@property IBOutlet NSWindow *mainWindow;
+@property IBOutlet NSApplication *application;
+@property IBOutlet NSWindow *historyWindow;
+@property (assign) IOPMAssertionID powerAssertionID;
 
 //Update Components
-@property (nonatomic, nullable) NSTask *getiPlayerUpdateTask;
-@property (nonatomic, nullable) NSPipe *getiPlayerUpdatePipe;
-@property (nonatomic) NSMutableArray *typesToCache;
-@property (nonatomic) BOOL didUpdate;
-@property (nonatomic) BOOL runSinceChange;
-@property (nonatomic) NSUInteger nextToCache;
-@property (nonatomic) NSDictionary *updateURLDic;
-@property (nonatomic) NSDate *lastUpdate;
+@property (nullable) NSTask *getiPlayerUpdateTask;
+@property (nullable) NSPipe *getiPlayerUpdatePipe;
+@property NSMutableArray *typesToCache;
+@property (assign) BOOL didUpdate;
+@property (assign) BOOL runSinceChange;
+@property (assign) NSUInteger nextToCache;
+@property NSDate *lastUpdate;
 
 //Main Window: Search
-@property (nonatomic) IBOutlet NSTextField *searchField;
-@property (nonatomic) IBOutlet NSProgressIndicator *searchIndicator;
-@property (nonatomic) IBOutlet NSArrayController *resultsController;
-@property (nonatomic) IBOutlet NSTableView *searchResultsTable;
-@property (nonatomic) NSMutableArray *searchResultsArray;
-@property (nonatomic, nullable) GiASearch *currentSearch;
+@property IBOutlet NSTextField *searchField;
+@property IBOutlet NSProgressIndicator *searchIndicator;
+@property IBOutlet NSArrayController *resultsController;
+@property IBOutlet NSTableView *searchResultsTable;
+@property NSMutableArray *searchResultsArray;
+@property (nullable) GiASearch *currentSearch;
 
 //PVR
-@property (nonatomic) IBOutlet NSTextField *pvrSearchField;
-@property (nonatomic) IBOutlet NSProgressIndicator *pvrSearchIndicator;
-@property (nonatomic) IBOutlet NSArrayController *pvrResultsController;
-@property (nonatomic) IBOutlet NSArrayController *pvrQueueController;
-@property (nonatomic) IBOutlet NSPanel *pvrPanel;
-@property (nonatomic) NSMutableArray *pvrSearchResultsArray;
-@property (nonatomic) NSMutableArray *pvrQueueArray;
-@property (nonatomic, nullable) GiASearch *currentPVRSearch;
+@property IBOutlet NSTextField *pvrSearchField;
+@property IBOutlet NSProgressIndicator *pvrSearchIndicator;
+@property IBOutlet NSArrayController *pvrResultsController;
+@property IBOutlet NSArrayController *pvrQueueController;
+@property IBOutlet NSPanel *pvrPanel;
+@property NSMutableArray *pvrSearchResultsArray;
+@property NSMutableArray *pvrQueueArray;
+@property (nullable) GiASearch *currentPVRSearch;
 //Queue
-@property (nonatomic) IBOutlet NSButton *addToQueue;
-@property (nonatomic) IBOutlet NSArrayController *queueController;
-@property (nonatomic) NSMutableArray *queueArray;
-@property (nonatomic) IBOutlet NSTableView *queueTableView;
-@property (nonatomic)  IBOutlet NSToolbarItem *addSeriesLinkToQueueButton;
+@property IBOutlet NSButton *addToQueue;
+@property IBOutlet NSArrayController *queueController;
+@property NSMutableArray *queueArray;
+@property IBOutlet NSTableView *queueTableView;
+@property  IBOutlet NSToolbarItem *addSeriesLinkToQueueButton;
 
 //Main Window: Status
-@property (nonatomic) IBOutlet NSProgressIndicator *currentIndicator;
-@property (nonatomic) IBOutlet NSTextField *currentProgress;
+@property IBOutlet NSProgressIndicator *currentIndicator;
+@property IBOutlet NSTextField *currentProgress;
 
 //Download Controller
-@property (nonatomic, nullable) Download *currentDownload;
-@property (nonatomic, nullable) IBOutlet NSToolbarItem *stopButton;
-@property (nonatomic) IBOutlet NSToolbarItem *startButton;
+@property (nullable) Download *currentDownload;
+@property (nullable) IBOutlet NSToolbarItem *stopButton;
+@property IBOutlet NSToolbarItem *startButton;
 
 //Preferences
-@property (nonatomic) NSMutableArray *tvFormatList;
-@property (nonatomic) NSMutableArray *radioFormatList;
-@property (nonatomic) NSMutableArray *itvFormatList;
-@property (nonatomic) IBOutlet NSArrayController *tvFormatController;
-@property (nonatomic) IBOutlet NSArrayController *radioFormatController;
-@property (nonatomic) IBOutlet NSArrayController *itvFormatController;
-@property (nonatomic) IBOutlet NSPanel *prefsPanel;
+@property NSMutableArray *tvFormatList;
+@property NSMutableArray *radioFormatList;
+@property NSMutableArray *itvFormatList;
+@property IBOutlet NSArrayController *tvFormatController;
+@property IBOutlet NSArrayController *radioFormatController;
+@property IBOutlet NSArrayController *itvFormatController;
+@property IBOutlet NSPanel *prefsPanel;
 
 //Scheduling a Start
-@property (nonatomic) IBOutlet NSPanel *scheduleWindow;
-@property (nonatomic) IBOutlet NSDatePicker *datePicker;
-@property (nonatomic) NSTimer *interfaceTimer;
-@property (nonatomic, nullable) NSTimer *scheduleTimer;
-@property (nonatomic) BOOL runScheduled;
+@property IBOutlet NSPanel *scheduleWindow;
+@property IBOutlet NSDatePicker *datePicker;
+@property NSTimer *interfaceTimer;
+@property (nullable) NSTimer *scheduleTimer;
+@property BOOL runScheduled;
 
 //Download Solutions
-@property (nonatomic) IBOutlet NSWindow *solutionsWindow;
-@property (nonatomic) IBOutlet NSArrayController *solutionsArrayController;
-@property (nonatomic) IBOutlet NSTableView *solutionsTableView;
-@property (nonatomic) NSDictionary *solutionsDictionary;
+@property IBOutlet NSWindow *solutionsWindow;
+@property IBOutlet NSArrayController *solutionsArrayController;
+@property IBOutlet NSTableView *solutionsTableView;
+@property NSDictionary *solutionsDictionary;
 
 //PVR list editing
-@property (nonatomic) NilToStringTransformer *nilToEmptyStringTransformer;
-@property (nonatomic) NilToStringTransformer *nilToAsteriskTransformer;
+@property NilToStringTransformer *nilToEmptyStringTransformer;
+@property NilToStringTransformer *nilToAsteriskTransformer;
 
 // Format preferences
-@property (nonatomic) EmptyToStringTransformer *tvFormatTransformer;
-@property (nonatomic) EmptyToStringTransformer *radioFormatTransformer;
-@property (nonatomic) EmptyToStringTransformer *itvFormatTransformer;
+@property EmptyToStringTransformer *tvFormatTransformer;
+@property EmptyToStringTransformer *radioFormatTransformer;
+@property EmptyToStringTransformer *itvFormatTransformer;
 
 //Verbose Logging
-@property (nonatomic) BOOL verbose;
-@property (nonatomic) IBOutlet LogController *logger;
+@property (assign) BOOL verbose;
+@property IBOutlet LogController *logger;
 
 //Proxy
-@property (nonatomic) GetiPlayerProxy *getiPlayerProxy;
-@property (nonatomic) HTTPProxy *proxy;
+@property GetiPlayerProxy *getiPlayerProxy;
+@property HTTPProxy *proxy;
 
 // Misc Menu Items / Buttons
-@property (nonatomic) IBOutlet NSToolbarItem *refreshCacheButton;
-@property (nonatomic) IBOutlet NSMenuItem *forceCacheUpdateMenuItem;
-@property (nonatomic) IBOutlet NSMenuItem *checkForCacheUpdateMenuItem;
+@property IBOutlet NSToolbarItem *refreshCacheButton;
+@property IBOutlet NSMenuItem *forceCacheUpdateMenuItem;
+@property IBOutlet NSMenuItem *checkForCacheUpdateMenuItem;
 
 //ITV Cache
-@property (nonatomic) BOOL updatingITVIndex;
-@property (nonatomic) BOOL updatingBBCIndex;
-@property (nonatomic) BOOL forceITVUpdateInProgress;
-@property (nonatomic) IBOutlet NSMenuItem          *showNewProgrammesMenuItem;
-@property (nonatomic) IBOutlet NSTextField         *itvProgressText;
-@property (nonatomic) IBOutlet NSMenuItem          *forceITVUpdateMenuItem;
+@property (assign) BOOL updatingITVIndex;
+@property (assign) BOOL updatingBBCIndex;
+@property (assign) BOOL forceITVUpdateInProgress;
+@property IBOutlet NSMenuItem          *showNewProgrammesMenuItem;
+@property IBOutlet NSTextField         *itvProgressText;
+@property IBOutlet NSMenuItem          *forceITVUpdateMenuItem;
 
 //New Programmes History
-@property (nonatomic) NSWindow *newestProgrammesWindow;
+@property NSWindow *newestProgrammesWindow;
 @property IBOutlet NSProgressIndicator *itvProgressIndicator;
 
 //Update

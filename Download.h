@@ -16,43 +16,43 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface Download : NSObject
 
-@property (nonatomic) LogController *logger;
+@property LogController *logger;
 
-@property (nonatomic) Programme *show;
+@property Programme *show;
 
-@property (nonatomic, nullable) NSTask *task;
-@property (nonatomic, nullable) NSPipe *pipe;
-@property (nonatomic, nullable) NSPipe *errorPipe;
+@property (nullable) NSTask *task;
+@property (nullable) NSPipe *pipe;
+@property (nullable) NSPipe *errorPipe;
 
 //AtomicParsley Tagging
-@property (nonatomic, nullable) NSTask *apTask;
-@property (nonatomic, nullable) NSPipe *apPipe;
+@property (nullable) NSTask *apTask;
+@property (nullable) NSPipe *apPipe;
 
 //Download Information
-@property (nonatomic, nullable) NSString *subtitleURL;
-@property (nonatomic) NSString *downloadPath;
-@property (nonatomic) NSString *thumbnailPath;
-@property (nonatomic) NSString *subtitlePath;
+@property (nullable) NSString *subtitleURL;
+@property (copy) NSString *downloadPath;
+@property (copy) NSString *thumbnailPath;
+@property (copy) NSString *subtitlePath;
 
 //Subtitle Conversion
-@property (nonatomic, nullable) NSTask *subsTask;
-@property (nonatomic, nullable) NSPipe *subsErrorPipe;
+@property (nullable) NSTask *subsTask;
+@property (nullable) NSPipe *subsErrorPipe;
 
-@property (nonatomic) NSString *defaultsPrefix;
-@property (nonatomic, assign) BOOL running;
+@property (copy) NSString *defaultsPrefix;
+@property (assign) BOOL running;
 
 //Verbose Logging
-@property (nonatomic, assign) BOOL verbose;
+@property (assign) BOOL verbose;
 
 //Proxy Info
-@property (nonatomic, nullable) HTTPProxy *proxy;
+@property (nullable) HTTPProxy *proxy;
 
 // If proxy is set, this will be a session configured with the set proxy.
 // Otherwise, it uses the system (shared) session information.
-@property (nonatomic) NSURLSession *session;
-@property (nonatomic, assign) BOOL isFilm;
+@property NSURLSession *session;
+@property (assign) BOOL isFilm;
 
-@property (nonatomic) NSURLSessionDataTask *currentRequest;
+@property NSURLSessionDataTask *currentRequest;
 
 - (instancetype)initWithLogController:(LogController *)logger;
 - (void)setCurrentProgress:(NSString *)string;

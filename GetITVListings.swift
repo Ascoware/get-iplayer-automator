@@ -346,31 +346,22 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
         //    my @cache_format = qw/index type name episode seriesnum episodenum pid channel available expires duration desc web thumbnail timeadded/;
         let cacheFileHeader = "#index|type|name|episode|seriesnum|episodenum|pid|channel|available|expires|duration|desc|web|thumbnail|timeadded\n"
         var cacheIndexNumber: Int = 100000
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "EEE MMM dd"
         var cachedEpisodeTitle: String = ""
-        let dateFormatter1 = DateFormatter()
-        dateFormatter1.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZZ"
-        dateFormatter1.timeZone = TimeZone(secondsFromGMT: 0)
-        var dateAiredString: String? = nil
+        let isoFormatter = DateFormatter()
+        isoFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZZ"
+        isoFormatter.timeZone = TimeZone(secondsFromGMT: 0)
         var cacheFileEntries = [String]()
         cacheFileEntries.append(cacheFileHeader)
         
         for episode: ProgrammeData in episodes {
             var cacheFileContentString = ""
-
-            if let timeDateLastAired = episode.timeDateLastAired {
-                dateAiredString = dateFormatter1.string(from: timeDateLastAired)
-            } else {
-                dateAiredString = dateFormatter1.string(from: Date())
-            }
+            let dateAiredString = isoFormatter.string(from: episode.timeDateLastAired ?? Date())
 
             if !episode.episodeTitle.isEmpty {
                 cachedEpisodeTitle = episode.episodeTitle
             } else {
-                cachedEpisodeTitle = dateAiredString ?? ""
+                cachedEpisodeTitle = DateFormatter.localizedString(from: episode.timeDateLastAired ?? Date(), dateStyle: .medium, timeStyle: .none)
             }
-
 
             let dateAddedInteger: TimeInterval
             if let timeAdded = episode.timeAdded {
@@ -389,10 +380,7 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
             cacheFileContentString += "|\(episode.seriesNumber)|\(episode.episodeNumber)|"
             cacheFileContentString += episode.productionId
             cacheFileContentString += "|ITV Player|"
-            if let aString = dateAiredString {
-                cacheFileContentString += aString
-            }
-            
+            cacheFileContentString += dateAiredString
             cacheFileContentString += "|||\(episode.programDescription)"
             cacheFileContentString += "|"
             cacheFileContentString += episode.programmeURL
