@@ -129,7 +129,7 @@
     }
 
     self.metadataTask.standardOutput = self.pipe;
-    self.metadataTask.standardOutput = self.errorPipe;
+    self.metadataTask.standardError = self.errorPipe;
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(metadataRetrievalDataReady:) name:NSFileHandleReadCompletionNotification object:self.pipe.fileHandleForReading];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(metadataRetrievalDataReady:) name:NSFileHandleReadCompletionNotification object:self.errorPipe.fileHandleForReading];
@@ -366,23 +366,13 @@
 
 - (void)getName
 {
-    // skip if pid looks like ITV productionId
-//    if ([_pid rangeOfString:@"/"].location != NSNotFound ||
-//        [_pid rangeOfString:@"#"].location != NSNotFound) {
-//
-//        if ( [[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheITV_TV"] isEqualTo:@YES] )
-//            self.status = @"New ITV Cache";
-//        else
-//            self.status = @"Undetermined-ITV";
-//        return;
-//    }
     @autoreleasepool {
         getNameRunning = true;
         
         NSTask *getNameTask = [[NSTask alloc] init];
         NSPipe *getNamePipe = [[NSPipe alloc] init];
         NSMutableString *getNameData = [[NSMutableString alloc] initWithString:@""];
-        NSString *listArgument = @"--listformat=<index>|<pid>|<type>|<name>|<episode>|<channel>|<available>|<web>";
+        NSString *listArgument = @"--listformat=<index>|<pid>|<type>|<name>|<episode>|<episodeNum>|<channel>|<available>|<web>";
         NSString *fieldsArgument = @"--fields=index,pid";
         NSString *wantedID = _pid;
         NSString *cacheExpiryArg = [[GetiPlayerArguments sharedController] cacheExpiryArgument:nil];
@@ -435,16 +425,17 @@
             continue;
         }
 
-        NSString *pid, *showName, *episode, *index, *type, *tvNetwork, *url, *dateAired;
+        NSString *pid, *showName, *episode, *episodeNum, *index, *type, *tvNetwork, *url, *dateAired;
         @try{
             index = elements[0];
             pid = elements[1];
             type = elements[2];
             showName = elements[3];
             episode = elements[4];
-            tvNetwork = elements[5];
-            dateAired = elements[6];
-            url = elements[7];
+            episodeNum = elements[5];
+            tvNetwork = elements[6];
+            dateAired = elements[7];
+            url = elements[8];
         }
         @catch (NSException *e) {
             NSAlert *getNameException = [[NSAlert alloc] init];

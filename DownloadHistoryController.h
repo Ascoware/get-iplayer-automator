@@ -11,7 +11,6 @@
 extern bool runDownloads;
 
 @interface DownloadHistoryController : NSObject {
-	NSMutableArray *history;
 	IBOutlet NSArrayController *historyArrayController;
 	IBOutlet NSWindow *historyWindow;
 	IBOutlet NSButton *cancelButton;
@@ -19,7 +18,6 @@ extern bool runDownloads;
 }
 - (IBAction)showHistoryWindow:(id)sender;
 - (IBAction)removeSelectedFromHistory:(id)sender;
-- (void)readHistory:(id)sender;
 - (IBAction)writeHistory:(id)sender;
 - (IBAction)cancelChanges:(id)sender;
 - (void)addToLog:(NSString *)logMessage;

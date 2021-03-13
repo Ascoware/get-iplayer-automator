@@ -20,11 +20,6 @@ class ITVMetadataExtractor {
         longDateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mmZ"
         longDateFormatter.locale = enUSPOSIXLocale
 
-        let shortDateFormatter = DateFormatter()
-        shortDateFormatter.dateFormat = "EEE MMM dd"
-        shortDateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
-        shortDateFormatter.locale = enUSPOSIXLocale
-
         let newProgram = Programme()
 
         if let htmlPage = try? HTML(html: htmlPageContent, encoding: .utf8) {
@@ -70,6 +65,10 @@ class ITVMetadataExtractor {
             }
         }
 
+        if newProgram.season != 0 {
+            newProgram.showName += ": Season \(newProgram.season)"
+        }
+
         if !episodeID.isEmpty {
             // At this point all we have left is the production ID.
             // A series number doesn't make much sense, so just parse out an episode number.
@@ -81,7 +80,7 @@ class ITVMetadataExtractor {
 
         if newProgram.episodeName.isEmpty {
             if let timeAired = timeAired {
-                let shortDate = shortDateFormatter.string(from: timeAired)
+                let shortDate = DateFormatter.localizedString(from: timeAired, dateStyle: .medium, timeStyle: .none)
                 newProgram.episodeName = shortDate
             }
         }

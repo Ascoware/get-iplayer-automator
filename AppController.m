@@ -715,7 +715,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
             NSString *string = [NSString stringWithString:taskData];
             NSArray *array = [string componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
             NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-            dateFormatter.dateFormat = @"yyyy'-'MM'-'dd'T'HH':'mm':'ssZZZZZ";
+            dateFormatter.dateFormat = @"yyyy-MM-dd'T'HH:mm:ssZZZZZ";
 
             for (NSString *string in array)
             {

@@ -20,6 +20,4 @@
 @property (copy) NSString *downloadPath;
 @property (readonly, copy) NSString *entryString;
 
-- (instancetype)initWithPID:(NSString *)temp_pid showName:(NSString *)temp_showName episodeName:(NSString *)temp_episodeName type:(NSString *)temp_type someNumber:(NSString *)temp_someNumber downloadFormat:(NSString *)temp_downloadFormat downloadPath:(NSString *)temp_downloadPath;
-
 @end

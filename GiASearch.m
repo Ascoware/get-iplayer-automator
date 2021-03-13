@@ -14,58 +14,64 @@
 {
     if (!(self = [super init])) return nil;
     
-    if(searchTerms.length > 0)
+    if (searchTerms.length > 0)
     {
-        _task = [[NSTask alloc] init];
-        _pipe = [[NSPipe alloc] init];
-        _errorPipe = [[NSPipe alloc] init];
-        _selector = selector;
-        _target = target;
-        _logger = logger;
+        self.task = [[NSTask alloc] init];
+        self.pipe = [[NSPipe alloc] init];
+        self.errorPipe = [[NSPipe alloc] init];
+
+        self.selector = selector;
+        self.target = target;
+        self.logger = logger;
         
-        _task.launchPath = [[AppController sharedController] perlBinaryPath];
+        self.task.launchPath = [[AppController sharedController] perlBinaryPath];
         NSString *typeArg = [[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO andIncludeITV:YES];
         NSArray *args = @[
             [[AppController sharedController] getiPlayerPath],
             @"--nocopyright",
             @"-e60480000000000000",
-            typeArg, @"--listformat=SearchResult|<pid>|<available>|<type>|<name>|<episode>|<channel>|<seriesnum>|<episodenum>|<desc>|<thumbnail>|<web>|<available>", @"--long",
+            typeArg,
+            @"--listformat=SearchResult|<pid>|<available>|<type>|<name>|<episode>|<channel>|<seriesnum>|<episodenum>|<desc>|<thumbnail>|<web>|<available>", @"--long",
             @"--nopurge",
             @"--search",
             searchTerms,
             [GetiPlayerArguments sharedController].profileDirArg];
         
         if (![[[NSUserDefaults standardUserDefaults] valueForKey:@"ShowDownloadedInSearch"] boolValue] && allowHidingOfDownloadedItems) {
-            args=[args arrayByAddingObject:@"--hide"];
+            args = [args arrayByAddingObject:@"--hide"];
         }
         
         for (NSString *arg in args) {
             [_logger addToLog: arg];
         }
         
-        _task.arguments = args;
-        _task.standardOutput = _pipe;
-        _task.standardError = _errorPipe;
+        self.task.arguments = args;
+        self.task.standardOutput = self.pipe;
+        self.task.standardError = self.errorPipe;
 
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(searchDataReadyNotification:)
                                                      name:NSFileHandleReadCompletionNotification
-                                                   object:_pipe.fileHandleForReading];
-        [_pipe.fileHandleForReading readInBackgroundAndNotify];
-        
+                                                   object:self.pipe.fileHandleForReading];
+        [self.pipe.fileHandleForReading readInBackgroundAndNotify];
+
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(searchDataReadyNotification:)
                                                      name:NSFileHandleReadCompletionNotification
-                                                   object:_errorPipe.fileHandleForReading];
-        [_errorPipe.fileHandleForReading readInBackgroundAndNotify];
-        
+                                                   object:self.errorPipe.fileHandleForReading];
+        [self.errorPipe.fileHandleForReading readInBackgroundAndNotify];
+
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(searchFinished:)
+                                                     name:NSTaskDidTerminateNotification
+                                                   object:self.task];
         _data = [[NSMutableString alloc] init];
-        NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:_task.environment];
+        NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:self.task.environment];
         envVariableDictionary[@"HOME"] = (@"~").stringByExpandingTildeInPath;
         envVariableDictionary[@"PERL_UNICODE"] = @"AS";
         envVariableDictionary[@"PATH"] = [[AppController sharedController] perlEnvironmentPath];
-        _task.environment = envVariableDictionary;
-        [_task launch];
+        self.task.environment = envVariableDictionary;
+        [self.task launch];
     }
     else {
         [[NSException exceptionWithName:@"EmptySearchArguments" reason:@"The search arguments string provided was nil or empty." userInfo:nil] raise];
@@ -74,35 +80,30 @@
     return self;
 }
 
-- (void)searchDataReadyNotification:(NSNotification *)n
+- (void)searchDataReadyNotification:(NSNotification *)notification
 {
-    NSData *d = n.userInfo[NSFileHandleNotificationDataItem];
-    [self searchDataReady:d];
-}
+    NSData *d = [notification.userInfo valueForKey:NSFileHandleNotificationDataItem];
 
-- (void)searchDataReady:(NSData *)d
-{
     if (d.length > 0) {
         NSString *s = [[NSString alloc] initWithData:d
                                             encoding:NSUTF8StringEncoding];
         [_data appendString:s];
     }
-    
-    if (_task.isRunning) {
-        [_pipe.fileHandleForReading readInBackgroundAndNotify];
-        [_errorPipe.fileHandleForReading readInBackgroundAndNotify];
-    }
-    else {
-        [self performSelectorOnMainThread:@selector(searchFinished:) withObject:nil waitUntilDone:NO];
-    }
+
+    NSFileHandle *fh = [notification object];
+    [fh readInBackgroundAndNotify];
 }
 
-- (void)searchFinished:(NSNotification *)N
+- (void)searchFinished:(NSNotification *)notification
 {
     NSArray *array = [_data componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
     NSMutableArray *resultsArray = [[NSMutableArray alloc] initWithCapacity:array.count];
     NSDateFormatter *rawDateParser = [[NSDateFormatter alloc]init];
     NSLocale *enUSPOSIXLocale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
+
+    self.task = nil;
+    self.pipe = nil;
+    self.errorPipe = nil;
     
     rawDateParser.locale = enUSPOSIXLocale;
     rawDateParser.dateFormat = @"yyyy-MM-dd'T'HH:mm:ssZZZZZ";
