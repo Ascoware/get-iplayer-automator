@@ -18,7 +18,6 @@
 		39FD5E9619D370BD006BC47B /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 39FD5E9519D370BD006BC47B /* Images.xcassets */; };
 		7F01382625F0A7520014703C /* ITVMetadataExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F01382525F0A7520014703C /* ITVMetadataExtractor.swift */; };
 		7F165A10205B92F9005BB78A /* GetITVListings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F165A0F205B92F9005BB78A /* GetITVListings.swift */; };
-		7F165A12205C1ED2005BB78A /* ProgrammeData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F165A11205C1ED2005BB78A /* ProgrammeData.swift */; };
 		7F165A14205C1F15005BB78A /* ProgrammeHistoryEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F165A13205C1F15005BB78A /* ProgrammeHistoryEntry.swift */; };
 		7F165A16205C1F8C005BB78A /* NewProgrammeHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F165A15205C1F8C005BB78A /* NewProgrammeHistory.swift */; };
 		7F165A18205C4051005BB78A /* NSScanner+Swift.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F165A17205C4051005BB78A /* NSScanner+Swift.swift */; };
@@ -125,7 +124,6 @@
 		39FD5E9519D370BD006BC47B /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = "Get iPlayer Automator/Images.xcassets"; sourceTree = "<group>"; };
 		7F01382525F0A7520014703C /* ITVMetadataExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ITVMetadataExtractor.swift; sourceTree = "<group>"; };
 		7F165A0F205B92F9005BB78A /* GetITVListings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GetITVListings.swift; sourceTree = "<group>"; };
-		7F165A11205C1ED2005BB78A /* ProgrammeData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgrammeData.swift; sourceTree = "<group>"; };
 		7F165A13205C1F15005BB78A /* ProgrammeHistoryEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgrammeHistoryEntry.swift; sourceTree = "<group>"; };
 		7F165A15205C1F8C005BB78A /* NewProgrammeHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewProgrammeHistory.swift; sourceTree = "<group>"; };
 		7F165A17205C4051005BB78A /* NSScanner+Swift.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSScanner+Swift.swift"; sourceTree = "<group>"; };
@@ -431,7 +429,6 @@
 				7F5B1C4A211F9E2D00BF7E99 /* Safari.swift */,
 				7F5B1C4D211F9E2E00BF7E99 /* SafariScripting.swift */,
 				7F165A15205C1F8C005BB78A /* NewProgrammeHistory.swift */,
-				7F165A11205C1ED2005BB78A /* ProgrammeData.swift */,
 				39D52EA61DAAFD450033C4ED /* NPHistoryWindowController.h */,
 				39D52EA71DAAFD450033C4ED /* NPHistoryWindowController.m */,
 				7F165A0F205B92F9005BB78A /* GetITVListings.swift */,
@@ -608,7 +605,6 @@
 				D97D9426106DBB68006ECD39 /* TVFormat.m in Sources */,
 				D97D9427106DBB68006ECD39 /* RadioFormat.m in Sources */,
 				7FEDA8EE24FC982200189D37 /* MicrosoftEdgeScripting.swift in Sources */,
-				7F165A12205C1ED2005BB78A /* ProgrammeData.swift in Sources */,
 				D9F97FE5198E9043006494A3 /* GetCurrentWebpage.swift in Sources */,
 				7F165A18205C4051005BB78A /* NSScanner+Swift.swift in Sources */,
 				7F54B1B11FFD656C006D1325 /* ITVDownload.swift in Sources */,

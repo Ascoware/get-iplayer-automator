@@ -57,7 +57,7 @@ typedef NS_ENUM(NSInteger, GIA_ProgrammeType) {
 @property (copy) NSString *thumbnailURLString;
 @property NSImage *thumbnail;
     
-@property (copy) NSMutableString *taskOutput;
+@property NSMutableString *taskOutput;
 @property (nullable) NSPipe *pipe;
 @property (nullable) NSPipe *errorPipe;
 @property (nullable) NSTask *metadataTask;

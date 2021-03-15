@@ -1401,8 +1401,11 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 {
     @autoreleasepool {
         NSArray *seriesLink = _pvrQueueController.arrangedObjects;
-        if (!runDownloads)
+
+        if (!runDownloads) {
             [_currentProgress performSelectorOnMainThread:@selector(setStringValue:) withObject:@"Updating Series Link..." waitUntilDone:YES];
+        }
+
         NSMutableArray *seriesToBeRemoved = [[NSMutableArray alloc] init];
         for (Series *series in seriesLink) {
             if (!runDownloads) {
@@ -1419,7 +1422,8 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 
             NSMutableArray *autoRecordArgs = [[NSMutableArray alloc] initWithObjects:
                                               _getiPlayerPath,
-                                              [GetiPlayerArguments sharedController].noWarningArg,@"--nopurge",
+                                              [GetiPlayerArguments sharedController].noWarningArg,
+                                              @"--nopurge",
                                               @"--listformat=<pid>|<type>|<name>|<episode>|<channel>|<timeadded>|<web>|<available>",
                                               cacheExpiryArgument,
                                               typeArgument,
@@ -1450,29 +1454,31 @@ static NSString *FORCE_RELOAD = @"ForceReload";
                 [seriesToBeRemoved addObject:series];
             }
         }
+
+        if (!runDownloads) {
+            [_currentProgress performSelectorOnMainThread:@selector(setStringValue:) withObject:@"" waitUntilDone:NO];
+        }
+
         [_pvrQueueController performSelectorOnMainThread:@selector(removeObjects:) withObject:seriesToBeRemoved waitUntilDone:NO];
     }
 }
 - (void)seriesLinkFinished:(NSNotification *)note
 {
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"NSThreadWillExitNotification" object:nil];
+
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSLog(@"Thread Finished Notification Received");
-        if (!runDownloads)
-        {
-            self.currentProgress.stringValue = @"";
+        if (!runDownloads) {
             [self.currentIndicator setIndeterminate:NO];
             [self.currentIndicator stopAnimation:self];
             [self.startButton setEnabled:YES];
         }
-        [[NSNotificationCenter defaultCenter] removeObserver:self name:@"NSThreadWillExitNotification" object:nil];
 
         //If this is an update initiated by the scheduler, run the downloads.
-        if (self.runScheduled && !self.scheduleTimer)
-        {
+        if (self.runScheduled && !self.scheduleTimer) {
             [self performSelectorOnMainThread:@selector(startDownloads:) withObject:self waitUntilDone:NO];
         }
+
         [self performSelectorOnMainThread:@selector(scheduleTimerForFinished:) withObject:nil waitUntilDone:NO];
-        NSLog(@"Series-Link Thread Finished");
     });
 }
 

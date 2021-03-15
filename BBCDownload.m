@@ -323,10 +323,16 @@
     //Parse each line individually.
     for (NSString *output in array)
     {
-        if (output.length > 0) {
-            [self addToLog:output noTag:YES];
+        if ([output hasPrefix:@"DEBUG:"]) {
+            continue;
         }
 
+        if (self.verbose) {
+            if (output.length > 0) {
+                [self addToLog:output noTag:YES];
+            }
+        }
+        
         if ([output hasPrefix:@"INFO: Downloading subtitles"])
         {
             NSScanner *scanner = [NSScanner scannerWithString:output];

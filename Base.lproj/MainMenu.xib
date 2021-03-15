@@ -806,9 +806,9 @@
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                             </tableHeaderCell>
-                                            <buttonCell key="dataCell" type="round" title="i" bezelStyle="circular" alignment="center" borderStyle="border" inset="2" id="XHg-RH-n5D">
+                                            <buttonCell key="dataCell" type="round" title="i" bezelStyle="circular" alignment="center" controlSize="small" borderStyle="border" inset="2" id="XHg-RH-n5D">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="system"/>
+                                                <font key="font" metaFont="smallSystem"/>
                                                 <connections>
                                                     <action selector="showExtendedInformationForSelectedProgramme:" target="GOW-LV-QLu" id="J4N-jS-WMw"/>
                                                 </connections>
@@ -892,7 +892,7 @@
                         </connections>
                     </button>
                     <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="788">
-                        <rect key="frame" x="341" y="493" width="118" height="17"/>
+                        <rect key="frame" x="342" y="493" width="118" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Search Results" id="789">
                             <font key="font" metaFont="system"/>

@@ -33,7 +33,7 @@
 
 -(void)awakeFromNib {
     _log.textColor = [NSColor whiteColor];
-    _log.font = [NSFont fontWithName:@"Monaco" size:12];
+    _log.font = [NSFont userFixedPitchFontOfSize:12.0];
 }
 
 - (void)showLog:(id)sender
@@ -78,7 +78,7 @@
                             value:[NSColor whiteColor]
                             range:NSMakeRange(0, current_log.length)];
         
-        NSFont *logFont =  [NSFont fontWithName:@"Monaco" size:12.0];
+        NSFont *logFont =  [NSFont userFixedPitchFontOfSize:12.0];
         [current_log addAttribute:NSFontAttributeName
                             value:logFont
                             range:NSMakeRange(0, current_log.length)];
