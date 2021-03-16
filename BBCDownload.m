@@ -352,10 +352,6 @@
         }
         else if ([output hasPrefix:@"INFO: No specified modes"] && [output hasSuffix:@"--modes=)"])
         {
-            self.reasonForFailure=@"proxy";
-        }
-        else if ([output hasPrefix:@"INFO: No specified modes"])
-        {
             self.reasonForFailure = @"Specified_Modes";
             NSScanner *modeScanner = [NSScanner scannerWithString:output];
             [modeScanner scanUpToString:@"--modes=" intoString:nil];

@@ -579,7 +579,7 @@
 - (void)processGetNameDataFromPID:(NSString *)getNameData
 {
     NSArray *array = [getNameData componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
-    NSString *available = nil, *versions = nil, *title = nil, *type = nil;
+    NSString *available = nil, *name = @"", *series = @"", *episode = @"", *type = @"";
     NSDate *broadcastDate = nil;
     
     for (NSString *string in array)
@@ -593,25 +593,30 @@
             available = [available stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
         }
         
-        if ([string hasPrefix:@"title:"]) {
+        if ([string hasPrefix:@"name:"]) {
             NSScanner *scanner = [NSScanner scannerWithString:string];
-            [scanner scanString:@"title:" intoString:nil];
-            [scanner scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet] intoString:&title];
-            title = [title stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+            [scanner scanString:@"name:" intoString:nil];
+            [scanner scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet] intoString:&name];
+            name = [name stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
         }
-        
-        if ([string hasPrefix:@"versions:"]) {
+        if ([string hasPrefix:@"nameshort:"]) {
             NSScanner *scanner = [NSScanner scannerWithString:string];
-            [scanner scanString:@"versions:" intoString:nil];
-            [scanner scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet] intoString:&versions];
-            versions = [versions stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+            [scanner scanString:@"nameshort:" intoString:nil];
+            [scanner scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet] intoString:&series];
+            series = [series stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
         }
-        
+
+        if ([string hasPrefix:@"episodeshort:"]) {
+            NSScanner *scanner = [NSScanner scannerWithString:string];
+            [scanner scanString:@"episodeshort:" intoString:nil];
+            [scanner scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet] intoString:&episode];
+            episode = [episode stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+        }
         if ([string hasPrefix:@"type:"]) {
             NSScanner *scanner = [NSScanner scannerWithString:string];
-            [scanner scanString:@"radio:" intoString:nil];
+            [scanner scanString:@"type:" intoString:nil];
             [scanner scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet] intoString:&type];
-            type = [versions stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+            type = [type stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
         }
         // firstbcastdate: 2005-04-09
         
@@ -645,12 +650,13 @@
         self.radio = YES;
     }
     
-    if (title) {
-        self.showName = title;
+    if (name) {
+        self.showName = name;
     } else {
         self.showName = @"Unknown: PID Not Found";
     }
-    
+    self.seriesName = series;
+    self.episodeName = episode;
     self.processedPID = NO;
 }
 
