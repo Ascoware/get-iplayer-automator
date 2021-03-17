@@ -19,7 +19,7 @@
 - (instancetype)init
 {
     if (self = [super init]) {
-        _status = runDownloads ? @"Waiting..." : @"";
+        _status = runDownloads ? @"Waiting…" : @"";
     }
     return self;
 }
@@ -468,7 +468,7 @@
                 self.url = url;
             }
             
-            self.status = runDownloads ? @"Waiting..." : @"Available";
+            self.status = runDownloads ? @"Waiting…" : @"Available";
             
             if ([type isEqualToString:@"radio"]) {
                 self.radio = YES;
@@ -579,64 +579,66 @@
 - (void)processGetNameDataFromPID:(NSString *)getNameData
 {
     NSArray *array = [getNameData componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
-    NSString *available = nil, *name = @"", *series = @"", *episode = @"", *type = @"";
-    NSDate *broadcastDate = nil;
-    
-    for (NSString *string in array)
-    {
-        // get_iplayer reports back "(available versions: none)" if a PID is invalid or unavailable for any reason.
-        // If we don't find that string we can assume it's available in some format.
-        if ([string containsString:@"(available versions: "]) {
-            NSScanner *scanner = [NSScanner scannerWithString:string];
-            [scanner scanString:@"(available versions: " intoString:nil];
-            [scanner scanUpToString:@")" intoString:&available];
-            available = [available stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-        }
-        
-        if ([string hasPrefix:@"name:"]) {
-            NSScanner *scanner = [NSScanner scannerWithString:string];
-            [scanner scanString:@"name:" intoString:nil];
-            [scanner scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet] intoString:&name];
-            name = [name stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-        }
-        if ([string hasPrefix:@"nameshort:"]) {
-            NSScanner *scanner = [NSScanner scannerWithString:string];
-            [scanner scanString:@"nameshort:" intoString:nil];
-            [scanner scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet] intoString:&series];
-            series = [series stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    NSMutableArray *validOutput = [NSMutableArray array];
+
+    for (NSString *line in array) {
+        if (line.length == 0) {
+            continue;
         }
 
-        if ([string hasPrefix:@"episodeshort:"]) {
-            NSScanner *scanner = [NSScanner scannerWithString:string];
-            [scanner scanString:@"episodeshort:" intoString:nil];
-            [scanner scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet] intoString:&episode];
-            episode = [episode stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+        if ([line hasPrefix:@"ERROR:"] || [line hasPrefix:@"WARN:"] || [line hasPrefix:@"Episodes:"]) {
+            continue;
         }
-        if ([string hasPrefix:@"type:"]) {
-            NSScanner *scanner = [NSScanner scannerWithString:string];
-            [scanner scanString:@"type:" intoString:nil];
-            [scanner scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet] intoString:&type];
-            type = [type stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+
+        [validOutput addObject:line];
+    }
+
+    NSString *available = nil, *name = @"", *series = @"", *episode = @"", *type = @"";
+    NSDate *broadcastDate = nil;
+    NSISO8601DateFormatter *isoDateFormatter = [NSISO8601DateFormatter new];
+    isoDateFormatter.formatOptions = NSISO8601DateFormatWithInternetDateTime;
+
+    for (NSString *line in validOutput)
+    {
+        NSString *key, *value;
+        NSScanner *scanner = [NSScanner scannerWithString:line];
+        [scanner scanUpToString:@":" intoString:&key];
+        [scanner scanString:@":" intoString:nil];
+        [scanner scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet] intoString:&value];
+        value = [value stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+
+        // get_iplayer reports back "(available versions: none)" if a PID is invalid or unavailable for any reason.
+        // If we don't find that string we can assume it's available in some format.
+        if ([key isEqualToString:@"INFO"] && [value containsString:@"(available versions: "]) {
+            NSScanner *scanner = [NSScanner scannerWithString:value];
+            [scanner scanUpToString:@"(available versions: " intoString:nil];
+            [scanner scanUpToString:@")" intoString:&available];
         }
-        // firstbcastdate: 2005-04-09
         
-        if ([string hasPrefix:@"firstbcastdate:"]) {
-            NSString *dateString = nil;
-            NSScanner *scanner = [NSScanner scannerWithString:string];
-            [scanner scanString:@"firstbcastdate:" intoString:nil];
-            [scanner scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet] intoString:&dateString];
-            dateString = [dateString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-            NSDateFormatter *shortDateFormatter = [[NSDateFormatter alloc] init];
-            shortDateFormatter.dateFormat = @"yyyy-MM-dd";
-            broadcastDate = [shortDateFormatter dateFromString:dateString];
-            
+        if ([key isEqualToString:@"name"]) {
+            name = value;
+        }
+        if ([key isEqualToString:@"nameshort"]) {
+            series = value;
+        }
+
+        if ([key isEqualToString:@"episodeshort"]) {
+            episode = value;
+        }
+
+        if ([key isEqualToString:@"type"]) {
+            type = value;
+        }
+
+        if ([key isEqualToString:@"firstbcast"]) {
+            broadcastDate = [isoDateFormatter dateFromString:value];
         }
     }
     
     if ([available isEqualToString:@"none"]) {
         self.status = @"Not Available";
     } else {
-        self.status = @"Available";
+        self.status = runDownloads ? @"Waiting…" : @"Available";
     }
     
     if (broadcastDate) {

@@ -858,7 +858,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     {
         if (![_queueController.arrangedObjects containsObject:show])
         {
-            if (runDownloads) show.status = @"Waiting...";
+            if (runDownloads) show.status = @"Waiting…";
             else show.status = @"Available";
             [_queueController addObject:show];
         }
@@ -901,7 +901,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         NSArray *selected = _queueController.selectedObjects;
         for (Programme *show in selected)
         {
-            if (![show.status isEqualToString:@"Waiting..."] && !show.complete)
+            if (![show.status isEqualToString:@"Waiting…"] && !show.complete)
             {
                 downloading = YES;
             }
@@ -999,7 +999,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
                 if (show.processedPID)
                 {
                     show.complete = NO;
-                    show.status = @"Waiting...";
+                    show.status = @"Waiting…";
                     foundOne=YES;
                 }
                 else
@@ -1015,7 +1015,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
                     else
                     {
                         show.complete = NO;
-                        show.status = @"Waiting...";
+                        show.status = @"Waiting…";
                         foundOne=YES;
                     }
                 }
@@ -1113,7 +1113,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 
     NSArray *tempQueue = _queueController.arrangedObjects;
     for (Programme *show in tempQueue)
-        if ([show.status isEqualToString:@"Waiting..."]) show.status = @"";
+        if ([show.status isEqualToString:@"Waiting…"]) show.status = @"";
 
     [NSTimer scheduledTimerWithTimeInterval:2.0 target:self selector:@selector(fixDownloadStatus:) userInfo:_currentDownload repeats:NO];
 }
@@ -1563,7 +1563,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
                         }
                         if (!inQueue)
                         {
-                            if (runDownloads) p.status = @"Waiting...";
+                            if (runDownloads) p.status = @"Waiting…";
                             [_queueController performSelectorOnMainThread:@selector(addObject:) withObject:p waitUntilDone:NO];
                         }
                     }

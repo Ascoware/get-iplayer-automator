@@ -152,7 +152,7 @@ import ScriptingBridge
         }
         
         // If we have a PID we can search for it.
-        if newProgram?.pid == nil {
+        guard let pid = newProgram?.pid, !pid.isEmpty else {
             let invalidPage = NSAlert()
             invalidPage.addButton(withTitle: "OK")
             invalidPage.messageText = "Programme Page Not Found"

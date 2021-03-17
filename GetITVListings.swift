@@ -42,7 +42,8 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
         logger?.add(toLog: "GetITVShows: ITV Cache Update Starting ")
         getITVShowRunning = true
         myQueueSize = 0
-        episodes = []
+        episodes.removeAll()
+        programmes.removeAll()
         
         /* Create the NUSRLSession */
         let defaultConfigObject = URLSessionConfiguration.default
@@ -335,8 +336,12 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
         cacheFileEntries.append(cacheFileHeader)
         let creationTime = Date()
 
-        for episode in episodes {
+        episodes.forEach { episode in
             var cacheEntry = ""
+            if episode.pid.isEmpty {
+                print("WARN: Bad episode object \(episode) ")
+                return
+            }
             let dateAiredString = isoFormatter.string(from: episode.lastBroadcast)
 
             if episode.episodeName.isEmpty {
