@@ -219,6 +219,10 @@ public class ITVDownload : Download {
                 scanner.scanString("[download]")
                 self.show.path = scanner.scanUpToString("has already been downloaded")?.trimmingCharacters(in: .whitespaces) ?? ""
             }
+
+            if line.hasPrefix("WARNING: Failed to download m3u8 information") {
+                self.show.reasonForFailure = "proxy"
+            }
         }
     }
     

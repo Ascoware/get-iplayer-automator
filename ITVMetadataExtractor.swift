@@ -69,9 +69,9 @@ class ITVMetadataExtractor {
             newProgram.showName += ": Season \(newProgram.season)"
         }
 
-        if !episodeID.isEmpty {
-            // At this point all we have left is the production ID.
-            // A series number doesn't make much sense, so just parse out an episode number.
+        if !episodeID.isEmpty && newProgram.episode == 0 {
+            // At this point all we have left is the production ID, if we haven't found an episode number
+            // in the show metadata. A series number doesn't make much sense, so just parse out an episode number.
             let programIDElements = episodeID.split(separator: "/")
             if let lastElement = programIDElements.last, let intLastElement = Int(lastElement) {
                 newProgram.episode = intLastElement

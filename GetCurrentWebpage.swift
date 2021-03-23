@@ -8,6 +8,7 @@
 //
 
 import ScriptingBridge
+import Kanna
 
 @objcMembers public class GetCurrentWebpage : NSObject {
     
@@ -24,7 +25,24 @@ import ScriptingBridge
             nameScanner.scanString("BBC iPlayer - ")
             show.showName = nameScanner.scanUpToString( " - ") ?? ""
             show.tvNetwork = "BBC"
-            // TODO: Get the series/episode info from the tail.
+        } else if url.hasPrefix("https://www.bbc.co.uk/iplayer/episodes/") {
+            // https://www.bbc.co.uk/iplayer/episodes/p00yzlr0/line-of-duty?seriesId=b01k9pm3
+            // It looks like a PID, but it's a 'brand ID' The real URL is embedded in an anchor tag.
+            if let htmlPage = try? HTML(html: pageSource, encoding: .utf8) {
+                // There should only be one 'video' element.
+                if let anchorElement = htmlPage.at_xpath("//a[@class='play-cta__inner play-cta__inner--do-not-wrap play-cta__inner--link']") {
+                    let showURLString = anchorElement.at_xpath("//@href")?.text ?? ""
+                    if let pageURL = URL(string: url), let showURL = URL(string: showURLString, relativeTo: pageURL) {
+                        show.pid = showURL.deletingLastPathComponent().lastPathComponent
+                        show.url = showURL.absoluteString
+                    }
+                }
+            }
+
+            let nameScanner = Scanner(string: tabTitle)
+            nameScanner.scanString("BBC iPlayer - ")
+            show.showName = nameScanner.scanUpToString( " - ") ?? ""
+            show.tvNetwork = "BBC"
         } else if url.hasPrefix("https://www.bbc.co.uk/radio/play/") || url.hasPrefix("https://www.bbc.co.uk/sounds/play/") {
             // PID is always the last element in the URL.
             if let nsUrl = URL(string: url) {

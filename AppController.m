@@ -212,11 +212,8 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     }
     @catch (NSException *e)
     {
-        NSString *error = [NSString stringWithFormat:@"Error restoring queue: %@", e.description];
-        [_logger addToLog:error];
-        [_logger addToLog:@"Unable to load saved application data. Deleted the data file."];
-
-        [fileManager removeItemAtPath:filePath error:nil];
+        [_logger addToLog:e.description];
+        [_logger addToLog:@"Unable to load Queue.automatorqueue. Please file a bug and mention the exception description above."];
         rootObject=nil;
     }
 
@@ -233,8 +230,8 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     }
     @catch (NSException *e)
     {
-        [fileManager removeItemAtPath:filePath error:nil];
-        NSLog(@"Unable to load saved application data. Deleted the data file.");
+        [_logger addToLog:e.description];
+        [_logger addToLog:@"Unable to load Formats.automatorqueue. Please file a bug and mention the exception description above."];
         rootObject=nil;
     }
     if (!tvFormats || !radioFormats) {
@@ -260,8 +257,9 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         rootObject = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
         [_itvFormatController addObjects:[rootObject valueForKey:@"itvFormats"]];
     }
-    @catch (NSException *exception) {
-        [fileManager removeItemAtPath:filePath error:nil];
+    @catch (NSException *e) {
+        [_logger addToLog: e.description];
+        [_logger addToLog: @"Unable to load ITV formats. Please file a bug and mention the exception description above."];
         rootObject=nil;
     }
 
@@ -414,6 +412,8 @@ static NSString *FORCE_RELOAD = @"ForceReload";
             [_forceITVUpdateMenuItem setEnabled:NO];
     }
     @catch (NSException *e) {
+        [_logger addToLog: e.description];
+        [_logger addToLog: @"UI setup failed before updating cache. Please file a bug and mention the exception description above."];
         NSLog(@"NO UI: updateCache:");
     }
     if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])
@@ -446,6 +446,8 @@ static NSString *FORCE_RELOAD = @"ForceReload";
             [_forceITVUpdateMenuItem setEnabled:YES];
     }
     @catch (NSException *e) {
+        [_logger addToLog: e.description];
+        [_logger addToLog: @"UI setup failed before updating cache, with proxy. Please file a bug and mention the exception description above."];
         NSLog(@"NO UI: updateCache:proxyError:");
     }
     if (proxyDict && [proxyDict[@"error"] code] == kProxyLoadCancelled) {
@@ -486,6 +488,8 @@ static NSString *FORCE_RELOAD = @"ForceReload";
             [_forceITVUpdateMenuItem setEnabled:NO];
     }
     @catch (NSException *e) {
+        [_logger addToLog: e.description];
+        [_logger addToLog: @"UI restore failed after cache. Please file a bug and mention the exception description above."];
         NSLog(@"NO UI");
     }
 
