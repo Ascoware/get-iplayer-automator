@@ -60,8 +60,16 @@
         _seriesName = [coder decodeObjectForKey:@"seriesName"];
         _episodeName = [coder decodeObjectForKey:@"episodeName"];
         _timeadded = [coder decodeObjectForKey:@"timeadded"];
-        _processedPID = [coder decodeBoolForKey:@"processedPID"];
-        _radio = [coder decodeBoolForKey:@"radio"];
+
+        @try {
+            _processedPID = [coder decodeBoolForKey:@"processedPID"];
+            _radio = [coder decodeBoolForKey:@"radio"];
+        } @catch (NSException *e) {
+            NSLog(@"Found old format data, retrying");
+            _processedPID = [[coder decodeObjectForKey:@"processedPID"] boolValue];
+            _radio = [[coder decodeObjectForKey:@"radio"] boolValue];
+        }
+        
         _realPID = [coder decodeObjectForKey:@"realPID"];
         _url = [coder decodeObjectForKey:@"url"];
         _subtitlePath = @"";
