@@ -18,10 +18,9 @@
 
 - (NSString *)typeArgumentForCacheUpdate:(BOOL)forCacheUpdate andIncludeITV:(BOOL)includeITV;
 - (IBAction)typeChanged:(id)sender;
-- (NSString *)cacheExpiryArgument:(id)sender;
+- (NSString *)cacheExpiryArgument;
 
 @property (readonly) NSString *profileDirArg;
 @property (readonly) NSString *noWarningArg;
-@property (readonly) NSString *standardListFormat;
 
 @end

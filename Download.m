@@ -303,16 +303,17 @@
 
     // XBMC naming is always used on ITV shows to ensure unique names.
     if ([_show.tvNetwork hasPrefix:@"ITV"] || [[[NSUserDefaults standardUserDefaults] valueForKey:@"XBMC_naming"] boolValue]) {
-        if (_show.seriesName)
+        if (_show.seriesName) {
             fileName = _show.seriesName;
+        }
         if (!_isFilm) {
-            if (!_show.season) {
+            if (_show.season == 0) {
                 _show.season = 1;
-                if (!_show.episode) {
+                if (_show.episode == 0) {
                     _show.episode = 1;
                 }
             }
-            NSString *format = _show.episodeName ? @"%@.s%02lde%02ld.%@" : @"%@.s%02lde%02ld";
+            NSString *format = _show.episodeName.length > 0 ? @"%@.s%02lde%02ld.%@" : @"%@.s%02lde%02ld";
             fileName = [NSString stringWithFormat:format, fileName, (long)_show.season, (long)_show.episode, _show.episodeName];
         }
 	}

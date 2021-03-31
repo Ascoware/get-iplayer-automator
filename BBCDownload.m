@@ -271,12 +271,10 @@
         if ([proxyOption isEqualToString:@"None"]) {
             self.show.status = @"Failed: See Log";
             [self addToLog:@"REASON FOR FAILURE: VPN or System Proxy failed. If you are using a VPN or a proxy configured in System Preferences, contact the VPN or proxy provider for assistance." noTag:TRUE];
-            [self addToLog:@"If outside the UK, you may also disconnect your VPN and enable the provided proxy in Preferences." noTag:TRUE];
             self.show.reasonForFailure = @"ShowNotFound";
         } else if ([proxyOption isEqualToString:@"Provided"]) {
             self.show.status = @"Failed: Bad Proxy";
             [self addToLog:@"REASON FOR FAILURE: Proxy failed. If in the UK, please disable the proxy in the preferences." noTag:TRUE];
-            [self addToLog:@"If outside the UK, please submit a bug report so that the proxy can be updated." noTag:TRUE];
             self.show.reasonForFailure = @"Provided_Proxy";
         } else if ([proxyOption isEqualToString:@"Custom"]) {
             self.show.status = @"Failed: Bad Proxy";

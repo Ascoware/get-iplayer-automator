@@ -61,7 +61,7 @@ static GetiPlayerArguments *sharedController = nil;
 {
     runCacheUpdateSinceChange=YES;
 }
-- (NSString *)cacheExpiryArgument:(id)sender
+- (NSString *)cacheExpiryArgument
 {
 	//NSString *cacheExpiryArg = [[NSString alloc] initWithFormat:@"-e%d", ([[[NSUserDefaults standardUserDefaults] objectForKey:@"CacheExpiryTime"] intValue]*3600)];
 	//return cacheExpiryArg;
@@ -77,11 +77,5 @@ static GetiPlayerArguments *sharedController = nil;
 {
    return @"--nocopyright";
 }
-
-- (NSString *)standardListFormat
-{
-   return @"--listformat=<pid>|<type>|<name>|<episode>|<channel>|<web>|<available>";
-}
-
 
 @end

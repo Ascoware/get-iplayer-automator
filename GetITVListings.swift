@@ -348,10 +348,6 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
                 episode.episodeName = DateFormatter.localizedString(from: episode.lastBroadcast, dateStyle: .medium, timeStyle: .none)
             }
 
-            if episode.season != 0 {
-                episode.seriesName += ": Season \(episode.season)"
-            }
-
             let dateAddedInteger = Int(floor(creationTime.timeIntervalSince1970))
 
             //    my @cache_format = qw/index type name episode seriesnum episodenum pid channel available expires duration desc web thumbnail timeadded/;

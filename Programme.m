@@ -383,10 +383,10 @@
         NSTask *getNameTask = [[NSTask alloc] init];
         NSPipe *getNamePipe = [[NSPipe alloc] init];
         NSMutableString *getNameData = [NSMutableString new];
-        NSString *listArgument = @"--listformat=<index>|<pid>|<type>|<name>|<episode>|<channel>|<available>|<web>";
+        NSString *listArgument = @"--listformat=<index>|<pid>|<type>|<name>|<seriesnum>|<episode>|<channel>|<available>|<web>";
         NSString *fieldsArgument = @"--fields=index,pid";
         NSString *wantedID = _pid;
-        NSString *cacheExpiryArg = [[GetiPlayerArguments sharedController] cacheExpiryArgument:nil];
+        NSString *cacheExpiryArg = [[GetiPlayerArguments sharedController] cacheExpiryArgument];
         NSArray *args = @[[[AppController sharedController] getiPlayerPath],
                           @"--nocopyright",
                           @"--nopurge",
@@ -432,20 +432,21 @@
     {
         // TODO: remove use of index in future version
         NSArray *elements = [string componentsSeparatedByString:@"|"];
-        if (elements.count < 8) {
+        if (elements.count < 9) {
             continue;
         }
 
-        NSString *pid, *showName, *episode, *index, *type, *tvNetwork, *url, *dateAired;
+        NSString *pid, *showName, *episode, *index, *type, *tvNetwork, *url, *dateAired, *season;
         @try{
             index = elements[0];
             pid = elements[1];
             type = elements[2];
             showName = elements[3];
-            episode = elements[4];
-            tvNetwork = elements[5];
-            dateAired = elements[6];
-            url = elements[7];
+            season = elements[4];
+            episode = elements[5];
+            tvNetwork = elements[6];
+            dateAired = elements[7];
+            url = elements[8];
         }
         @catch (NSException *e) {
             NSAlert *getNameException = [[NSAlert alloc] init];
@@ -459,7 +460,13 @@
 
         if ([wantedID isEqualToString:pid] || [wantedID isEqualToString:index]) {
             found=YES;
-            self.showName = showName;
+
+            if ([type isEqualToString:@"itv"] && season.length > 0) {
+                self.showName = [NSString stringWithFormat:@"%@: Season %@", showName, season];
+            } else {
+                self.showName = showName;
+            }
+
             self.episodeName = episode;
             self.lastBroadcast = [dateFormatter dateFromString:dateAired];
             self.lastBroadcastString = [NSDateFormatter localizedStringFromDate:self.lastBroadcast dateStyle:NSDateFormatterMediumStyle timeStyle:NSDateFormatterNoStyle];
@@ -528,7 +535,7 @@
         [versionArg  appendString:@"default"];
         NSString *infoArgument = @"--info";
         NSString *pidArgument = @"--pid";
-        NSString *cacheExpiryArg = [[GetiPlayerArguments sharedController] cacheExpiryArgument:nil];
+        NSString *cacheExpiryArg = [[GetiPlayerArguments sharedController] cacheExpiryArgument];
         NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:
                                 [[AppController sharedController] getiPlayerPath],
                                 @"--nocopyright",

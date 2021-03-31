@@ -522,7 +522,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 
     NSString *typeArgument = [[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:YES andIncludeITV:NO];
 
-    if (!typeArgument) {
+    if (typeArgument.length == 0) {
         _updatingBBCIndex = false;
         [self getiPlayerUpdateFinished];
         return;
@@ -686,13 +686,6 @@ static NSString *FORCE_RELOAD = @"ForceReload";
             NSTask *pipeTask = [[NSTask alloc] init];
             NSPipe *newPipe = [[NSPipe alloc] init];
             NSFileHandle *readHandle2 = newPipe.fileHandleForReading;
-            NSData *someData;
-
-            NSString *name = [show.showName copy];
-            NSScanner *scanner = [NSScanner scannerWithString:name];
-            NSString *searchArgument;
-            [scanner scanUpToString:@" - " intoString:&searchArgument];
-            // write handle is closed to this process
             pipeTask.standardOutput = newPipe;
             pipeTask.standardError = newPipe;
             pipeTask.launchPath = _perlBinaryPath;
@@ -702,9 +695,9 @@ static NSString *FORCE_RELOAD = @"ForceReload";
                 @"--nopurge",
                 [GetiPlayerArguments sharedController].noWarningArg,
                 [[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO andIncludeITV:YES],
-                [[GetiPlayerArguments sharedController] cacheExpiryArgument:nil],
-                [GetiPlayerArguments sharedController].standardListFormat,
-                searchArgument];
+                [[GetiPlayerArguments sharedController] cacheExpiryArgument],
+                @"--listformat=<pid>|<type>|<name>|<seriesnum>|<episode>|<channel>|<web>|<available>",
+                show.showName];
             NSMutableString *taskData = [[NSMutableString alloc] initWithString:@""];
             NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:pipeTask.environment];
             envVariableDictionary[@"HOME"] = (@"~").stringByExpandingTildeInPath;
@@ -712,6 +705,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
             envVariableDictionary[@"PATH"] = _perlBinaryPath;
             pipeTask.environment = envVariableDictionary;
             [pipeTask launch];
+            NSData *someData;
             while ((someData = readHandle2.availableData) && someData.length) {
                 [taskData appendString:[[NSString alloc] initWithData:someData
                                                              encoding:NSUTF8StringEncoding]];
@@ -732,14 +726,15 @@ static NSString *FORCE_RELOAD = @"ForceReload";
                         NSArray *matchElements = [string componentsSeparatedByString:@"|"];
 
                         Programme *p = [[Programme alloc] init];
-                        NSString *temp_pid, *temp_showName, *temp_tvNetwork, *temp_type, *url, *temp_date;
+                        NSString *temp_pid, *temp_showName, *temp_tvNetwork, *season, *temp_type, *url, *temp_date;
                         temp_pid = matchElements[0];
                         temp_type = matchElements[1];
                         temp_showName = matchElements[2];
-                        p.episodeName = matchElements[3];
-                        temp_tvNetwork = matchElements[4];
-                        url = matchElements[5];
-                        temp_date = matchElements[6];
+                        season = matchElements[3];
+                        p.episodeName = matchElements[4];
+                        temp_tvNetwork = matchElements[5];
+                        url = matchElements[6];
+                        temp_date = matchElements[7];
                         p.pid =  temp_pid;
                         p.showName = temp_showName;
                         p.tvNetwork = temp_tvNetwork;
@@ -747,12 +742,15 @@ static NSString *FORCE_RELOAD = @"ForceReload";
                         p.lastBroadcast = [dateFormatter dateFromString:temp_date];
                         p.lastBroadcastString = [NSDateFormatter localizedStringFromDate:p.lastBroadcast dateStyle:NSDateFormatterMediumStyle timeStyle:NSDateFormatterNoStyle];
 
+                        if ([temp_tvNetwork isEqualToString:@"itv"] && season.length > 0) {
+                            p.showName = [NSString stringWithFormat:@": Season %@", season];
+                        }
 
                         if ([temp_type isEqualToString:@"radio"])  {
                             p.radio = YES;
                         }
 
-                        if (  [p.url isEqualToString:show.url] && show.url )
+                        if ([p.url isEqualToString:show.url] && p.url)
                         {
                             show.pid = p.pid;
                             show.status = @"Available";
@@ -1421,7 +1419,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
             } else if (series.tvNetwork.length == 0) {
                 series.tvNetwork = @"*";
             }
-            NSString *cacheExpiryArgument = [[GetiPlayerArguments sharedController] cacheExpiryArgument:nil];
+            NSString *cacheExpiryArgument = [[GetiPlayerArguments sharedController] cacheExpiryArgument];
             NSString *typeArgument = [[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO andIncludeITV:YES];
 
             NSMutableArray *autoRecordArgs = [[NSMutableArray alloc] initWithObjects:
