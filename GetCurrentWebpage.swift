@@ -115,7 +115,8 @@ import Kanna
         browserNotOpen.alertStyle = .warning
         
         //Get URL
-        if (browser == "Safari") {
+        switch (browser) {
+        case "Safari":
             var safariRunning: SafariApplication? = nil
             let safariTechPreview = SBApplication(bundleIdentifier: "com.apple.SafariTechnologyPreview")
             
@@ -137,8 +138,17 @@ import Kanna
             if let frontWindow = orderedWindows.first, let tab = frontWindow.currentTab, let url = tab.URL, let name = tab.name, let source = tab.source {
                 newProgram = extractMetadata(url: url, tabTitle: name, pageSource: source)
             }
-        } else if (browser == "Chrome") {
-            guard let chrome : ChromeApplication = SBApplication(bundleIdentifier: "com.google.Chrome"), chrome.isRunning, let chromeWindows = chrome.windows?().compactMap({ $0 as? ChromeWindow }) else {
+            break
+
+        case "Chrome", "Microsoft Edge", "Vivaldi":
+            // All WebKit browsers have the same AppleScript support.
+            // We just need to find the right bundle ID.
+            let mapping = [
+                "Chrome" : "com.google.Chrome",
+                "Microsoft Edge" : "com.microsoft.edgemac",
+                "Vivaldi" : "com.vivaldi.Vivaldi"]
+
+            guard let bundleID = mapping[browser], let chrome : ChromeApplication = SBApplication(bundleIdentifier: bundleID), chrome.isRunning, let chromeWindows = chrome.windows?().compactMap({ $0 as? ChromeWindow }) else {
                 browserNotOpen.runModal()
                 return nil
             }
@@ -148,19 +158,10 @@ import Kanna
                let source = tab.executeJavascript?("document.documentElement.outerHTML") as? String {
                 newProgram = extractMetadata(url: url, tabTitle: title, pageSource: source)
             }
-        } else if (browser == "Microsoft Edge") {
-            guard let edge : MicrosoftEdgeApplication = SBApplication(bundleIdentifier: "com.microsoft.edgemac"), edge.isRunning, let edgeWindows =
-                edge.windows?().compactMap({ $0 as? MicrosoftEdgeWindow }) else {
-                browserNotOpen.runModal()
-                return nil
-            }
 
-            let orderedWindows = edgeWindows.sorted { $0.index! < $1.index! }
-            if let frontWindow = orderedWindows.first, let tab = frontWindow.activeTab, let url = tab.URL, let title = tab.title,
-               let source = tab.executeJavascript?("document.documentElement.outerHTML") as? String {
-                newProgram = extractMetadata(url: url, tabTitle: title, pageSource: source)
-            }
-        } else {
+            break
+
+        default:
             let unsupportedBrowser = NSAlert()
             unsupportedBrowser.messageText = "Uh, something went horribly wrong."
             unsupportedBrowser.addButton(withTitle: "OK")
