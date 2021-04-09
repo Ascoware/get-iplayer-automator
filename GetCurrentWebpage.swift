@@ -90,10 +90,6 @@ import Kanna
 
         } else if url.hasPrefix("https://www.itv.com/hub/") {
             show = ITVMetadataExtractor.getShowMetadata(htmlPageContent: pageSource)
-
-            if let nsUrl = URL(string: url) {
-                show.pid = nsUrl.lastPathComponent
-            }
         }
 
         return show

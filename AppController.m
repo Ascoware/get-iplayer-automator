@@ -742,7 +742,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
                         p.lastBroadcast = [dateFormatter dateFromString:temp_date];
                         p.lastBroadcastString = [NSDateFormatter localizedStringFromDate:p.lastBroadcast dateStyle:NSDateFormatterMediumStyle timeStyle:NSDateFormatterNoStyle];
 
-                        if ([temp_tvNetwork isEqualToString:@"itv"] && season.length > 0) {
+                        if ([temp_tvNetwork isEqualToString:@"itv"] && [season intValue] > 0) {
                             p.showName = [NSString stringWithFormat:@": Season %@", season];
                         }
 

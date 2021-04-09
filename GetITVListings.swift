@@ -232,6 +232,7 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
             episode.pid = productionID ?? ""
             episode.url = showURL?.absoluteString ?? ""
             episode.lastBroadcast = dateAiredUTC ?? Date()
+            episode.lastBroadcastString = dateTimeString ?? ""
             episode.desc = description ?? ""
             episode.episodeName = episodeTitle ?? ""
             episode.season = season

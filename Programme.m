@@ -461,7 +461,7 @@
         if ([wantedID isEqualToString:pid] || [wantedID isEqualToString:index]) {
             found=YES;
 
-            if ([type isEqualToString:@"itv"] && season.length > 0) {
+            if ([type isEqualToString:@"itv"] && [season integerValue] > 0) {
                 self.showName = [NSString stringWithFormat:@"%@: Season %@", showName, season];
             } else {
                 self.showName = showName;

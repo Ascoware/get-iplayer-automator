@@ -21,7 +21,8 @@ class ITVMetadataExtractor {
         longDateFormatter.locale = enUSPOSIXLocale
 
         let newProgram = Programme()
-
+        newProgram.tvNetwork = "ITV"
+        
         if let htmlPage = try? HTML(html: htmlPageContent, encoding: .utf8) {
             // There should only be one 'video' element.
             if let videoElement = htmlPage.at_xpath("//div[@id='video']") {
@@ -37,7 +38,14 @@ class ITVMetadataExtractor {
                     let breadcrumbs = descriptionData["itemListElement:"].arrayValue
                     for item in breadcrumbs {
                         if item["item:"]["@type"] == "TVEpisode" {
+
                             let showMetadata = item["item:"]
+                            newProgram.url = showMetadata["@id"].string ?? ""
+
+                            if let showURL = URL(string: newProgram.url) {
+                                newProgram.pid = showURL.lastPathComponent
+                            }
+
                             newProgram.desc = showMetadata["description"].string ?? "None available"
                             newProgram.episode = showMetadata["episodeNumber"].intValue
                             newProgram.season = showMetadata["partOfSeason"]["seasonNumber"].intValue
@@ -85,8 +93,8 @@ class ITVMetadataExtractor {
             }
         }
         if let timeAired = timeAired {
-            newProgram.dateAired = timeAired
-            newProgram.standardizedAirDate = longDateFormatter.string(from: timeAired)
+            newProgram.lastBroadcast = timeAired
+            newProgram.lastBroadcastString = longDateFormatter.string(from: timeAired)
         }
 
         return newProgram

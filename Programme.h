@@ -41,11 +41,9 @@ typedef NS_ENUM(NSInteger, GIA_ProgrammeType) {
 @property (copy) NSString *reasonForFailure;
 @property (copy) NSString *availableModes;
 @property (copy) NSString *url;
-@property (copy) NSDate *dateAired;
-@property (copy) NSString *standardizedAirDate;
 @property (copy) NSString *desc;
     
-    //Extended Metadata
+//Extended Metadata
 @property (assign) BOOL extendedMetadataRetrieved;
 @property (assign) BOOL successfulRetrieval;
 @property (assign) NSNumber *duration;

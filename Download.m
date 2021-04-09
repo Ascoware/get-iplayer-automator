@@ -118,7 +118,7 @@
         [self safeAppend:arguments key:@"--description" value:self.show.desc];
         [self safeAppend:arguments key:@"--artist" value:self.show.tvNetwork];
         [self safeAppend:arguments key:@"--artwork" value: self.thumbnailPath];
-        [self safeAppend:arguments key:@"--year" value: self.show.standardizedAirDate];
+        [self safeAppend:arguments key:@"--year" value: self.show.lastBroadcastString];
         [arguments addObject:@"--overWrite"];
 
         self.apTask.arguments = arguments;
