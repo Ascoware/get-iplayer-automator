@@ -8,6 +8,7 @@
 //
 
 import ScriptingBridge
+import SwiftyJSON
 import Kanna
 
 @objcMembers public class GetCurrentWebpage : NSObject {
@@ -54,40 +55,71 @@ import Kanna
             // Program title is buried in the page HTML.
             
         } else if url.hasPrefix("https://www.bbc.co.uk/programmes/") {
-            // PID is the last element in the URL, but it could be a program or series page.
-            if let nsUrl = URL(string: url) {
-                show.pid = nsUrl.lastPathComponent
-                show.tvNetwork = "BBC"
+            // Search the page to see if it is an episode or a series page. If we don't the PID inside
+            // a bbcProgrammes element, it's a series page and we can't use it (though we might want to try
+            // adding it with recursive-pid)
+            guard let htmlPage = try? HTML(html: pageSource, encoding: .utf8) else {
+                return show
+            }
 
-                // Search the page to see if it is an episode or a series page. If we don't the PID inside
-                // a bbcProgrammes element, it's a series page and we can't use it (though we might want to try
-                // adding it with recursive-pid)
-                let scanner = Scanner(string: pageSource)
-                scanner.scanUpTo("\"@type\":\"TVEpisode\",\"identifier\":\"\(show.pid)\"", into: nil)
-                if scanner.isAtEnd {
-                    scanner.scanLocation = 0
-                    scanner.scanUpTo("\"@type\":\"RadioEpisode\",\"identifier\":\"\(show.pid)\"", into: nil)
-                    
-                    // Radio shows and clips will be routed to Music.app.
-                    show.radio = true
-                    
-                    if scanner.isAtEnd {
-                        scanner.scanLocation = 0
-                        scanner.scanUpTo("bbcProgrammes.programme = { pid : '\(show.pid)', type : 'clip' }", into: nil)
-                    }
+            var infoDicts: [JSON] = []
+
+            for showInfo in htmlPage.xpath("//script[@type='application/ld+json']") {
+                guard let content = showInfo.content, !content.isEmpty else {
+                    continue
                 }
-                
-                if scanner.isAtEnd {
-                    let invalidPage = NSAlert()
-                    invalidPage.addButton(withTitle: "OK")
-                    invalidPage.messageText = "Series Page Found: \(url)"
-                    invalidPage.informativeText = "Please ensure the frontmost browser tab is open to an iPlayer episode page or programme clip page. Get iPlayer Automator doesn't support downloading all available shows from a series."
-                    invalidPage.alertStyle = .warning
-                    invalidPage.runModal()
-                    return show
+
+                let infoJSON = JSON(parseJSON: content)
+
+                if infoJSON["@type"].exists() {
+                    infoDicts.append(infoJSON)
+                } else {
+                    let graphBlocks = infoJSON["@graph"].arrayValue
+                    for block in graphBlocks {
+                        if block["@type"].exists() {
+                            infoDicts.append(block)
+                        }
+                    }
                 }
             }
 
+            // Search all of the show infos for something we know about.
+            for infoDict in infoDicts {
+                let contentType = infoDict["@type"]
+
+                if contentType == "BreadcrumbList" {
+                    continue
+                }
+
+                switch contentType {
+                case "TVEpisode", "@TVEpisode", "@RadioEpisode", "RadioEpisode", "Clip":
+                    show.pid = infoDict["identifier"].stringValue
+                    show.seriesName = infoDict["partOfSeries"]["name"].stringValue
+                    show.episodeName = infoDict["name"].stringValue
+                    show.url = infoDict["url"].stringValue
+                    show.desc = infoDict["description"].stringValue
+                    show.showName = !show.seriesName.isEmpty ? show.seriesName : show.episodeName
+
+                    if ["@RadioEpisode", "RadioEpisode"].contains(contentType.stringValue) {
+                        show.radio = true
+                    }
+
+                    break
+
+                default:
+                    continue
+                }
+            }
+
+            if show.pid.isEmpty {
+                let invalidPage = NSAlert()
+                invalidPage.addButton(withTitle: "OK")
+                invalidPage.messageText = "Series Page Found: \(url)"
+                invalidPage.informativeText = "Please ensure the frontmost browser tab is open to an iPlayer episode page or programme clip page. Get iPlayer Automator doesn't support downloading all available shows from a series."
+                invalidPage.alertStyle = .warning
+                invalidPage.runModal()
+                return show
+            }
         } else if url.hasPrefix("https://www.itv.com/hub/") {
             show = ITVMetadataExtractor.getShowMetadata(htmlPageContent: pageSource)
         }
