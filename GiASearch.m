@@ -133,15 +133,11 @@
                 p.episode = fields[8].integerValue;
                 p.desc = fields[9];
 
-                if ([fields[3] isEqualToString:@"itv"] && p.season !=  0) {
-                    p.showName = [NSString stringWithFormat:@"%@: Season %ld", p.seriesName, p.season];
-                } else if (p.seriesName.length > 0) {
+                if (p.seriesName.length > 0) {
                     p.showName = p.seriesName;
                 } else {
                     p.showName = p.episodeName;
                 }
-
-
 
                 p.thumbnail = [[NSImage alloc] initByReferencingURL:[NSURL URLWithString:fields[10]]];
                 p.url = fields[11];

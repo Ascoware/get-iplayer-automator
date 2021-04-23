@@ -73,8 +73,10 @@ class ITVMetadataExtractor {
             }
         }
 
+        // The series number should appear in the showName. If this program is eventually
+        // found in the cache showName will be overwritten. If not, it follows the naming pattern.
         if newProgram.season != 0 {
-            newProgram.showName += ": Season \(newProgram.season)"
+            newProgram.showName += ": Series \(newProgram.season)"
         }
 
         if !episodeID.isEmpty && newProgram.episode == 0 {
