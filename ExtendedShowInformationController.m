@@ -28,7 +28,7 @@
     Programme *programme = searchResultsArrayController.arrangedObjects[searchResultsTable.selectedRow];
     if (programme) {
         
-        if ( [programme.tvNetwork isEqualToString:@"ITV Player"] )
+        if ( [programme.tvNetwork hasPrefix:@"ITV"] )
         {
             NSAlert *notNewITV = [[NSAlert alloc] init];
             [notNewITV addButtonWithTitle:@"OK"];

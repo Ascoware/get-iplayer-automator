@@ -496,8 +496,9 @@
             self.status = @"Unknown: Not in cache";
         }
         
-        self.processedPID = NO;
-        [self getNameFromPID];
+        if (![self.tvNetwork isEqualToString:@"ITV"]) {
+            [self getNameFromPID];
+        }
     }
 }
 
