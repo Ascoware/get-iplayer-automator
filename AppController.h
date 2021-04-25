@@ -179,10 +179,7 @@ extern NSDictionary *radioFormats;
 
 -(void)updateHistory;
 -(void)updateHistoryForType:(NSString *)chanelType andProgFile:(NSString *)oldProgrammesFile andCacheFile:(NSString *)newCacheFile;
--(NSScanner *)skip:(NSScanner *)s andDelimiter:(NSString *)d andTimes:(int)times;
 -(void)itvUpdateFinished;
--(int)findItemNumberFor:(NSString *)key inString:(NSString *)string;
--(NSString *)getItemNumber:(int)itemLocation fromString:(NSString *)string;
 
 @end
 

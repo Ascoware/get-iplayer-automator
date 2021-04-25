@@ -140,15 +140,6 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     NSString *appSupportDirectory = [[NSFileManager defaultManager] applicationSupportDirectory];
     [[NSFileManager defaultManager] changeCurrentDirectoryPath:appSupportDirectory];
 
-    //Install Plugins If Needed
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    NSString *pluginPath = [appSupportDirectory stringByAppendingPathComponent:@"plugins"];
-    [_logger addToLog:@"Installing/Updating Get_iPlayer Plugins..." :self];
-    NSString *providedPath = [NSBundle mainBundle].bundlePath;
-    if ([fileManager fileExistsAtPath:pluginPath]) [fileManager removeItemAtPath:pluginPath error:NULL];
-    providedPath = [providedPath stringByAppendingPathComponent:@"/Contents/Resources/plugins"];
-    [fileManager copyItemAtPath:providedPath toPath:pluginPath error:nil];
-
     //Initialize Arguments
     NSString *getiPlayerInstallation = [[NSString alloc] initWithString:[NSBundle mainBundle].bundlePath];
     getiPlayerInstallation = [getiPlayerInstallation stringByAppendingString:@"/Contents/Resources/get_iplayer"];
@@ -622,8 +613,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 
 - (void)itvUpdateFinished
 {
-    //  ITV Cache Update Finished - turn off progress display and process data
-
+    // ITV Cache Update Finished - turn off progress display and process data
     _updatingITVIndex = false;
     _didUpdate = YES;
     [self.itvProgressIndicator stopAnimation:self];
@@ -2053,25 +2043,25 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     NSString *newCacheString = [NSString stringWithContentsOfFile:newCacheFile encoding:NSUTF8StringEncoding error:&error];
     NSArray  *newCacheArray  = [newCacheString componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
 
-    NSMutableSet *todayProgrammes = [[NSMutableSet alloc]init];
-    NSString *entry;
-    NSString *programmeName;
-    NSString  *channel;
-
+    NSMutableSet *todayProgrammes = [NSMutableSet new];
     BOOL firstEntry = true;
 
-    int programmeNameLocation = 0;
-    int channelLocation = 0;
+    NSUInteger programmeNameLocation = 0;
+    NSUInteger channelLocation = 0;
 
-    for (entry in newCacheArray)
-    {
-        if (firstEntry )  {
+    for (NSString *entry in newCacheArray) {
+        if (entry.length == 0) {
+            continue;
+        }
+
+        NSArray *entryFields = [entry componentsSeparatedByString:@"|"];
+
+        if (firstEntry) {
             firstEntry = false;
-            programmeNameLocation = [self findItemNumberFor:@"name" inString:entry];
-            channelLocation = [self findItemNumberFor:@"channel" inString:entry];
+            programmeNameLocation = [entryFields indexOfObject:@"name"];
+            channelLocation = [entryFields indexOfObject:@"channel"];
 
-            if (programmeNameLocation == 0 || channelLocation == 0)
-            {
+            if (programmeNameLocation == 0 || channelLocation == 0) {
                 NSLog(@"ERROR: Cannot update new programmes history from cache file: %@", newCacheFile);
                 [_logger addToLog:[NSString stringWithFormat:@"ERROR: Cannot update new programmes history from cache file: %@", newCacheFile]];
                 return;
@@ -2079,10 +2069,10 @@ static NSString *FORCE_RELOAD = @"ForceReload";
             continue;
         }
 
-        programmeName = [self getItemNumber:programmeNameLocation fromString:entry];
-        channel = [self getItemNumber:channelLocation fromString:entry];
+        NSString *programmeName = [entryFields objectAtIndex:programmeNameLocation];
+        NSString *channel = [entryFields objectAtIndex:channelLocation];
 
-        if ( programmeName.length == 0 || channel.length == 0)
+        if (programmeName.length == 0 || channel.length == 0)
             continue;
 
         ProgrammeHistoryObject *p = [[ProgrammeHistoryObject alloc] initWithSortKey:0 programmeName:programmeName dateFound:@"" tvChannel:channel networkName:networkName];
@@ -2108,46 +2098,6 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         }
     }
 
-}
--(NSString *)getItemNumber:(int)itemLocation fromString:(NSString *)string
-{
-    NSString *theItem;
-    NSScanner *scanner = [NSScanner scannerWithString:string];
-
-    scanner = [self skip:scanner andDelimiter:@"|" andTimes:itemLocation];
-    [scanner scanUpToString:@"|" intoString:&theItem];
-
-    return theItem;
-}
-
--(int)findItemNumberFor:(NSString *)key inString:(NSString *)string
-{
-    NSString *theItem;
-    NSScanner *scanner = [NSScanner scannerWithString:string];
-
-    for (int itemNumber = 1; [scanner scanUpToString:@"|" intoString:&theItem]; itemNumber++ )
-    {
-        if ( [theItem isEqualToString:key] )
-            return itemNumber;
-
-        [scanner scanString:@"|"  intoString:nil];
-    }
-    return false;
-}
-
--(NSScanner *) skip:(NSScanner *)s andDelimiter:(NSString *)d andTimes:(int)times
-{
-    if (--times < 0)
-        return s;
-
-    do
-    {
-        [s scanUpToString:d intoString:nil];
-        [s scanString:d intoString:nil];
-
-    } while (--times > 0);
-
-    return s;
 }
 
 -(IBAction)changeNewProgrmmeDisplayFilter:(id)sender
