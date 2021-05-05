@@ -345,7 +345,7 @@ public class ITVDownload : Download {
             task?.arguments = args
             let extraBinaryPath = AppController.shared().extraBinariesPath
             var envVariableDictionary = [String : String]()
-            envVariableDictionary["PATH"] = "\(binaryPath):\(extraBinaryPath):/usr/bin"
+            envVariableDictionary["PATH"] = "\(binaryPath):\(extraBinaryPath):/usr/local/bin:/usr/bin"
             envVariableDictionary["PYTHONPATH"] = "\(resourcePath)"
             task?.environment = envVariableDictionary
             self.logDebugMessage("DEBUG: youtube-dl environment: \(envVariableDictionary)", noTag: true)
