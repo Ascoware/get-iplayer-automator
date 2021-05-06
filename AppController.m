@@ -856,8 +856,10 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 {
     for (Programme *p in _queueController.selectedObjects)
     {
-        p.status = @"Processing...";
-        [p performSelectorInBackground:@selector(getName) withObject:nil];
+        if (p.pid.length > 0) {
+            p.status = @"Processing...";
+            [p performSelectorInBackground:@selector(getName) withObject:nil];
+        }
     }
 }
 
