@@ -45,7 +45,6 @@
 		7F9FE9241EC170E60058CB1B /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F9FE91E1EC16E3E0058CB1B /* Sparkle.framework */; };
 		7F9FE9251EC170E60058CB1B /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7F9FE91E1EC16E3E0058CB1B /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7FAA6A25206F36B800B6B50C /* Crypto in Resources */ = {isa = PBXBuildFile; fileRef = 7FAA6A24206F36B800B6B50C /* Crypto */; };
-		7FAA6A2720744A5D00B6B50C /* pycrypto-2.6.1-py2.7.egg-info in Resources */ = {isa = PBXBuildFile; fileRef = 7FAA6A2620744A5C00B6B50C /* pycrypto-2.6.1-py2.7.egg-info */; };
 		7FC8F71C20674B7600DC158C /* youtube-dl in Resources */ = {isa = PBXBuildFile; fileRef = 7FC8F71B20674B6700DC158C /* youtube-dl */; };
 		7FEDA8ED24FC982200189D37 /* MicrosoftEdge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FEDA8EB24FC982200189D37 /* MicrosoftEdge.swift */; };
 		7FEDA8EE24FC982200189D37 /* MicrosoftEdgeScripting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FEDA8EC24FC982200189D37 /* MicrosoftEdgeScripting.swift */; };
@@ -157,7 +156,6 @@
 		7F9FE9201EC16ED80058CB1B /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		7F9FE9221EC16F160058CB1B /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		7FAA6A24206F36B800B6B50C /* Crypto */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Crypto; sourceTree = "<group>"; };
-		7FAA6A2620744A5C00B6B50C /* pycrypto-2.6.1-py2.7.egg-info */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "pycrypto-2.6.1-py2.7.egg-info"; sourceTree = "<group>"; };
 		7FC8F71B20674B6700DC158C /* youtube-dl */ = {isa = PBXFileReference; lastKnownFileType = text; path = "youtube-dl"; sourceTree = "<group>"; };
 		7FEDA8EB24FC982200189D37 /* MicrosoftEdge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MicrosoftEdge.swift; sourceTree = "<group>"; };
 		7FEDA8EC24FC982200189D37 /* MicrosoftEdgeScripting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MicrosoftEdgeScripting.swift; sourceTree = "<group>"; };
@@ -355,7 +353,6 @@
 		D904F04D1009F28400D60BBF /* Binaries */ = {
 			isa = PBXGroup;
 			children = (
-				7FAA6A2620744A5C00B6B50C /* pycrypto-2.6.1-py2.7.egg-info */,
 				7F748E3323FB416B00626A77 /* get_iplayer */,
 				7FAA6A24206F36B800B6B50C /* Crypto */,
 				7FC8F71B20674B6700DC158C /* youtube-dl */,
@@ -564,7 +561,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7FAA6A2720744A5D00B6B50C /* pycrypto-2.6.1-py2.7.egg-info in Resources */,
 				39FD5E9619D370BD006BC47B /* Images.xcassets in Resources */,
 				396FDA611DA98179003F3F57 /* MainMenu.xib in Resources */,
 				8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */,
