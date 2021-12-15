@@ -254,11 +254,7 @@
         // Should not get inside this code for ITV (webvtt) subtitles.
         if ([aNotification.object terminationStatus] == 0)
         {
-            BOOL keepRawSubtitles = [[NSUserDefaults standardUserDefaults] boolForKey:[NSString stringWithFormat:@"%@KeepRawSubtitles", _defaultsPrefix]];
-            if (!keepRawSubtitles)
-            {
-                [[NSFileManager defaultManager] removeItemAtPath:_subtitlePath error:nil];
-            }
+            [[NSFileManager defaultManager] removeItemAtPath:_subtitlePath error:nil];
             [self addToLog:[NSString stringWithFormat:@"INFO: Conversion to SubRip complete: %@", [_show.path.stringByDeletingPathExtension stringByAppendingPathExtension:@"srt"]] noTag:YES];
         }
         else
