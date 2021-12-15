@@ -168,13 +168,14 @@ import Kanna
             }
             break
 
-        case "Chrome", "Microsoft Edge", "Vivaldi":
+        case "Chrome", "Microsoft Edge", "Vivaldi", "Brave":
             // All WebKit browsers have the same AppleScript support.
             // We just need to find the right bundle ID.
             let mapping = [
                 "Chrome" : "com.google.Chrome",
                 "Microsoft Edge" : "com.microsoft.edgemac",
-                "Vivaldi" : "com.vivaldi.Vivaldi"]
+                "Vivaldi" : "com.vivaldi.Vivaldi",
+                "Brave" : "com.brave.Browser"]
 
             guard let bundleID = mapping[browser], let chrome : ChromeApplication = SBApplication(bundleIdentifier: bundleID), chrome.isRunning, let chromeWindows = chrome.windows?().compactMap({ $0 as? ChromeWindow }) else {
                 browserNotOpen.runModal()
