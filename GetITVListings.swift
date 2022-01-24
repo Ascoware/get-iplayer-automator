@@ -46,10 +46,7 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
         programmes.removeAll()
         
         /* Create the NUSRLSession */
-        let defaultConfigObject = URLSessionConfiguration.default
-        let cachePath: String = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("/itvloader.cache").path
-        let myCache = URLCache(memoryCapacity: 16384, diskCapacity: 268435456, diskPath: cachePath)
-        defaultConfigObject.urlCache = myCache
+        let defaultConfigObject = URLSessionConfiguration.ephemeral
         defaultConfigObject.requestCachePolicy = .useProtocolCachePolicy
         defaultConfigObject.timeoutIntervalForResource = 30
         defaultConfigObject.timeoutIntervalForRequest = 30
@@ -59,7 +56,7 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
         if let aString = URL(string: "https://www.itv.com/hub/shows") {
             mySession?.dataTask(with: aString) {(_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void in
                 if let error = error {
-                    let errorMessage = "GetITVListings (Error: \(error.localizedDescription)): Unable to retreive show listings from ITV"
+                    let errorMessage = "GetITVListings (Error: \(error.localizedDescription)): Unable to retrieve show listings from ITV"
                     self.logger?.add(toLog: errorMessage)
                 }
                 guard let data = data else {
@@ -260,7 +257,7 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
 
     func processEpisodes(program: Programme, pageData: Data?, error: Error?) {
         if let error = error {
-            let errorMessage = "GetITVListings (Error(\(error))): Unable to retreive programme episodes for \(program.url)"
+            let errorMessage = "GetITVListings (Error(\(error))): Unable to retrieve programme episodes for \(program.url)"
             self.logger?.add(toLog: errorMessage)
             operationCompleted()
             return

@@ -7,13 +7,15 @@
 
 import Foundation
 
-public class NewProgrammeHistory: NSObject {
+@objc public class NewProgrammeHistory: NSObject {
     @objc public var programmeHistoryArray = [ProgrammeHistoryObject]()
-    @objc public var itemsAdded = false
-    @objc public var timeIntervalSince1970UTC: TimeInterval = 0
-    @objc public var dateFound = ""
+
+    var itemsAdded = false
+    var timeIntervalSince1970UTC: TimeInterval = 0
+    var dateFound = ""
     
     static let _sharedInstance = NewProgrammeHistory()
+
     @objc public static func sharedInstance() -> NewProgrammeHistory {
         return _sharedInstance
     }
@@ -52,13 +54,6 @@ public class NewProgrammeHistory: NSObject {
         itemsAdded = true
         let newEntry = ProgrammeHistoryObject(sortKey: timeIntervalSince1970UTC, programmeName: name ?? "", dateFound: dateFound, tvChannel: tvChannel ?? "", networkName: networkName ?? "")
         programmeHistoryArray.append(newEntry)
-    }
-    
-    func getArray() -> [AnyHashable]? {
-        if itemsAdded {
-            flushHistoryToDisk()
-        }
-        return programmeHistoryArray
     }
     
     @objc func flushHistoryToDisk() {

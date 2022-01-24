@@ -68,7 +68,7 @@
         NSString *progressArg = @"--logprogress";
         
         NSString *getArg = @"--pid";
-        NSString *searchArg = [[NSString alloc] initWithFormat:@"%@", self.show.pid];
+        NSString *searchArg = self.show.pid;
         NSString *whitespaceArg = @"--whitespace";
         
         //AudioDescribed & Signed

@@ -7,6 +7,7 @@
 //
 
 #import "GetiPlayerProxy.h"
+#import <CFNetwork/CFNetwork.h>
 
 @implementation GetiPlayerProxy
 
@@ -217,17 +218,24 @@
     
     // Create an NSURLSessionConfiguration that uses the proxy
     NSMutableDictionary *proxyDict = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                      (__bridge NSString *)kCFProxyTypeHTTP,
-                                      (__bridge NSString *)kCFProxyTypeKey,
-                                      
+
                                       @(1),
-                                      (__bridge NSString *)kCFNetworkProxiesHTTPEnable,
-                                      
+                                      kCFNetworkProxiesHTTPEnable,
+
                                       proxy.host,
-                                      (__bridge NSString *)kCFStreamPropertyHTTPProxyHost,
-                                      
+                                      kCFNetworkProxiesHTTPProxy,
+
                                       @(port),
-                                      (__bridge NSString *)kCFStreamPropertyHTTPProxyPort,
+                                      kCFNetworkProxiesHTTPSPort,
+
+                                      @(1),
+                                      kCFNetworkProxiesHTTPSEnable,
+
+                                      proxy.host,
+                                      kCFNetworkProxiesHTTPSProxy,
+
+                                      @(port),
+                                      kCFNetworkProxiesHTTPSPort,
                                       nil];
     
     if (proxy.user) {

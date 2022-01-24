@@ -61,17 +61,16 @@ public class ITVDownload : Download {
 
             if let proxy = self.proxy {
                 // Create an NSURLSessionConfiguration that uses the proxy
-                var proxyDict: [String: Any] = [kCFProxyTypeKey as String : kCFProxyTypeHTTP as String,
-                                                kCFNetworkProxiesHTTPEnable as String : true,
-                                                kCFNetworkProxiesHTTPProxy as String : proxy.host,
-                                                kCFStreamPropertyHTTPProxyPort as String : proxy.port,
-                                                kCFNetworkProxiesHTTPSEnable as String : true,
-                                                kCFNetworkProxiesHTTPSProxy as String : proxy.host,
-                                                kCFStreamPropertyHTTPSProxyPort as String : proxy.port]
+                var proxyDict: [AnyHashable : Any] = [kCFNetworkProxiesHTTPEnable : true,
+                                                       kCFNetworkProxiesHTTPProxy : proxy.host,
+                                                        kCFNetworkProxiesHTTPPort : proxy.port,
+                                                     kCFNetworkProxiesHTTPSEnable : true,
+                                                      kCFNetworkProxiesHTTPSProxy : proxy.host,
+                                                       kCFNetworkProxiesHTTPSPort : proxy.port]
 
                 if let user = proxy.user, let password = proxy.password {
-                    proxyDict[kCFProxyUsernameKey as String] = user
-                    proxyDict[kCFProxyPasswordKey as String] = password
+                    proxyDict[kCFProxyUsernameKey] = user
+                    proxyDict[kCFProxyPasswordKey] = password
                 }
 
                 let configuration = URLSessionConfiguration.ephemeral
@@ -297,6 +296,8 @@ public class ITVDownload : Download {
         let errorFh = errorPipe?.fileHandleForReading
         
         var args: [String] = [show.url,
+                              "--user-agent",
+                              "Mozilla/5.0",
                               "-f",
                               "mp4/best",
                               "-o",

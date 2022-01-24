@@ -7,13 +7,13 @@
 
 import Foundation
 
-public class ProgrammeHistoryObject: NSObject, NSCoding {
+@objc public class ProgrammeHistoryObject: NSObject, NSCoding {
     @objc public var sortKey: TimeInterval = 0
     @objc public var programmeName: String = ""
     @objc public var dateFound: String = ""
     @objc public var tvChannel: String = ""
     @objc public var networkName: String = ""
-    
+
     public func encode(with aCoder: NSCoder) {
         aCoder.encode(sortKey, forKey: "sortKey")
         aCoder.encode(programmeName, forKey: "programmeName")
@@ -37,14 +37,14 @@ public class ProgrammeHistoryObject: NSObject, NSCoding {
     
     public required init?(coder: NSCoder) {
         super.init()
-        
-        sortKey = TimeInterval(coder.decodeObject(forKey: "sortKey") as? Int ?? 0)
+
+        sortKey = TimeInterval(coder.decodeDouble(forKey: "sortKey"))
         programmeName = coder.decodeObject(forKey: "programmeName") as? String ?? ""
         dateFound = coder.decodeObject(forKey: "dateFound") as? String ?? ""
         tvChannel = coder.decodeObject(forKey: "tvChannel") as? String ?? ""
         networkName = coder.decodeObject(forKey: "networkName") as? String ?? ""
     }
-    
+
     public override func isEqual(_ object: Any?) -> Bool {
         if let entry = object as? ProgrammeHistoryObject {
             return programmeName == entry.programmeName
@@ -52,7 +52,7 @@ public class ProgrammeHistoryObject: NSObject, NSCoding {
             return false
         }
     }
-    
+
     public override var hash: Int {
         return programmeName.hash
     }
