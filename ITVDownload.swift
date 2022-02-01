@@ -283,8 +283,13 @@ public class ITVDownload : Download {
         task?.standardError = errorPipe
         let fh = pipe?.fileHandleForReading
         let errorFh = errorPipe?.fileHandleForReading
-        
-        var args: [String] = [show.url,
+
+        guard let executableURL = Bundle.main.path(forResource: "youtube-dl", ofType:nil) else {
+            return
+        }
+
+        var args: [String] = [executableURL,
+                              show.url,
                               "--user-agent",
                               "Mozilla/5.0",
                               "-f",
@@ -326,17 +331,21 @@ public class ITVDownload : Download {
         if self.verbose {
             self.logDebugMessage("DEBUG: youtube-dl args:\(args)", noTag: true)
         }
-        
-        if let executableURL = Bundle.main.url(forResource: "youtube-dl", withExtension:nil),
-           let binaryPath = Bundle.main.executableURL?.deletingLastPathComponent().path,
-           let resourcePath = Bundle.main.resourcePath
-        {
-            task?.launchPath = executableURL.path
+
+        let pythonInstall = Bundle.main.url(forResource: "python", withExtension: nil)
+        let binaryPath = Bundle.main.executableURL?.deletingLastPathComponent().path
+
+        if let pythonInstall = pythonInstall,
+           let binaryPath = binaryPath {
+            let pythonPath = pythonInstall.appendingPathComponent("bin/python3.11")
+            let certificatePath = pythonInstall.appendingPathComponent("lib/python3.11/site-packages/certifi/cacert.pem")
+            task?.launchPath = pythonPath.path
             task?.arguments = args
             let extraBinaryPath = AppController.shared().extraBinariesPath
             var envVariableDictionary = [String : String]()
-            envVariableDictionary["PATH"] = "\(binaryPath):\(extraBinaryPath):/usr/bin"
-            envVariableDictionary["PYTHONPATH"] = "\(resourcePath)"
+            envVariableDictionary["PATH"] = "\(binaryPath):\(pythonInstall.path):\(extraBinaryPath)"
+            envVariableDictionary["PYTHONPATH"] = pythonInstall.path
+            envVariableDictionary["SSL_CERT_FILE"] = certificatePath.path
             task?.environment = envVariableDictionary
             self.logDebugMessage("DEBUG: youtube-dl environment: \(envVariableDictionary)", noTag: true)
             
