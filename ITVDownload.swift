@@ -284,12 +284,13 @@ public class ITVDownload : Download {
         let fh = pipe?.fileHandleForReading
         let errorFh = errorPipe?.fileHandleForReading
 
-        guard let executableURL = Bundle.main.path(forResource: "youtube-dl", ofType:nil) else {
+        guard let youtubeDLFolder = Bundle.main.path(forResource: "yt-dlp_macos", ofType:nil),
+              let cacertFile = Bundle.main.url(forResource: "cacert", withExtension: "pem") else {
             return
         }
 
-        var args: [String] = [executableURL,
-                              show.url,
+        let youtubeDLBinary = youtubeDLFolder + "/yt-dlp_macos"
+        var args: [String] = [show.url,
                               "--user-agent",
                               "Mozilla/5.0",
                               "-f",
@@ -332,32 +333,24 @@ public class ITVDownload : Download {
             self.logDebugMessage("DEBUG: youtube-dl args:\(args)", noTag: true)
         }
 
-        let pythonInstall = Bundle.main.url(forResource: "python", withExtension: nil)
-        let binaryPath = Bundle.main.executableURL?.deletingLastPathComponent().path
 
-        if let pythonInstall = pythonInstall,
-           let binaryPath = binaryPath {
-            let pythonPath = pythonInstall.appendingPathComponent("bin/python3.11")
-            let certificatePath = pythonInstall.appendingPathComponent("lib/python3.11/site-packages/certifi/cacert.pem")
-            task?.launchPath = pythonPath.path
-            task?.arguments = args
-            let extraBinaryPath = AppController.shared().extraBinariesPath
-            var envVariableDictionary = [String : String]()
-            envVariableDictionary["PATH"] = "\(binaryPath):\(pythonInstall.path):\(extraBinaryPath)"
-            envVariableDictionary["PYTHONPATH"] = pythonInstall.path
-            envVariableDictionary["SSL_CERT_FILE"] = certificatePath.path
-            task?.environment = envVariableDictionary
-            self.logDebugMessage("DEBUG: youtube-dl environment: \(envVariableDictionary)", noTag: true)
-            
-            NotificationCenter.default.addObserver(self, selector: #selector(self.youtubeDLProgress), name: FileHandle.readCompletionNotification, object: fh)
-            NotificationCenter.default.addObserver(self, selector: #selector(self.youtubeDLProgress), name: FileHandle.readCompletionNotification, object: errorFh)
-            
-            task?.terminationHandler = youtubeDLTaskFinished
-            
-            task?.launch()
-            fh?.readInBackgroundAndNotify()
-            errorFh?.readInBackgroundAndNotify()
-        }
+        task?.launchPath = youtubeDLBinary
+        task?.arguments = args
+        let extraBinaryPath = AppController.shared().extraBinariesPath
+        var envVariableDictionary = [String : String]()
+        envVariableDictionary["PATH"] = "\(youtubeDLFolder):\(extraBinaryPath)"
+        envVariableDictionary["SSL_CERT_FILE"] = cacertFile.path
+        task?.environment = envVariableDictionary
+        self.logDebugMessage("DEBUG: youtube-dl environment: \(envVariableDictionary)", noTag: true)
+
+        NotificationCenter.default.addObserver(self, selector: #selector(self.youtubeDLProgress), name: FileHandle.readCompletionNotification, object: fh)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.youtubeDLProgress), name: FileHandle.readCompletionNotification, object: errorFh)
+
+        task?.terminationHandler = youtubeDLTaskFinished
+
+        task?.launch()
+        fh?.readInBackgroundAndNotify()
+        errorFh?.readInBackgroundAndNotify()
     }
 }
 
