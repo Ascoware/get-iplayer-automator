@@ -88,25 +88,23 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
         programmes.removeAll()
         
         if let showsPage = try? HTML(html: data, encoding: .utf8) {
-            let shows = showsPage.xpath("//a[@class='complex-link']")
+            let shows = showsPage.xpath("//li[@class='cp_grid__item cp_tile-grid__item']")
             
             for show in shows {
-                guard let showPage = show.at_xpath("@href")?.text,
-                    let showPageURL = URL(string: showPage) else {
-                        continue
-                }
+                let showPage = show.at_xpath("//a")
+                guard let showURL = showPage?["href"],
+                      let showPageURL = URL(string: "https:" + showURL) else {
+                          continue
+                      }
                 
                 let showName: String?
                 let numberEpisodes: Int
                 let productionID: String?
-                let showPageURLString: String?
-                
-                showPageURLString = showPage
                 productionID = showPageURL.lastPathComponent
                 
-                showName = show.at_xpath(".//h3[@class='tout__title complex-link__target theme__target']")?.content?.trimmingCharacters(in: .whitespacesAndNewlines)
+                showName = showPage?["aria-label"]?.trimmingCharacters(in: .whitespacesAndNewlines)
                 
-                if let numberEpisodesString = show.at_xpath(".//p[@class='tout__meta theme__meta']")?.content?.trimmingCharacters(in: .whitespacesAndNewlines) {
+                if let numberEpisodesString = show.at_xpath(".//span[@class='cp_basic-tile__episode-count']")?.content?.trimmingCharacters(in: .whitespacesAndNewlines) {
                     let scanner = Scanner(string: numberEpisodesString)
                     numberEpisodes = scanner.scanInteger() ?? 0
                 } else {
@@ -121,7 +119,7 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
                         let seriesInfo = Programme()
                         seriesInfo.seriesName = showName ?? ""
                         seriesInfo.pid = productionID ?? ""
-                        seriesInfo.url = showPageURLString ?? ""
+                        seriesInfo.url = showPageURL.absoluteString
                         programmes.append(seriesInfo)
                     }
                 }
