@@ -498,6 +498,8 @@
         
         if (![self.tvNetwork isEqualToString:@"ITV"]) {
             [self getNameFromPID];
+        } else {
+            self.status = @"Not in cache";
         }
     }
 }

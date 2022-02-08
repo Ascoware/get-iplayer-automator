@@ -844,11 +844,12 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 {
     for (Programme *show in _resultsController.selectedObjects)
     {
-        if (![_queueController.arrangedObjects containsObject:show])
-        {
+        if (![_queueController.arrangedObjects containsObject:show]) {
             if (runDownloads) show.status = @"Waiting…";
             else show.status = @"Available";
             [_queueController addObject:show];
+        } else {
+            show.status = @"";
         }
     }
 }

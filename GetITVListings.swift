@@ -141,7 +141,7 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
     func requestEpisodes(program: Programme) {
         /* Get all episodes for the programme name identified in MyProgramme */
         if let url = URL(string: program.url) {
-            mySession?.dataTask(with: url) {(data, _, error) in
+            mySession?.dataTask(with: url) {(data, response, error) in
                 self.processEpisodes(program: program, pageData: data, error: error)
             }.resume()
         }
@@ -219,9 +219,12 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
 //        print("productionID: \(productionID ?? "")")
 //        print("Date aired: \(dateTimeString ?? "Unknown")")
 //        print("=================")
-        
-        // Make sure the URL matches the show listing -- ITV likes to sneak other shows on a program page.
-        if let showURLBase = showURL?.deletingLastPathComponent(), showURLBase.absoluteString == programURL?.absoluteString {
+
+        let alreadyFound = self.episodes.contains { p in
+            p.url == programURL?.absoluteString
+        }
+
+        if !alreadyFound {
             let episode = Programme()
             episode.seriesName = programInfo.seriesName
             episode.pid = productionID ?? ""
@@ -233,6 +236,8 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
             episode.season = season
             episode.episode = episodeNumber
             self.episodes.append(episode)
+        } else {
+            logger?.add(toLog: "Skipping episode: \(showURL?.absoluteString ?? "")")
         }
 
     }
@@ -267,12 +272,12 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
         }
 
         if let showPageHTML = try? HTML(html: pageData, encoding: .utf8) {
-            let seriesElements = showPageHTML.xpath("//section[@class='module module--secondary js-series-group']")
+            let seriesElements = showPageHTML.xpath("//li[@class='grid-list__item width--one-half width--custard--one-third js-lazy js-list-item']")
 
             if seriesElements.count > 0 {
                 for series in seriesElements {
                     var seriesNumber = 0
-                    if let seriesText = series.at_xpath("//h2")?.content {
+                    if let seriesText = series.at_xpath("//h3")?.content {
                         let pattern = #"([\d]+$)"#;
                         let episodeRegex = try! NSRegularExpression(pattern: pattern, options: [])
                         let nsrange = NSRange(seriesText.startIndex..<seriesText.endIndex,
