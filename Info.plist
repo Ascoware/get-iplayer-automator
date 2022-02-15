@@ -19,7 +19,7 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>20220207002</string>
+	<string>20220215001</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.video</string>
 	<key>LSMinimumSystemVersion</key>
@@ -30,7 +30,7 @@
 		<true/>
 	</dict>
 	<key>NSAppleEventsUsageDescription</key>
-	<string>Get iPlayer Automator can schedule the current browser tab for downloads, and automatically add downloads to iTunes.</string>
+	<string>Get iPlayer Automator can scan the current browser tab for shows to download, and also automatically add downloaded content to Music or TV.</string>
 	<key>NSAppleScriptEnabled</key>
 	<true/>
 	<key>NSMainNibFile</key>

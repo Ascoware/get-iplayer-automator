@@ -17,6 +17,15 @@
 	return self;
 }
 
+-(instancetype)initWithFormat:(NSString *)format
+{
+    if (self = [super init]) {
+        self.format = format;
+    }
+
+    return self;
+}
+
 - (void) encodeWithCoder: (NSCoder *)coder
 {
 	[coder encodeObject: _format forKey:@"format"];

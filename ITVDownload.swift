@@ -22,23 +22,12 @@ public class ITVDownload : Download {
         // Nothing to do here.
     }
     
-    @objc public init(programme: Programme, formats: [TVFormat]?, proxy: HTTPProxy?, logger: LogController) {
+    @objc public init(programme: Programme, proxy: HTTPProxy?, logger: LogController) {
         super.init(logController: logger)
         self.proxy = proxy
         self.show = programme
         self.defaultsPrefix = "ITV_"
         self.running = true
-
-        //        guard let formats = formats, formats.count > 0 else {
-        //            print("ERROR: ITV Format List is empty")
-        //            add(toLog: "ERROR: ITV Format List is empty")
-        //            show.reasonForFailure = "ITVFormatListEmpty"
-        //            show.complete = true
-        //            show.successful = false
-        //            show.setValue("Download Failed", forKey:"status")
-        //            NotificationCenter.default.post(name:NSNotification.Name(rawValue: "DownloadFinished"), object:self.show)
-        //            return
-        //        }
         
         setCurrentProgress("Retrieving Programme Metadata... \(show.showName)")
         setPercentage(102)

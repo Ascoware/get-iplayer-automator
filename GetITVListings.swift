@@ -13,7 +13,6 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
     var myQueueLeft: Int = 0
     var mySession: URLSession?
     
-    var programmes = [Programme]()
     var episodes = [Programme]()
     var getITVShowRunning = false
     let currentTime = Date()
@@ -28,23 +27,12 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
         return NSHomeDirectory().appending("/.get_iplayer/").appending(fileName)
     }
 
-    public override init() {
-        super.init()
-        getITVShowRunning = false
-    }
-    
     @objc public func itvUpdate(newLogger: LogController) {
-        /* cant run if we are already running */
-        if getITVShowRunning == true {
-            return
-        }
         logger = newLogger
         logger?.add(toLog: "GetITVShows: ITV Cache Update Starting ")
-        getITVShowRunning = true
         myQueueSize = 0
         episodes.removeAll()
-        programmes.removeAll()
-        
+
         /* Create the NUSRLSession */
         let defaultConfigObject = URLSessionConfiguration.ephemeral
         defaultConfigObject.requestCachePolicy = .useProtocolCachePolicy
@@ -64,78 +52,74 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
                     return
                 }
                 
-                if self.createProgrammes(data: data) {
-                    self.myQueueSize = self.programmes.count
-                    self.myQueueLeft = self.myQueueSize
+                let programmes = self.createProgrammes(data: data)
+                self.myQueueSize = programmes.count
+                self.myQueueLeft = self.myQueueSize
+                self.logger?.add(toLog: "GetITVShows (Info): Programmes: \(programmes.count)")
 
-                    if self.myQueueSize >= 0 {
-                        for todayProgramme in self.programmes {
-                            self.requestEpisodes(program: todayProgramme)
-                        }
-                    } else {
-                        self.writeEpisodeCacheFile()
+                if self.myQueueSize >= 0 {
+                    for todayProgramme in programmes {
+                        self.requestEpisodes(program: todayProgramme)
                     }
-                    
                 } else {
-                    self.endOfRun()
+                    /* Now we sort the programmes and drop the duplicates */
+                    self.logger?.add(toLog: "No programmes found on www.itv.com/hub/shows")
+                    self.showAlert(message: "No programmes were found on www.itv.com/hub/shows",
+                              informative: "Try again later. If the problem persists please file a bug.")
+                    self.writeEpisodeCacheFile()
                 }
+
             }.resume()
+        } else {
+            self.endOfRun()
         }
     }
-    
-    func createProgrammes(data: Data) -> Bool {
+
+    func createProgrammes(data: Data) -> [Programme] {
         /* Scan itv.com/shows to create full listing of programmes (not episodes) that are available today */
-        programmes.removeAll()
-        
-        if let showsPage = try? HTML(html: data, encoding: .utf8) {
-            let shows = showsPage.xpath("//li[@class='cp_grid__item cp_tile-grid__item']")
-            
-            for show in shows {
-                let showPage = show.at_xpath("//a")
-                guard let showURL = showPage?["href"],
-                      let showPageURL = URL(string: "https:" + showURL) else {
-                          continue
-                      }
-                
-                let showName: String?
-                let numberEpisodes: Int
-                let productionID: String?
-                productionID = showPageURL.lastPathComponent
-                
-                showName = showPage?["aria-label"]?.trimmingCharacters(in: .whitespacesAndNewlines)
-                
-                if let numberEpisodesString = show.at_xpath(".//span[@class='cp_basic-tile__episode-count']")?.content?.trimmingCharacters(in: .whitespacesAndNewlines) {
-                    let scanner = Scanner(string: numberEpisodesString)
-                    numberEpisodes = scanner.scanInteger() ?? 0
-                } else {
-                    numberEpisodes = 0
-                }
-                
-                if numberEpisodes > 0 {
-                    // Check for duplicate show listings.
-                    let existingProgram = programmes.filter { $0.pid == productionID }
-                    
-                    if existingProgram.count == 0 {
-                        let seriesInfo = Programme()
-                        seriesInfo.seriesName = showName ?? ""
-                        seriesInfo.pid = productionID ?? ""
-                        seriesInfo.url = showPageURL.absoluteString
-                        programmes.append(seriesInfo)
-                    }
+        var foundPrograms = [Programme]()
+
+        guard let showsPage = try? HTML(html: data, encoding: .utf8) else {
+            return foundPrograms
+        }
+
+        let shows = showsPage.xpath("//li[@class='cp_grid__item cp_tile-grid__item']")
+
+        for show in shows {
+            let showPage = show.at_xpath("//a")
+            guard let showURL = showPage?["href"],
+                  let showPageURL = URL(string: "https:" + showURL) else {
+                      continue
+                  }
+
+            let numberEpisodes: Int
+            let productionID = showPageURL.lastPathComponent
+            let showName = showPage?["aria-label"]?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+
+            if let numberEpisodesString = show.at_xpath(".//span[@class='cp_basic-tile__episode-count']")?.content?.trimmingCharacters(in: .whitespacesAndNewlines) {
+                let scanner = Scanner(string: numberEpisodesString)
+                numberEpisodes = scanner.scanInteger() ?? 0
+            } else {
+                numberEpisodes = 0
+            }
+
+            if numberEpisodes > 0 {
+                // Check for duplicate show listings. This is needed because ITV lists
+                // shows with 'The' as the first word twice.
+                let existingProgram = foundPrograms.filter { $0.pid == productionID }
+
+                if existingProgram.count == 0 {
+                    let seriesInfo = Programme()
+                    seriesInfo.seriesName = showName
+                    seriesInfo.pid = productionID
+                    seriesInfo.url = showPageURL.absoluteString
+                    foundPrograms.append(seriesInfo)
                 }
             }
         }
-        
-        /* Now we sort the programmes and drop the duplicates */
-        if programmes.count == 0 {
-            self.logger?.add(toLog: "No programmes found on www.itv.com/hub/shows")
-            showAlert(message: "No programmes were found on www.itv.com/hub/shows",
-                      informative: "Try again later. If the problem persists please file a bug.")
-            return false
-        }
-        
-        programmes.sort { $0.seriesName < $1.seriesName }
-        return true
+
+        foundPrograms.sort { $0.seriesName < $1.seriesName }
+        return foundPrograms
     }
 
     func requestEpisodes(program: Programme) {
@@ -146,26 +130,26 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
             }.resume()
         }
     }
-    
+
     func dateForTimeString(_ time:String) -> Date? {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mmZ"
         dateFormatter.timeZone = TimeZone(secondsFromGMT:0)
         return dateFormatter.date(from: time)
     }
-        
+
     func processEpisodeElement(programInfo: Programme, show: Kanna.XMLElement, season: Int) {
         let dateTimeString = show.at_xpath(".//@datetime")?.text
-        
+
         var dateAiredUTC: Date? = nil
         if let dateTimeString = dateTimeString {
             dateAiredUTC = dateForTimeString(dateTimeString)
         }
-        
+
         let programURL = URL(string: programInfo.url)?.deletingLastPathComponent()
 
         let description = show.at_xpath(".//p[@class='tout__summary theme__subtle']")?.content?.trimmingCharacters(in: .whitespacesAndNewlines)
-        
+
         var episodeNumber: Int = 0
         var episodeTitle: String?
 
@@ -204,21 +188,21 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
                 }
             }
         }
-        
+
         var productionID: String? = ""
         var showURL: URL? = nil
         if let showURLString = show.at_xpath("@href")?.text {
             showURL = URL(string: showURLString)
             productionID = showURL?.lastPathComponent
         }
-        
-//        print("Program: \(program.programmeName)")
-//        print("Show URL: \(showURL?.absoluteString ?? "")")
-//        print("Episode number: \(episodeNumber ?? 0)")
-//        print("Series number: \(seriesNumber ?? 0)")
-//        print("productionID: \(productionID ?? "")")
-//        print("Date aired: \(dateTimeString ?? "Unknown")")
-//        print("=================")
+
+        //        print("Program: \(program.programmeName)")
+        //        print("Show URL: \(showURL?.absoluteString ?? "")")
+        //        print("Episode number: \(episodeNumber ?? 0)")
+        //        print("Series number: \(seriesNumber ?? 0)")
+        //        print("productionID: \(productionID ?? "")")
+        //        print("Date aired: \(dateTimeString ?? "Unknown")")
+        //        print("=================")
 
         let alreadyFound = self.episodes.contains { p in
             p.url == programURL?.absoluteString
@@ -241,7 +225,7 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
         }
 
     }
-    
+
     func processSingleEpisode(html: String) {
         let newProgram = ITVMetadataExtractor.getShowMetadata(htmlPageContent: html)
         self.episodes.append(newProgram)
@@ -250,7 +234,7 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
     fileprivate func operationCompleted() {
         let increment = Double(myQueueSize - 1) > 0 ? 100.0 / Double(myQueueSize - 1) : 100.0
         AppController.shared().itvProgressIndicator.increment(by: increment)
-        
+
         /* Check if there is any outstanding work before processing the carried forward programme list */
         myQueueLeft -= 1
         if (myQueueLeft == 0) {
@@ -272,12 +256,12 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
         }
 
         if let showPageHTML = try? HTML(html: pageData, encoding: .utf8) {
-            let seriesElements = showPageHTML.xpath("//li[@class='grid-list__item width--one-half width--custard--one-third js-lazy js-list-item']")
+            let seriesElements = showPageHTML.xpath("//section[@class='module module--secondary js-series-group']")
 
             if seriesElements.count > 0 {
                 for series in seriesElements {
                     var seriesNumber = 0
-                    if let seriesText = series.at_xpath("//h3")?.content {
+                    if let seriesText = series.at_xpath("//h2")?.content {
                         let pattern = #"([\d]+$)"#;
                         let episodeRegex = try! NSRegularExpression(pattern: pattern, options: [])
                         let nsrange = NSRange(seriesText.startIndex..<seriesText.endIndex,
@@ -319,12 +303,12 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
                 }
             }
         }
-        
+
         operationCompleted()
     }
-    
+
     func writeEpisodeCacheFile() {
-        self.logger?.add(toLog: "GetITVShows (Info): Episodes: \(episodes.count) Today Programmes: \(programmes.count) ")
+        self.logger?.add(toLog: "GetITVShows (Info): Episodes: \(episodes.count)")
 
         /* Now create the cache file that used to be created by get_iplayer */
         //    my @cache_format = qw/index type name episode seriesnum episodenum pid channel available expires duration desc web thumbnail timeadded/;
@@ -376,7 +360,7 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
             cacheEntry += "|\(dateAddedInteger)|\n"
             cacheFileEntries.append(cacheEntry)
         }
-        
+
         var cacheData = Data()
         for cacheString in cacheFileEntries {
             if let stringData = cacheString.data(using: .utf8) {
@@ -393,7 +377,7 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
 
         endOfRun()
     }
-    
+
     private func showAlert(message: String, informative: String) {
         DispatchQueue.main.async {
             let alert = NSAlert()
@@ -405,13 +389,13 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
 
         }
     }
+
     func endOfRun() {
         /* Notify finish and invaliate the NSURLSession */
-        getITVShowRunning = false
         mySession?.finishTasksAndInvalidate()
         NotificationCenter.default.post(name: NSNotification.Name("ITVUpdateFinished"), object: nil)
         self.logger?.add(toLog: "GetITVShows: Update Finished")
     }
-    
+
 }
 

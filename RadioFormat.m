@@ -13,8 +13,16 @@
 - (instancetype)init
 {
 	if (!(self = [super init])) return nil;
-	format = [[NSString alloc] init];
+    format = @"";
 	return self;
+}
+
+-(instancetype)initWithFormat:(NSString *)format
+{
+    if (self = [super init]) {
+        self.format = format;
+    }
+    return self;
 }
 
 - (void) encodeWithCoder: (NSCoder *)coder

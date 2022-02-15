@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="17701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17701"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -60,6 +60,7 @@
                 <string>showName</string>
                 <string>solution</string>
             </declaredKeys>
+            <classReference key="objectClass" className="ReasonForFailure"/>
         </arrayController>
         <customObject id="987" customClass="SUUpdater">
             <connections>
@@ -80,6 +81,7 @@
                 <string>showName</string>
                 <string>episodeName</string>
             </declaredKeys>
+            <classReference key="objectClass" className="DownloadHistoryEntry"/>
         </arrayController>
         <arrayController objectClassName="Programme" editable="NO" id="683" userLabel="Results Controller">
             <declaredKeys>
@@ -90,6 +92,7 @@
                 <string>status</string>
                 <string>successful</string>
             </declaredKeys>
+            <classReference key="objectClass" className="Programme"/>
             <connections>
                 <binding destination="621" name="contentArray" keyPath="searchResultsArray" id="695"/>
             </connections>
@@ -104,6 +107,7 @@
                 <string>successful</string>
                 <string>canAdd</string>
             </declaredKeys>
+            <classReference key="objectClass" className="Programme"/>
             <connections>
                 <binding destination="621" name="contentArray" keyPath="queueArray" id="712"/>
                 <outlet property="oTableView" destination="469" id="GLB-ew-7sa"/>
@@ -118,6 +122,7 @@
                 <string>status</string>
                 <string>successful</string>
             </declaredKeys>
+            <classReference key="objectClass" className="Programme"/>
             <connections>
                 <binding destination="621" name="contentArray" keyPath="pvrSearchResultsArray" id="975"/>
             </connections>
@@ -126,6 +131,7 @@
             <declaredKeys>
                 <string>showName</string>
             </declaredKeys>
+            <classReference key="objectClass" className="Series"/>
             <connections>
                 <binding destination="621" name="contentArray" keyPath="pvrQueueArray" id="974"/>
                 <outlet property="oTableView" destination="536" id="xIF-Yg-nEy"/>
@@ -190,7 +196,7 @@
                             <autoresizingMask key="autoresizingMask"/>
                             <clipView key="contentView" drawsBackground="NO" id="LYx-5P-gHI">
                                 <rect key="frame" x="1" y="1" width="309" height="133"/>
-                                <autoresizingMask key="autoresizingMask"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <textView editable="NO" importsGraphics="NO" verticallyResizable="YES" usesFontPanel="YES" findStyle="panel" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" spellingCorrection="YES" smartInsertDelete="YES" id="7Pi-tT-G0Q" userLabel="Description View">
                                         <rect key="frame" x="0.0" y="0.0" width="309" height="133"/>
@@ -226,7 +232,7 @@
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <clipView key="contentView" drawsBackground="NO" id="jHT-Hr-sFJ">
                                 <rect key="frame" x="1" y="1" width="309" height="133"/>
-                                <autoresizingMask key="autoresizingMask"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="jeg-8F-HB4" id="MRJ-oM-h7R">
                                         <rect key="frame" x="0.0" y="0.0" width="309" height="116"/>
@@ -373,6 +379,7 @@
             <declaredKeys>
                 <string>format</string>
             </declaredKeys>
+            <classReference key="objectClass" className="TVFormat"/>
             <connections>
                 <binding destination="621" name="contentArray" keyPath="tvFormatList" id="1143"/>
             </connections>
@@ -381,6 +388,7 @@
             <declaredKeys>
                 <string>format</string>
             </declaredKeys>
+            <classReference key="objectClass" className="RadioFormat"/>
             <connections>
                 <binding destination="621" name="contentArray" keyPath="radioFormatList" id="1140"/>
             </connections>
@@ -389,7 +397,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" utility="YES" HUD="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="146" width="420" height="225"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1792" height="1095"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2056" height="1285"/>
             <view key="contentView" id="1149">
                 <rect key="frame" x="0.0" y="0.0" width="420" height="225"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -696,7 +704,7 @@
         <window title="Get iPlayer Automator" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" frameAutosaveName="mainWindow" animationBehavior="default" id="371" userLabel="Main Window">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <rect key="contentRect" x="254" y="117" width="807" height="557"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1792" height="1095"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2056" height="1285"/>
             <value key="minSize" type="size" width="640" height="500"/>
             <view key="contentView" id="372">
                 <rect key="frame" x="0.0" y="0.0" width="807" height="557"/>
@@ -715,7 +723,7 @@
                         </connections>
                     </textField>
                     <button toolTip="Retrieve information about manually entered PIDs for currently selected shows." verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="477">
-                        <rect key="frame" x="684" y="275" width="109" height="32"/>
+                        <rect key="frame" x="685" y="275" width="107" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="push" title="Process PID" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="478">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -727,7 +735,7 @@
                         </connections>
                     </button>
                     <button toolTip="Use the current webpage to add a program to the queue." verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="479">
-                        <rect key="frame" x="13" y="275" width="177" height="32"/>
+                        <rect key="frame" x="18" y="275" width="168" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="push" title="Use Current Webpage" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="480">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -852,7 +860,7 @@
                         </tableHeaderView>
                     </scrollView>
                     <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="499">
-                        <rect key="frame" x="346" y="282" width="112" height="17"/>
+                        <rect key="frame" x="346" y="282" width="112" height="16"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Download Queue" id="500">
                             <font key="font" metaFont="system"/>
@@ -885,7 +893,7 @@
                         </textFieldCell>
                     </textField>
                     <button toolTip="Add selected show(s) in search results to queue." verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="513">
-                        <rect key="frame" x="338" y="299" width="131" height="32"/>
+                        <rect key="frame" x="344" y="299" width="120" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="push" title="Add To Queue" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="514">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1172,7 +1180,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="60" width="623" height="450"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1792" height="1095"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2056" height="1285"/>
             <value key="minSize" type="size" width="623" height="450"/>
             <view key="contentView" id="518">
                 <rect key="frame" x="0.0" y="0.0" width="623" height="450"/>
@@ -1199,7 +1207,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                         <clipView key="contentView" id="en0-B7-GvD">
                             <rect key="frame" x="1" y="1" width="566" height="147"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="sequential" columnSelection="YES" autosaveColumns="NO" headerView="526" id="525">
                                     <rect key="frame" x="0.0" y="0.0" width="566" height="130"/>
@@ -1295,7 +1303,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" id="vxe-2Q-IFs">
                             <rect key="frame" x="1" y="1" width="566" height="124"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="sequential" columnSelection="YES" autosaveColumns="NO" headerView="537" id="536">
                                     <rect key="frame" x="0.0" y="0.0" width="566" height="107"/>
@@ -1370,7 +1378,7 @@
                         </tableHeaderView>
                     </scrollView>
                     <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="542">
-                        <rect key="frame" x="17" y="171" width="116" height="17"/>
+                        <rect key="frame" x="17" y="171" width="77" height="16"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Series-Link:" id="543">
                             <font key="font" metaFont="system"/>
@@ -1438,10 +1446,10 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" utility="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="16" width="497" height="626"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1792" height="1095"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2056" height="1285"/>
             <view key="contentView" id="548">
                 <rect key="frame" x="0.0" y="0.0" width="497" height="626"/>
-                <autoresizingMask key="autoresizingMask"/>
+                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
                     <tabView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1069">
                         <rect key="frame" x="13" y="18" width="471" height="594"/>
@@ -1587,7 +1595,7 @@
                                             </connections>
                                         </matrix>
                                         <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="549">
-                                            <rect key="frame" x="14" y="509" width="103" height="17"/>
+                                            <rect key="frame" x="14" y="509" width="95" height="16"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Download Path" id="550">
                                                 <font key="font" metaFont="system"/>
@@ -1909,25 +1917,25 @@
                                 </view>
                             </tabViewItem>
                             <tabViewItem label="Download Formats" identifier="2" id="1072">
-                                <view key="view" ambiguous="YES" id="1073">
+                                <view key="view" id="1073">
                                     <rect key="frame" x="10" y="33" width="451" height="548"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <scrollView fixedFrame="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1075">
                                             <rect key="frame" x="17" y="403" width="417" height="142"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <clipView key="contentView" ambiguous="YES" id="iNe-PX-Coi">
+                                            <clipView key="contentView" id="iNe-PX-Coi">
                                                 <rect key="frame" x="1" y="1" width="400" height="125"/>
-                                                <autoresizingMask key="autoresizingMask"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <tableView verticalHuggingPriority="750" ambiguous="YES" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="1079" id="1078">
+                                                    <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="1079" id="1078">
                                                         <rect key="frame" x="0.0" y="0.0" width="400" height="108"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <size key="intercellSpacing" width="3" height="2"/>
                                                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                                         <tableColumns>
-                                                            <tableColumn width="368" minWidth="40" maxWidth="1000" id="1080">
+                                                            <tableColumn width="388" minWidth="40" maxWidth="1000" id="1080">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="BBC TV Show Formats">
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
@@ -1940,16 +1948,19 @@
                                                                             <menuItem title="Please select..." state="on" id="fiI-sm-4j3">
                                                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                                                             </menuItem>
-                                                                            <menuItem title="Best" state="on" id="k2x-Yo-cqd" userLabel="Best">
+                                                                            <menuItem title="Full HD (1080p)" state="on" id="k2x-Yo-cqd">
                                                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                                                             </menuItem>
-                                                                            <menuItem title="Better" id="QPv-lH-1Bk" userLabel="Better">
+                                                                            <menuItem title="HD (720p)" id="QPv-lH-1Bk">
                                                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                                                             </menuItem>
-                                                                            <menuItem title="Good" id="1gB-ry-erP" userLabel="Good">
+                                                                            <menuItem title="SD (540p)" id="1gB-ry-erP">
                                                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                                                             </menuItem>
-                                                                            <menuItem title="Worst" id="MNn-oe-AHd">
+                                                                            <menuItem title="Web (396p)" id="MNn-oe-AHd">
+                                                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                                                            </menuItem>
+                                                                            <menuItem title="Mobile (288p)" id="7tc-C5-tKt" userLabel="Mobile (288p)">
                                                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                                                             </menuItem>
                                                                         </items>
@@ -1984,18 +1995,18 @@
                                         <scrollView fixedFrame="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1085">
                                             <rect key="frame" x="17" y="175" width="417" height="174"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <clipView key="contentView" ambiguous="YES" id="Yo1-zO-Vaa">
+                                            <clipView key="contentView" id="Yo1-zO-Vaa">
                                                 <rect key="frame" x="1" y="1" width="400" height="157"/>
-                                                <autoresizingMask key="autoresizingMask"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <tableView verticalHuggingPriority="750" ambiguous="YES" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="1086" id="1087">
+                                                    <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="1086" id="1087">
                                                         <rect key="frame" x="0.0" y="0.0" width="400" height="140"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <size key="intercellSpacing" width="3" height="2"/>
                                                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                                         <tableColumns>
-                                                            <tableColumn width="368" minWidth="40" maxWidth="1000" id="1090">
+                                                            <tableColumn width="388" minWidth="40" maxWidth="1000" id="1090">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="BBC Radio Show Formats">
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
@@ -2008,16 +2019,14 @@
                                                                             <menuItem title="Please select..." state="on" id="KJk-TX-uSU">
                                                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                                                             </menuItem>
-                                                                            <menuItem title="Best" id="o8l-i9-SFq"/>
-                                                                            <menuItem title="Better" id="Swo-hy-7U9">
+                                                                            <menuItem title="High" id="o8l-i9-SFq"/>
+                                                                            <menuItem title="Standard" id="hEc-5D-qO2" userLabel="Standard">
                                                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                                                             </menuItem>
-                                                                            <menuItem title="Very Good" id="glb-6P-Pu3"/>
-                                                                            <menuItem title="Good" id="eZ8-k4-Tug"/>
-                                                                            <menuItem title="Worse" id="QOv-mI-7kd">
+                                                                            <menuItem title="Medium" id="ID9-dN-2Kh" userLabel="Medium">
                                                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                                                             </menuItem>
-                                                                            <menuItem title="Worst" id="Coz-Qs-UQO">
+                                                                            <menuItem title="Low" id="r4G-vd-h6j" userLabel="Low">
                                                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                                                             </menuItem>
                                                                         </items>
@@ -2109,108 +2118,10 @@
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                         </button>
-                                        <scrollView fixedFrame="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="P0h-W7-YO2">
-                                            <rect key="frame" x="17" y="3" width="417" height="153"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <clipView key="contentView" ambiguous="YES" id="Xcv-fl-nad">
-                                                <rect key="frame" x="1" y="1" width="400" height="136"/>
-                                                <autoresizingMask key="autoresizingMask"/>
-                                                <subviews>
-                                                    <tableView verticalHuggingPriority="750" ambiguous="YES" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="IKG-gn-2PC" id="gbz-Rl-ARO">
-                                                        <rect key="frame" x="0.0" y="0.0" width="400" height="113"/>
-                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                        <size key="intercellSpacing" width="3" height="2"/>
-                                                        <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                        <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
-                                                        <tableColumns>
-                                                            <tableColumn width="368" minWidth="40" maxWidth="1000" id="MbW-0I-Tgw">
-                                                                <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="ITV TV Show Formats">
-                                                                    <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
-                                                                    <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
-                                                                </tableHeaderCell>
-                                                                <popUpButtonCell key="dataCell" type="bevel" title="Please select..." bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="bezel" imageScaling="proportionallyDown" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="7NN-Fg-bJb" id="6Qf-m3-xQN">
-                                                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                                                    <font key="font" metaFont="message" size="11"/>
-                                                                    <menu key="menu" id="rlk-XY-zON">
-                                                                        <items>
-                                                                            <menuItem title="Please select..." state="on" id="7NN-Fg-bJb">
-                                                                                <modifierMask key="keyEquivalentModifierMask"/>
-                                                                            </menuItem>
-                                                                            <menuItem title="Flash - HD" id="Whe-Zh-iRf"/>
-                                                                            <menuItem title="Flash - Very High" id="4B2-eT-34U"/>
-                                                                            <menuItem title="Flash - High" id="tW6-91-Iyn"/>
-                                                                            <menuItem title="Flash - Standard" id="Wuf-f0-zJi">
-                                                                                <modifierMask key="keyEquivalentModifierMask"/>
-                                                                            </menuItem>
-                                                                            <menuItem title="Flash - Low" id="VS3-9S-XVj">
-                                                                                <modifierMask key="keyEquivalentModifierMask"/>
-                                                                            </menuItem>
-                                                                            <menuItem title="Flash - Very Low" id="uCQ-WZ-jSz">
-                                                                                <modifierMask key="keyEquivalentModifierMask"/>
-                                                                            </menuItem>
-                                                                        </items>
-                                                                    </menu>
-                                                                </popUpButtonCell>
-                                                                <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
-                                                                <connections>
-                                                                    <binding destination="1432" name="selectedValue" keyPath="arrangedObjects.format" id="v7f-yb-bKm">
-                                                                        <dictionary key="options">
-                                                                            <string key="NSValueTransformerName">ITVFormatTransformer</string>
-                                                                        </dictionary>
-                                                                    </binding>
-                                                                </connections>
-                                                            </tableColumn>
-                                                        </tableColumns>
-                                                    </tableView>
-                                                </subviews>
-                                            </clipView>
-                                            <scroller key="horizontalScroller" verticalHuggingPriority="750" horizontal="YES" id="fkg-ES-yOP">
-                                                <rect key="frame" x="1" y="137" width="400" height="15"/>
-                                                <autoresizingMask key="autoresizingMask"/>
-                                            </scroller>
-                                            <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="K7M-kc-9tT">
-                                                <rect key="frame" x="401" y="24" width="15" height="113"/>
-                                                <autoresizingMask key="autoresizingMask"/>
-                                            </scroller>
-                                            <tableHeaderView key="headerView" id="IKG-gn-2PC">
-                                                <rect key="frame" x="0.0" y="0.0" width="400" height="23"/>
-                                                <autoresizingMask key="autoresizingMask"/>
-                                            </tableHeaderView>
-                                        </scrollView>
-                                        <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3ik-hE-3Me">
-                                            <rect key="frame" x="17" y="0.0" width="29" height="23"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="smallSquare" title="+" bezelStyle="smallSquare" imagePosition="below" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="kKG-hL-9vH">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="add:" target="1432" id="yvt-KY-udx"/>
-                                            </connections>
-                                        </button>
-                                        <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QQh-ET-7Tw">
-                                            <rect key="frame" x="45" y="0.0" width="29" height="23"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="smallSquare" title="-" bezelStyle="smallSquare" imagePosition="below" alignment="center" state="on" borderStyle="border" allowsMixedState="YES" imageScaling="proportionallyDown" inset="2" id="pdw-fv-9UN">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="remove:" target="1432" id="qgk-rS-ZmK"/>
-                                            </connections>
-                                        </button>
-                                        <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="EPg-Rn-dtg">
-                                            <rect key="frame" x="73" y="0.0" width="361" height="23"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" imagePosition="below" alignment="center" refusesFirstResponder="YES" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="P5s-1g-yFI">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                        </button>
                                         <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0tJ-5h-fyc" userLabel="Use 50 FPS">
-                                            <rect key="frame" x="15" y="365" width="236" height="18"/>
+                                            <rect key="frame" x="15" y="365" width="249" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Prefer 25 FPS streams if available" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="LOo-cl-WiG" userLabel="Prefer 50 FPS streams if available">
+                                            <buttonCell key="cell" type="check" title="Use lower bitrate streams if available" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="LOo-cl-WiG" userLabel="Prefer 50 FPS streams if available">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
@@ -2234,7 +2145,7 @@
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Wk6-ae-0Ab">
-                                                        <rect key="frame" x="12" y="101" width="77" height="18"/>
+                                                        <rect key="frame" x="12" y="101" width="81" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC One" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="e6W-Fp-His">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2246,7 +2157,7 @@
                                                         </connections>
                                                     </button>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="EQj-uS-ifA">
-                                                        <rect key="frame" x="123" y="101" width="77" height="18"/>
+                                                        <rect key="frame" x="123" y="101" width="81" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC Two" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="zhN-8d-7Aq">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2258,15 +2169,27 @@
                                                         </connections>
                                                     </button>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kTz-fz-PyE">
-                                                        <rect key="frame" x="235" y="101" width="80" height="18"/>
+                                                        <rect key="frame" x="227" y="101" width="91" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="BBC Four" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="wbk-x4-9tX">
+                                                        <buttonCell key="cell" type="check" title="BBC Three" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="wbk-x4-9tX">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
                                                         <connections>
                                                             <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="B83-Rs-nhi"/>
-                                                            <binding destination="668" name="value" keyPath="values.BBCFour" id="LSR-WX-bdS"/>
+                                                            <binding destination="668" name="value" keyPath="values.BBCThree" id="7zP-OK-RMF"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DEf-zb-63x">
+                                                        <rect key="frame" x="334" y="101" width="84" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="BBC Four" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="W7T-y8-dSe">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="SdH-h2-0Ys"/>
+                                                            <binding destination="668" name="value" keyPath="values.BBCFour" id="2qq-4J-oNT"/>
                                                         </connections>
                                                     </button>
                                                     <box verticalHuggingPriority="750" fixedFrame="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="Wha-sr-x29">
@@ -2603,7 +2526,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="159" width="584" height="351"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1792" height="1095"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2056" height="1285"/>
             <value key="minSize" type="size" width="584" height="351"/>
             <view key="contentView" id="1213">
                 <rect key="frame" x="0.0" y="0.0" width="584" height="351"/>
@@ -2746,7 +2669,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="109" width="469" height="401"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1792" height="1095"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2056" height="1285"/>
             <view key="contentView" id="612">
                 <rect key="frame" x="0.0" y="0.0" width="469" height="401"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -2809,7 +2732,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="300" width="397" height="198"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1792" height="1095"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2056" height="1285"/>
             <view key="contentView" id="883">
                 <rect key="frame" x="0.0" y="0.0" width="397" height="198"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -2834,7 +2757,7 @@ Please Note: The searchable/downloadable types will not be updated until the cac
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="419" width="397" height="68"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1792" height="1095"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2056" height="1285"/>
             <view key="contentView" id="896">
                 <rect key="frame" x="0.0" y="0.0" width="397" height="68"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -2856,7 +2779,7 @@ Please Note: The searchable/downloadable types will not be updated until the cac
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" utility="YES" HUD="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="690" y="385" width="432" height="244"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1792" height="1095"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2056" height="1285"/>
             <view key="contentView" id="783">
                 <rect key="frame" x="0.0" y="0.0" width="432" height="244"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -2883,7 +2806,7 @@ Note 2: Due to the way search is currently implemented, BBC shows older than 7 d
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" utility="YES" HUD="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="690" y="368" width="432" height="295"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1792" height="1095"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2056" height="1285"/>
             <view key="contentView" id="1258">
                 <rect key="frame" x="0.0" y="0.0" width="432" height="295"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -2910,7 +2833,7 @@ Note: Only the types of shows you select in the preferences will show up here.</
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="240" width="480" height="270"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1792" height="1095"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2056" height="1285"/>
             <view key="contentView" id="1272">
                 <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -2920,7 +2843,7 @@ Note: Only the types of shows you select in the preferences will show up here.</
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="269" y="337" width="802" height="400"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1792" height="1095"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2056" height="1285"/>
             <value key="minSize" type="size" width="400" height="150"/>
             <view key="contentView" id="1375">
                 <rect key="frame" x="0.0" y="0.0" width="802" height="400"/>
@@ -3033,6 +2956,7 @@ DQ
             <declaredKeys>
                 <string>format</string>
             </declaredKeys>
+            <classReference key="objectClass" className="TVFormat"/>
         </arrayController>
         <customFormatter id="S9t-eO-Bm7" customClass="StringTrimFormatter"/>
         <viewController id="QMk-Wb-aLD" userLabel="Show Popover View Controller">

@@ -12,35 +12,38 @@
 @implementation BBCDownload
 + (void)initFormats
 {
-    NSArray *tvFormatKeys = @[@"Best", @"Better", @"Good", @"Worst"];
-    NSArray *tvFormatObjects = @[@"tvbest",@"tvbetter",@"tvgood", @"tvworst"];
-    NSArray *radioFormatKeys = @[@"Best", @"Better", @"Good", @"Worst"];
-    NSArray *radioFormatObjects = @[@"radiobest", @"radiobetter", @"radiogood", @"radioworst"];
+    NSArray *tvFormatKeys = @[@"Full HD (1080p)", @"HD (720p)", @"Web (540p)", @"Mobile (288p)"];
+    NSArray *tvFormatObjects = @[@"fhd",@"hd",@"sd", @"mobile"];
+    NSArray *radioFormatKeys = @[@"High", @"Standard", @"Medium", @"Low"];
+    NSArray *radioFormatObjects = @[@"high", @"std", @"med", @"low"];
     
     tvFormats = [[NSDictionary alloc] initWithObjects:tvFormatObjects forKeys:tvFormatKeys];
     radioFormats = [[NSDictionary alloc] initWithObjects:radioFormatObjects forKeys:radioFormatKeys];
 }
 #pragma mark Overridden Methods
-- (instancetype)initWithProgramme:(Programme *)tempShow tvFormats:(NSArray *)tvFormatList radioFormats:(NSArray *)radioFormatList proxy:(HTTPProxy *)aProxy logController:(LogController *)logger
+- (instancetype)initWithProgramme:(Programme *)p tvFormats:(NSArray *)tvFormatList radioFormats:(NSArray *)radioFormatList proxy:(HTTPProxy *)aProxy logController:(LogController *)logger
 {
     if (self = [super initWithLogController:logger]) {
         self.reasonForFailure = nil;
         self.proxy = aProxy;
-        self.show = tempShow;
-        [self addToLog:[NSString stringWithFormat:@"Downloading %@", tempShow.showName]];
+        self.show = p;
+        [self addToLog:[NSString stringWithFormat:@"Downloading %@", self.show.showName]];
 
         //Initialize Formats
         if (!tvFormats || !radioFormats) {
             [BBCDownload initFormats];
         }
-        NSMutableString *formatArg = [[NSMutableString alloc] initWithString:@"--modes="];
+        NSMutableString *formatArg = [[NSMutableString alloc] initWithString:@"--quality="];
         NSMutableArray *formatStrings = [NSMutableArray array];
-        
-        for (RadioFormat *format in radioFormatList) {
-            [formatStrings addObject:[radioFormats valueForKey:format.format]];
-        }
-        for (TVFormat *format in tvFormatList) {
-            [formatStrings addObject:[tvFormats valueForKey:format.format]];
+
+        if (self.show.radio) {
+            for (RadioFormat *format in radioFormatList) {
+                [formatStrings addObject:[radioFormats valueForKey:format.format]];
+            }
+        } else {
+            for (TVFormat *format in tvFormatList) {
+                [formatStrings addObject:[tvFormats valueForKey:format.format]];
+            }
         }
         
         NSString *commaSeparatedFormats = [formatStrings componentsJoinedByString:@","];
@@ -149,7 +152,7 @@
         
         // 50 FPS frames?
         if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"Use25FPSStreams"] boolValue]) {
-            [args addObject:@"--fps25"];
+            [args addObject:@"--tv-lower-bitrate"];
         }
         
         //Tagging
@@ -348,12 +351,12 @@
             [scanner scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet] intoString:&path];
             self.show.path = path;
         }
-        else if ([output hasPrefix:@"INFO: No specified modes"] && [output hasSuffix:@"--modes=)"])
+        else if ([output hasPrefix:@"INFO: No specified modes"] && [output hasSuffix:@"--quality=)"])
         {
             self.reasonForFailure = @"Specified_Modes";
             NSScanner *modeScanner = [NSScanner scannerWithString:output];
-            [modeScanner scanUpToString:@"--modes=" intoString:nil];
-            [modeScanner scanString:@"--modes=" intoString:nil];
+            [modeScanner scanUpToString:@"--quality=" intoString:nil];
+            [modeScanner scanString:@"--quality=" intoString:nil];
             NSString *availableModes;
             [modeScanner scanUpToString:@")" intoString:&availableModes];
             self.show.availableModes = availableModes;

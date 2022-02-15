@@ -522,7 +522,6 @@
 					};
 					8D1107260486CEB800E47090 = {
 						LastSwiftMigration = "";
-						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.HardenedRuntime = {
 								enabled = 1;
@@ -772,6 +771,7 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_ENTITLEMENTS = "Get iPlayer Automator/Get iPlayer Automator.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEVELOPMENT_TEAM = L8BMU8WLEC;
@@ -800,7 +800,7 @@
 					"\"$(SRCROOT)/Binaries\"",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
-				MARKETING_VERSION = 1.21.15;
+				MARKETING_VERSION = 1.22;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CODE_SIGN_FLAGS = "--no-strict";
 				OTHER_LDFLAGS = "-licucore";
@@ -825,6 +825,7 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_ENTITLEMENTS = "Get iPlayer Automator/Get iPlayer Automator.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = L8BMU8WLEC;
@@ -848,7 +849,7 @@
 					"\"$(SRCROOT)/Binaries\"",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
-				MARKETING_VERSION = 1.21.15;
+				MARKETING_VERSION = 1.22;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CODE_SIGN_FLAGS = "--no-strict";
 				OTHER_LDFLAGS = "-licucore";

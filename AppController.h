@@ -91,7 +91,7 @@ extern NSDictionary *radioFormats;
 //Scheduling a Start
 @property IBOutlet NSPanel *scheduleWindow;
 @property IBOutlet NSDatePicker *datePicker;
-@property NSTimer *interfaceTimer;
+@property (nullable) NSTimer *interfaceTimer;
 @property (nullable) NSTimer *scheduleTimer;
 @property BOOL runScheduled;
 

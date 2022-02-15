@@ -79,6 +79,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     defaultValues[@"TagRadioAsPodcast"] = @NO;
     defaultValues[@"BBCOne"] = @YES;
     defaultValues[@"BBCTwo"] = @YES;
+    defaultValues[@"BBCThree"] = @YES;
     defaultValues[@"BBCFour"] = @YES;
     defaultValues[@"CBBC"] = @NO;
     defaultValues[@"CBeebies"] = @NO;
@@ -213,11 +214,54 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     filename = @"Formats.automatorqueue";
     filePath = [appSupportFolder stringByAppendingPathComponent:filename];
 
+    NSDictionary *newTvFormatMapping = @{
+        @"Best" : @"HD (720p)",
+        @"Better" : @"Web (580p)",
+        @"Very Good" : @"Web (580p)",
+        @"Good" : @"Web (580p)",
+        @"Worst" : @"Mobile (288p)"
+    };
+
+    NSDictionary *newRadioFormatMapping = @{
+        @"Best" : @"High",
+        @"Better" : @"Standard",
+        @"Very Good" : @"Standard",
+        @"Good" : @"Medium",
+        @"Worst" : @"Low"
+    };
+
     @try
     {
         rootObject = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
-        [_radioFormatController addObjects:[rootObject valueForKey:@"radioFormats"]];
-        [_tvFormatController addObjects:[rootObject valueForKey:@"tvFormats"]];
+        NSArray *archivedTVFormats = [rootObject valueForKey:@"tvFormats"];
+        NSMutableArray *updatedTVFormats = [NSMutableArray array];
+
+        for (TVFormat *fmt in archivedTVFormats) {
+            NSString *updatedValue = newTvFormatMapping[fmt.format];
+            if (updatedValue) {
+                [updatedTVFormats addObject:[[TVFormat alloc] initWithFormat:updatedValue]];
+            } else {
+                [updatedTVFormats addObject:fmt];
+            }
+        }
+
+        [_tvFormatController addObjects:updatedTVFormats];
+
+        NSArray *archivedRadioFormats = [rootObject valueForKey:@"radioFormats"];
+        NSMutableArray *updatedRadioFormats = [NSMutableArray array];
+
+        for (RadioFormat *fmt in archivedRadioFormats) {
+            NSString *updatedValue = newRadioFormatMapping[fmt.format];
+            if (updatedValue) {
+                [updatedRadioFormats addObject:[[RadioFormat alloc] initWithFormat:updatedValue]];
+            } else {
+                [updatedRadioFormats addObject:fmt];
+            }
+        }
+
+        [_radioFormatController addObjects:updatedRadioFormats];
+
+
     }
     @catch (NSException *e)
     {
@@ -258,22 +302,28 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     if ([_tvFormatController.arrangedObjects count] == 0)
     {
         TVFormat *format1 = [[TVFormat alloc] init];
-        format1.format = @"Best";
+        format1.format = @"Full HD (1080p)";
         TVFormat *format2 = [[TVFormat alloc] init];
-        format2.format = @"Better";
+        format2.format = @"HD (720p)";
         TVFormat *format3 = [[TVFormat alloc] init];
-        format3.format = @"Very Good";
-        [_tvFormatController addObjects:@[format1,format2,format3]];
+        format3.format = @"SD (540p)";
+        TVFormat *format4 = [[TVFormat alloc] init];
+        format4.format = @"Web (396p)";
+        TVFormat *format5 = [[TVFormat alloc] init];
+        format5.format = @"Mobile (288p)";
+        [_tvFormatController addObjects:@[format1,format2,format3,format4,format5]];
     }
     if ([_radioFormatController.arrangedObjects count] == 0)
     {
         RadioFormat *format1 = [[RadioFormat alloc] init];
-        format1.format = @"Best";
+        format1.format = @"High";
         RadioFormat *format2 = [[RadioFormat alloc] init];
-        format2.format = @"Better";
+        format2.format = @"Standard";
         RadioFormat *format3 = [[RadioFormat alloc] init];
-        format3.format = @"Very Good";
-        [_radioFormatController addObjects:@[format1,format2,format3]];
+        format3.format = @"Medium";
+        RadioFormat *format4 = [[RadioFormat alloc] init];
+        format4.format = @"Low";
+        [_radioFormatController addObjects:@[format1,format2,format3,format4]];
     }
     if ([_itvFormatController.arrangedObjects count] == 0)
     {
@@ -1038,7 +1088,6 @@ static NSString *FORCE_RELOAD = @"ForceReload";
                     if ([show.tvNetwork hasPrefix:@"ITV"]) {
                         _currentDownload = [[ITVDownload alloc]
                                             initWithProgramme:show
-                                            formats:_itvFormatController.arrangedObjects
                                             proxy:_proxy
                                             logger:_logger];
                     } else {
@@ -1242,7 +1291,6 @@ static NSString *FORCE_RELOAD = @"ForceReload";
             {
                 if ([nextShow.tvNetwork hasPrefix:@"ITV"])
                     _currentDownload = [[ITVDownload alloc] initWithProgramme:nextShow
-                                                                         formats:_itvFormatController.arrangedObjects
                                                                            proxy:_proxy
                                                                    logger:_logger];
                 else
