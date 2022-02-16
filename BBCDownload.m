@@ -12,8 +12,8 @@
 @implementation BBCDownload
 + (void)initFormats
 {
-    NSArray *tvFormatKeys = @[@"Full HD (1080p)", @"HD (720p)", @"Web (540p)", @"Mobile (288p)"];
-    NSArray *tvFormatObjects = @[@"fhd",@"hd",@"sd", @"mobile"];
+    NSArray *tvFormatKeys = @[@"Full HD (1080p)", @"HD (720p)", @"SD (540p)", @"Web (396p)", @"Mobile (288p)"];
+    NSArray *tvFormatObjects = @[@"fhd",@"hd",@"sd",@"web",@"mobile"];
     NSArray *radioFormatKeys = @[@"High", @"Standard", @"Medium", @"Low"];
     NSArray *radioFormatObjects = @[@"high", @"std", @"med", @"low"];
     
