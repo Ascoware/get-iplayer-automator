@@ -216,9 +216,9 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 
     NSDictionary *newTvFormatMapping = @{
         @"Best" : @"HD (720p)",
-        @"Better" : @"Web (580p)",
-        @"Very Good" : @"Web (580p)",
-        @"Good" : @"Web (580p)",
+        @"Better" : @"SD (540p)",
+        @"Very Good" : @"SD (540p)",
+        @"Good" : @"Web (396p)",
         @"Worst" : @"Mobile (288p)"
     };
 
