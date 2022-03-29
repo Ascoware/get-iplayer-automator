@@ -666,10 +666,12 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     // ITV Cache Update Finished - turn off progress display and process data
     _updatingITVIndex = false;
     _didUpdate = YES;
-    [self.itvProgressIndicator stopAnimation:self];
-    [self.itvProgressIndicator setHidden:true];
-    [_itvProgressText setHidden:true];
-    [self getiPlayerUpdateFinished];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.itvProgressIndicator stopAnimation:self];
+        [self.itvProgressIndicator setHidden:true];
+        [self.itvProgressText setHidden:true];
+        [self getiPlayerUpdateFinished];
+    });
 }
 
 - (void)getiPlayerUpdateFinished
@@ -1217,147 +1219,129 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 }
 
 - (void)performNextDownload:(NSNotification *)note {
-    if (runDownloads)
-    {
-        Programme *finishedShow = note.object;
-        if (finishedShow.successful)
-        {
-            finishedShow.status = @"Processing...";
+    if (!runDownloads) {
+        return;
+    }
 
-            if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"AddCompletedToiTunes"] isEqualTo:@YES])
-                [NSThread detachNewThreadSelector:@selector(addToiTunesThread:) toTarget:self withObject:finishedShow];
-            else
-                finishedShow.status = @"Download Complete";
-            
-            NSUserNotification *notification = [[NSUserNotification alloc] init];
-            notification.informativeText = [NSString stringWithFormat:@"%@ Completed Successfully",finishedShow.showName];
-            notification.title = @"Download Finished";
-            [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
-        }
-        else
-        {
-            NSUserNotification *notification = [[NSUserNotification alloc] init];
-            notification.informativeText = [NSString stringWithFormat:@"%@ failed. See log for details.",finishedShow.showName];
-            notification.title = @"Download Failed";
-            [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
+    Programme *finishedShow = note.object;
+    if (finishedShow.successful) {
+        finishedShow.status = @"Processing...";
 
-            ReasonForFailure *showSolution = [[ReasonForFailure alloc] init];
-
-            NSString *displayedName = @"";
-            if (finishedShow.showName.length > 0 && finishedShow.episodeName.length > 0) {
-                displayedName = [NSString stringWithFormat:@"%@ - %@", finishedShow.showName, finishedShow.episodeName];
-            } else {
-                displayedName = finishedShow.seriesName.length > 0 ? finishedShow.seriesName : finishedShow.episodeName;
-            }
-
-            showSolution.showName = displayedName;
-            showSolution.solution = _solutionsDictionary[finishedShow.reasonForFailure];
-            if (!showSolution.solution)
-                showSolution.solution = @"Problem Unknown.\nPlease submit a bug report from the application menu.";
-            NSLog(@"Reason for Failure: %@", finishedShow.reasonForFailure);
-            NSLog(@"Dictionary Lookup: %@", [_solutionsDictionary valueForKey:finishedShow.reasonForFailure]);
-            NSLog(@"Solution: %@", showSolution.solution);
-            [_solutionsArrayController addObject:showSolution];
-            NSLog(@"Added Solution");
-            _solutionsTableView.rowHeight = 68;
+        if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"AddCompletedToiTunes"] isEqualTo:@YES]) {
+            [NSThread detachNewThreadSelector:@selector(addToiTunesThread:) toTarget:self withObject:finishedShow];
+        } else {
+            finishedShow.status = @"Download Complete";
         }
 
-        [self saveAppData]; //Save app data in case of crash.
+        NSUserNotification *notification = [[NSUserNotification alloc] init];
+        notification.informativeText = [NSString stringWithFormat:@"%@ Completed Successfully",finishedShow.showName];
+        notification.title = @"Download Finished";
+        [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
+    } else {
+        NSUserNotification *notification = [[NSUserNotification alloc] init];
+        notification.informativeText = [NSString stringWithFormat:@"%@ failed. See log for details.",finishedShow.showName];
+        notification.title = @"Download Failed";
+        [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
 
-        NSArray *tempQueue = _queueController.arrangedObjects;
-        Programme *nextShow=nil;
-        NSUInteger showNum=0;
-        @try
-        {
-            for (Programme *show in tempQueue)
-            {
-                showNum++;
-                if (!show.complete)
-                {
-                    nextShow = show;
-                    break;
-                }
-            }
-            if (nextShow==nil)
-            {
-                NSException *noneLeft = [NSException exceptionWithName:@"EndOfDownloads" reason:@"Done" userInfo:nil];
-                [noneLeft raise];
-            }
-            [_logger addToLog:[NSString stringWithFormat:@"\nDownloading Show %lu/%lu:\n",
-                              (unsigned long)([tempQueue indexOfObject:nextShow]+1),
-                              (unsigned long)tempQueue.count]
-                            :nil];
-            if (!nextShow.complete)
-            {
-                if ([nextShow.tvNetwork hasPrefix:@"ITV"])
-                    _currentDownload = [[ITVDownload alloc] initWithProgramme:nextShow
-                                                                           proxy:_proxy
-                                                                   logger:_logger];
-                else
-                    _currentDownload = [[BBCDownload alloc] initWithProgramme:nextShow
-                                                                   tvFormats:_tvFormatController.arrangedObjects
-                                                                radioFormats:_radioFormatController.arrangedObjects
-                                                                       proxy:_proxy
-                                                               logController:_logger];
-            }
+        ReasonForFailure *showSolution = [[ReasonForFailure alloc] init];
+
+        NSString *displayedName = @"";
+        if (finishedShow.showName.length > 0 && finishedShow.episodeName.length > 0) {
+            displayedName = [NSString stringWithFormat:@"%@ - %@", finishedShow.showName, finishedShow.episodeName];
+        } else {
+            displayedName = finishedShow.seriesName.length > 0 ? finishedShow.seriesName : finishedShow.episodeName;
         }
-        @catch (NSException *e)
-        {
-            //Downloads must be finished.
-            IOPMAssertionRelease(_powerAssertionID);
 
-            [_stopButton setEnabled:NO];
-            [_startButton setEnabled:YES];
-            _currentProgress.stringValue = @"";
-            _currentIndicator.doubleValue = 0;
-            @try {[_currentIndicator stopAnimation:nil];}
-            @catch (NSException *exception) {NSLog(@"Unable to stop Animation.");}
-            [_currentIndicator setIndeterminate:NO];
-            [_logger addToLog:@"AppController: Downloads Finished" :nil];
-            NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-            [nc removeObserver:self name:@"setPercentage" object:nil];
-            [nc removeObserver:self name:@"setCurrentProgress" object:nil];
-            [nc removeObserver:self name:@"DownloadFinished" object:nil];
+        showSolution.showName = displayedName;
+        showSolution.solution = _solutionsDictionary[finishedShow.reasonForFailure];
+        if (!showSolution.solution)
+            showSolution.solution = @"Problem Unknown.\nPlease submit a bug report from the application menu.";
+        NSLog(@"Reason for Failure: %@", finishedShow.reasonForFailure);
+        NSLog(@"Dictionary Lookup: %@", [_solutionsDictionary valueForKey:finishedShow.reasonForFailure]);
+        NSLog(@"Solution: %@", showSolution.solution);
+        [_solutionsArrayController addObject:showSolution];
+        NSLog(@"Added Solution");
+        _solutionsTableView.rowHeight = 68;
+    }
 
-            runDownloads=NO;
-            [_mainWindow setDocumentEdited:NO];
+    [self saveAppData]; //Save app data in case of crash.
 
-            //Growl Notification
-            NSUInteger downloadsSuccessful=0, downloadsFailed=0;
-            for (Programme *show in tempQueue)
-            {
-                if (show.successful)
-                {
-                    downloadsSuccessful++;
-                }
-                else
-                {
-                    downloadsFailed++;
-                }
-            }
-            tempQueue=nil;
+    NSArray *tempQueue = _queueController.arrangedObjects;
+    Programme *nextShow=nil;
 
-            NSUserNotification *notification = [[NSUserNotification alloc] init];
-            notification.informativeText = [NSString stringWithFormat:@"Downloads Successful = %lu\nDownload Failed = %lu",
-                                            (unsigned long)downloadsSuccessful,(unsigned long)downloadsFailed];
-            notification.title = @"Downloads Finished";
-            [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
-            
-            [[SUUpdater sharedUpdater] checkForUpdatesInBackground];
-
-            if (downloadsFailed>0)
-                [_solutionsWindow makeKeyAndOrderFront:self];
-            if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"AutoRetryFailed"] boolValue] && downloadsFailed>0)
-            {
-                NSDate *scheduledDate = [NSDate dateWithTimeIntervalSinceNow:60*[[[NSUserDefaults standardUserDefaults] valueForKey:@"AutoRetryTime"] doubleValue]];
-                _datePicker.dateValue = scheduledDate;
-                [self scheduleStartWithCacheUpdate:NO];
-            }
-
-            return;
+    for (Programme *show in tempQueue) {
+        if (!show.complete) {
+            nextShow = show;
+            break;
         }
     }
-    return;
+
+    if (nextShow != nil) {
+        if (!nextShow.complete) {
+            [_logger addToLog:[NSString stringWithFormat:@"\nDownloading Show %lu/%lu:\n",
+                               (unsigned long)([tempQueue indexOfObject:nextShow]+1),
+                               (unsigned long)tempQueue.count]
+                             :nil];
+            if ([nextShow.tvNetwork hasPrefix:@"ITV"])
+                _currentDownload = [[ITVDownload alloc] initWithProgramme:nextShow
+                                                                    proxy:_proxy
+                                                                   logger:_logger];
+            else
+                _currentDownload = [[BBCDownload alloc] initWithProgramme:nextShow
+                                                                tvFormats:_tvFormatController.arrangedObjects
+                                                             radioFormats:_radioFormatController.arrangedObjects
+                                                                    proxy:_proxy
+                                                            logController:_logger];
+        }
+    } else {
+        //Downloads must be finished.
+        IOPMAssertionRelease(_powerAssertionID);
+
+        [_stopButton setEnabled:NO];
+        [_startButton setEnabled:YES];
+        _currentProgress.stringValue = @"";
+        _currentIndicator.doubleValue = 0;
+        @try {[_currentIndicator stopAnimation:nil];}
+        @catch (NSException *exception) {NSLog(@"Unable to stop Animation.");}
+        [_currentIndicator setIndeterminate:NO];
+        [_logger addToLog:@"AppController: Downloads Finished" :nil];
+        NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+        [nc removeObserver:self name:@"setPercentage" object:nil];
+        [nc removeObserver:self name:@"setCurrentProgress" object:nil];
+        [nc removeObserver:self name:@"DownloadFinished" object:nil];
+
+        runDownloads=NO;
+        [_mainWindow setDocumentEdited:NO];
+
+        NSUInteger downloadsSuccessful=0, downloadsFailed=0;
+        for (Programme *show in tempQueue) {
+            if (show.successful) {
+                downloadsSuccessful++;
+            } else {
+                downloadsFailed++;
+            }
+        }
+
+        tempQueue=nil;
+
+        NSUserNotification *notification = [[NSUserNotification alloc] init];
+        notification.informativeText = [NSString stringWithFormat:@"Downloads Successful = %lu\nDownload Failed = %lu",
+                                        (unsigned long)downloadsSuccessful,(unsigned long)downloadsFailed];
+        notification.title = @"Downloads Finished";
+        [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
+
+        [[SUUpdater sharedUpdater] checkForUpdatesInBackground];
+
+        if (downloadsFailed>0) {
+            [_solutionsWindow makeKeyAndOrderFront:self];
+        }
+
+        if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"AutoRetryFailed"] boolValue] && downloadsFailed > 0) {
+            NSDate *scheduledDate = [NSDate dateWithTimeIntervalSinceNow:60*[[[NSUserDefaults standardUserDefaults] valueForKey:@"AutoRetryTime"] doubleValue]];
+            _datePicker.dateValue = scheduledDate;
+            [self scheduleStartWithCacheUpdate:NO];
+        }
+    }
 }
 
 #pragma mark PVR

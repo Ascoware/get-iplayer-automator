@@ -11,8 +11,6 @@ import SwiftyJSON
 
 public class ITVDownload : Download {
 
-    var thumbnailURLString: String?
-
     public override var description: String {
         return "ITV Download (ID=\(show.pid))"
     }
@@ -246,11 +244,11 @@ public class ITVDownload : Download {
             self.show.status = "Downloading Thumbnail..."
             setPercentage(102)
             setCurrentProgress("Downloading Thumbnail... -- \(show.showName)")
-            if let thumbnailURLString = thumbnailURLString {
+            if !show.thumbnailURLString.isEmpty {
                 add(toLog: "INFO: Downloading thumbnail", noTag: true)
                 thumbnailPath = URL(fileURLWithPath: show.path).appendingPathExtension("jpg").path
                 
-                if let thumbnailURL = URL(string: thumbnailURLString) {
+                if let thumbnailURL = URL(string: show.thumbnailURLString) {
                     let downloadTask = session.downloadTask(with: thumbnailURL) { (location, _, _) in
                         self.thumbnailRequestFinished(location)
                     }
