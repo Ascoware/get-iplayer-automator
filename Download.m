@@ -240,7 +240,10 @@
             self.subsTask.standardError = self.subsErrorPipe;
             [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(convertSubtitlesFinished:) name:NSTaskDidTerminateNotification object:self.subsTask];
 
-            self.subsTask.launchPath = @"/usr/bin/python";
+            NSURL *pythonInstall = [[NSBundle mainBundle] URLForResource: @"python" withExtension: nil];
+            NSURL *pythonPath = [pythonInstall URLByAppendingPathComponent:@"bin/python3.11" isDirectory:false];
+
+            self.subsTask.launchPath = pythonPath.path;
             self.subsTask.arguments = args;
             [self.subsTask launch];
         });

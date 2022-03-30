@@ -11,8 +11,6 @@ import SwiftyJSON
 
 public class ITVDownload : Download {
 
-    var thumbnailURLString: String?
-
     public override var description: String {
         return "ITV Download (ID=\(show.pid))"
     }
@@ -246,11 +244,11 @@ public class ITVDownload : Download {
             self.show.status = "Downloading Thumbnail..."
             setPercentage(102)
             setCurrentProgress("Downloading Thumbnail... -- \(show.showName)")
-            if let thumbnailURLString = thumbnailURLString {
+            if !show.thumbnailURLString.isEmpty {
                 add(toLog: "INFO: Downloading thumbnail", noTag: true)
                 thumbnailPath = URL(fileURLWithPath: show.path).appendingPathExtension("jpg").path
                 
-                if let thumbnailURL = URL(string: thumbnailURLString) {
+                if let thumbnailURL = URL(string: show.thumbnailURLString) {
                     let downloadTask = session.downloadTask(with: thumbnailURL) { (location, _, _) in
                         self.thumbnailRequestFinished(location)
                     }
@@ -283,7 +281,13 @@ public class ITVDownload : Download {
         task?.standardError = errorPipe
         let fh = pipe?.fileHandleForReading
         let errorFh = errorPipe?.fileHandleForReading
-        
+
+        guard let youtubeDLFolder = Bundle.main.path(forResource: "yt-dlp_macos", ofType:nil),
+              let cacertFile = Bundle.main.url(forResource: "cacert", withExtension: "pem") else {
+            return
+        }
+
+        let youtubeDLBinary = youtubeDLFolder + "/yt-dlp_macos"
         var args: [String] = [show.url,
                               "--user-agent",
                               "Mozilla/5.0",
@@ -326,29 +330,25 @@ public class ITVDownload : Download {
         if self.verbose {
             self.logDebugMessage("DEBUG: youtube-dl args:\(args)", noTag: true)
         }
-        
-        if let executableURL = Bundle.main.url(forResource: "youtube-dl", withExtension:nil),
-           let binaryPath = Bundle.main.executableURL?.deletingLastPathComponent().path,
-           let resourcePath = Bundle.main.resourcePath
-        {
-            task?.launchPath = executableURL.path
-            task?.arguments = args
-            let extraBinaryPath = AppController.shared().extraBinariesPath
-            var envVariableDictionary = [String : String]()
-            envVariableDictionary["PATH"] = "\(binaryPath):\(extraBinaryPath):/usr/bin"
-            envVariableDictionary["PYTHONPATH"] = "\(resourcePath)"
-            task?.environment = envVariableDictionary
-            self.logDebugMessage("DEBUG: youtube-dl environment: \(envVariableDictionary)", noTag: true)
-            
-            NotificationCenter.default.addObserver(self, selector: #selector(self.youtubeDLProgress), name: FileHandle.readCompletionNotification, object: fh)
-            NotificationCenter.default.addObserver(self, selector: #selector(self.youtubeDLProgress), name: FileHandle.readCompletionNotification, object: errorFh)
-            
-            task?.terminationHandler = youtubeDLTaskFinished
-            
-            task?.launch()
-            fh?.readInBackgroundAndNotify()
-            errorFh?.readInBackgroundAndNotify()
-        }
+
+
+        task?.launchPath = youtubeDLBinary
+        task?.arguments = args
+        let extraBinaryPath = AppController.shared().extraBinariesPath
+        var envVariableDictionary = [String : String]()
+        envVariableDictionary["PATH"] = "\(youtubeDLFolder):\(extraBinaryPath)"
+        envVariableDictionary["SSL_CERT_FILE"] = cacertFile.path
+        task?.environment = envVariableDictionary
+        self.logDebugMessage("DEBUG: youtube-dl environment: \(envVariableDictionary)", noTag: true)
+
+        NotificationCenter.default.addObserver(self, selector: #selector(self.youtubeDLProgress), name: FileHandle.readCompletionNotification, object: fh)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.youtubeDLProgress), name: FileHandle.readCompletionNotification, object: errorFh)
+
+        task?.terminationHandler = youtubeDLTaskFinished
+
+        task?.launch()
+        fh?.readInBackgroundAndNotify()
+        errorFh?.readInBackgroundAndNotify()
     }
 }
 

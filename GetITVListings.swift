@@ -12,7 +12,7 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
     var myQueueSize: Int = 0
     var myQueueLeft: Int = 0
     var mySession: URLSession?
-    
+    var operationQueue: OperationQueue = OperationQueue()
     var episodes = [Programme]()
     var getITVShowRunning = false
     let currentTime = Date()
@@ -38,7 +38,7 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
         defaultConfigObject.requestCachePolicy = .useProtocolCachePolicy
         defaultConfigObject.timeoutIntervalForResource = 30
         defaultConfigObject.timeoutIntervalForRequest = 30
-        mySession = URLSession(configuration: defaultConfigObject, delegate: self, delegateQueue: OperationQueue.main)
+        mySession = URLSession(configuration: defaultConfigObject, delegate: self, delegateQueue: nil)
         
         /* Load in all shows for itv.com */
         if let aString = URL(string: "https://www.itv.com/hub/shows") {
@@ -123,11 +123,13 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
     }
 
     func requestEpisodes(program: Programme) {
-        /* Get all episodes for the programme name identified in MyProgramme */
-        if let url = URL(string: program.url) {
-            mySession?.dataTask(with: url) {(data, response, error) in
-                self.processEpisodes(program: program, pageData: data, error: error)
-            }.resume()
+        operationQueue.addOperation {
+            /* Get all episodes for the programme name identified in MyProgramme */
+            if let url = URL(string: program.url) {
+                self.mySession?.dataTask(with: url) {(data, response, error) in
+                    self.processEpisodes(program: program, pageData: data, error: error)
+                }.resume()
+            }
         }
     }
 
@@ -233,7 +235,9 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
 
     fileprivate func operationCompleted() {
         let increment = Double(myQueueSize - 1) > 0 ? 100.0 / Double(myQueueSize - 1) : 100.0
-        AppController.shared().itvProgressIndicator.increment(by: increment)
+        DispatchQueue.main.async {
+            AppController.shared().itvProgressIndicator.increment(by: increment)
+        }
 
         /* Check if there is any outstanding work before processing the carried forward programme list */
         myQueueLeft -= 1

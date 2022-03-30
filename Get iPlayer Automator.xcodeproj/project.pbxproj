@@ -44,9 +44,9 @@
 		7F9FE9231EC16F160058CB1B /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F9FE9221EC16F160058CB1B /* IOKit.framework */; };
 		7F9FE9241EC170E60058CB1B /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F9FE91E1EC16E3E0058CB1B /* Sparkle.framework */; };
 		7F9FE9251EC170E60058CB1B /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7F9FE91E1EC16E3E0058CB1B /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		7FAA6A25206F36B800B6B50C /* Crypto in Resources */ = {isa = PBXBuildFile; fileRef = 7FAA6A24206F36B800B6B50C /* Crypto */; };
-		7FAA6A2720744A5D00B6B50C /* pycrypto-2.6.1-py2.7.egg-info in Resources */ = {isa = PBXBuildFile; fileRef = 7FAA6A2620744A5C00B6B50C /* pycrypto-2.6.1-py2.7.egg-info */; };
-		7FC8F71C20674B7600DC158C /* youtube-dl in Resources */ = {isa = PBXBuildFile; fileRef = 7FC8F71B20674B6700DC158C /* youtube-dl */; };
+		7FB49CF827AA539800E80F76 /* cacert.pem in Resources */ = {isa = PBXBuildFile; fileRef = 7FB49CF727AA539800E80F76 /* cacert.pem */; };
+		7FB49CFA27AA589500E80F76 /* yt-dlp_macos in Resources */ = {isa = PBXBuildFile; fileRef = 7FB49CF927AA589500E80F76 /* yt-dlp_macos */; };
+		7FCF7263271388990086B0CD /* HistoryTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FCF7262271388990086B0CD /* HistoryTableViewController.swift */; };
 		7FEDA8ED24FC982200189D37 /* MicrosoftEdge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FEDA8EB24FC982200189D37 /* MicrosoftEdge.swift */; };
 		7FEDA8EE24FC982200189D37 /* MicrosoftEdgeScripting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FEDA8EC24FC982200189D37 /* MicrosoftEdgeScripting.swift */; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
@@ -156,9 +156,9 @@
 		7F9FE91E1EC16E3E0058CB1B /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = Carthage/Build/Mac/Sparkle.framework; sourceTree = "<group>"; };
 		7F9FE9201EC16ED80058CB1B /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		7F9FE9221EC16F160058CB1B /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
-		7FAA6A24206F36B800B6B50C /* Crypto */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Crypto; sourceTree = "<group>"; };
-		7FAA6A2620744A5C00B6B50C /* pycrypto-2.6.1-py2.7.egg-info */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "pycrypto-2.6.1-py2.7.egg-info"; sourceTree = "<group>"; };
-		7FC8F71B20674B6700DC158C /* youtube-dl */ = {isa = PBXFileReference; lastKnownFileType = text; path = "youtube-dl"; sourceTree = "<group>"; };
+		7FB49CF727AA539800E80F76 /* cacert.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = cacert.pem; sourceTree = "<group>"; };
+		7FB49CF927AA589500E80F76 /* yt-dlp_macos */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "yt-dlp_macos"; sourceTree = "<group>"; };
+		7FCF7262271388990086B0CD /* HistoryTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryTableViewController.swift; sourceTree = "<group>"; };
 		7FEDA8EB24FC982200189D37 /* MicrosoftEdge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MicrosoftEdge.swift; sourceTree = "<group>"; };
 		7FEDA8EC24FC982200189D37 /* MicrosoftEdgeScripting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MicrosoftEdgeScripting.swift; sourceTree = "<group>"; };
 		7FF4174321FC02AE004FF8CE /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -277,7 +277,6 @@
 		29B97314FDCFA39411CA2CEA /* Get_iPlayer GUI */ = {
 			isa = PBXGroup;
 			children = (
-				7F01382525F0A7520014703C /* ITVMetadataExtractor.swift */,
 				7F6B2B2B20EE87D800E4BBDF /* Get iPlayer Automator.entitlements */,
 				D9B6DB97196D938300161ECB /* Interface2.xib */,
 				D9CCF52E10259DED009205BE /* Features.rtf */,
@@ -355,10 +354,9 @@
 		D904F04D1009F28400D60BBF /* Binaries */ = {
 			isa = PBXGroup;
 			children = (
-				7FAA6A2620744A5C00B6B50C /* pycrypto-2.6.1-py2.7.egg-info */,
+				7FB49CF727AA539800E80F76 /* cacert.pem */,
+				7FB49CF927AA589500E80F76 /* yt-dlp_macos */,
 				7F748E3323FB416B00626A77 /* get_iplayer */,
-				7FAA6A24206F36B800B6B50C /* Crypto */,
-				7FC8F71B20674B6700DC158C /* youtube-dl */,
 			);
 			path = Binaries;
 			sourceTree = "<group>";
@@ -431,6 +429,8 @@
 				7F165A15205C1F8C005BB78A /* NewProgrammeHistory.swift */,
 				39D52EA61DAAFD450033C4ED /* NPHistoryWindowController.h */,
 				39D52EA71DAAFD450033C4ED /* NPHistoryWindowController.m */,
+				7F01382525F0A7520014703C /* ITVMetadataExtractor.swift */,
+				7FCF7262271388990086B0CD /* HistoryTableViewController.swift */,
 				7F165A0F205B92F9005BB78A /* GetITVListings.swift */,
 				7F165A13205C1F15005BB78A /* ProgrammeHistoryEntry.swift */,
 				393D1DEC18A5BBB500F27880 /* RSRTVArrayController.h */,
@@ -563,20 +563,19 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7FAA6A2720744A5D00B6B50C /* pycrypto-2.6.1-py2.7.egg-info in Resources */,
 				39FD5E9619D370BD006BC47B /* Images.xcassets in Resources */,
 				396FDA611DA98179003F3F57 /* MainMenu.xib in Resources */,
 				8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */,
+				7FB49CFA27AA589500E80F76 /* yt-dlp_macos in Resources */,
 				D9CCF3CC1023485A009205BE /* dsa_pub.pem in Resources */,
 				BF382EE31D73C36300BAF106 /* NPHistoryWindow.xib in Resources */,
 				D9A4509D102FF8090011E175 /* Credits.html in Resources */,
 				D9A450A4102FFDC00011E175 /* LICENSE.txt in Resources */,
 				DFFF196713E96288007B52AC /* ReasonsForFailure.plist in Resources */,
-				7FAA6A25206F36B800B6B50C /* Crypto in Resources */,
 				D9CDC9E8186B8F2B0003A4E2 /* GetiPlayerAutomator.sdef in Resources */,
 				7F748E3423FB416B00626A77 /* get_iplayer in Resources */,
+				7FB49CF827AA539800E80F76 /* cacert.pem in Resources */,
 				3975484D1622504F00470DD1 /* ttml2srt.py in Resources */,
-				7FC8F71C20674B7600DC158C /* youtube-dl in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -610,6 +609,7 @@
 				7F5B1C51211F9E2E00BF7E99 /* SafariScripting.swift in Sources */,
 				D9CDC9EC186B90A90003A4E2 /* ASDownloadShows.m in Sources */,
 				D92687C51087F81F000E8132 /* DownloadHistoryController.m in Sources */,
+				7FCF7263271388990086B0CD /* HistoryTableViewController.swift in Sources */,
 				D92687CA1087F836000E8132 /* DownloadHistoryEntry.m in Sources */,
 				7FEDA8ED24FC982200189D37 /* MicrosoftEdge.swift in Sources */,
 				DFC865E213E96BE200606599 /* ReasonForFailure.m in Sources */,
@@ -781,6 +781,7 @@
 					"$(SRCROOT)",
 					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/Carthage/Build/Mac",
+					"$(PROJECT_DIR)/Binaries",
 				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -798,9 +799,10 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/Binaries\"",
+					"$(PROJECT_DIR)",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
-				MARKETING_VERSION = 1.22.1;
+				MARKETING_VERSION = 1.23.0;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CODE_SIGN_FLAGS = "--no-strict";
 				OTHER_LDFLAGS = "-licucore";
@@ -835,6 +837,7 @@
 					"$(SRCROOT)",
 					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/Carthage/Build/Mac",
+					"$(PROJECT_DIR)/Binaries",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_VERSION = "";
@@ -847,9 +850,10 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/Binaries\"",
+					"$(PROJECT_DIR)",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
-				MARKETING_VERSION = 1.22.1;
+				MARKETING_VERSION = 1.23.0;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CODE_SIGN_FLAGS = "--no-strict";
 				OTHER_LDFLAGS = "-licucore";
