@@ -1522,6 +1522,7 @@
                                                 <menu key="menu" title="OtherViews" id="585">
                                                     <items>
                                                         <menuItem title="Safari" state="on" id="586"/>
+                                                        <menuItem title="Brave" id="1528"/>
                                                         <menuItem title="Chrome" id="1529"/>
                                                         <menuItem title="Microsoft Edge" id="5wj-Ph-3C9">
                                                             <modifierMask key="keyEquivalentModifierMask"/>
