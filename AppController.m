@@ -1721,7 +1721,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 - (void)addToiTunesThread:(Programme *)show
 {
     @autoreleasepool {
-        NSString *path = [[NSString alloc] initWithString:show.path];
+        NSString *path = show.path;
         NSString *ext = path.pathExtension;
         NSString *appName = nil;
         
@@ -1748,16 +1748,20 @@ static NSString *FORCE_RELOAD = @"ForceReload";
             appName = @"iTunes";
         }
 
-        // In this case it's a podcast and we're on Catalina. Can't do much with it, unfortuantely.
+        // In this case it's a podcast and we're on Catalina or later. Can't do much with it, unfortuantely.
         if (iTunes == nil) {
             show.status = @"Complete: No media app available";
             return;
         }
         
         [_logger performSelectorOnMainThread:@selector(addToLog:) withObject:[NSString stringWithFormat:@"Adding %@ to %@", show.showName, appName] waitUntilDone:NO];
-
         NSArray *fileToAdd = @[[NSURL fileURLWithPath:path]];
+
+        // Music and TV will not store the track if the app isn't fully up and running when the add command is received.
+        // Launch the app and schedule the add for two seconds after launch.
         if (!iTunes.running) [iTunes activate];
+
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         @try
         {
             if ([ext isEqualToString:@"mov"] || [ext isEqualToString:@"mp4"] || [ext isEqualToString:@"mp3"] || [ext isEqualToString:@"m4a"])
@@ -1786,24 +1790,25 @@ static NSString *FORCE_RELOAD = @"ForceReload";
                 }
                 else
                 {
-                    [_logger performSelectorOnMainThread:@selector(addToLog:) withObject:@"Media app did not accept file." waitUntilDone:YES];
-                    [_logger performSelectorOnMainThread:@selector(addToLog:) withObject:@"Try dragging the file from the Finder into TV or iTunes." waitUntilDone:YES];
+                        [self.logger performSelectorOnMainThread:@selector(addToLog:) withObject:@"Media app did not accept file." waitUntilDone:YES];
+                        [self.logger performSelectorOnMainThread:@selector(addToLog:) withObject:@"Try dragging the file from the Finder into TV or iTunes." waitUntilDone:YES];
                     show.status = [NSString stringWithFormat:@"Complete: Not in %@", appName];
                 }
             }
             else
             {
                 NSString *message = [NSString stringWithFormat:@"Can't add %@ file to %@ -- incompatible format.", ext, appName];
-                [_logger performSelectorOnMainThread:@selector(addToLog:) withObject:message waitUntilDone:YES];
+                    [self.logger performSelectorOnMainThread:@selector(addToLog:) withObject:message waitUntilDone:YES];
                 show.status = @"Download Complete";
             }
         }
         @catch (NSException *e)
         {
             NSString *message = [NSString stringWithFormat:@"Unable to add %@ to %@", show, appName];
-            [_logger performSelectorOnMainThread:@selector(addToLog:) withObject:message waitUntilDone:YES];
+                [self.logger performSelectorOnMainThread:@selector(addToLog:) withObject:message waitUntilDone:YES];
             show.status = [NSString stringWithFormat:@"Complete: Not in %@", appName];
         }
+        });
     }
 }
 

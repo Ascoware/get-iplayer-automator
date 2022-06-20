@@ -66,7 +66,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)processGetiPlayerOutput:(NSString *)outp;
 - (void)createDownloadPath;
 
-- (void)thumbnailRequestFinished:(nullable NSURL *)location;
 - (void)atomicParsleyFinished:(nullable NSNotification *)finishedNote;
 
 @end
