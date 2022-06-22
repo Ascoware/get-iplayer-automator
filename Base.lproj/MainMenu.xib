@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21179.7" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21179.7"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -97,7 +97,7 @@
                 <binding destination="621" name="contentArray" keyPath="searchResultsArray" id="695"/>
             </connections>
         </arrayController>
-        <arrayController objectClassName="Programme" id="700" userLabel="Queue Controller" customClass="RSRTVArrayController">
+        <arrayController objectClassName="Programme" automaticallyRearrangesObjects="YES" id="700" userLabel="Queue Controller" customClass="RSRTVArrayController">
             <declaredKeys>
                 <string>pid</string>
                 <string>showName</string>
@@ -756,14 +756,14 @@
                             <rect key="frame" x="1" y="1" width="753" height="130"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
-                                <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" autosaveColumns="NO" headerView="494" id="493">
+                                <tableView identifier="SearchResults" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" typeSelect="NO" autosaveName="SearchResults" headerView="494" id="493">
                                     <rect key="frame" x="0.0" y="0.0" width="753" height="113"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <size key="intercellSpacing" width="3" height="2"/>
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                     <tableColumns>
-                                        <tableColumn editable="NO" width="176.8984375" minWidth="40" maxWidth="1000" id="495" userLabel="Show">
+                                        <tableColumn identifier="0" editable="NO" width="176.8984375" minWidth="40" maxWidth="1000" id="495" userLabel="Show">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Show">
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
@@ -773,12 +773,12 @@
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
-                                            <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                            <tableColumnResizingMask key="resizingMask" userResizable="YES"/>
                                             <connections>
                                                 <binding destination="683" name="value" keyPath="arrangedObjects.showName" id="697"/>
                                             </connections>
                                         </tableColumn>
-                                        <tableColumn editable="NO" width="226" minWidth="10" maxWidth="3.4028234663852886e+38" id="IYc-LA-l2p" userLabel="Episode">
+                                        <tableColumn identifier="1" editable="NO" width="226" minWidth="10" maxWidth="3.4028234663852886e+38" id="IYc-LA-l2p" userLabel="Episode">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Episode">
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -788,12 +788,12 @@
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
-                                            <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                            <tableColumnResizingMask key="resizingMask" userResizable="YES"/>
                                             <connections>
                                                 <binding destination="683" name="value" keyPath="arrangedObjects.episodeName" id="OtM-9C-C5a"/>
                                             </connections>
                                         </tableColumn>
-                                        <tableColumn editable="NO" width="102" minWidth="10" maxWidth="3.4028234663852886e+38" id="Ven-9I-Ggq">
+                                        <tableColumn identifier="2" editable="NO" width="102" minWidth="10" maxWidth="3.4028234663852886e+38" id="Ven-9I-Ggq">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Last Broadcast">
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -804,7 +804,7 @@
                                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                             <sortDescriptor key="sortDescriptorPrototype" selector="compare:" sortKey="lastBroadcast"/>
-                                            <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                            <tableColumnResizingMask key="resizingMask" userResizable="YES"/>
                                             <connections>
                                                 <binding destination="683" name="value" keyPath="arrangedObjects.lastBroadcastString" id="qXW-6Z-bGC">
                                                     <dictionary key="options">
@@ -813,21 +813,20 @@
                                                 </binding>
                                             </connections>
                                         </tableColumn>
-                                        <tableColumn width="26.73046875" minWidth="10" maxWidth="3.4028234663852886e+38" id="zjB-wg-YbI">
+                                        <tableColumn identifier="3" width="31.73046875" minWidth="10" maxWidth="3.4028234663852886e+38" id="zjB-wg-YbI">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Info">
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                             </tableHeaderCell>
-                                            <buttonCell key="dataCell" type="round" title="i" bezelStyle="circular" alignment="center" controlSize="small" borderStyle="border" inset="2" id="XHg-RH-n5D">
+                                            <buttonCell key="dataCell" type="round" title="i" bezelStyle="circular" alignment="center" controlSize="small" lineBreakMode="truncatingTail" borderStyle="border" inset="2" id="XHg-RH-n5D">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <connections>
                                                     <action selector="showExtendedInformationForSelectedProgramme:" target="GOW-LV-QLu" id="J4N-jS-WMw"/>
                                                 </connections>
                                             </buttonCell>
-                                            <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                         </tableColumn>
-                                        <tableColumn width="128" minWidth="40" maxWidth="1000" id="496">
+                                        <tableColumn identifier="4" width="128" minWidth="40" maxWidth="1000" id="496">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Network">
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
@@ -837,7 +836,7 @@
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
-                                            <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                            <tableColumnResizingMask key="resizingMask" userResizable="YES"/>
                                             <connections>
                                                 <binding destination="683" name="value" keyPath="arrangedObjects.tvNetwork" id="699"/>
                                             </connections>
@@ -973,14 +972,14 @@
                             <rect key="frame" x="0.0" y="0.0" width="755" height="187"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
-                                <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" autosaveColumns="NO" headerView="470" id="469">
+                                <tableView identifier="DownloadQueue" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" typeSelect="NO" autosaveName="DownloadQueue" headerView="470" id="469">
                                     <rect key="frame" x="0.0" y="0.0" width="755" height="170"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <size key="intercellSpacing" width="3" height="2"/>
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                     <tableColumns>
-                                        <tableColumn width="99.78515625" minWidth="40" maxWidth="1000" id="471">
+                                        <tableColumn identifier="0" width="86.78515625" minWidth="40" maxWidth="1000" id="471">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Programme ID">
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
@@ -993,7 +992,7 @@
                                                     <action selector="getName:" target="621" id="1008"/>
                                                 </connections>
                                             </textFieldCell>
-                                            <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                            <tableColumnResizingMask key="resizingMask" userResizable="YES"/>
                                             <connections>
                                                 <binding destination="700" name="value" keyPath="arrangedObjects.pid" id="CPA-Y3-bvT">
                                                     <dictionary key="options">
@@ -1002,7 +1001,7 @@
                                                 </binding>
                                             </connections>
                                         </tableColumn>
-                                        <tableColumn editable="NO" width="116.5" minWidth="40" maxWidth="1000" id="472">
+                                        <tableColumn identifier="1" editable="NO" width="77.5" minWidth="40" maxWidth="1000" id="472">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Status">
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
@@ -1012,12 +1011,12 @@
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
-                                            <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                            <tableColumnResizingMask key="resizingMask" userResizable="YES"/>
                                             <connections>
                                                 <binding destination="700" name="value" keyPath="arrangedObjects.status" id="nKo-Iq-50a"/>
                                             </connections>
                                         </tableColumn>
-                                        <tableColumn width="209.5" minWidth="10" maxWidth="3.4028229999999999e+38" id="503" userLabel="Show">
+                                        <tableColumn identifier="2" width="209.5" minWidth="10" maxWidth="3.4028229999999999e+38" id="503" userLabel="Show">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Show">
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
@@ -1027,7 +1026,7 @@
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
-                                            <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                            <tableColumnResizingMask key="resizingMask" userResizable="YES"/>
                                             <connections>
                                                 <binding destination="700" name="value" keyPath="arrangedObjects.showName" id="49f-76-bCT">
                                                     <dictionary key="options">
@@ -1036,7 +1035,7 @@
                                                 </binding>
                                             </connections>
                                         </tableColumn>
-                                        <tableColumn width="173" minWidth="10" maxWidth="3.4028234663852886e+38" id="B4p-fs-k3z" userLabel="Episode">
+                                        <tableColumn identifier="3" width="173" minWidth="10" maxWidth="3.4028234663852886e+38" headerToolTip="" id="B4p-fs-k3z" userLabel="Episode">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Episode">
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -1046,7 +1045,7 @@
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
-                                            <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                            <tableColumnResizingMask key="resizingMask" userResizable="YES"/>
                                             <connections>
                                                 <binding destination="700" name="value" keyPath="arrangedObjects.episodeName" id="4WS-Cb-0e5">
                                                     <dictionary key="options">
@@ -1055,7 +1054,7 @@
                                                 </binding>
                                             </connections>
                                         </tableColumn>
-                                        <tableColumn editable="NO" width="112" minWidth="10" maxWidth="3.4028234663852886e+38" id="P0q-Ie-8GE">
+                                        <tableColumn identifier="4" editable="NO" width="112" minWidth="10" maxWidth="3.4028234663852886e+38" id="P0q-Ie-8GE">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Last Broadcast">
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -1066,7 +1065,7 @@
                                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                             <sortDescriptor key="sortDescriptorPrototype" selector="compare:" sortKey="lastBroadcast"/>
-                                            <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                            <tableColumnResizingMask key="resizingMask" userResizable="YES"/>
                                             <connections>
                                                 <binding destination="700" name="value" keyPath="arrangedObjects.lastBroadcastString" id="W73-Fn-nKl">
                                                     <dictionary key="options">
@@ -1100,54 +1099,40 @@
             </view>
             <toolbar key="toolbar" implicitIdentifier="CB7AE3DA-8BA6-47C2-92ED-145F2C8CF5BE" displayMode="iconAndLabel" sizeMode="regular" id="450">
                 <allowedToolbarItems>
-                    <toolbarItem implicitItemIdentifier="00E3046B-B3D2-46E3-A5D6-6E9B37940939" label="PVR" paletteLabel="PVR" toolTip="Display PVR Manager HUD." tag="-1" image="pvr" id="516">
-                        <size key="minSize" width="22" height="22"/>
-                        <size key="maxSize" width="22" height="22"/>
+                    <toolbarItem implicitItemIdentifier="00E3046B-B3D2-46E3-A5D6-6E9B37940939" label="PVR" paletteLabel="PVR" toolTip="Display PVR Manager HUD." tag="-1" image="pvr" sizingBehavior="auto" id="516">
                         <connections>
                             <action selector="makeKeyAndOrderFront:" target="517" id="619"/>
                         </connections>
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="NSToolbarSpaceItem" id="455"/>
                     <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="456"/>
-                    <toolbarItem implicitItemIdentifier="F0591DED-DD7F-4E98-8D6E-BA5545189D77" label="Start" paletteLabel="Start" toolTip="Start Downloads" tag="-1" image="play" autovalidates="NO" id="481">
-                        <size key="minSize" width="22" height="22"/>
-                        <size key="maxSize" width="22" height="22"/>
+                    <toolbarItem implicitItemIdentifier="F0591DED-DD7F-4E98-8D6E-BA5545189D77" label="Start" paletteLabel="Start" toolTip="Start Downloads" tag="-1" image="play" sizingBehavior="auto" autovalidates="NO" id="481">
                         <connections>
                             <action selector="startDownloads:" target="621" id="924"/>
                         </connections>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="9EDAA06C-246F-46ED-AD74-360506A91CD1" label="Stop" paletteLabel="Stop" toolTip="Stop Downloads" tag="-1" image="stop" autovalidates="NO" id="482">
-                        <size key="minSize" width="22" height="22"/>
-                        <size key="maxSize" width="22" height="22"/>
+                    <toolbarItem implicitItemIdentifier="9EDAA06C-246F-46ED-AD74-360506A91CD1" label="Stop" paletteLabel="Stop" toolTip="Stop Downloads" tag="-1" image="stop" sizingBehavior="auto" autovalidates="NO" id="482">
                         <connections>
                             <action selector="stopDownloads:" target="621" id="925"/>
                         </connections>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="3588F9B5-EB47-4A3A-8EB1-C433EE59A501" label="Show Log" paletteLabel="Show Log" toolTip="Show the Log" tag="-1" image="log" id="483">
-                        <size key="minSize" width="22" height="22"/>
-                        <size key="maxSize" width="22" height="22"/>
+                    <toolbarItem implicitItemIdentifier="3588F9B5-EB47-4A3A-8EB1-C433EE59A501" label="Show Log" paletteLabel="Show Log" toolTip="Show the Log" tag="-1" image="log" sizingBehavior="auto" id="483">
                         <connections>
                             <action selector="showLog:" target="BZI-HO-NFo" id="7aP-yb-C2L"/>
                         </connections>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="AE92BE9D-F881-4573-98F1-DC4B86D73B09" label="Preferences" paletteLabel="Preferences" toolTip="Display the Preferences Panel." tag="-1" image="settings" id="484">
-                        <size key="minSize" width="22" height="22"/>
-                        <size key="maxSize" width="22" height="22"/>
+                    <toolbarItem implicitItemIdentifier="AE92BE9D-F881-4573-98F1-DC4B86D73B09" label="Preferences" paletteLabel="Preferences" toolTip="Display the Preferences Panel." tag="-1" image="settings" sizingBehavior="auto" id="484">
                         <connections>
                             <action selector="makeKeyAndOrderFront:" target="547" id="912"/>
                         </connections>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="0201AD58-761C-44C0-9B26-55F77446A5D5" label="Series-Link to Queue" paletteLabel="Series-Link to Queue" toolTip="Add available Series-Link shows to queue." tag="-1" image="refresh-link_red" autovalidates="NO" id="985">
-                        <size key="minSize" width="22" height="22"/>
-                        <size key="maxSize" width="22" height="22"/>
+                    <toolbarItem implicitItemIdentifier="0201AD58-761C-44C0-9B26-55F77446A5D5" label="Series-Link to Queue" paletteLabel="Series-Link to Queue" toolTip="Add available Series-Link shows to queue." tag="-1" image="refresh-link_red" sizingBehavior="auto" autovalidates="NO" id="985">
                         <connections>
                             <action selector="addSeriesLinkToQueue:" target="621" id="986"/>
                         </connections>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="43EBB453-5B54-4492-A515-60D18DB398EB" label="Refresh Cache" paletteLabel="Refresh Cache" tag="-1" image="refresh" id="1042">
+                    <toolbarItem implicitItemIdentifier="43EBB453-5B54-4492-A515-60D18DB398EB" label="Refresh Cache" paletteLabel="Refresh Cache" tag="-1" image="refresh" sizingBehavior="auto" id="1042">
                         <nil key="toolTip"/>
-                        <size key="minSize" width="22" height="22"/>
-                        <size key="maxSize" width="22" height="22"/>
                         <connections>
                             <action selector="forceUpdate:" target="621" id="1043"/>
                         </connections>
@@ -2538,16 +2523,16 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" id="Npw-zh-ApO">
                             <rect key="frame" x="1" y="1" width="534" height="256"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
-                                <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnSelection="YES" autosaveColumns="NO" headerView="1218" id="1217">
+                                <tableView identifier="DownloadHistory" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" alternatingRowBackgroundColors="YES" columnSelection="YES" autosaveName="DownloadHistory" headerView="1218" id="1217">
                                     <rect key="frame" x="0.0" y="0.0" width="534" height="239"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <size key="intercellSpacing" width="3" height="2"/>
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                     <tableColumns>
-                                        <tableColumn width="139.57421875" minWidth="40" maxWidth="1000" id="1219">
+                                        <tableColumn identifier="0" width="139.57421875" minWidth="40" maxWidth="1000" id="1219">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="PID">
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
@@ -2566,7 +2551,7 @@
                                                 </binding>
                                             </connections>
                                         </tableColumn>
-                                        <tableColumn width="195" minWidth="40" maxWidth="1000" id="1220">
+                                        <tableColumn identifier="1" width="195" minWidth="40" maxWidth="1000" id="1220">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Show Name">
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
@@ -2585,7 +2570,7 @@
                                                 </binding>
                                             </connections>
                                         </tableColumn>
-                                        <tableColumn width="151.5" minWidth="10" maxWidth="3.4028229999999999e+38" id="1223">
+                                        <tableColumn identifier="2" width="151.5" minWidth="10" maxWidth="3.4028229999999999e+38" id="1223">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Episode Name">
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
