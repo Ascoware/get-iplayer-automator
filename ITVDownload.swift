@@ -240,31 +240,7 @@ public class ITVDownload : Download {
     }
     
     @objc public func youtubeDLFinishedDownload() {
-        if let tagOption = UserDefaults.standard.object(forKey: "TagShows") as? Bool, tagOption {
-            self.show.status = "Downloading Thumbnail..."
-            setPercentage(102)
-            setCurrentProgress("Downloading Thumbnail... -- \(show.showName)")
-            if !show.thumbnailURLString.isEmpty {
-                add(toLog: "INFO: Downloading thumbnail", noTag: true)
-                thumbnailPath = URL(fileURLWithPath: show.path).appendingPathExtension("jpg").path
-                
-                if let thumbnailURL = URL(string: show.thumbnailURLString) {
-                    let downloadTask = session.downloadTask(with: thumbnailURL) { (location, _, _) in
-                        self.thumbnailRequestFinished(location)
-                    }
-                    downloadTask.resume()
-                } else {
-                    self.add(toLog: "Bad URL for thumbnail")
-                    self.thumbnailRequestFinished(nil)
-                }
-            } else {
-                self.add(toLog: "No thumbnail URL, skipping")
-                thumbnailRequestFinished(nil)
-            }
-        }
-        else {
-            atomicParsleyFinished(nil)
-        }
+        atomicParsleyFinished(nil)
     }
     
     
@@ -308,6 +284,13 @@ public class ITVDownload : Download {
 
         if verbose {
             args.append("--verbose")
+        }
+
+        if let tagOption = UserDefaults.standard.object(forKey: "TagShows") as? Bool, tagOption {
+            args.append("--embed-metadata")
+            args.append("--embed-thumbnail")
+            args.append("--ppa")
+            args.append("AtomicParsley:stik=value=10")
         }
         
         if let proxyHost = self.proxy?.host {

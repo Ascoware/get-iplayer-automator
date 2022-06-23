@@ -76,85 +76,17 @@
         [self addToLog:msg noTag:YES];
     }
 }
-- (void)thumbnailRequestFinished:(NSURL *)location
-{
 
-    if (location) {
-        NSString *msg = [NSString stringWithFormat:@"INFO: Thumbnail download completed to %@", location];
-        [self addToLog:msg noTag:YES];
-        NSFileManager *fm = [NSFileManager defaultManager];
-        NSURL *destinationURL = [NSURL fileURLWithPath:_thumbnailPath];
-        NSError *error = nil;
-        [fm removeItemAtPath:_thumbnailPath error:&error];
-        if (![fm copyItemAtURL:location toURL:destinationURL error:&error]) {
-            NSLog(@"Unable to save downloaded thumbnail: %@", error.description);
-            [self addToLog:@"INFO: Thumbnail Download Failed" noTag:YES];
-        }
-    } else {
-        [self addToLog:@"INFO: No thumbnail downloaded" noTag:YES];
-    }
-
-    if (self.show.path.length == 0) {
-        [self addToLog:@"WARN: Can't tag, no path" noTag:YES];
-        [self atomicParsleyFinished:nil];
-        return;
-    }
-
-    dispatch_async(dispatch_get_main_queue(), ^{
-        self.apTask = [[NSTask alloc] init];
-        self.apPipe = [[NSPipe alloc] init];
-
-        self.apTask.launchPath = [[[AppController sharedController] extraBinariesPath] stringByAppendingPathComponent:@"AtomicParsley"];
-
-        NSMutableArray *arguments = [NSMutableArray array];
-        [arguments addObject:self.show.path];
-        [self safeAppend:arguments key:@"--stik" value:@"value=10"];
-        [self safeAppend:arguments key:@"--TVNetwork" value:self.show.tvNetwork];
-        [self safeAppend:arguments key:@"--TVShowName" value:self.show.seriesName];
-        [self safeAppend:arguments key:@"--TVSeasonNum" value: @(self.show.season)];
-        [self safeAppend:arguments key:@"--TVEpisodeNum" value: @(self.show.episode)];
-        [self safeAppend:arguments key:@"--TVEpisode" value:self.show.episodeName];
-        [self safeAppend:arguments key:@"--title" value:self.show.episodeName];
-        [self safeAppend:arguments key:@"--description" value:self.show.desc];
-        [self safeAppend:arguments key:@"--artist" value:self.show.tvNetwork];
-        [self safeAppend:arguments key:@"--artwork" value: self.thumbnailPath];
-        [self safeAppend:arguments key:@"--year" value: self.show.lastBroadcastString];
-        [arguments addObject:@"--overWrite"];
-
-        self.apTask.arguments = arguments;
-
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(atomicParsleyFinished:)
-                                                     name:NSTaskDidTerminateNotification
-                                                   object:self.apTask];
-
-        [self addToLog:@"INFO: Beginning AtomicParsley Tagging." noTag:YES];
-
-        [self.apTask launch];
-        [self setCurrentProgress:[NSString stringWithFormat:@"Tagging the Programme... -- %@",self.show.showName]];
-    });
-}
 - (void)atomicParsleyFinished:(NSNotification *)finishedNote
 {
-    if (finishedNote) {
-        if ([finishedNote.object terminationStatus] == 0) {
-            [[NSFileManager defaultManager] removeItemAtPath:_thumbnailPath error:nil];
-            [self addToLog:@"INFO: AtomicParsley Tagging finished." noTag:YES];
-            self.show.successful = YES;
-        } else {
-            [self addToLog:@"INFO: Tagging failed." noTag:YES];
-            self.show.successful = NO;
-        }
-    }
-
+    self.show.successful = YES;
     self.apTask = nil;
     self.apPipe = nil;
 
     if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"DownloadSubtitles"] boolValue]) {
         // youtube-dl should try to download a subtitle file, but if there isn't one log it and continue.
         if (_subtitlePath && [[NSFileManager defaultManager] fileExistsAtPath:_subtitlePath]) {
-            if (![_subtitlePath.pathExtension isEqual: @"srt"])
-            {
+            if (![_subtitlePath.pathExtension isEqual: @"srt"]) {
                 _show.status = @"Converting Subtitles...";
                 [self setPercentage:102];
                 [self setCurrentProgress:[NSString stringWithFormat:@"Converting Subtitles... -- %@",_show.showName]];
@@ -277,15 +209,7 @@
     self.subsTask = nil;
     self.subsErrorPipe = nil;
 }
-- (void)DownloadDataReady:(NSNotification *)note
-{
-    NSData *data = [note.userInfo valueForKey:NSFileHandleNotificationDataItem];
-    if (data.length > 0) {
-		NSString *s = [[NSString alloc] initWithData:data
-											encoding:NSUTF8StringEncoding];
-		[self processGetiPlayerOutput:s];
-	}
-}
+
 - (void)processGetiPlayerOutput:(NSString *)output
 {
 	NSArray *array = [output componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];

@@ -24,7 +24,7 @@
 #
 #
 package main;
-my $version = 3.29;
+my $version = 3.30;
 my $version_text;
 $version_text = sprintf("v%.2f", $version) unless $version_text;
 #
@@ -84,7 +84,7 @@ my $opt_format = {
 	# Recording
 	attempts	=> [ 1, "attempts=n", 'Recording', '--attempts <number>', "Number of attempts to make or resume a failed connection.  --attempts is applied per-stream, per-mode.  Many modes have two or more streams available."],
 	audioonly		=> [ 1, "audioonly|audio-only!", 'Recording', '--audio-only', "Only download audio stream for TV programme. Produces .m4a file. Implies --force."],
-	downloadabortonfail	=> [ 1, "downloadabortonfail||download-abort-onfail|download-abort-onfail!", 'Recording', '--download-abort-onfail', "Exit immediately if any stream to download. Use to avoid repeated failed download attempts if connection is dropped or access is blocked."],
+	downloadabortonfail	=> [ 1, "downloadabortonfail|download-abort-onfail|download-abort-onfail!", 'Recording', '--download-abort-onfail', "Exit immediately if any stream fails to download. Use to avoid repeated failed download attempts if connection is dropped or access is blocked."],
 	excludeformat	=> [ 1, "excludeformat|exclude-format=s", 'Recording', '--exclude-format <format>,<format>,...', "Comma-separated list of media stream formats to ignore when recording. Valid values: hls,dash."],
 	excludesupplier	=> [ 1, "excludecdn|exclude-cdn|excludesupplier|exclude-supplier=s", 'Recording', '--exclude-supplier <supplier>,<supplier>,...', "Comma-separated list of media stream suppliers (CDNs) to skip. Possible values: akamai,limelight,bidi,cloudfront. Synonym: --exclude-cdn."],
 	force		=> [ 1, "force|force-download!", 'Recording', '--force', "Ignore programme history (unsets --hide option also)."],
@@ -179,8 +179,8 @@ my $opt_format = {
 	preset		=> [ 1, "preset|z=s", 'Config', '--preset, -z <name>', "Use specified user options preset"],
 	presetlist	=> [ 1, "listpresets|list-presets|presetlist|preset-list!", 'Config', '--preset-list', "Show all valid presets"],
 	profiledir	=> [ 1, "profiledir|profile-dir=s", 'Config', '--profile-dir <dir>', "Override the user profile directory"],
-	refresh		=> [ 2, "refresh|flush|f!", 'Config', '--refresh, --flush, -f', "Refresh cache"],
-	refreshabortonerror	=> [ 1, "refreshabortonerror|refresh-abortonerror!", 'Config', '--refresh-abortonerror', "Abort cache refresh for programme type if data for any channel fails to download.  Use --refresh-exclude to temporarily skip failing channels."],
+	refresh		=> [ 2, "refresh|flush|f!", 'Config', '--refresh', "Refresh cache"],
+	refreshabortonerror	=> [ 1, "refreshabortonerror|refresh-abortonerror|refresh-abort-onerror!", 'Config', '--refresh-abort-onerror', "Abort cache refresh for programme type if data for any channel fails to download.  Use --refresh-exclude to temporarily skip failing channels."],
 	refreshinclude	=> [ 1, "refreshinclude|refresh-include=s", 'Config', '--refresh-include <channel>,<channel>,...', "Include matched channel(s) when refreshing cache (comma-separated regex list).  Defaults to substring match.  Overrides --refresh-exclude-groups[-{tv,radio}] status for specified channel(s)"],
 	refreshexclude	=> [ 1, "refreshexclude|refresh-exclude|ignorechannels=s", 'Config', '--refresh-exclude <channel>,<channel>,...', "Exclude matched channel(s) when refreshing cache (comma-separated regex list).  Defaults to substring match.  Overrides --refresh-include-groups[-{tv,radio}] status for specified channel(s)"],
 	refreshexcludegroups	=> [ 1, "refreshexcludegroups|refresh-exclude-groups=s", 'Config', '--refresh-exclude-groups <group>,<group>,...', "Exclude channel groups when refreshing radio or TV cache (comma-separated values).  Valid values: 'national', 'regional', 'local'"],
@@ -2534,7 +2534,7 @@ sub usage {
 		'This applies even if the base option name already begins with "no-", e.g., --no-no-tag or --no-no-artwork',
 	);
 	push @man,
-		'.TH GET_IPLAYER "1" "February 2022" "Phil Lewis" "get_iplayer Manual"',
+		'.TH GET_IPLAYER "1" "May 2022" "Phil Lewis" "get_iplayer Manual"',
 		'.SH NAME', 'get_iplayer - Stream Recording tool and PVR for BBC iPlayer and BBC Sounds',
 		'.SH SYNOPSIS',
 		'\fBget_iplayer\fR [<options>] [<regex|index> ...]',
@@ -6510,7 +6510,9 @@ sub get_stream_data {
 			}
 			my $xvs = main::request_url_retry( $ua, $stm2->{streamurl}, 3, undef, undef, 1, undef, 1 );
 			if ( $xvs && $xvs !~ /<html/i ) {
-				$data->{$key2} = $stm2;
+				if ( $key2 =~ /dashfhd/ || $xvs =~ /video=${xvi}000/) {
+					$data->{$key2} = $stm2;
+				}
 			}
 		}
 	}
@@ -6891,7 +6893,7 @@ sub channels_schedule {
 sub opt_format {
 	return {
 		commandtv	=> [ 1, "commandtv|command-tv=s", 'Output', '--command-tv <command>', "User command to run after successful recording of TV programme. Use substitution parameters in command string (see docs for list). Overrides --command."],
-		fps25		=> [ 1, "fps25|tvlbr|tvlowerbitrate|tv-lower-bitrate!", 'Recording', '--tv-lower-bitrate', "Prefer 25fps (or lower-bitrate 50fps) streams for TV programmes if available."],
+		fps25		=> [ 1, "fps25|tvlbr|tvlowerbitrate|tv-lower-bitrate!", 'Recording', '--tv-lower-bitrate, --tvlbr', "Prefer 25fps (or lower-bitrate 50fps) streams for TV programmes if available."],
 		outputtv	=> [ 1, "outputtv|output-tv=s", 'Output', '--output-tv <dir>', "Output directory for tv recordings (overrides --output)"],
 		tvmode		=> [ 0, "tvmode|tv-mode|vmode|tvquality|tv-quality|vquality=s", 'Recording', '--tv-quality <quality>,<quality>,...', "TV recording quality preference (overrides --quality): fhd,hd,sd,web,mobile,default (Aliases: 1080p,720p,540p,396p,288p). Comma-delimited list in descending order of preference. Default: hd,sd,web,mobile"],
 	};
@@ -8212,6 +8214,16 @@ sub fetch {
 		}
 		$size = tell $fh;
 		return if $opt->{quiet} || $opt->{silent};
+		if ( $prog_mode =~ /fhd/ && $curr_sequence - $start_sequence > 0 ) {
+			my $sequence_size = int($size / ($curr_sequence - $start_sequence));
+			if ( $stop_sequence - $start_sequence > 0 ) {
+				my $new_size = $sequence_size * ($stop_sequence - $start_sequence);
+				if ( abs($new_size - $file_size) > 0.05 * $file_size ) {
+					$file_size = $new_size;
+					$file_size_mb = $file_size / 1000000.0;
+				}
+			}
+		}
 		$percent = $file_size ? 100.0 * $curr_size / $file_size : 0;
 		# limit progress display to 99.9%
 		if ( $percent > 99.9 ) {
