@@ -290,7 +290,7 @@ public class ITVDownload : Download {
             args.append("--embed-metadata")
             args.append("--embed-thumbnail")
             args.append("--ppa")
-            args.append("AtomicParsley:stik=value=10")
+            args.append("AtomicParsley:--stik value=10")
         }
         
         if let proxyHost = self.proxy?.host {
