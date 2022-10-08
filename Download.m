@@ -77,9 +77,60 @@
     }
 }
 
+- (void)tagDownloadWithMetadata
+{
+    if (self.show.path.length == 0) {
+        [self addToLog:@"WARN: Can't tag, no path" noTag:YES];
+        [self atomicParsleyFinished:nil];
+        return;
+    }
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.apTask = [[NSTask alloc] init];
+        self.apPipe = [[NSPipe alloc] init];
+
+        self.apTask.launchPath = [[[AppController sharedController] extraBinariesPath] stringByAppendingPathComponent:@"AtomicParsley"];
+
+        NSMutableArray *arguments = [NSMutableArray array];
+        [arguments addObject:self.show.path];
+        [self safeAppend:arguments key:@"--stik" value:@"value=10"];
+        [self safeAppend:arguments key:@"--TVNetwork" value:self.show.tvNetwork];
+        [self safeAppend:arguments key:@"--TVShowName" value:self.show.seriesName];
+        [self safeAppend:arguments key:@"--TVSeasonNum" value: @(self.show.season)];
+        [self safeAppend:arguments key:@"--TVEpisodeNum" value: @(self.show.episode)];
+        [self safeAppend:arguments key:@"--TVEpisode" value:self.show.episodeName];
+        [self safeAppend:arguments key:@"--title" value:self.show.episodeName];
+        [self safeAppend:arguments key:@"--description" value:self.show.desc];
+        [self safeAppend:arguments key:@"--artist" value:self.show.tvNetwork];
+        [self safeAppend:arguments key:@"--year" value: self.show.lastBroadcastString];
+        [arguments addObject:@"--overWrite"];
+
+        self.apTask.arguments = arguments;
+
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(atomicParsleyFinished:)
+                                                     name:NSTaskDidTerminateNotification
+                                                   object:self.apTask];
+
+        [self addToLog:@"INFO: Beginning AtomicParsley Tagging." noTag:YES];
+
+        [self.apTask launch];
+        [self setCurrentProgress:[NSString stringWithFormat:@"Tagging the Programme... -- %@",self.show.showName]];
+    });
+}
+
 - (void)atomicParsleyFinished:(NSNotification *)finishedNote
 {
-    self.show.successful = YES;
+    if (finishedNote) {
+        if ([finishedNote.object terminationStatus] == 0) {
+            [self addToLog:@"INFO: AtomicParsley Tagging finished." noTag:YES];
+            self.show.successful = YES;
+        } else {
+            [self addToLog:@"INFO: Tagging failed." noTag:YES];
+            self.show.successful = NO;
+        }
+    }
+
     self.apTask = nil;
     self.apPipe = nil;
 
