@@ -88,15 +88,13 @@ class ITVMetadataExtractor {
             }
         }
 
-        if newProgram.episodeName.isEmpty {
-            if let timeAired = timeAired {
-                let shortDate = DateFormatter.localizedString(from: timeAired, dateStyle: .medium, timeStyle: .none)
-                newProgram.episodeName = shortDate
-            }
-        }
         if let timeAired = timeAired {
             newProgram.lastBroadcast = timeAired
-            newProgram.lastBroadcastString = longDateFormatter.string(from: timeAired)
+            newProgram.lastBroadcastString = DateFormatter.localizedString(from: timeAired, dateStyle: .medium, timeStyle: .none)
+
+            if newProgram.episodeName.isEmpty {
+                newProgram.episodeName = newProgram.lastBroadcastString
+            }
         }
 
         return newProgram

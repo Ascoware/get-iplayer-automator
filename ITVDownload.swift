@@ -240,7 +240,11 @@ public class ITVDownload : Download {
     }
     
     @objc public func youtubeDLFinishedDownload() {
-        atomicParsleyFinished(nil)
+        if let tagOption = UserDefaults.standard.object(forKey: "TagShows") as? Bool, tagOption {
+            tagDownloadWithMetadata()
+        } else {
+            atomicParsleyFinished(nil)
+        }
     }
     
     
@@ -287,10 +291,7 @@ public class ITVDownload : Download {
         }
 
         if let tagOption = UserDefaults.standard.object(forKey: "TagShows") as? Bool, tagOption {
-            args.append("--embed-metadata")
             args.append("--embed-thumbnail")
-            args.append("--ppa")
-            args.append("AtomicParsley:--stik value=10")
         }
         
         if let proxyHost = self.proxy?.host {

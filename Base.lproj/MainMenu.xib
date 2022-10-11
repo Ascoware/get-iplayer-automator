@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21225" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21225"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -97,7 +97,7 @@
                 <binding destination="621" name="contentArray" keyPath="searchResultsArray" id="695"/>
             </connections>
         </arrayController>
-        <arrayController objectClassName="Programme" automaticallyRearrangesObjects="YES" id="700" userLabel="Queue Controller" customClass="RSRTVArrayController">
+        <arrayController objectClassName="Programme" id="700" userLabel="Queue Controller" customClass="RSRTVArrayController">
             <declaredKeys>
                 <string>pid</string>
                 <string>showName</string>
@@ -879,11 +879,11 @@
                         </connections>
                     </button>
                     <progressIndicator verticalHuggingPriority="750" fixedFrame="YES" maxValue="100" bezeled="NO" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="505">
-                        <rect key="frame" x="17" y="12" width="778" height="20"/>
+                        <rect key="frame" x="20" y="12" width="769" height="20"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                     </progressIndicator>
                     <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="508">
-                        <rect key="frame" x="16" y="37" width="583" height="17"/>
+                        <rect key="frame" x="18" y="37" width="581" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" id="509">
                             <font key="font" metaFont="system"/>
@@ -953,11 +953,11 @@
                         </connections>
                     </button>
                     <progressIndicator hidden="YES" wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" maxValue="100" displayedWhenStopped="NO" bezeled="NO" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="e7O-Z3-UPb">
-                        <rect key="frame" x="770" y="39" width="16" height="16"/>
+                        <rect key="frame" x="770" y="38" width="16" height="16"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                     </progressIndicator>
                     <textField hidden="YES" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vBT-g6-IDt" userLabel="ITV Progress Cell">
-                        <rect key="frame" x="623" y="38" width="135" height="17"/>
+                        <rect key="frame" x="623" y="37" width="135" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Updating ITV Indexes" id="MT9-wB-y1L">
                             <font key="font" metaFont="system"/>
@@ -965,15 +965,15 @@
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <scrollView fixedFrame="YES" borderType="none" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="466">
-                        <rect key="frame" x="20" y="84" width="770" height="187"/>
+                    <scrollView fixedFrame="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="466">
+                        <rect key="frame" x="20" y="84" width="769" height="187"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" copiesOnScroll="NO" id="qBj-Iv-0lY">
-                            <rect key="frame" x="0.0" y="0.0" width="755" height="187"/>
+                            <rect key="frame" x="0.0" y="0.0" width="769" height="187"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView identifier="DownloadQueue" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" typeSelect="NO" autosaveName="DownloadQueue" headerView="470" id="469">
-                                    <rect key="frame" x="0.0" y="0.0" width="755" height="170"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="769" height="170"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <size key="intercellSpacing" width="3" height="2"/>
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -994,9 +994,10 @@
                                             </textFieldCell>
                                             <tableColumnResizingMask key="resizingMask" userResizable="YES"/>
                                             <connections>
-                                                <binding destination="700" name="value" keyPath="arrangedObjects.pid" id="CPA-Y3-bvT">
+                                                <binding destination="700" name="value" keyPath="arrangedObjects.pid" id="B2v-QW-0TT">
                                                     <dictionary key="options">
                                                         <bool key="NSConditionallySetsEditable" value="NO"/>
+                                                        <bool key="NSCreatesSortDescriptor" value="NO"/>
                                                     </dictionary>
                                                 </binding>
                                             </connections>
@@ -1013,7 +1014,11 @@
                                             </textFieldCell>
                                             <tableColumnResizingMask key="resizingMask" userResizable="YES"/>
                                             <connections>
-                                                <binding destination="700" name="value" keyPath="arrangedObjects.status" id="nKo-Iq-50a"/>
+                                                <binding destination="700" name="value" keyPath="arrangedObjects.status" id="JH3-rZ-gMn">
+                                                    <dictionary key="options">
+                                                        <bool key="NSCreatesSortDescriptor" value="NO"/>
+                                                    </dictionary>
+                                                </binding>
                                             </connections>
                                         </tableColumn>
                                         <tableColumn identifier="2" width="209.5" minWidth="10" maxWidth="3.4028229999999999e+38" id="503" userLabel="Show">
@@ -1028,9 +1033,10 @@
                                             </textFieldCell>
                                             <tableColumnResizingMask key="resizingMask" userResizable="YES"/>
                                             <connections>
-                                                <binding destination="700" name="value" keyPath="arrangedObjects.showName" id="49f-76-bCT">
+                                                <binding destination="700" name="value" keyPath="arrangedObjects.showName" id="GCf-8n-zmd">
                                                     <dictionary key="options">
                                                         <bool key="NSConditionallySetsEditable" value="NO"/>
+                                                        <bool key="NSCreatesSortDescriptor" value="NO"/>
                                                     </dictionary>
                                                 </binding>
                                             </connections>
@@ -1047,9 +1053,10 @@
                                             </textFieldCell>
                                             <tableColumnResizingMask key="resizingMask" userResizable="YES"/>
                                             <connections>
-                                                <binding destination="700" name="value" keyPath="arrangedObjects.episodeName" id="4WS-Cb-0e5">
+                                                <binding destination="700" name="value" keyPath="arrangedObjects.episodeName" id="6cK-D7-ydQ">
                                                     <dictionary key="options">
                                                         <bool key="NSConditionallySetsEditable" value="NO"/>
+                                                        <bool key="NSCreatesSortDescriptor" value="NO"/>
                                                     </dictionary>
                                                 </binding>
                                             </connections>
@@ -1067,9 +1074,9 @@
                                             <sortDescriptor key="sortDescriptorPrototype" selector="compare:" sortKey="lastBroadcast"/>
                                             <tableColumnResizingMask key="resizingMask" userResizable="YES"/>
                                             <connections>
-                                                <binding destination="700" name="value" keyPath="arrangedObjects.lastBroadcastString" id="W73-Fn-nKl">
+                                                <binding destination="700" name="value" keyPath="arrangedObjects.lastBroadcastString" id="xOs-rl-Jlh">
                                                     <dictionary key="options">
-                                                        <bool key="NSConditionallySetsEditable" value="NO"/>
+                                                        <bool key="NSCreatesSortDescriptor" value="NO"/>
                                                     </dictionary>
                                                 </binding>
                                             </connections>
@@ -1083,15 +1090,15 @@
                             </subviews>
                         </clipView>
                         <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="468">
-                            <rect key="frame" x="-100" y="-100" width="764" height="15"/>
+                            <rect key="frame" x="0.0" y="172" width="755" height="15"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
-                        <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="467">
-                            <rect key="frame" x="755" y="17" width="15" height="170"/>
+                        <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="467">
+                            <rect key="frame" x="755" y="17" width="15" height="155"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <tableHeaderView key="headerView" id="470">
-                            <rect key="frame" x="0.0" y="0.0" width="755" height="17"/>
+                            <rect key="frame" x="0.0" y="0.0" width="769" height="17"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </tableHeaderView>
                     </scrollView>
@@ -2523,7 +2530,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" id="Npw-zh-ApO">
                             <rect key="frame" x="1" y="1" width="534" height="256"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <autoresizingMask key="autoresizingMask"/>
                             <subviews>
                                 <tableView identifier="DownloadHistory" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" alternatingRowBackgroundColors="YES" columnSelection="YES" autosaveName="DownloadHistory" headerView="1218" id="1217">
                                     <rect key="frame" x="0.0" y="0.0" width="534" height="239"/>

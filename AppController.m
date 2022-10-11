@@ -500,14 +500,15 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     _didUpdate=NO;
     [_mainWindow setDocumentEdited:YES];
 
-    NSArray *tempQueue = _queueController.arrangedObjects;
-    for (Programme *show in tempQueue)
+    NSMutableArray *finishedShows = [NSMutableArray new];
+    for (Programme *show in _queueController.arrangedObjects)
     {
-        if (show.successful)
-        {
-            [_queueController removeObject:show];
+        if (show.successful) {
+            [finishedShows addObject:show];
         }
     }
+
+    [_queueController removeObjects:finishedShows];
 
     //UI might not be loaded yet
     @try
@@ -1035,6 +1036,8 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 
         //Clean-Up Queue
         NSArray *tempQueue = _queueController.arrangedObjects;
+        NSMutableArray *removedShows = [NSMutableArray new];
+
         for (Programme *show in tempQueue)
         {
             if (!show.successful)
@@ -1065,9 +1068,12 @@ static NSString *FORCE_RELOAD = @"ForceReload";
             }
             else
             {
-                [_queueController removeObject:show];
+                [removedShows addObject:show];
             }
         }
+
+        [_queueController removeObjects:removedShows];
+
         if (foundOne)
         {
             //Start First Download

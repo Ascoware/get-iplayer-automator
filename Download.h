@@ -31,7 +31,6 @@ NS_ASSUME_NONNULL_BEGIN
 //Download Information
 @property (nullable) NSString *subtitleURL;
 @property (copy) NSString *downloadPath;
-@property (copy) NSString *thumbnailPath;
 @property (copy) NSString *subtitlePath;
 
 //Subtitle Conversion
@@ -66,6 +65,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)processGetiPlayerOutput:(NSString *)outp;
 - (void)createDownloadPath;
 
+- (void)tagDownloadWithMetadata;
 - (void)atomicParsleyFinished:(nullable NSNotification *)finishedNote;
 
 @end
