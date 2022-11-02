@@ -1,23 +1,19 @@
 //  Converted with Swiftify v1.0.6472 - https://objectivec2swift.com/
 //
-//  GetCurrentWebpageController.m
+//  GetCurrentWebpage.swift
 //  Get_iPlayer GUI
-//
-//  Created by Thomas Willson on 8/3/14.
-//
 //
 
 import ScriptingBridge
 import SwiftyJSON
 import Kanna
 
-@objcMembers public class GetCurrentWebpage : NSObject {
+@objc public class GetCurrentWebpage : NSObject {
     
-    private class func extractMetadata(url: String, tabTitle: String, pageSource: String) -> Programme {
-        var show = Programme()
-
+    private class func extractMetadata(url: String, tabTitle: String, pageSource: String, completion: ([Programme]) -> Void) {
         if url.hasPrefix("https://www.bbc.co.uk/iplayer/episode/") {
             // PID is always the second-to-last element in the URL.
+            let show = Programme()
             if let nsUrl = URL(string: url) {
                 show.pid = nsUrl.deletingLastPathComponent().lastPathComponent
             }
@@ -26,9 +22,12 @@ import Kanna
             nameScanner.scanString("BBC iPlayer - ")
             show.showName = nameScanner.scanUpToString( " - ") ?? ""
             show.tvNetwork = "BBC"
+            completion([show])
+            return
         } else if url.hasPrefix("https://www.bbc.co.uk/iplayer/episodes/") {
             // https://www.bbc.co.uk/iplayer/episodes/p00yzlr0/line-of-duty?seriesId=b01k9pm3
             // It looks like a PID, but it's a 'brand ID' The real URL is embedded in an anchor tag.
+            let show = Programme()
             if let htmlPage = try? HTML(html: pageSource, encoding: .utf8) {
                 // There should only be one 'video' element.
                 if let anchorElement = htmlPage.at_xpath("//a[@class='play-cta__inner play-cta__inner--do-not-wrap play-cta__inner--link']") {
@@ -44,24 +43,28 @@ import Kanna
             nameScanner.scanString("BBC iPlayer - ")
             show.showName = nameScanner.scanUpToString( " - ") ?? ""
             show.tvNetwork = "BBC"
+            completion([show])
+            return
         } else if url.hasPrefix("https://www.bbc.co.uk/radio/play/") || url.hasPrefix("https://www.bbc.co.uk/sounds/play/") {
             // PID is always the last element in the URL.
             if let nsUrl = URL(string: url) {
+                let show = Programme()
                 show.pid = nsUrl.lastPathComponent
                 show.tvNetwork = "BBC"
+                show.radio = true
+                // Program title is buried in the page HTML.
+                completion([show])
             }
-
-            show.radio = true
-            // Program title is buried in the page HTML.
-            
+            return
         } else if url.hasPrefix("https://www.bbc.co.uk/programmes/") {
-            // Search the page to see if it is an episode or a series page. If we don't the PID inside
+            // Search the page to see if it is an episode or a series page. If we don't find the PID inside
             // a bbcProgrammes element, it's a series page and we can't use it (though we might want to try
-            // adding it with recursive-pid)
+            // adding it with pid-recursive)
             guard let htmlPage = try? HTML(html: pageSource, encoding: .utf8) else {
-                return show
+                return
             }
 
+            var showList = [Programme]()
             var infoDicts: [JSON] = []
 
             for showInfo in htmlPage.xpath("//script[@type='application/ld+json']") {
@@ -93,6 +96,7 @@ import Kanna
 
                 switch contentType {
                 case "TVEpisode", "@TVEpisode", "@RadioEpisode", "RadioEpisode", "Clip":
+                    let show = Programme()
                     show.pid = infoDict["identifier"].stringValue
                     show.seriesName = infoDict["partOfSeries"]["name"].stringValue
                     show.episodeName = infoDict["name"].stringValue
@@ -104,6 +108,7 @@ import Kanna
                         show.radio = true
                     }
 
+                    showList.append(show)
                     break
 
                 default:
@@ -111,29 +116,30 @@ import Kanna
                 }
             }
 
-            if show.pid.isEmpty {
-                let invalidPage = NSAlert()
-                invalidPage.addButton(withTitle: "OK")
-                invalidPage.messageText = "Series Page Found: \(url)"
-                invalidPage.informativeText = "Please ensure the frontmost browser tab is open to an iPlayer episode page or programme clip page. Get iPlayer Automator doesn't support downloading all available shows from a series."
-                invalidPage.alertStyle = .warning
-                invalidPage.runModal()
-                return show
+            if showList.isEmpty {
+                showList = searchForPIDs(url: url)
             }
+
+            completion(showList)
         } else if url.hasPrefix("https://www.itv.com/hub/") {
-            show = ITVMetadataExtractor.getShowMetadata(htmlPageContent: pageSource)
+            let show = ITVMetadataExtractor.getShowMetadata(htmlPageContent: pageSource)
+            completion([show])
+        } else {
+            let invalidPage = NSAlert()
+            invalidPage.addButton(withTitle: "OK")
+            invalidPage.messageText = "Programme Page Not Found"
+            invalidPage.informativeText = "Please ensure the frontmost browser tab is open to an iPlayer episode page or ITV Hub episode page."
+            invalidPage.alertStyle = .warning
+            invalidPage.runModal()
         }
 
-        return show
     }
-    
-    public class func getCurrentWebpage(_ logger: LogController) -> Programme? {
+
+    @objc open class func getCurrentWebpage(completion: ([Programme]) -> Void) {
         //Get Default Browser
         guard let browser = UserDefaults.standard.object(forKey: "DefaultBrowser") as? String else {
-            return nil
+            return
         }
-
-        var newProgram: Programme? = nil
 
         //Prepare Alert in Case the Browser isn't Open
         let browserNotOpen = NSAlert()
@@ -159,12 +165,16 @@ import Kanna
             
             guard let safari = safariRunning, let safariWindows = safari.windows?().compactMap({ $0 as? SafariWindow }) else {
                 browserNotOpen.runModal()
-                return nil
+                return
             }
 
             let orderedWindows = safariWindows.sorted { $0.index! < $1.index! }
-            if let frontWindow = orderedWindows.first, let tab = frontWindow.currentTab, let url = tab.URL, let name = tab.name, let source = tab.source {
-                newProgram = extractMetadata(url: url, tabTitle: name, pageSource: source)
+            if let frontWindow = orderedWindows.first,
+               let tab = frontWindow.currentTab,
+               let url = tab.URL,
+               let name = tab.name,
+               let source = tab.source {
+                extractMetadata(url: url, tabTitle: name, pageSource: source, completion: completion)
             }
             break
 
@@ -179,13 +189,16 @@ import Kanna
 
             guard let bundleID = mapping[browser], let chrome : ChromeApplication = SBApplication(bundleIdentifier: bundleID), chrome.isRunning, let chromeWindows = chrome.windows?().compactMap({ $0 as? ChromeWindow }) else {
                 browserNotOpen.runModal()
-                return nil
+                return
             }
 
             let orderedWindows = chromeWindows.sorted { $0.index! < $1.index! }
-            if let frontWindow = orderedWindows.first, let tab = frontWindow.activeTab, let url = tab.URL, let title = tab.title,
+            if let frontWindow = orderedWindows.first,
+               let tab = frontWindow.activeTab,
+               let url = tab.URL,
+               let title = tab.title,
                let source = tab.executeJavascript?("document.documentElement.outerHTML") as? String {
-                newProgram = extractMetadata(url: url, tabTitle: title, pageSource: source)
+                extractMetadata(url: url, tabTitle: title, pageSource: source, completion: completion)
             }
 
             break
@@ -196,23 +209,63 @@ import Kanna
             unsupportedBrowser.addButton(withTitle: "OK")
             unsupportedBrowser.informativeText = "Get iPlayer Automator only works with Safari and Chrome. We shouldn't be here; please file a bug."
             unsupportedBrowser.runModal()
-            return nil
         }
-        
-        // If we have a PID we can search for it.
-        guard let pid = newProgram?.pid, !pid.isEmpty else {
-            let invalidPage = NSAlert()
-            invalidPage.addButton(withTitle: "OK")
-            invalidPage.messageText = "Programme Page Not Found"
-            invalidPage.informativeText = "Please ensure the frontmost browser tab is open to an iPlayer episode page or ITV Hub episode page."
-            invalidPage.alertStyle = .warning
-            invalidPage.runModal()
-            return nil
+    }
+
+    private class func searchForPIDs(url: String) -> [Programme] {
+        let task = Process()
+        let pipe = Pipe()
+        let errorPipe = Pipe();
+
+        task.launchPath = AppController.shared().perlBinaryPath
+        let args = [
+            AppController.shared().getiPlayerPath,
+            "--nocopyright",
+            "-e60480000000000000",
+            "--pid-recursive-list",
+            url,
+            GetiPlayerArguments.sharedController().profileDirArg ?? ""
+            ]
+
+//        for arg in args {
+//            DDLogVerbose("\(arg)");
+//        }
+
+        task.arguments = args
+        task.standardOutput = pipe
+        task.standardError = errorPipe
+
+        if var envVariableDictionary = task.environment {
+            envVariableDictionary["HOME"] = NSString("~").expandingTildeInPath
+            envVariableDictionary["PERL_UNICODE"] = "AS"
+            envVariableDictionary["PATH"] = AppController.shared().perlEnvironmentPath
+            task.environment = envVariableDictionary
         }
 
-        newProgram?.status = "Processing..."
-        newProgram?.performSelector(inBackground: #selector(Programme.getName), with: nil)
-        return newProgram
+        task.launch()
+
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+
+        var foundPrograms = [Programme]()
+
+        if let stringData = String(data: data, encoding: .utf8) {
+            let lines = stringData.components(separatedBy: .newlines)
+
+            for line in lines {
+                if line.isEmpty || line.hasPrefix("Episodes:") || line.hasPrefix("INFO:") {
+                    continue
+                }
+
+                let program = Programme()
+                let outputParts = line.components(separatedBy:",")
+                program.episodeName = outputParts[0].trimmingCharacters(in: .whitespaces)
+                program.tvNetwork = outputParts[1].trimmingCharacters(in: .whitespaces)
+                program.pid = outputParts[2].trimmingCharacters(in: .whitespaces)
+
+                foundPrograms.append(program)
+            }
+        }
+
+        return foundPrograms
     }
-    
 }
