@@ -11,7 +11,6 @@
 #import "Programme.h"
 #import "NSFileManager+DirectoryLocations.h"
 
-
 @implementation DownloadHistoryController
 
 - (void)awakeFromNib
@@ -22,7 +21,7 @@
 
 - (void)readHistory
 {
-	NSLog(@"Read History");
+	DDLogVerbose(@"Read History");
     if ([historyArrayController.arrangedObjects count] > 0) {
 		[historyArrayController removeObjectsAtArrangedObjectIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, [historyArrayController.arrangedObjects count])]];
     }
@@ -53,14 +52,14 @@
             [historyArrayController addObject:historyEntry];
         }
 	}
-	NSLog(@"end read history");
+    DDLogVerbose(@"End read history");
 }
 
 - (IBAction)writeHistory:(id)sender
 {
 	if (!runDownloads || [sender isEqualTo:self])
 	{
-		NSLog(@"Write History to File");
+        DDLogVerbose(@"Write History to File");
 		NSArray *currentHistory = historyArrayController.arrangedObjects;
 		NSMutableString *historyString = [[NSMutableString alloc] init];
 		for (DownloadHistoryEntry *entry in currentHistory)
@@ -79,7 +78,7 @@
                 alert.messageText = @"Could not create history file!";
                 [alert addButtonWithTitle:@"OK"];
                 [alert runModal];
-                [self addToLog:@"Could not create history file!"];
+                DDLogWarn(@"%@: Could not create history file!", self.description);
             }
         }
 		else
@@ -167,8 +166,4 @@
 	[self writeHistory:self];
 }
 
-- (void)addToLog:(NSString *)logMessage
-{
-	[[NSNotificationCenter defaultCenter] postNotificationName:@"AddToLog" object:self userInfo:@{@"message": logMessage}];
-}
 @end

@@ -14,38 +14,13 @@
 - (instancetype)init {
     if (self = [super init]) {
         _running=YES;
-        _verbose = [[NSUserDefaults standardUserDefaults] boolForKey:@"Verbose"];
         _defaultsPrefix = @"BBC_";
         _downloadPath = [[NSString alloc] initWithString:[[NSUserDefaults standardUserDefaults] valueForKey:@"DownloadPath"]];
     }
     return self;
 }
-- (instancetype)initWithLogController:(LogController *)logger {
-    if (self = [self init]) {
-        _logger = logger;
-    }
-    return self;
-}
 
 #pragma mark Notification Posters
-- (void)logDebugMessage:(NSString *)message noTag:(BOOL)b {
-    NSLog(@"%@", message);
-
-    if (self.verbose) {
-        [self addToLog:message noTag:b];
-    }
-}
-
-- (void)addToLog:(NSString *)logMessage noTag:(BOOL)noTag
-{
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"AddToLog" object:(noTag ? nil : self) userInfo:@{@"message": logMessage}];
-}
-
-- (void)addToLog:(NSString *)logMessage
-{
-    [self addToLog: logMessage noTag:YES];
-}
-
 - (void)setCurrentProgress:(NSString *)string
 {
 	[[NSNotificationCenter defaultCenter] postNotificationName:@"setCurrentProgress" object:self userInfo:@{@"string": string}];
@@ -72,15 +47,14 @@
         // Converts any object into a string representation
         [array addObject:[NSString stringWithFormat:@"%@", value]];
     } else {
-        NSString *msg = [NSString stringWithFormat:@"WARN: AtomicParsley key: %@, value: %@", (key ?: @"nil"), (value ?: @"nil")];
-        [self addToLog:msg noTag:YES];
+        DDLogWarn(@"WARNING: AtomicParsley key: %@, value: %@", (key ?: @"nil"), (value ?: @"nil"));
     }
 }
 
 - (void)tagDownloadWithMetadata
 {
     if (self.show.path.length == 0) {
-        [self addToLog:@"WARN: Can't tag, no path" noTag:YES];
+        DDLogWarn(@"WARNING: Can't tag, no path");
         [self atomicParsleyFinished:nil];
         return;
     }
@@ -112,7 +86,7 @@
                                                      name:NSTaskDidTerminateNotification
                                                    object:self.apTask];
 
-        [self addToLog:@"INFO: Beginning AtomicParsley Tagging." noTag:YES];
+        DDLogInfo(@"INFO: Beginning AtomicParsley Tagging.");
 
         [self.apTask launch];
         [self setCurrentProgress:[NSString stringWithFormat:@"Tagging the Programme... -- %@",self.show.showName]];
@@ -123,10 +97,10 @@
 {
     if (finishedNote) {
         if ([finishedNote.object terminationStatus] == 0) {
-            [self addToLog:@"INFO: AtomicParsley Tagging finished." noTag:YES];
+            DDLogInfo(@"INFO: AtomicParsley Tagging finished.");
             self.show.successful = YES;
         } else {
-            [self addToLog:@"INFO: Tagging failed." noTag:YES];
+            DDLogInfo(@"INFO: Tagging failed.");
             self.show.successful = NO;
         }
     }
@@ -141,7 +115,7 @@
                 _show.status = @"Converting Subtitles...";
                 [self setPercentage:102];
                 [self setCurrentProgress:[NSString stringWithFormat:@"Converting Subtitles... -- %@",_show.showName]];
-                [self addToLog:@"INFO: Converting Subtitles..." noTag:YES];
+                DDLogInfo(@"INFO: Converting Subtitles...");
                 if ([_subtitlePath.pathExtension isEqualToString:@"ttml"]) {
                     [self convertTTMLToSRT];
                 } else {
@@ -154,8 +128,7 @@
             // If youtube-dl embeds subtitles for us it deletes the raw subtitle file. When that happens
             // we don't know if it was subtitled or not, so don't report an error when embedding is on.
             if (![[[NSUserDefaults standardUserDefaults] objectForKey:@"EmbedSubtitles"] boolValue]) {
-                NSString *message = [NSString stringWithFormat:@"INFO: No subtitles were found for %@", _show.showName];
-                [self addToLog:message noTag:YES];
+                DDLogInfo(@"INFO: No subtitles were found for %@", _show.showName);
             }
             [self convertSubtitlesFinished:nil];
         }
@@ -170,7 +143,7 @@
         [self convertSubtitlesFinished:nil];
     } else {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self addToLog:[NSString stringWithFormat:@"INFO: Converting to SubRip: %@", self.subtitlePath] noTag:YES];
+            DDLogInfo(@"INFO: Converting to SubRip: %@", self.subtitlePath);
 
             NSURL *outputURL = [NSURL fileURLWithPath:self.subtitlePath];
             outputURL = [[outputURL URLByDeletingPathExtension] URLByAppendingPathExtension:@"srt"];
@@ -206,7 +179,7 @@
         [self convertSubtitlesFinished:nil];
     } else {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self addToLog:[NSString stringWithFormat:@"INFO: Converting to SubRip: %@", self.subtitlePath] noTag:YES];
+            DDLogInfo(@"INFO: Converting to SubRip: %@", self.subtitlePath);
             NSString *ttml2srtPath = [[NSBundle mainBundle] pathForResource:@"ttml2srt.py" ofType:nil];
             NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:ttml2srtPath, nil];
 
@@ -241,16 +214,15 @@
         if ([aNotification.object terminationStatus] == 0)
         {
             [[NSFileManager defaultManager] removeItemAtPath:_subtitlePath error:nil];
-            [self addToLog:[NSString stringWithFormat:@"INFO: Conversion to SubRip complete: %@", [_show.path.stringByDeletingPathExtension stringByAppendingPathExtension:@"srt"]] noTag:YES];
+            DDLogInfo(@"INFO: Conversion to SubRip complete: %@", [_show.path.stringByDeletingPathExtension stringByAppendingPathExtension:@"srt"]);
         }
         else
         {
-            [self addToLog:[NSString stringWithFormat:@"ERROR: Conversion to SubRip failed: %@", _subtitlePath] noTag:YES];
+            DDLogError(@"ERROR: Conversion to SubRip failed: %@", _subtitlePath);
             NSData *errData = [_subsErrorPipe.fileHandleForReading readDataToEndOfFile];
             if (errData.length > 0)
             {
-                NSString *errOutput = [[NSString alloc] initWithData:errData encoding:NSUTF8StringEncoding];
-                [self addToLog:errOutput noTag:YES];
+                DDLogError(@"%@", [[NSString alloc] initWithData:errData encoding:NSUTF8StringEncoding]);
             }
         }
     }
@@ -267,7 +239,7 @@
 	for (NSString *outputLine in array)
 	{
         if (![outputLine hasPrefix:@"frame="])
-            [self addToLog:outputLine noTag:YES];
+            DDLogInfo(@"%@", outputLine);
     }
 }
 
@@ -319,7 +291,7 @@
 	self.show.status = @"Cancelled";
     _show.complete = NO;
     _show.successful = NO;
-	[self addToLog:@"Download Cancelled"];
+	DDLogInfo(@"%@: Download Cancelled", self.description);
     _running=FALSE;
 }
 

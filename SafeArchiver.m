@@ -14,7 +14,7 @@
         id object = [NSKeyedUnarchiver unarchiveObjectWithData:data];
         return object;
     } @catch (NSException *exception) {
-        NSLog(@"ERROR attempting to unarchive object: %@", exception);
+        DDLogError(@"ERROR attempting to unarchive object: %@", exception);
     }
     return nil;
 }

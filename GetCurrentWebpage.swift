@@ -7,6 +7,7 @@
 import ScriptingBridge
 import SwiftyJSON
 import Kanna
+import CocoaLumberjackSwift
 
 @objc public class GetCurrentWebpage : NSObject {
     
@@ -227,9 +228,9 @@ import Kanna
             GetiPlayerArguments.sharedController().profileDirArg
             ]
 
-//        for arg in args {
-//            DDLogVerbose("\(arg)");
-//        }
+        for arg in args {
+            DDLogVerbose("\(arg)");
+        }
 
         task.arguments = args
         task.standardOutput = pipe

@@ -10,7 +10,7 @@
 #import "AppController.h"
 
 @implementation GiASearch
-- (instancetype)initWithSearchTerms:(NSString *)searchTerms allowHidingOfDownloadedItems:(BOOL)allowHidingOfDownloadedItems logController:(LogController *)logger selector:(SEL)selector withTarget:(id)target
+- (instancetype)initWithSearchTerms:(NSString *)searchTerms allowHidingOfDownloadedItems:(BOOL)allowHidingOfDownloadedItems selector:(SEL)selector withTarget:(id)target
 {
     if (!(self = [super init])) return nil;
     
@@ -22,7 +22,6 @@
 
         self.selector = selector;
         self.target = target;
-        self.logger = logger;
         
         self.task.launchPath = [[AppController sharedController] perlBinaryPath];
         NSString *typeArg = [[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO];
@@ -44,7 +43,7 @@
         }
         
         for (NSString *arg in args) {
-            [_logger addToLog: arg];
+            DDLogVerbose(@"%@", arg);
         }
         
         self.task.arguments = args;
@@ -119,7 +118,6 @@
                 //SearchResult|<pid>|<available>|<type>|<name>|<episode>|<channel>|<seriesnum>|<episodenum>|<desc>|<thumbnail>|<web>
                 NSArray<NSString *> *fields = [string componentsSeparatedByString:@"|"];
                 Programme *p = [Programme new];
-                p.logger = _logger;
                 p.processedPID = YES;
                 p.pid = fields[1];
                 NSDate *broadcastDate = [rawDateParser dateFromString:fields[2]];
@@ -143,7 +141,7 @@
                 p.url = fields[11];
 
                 if (p.pid == nil || p.showName == nil || p.tvNetwork == nil || p.url == nil) {
-                    [_logger addToLog: [NSString stringWithFormat:@"WARNING: Skipped invalid search result: %@", string]];
+                    DDLogWarn(@"Skipped invalid search result: %@", string);
                     continue;
                 }
                 
@@ -163,7 +161,7 @@
         {
             if ([string hasPrefix:@"Unknown option:"] || [string hasPrefix:@"Option"] || [string hasPrefix:@"Usage"])
             {
-                [_logger addToLog:@"Unknown option" :self];
+                DDLogWarn(@"%@: Unknown option %@", self.description, string);
             }
         }
     }

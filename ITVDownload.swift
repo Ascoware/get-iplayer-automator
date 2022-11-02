@@ -8,6 +8,7 @@
 import Foundation
 import Kanna
 import SwiftyJSON
+import CocoaLumberjackSwift
 
 public class ITVDownload : Download {
 
@@ -20,8 +21,8 @@ public class ITVDownload : Download {
         // Nothing to do here.
     }
     
-    @objc public init(programme: Programme, proxy: HTTPProxy?, logger: LogController) {
-        super.init(logController: logger)
+    @objc public init(programme: Programme, proxy: HTTPProxy?) {
+        super.init()
         self.proxy = proxy
         self.show = programme
         self.defaultsPrefix = "ITV_"
@@ -32,8 +33,8 @@ public class ITVDownload : Download {
         programme.status = "Initialising..."
         
         //        formatList = formats
-        add(toLog: "Downloading \(show.showName)")
-        add(toLog: "INFO: Preparing Request for Auth Info", noTag: true)
+        DDLogInfo("Downloading \(show.showName)")
+        DDLogInfo("INFO: Preparing Request for Auth Info")
         
         DispatchQueue.main.async {
             guard let requestURL = URL(string: self.show.url) else {
@@ -67,11 +68,7 @@ public class ITVDownload : Download {
                 self.session = URLSession(configuration:configuration, delegate:nil, delegateQueue:OperationQueue.main)
             }
 
-            let message = "INFO: Requesting Metadata."
-            print(message)
-            if (self.verbose) {
-                self.add(toLog:message, noTag:true)
-            }
+            DDLogVerbose("ITV: Requesting Metadata")
 
             self.currentRequest = self.session.dataTask(with: downloadRequest) { (data, response, error) in
                 if let httpResponse = response as? HTTPURLResponse {
@@ -102,20 +99,13 @@ public class ITVDownload : Download {
             
             self.show.successful = false
             self.show.complete = true
-            print(message)
-            add(toLog: message)
+            DDLogError(message)
             NotificationCenter.default.post(name: NSNotification.Name(rawValue:"DownloadFinished"), object:self.show)
-            add(toLog:"Download Failed", noTag:false)
             return
         }
         
         
-        let message = "DEBUG: Metadata response status code: \(response.statusCode)"
-        print(message)
-        
-        if verbose {
-            add(toLog: message, noTag: true)
-        }
+        DDLogDebug("DEBUG: Metadata response status code: \(response.statusCode)")
 
         let showMetadata = ITVMetadataExtractor.getShowMetadata(htmlPageContent: responseString)
         self.show.desc = showMetadata.desc
@@ -124,7 +114,7 @@ public class ITVDownload : Download {
         self.show.episodeName = showMetadata.episodeName
         self.show.thumbnailURLString = showMetadata.thumbnailURLString
 
-        add(toLog:"INFO: Metadata processed.", noTag:true)
+        DDLogInfo("INFO: Metadata processed.")
         
         //Create Download Path
         self.createDownloadPath()
@@ -151,9 +141,7 @@ public class ITVDownload : Download {
         let lines = s.components(separatedBy: .newlines)
 
         for line in lines {
-            if self.verbose && !line.isEmpty {
-                self.logger.add(toLog: line)
-            }
+            DDLogInfo(line)
 
             if line.contains("Writing video subtitles") {
                 //ITV Download (ID=2a4910a0046): [info] Writing video subtitles to: /Users/skovatch/Movies/TV Shows/LA Story/LA Story - Just Friends - 2a4910a0046.en.vtt
@@ -161,9 +149,7 @@ public class ITVDownload : Download {
                 scanner.scanUpToString("to: ")
                 scanner.scanString("to: ")
                 subtitlePath = scanner.scanUpToString("\n") ?? ""
-                if self.verbose {
-                    self.add(toLog: "Subtitle path = \(subtitlePath)")
-                }
+                DDLogDebug("Subtitle path = \(subtitlePath)")
             }
 
             if line.contains("Destination: ") {
@@ -171,9 +157,7 @@ public class ITVDownload : Download {
                 scanner.scanUpToString("Destination: ")
                 scanner.scanString("Destination: ")
                 self.show.path = scanner.scanUpToString("\n") ?? ""
-                if self.verbose {
-                    self.add(toLog: "Downloading to \(self.show.path)")
-                }
+                DDLogDebug("Downloading to \(self.show.path)")
             }
 
             // youtube-dl native download generates a percentage complete and ETA remaining
@@ -213,7 +197,7 @@ public class ITVDownload : Download {
     }
     
     public func youtubeDLTaskFinished(_ proc: Process) {
-        self.add(toLog: "youtube-dl finished downloading")
+        DDLogInfo("yt-dlp finished downloading")
 
         self.task = nil
         self.pipe = nil
@@ -286,7 +270,7 @@ public class ITVDownload : Download {
             }
         }
 
-        if verbose {
+        if let verboseOption = UserDefaults.standard.object(forKey: "Verbose") as? Bool, verboseOption {
             args.append("--verbose")
         }
 
@@ -311,9 +295,7 @@ public class ITVDownload : Download {
             args.append(proxyString)
         }
         
-        if self.verbose {
-            self.logDebugMessage("DEBUG: youtube-dl args:\(args)", noTag: true)
-        }
+        DDLogVerbose("DEBUG: youtube-dl args:\(args)")
 
 
         task?.launchPath = youtubeDLBinary
@@ -323,7 +305,7 @@ public class ITVDownload : Download {
         envVariableDictionary["PATH"] = "\(youtubeDLFolder):\(extraBinaryPath)"
         envVariableDictionary["SSL_CERT_FILE"] = cacertFile.path
         task?.environment = envVariableDictionary
-        self.logDebugMessage("DEBUG: youtube-dl environment: \(envVariableDictionary)", noTag: true)
+        DDLogVerbose("DEBUG: youtube-dl environment: \(envVariableDictionary)")
 
         NotificationCenter.default.addObserver(self, selector: #selector(self.youtubeDLProgress), name: FileHandle.readCompletionNotification, object: fh)
         NotificationCenter.default.addObserver(self, selector: #selector(self.youtubeDLProgress), name: FileHandle.readCompletionNotification, object: errorFh)

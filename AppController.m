@@ -162,7 +162,6 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     [NSValueTransformer setValueTransformer:_tvFormatTransformer forName:@"TVFormatTransformer"];
     [NSValueTransformer setValueTransformer:_radioFormatTransformer forName:@"RadioFormatTransformer"];
     [NSValueTransformer setValueTransformer:_itvFormatTransformer forName:@"ITVFormatTransformer"];
-    _verbose = [stdDefaults boolForKey:@"Verbose"];
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(itvUpdateFinished) name:@"ITVUpdateFinished" object:nil];
     newITVListing =  [[GetITVShows alloc] init];
@@ -170,6 +169,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 
     return self;
 }
+
 #pragma mark Delegate Methods
 - (void)awakeFromNib
 {
@@ -208,8 +208,8 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     }
     @catch (NSException *e)
     {
-        [_logger addToLog:e.description];
-        [_logger addToLog:@"Unable to load Queue.automatorqueue. Please file a bug and mention the exception description above."];
+        DDLogError(@"%@", e.description);
+        DDLogError(@"Unable to load Queue.automatorqueue. Please file a bug and mention the exception description above.");
         rootObject=nil;
     }
 
@@ -272,8 +272,8 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     }
     @catch (NSException *e)
     {
-        [_logger addToLog:e.description];
-        [_logger addToLog:@"Unable to load Formats.automatorqueue. Please file a bug and mention the exception description above."];
+        DDLogError(@"%@", e.description);
+        DDLogError(@"Unable to load Formats.automatorqueue. Please file a bug and mention the exception description above.");
         rootObject=nil;
     }
     if (!tvFormats || !radioFormats) {
@@ -404,12 +404,12 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 
 - (void)updater:(SPUStandardUpdaterController *)updater didFinishLoadingAppcast:(SUAppcast *)appcast
 {
-//    NSLog(@"didFinishLoadingAppcast");
+//    DDLogDebug(@"didFinishLoadingAppcast");
 }
 
 - (void)updaterDidNotFindUpdate:(SPUStandardUpdaterController *)updater
 {
-//    NSLog(@"No update found.");
+//    DDLogDebug(@"No update found.");
 }
 
 - (void)updater:(SPUStandardUpdaterController *)updater didFindValidUpdate:(SUAppcastItem *)update
@@ -438,17 +438,14 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         [_forceCacheUpdateMenuItem setEnabled:NO];
         [_checkForCacheUpdateMenuItem setEnabled:NO];
         [_showNewProgrammesMenuItem setEnabled:NO];
-        if (!_forceITVUpdateMenuItem.hidden)
-            [_forceITVUpdateMenuItem setEnabled:NO];
     }
     @catch (NSException *e) {
-        [_logger addToLog: e.description];
-        [_logger addToLog: @"UI setup failed before updating cache. Please file a bug and mention the exception description above."];
-        NSLog(@"NO UI: updateCache:");
+        DDLogError(@"%@", e.description);
+        DDLogError(@"UI setup failed before updating cache. Please file a bug and mention the exception description above.");
     }
     if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])
     {
-        _getiPlayerProxy = [[GetiPlayerProxy alloc] initWithLogger:_logger];
+        _getiPlayerProxy = [GetiPlayerProxy new];
         [_getiPlayerProxy loadProxyInBackgroundForSelector:@selector(updateCache:proxyDict:) withObject:sender onTarget:self silently:_runScheduled];
     }
     else
@@ -472,13 +469,10 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         [_forceCacheUpdateMenuItem setEnabled:YES];
         [_checkForCacheUpdateMenuItem setEnabled:YES];
         [_showNewProgrammesMenuItem setEnabled:YES];
-        if (!_forceITVUpdateMenuItem.hidden)
-            [_forceITVUpdateMenuItem setEnabled:YES];
     }
     @catch (NSException *e) {
-        [_logger addToLog: e.description];
-        [_logger addToLog: @"UI setup failed before updating cache, with proxy. Please file a bug and mention the exception description above."];
-        NSLog(@"NO UI: updateCache:proxyError:");
+        DDLogError(@"%@", e.description);
+        DDLogError(@"UI setup failed before updating cache with proxy. Please file a bug and mention the exception description above.");
     }
     if (proxyDict && [proxyDict[@"error"] code] == kProxyLoadCancelled) {
         [_stopButton setEnabled:NO];
@@ -515,13 +509,10 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         [_forceCacheUpdateMenuItem setEnabled:NO];
         [_checkForCacheUpdateMenuItem setEnabled:NO];
         [_showNewProgrammesMenuItem setEnabled:NO];
-        if (!_forceITVUpdateMenuItem.hidden)
-            [_forceITVUpdateMenuItem setEnabled:NO];
     }
     @catch (NSException *e) {
-        [_logger addToLog: e.description];
-        [_logger addToLog: @"UI restore failed after cache. Please file a bug and mention the exception description above."];
-        NSLog(@"NO UI");
+        DDLogError(@"%@", e.description);
+        DDLogError(@"UI restore failed after cache. Please file a bug and mention the exception description above.");
     }
 
     if (proxyDict) {
@@ -534,9 +525,8 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         [self.itvProgressIndicator startAnimation:self];
         self.itvProgressIndicator.doubleValue = 0.0;
         [self.itvProgressIndicator setHidden:false];
-        [_itvProgressText setHidden:false];
 
-        [newITVListing itvUpdateWithNewLogger:_logger];
+        [newITVListing itvUpdate];
     }
 
     _updatingBBCIndex = true;
@@ -572,7 +562,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         getiPlayerUpdateArgs = [getiPlayerUpdateArgs arrayByAddingObject:[[NSString alloc] initWithFormat:@"-p%@", _proxy.url]];
     }
 
-    [_logger addToLog:@"Updating Programme Index Feeds...\n" :self];
+    DDLogInfo(@"Updating Programme Index Feeds...\n");
     _currentProgress.stringValue = @"Updating Programme Index Feeds...";
 
     self.getiPlayerUpdateTask = [NSTask new];
@@ -582,10 +572,8 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     self.getiPlayerUpdateTask.standardOutput = _getiPlayerUpdatePipe;
     self.getiPlayerUpdateTask.standardError =_getiPlayerUpdatePipe;
 
-    if (_verbose) {
         for (NSString *arg in getiPlayerUpdateArgs) {
-            [_logger addToLog:arg];
-        }
+        DDLogVerbose(@"%@", arg);
     }
 
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
@@ -621,19 +609,16 @@ static NSString *FORCE_RELOAD = @"ForceReload";
                                             encoding:NSUTF8StringEncoding];
         NSArray *lines = [s componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
         for (NSString *line in lines) {
-            if ([line hasPrefix:@"INFO:"])
-            {
-                [_logger addToLog:line];
+            if ([line hasPrefix:@"INFO:"]) {
+                DDLogInfo(@"%@", line);
                 NSString *actualMessage = [line substringFromIndex:5];
                 NSString *infoMessage = [[NSString alloc] initWithFormat:@"Updating Programme Indexes: %@", actualMessage];
                 _currentProgress.stringValue = infoMessage;
-            }
-            else if ([line hasPrefix:@"WARNING:"] || [line hasPrefix:@"ERROR:"])
-            {
-                [_logger addToLog:s :nil];
-            }
-            else if ([line isEqualToString:@"."])
-            {
+            } else if ([line hasPrefix:@"WARNING:"]) {
+                DDLogWarn(@"%@", s);
+            } else if ([line hasPrefix:@"ERROR:"]) {
+                DDLogError(@"%@", s);
+            } else if ([line isEqualToString:@"."]) {
                 NSMutableString *infomessage = [[NSMutableString alloc] initWithFormat:@"%@.", _currentProgress.stringValue];
                 if ([infomessage hasSuffix:@".........."]) [infomessage deleteCharactersInRange:NSMakeRange(infomessage.length-9, 9)];
                 _currentProgress.stringValue = infomessage;
@@ -659,7 +644,6 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.itvProgressIndicator stopAnimation:self];
         [self.itvProgressIndicator setHidden:true];
-        [self.itvProgressText setHidden:true];
         [self getiPlayerUpdateFinished];
     });
 }
@@ -685,8 +669,6 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     [_forceCacheUpdateMenuItem setEnabled:YES];
     [_checkForCacheUpdateMenuItem setEnabled:YES];
     [_showNewProgrammesMenuItem setEnabled:YES];
-    if (!_forceITVUpdateMenuItem.hidden)
-        [_forceITVUpdateMenuItem setEnabled:YES];
 
     if (_didUpdate)
     {
@@ -698,14 +680,14 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 
         UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:@"" content:content trigger:nil];
         [center addNotificationRequest:request withCompletionHandler:nil];
-        [_logger addToLog:@"Index Updated." :self];
+        DDLogInfo(@"BBC Index Updated");
         _lastUpdate=[NSDate date];
         [self updateHistory];
     }
     else
     {
         _runSinceChange=NO;
-        [_logger addToLog:@"Index was Up-To-Date." :self];
+        DDLogInfo(@"BBC index was up to date.");
     }
 
 
@@ -819,22 +801,16 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     }
 
     //Don't want to add these until the cache is up-to-date!
-    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"SeriesLinkStartup"] boolValue])
-    {
-        NSLog(@"Checking series link");
+    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"SeriesLinkStartup"] boolValue]) {
         [self addSeriesLinkToQueue:self];
-    }
-    else
-    {
-        if (_runScheduled)
-        {
+    } else {
+        if (_runScheduled) {
             [self performSelectorOnMainThread:@selector(startDownloads:) withObject:self waitUntilDone:NO];
         }
     }
 
-    if (runDownloads)
-    {
-        [_logger addToLog:@"Download(s) are still running." :self];
+    if (runDownloads) {
+        DDLogDebug(@"Download(s) are still running.");
     }
 }
 - (IBAction)forceUpdate:(id)sender
@@ -856,7 +832,6 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         [_resultsController removeObjectsAtArrangedObjectIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, [_resultsController.arrangedObjects count])]];
         _currentSearch = [[GiASearch alloc] initWithSearchTerms:_searchField.stringValue
                                   allowHidingOfDownloadedItems:YES
-                                                 logController:_logger
                                                       selector:@selector(searchFinished:)
                                                     withTarget:self];
     }
@@ -983,10 +958,10 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         [_startButton setEnabled:NO];
     }
     @catch (NSException *e) {
-        NSLog(@"NO UI: startDownloads:");
+        DDLogError(@"NO UI: startDownloads:");
     }
     [self saveAppData]; //Save data in case of crash.
-    _getiPlayerProxy = [[GetiPlayerProxy alloc] initWithLogger:_logger];
+    _getiPlayerProxy = [GetiPlayerProxy new];
     [_getiPlayerProxy loadProxyInBackgroundForSelector:@selector(startDownloads:proxyDict:) withObject:sender onTarget:self silently:_runScheduled];
 }
 
@@ -999,7 +974,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         [_stopButton setEnabled:YES];
     }
     @catch (NSException *e) {
-        NSLog(@"NO UI: startDownloads:proxyError:");
+        DDLogError(@"NO UI: startDownloads:proxyError:");
     }
     if (proxyDict && [proxyDict[@"error"] code] == kProxyLoadCancelled) {
         [_startButton setEnabled:YES];
@@ -1016,16 +991,16 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     whatAnIdiot.informativeText = @"Try adding shows to the queue before clicking Start. Get iPlayer Automator needs to know what to download.";
     if ([_queueController.arrangedObjects count] > 0)
     {
-        NSLog(@"Initialising Failure Dictionary");
+        DDLogVerbose(@"Initialising Failure Dictionary");
         if (!_solutionsDictionary)
             _solutionsDictionary = [NSDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"ReasonsForFailure" ofType:@"plist"]];
-        NSLog(@"Failure Dictionary Ready");
+        DDLogVerbose(@"Failure Dictionary Ready");
 
         BOOL foundOne=NO;
         runDownloads=YES;
         _runScheduled=NO;
         [_mainWindow setDocumentEdited:YES];
-        [_logger addToLog:@"AppController: Starting Downloads\n" :nil];
+        DDLogInfo(@"Starting Downloads\n");
 
         //Clean-Up Queue
         NSArray *tempQueue = _queueController.arrangedObjects;
@@ -1049,7 +1024,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
                         show.complete = YES;
                         show.successful = NO;
                         show.status = @"Failed: Please set the show name";
-                        [_logger addToLog:@"Could not download. Please set a show name first." :self];
+                        DDLogError(@"Could not download. Please set a show name first.");
                     }
                     else
                     {
@@ -1078,10 +1053,10 @@ static NSString *FORCE_RELOAD = @"ForceReload";
             [nc addObserver:self selector:@selector(nextDownload:) name:@"DownloadFinished" object:nil];
 
             tempQueue = _queueController.arrangedObjects;
-            [_logger addToLog:[NSString stringWithFormat:@"\nDownloading Show %lu/%lu:\n",
+            DDLogInfo(@"\nDownloading Show %lu/%lu:\n",
                               (unsigned long)1,
-                              (unsigned long)tempQueue.count]
-                            :nil];
+                      (unsigned long)tempQueue.count);
+
             for (Programme *show in tempQueue)
             {
                 if (!show.complete)
@@ -1089,14 +1064,12 @@ static NSString *FORCE_RELOAD = @"ForceReload";
                     if ([show.tvNetwork hasPrefix:@"ITV"]) {
                         _currentDownload = [[ITVDownload alloc]
                                             initWithProgramme:show
-                                            proxy:_proxy
-                                            logger:_logger];
+                                            proxy:_proxy];
                     } else {
                         _currentDownload = [[BBCDownload alloc] initWithProgramme:show
                                                                        tvFormats:_tvFormatController.arrangedObjects
                                                                     radioFormats:_radioFormatController.arrangedObjects
-                                                                           proxy:_proxy
-                                                                   logController:_logger];
+                                                                           proxy:_proxy];
                     }
                     break;
                 }
@@ -1164,10 +1137,10 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     {
         ((Download*)note.userInfo).show.status = @"Cancelled";
         _currentDownload=nil;
-        NSLog(@"Download should read cancelled");
+        DDLogVerbose(@"Download should read cancelled");
     }
     else
-        NSLog(@"fixDownloadStatus handler did not run because downloads appear to be running again");
+        DDLogVerbose(@"fixDownloadStatus handler did not run because downloads appear to be running again");
 }
 - (void)setPercentage:(NSNotification *)note
 {
@@ -1254,11 +1227,11 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         showSolution.solution = _solutionsDictionary[finishedShow.reasonForFailure];
         if (!showSolution.solution)
             showSolution.solution = @"Problem Unknown.\nPlease submit a bug report from the application menu.";
-        NSLog(@"Reason for Failure: %@", finishedShow.reasonForFailure);
-        NSLog(@"Dictionary Lookup: %@", [_solutionsDictionary valueForKey:finishedShow.reasonForFailure]);
-        NSLog(@"Solution: %@", showSolution.solution);
+        DDLogVerbose(@"Reason for Failure: %@", finishedShow.reasonForFailure);
+        DDLogVerbose(@"Dictionary Lookup: %@", [_solutionsDictionary valueForKey:finishedShow.reasonForFailure]);
+        DDLogVerbose(@"Solution: %@", showSolution.solution);
         [_solutionsArrayController addObject:showSolution];
-        NSLog(@"Added Solution");
+        DDLogVerbose(@"Added Solution");
         _solutionsTableView.rowHeight = 68;
     }
 
@@ -1279,20 +1252,17 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 
     if (nextShow != nil) {
         if (!nextShow.complete) {
-            [_logger addToLog:[NSString stringWithFormat:@"\nDownloading Show %lu/%lu:\n",
+            DDLogInfo(@"\nDownloading Show %lu/%lu:\n",
                                (unsigned long)([tempQueue indexOfObject:nextShow]+1),
-                               (unsigned long)tempQueue.count]
-                             :nil];
+                      (unsigned long)tempQueue.count);
             if ([nextShow.tvNetwork hasPrefix:@"ITV"])
                 _currentDownload = [[ITVDownload alloc] initWithProgramme:nextShow
-                                                                    proxy:_proxy
-                                                                   logger:_logger];
+                                                                    proxy:_proxy];
             else
                 _currentDownload = [[BBCDownload alloc] initWithProgramme:nextShow
                                                                 tvFormats:_tvFormatController.arrangedObjects
                                                              radioFormats:_radioFormatController.arrangedObjects
-                                                                    proxy:_proxy
-                                                            logController:_logger];
+                                                                    proxy:_proxy];
         }
     } else {
         //Downloads must be finished.
@@ -1303,9 +1273,9 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         _currentProgress.stringValue = @"";
         _currentIndicator.doubleValue = 0;
         @try {[_currentIndicator stopAnimation:nil];}
-        @catch (NSException *exception) {NSLog(@"Unable to stop Animation.");}
+        @catch (NSException *exception) {DDLogError(@"Unable to stop Animation.");}
         [_currentIndicator setIndeterminate:NO];
-        [_logger addToLog:@"AppController: Downloads Finished" :nil];
+        DDLogVerbose(@"AppController: Downloads Finished");
         NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
         [nc removeObserver:self name:@"setPercentage" object:nil];
         [nc removeObserver:self name:@"setCurrentProgress" object:nil];
@@ -1353,7 +1323,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         [_pvrSearchField setEnabled:NO];
         [_pvrResultsController removeObjectsAtArrangedObjectIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, [_pvrResultsController.arrangedObjects count])]];
         _currentPVRSearch = [[GiASearch alloc] initWithSearchTerms:_pvrSearchField.stringValue
-                                     allowHidingOfDownloadedItems:NO logController:_logger
+                                     allowHidingOfDownloadedItems:NO 
                                                          selector:@selector(pvrSearchFinished:)
                                                        withTarget:self];
         [_pvrSearchIndicator startAnimation:nil];
@@ -1412,9 +1382,9 @@ static NSString *FORCE_RELOAD = @"ForceReload";
             [_startButton setEnabled:NO];
         }
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(seriesLinkFinished:) name:@"NSThreadWillExitNotification" object:nil];
-        NSLog(@"About to launch Series-Link Thread");
+        DDLogVerbose(@"About to launch Series-Link Thread");
         [NSThread detachNewThreadSelector:@selector(seriesLinkToQueueThread) toTarget:self withObject:nil];
-        NSLog(@"Series-Link Thread Launched");
+        DDLogVerbose(@"Series-Link Thread Launched");
     }
     else if (_runScheduled && !_scheduleTimer)
     {
@@ -1512,16 +1482,15 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 }
 - (void)seriesLinkFinished2:(NSNotification *)note
 {
-    NSLog(@"Second Check");
+    DDLogVerbose(@"Second Check");
     if (!runDownloads)
     {
         _currentProgress.stringValue = @"";
         [_currentIndicator setIndeterminate:NO];
         [_currentIndicator stopAnimation:self];
-        if ( !_forceITVUpdateInProgress )
             [_startButton setEnabled:YES];
     }
-    NSLog(@"Definitely shouldn't show an updating series-link thing!");
+    DDLogVerbose(@"Definitely shouldn't show an updating series-link thing!");
 }
 - (BOOL)processAutoRecordData:(NSString *)autoRecordData2 forSeries:(Series *)series2
 {
@@ -1567,7 +1536,6 @@ static NSString *FORCE_RELOAD = @"ForceReload";
                         }
 
                         Programme *p = [Programme new];
-                        p.logger = _logger;
                         p.pid = temp_pid;
                         p.showName = series_Name;
                         p.tvNetwork = temp_tvNetwork;
@@ -1752,7 +1720,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
             return;
         }
         
-        [_logger performSelectorOnMainThread:@selector(addToLog:) withObject:[NSString stringWithFormat:@"Adding %@ to %@", show.showName, appName] waitUntilDone:NO];
+        DDLogInfo(@"Adding %@ to %@", show.showName, appName);
         NSArray *fileToAdd = @[[NSURL fileURLWithPath:path]];
 
         // Music and TV will not store the track if the app isn't fully up and running when the add command is received.
@@ -1765,7 +1733,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
             if ([ext isEqualToString:@"mov"] || [ext isEqualToString:@"mp4"] || [ext isEqualToString:@"mp3"] || [ext isEqualToString:@"m4a"])
             {
                 iTunesTrack *track = [iTunes add:fileToAdd to:nil];
-                NSLog(@"Track exists = %@", ([track exists] ? @"YES" : @"NO"));
+                DDLogVerbose(@"Track exists = %@", ([track exists] ? @"YES" : @"NO"));
                 if ([track exists] && ([ext isEqualToString:@"mov"] || [ext isEqualToString:@"mp4"]))
                 {
                     if ([ext isEqualToString:@"mov"])
@@ -1788,22 +1756,20 @@ static NSString *FORCE_RELOAD = @"ForceReload";
                 }
                 else
                 {
-                        [self.logger performSelectorOnMainThread:@selector(addToLog:) withObject:@"Media app did not accept file." waitUntilDone:YES];
-                        [self.logger performSelectorOnMainThread:@selector(addToLog:) withObject:@"Try dragging the file from the Finder into TV or iTunes." waitUntilDone:YES];
+                    DDLogWarn(@"Media app did not accept file.");
+                    DDLogWarn(@"Try dragging the file from the Finder into TV or iTunes.");
                     show.status = [NSString stringWithFormat:@"Complete: Not in %@", appName];
                 }
             }
             else
             {
-                NSString *message = [NSString stringWithFormat:@"Can't add %@ file to %@ -- incompatible format.", ext, appName];
-                    [self.logger performSelectorOnMainThread:@selector(addToLog:) withObject:message waitUntilDone:YES];
+                DDLogWarn(@"Can't add %@ file to %@ -- incompatible format.", ext, appName);
                 show.status = @"Download Complete";
             }
         }
         @catch (NSException *e)
         {
-            NSString *message = [NSString stringWithFormat:@"Unable to add %@ to %@", show, appName];
-                [self.logger performSelectorOnMainThread:@selector(addToLog:) withObject:message waitUntilDone:YES];
+            DDLogError(@"Unable to add %@ to %@", show, appName);
             show.status = [NSString stringWithFormat:@"Complete: Not in %@", appName];
         }
         });
@@ -2074,7 +2040,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         NSSet *allowedClasses = [NSSet setWithObjects: [ProgrammeHistoryObject class], [NSArray class], [NSString class], nil];
         oldProgrammesArray = [NSKeyedUnarchiver unarchivedObjectOfClasses:allowedClasses fromData:oldProgramData error:&error];
         if (error) {
-            [_logger addToLog:[error description]];
+            DDLogError(@"error unarchiving 'old program data': %@", error.description);
         }
     } @catch (NSException *exception) {
         firstTimeBuild = YES;
@@ -2106,8 +2072,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
             channelLocation = [entryFields indexOfObject:@"channel"];
 
             if (programmeNameLocation == 0 || channelLocation == 0) {
-                NSLog(@"ERROR: Cannot update new programmes history from cache file: %@", newCacheFile);
-                [_logger addToLog:[NSString stringWithFormat:@"ERROR: Cannot update new programmes history from cache file: %@", newCacheFile]];
+                DDLogError(@"Cannot update new programmes history from cache file: %@", newCacheFile);
                 return;
             }
             continue;

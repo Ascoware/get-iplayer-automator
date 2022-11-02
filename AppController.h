@@ -86,7 +86,7 @@ extern NSDictionary *radioFormats;
 @property IBOutlet NSArrayController *tvFormatController;
 @property IBOutlet NSArrayController *radioFormatController;
 @property IBOutlet NSPanel *prefsPanel;
-
+@property IBOutlet NSUserDefaultsController *preferences;
 //Scheduling a Start
 @property IBOutlet NSPanel *scheduleWindow;
 @property IBOutlet NSDatePicker *datePicker;
@@ -125,10 +125,7 @@ extern NSDictionary *radioFormats;
 //ITV Cache
 @property (assign) BOOL updatingITVIndex;
 @property (assign) BOOL updatingBBCIndex;
-@property (assign) BOOL forceITVUpdateInProgress;
-@property IBOutlet NSMenuItem          *showNewProgrammesMenuItem;
-@property IBOutlet NSTextField         *itvProgressText;
-@property IBOutlet NSMenuItem          *forceITVUpdateMenuItem;
+@property IBOutlet NSMenuItem *showNewProgrammesMenuItem;
 
 //New Programmes History
 @property NSWindow *newestProgrammesWindow;

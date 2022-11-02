@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21225" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21225"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -19,7 +18,6 @@
             <connections>
                 <outlet property="addSeriesLinkToQueueButton" destination="985" id="Sxz-ip-Nn7"/>
                 <outlet property="addToQueue" destination="513" id="707"/>
-                <outlet property="application" destination="-2" id="1067"/>
                 <outlet property="checkForCacheUpdateMenuItem" destination="1023" id="Oyw-wg-HAI"/>
                 <outlet property="currentIndicator" destination="505" id="795"/>
                 <outlet property="currentProgress" destination="508" id="796"/>
@@ -27,9 +25,9 @@
                 <outlet property="forceCacheUpdateMenuItem" destination="1026" id="9lH-fR-fdc"/>
                 <outlet property="historyWindow" destination="1212" id="1468"/>
                 <outlet property="itvProgressIndicator" destination="e7O-Z3-UPb" id="fr7-dg-PeT"/>
-                <outlet property="itvProgressText" destination="vBT-g6-IDt" id="OYl-hm-aaU"/>
-                <outlet property="logger" destination="BZI-HO-NFo" id="LLH-v9-nI4"/>
+                <outlet property="logger" destination="BZI-HO-NFo" id="Cl9-j4-wet"/>
                 <outlet property="mainWindow" destination="371" id="1066"/>
+                <outlet property="preferences" destination="668" id="M7Y-1Y-FGH"/>
                 <outlet property="prefsPanel" destination="547" id="1471"/>
                 <outlet property="pvrPanel" destination="517" id="1470"/>
                 <outlet property="pvrQueueController" destination="952" id="959"/>
@@ -1913,7 +1911,7 @@
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <clipView key="contentView" id="iNe-PX-Coi">
                                                 <rect key="frame" x="1" y="1" width="400" height="125"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <autoresizingMask key="autoresizingMask"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="1079" id="1078">
                                                         <rect key="frame" x="0.0" y="0.0" width="400" height="108"/>
@@ -1984,7 +1982,7 @@
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <clipView key="contentView" id="Yo1-zO-Vaa">
                                                 <rect key="frame" x="1" y="1" width="400" height="157"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <autoresizingMask key="autoresizingMask"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="1086" id="1087">
                                                         <rect key="frame" x="0.0" y="0.0" width="400" height="140"/>
@@ -2825,6 +2823,7 @@ Note: Only the types of shows you select in the preferences will show up here.</
                 <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
                 <autoresizingMask key="autoresizingMask"/>
             </view>
+            <point key="canvasLocation" x="590" y="-190"/>
         </window>
         <window title="Failed Download Solutions" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="FailedDownloadSolutionsWindow" animationBehavior="default" id="1374">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
@@ -2938,6 +2937,7 @@ DQ
                     </button>
                 </subviews>
             </view>
+            <point key="canvasLocation" x="725" y="262"/>
         </window>
         <customFormatter id="S9t-eO-Bm7" customClass="StringTrimFormatter"/>
         <viewController id="QMk-Wb-aLD" userLabel="Show Popover View Controller">

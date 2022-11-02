@@ -9,6 +9,10 @@
 #import "BBCDownload.h"
 #import "AppController.h"
 
+@interface BBCDownload ()
+- (instancetype)init NS_DESIGNATED_INITIALIZER;
+@end
+
 @implementation BBCDownload
 + (void)initFormats
 {
@@ -20,14 +24,16 @@
     tvFormats = [[NSDictionary alloc] initWithObjects:tvFormatObjects forKeys:tvFormatKeys];
     radioFormats = [[NSDictionary alloc] initWithObjects:radioFormatObjects forKeys:radioFormatKeys];
 }
+
 #pragma mark Overridden Methods
-- (instancetype)initWithProgramme:(Programme *)p tvFormats:(NSArray *)tvFormatList radioFormats:(NSArray *)radioFormatList proxy:(HTTPProxy *)aProxy logController:(LogController *)logger
+
+- (instancetype)initWithProgramme:(Programme *)p tvFormats:(NSArray *)tvFormatList radioFormats:(NSArray *)radioFormatList proxy:(HTTPProxy *)aProxy
 {
-    if (self = [super initWithLogController:logger]) {
+    if (self = [super init]) {
         self.reasonForFailure = nil;
         self.proxy = aProxy;
         self.show = p;
-        [self addToLog:[NSString stringWithFormat:@"Downloading %@", self.show.showName]];
+        DDLogInfo(@"Downloading %@", self.show.showName);
 
         //Initialize Formats
         if (!tvFormats || !radioFormats) {
@@ -130,8 +136,10 @@
         }
         
         //Verbose?
-        if (self.verbose)
+        if ([[NSUserDefaults standardUserDefaults] boolForKey:@"Verbose"]) {
             [args addObject:@"--verbose"];
+        }
+
         if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"DownloadSubtitles"] isEqualTo:@YES]) {
             [args addObject:@"--subtitles"];
             if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"EmbedSubtitles"] isEqualTo:@YES]) {
@@ -159,10 +167,8 @@
         if (![[NSUserDefaults standardUserDefaults] boolForKey:@"TagShows"])
             [args addObject:@"--no-tag"];
         
-        if (self.verbose) {
-            for (NSString *arg in args) {
-                [self logDebugMessage:arg noTag:YES];
-            }
+        for (NSString *arg in args) {
+            DDLogVerbose(@"%@", arg);
         }
         
         if ([[NSUserDefaults standardUserDefaults] boolForKey:@"TagRadioAsPodcast"]) {
@@ -266,54 +272,51 @@
 
     if ([self.reasonForFailure isEqualToString:@"FileExists"]) {
         self.show.status = @"Failed: File already exists";
-        [self addToLog:[NSString stringWithFormat:@"%@ Failed",self.show.showName]];
+        DDLogError(@"%@ Failed, already exists",self.show.showName);
     } else if ([self.reasonForFailure isEqualToString:@"ShowNotFound"]) {
         self.show.status = @"Failed: PID not found";
     } else if ([self.reasonForFailure isEqualToString:@"proxy"]) {
         NSString *proxyOption = [[NSUserDefaults standardUserDefaults] valueForKey:@"Proxy"];
         if ([proxyOption isEqualToString:@"None"]) {
             self.show.status = @"Failed: See Log";
-            [self addToLog:@"REASON FOR FAILURE: VPN or System Proxy failed. If you are using a VPN or a proxy configured in System Preferences, contact the VPN or proxy provider for assistance." noTag:TRUE];
+            DDLogError(@"REASON FOR FAILURE: VPN or System Proxy failed. If you are using a VPN or a proxy configured in System Preferences, contact the VPN or proxy provider for assistance.");
             self.show.reasonForFailure = @"ShowNotFound";
         } else if ([proxyOption isEqualToString:@"Provided"]) {
             self.show.status = @"Failed: Bad Proxy";
-            [self addToLog:@"REASON FOR FAILURE: Proxy failed. If in the UK, please disable the proxy in the preferences." noTag:TRUE];
+            DDLogError(@"REASON FOR FAILURE: Proxy failed. If in the UK, please disable the proxy in the preferences.");
             self.show.reasonForFailure = @"Provided_Proxy";
         } else if ([proxyOption isEqualToString:@"Custom"]) {
             self.show.status = @"Failed: Bad Proxy";
-            [self addToLog:@"REASON FOR FAILURE: Proxy failed. If in the UK, please disable the proxy in the preferences." noTag:TRUE];
-            [self addToLog:@"If outside the UK, please use a different proxy." noTag:TRUE];
+            DDLogError(@"REASON FOR FAILURE: Proxy failed. If in the UK, please disable the proxy in the preferences.");
+            DDLogError(@"If outside the UK, please use a different proxy.");
             self.show.reasonForFailure = @"Custom_Proxy";
         }
         
-        [self addToLog:[NSString stringWithFormat:@"%@ Failed",self.show.showName]];
+        DDLogError(@"%@ Failed",self.show.showName);
     } else if ([self.reasonForFailure isEqualToString:@"Specified_Modes"]) {
         self.show.status = @"Failed: No Specified Modes";
-        [self addToLog:@"REASON FOR FAILURE: None of the modes in your download format list are available for this show." noTag:YES];
-        [self addToLog:@"Try adding more modes." noTag:YES];
-        [self addToLog:[NSString stringWithFormat:@"%@ Failed",self.show.showName]];
-        NSLog(@"Set Modes");
+        DDLogError(@"REASON FOR FAILURE: None of the modes in your download format list are available for this show.");
+        DDLogError(@"Try adding more modes.");
+        DDLogError(@"%@ Failed",self.show.showName);
     } else if ([self.reasonForFailure isEqualToString:@"InHistory"]) {
         self.show.status = @"Failed: In download history";
-        NSLog(@"InHistory");
+        DDLogError(@"InHistory");
     } else if ([self.reasonForFailure isEqualToString:@"AudioDescribedOnly"]) {
         self.show.reasonForFailure = @"AudioDescribedOnly";
     } else if ([self.reasonForFailure isEqualToString:@"External_Disconnected"]) {
         self.show.status = @"Failed: HDD not Accessible";
-        [self addToLog:@"REASON FOR FAILURE: The specified download directory could not be written to." noTag:YES];
-        [self addToLog:@"Most likely this is because your external hard drive is disconnected but it could also be a permission issue"
-                 noTag:YES];
-        [self addToLog:[NSString stringWithFormat:@"%@ Failed",self.show.showName]];
+        DDLogError(@"REASON FOR FAILURE: The specified download directory could not be written to.");
+        DDLogError(@"Most likely this is because your external hard drive is disconnected but it could also be a permission issue");
+        DDLogError(@"%@ Failed",self.show.showName);
     } else if ([self.reasonForFailure isEqualToString:@"Download_Directory_Permissions"]) {
         self.show.status = @"Failed: Download Directory Unwriteable";
-        [self addToLog:@"REASON FOR FAILURE: The specified download directory could not be written to." noTag:YES];
-        [self addToLog:@"Please check the permissions on your download directory."
-                 noTag:YES];
-        [self addToLog:[NSString stringWithFormat:@"%@ Failed",self.show.showName]];
+        DDLogError(@"REASON FOR FAILURE: The specified download directory could not be written to.");
+        DDLogError(@"Please check the permissions on your download directory.");
+        DDLogError(@"%@ Failed",self.show.showName);
     } else {
         // Failed for an unknown reason.
         self.show.status = @"Download Failed";
-        [self addToLog:[NSString stringWithFormat:@"%@ Failed",self.show.showName]];
+        DDLogError(@"%@ Failed",self.show.showName);
     }
 }
 
@@ -324,16 +327,18 @@
     //Parse each line individually.
     for (NSString *output in array)
     {
-        if ([output hasPrefix:@"DEBUG:"]) {
+        if (output.length == 0) {
             continue;
         }
-
-        if (self.verbose) {
-            if (output.length > 0) {
-                [self addToLog:output noTag:YES];
-            }
-        }
         
+        if ([output hasPrefix:@"DEBUG:"]) {
+            DDLogDebug(@"%@", output);
+        } else if ([output hasPrefix:@"WARNING:"]) {
+            DDLogWarn(@"%@", output);
+        } else {
+            DDLogInfo(@"%@", output);
+        }
+
         if ([output hasPrefix:@"INFO: Downloading subtitles"])
         {
             NSScanner *scanner = [NSScanner scannerWithString:output];

@@ -69,7 +69,7 @@
             _processedPID = [coder decodeBoolForKey:@"processedPID"];
             _radio = [coder decodeBoolForKey:@"radio"];
         } @catch (NSException *e) {
-            NSLog(@"Found old format data, retrying");
+            DDLogDebug(@"Found old format data, retrying");
             _processedPID = [[coder decodeObjectForKey:@"processedPID"] boolValue];
             _radio = [[coder decodeObjectForKey:@"radio"] boolValue];
         }
@@ -92,8 +92,8 @@
 
 -(void)retrieveExtendedMetadata
 {
-    [_logger addToLog:@"Retrieving Extended Metadata" :self];
-    _getiPlayerProxy = [[GetiPlayerProxy alloc] initWithLogger:_logger];
+    DDLogInfo(@"Retrieving Extended Metadata");
+    _getiPlayerProxy = [GetiPlayerProxy new];
     [_getiPlayerProxy loadProxyInBackgroundForSelector:@selector(proxyRetrievalFinished:proxyDict:) withObject:nil onTarget:self silently:NO];
 }
 
@@ -137,7 +137,7 @@
     BOOL verbose = [[NSUserDefaults standardUserDefaults] boolForKey:@"Verbose"];
 
     if (verbose) {
-        NSLog(@"get metadata args: %@", args);
+        DDLogVerbose(@"get metadata args: %@", args);
     }
 
     self.metadataTask.standardOutput = self.pipe;
@@ -171,7 +171,7 @@
             [self.taskOutput appendString:s];
         }
 
-        [_logger addToLog:s :self];
+        DDLogVerbose(@"%@", s);
     }
     NSFileHandle *fh = [n.userInfo valueForKey:NSFileHandleNotificationFileHandleItem];
     [fh readInBackgroundAndNotify];
@@ -279,7 +279,7 @@
     NSString *thumbURL = [self scanField:@"thumbnail" fromList:_taskOutput];
     
     if (thumbURL) {
-        NSLog(@"URL: %@", thumbURL);
+        DDLogDebug(@"Thumbnail URL: %@", thumbURL);
         NSURLSessionDownloadTask *downloadTask = [[NSURLSession sharedSession] downloadTaskWithURL:[NSURL URLWithString:thumbURL]
                                                                                  completionHandler:^(NSURL * _Nullable location, NSURLResponse * _Nullable response, NSError * _Nullable error) {
                                                                                      NSData *thumbnailData = nil;
@@ -333,7 +333,7 @@
 {
     if (self.metadataTask.running) {
         [self.metadataTask interrupt];
-        [self.logger addToLog:@"Metadata Retrieval Cancelled" :self];
+        DDLogInfo(@"Metadata retrieval cancelled for %@", self.description);
     }
 
     self.metadataTask = nil;
@@ -509,8 +509,8 @@
 
 - (void)getNameFromPID
 {
-    [_logger addToLog:@"Retrieving Metadata For PID" :self];
-    _getiPlayerProxy = [[GetiPlayerProxy alloc] initWithLogger:_logger];
+    DDLogInfo(@"%@: Retrieving Metadata For PID", self.description);
+    _getiPlayerProxy = [GetiPlayerProxy new];
     [_getiPlayerProxy loadProxyInBackgroundForSelector:@selector(getNameFromPIDProxyLoadFinished:proxyDict:) withObject:nil onTarget:self silently:NO];
 }
 
@@ -601,7 +601,7 @@
             continue;
         }
 
-        if ([line hasPrefix:@"ERROR:"] || [line hasPrefix:@"WARN:"] || [line hasPrefix:@"Episodes:"]) {
+        if ([line hasPrefix:@"ERROR:"] || [line hasPrefix:@"WARNING:"] || [line hasPrefix:@"Episodes:"]) {
             continue;
         }
 

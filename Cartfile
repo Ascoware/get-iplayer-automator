@@ -1,3 +1,4 @@
 binary "https://sparkle-project.org/Carthage/Sparkle.json"
 github "tid-kijyun/Kanna" ~> 5.0
 github "SwiftyJSON/SwiftyJSON" ~> 5.0
+github "CocoaLumberjack/CocoaLumberjack"

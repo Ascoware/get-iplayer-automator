@@ -19,7 +19,8 @@
 @property (copy) NSString *reasonForFailure;
 
 + (void)initFormats;
-- (instancetype)initWithProgramme:(Programme *)tempShow tvFormats:(NSArray *)tvFormatList radioFormats:(NSArray *)radioFormatList proxy:(HTTPProxy *)aProxy logController:(LogController *)logger NS_DESIGNATED_INITIALIZER;
+- (instancetype)init NS_UNAVAILABLE;
+- (instancetype)initWithProgramme:(Programme *)tempShow tvFormats:(NSArray *)tvFormatList radioFormats:(NSArray *)radioFormatList proxy:(HTTPProxy *)aProxy  NS_DESIGNATED_INITIALIZER;
 - (void)processGetiPlayerOutput:(NSString *)outp;
 
 @end

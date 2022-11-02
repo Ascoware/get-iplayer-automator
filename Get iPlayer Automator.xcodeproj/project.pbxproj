@@ -36,6 +36,10 @@
 		7F5B1C51211F9E2E00BF7E99 /* SafariScripting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F5B1C4D211F9E2E00BF7E99 /* SafariScripting.swift */; };
 		7F5B1C54211F9EE600BF7E99 /* SBObjectProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F5B1C52211F9EE500BF7E99 /* SBObjectProtocol.swift */; };
 		7F5B1C55211F9EE600BF7E99 /* SBApplicationProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F5B1C53211F9EE500BF7E99 /* SBApplicationProtocol.swift */; };
+		7F70246029104CE200A48BE1 /* CocoaLumberjack.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F70245F29104CE100A48BE1 /* CocoaLumberjack.framework */; };
+		7F70246129105BDE00A48BE1 /* CocoaLumberjack.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7F70245F29104CE100A48BE1 /* CocoaLumberjack.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		7F70246929107E2400A48BE1 /* CocoaLumberjackSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F70246829107E2400A48BE1 /* CocoaLumberjackSwift.framework */; };
+		7F70246A29107E4400A48BE1 /* CocoaLumberjackSwift.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7F70246829107E2400A48BE1 /* CocoaLumberjackSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7F748E3423FB416B00626A77 /* get_iplayer in Resources */ = {isa = PBXBuildFile; fileRef = 7F748E3323FB416B00626A77 /* get_iplayer */; };
 		7F90591A253B90320094099B /* SwiftyJSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F905919253B90320094099B /* SwiftyJSON.framework */; };
 		7F90591B253B9FB60094099B /* SwiftyJSON.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7F905919253B90320094099B /* SwiftyJSON.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -95,6 +99,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				7F70246A29107E4400A48BE1 /* CocoaLumberjackSwift.framework in Copy Frameworks */,
+				7F70246129105BDE00A48BE1 /* CocoaLumberjack.framework in Copy Frameworks */,
 				7F90591B253B9FB60094099B /* SwiftyJSON.framework in Copy Frameworks */,
 				7F54B1B41FFF38F8006D1325 /* Kanna.framework in Copy Frameworks */,
 				7F9FE9251EC170E60058CB1B /* Sparkle.framework in Copy Frameworks */,
@@ -150,6 +156,9 @@
 		7F5B1C52211F9EE500BF7E99 /* SBObjectProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SBObjectProtocol.swift; sourceTree = "<group>"; };
 		7F5B1C53211F9EE500BF7E99 /* SBApplicationProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SBApplicationProtocol.swift; sourceTree = "<group>"; };
 		7F6B2B2B20EE87D800E4BBDF /* Get iPlayer Automator.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = "Get iPlayer Automator.entitlements"; path = "Get iPlayer Automator/Get iPlayer Automator.entitlements"; sourceTree = "<group>"; };
+		7F70245F29104CE100A48BE1 /* CocoaLumberjack.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CocoaLumberjack.framework; path = Carthage/Build/Mac/CocoaLumberjack.framework; sourceTree = "<group>"; };
+		7F70246829107E2400A48BE1 /* CocoaLumberjackSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CocoaLumberjackSwift.framework; path = Carthage/Build/Mac/CocoaLumberjackSwift.framework; sourceTree = "<group>"; };
+		7F70246B2911825600A48BE1 /* GetiPlayerAutomator-Prefix.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "GetiPlayerAutomator-Prefix.h"; sourceTree = "<group>"; };
 		7F748E3323FB416B00626A77 /* get_iplayer */ = {isa = PBXFileReference; lastKnownFileType = folder; path = get_iplayer; sourceTree = "<group>"; };
 		7F905919253B90320094099B /* SwiftyJSON.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftyJSON.framework; path = Carthage/Build/Mac/SwiftyJSON.framework; sourceTree = "<group>"; };
 		7F9FE91E1EC16E3E0058CB1B /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = Carthage/Build/Mac/Sparkle.framework; sourceTree = "<group>"; };
@@ -225,7 +234,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7F70246929107E2400A48BE1 /* CocoaLumberjackSwift.framework in Frameworks */,
 				7F90591A253B90320094099B /* SwiftyJSON.framework in Frameworks */,
+				7F70246029104CE200A48BE1 /* CocoaLumberjack.framework in Frameworks */,
 				7F9FE9231EC16F160058CB1B /* IOKit.framework in Frameworks */,
 				7F9FE9211EC16ED80058CB1B /* libz.tbd in Frameworks */,
 				7F54B1B31FFF38E8006D1325 /* Kanna.framework in Frameworks */,
@@ -255,6 +266,8 @@
 				7F905919253B90320094099B /* SwiftyJSON.framework */,
 				7F54B1B21FFF38E8006D1325 /* Kanna.framework */,
 				7F9FE91E1EC16E3E0058CB1B /* Sparkle.framework */,
+				7F70246829107E2400A48BE1 /* CocoaLumberjackSwift.framework */,
+				7F70245F29104CE100A48BE1 /* CocoaLumberjack.framework */,
 				D921C9C1149BBF51004CB558 /* CoreServices.framework */,
 				D941D99F1025DDCF0012A75F /* SystemConfiguration.framework */,
 				D914BC58100C9F0100F7E68E /* ScriptingBridge.framework */,
@@ -291,6 +304,7 @@
 		29B97315FDCFA39411CA2CEA /* Other Sources */ = {
 			isa = PBXGroup;
 			children = (
+				7F70246B2911825600A48BE1 /* GetiPlayerAutomator-Prefix.h */,
 				7F382EF521DD110400CCB64F /* SafeArchiver.h */,
 				7F382EF621DD110400CCB64F /* SafeArchiver.m */,
 				3975484C1622504F00470DD1 /* ttml2srt.py */,
@@ -785,6 +799,7 @@
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "GetiPlayerAutomator-Prefix.h";
 				GCC_VERSION = "";
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_MISSING_PARENTHESES = YES;
@@ -840,6 +855,7 @@
 					"$(PROJECT_DIR)/Binaries",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "GetiPlayerAutomator-Prefix.h";
 				GCC_VERSION = "";
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = /Applications;
@@ -897,6 +913,7 @@
 				EXCLUDED_ARCHS = "";
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = "DEBUG=1";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -939,6 +956,7 @@
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				EXCLUDED_ARCHS = "";
 				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = "";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
