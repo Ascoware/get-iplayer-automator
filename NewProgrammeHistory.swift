@@ -20,12 +20,12 @@ import Foundation
         return _sharedInstance
     }
 
-    var historyFile: String {
+    var historyFile: URL {
         if let applicationSupportPath = FileManager.default.applicationSupportDirectory() {
-            return applicationSupportPath.appending("/").appending("history.gia")
+            return URL(fileURLWithPath: applicationSupportPath.appending("/").appending("history.gia"))
         }
         
-        return NSHomeDirectory().appending("/.get_iplayer/history.gia")
+        return URL(fileURLWithPath: NSHomeDirectory().appending("/.get_iplayer/history.gia"))
     }
 
     private override init() {
@@ -35,14 +35,17 @@ import Foundation
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "EEE MMM dd"
         dateFound = dateFormatter.string(from: Date())
-        NSKeyedUnarchiver.setClass(ProgrammeHistoryObject.self, forClassName: "ProgrammeHistoryObject")
         super.init()
 
-        if let historyData = FileManager.default.contents(atPath: historyFile),
-            let unarchivedHistory = SafeArchiver.unarchive(historyData) as? [ProgrammeHistoryObject] {
-            programmeHistoryArray = unarchivedHistory
+        do {
+            let data = try Data(contentsOf: historyFile)
+            if let unarchivedHistory = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? [ProgrammeHistoryObject] {
+                programmeHistoryArray = unarchivedHistory
+            }
+        } catch {
+            print("Couldn't read program history file.")
         }
-        
+
         /* Cull history if > 3,000 entries */
         while programmeHistoryArray.count > 3000 {
             programmeHistoryArray.remove(at: 0)
@@ -63,7 +66,13 @@ import Foundation
         let sort2 = NSSortDescriptor(key: "programmeName", ascending: true)
         let sort3 = NSSortDescriptor(key: "tvChannel", ascending: true)
         programmeHistoryArray = (programmeHistoryArray as NSArray).sortedArray(using: [sort1, sort2, sort3]) as? [ProgrammeHistoryObject] ?? programmeHistoryArray
-        NSKeyedArchiver.archiveRootObject(programmeHistoryArray, toFile: historyFile)
+
+        do {
+            let data = try NSKeyedArchiver.archivedData(withRootObject: programmeHistoryArray, requiringSecureCoding: false)
+            try data.write(to: historyFile)
+        } catch {
+            print("Couldn't write program history file")
+        }
     }
     
 }

@@ -19,7 +19,7 @@ typedef NS_ENUM(NSInteger, GIA_ProgrammeType) {
     GIA_ProgrammeTypeITV
 };
 
-@interface Programme : NSObject <NSCoding>
+@interface Programme : NSObject <NSSecureCoding>
 @property LogController *logger;
 @property (copy) NSString *tvNetwork;
 @property (copy) NSString *showName;

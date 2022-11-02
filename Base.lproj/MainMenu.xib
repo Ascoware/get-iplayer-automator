@@ -26,7 +26,6 @@
                 <outlet property="datePicker" destination="1150" id="1161"/>
                 <outlet property="forceCacheUpdateMenuItem" destination="1026" id="9lH-fR-fdc"/>
                 <outlet property="historyWindow" destination="1212" id="1468"/>
-                <outlet property="itvFormatController" destination="1432" id="1439"/>
                 <outlet property="itvProgressIndicator" destination="e7O-Z3-UPb" id="fr7-dg-PeT"/>
                 <outlet property="itvProgressText" destination="vBT-g6-IDt" id="OYl-hm-aaU"/>
                 <outlet property="logger" destination="BZI-HO-NFo" id="LLH-v9-nI4"/>
@@ -62,9 +61,9 @@
             </declaredKeys>
             <classReference key="objectClass" className="ReasonForFailure"/>
         </arrayController>
-        <customObject id="987" customClass="SUUpdater">
+        <customObject id="987" customClass="SPUStandardUpdaterController">
             <connections>
-                <outlet property="delegate" destination="621" id="sxG-cb-VS0"/>
+                <outlet property="updaterDelegate" destination="621" id="FZt-83-3o4"/>
             </connections>
         </customObject>
         <customObject id="1203" customClass="DownloadHistoryController">
@@ -1104,7 +1103,7 @@
                     </scrollView>
                 </subviews>
             </view>
-            <toolbar key="toolbar" implicitIdentifier="CB7AE3DA-8BA6-47C2-92ED-145F2C8CF5BE" displayMode="iconAndLabel" sizeMode="regular" id="450">
+            <toolbar key="toolbar" implicitIdentifier="CB7AE3DA-8BA6-47C2-92ED-145F2C8CF5BE" allowsUserCustomization="NO" showsBaselineSeparator="NO" displayMode="iconAndLabel" sizeMode="regular" id="450">
                 <allowedToolbarItems>
                     <toolbarItem implicitItemIdentifier="00E3046B-B3D2-46E3-A5D6-6E9B37940939" label="PVR" paletteLabel="PVR" toolTip="Display PVR Manager HUD." tag="-1" image="pvr" sizingBehavior="auto" id="516">
                         <connections>
@@ -1144,8 +1143,6 @@
                             <action selector="forceUpdate:" target="621" id="1043"/>
                         </connections>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="NSToolbarSeparatorItem" id="453"/>
-                    <toolbarItem implicitItemIdentifier="NSToolbarCustomizeToolbarItem" id="457"/>
                 </allowedToolbarItems>
                 <defaultToolbarItems>
                     <toolbarItem reference="456"/>
@@ -2945,12 +2942,6 @@ DQ
                 </subviews>
             </view>
         </window>
-        <arrayController objectClassName="TVFormat" id="1432" userLabel="ITV Format Controller">
-            <declaredKeys>
-                <string>format</string>
-            </declaredKeys>
-            <classReference key="objectClass" className="TVFormat"/>
-        </arrayController>
         <customFormatter id="S9t-eO-Bm7" customClass="StringTrimFormatter"/>
         <viewController id="QMk-Wb-aLD" userLabel="Show Popover View Controller">
             <connections>

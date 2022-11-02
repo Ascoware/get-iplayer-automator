@@ -6,6 +6,7 @@
 //  Copyright 2009 __MyCompanyName__. All rights reserved.
 //
 
+#import <UserNotifications/UserNotifications.h>
 #import "AppController.h"
 #import <Sparkle/Sparkle.h>
 #import "HTTPProxy.h"
@@ -195,7 +196,10 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     NSDictionary * rootObject;
     @try
     {
-        rootObject = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
+        NSData *fileContents = [NSData dataWithContentsOfFile:filePath];
+        NSError *error;
+        NSSet *allowedClasses = [NSSet setWithObjects: [NSMutableArray class], [NSMutableDictionary class], [NSDate class], [NSString class], [Series class], nil];
+        rootObject = [NSKeyedUnarchiver unarchivedObjectOfClasses:allowedClasses fromData:fileContents error:&error];
         NSArray *tempQueue = [rootObject valueForKey:@"queue"];
         NSArray *tempSeries = [rootObject valueForKey:@"serieslink"];
         _lastUpdate = [rootObject valueForKey:@"lastUpdate"];
@@ -232,7 +236,10 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 
     @try
     {
-        rootObject = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
+        NSData *fileContents = [NSData dataWithContentsOfFile:filePath];
+        NSSet *allowedClasses = [NSSet setWithObjects: [NSMutableDictionary class], [NSArray class], [RadioFormat class], [TVFormat class], [NSString class], nil];
+        NSError *error;
+        rootObject = [NSKeyedUnarchiver unarchivedObjectOfClasses:allowedClasses fromData:fileContents error:&error];
         NSArray *archivedTVFormats = [rootObject valueForKey:@"tvFormats"];
         NSMutableArray *updatedTVFormats = [NSMutableArray array];
 
@@ -286,18 +293,6 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         }
     }
 
-    filename = @"ITVFormats.automator";
-    filePath = [appSupportFolder stringByAppendingPathComponent:filename];
-    @try {
-        rootObject = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
-        [_itvFormatController addObjects:[rootObject valueForKey:@"itvFormats"]];
-    }
-    @catch (NSException *e) {
-        [_logger addToLog: e.description];
-        [_logger addToLog: @"Unable to load ITV formats. Please file a bug and mention the exception description above."];
-        rootObject=nil;
-    }
-
     //Adds Defaults to Type Preferences
     if ([_tvFormatController.arrangedObjects count] == 0)
     {
@@ -324,16 +319,6 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         RadioFormat *format4 = [[RadioFormat alloc] init];
         format4.format = @"Low";
         [_radioFormatController addObjects:@[format1,format2,format3,format4]];
-    }
-    if ([_itvFormatController.arrangedObjects count] == 0)
-    {
-        TVFormat *format0 = [[TVFormat alloc] init];
-        format0.format = @"Flash - HD";
-        TVFormat *format1 = [[TVFormat alloc] init];
-        format1.format = @"Flash - Very High";
-        TVFormat *format2 = [[TVFormat alloc] init];
-        format2.format = @"Flash - High";
-        [_itvFormatController addObjects:@[format0, format1, format2]];
     }
 
     //Remove SWFinfo
@@ -417,22 +402,26 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     [self saveAppData];
 }
 
-- (void)updater:(SUUpdater *)updater didFinishLoadingAppcast:(SUAppcast *)appcast
+- (void)updater:(SPUStandardUpdaterController *)updater didFinishLoadingAppcast:(SUAppcast *)appcast
 {
 //    NSLog(@"didFinishLoadingAppcast");
 }
 
-- (void)updaterDidNotFindUpdate:(SUUpdater *)updater
+- (void)updaterDidNotFindUpdate:(SPUStandardUpdaterController *)updater
 {
 //    NSLog(@"No update found.");
 }
 
-- (void)updater:(SUUpdater *)updater didFindValidUpdate:(SUAppcastItem *)update
+- (void)updater:(SPUStandardUpdaterController *)updater didFindValidUpdate:(SUAppcastItem *)update
 {
-    NSUserNotification *notification = [[NSUserNotification alloc] init];
-    notification.informativeText = [NSString stringWithFormat:@"Get iPlayer Automator %@ is available.",update.displayVersionString];
-    notification.title = @"Update Available!";
-    [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
+    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+
+    UNMutableNotificationContent *content = [UNMutableNotificationContent new];
+    content.title = @"Update Available!";
+    content.body = [NSString stringWithFormat:@"Get iPlayer Automator %@ is available.",update.displayVersionString];
+
+    UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:@"" content:content trigger:nil];
+    [center addNotificationRequest:request withCompletionHandler:nil];
 }
 
 #pragma mark Cache Update
@@ -701,12 +690,14 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 
     if (_didUpdate)
     {
-        NSUserNotification *indexUpdated = [[NSUserNotification alloc] init];
-        indexUpdated.title = @"Index Updated";
-        indexUpdated.informativeText = @"The program index was updated.";
-        indexUpdated.identifier = @"Index Updating Completed";
-        
-        [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:indexUpdated];
+        UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+
+        UNMutableNotificationContent *content = [UNMutableNotificationContent new];
+        content.title =  @"Index Updated";
+        content.body = @"The program index was updated.";
+
+        UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:@"" content:content trigger:nil];
+        [center addNotificationRequest:request withCompletionHandler:nil];
         [_logger addToLog:@"Index Updated." :self];
         _lastUpdate=[NSDate date];
         [self updateHistory];
@@ -840,10 +831,6 @@ static NSString *FORCE_RELOAD = @"ForceReload";
             [self performSelectorOnMainThread:@selector(startDownloads:) withObject:self waitUntilDone:NO];
         }
     }
-
-    //Check for Updates - Don't want to prompt the user when updates are running.
-    SUUpdater *updater = [SUUpdater sharedUpdater];
-    [updater checkForUpdatesInBackground];
 
     if (runDownloads)
     {
@@ -1236,6 +1223,9 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     }
 
     Programme *finishedShow = note.object;
+    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+    UNMutableNotificationContent *content = [UNMutableNotificationContent new];
+
     if (finishedShow.successful) {
         finishedShow.status = @"Processing...";
 
@@ -1245,15 +1235,11 @@ static NSString *FORCE_RELOAD = @"ForceReload";
             finishedShow.status = @"Download Complete";
         }
 
-        NSUserNotification *notification = [[NSUserNotification alloc] init];
-        notification.informativeText = [NSString stringWithFormat:@"%@ Completed Successfully",finishedShow.showName];
-        notification.title = @"Download Finished";
-        [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
+        content.title = @"Download Finished";
+        content.body = [NSString stringWithFormat:@"%@ Completed Successfully",finishedShow.showName];
     } else {
-        NSUserNotification *notification = [[NSUserNotification alloc] init];
-        notification.informativeText = [NSString stringWithFormat:@"%@ failed. See log for details.",finishedShow.showName];
-        notification.title = @"Download Failed";
-        [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
+        content.body = [NSString stringWithFormat:@"%@ failed. See log for details.",finishedShow.showName];
+        content.title = @"Download Failed";
 
         ReasonForFailure *showSolution = [[ReasonForFailure alloc] init];
 
@@ -1275,6 +1261,9 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         NSLog(@"Added Solution");
         _solutionsTableView.rowHeight = 68;
     }
+
+    UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:@"" content:content trigger:nil];
+    [center addNotificationRequest:request withCompletionHandler:nil];
 
     [self saveAppData]; //Save app data in case of crash.
 
@@ -1336,13 +1325,13 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 
         tempQueue=nil;
 
-        NSUserNotification *notification = [[NSUserNotification alloc] init];
-        notification.informativeText = [NSString stringWithFormat:@"Downloads Successful = %lu\nDownload Failed = %lu",
-                                        (unsigned long)downloadsSuccessful,(unsigned long)downloadsFailed];
-        notification.title = @"Downloads Finished";
-        [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
-
-        [[SUUpdater sharedUpdater] checkForUpdatesInBackground];
+        UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+        UNMutableNotificationContent *content = [UNMutableNotificationContent new];
+        content.title = @"Downloads Finished";
+        content.body = [NSString stringWithFormat:@"Downloads Successful = %lu\nDownload Failed = %lu",
+                        (unsigned long)downloadsSuccessful,(unsigned long)downloadsFailed];
+        UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:@"" content:content trigger:nil];
+        [center addNotificationRequest:request withCompletionHandler:nil];
 
         if (downloadsFailed>0) {
             [_solutionsWindow makeKeyAndOrderFront:self];
@@ -1683,7 +1672,9 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     rootObject[@"queue"] = tempQueue;
     rootObject[@"serieslink"] = tempSeries;
     rootObject[@"lastUpdate"] = _lastUpdate;
-    [NSKeyedArchiver archiveRootObject: rootObject toFile: filePath];
+    NSError *error;
+    NSData *archivedData = [NSKeyedArchiver archivedDataWithRootObject:rootObject requiringSecureCoding:NO error:&error];
+    [archivedData writeToFile:filePath atomically:NO];
 
     filename = @"Formats.automatorqueue";
     filePath = [appSupportFolder stringByAppendingPathComponent:filename];
@@ -1692,13 +1683,8 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 
     rootObject[@"tvFormats"] = _tvFormatController.arrangedObjects;
     rootObject[@"radioFormats"] = _radioFormatController.arrangedObjects;
-    [NSKeyedArchiver archiveRootObject:rootObject toFile:filePath];
-
-    filename = @"ITVFormats.automator";
-    filePath = [appSupportFolder stringByAppendingPathComponent:filename];
-    rootObject = [NSMutableDictionary dictionary];
-    rootObject[@"itvFormats"] = _itvFormatController.arrangedObjects;
-    [NSKeyedArchiver archiveRootObject:rootObject toFile:filePath];
+    archivedData = [NSKeyedArchiver archivedDataWithRootObject:rootObject requiringSecureCoding:NO error:nil];
+    [archivedData writeToFile:filePath atomically:NO];
 
     //Store Preferences in case of crash
     [[NSUserDefaults standardUserDefaults] synchronize];
@@ -2083,7 +2069,13 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     
     // Guard against bad data in the archive. If the un-archive fails ignore it and just make an empty array.
     @try {
-        oldProgrammesArray = [NSKeyedUnarchiver unarchiveObjectWithFile:oldProgrammesFile];
+        NSData *oldProgramData = [NSData dataWithContentsOfFile:oldProgrammesFile];
+        NSError *error;
+        NSSet *allowedClasses = [NSSet setWithObjects: [ProgrammeHistoryObject class], [NSArray class], [NSString class], nil];
+        oldProgrammesArray = [NSKeyedUnarchiver unarchivedObjectOfClasses:allowedClasses fromData:oldProgramData error:&error];
+        if (error) {
+            [_logger addToLog:[error description]];
+        }
     } @catch (NSException *exception) {
         firstTimeBuild = YES;
         oldProgrammesArray = [NSMutableArray new];
@@ -2134,7 +2126,8 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     /* Put back today's programmes for comparison on the next run */
 
     NSArray *cfProgrammes = todayProgrammes.allObjects;
-    [NSKeyedArchiver archiveRootObject:cfProgrammes toFile:oldProgrammesFile];
+    NSData *archivedData = [NSKeyedArchiver archivedDataWithRootObject:cfProgrammes requiringSecureCoding:NO error:nil];
+    [archivedData writeToFile:oldProgrammesFile atomically:NO];
 
     /* subtract bought forward from today to create new programmes list */
 

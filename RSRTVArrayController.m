@@ -53,7 +53,7 @@ NSString *kRSRTVMovedRowsType = @"com.red-sweater.RSRTVArrayController";
 {
 	if ([self draggingEnabled] == YES)
 	{
-        NSData *data = [NSKeyedArchiver archivedDataWithRootObject:rowIndexes];
+        NSData *data = [NSKeyedArchiver archivedDataWithRootObject:rowIndexes requiringSecureCoding:NO error:nil];
         [pboard declareTypes:@[kRSRTVMovedRowsType] owner:self];
         [pboard setData:data forType:kRSRTVMovedRowsType];
 	}
@@ -102,7 +102,7 @@ NSString *kRSRTVMovedRowsType = @"com.red-sweater.RSRTVArrayController";
 //		NSArray *rows = [[info draggingPasteboard] propertyListForType:kRSRTVMovedRowsType];
 //		NSIndexSet *indexSet = [self indexSetFromRows:rows];
         NSData *data = [[info draggingPasteboard] dataForType:kRSRTVMovedRowsType];
-        NSIndexSet *indexSet = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+        NSIndexSet *indexSet = [NSKeyedUnarchiver unarchivedObjectOfClass:[NSIndexSet class] fromData:data error:nil];
 		NSInteger rowsAbove = 0;
 		
 		if (([info draggingSourceOperationMask] == NSDragOperationCopy) && [self tableObjectsSupportCopying])

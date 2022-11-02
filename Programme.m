@@ -24,6 +24,10 @@
     return self;
 }
 
++ (BOOL)supportsSecureCoding {
+    return YES;
+}
+
 - (id)description
 {
     return [NSString stringWithFormat:@"%@: %@",_pid, _showName];

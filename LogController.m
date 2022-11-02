@@ -108,9 +108,9 @@
 {
 	NSString *unattributedLog = _log.string;
 	NSPasteboard *pb = [NSPasteboard generalPasteboard];
-	NSArray *types = @[NSStringPboardType];
+    NSArray *types = @[NSPasteboardTypeString];
 	[pb declareTypes:types owner:self];
-	[pb setString:unattributedLog forType:NSStringPboardType];
+    [pb setString:unattributedLog forType:NSPasteboardTypeString];
 }
 
 - (IBAction)clearLog:(id)sender

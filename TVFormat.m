@@ -17,6 +17,10 @@
 	return self;
 }
 
++ (BOOL)supportsSecureCoding {
+    return YES;
+}
+
 -(instancetype)initWithFormat:(NSString *)format
 {
     if (self = [super init]) {

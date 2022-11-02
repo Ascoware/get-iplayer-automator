@@ -148,6 +148,11 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
             dateAiredUTC = dateForTimeString(dateTimeString)
         }
 
+        if let dateAiredUTC = dateAiredUTC, dateAiredUTC > Date() {
+            // logger?.add(toLog: "Skipping episode - \(dateAiredUTC), because it hasn't aired yet")
+            return
+        }
+
         let programURL = URL(string: programInfo.url)?.deletingLastPathComponent()
 
         let description = show.at_xpath(".//p[@class='tout__summary theme__subtle']")?.content?.trimmingCharacters(in: .whitespacesAndNewlines)

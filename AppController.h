@@ -26,7 +26,7 @@ extern BOOL runDownloads;
 extern NSDictionary *tvFormats;
 extern NSDictionary *radioFormats;
 
-@interface AppController : NSObject <SUUpdaterDelegate, NSApplicationDelegate>
+@interface AppController : NSObject <SPUUpdaterDelegate, NSApplicationDelegate>
 //General
 @property (readonly) NSString *getiPlayerPath;
 @property (readonly) NSString *perlBinaryPath;
@@ -85,7 +85,6 @@ extern NSDictionary *radioFormats;
 @property NSMutableArray *itvFormatList;
 @property IBOutlet NSArrayController *tvFormatController;
 @property IBOutlet NSArrayController *radioFormatController;
-@property IBOutlet NSArrayController *itvFormatController;
 @property IBOutlet NSPanel *prefsPanel;
 
 //Scheduling a Start
