@@ -62,7 +62,7 @@
             }
         }
         //Initialize the rest of the arguments
-        NSString *noWarningArg = @"--nocopyright";
+        NSString *noWarningArg = [GetiPlayerArguments sharedController].noWarningArg;
         NSString *noPurgeArg = @"--nopurge";
         NSString *atomicParsleyArg = [[NSString alloc] initWithFormat:@"--atomicparsley=%@", [[[AppController sharedController] extraBinariesPath] stringByAppendingPathComponent:@"AtomicParsley"]];
         NSString *ffmpegArg = [[NSString alloc] initWithFormat:@"--ffmpeg=%@", [[[AppController sharedController] extraBinariesPath] stringByAppendingPathComponent:@"ffmpeg"]];
@@ -89,7 +89,7 @@
         }
         
         //We don't want this to refresh now!
-        NSString *cacheExpiryArg = @"-e604800000000";
+        NSString *cacheExpiryArg = [[GetiPlayerArguments sharedController] cacheExpiryArg];
         NSString *profileDirArg = [[GetiPlayerArguments sharedController] profileDirArg];
         
         //Add Arguments that can't be NULL

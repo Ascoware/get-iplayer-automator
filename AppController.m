@@ -548,10 +548,10 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     }
     else
     {
-        cacheExpiryArg = [[NSString alloc] initWithFormat:@"-e%d", ([[[NSUserDefaults standardUserDefaults] objectForKey:@"CacheExpiryTime"] intValue]*3600)];
+        cacheExpiryArg = [[NSString alloc] initWithFormat:@"--expiry=%d", ([[[NSUserDefaults standardUserDefaults] objectForKey:@"CacheExpiryTime"] intValue]*3600)];
     }
 
-    NSString *typeArgument = [[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:YES andIncludeITV:NO];
+    NSString *typeArgument = [[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:YES];
 
     if (typeArgument.length == 0) {
         _updatingBBCIndex = false;
@@ -728,8 +728,8 @@ static NSString *FORCE_RELOAD = @"ForceReload";
                 [GetiPlayerArguments sharedController].profileDirArg,
                 @"--nopurge",
                 [GetiPlayerArguments sharedController].noWarningArg,
-                [[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO andIncludeITV:YES],
-                [[GetiPlayerArguments sharedController] cacheExpiryArgument],
+                [[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO],
+                [[GetiPlayerArguments sharedController] cacheExpiryArg],
                 @"--listformat=<pid>|<type>|<name>|<seriesnum>|<episode>|<channel>|<web>|<available>",
                 show.showName];
             NSMutableString *taskData = [[NSMutableString alloc] initWithString:@""];
@@ -1441,15 +1441,15 @@ static NSString *FORCE_RELOAD = @"ForceReload";
             } else if (series.tvNetwork.length == 0) {
                 series.tvNetwork = @"*";
             }
-            NSString *cacheExpiryArgument = [[GetiPlayerArguments sharedController] cacheExpiryArgument];
-            NSString *typeArgument = [[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO andIncludeITV:YES];
+            NSString *cacheExpiryArg = [[GetiPlayerArguments sharedController] cacheExpiryArg];
+            NSString *typeArgument = [[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO];
 
             NSMutableArray *autoRecordArgs = [[NSMutableArray alloc] initWithObjects:
                                               _getiPlayerPath,
                                               [GetiPlayerArguments sharedController].noWarningArg,
                                               @"--nopurge",
                                               @"--listformat=<pid>|<type>|<name>|<episode>|<channel>|<timeadded>|<web>|<available>",
-                                              cacheExpiryArgument,
+                                              cacheExpiryArg,
                                               typeArgument,
                                               [GetiPlayerArguments sharedController].profileDirArg,
                                               @"--hide",

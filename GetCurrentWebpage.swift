@@ -220,11 +220,11 @@ import Kanna
         task.launchPath = AppController.shared().perlBinaryPath
         let args = [
             AppController.shared().getiPlayerPath,
-            "--nocopyright",
-            "-e60480000000000000",
+            GetiPlayerArguments.sharedController().noWarningArg,
+            GetiPlayerArguments.sharedController().cacheExpiryArg,
             "--pid-recursive-list",
             url,
-            GetiPlayerArguments.sharedController().profileDirArg ?? ""
+            GetiPlayerArguments.sharedController().profileDirArg
             ]
 
 //        for arg in args {

@@ -25,11 +25,11 @@
         self.logger = logger;
         
         self.task.launchPath = [[AppController sharedController] perlBinaryPath];
-        NSString *typeArg = [[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO andIncludeITV:YES];
+        NSString *typeArg = [[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO];
         NSArray *args = @[
             [[AppController sharedController] getiPlayerPath],
-            @"--nocopyright",
-            @"-e60480000000000000",
+            [[GetiPlayerArguments sharedController] noWarningArg],
+            [[GetiPlayerArguments sharedController] cacheExpiryArg],
             typeArg,
             @"--listformat",
             @"SearchResult|<pid>|<available>|<type>|<name>|<episode>|<channel>|<seriesnum>|<episodenum>|<desc>|<thumbnail>|<web>|<available>",

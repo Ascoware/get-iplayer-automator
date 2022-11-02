@@ -116,8 +116,8 @@
     
     NSMutableArray *args = [NSMutableArray arrayWithArray:@[[[AppController sharedController] getiPlayerPath],
                                                             @"--nopurge",
-                                                            @"--nocopyright",
-                                                            @"-e60480000000000000",
+                                                            [[GetiPlayerArguments sharedController] noWarningArg],
+                                                            [[GetiPlayerArguments sharedController] cacheExpiryArg],
                                                             @"--info",
                                                             profileArg,
                                                             @"--pid",
@@ -390,12 +390,11 @@
         NSString *listArgument = @"--listformat=<index>|<pid>|<type>|<name>|<seriesnum>|<episode>|<channel>|<available>|<web>";
         NSString *fieldsArgument = @"--fields=index,pid";
         NSString *wantedID = _pid;
-        NSString *cacheExpiryArg = [[GetiPlayerArguments sharedController] cacheExpiryArgument];
         NSArray *args = @[[[AppController sharedController] getiPlayerPath],
-                          @"--nocopyright",
+                          [[GetiPlayerArguments sharedController] noWarningArg],
+                          [[GetiPlayerArguments sharedController] cacheExpiryArg],
                           @"--nopurge",
-                          cacheExpiryArg,
-                          [[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO andIncludeITV:YES],
+                          [[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO],
                           listArgument,
                           [GetiPlayerArguments sharedController].profileDirArg,
                           fieldsArgument,
@@ -537,13 +536,12 @@
         [versionArg  appendString:@"default"];
         NSString *infoArgument = @"--info";
         NSString *pidArgument = @"--pid";
-        NSString *cacheExpiryArg = [[GetiPlayerArguments sharedController] cacheExpiryArgument];
         NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:
                                 [[AppController sharedController] getiPlayerPath],
-                                @"--nocopyright",
+                                [[GetiPlayerArguments sharedController] noWarningArg],
+                                [[GetiPlayerArguments sharedController] cacheExpiryArg],
                                 @"--nopurge",
                                 versionArg,
-                                cacheExpiryArg,
                                 [GetiPlayerArguments sharedController].profileDirArg,
                                 infoArgument,
                                 pidArgument,
