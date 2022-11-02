@@ -919,23 +919,29 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 
 - (IBAction)getCurrentWebpage:(id)sender
 {
-    Programme *p = [GetCurrentWebpage getCurrentWebpage:_logger];
-
-    if (p)  {
-
+    void(^callback)(NSArray<Programme*>* _Nonnull) = ^void (NSArray<Programme*>* programs){
+        for (Programme *p in programs) {
         /* don't allow duplicates */
-
-        NSArray *tempQueue = _queueController.arrangedObjects;
+            NSArray *tempQueue = self.queueController.arrangedObjects;
         BOOL foundIt = false;
 
-        for (Programme *show in tempQueue)
-            if ( [show.pid isEqualToString:p.pid] )
+            for (Programme *show in tempQueue) {
+                if ([show.pid isEqualToString:p.pid]) {
                 foundIt = true;
+                }
+            }
 
-        if ( !foundIt )
-            [_queueController addObject:p];
+            if (!foundIt) {
+                p.status = @"Processing...";
+                [p performSelectorInBackground: @selector(getName) withObject:nil];
+                [self.queueController addObject:p];
+            }
     }
+    };
+
+    [GetCurrentWebpage getCurrentWebpageWithCompletion: callback];
 }
+
 - (IBAction)removeFromQueue:(id)sender
 {
     //Check to make sure one of the shows isn't currently downloading.
