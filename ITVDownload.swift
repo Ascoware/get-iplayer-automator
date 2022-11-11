@@ -10,42 +10,37 @@ import Kanna
 import SwiftyJSON
 import CocoaLumberjackSwift
 
-public class ITVDownload : Download {
+@objc public class ITVDownload : Download {
 
-    public override var description: String {
+    override public var description: String {
         return "ITV Download (ID=\(show.pid))"
     }
     
-    @objc public override init() {
-        super.init()
-        // Nothing to do here.
-    }
-    
+
     @objc public init(programme: Programme, proxy: HTTPProxy?) {
         super.init()
         self.proxy = proxy
         self.show = programme
         self.defaultsPrefix = "ITV_"
+        self.downloadPath = UserDefaults.standard.string(forKey: "DownloadPath") ?? ""
         self.running = true
         
         setCurrentProgress("Retrieving Programme Metadata... \(show.showName)")
         setPercentage(102)
         programme.status = "Initialising..."
         
-        //        formatList = formats
         DDLogInfo("Downloading \(show.showName)")
-        DDLogInfo("INFO: Preparing Request for Auth Info")
         
         DispatchQueue.main.async {
             guard let requestURL = URL(string: self.show.url) else {
                 return
             }
 
-            self.currentRequest.cancel()
+            self.currentRequest?.cancel()
             var downloadRequest = URLRequest(url:requestURL)
 
             downloadRequest.timeoutInterval = 10
-            self.session = URLSession.shared
+            var session = URLSession.shared
 
             if let proxy = self.proxy {
                 // Create an NSURLSessionConfiguration that uses the proxy
@@ -65,17 +60,17 @@ public class ITVDownload : Download {
                 configuration.connectionProxyDictionary = proxyDict
 
                 // Create a NSURLSession with our proxy aware configuration
-                self.session = URLSession(configuration:configuration, delegate:nil, delegateQueue:OperationQueue.main)
+                session = URLSession(configuration:configuration, delegate:nil, delegateQueue:OperationQueue.main)
             }
 
             DDLogVerbose("ITV: Requesting Metadata")
 
-            self.currentRequest = self.session.dataTask(with: downloadRequest) { (data, response, error) in
+            self.currentRequest = session.dataTask(with: downloadRequest) { (data, response, error) in
                 if let httpResponse = response as? HTTPURLResponse {
                     self.metaRequestFinished(response: httpResponse, data: data, error: error)
                 }
             }
-            self.currentRequest.resume()
+            self.currentRequest?.resume()
         }
     }
 
@@ -215,7 +210,6 @@ public class ITVDownload : Download {
         } else {
             self.show.complete = true
             self.show.successful = false
-            self.show.status = "Download Failed"
             
             // Something went wrong inside youtube-dl.
             NotificationCenter.default.removeObserver(self)
@@ -224,7 +218,7 @@ public class ITVDownload : Download {
     }
     
     @objc public func youtubeDLFinishedDownload() {
-        if let tagOption = UserDefaults.standard.object(forKey: "TagShows") as? Bool, tagOption {
+        if UserDefaults.standard.bool(forKey: "TagShows") {
             tagDownloadWithMetadata()
         } else {
             atomicParsleyFinished(nil)
@@ -260,21 +254,21 @@ public class ITVDownload : Download {
                               "-o",
                               downloadPath]
         
-        if let downloadSubs = UserDefaults.standard.object(forKey: "DownloadSubtitles") as? Bool, downloadSubs {
+        if UserDefaults.standard.bool(forKey: "DownloadSubtitles") {
             args.append("--write-sub")
             
-            if let embedSubs = UserDefaults.standard.object(forKey: "EmbedSubtitles") as? Bool, embedSubs {
+            if UserDefaults.standard.bool(forKey: "EmbedSubtitles") {
                 args.append("--embed-subs")
             } else {
                 args.append("-k")
             }
         }
 
-        if let verboseOption = UserDefaults.standard.object(forKey: "Verbose") as? Bool, verboseOption {
+        if UserDefaults.standard.bool(forKey: "Verbose") {
             args.append("--verbose")
         }
 
-        if let tagOption = UserDefaults.standard.object(forKey: "TagShows") as? Bool, tagOption {
+        if UserDefaults.standard.bool(forKey: "TagShows") {
             args.append("--embed-thumbnail")
         }
         
@@ -297,7 +291,6 @@ public class ITVDownload : Download {
         
         DDLogVerbose("DEBUG: youtube-dl args:\(args)")
 
-
         task?.launchPath = youtubeDLBinary
         task?.arguments = args
         let extraBinaryPath = AppController.shared().extraBinariesPath
@@ -316,5 +309,46 @@ public class ITVDownload : Download {
         fh?.readInBackgroundAndNotify()
         errorFh?.readInBackgroundAndNotify()
     }
+
+    func createDownloadPath() {
+        var fileName = show.showName
+
+        // XBMC naming is always used on ITV shows to ensure unique names.
+        if !show.seriesName.isEmpty {
+            fileName = show.seriesName;
+        }
+
+        if show.season == 0 {
+            show.season = 1
+            if show.episode == 0 {
+                show.episode = 1
+            }
+        }
+        let format = !show.episodeName.isEmpty ? "%@.s%02lde%02ld.%@" : "%@.s%02lde%02ld"
+        fileName = String(format: format, fileName, show.season, show.episode, show.episodeName)
+
+        //Create Download Path
+        var dirName = show.seriesName
+
+        if dirName.isEmpty {
+            dirName = show.showName
+        }
+
+        downloadPath = UserDefaults.standard.string(forKey:"DownloadPath") ?? ""
+        dirName = dirName.replacingOccurrences(of: "/", with: "-").replacingOccurrences(of: ":", with: " -")
+        downloadPath = (downloadPath as NSString).appendingPathComponent(dirName)
+
+        var filepart = String(format:"%@.%%(ext)s",fileName).replacingOccurrences(of: "/", with: "-").replacingOccurrences(of: ":", with: " -")
+
+        do {
+            try FileManager.default.createDirectory(atPath: downloadPath, withIntermediateDirectories: true)
+            let dateRegex = try NSRegularExpression(pattern: "(\\d{2})[-_](\\d{2})[-_](\\d{4})")
+            filepart = dateRegex.stringByReplacingMatches(in: filepart, range: NSRange(location: 0, length: filepart.count), withTemplate: "$3-$2-$1")
+        } catch {
+            DDLogError("Failed to create download directory! ")
+        }
+        downloadPath = (downloadPath as NSString).appendingPathComponent(filepart)
+    }
+
 }
 

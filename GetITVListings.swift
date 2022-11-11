@@ -333,10 +333,11 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
                 DDLogWarn("WARNING: Bad episode object \(episode) ")
                 return
             }
-            let dateAiredString = isoFormatter.string(from: episode.lastBroadcast)
 
-            if episode.episodeName.isEmpty {
-                episode.episodeName = DateFormatter.localizedString(from: episode.lastBroadcast, dateStyle: .medium, timeStyle: .none)
+            let dateAiredString = isoFormatter.string(from: episode.lastBroadcast ?? Date())
+
+            if episode.episodeName.isEmpty, let lastBCast = episode.lastBroadcast {
+                episode.episodeName = DateFormatter.localizedString(from: lastBCast, dateStyle: .medium, timeStyle: .none)
             }
 
             let dateAddedInteger = Int(floor(creationTime.timeIntervalSince1970))

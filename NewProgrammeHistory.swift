@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import CocoaLumberjackSwift
 
 @objc public class NewProgrammeHistory: NSObject {
     @objc public var programmeHistoryArray = [ProgrammeHistoryObject]()
@@ -43,7 +44,7 @@ import Foundation
                 programmeHistoryArray = unarchivedHistory
             }
         } catch {
-            print("Couldn't read program history file.")
+            DDLogError("Couldn't read program history file.")
         }
 
         /* Cull history if > 3,000 entries */
@@ -71,7 +72,7 @@ import Foundation
             let data = try NSKeyedArchiver.archivedData(withRootObject: programmeHistoryArray, requiringSecureCoding: false)
             try data.write(to: historyFile)
         } catch {
-            print("Couldn't write program history file")
+            DDLogError("Couldn't write program history file.")
         }
     }
     

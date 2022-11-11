@@ -41,6 +41,9 @@
 		7F70246929107E2400A48BE1 /* CocoaLumberjackSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F70246829107E2400A48BE1 /* CocoaLumberjackSwift.framework */; };
 		7F70246A29107E4400A48BE1 /* CocoaLumberjackSwift.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7F70246829107E2400A48BE1 /* CocoaLumberjackSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7F748E3423FB416B00626A77 /* get_iplayer in Resources */ = {isa = PBXBuildFile; fileRef = 7F748E3323FB416B00626A77 /* get_iplayer */; };
+		7F78C1FD291C26EA00DAD51E /* Programme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F78C1FB291B6FFC00DAD51E /* Programme.swift */; };
+		7F78C1FF291C385500DAD51E /* Download.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F78C1FE291C385500DAD51E /* Download.swift */; };
+		7F78C201291C42C500DAD51E /* BBCDownload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F78C200291C42C500DAD51E /* BBCDownload.swift */; };
 		7F90591A253B90320094099B /* SwiftyJSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F905919253B90320094099B /* SwiftyJSON.framework */; };
 		7F90591B253B9FB60094099B /* SwiftyJSON.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7F905919253B90320094099B /* SwiftyJSON.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7F9FE9211EC16ED80058CB1B /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F9FE9201EC16ED80058CB1B /* libz.tbd */; };
@@ -59,12 +62,9 @@
 		BF382ED41D73C26800BAF106 /* ExtendedShowInformationController.m in Sources */ = {isa = PBXBuildFile; fileRef = BF382ED31D73C26800BAF106 /* ExtendedShowInformationController.m */; };
 		BF382ED71D73C2A400BAF106 /* GetiPlayerArguments.m in Sources */ = {isa = PBXBuildFile; fileRef = BF382ED61D73C2A400BAF106 /* GetiPlayerArguments.m */; };
 		BF382ED91D73C2C700BAF106 /* GiASearch.m in Sources */ = {isa = PBXBuildFile; fileRef = BF382ED81D73C2C700BAF106 /* GiASearch.m */; };
-		BF382EDB1D73C2E700BAF106 /* Programme.m in Sources */ = {isa = PBXBuildFile; fileRef = BF382EDA1D73C2E700BAF106 /* Programme.m */; };
 		BF382EE31D73C36300BAF106 /* NPHistoryWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = BF382EE21D73C36300BAF106 /* NPHistoryWindow.xib */; };
 		D914BC59100C9F0100F7E68E /* ScriptingBridge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D914BC58100C9F0100F7E68E /* ScriptingBridge.framework */; };
-		D914BD29100CBFA900F7E68E /* BBCDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = D914BD28100CBFA900F7E68E /* BBCDownload.m */; };
 		D9178595101345D700B82736 /* Series.m in Sources */ = {isa = PBXBuildFile; fileRef = D9178594101345D700B82736 /* Series.m */; };
-		D921C9EB149BCDEB004CB558 /* Download.m in Sources */ = {isa = PBXBuildFile; fileRef = D921C9EA149BCDEA004CB558 /* Download.m */; };
 		D92687C51087F81F000E8132 /* DownloadHistoryController.m in Sources */ = {isa = PBXBuildFile; fileRef = D92687C41087F81F000E8132 /* DownloadHistoryController.m */; };
 		D92687CA1087F836000E8132 /* DownloadHistoryEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = D92687C91087F836000E8132 /* DownloadHistoryEntry.m */; };
 		D941D9A01025DDCF0012A75F /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D941D99F1025DDCF0012A75F /* SystemConfiguration.framework */; };
@@ -160,6 +160,9 @@
 		7F70246829107E2400A48BE1 /* CocoaLumberjackSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CocoaLumberjackSwift.framework; path = Carthage/Build/Mac/CocoaLumberjackSwift.framework; sourceTree = "<group>"; };
 		7F70246B2911825600A48BE1 /* GetiPlayerAutomator-Prefix.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "GetiPlayerAutomator-Prefix.h"; sourceTree = "<group>"; };
 		7F748E3323FB416B00626A77 /* get_iplayer */ = {isa = PBXFileReference; lastKnownFileType = folder; path = get_iplayer; sourceTree = "<group>"; };
+		7F78C1FB291B6FFC00DAD51E /* Programme.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Programme.swift; sourceTree = "<group>"; };
+		7F78C1FE291C385500DAD51E /* Download.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Download.swift; sourceTree = "<group>"; };
+		7F78C200291C42C500DAD51E /* BBCDownload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BBCDownload.swift; sourceTree = "<group>"; };
 		7F905919253B90320094099B /* SwiftyJSON.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftyJSON.framework; path = Carthage/Build/Mac/SwiftyJSON.framework; sourceTree = "<group>"; };
 		7F9FE91E1EC16E3E0058CB1B /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = Carthage/Build/Mac/Sparkle.framework; sourceTree = "<group>"; };
 		7F9FE9201EC16ED80058CB1B /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
@@ -178,18 +181,12 @@
 		BF382ED51D73C29B00BAF106 /* GetiPlayerArguments.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GetiPlayerArguments.h; sourceTree = "<group>"; };
 		BF382ED61D73C2A400BAF106 /* GetiPlayerArguments.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GetiPlayerArguments.m; sourceTree = "<group>"; };
 		BF382ED81D73C2C700BAF106 /* GiASearch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GiASearch.m; sourceTree = "<group>"; };
-		BF382EDA1D73C2E700BAF106 /* Programme.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Programme.m; sourceTree = "<group>"; };
 		BF382EE21D73C36300BAF106 /* NPHistoryWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NPHistoryWindow.xib; sourceTree = "<group>"; };
-		D904F422100B077600D60BBF /* Programme.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Programme.h; sourceTree = "<group>"; };
 		D914BC58100C9F0100F7E68E /* ScriptingBridge.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ScriptingBridge.framework; path = /System/Library/Frameworks/ScriptingBridge.framework; sourceTree = "<absolute>"; };
-		D914BD27100CBFA900F7E68E /* BBCDownload.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BBCDownload.h; sourceTree = "<group>"; };
-		D914BD28100CBFA900F7E68E /* BBCDownload.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = BBCDownload.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		D9158E06187150B000FBA515 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		D9178593101345D700B82736 /* Series.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Series.h; sourceTree = "<group>"; };
 		D9178594101345D700B82736 /* Series.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Series.m; sourceTree = "<group>"; };
 		D921C9C1149BBF51004CB558 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = System/Library/Frameworks/CoreServices.framework; sourceTree = SDKROOT; };
-		D921C9E9149BCDEA004CB558 /* Download.h */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.h; path = Download.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; wrapsLines = 1; };
-		D921C9EA149BCDEA004CB558 /* Download.m */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.objc; path = Download.m; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; wrapsLines = 1; };
 		D92687C31087F81F000E8132 /* DownloadHistoryController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DownloadHistoryController.h; sourceTree = "<group>"; };
 		D92687C41087F81F000E8132 /* DownloadHistoryController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DownloadHistoryController.m; sourceTree = "<group>"; };
 		D92687C81087F836000E8132 /* DownloadHistoryEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DownloadHistoryEntry.h; sourceTree = "<group>"; };
@@ -288,6 +285,7 @@
 		29B97314FDCFA39411CA2CEA /* Get_iPlayer GUI */ = {
 			isa = PBXGroup;
 			children = (
+				7F78C200291C42C500DAD51E /* BBCDownload.swift */,
 				7F6B2B2B20EE87D800E4BBDF /* Get iPlayer Automator.entitlements */,
 				D9CCF52E10259DED009205BE /* Features.rtf */,
 				D9F97FE9198EBA73006494A3 /* Categories */,
@@ -396,16 +394,12 @@
 				392628B01C999B1A0033CF84 /* EmptyToStringTransformer.m */,
 				39D7C1BE1874AD9D00B78698 /* NilToStringTransformer.h */,
 				39D7C1BF1874AD9D00B78698 /* NilToStringTransformer.m */,
-				D921C9E9149BCDEA004CB558 /* Download.h */,
-				D921C9EA149BCDEA004CB558 /* Download.m */,
-				D914BD27100CBFA900F7E68E /* BBCDownload.h */,
-				D914BD28100CBFA900F7E68E /* BBCDownload.m */,
+				7F78C1FE291C385500DAD51E /* Download.swift */,
 				7F340B5A1FFB063700F415A4 /* ITVDownload.swift */,
 				D9F97FE4198E9043006494A3 /* GetCurrentWebpage.swift */,
 				BF382ED51D73C29B00BAF106 /* GetiPlayerArguments.h */,
 				BF382ED61D73C2A400BAF106 /* GetiPlayerArguments.m */,
-				D904F422100B077600D60BBF /* Programme.h */,
-				BF382EDA1D73C2E700BAF106 /* Programme.m */,
+				7F78C1FB291B6FFC00DAD51E /* Programme.swift */,
 				D9178593101345D700B82736 /* Series.h */,
 				D9178594101345D700B82736 /* Series.m */,
 				D97D9422106DBB68006ECD39 /* TVFormat.h */,
@@ -607,7 +601,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				8D11072D0486CEB800E47090 /* main.m in Sources */,
-				D914BD29100CBFA900F7E68E /* BBCDownload.m in Sources */,
 				BF382ED71D73C2A400BAF106 /* GetiPlayerArguments.m in Sources */,
 				D9178595101345D700B82736 /* Series.m in Sources */,
 				7F165A14205C1F15005BB78A /* ProgrammeHistoryEntry.swift in Sources */,
@@ -620,16 +613,18 @@
 				7F5B1C51211F9E2E00BF7E99 /* SafariScripting.swift in Sources */,
 				D9CDC9EC186B90A90003A4E2 /* ASDownloadShows.m in Sources */,
 				D92687C51087F81F000E8132 /* DownloadHistoryController.m in Sources */,
+				7F78C1FF291C385500DAD51E /* Download.swift in Sources */,
 				7FCF7263271388990086B0CD /* HistoryTableViewController.swift in Sources */,
 				D92687CA1087F836000E8132 /* DownloadHistoryEntry.m in Sources */,
 				7FEDA8ED24FC982200189D37 /* MicrosoftEdge.swift in Sources */,
 				DFC865E213E96BE200606599 /* ReasonForFailure.m in Sources */,
 				39D7C1C01874AD9D00B78698 /* NilToStringTransformer.m in Sources */,
+				7F78C201291C42C500DAD51E /* BBCDownload.swift in Sources */,
 				7F5B1C55211F9EE600BF7E99 /* SBApplicationProtocol.swift in Sources */,
 				D9B6DB9A196D9AEC00161ECB /* LogController.m in Sources */,
 				7F01382625F0A7520014703C /* ITVMetadataExtractor.swift in Sources */,
 				392628B11C999B1A0033CF84 /* EmptyToStringTransformer.m in Sources */,
-				BF382EDB1D73C2E700BAF106 /* Programme.m in Sources */,
+				7F78C1FD291C26EA00DAD51E /* Programme.swift in Sources */,
 				D9C1D0F01993BBE00034465E /* GetiPlayerProxy.m in Sources */,
 				7F5B1C50211F9E2E00BF7E99 /* ChromeScripting.swift in Sources */,
 				39D52EA81DAAFD450033C4ED /* NPHistoryWindowController.m in Sources */,
@@ -638,7 +633,6 @@
 				393D1DEE18A5BBB500F27880 /* RSRTVArrayController.m in Sources */,
 				39D7C1BD1874AD7400B78698 /* StringTrimFormatter.m in Sources */,
 				D9F97FEC198EBA94006494A3 /* NSFileManager+DirectoryLocations.m in Sources */,
-				D921C9EB149BCDEB004CB558 /* Download.m in Sources */,
 				7F165A16205C1F8C005BB78A /* NewProgrammeHistory.swift in Sources */,
 				7F5B1C54211F9EE600BF7E99 /* SBObjectProtocol.swift in Sources */,
 				BF382ED91D73C2C700BAF106 /* GiASearch.m in Sources */,

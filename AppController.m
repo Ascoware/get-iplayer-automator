@@ -10,17 +10,19 @@
 #import "AppController.h"
 #import <Sparkle/Sparkle.h>
 #import "HTTPProxy.h"
-#import "Programme.h"
+#import "NSFileManager+DirectoryLocations.h"
 #import "iTunes.h"
 #import "ReasonForFailure.h"
 #import "NPHistoryWindowController.h"
+#import "TVFormat.h"
+#import "RadioFormat.h"
 #import "Get_iPlayer_Automator-Swift.h"
 
 static AppController *sharedController;
 BOOL runDownloads = NO;
 BOOL runUpdate = NO;
-NSDictionary *tvFormats;
-NSDictionary *radioFormats;
+NSDictionary<NSString*, NSString*> *tvFormats;
+NSDictionary<NSString*, NSString*> *radioFormats;
 
 // New ITV Cache
 GetITVShows                   *newITVListing;
@@ -198,7 +200,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     {
         NSData *fileContents = [NSData dataWithContentsOfFile:filePath];
         NSError *error;
-        NSSet *allowedClasses = [NSSet setWithObjects: [NSMutableArray class], [NSMutableDictionary class], [NSDate class], [NSString class], [Series class], nil];
+        NSSet *allowedClasses = [NSSet setWithObjects: [NSNumber class], [NSMutableArray class], [NSMutableDictionary class], [NSDate class], [NSString class], [Series class], [Programme class], nil];
         rootObject = [NSKeyedUnarchiver unarchivedObjectOfClasses:allowedClasses fromData:fileContents error:&error];
         NSArray *tempQueue = [rootObject valueForKey:@"queue"];
         NSArray *tempSeries = [rootObject valueForKey:@"serieslink"];
@@ -276,9 +278,17 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         DDLogError(@"Unable to load Formats.automatorqueue. Please file a bug and mention the exception description above.");
         rootObject=nil;
     }
+
     if (!tvFormats || !radioFormats) {
-        [BBCDownload initFormats];
+        NSArray *tvFormatKeys = @[@"Full HD (1080p)", @"HD (720p)", @"SD (540p)", @"Web (396p)", @"Mobile (288p)"];
+        NSArray *tvFormatObjects = @[@"fhd",@"hd",@"sd",@"web",@"mobile"];
+        NSArray *radioFormatKeys = @[@"High", @"Standard", @"Medium", @"Low"];
+        NSArray *radioFormatObjects = @[@"high", @"std", @"med", @"low"];
+
+        tvFormats = [[NSDictionary alloc] initWithObjects:tvFormatObjects forKeys:tvFormatKeys];
+        radioFormats = [[NSDictionary alloc] initWithObjects:radioFormatObjects forKeys:radioFormatKeys];
     }
+
     // clear obsolete formats
     NSMutableArray *tempTVFormats = [[NSMutableArray alloc] initWithArray:_tvFormatController.arrangedObjects];
     for (TVFormat *tvFormat in tempTVFormats) {
@@ -397,7 +407,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 {
     //End Downloads if Running
     if (runDownloads)
-        [_currentDownload cancelDownload];
+        [_currentDownload cancel];
 
     [self saveAppData];
 }
@@ -1008,7 +1018,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 
         for (Programme *show in tempQueue)
         {
-            if (!show.successful)
+            if (!show.successful && show.pid.length > 0)
             {
                 if (show.processedPID)
                 {
@@ -1107,7 +1117,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 
     runDownloads=NO;
     _runScheduled=NO;
-    [_currentDownload cancelDownload];
+    [_currentDownload cancel];
     _currentDownload.show.status = @"Cancelled";
     if (!runUpdate)
         [_startButton setEnabled:YES];
@@ -1642,7 +1652,12 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     rootObject[@"lastUpdate"] = _lastUpdate;
     NSError *error;
     NSData *archivedData = [NSKeyedArchiver archivedDataWithRootObject:rootObject requiringSecureCoding:NO error:&error];
-    [archivedData writeToFile:filePath atomically:NO];
+
+    if (!error) {
+        [archivedData writeToFile:filePath atomically:NO];
+    } else {
+        DDLogError(@"Error archiving queue and PVR data: %@", error.description);
+    }
 
     filename = @"Formats.automatorqueue";
     filePath = [appSupportFolder stringByAppendingPathComponent:filename];
@@ -1651,8 +1666,14 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 
     rootObject[@"tvFormats"] = _tvFormatController.arrangedObjects;
     rootObject[@"radioFormats"] = _radioFormatController.arrangedObjects;
-    archivedData = [NSKeyedArchiver archivedDataWithRootObject:rootObject requiringSecureCoding:NO error:nil];
-    [archivedData writeToFile:filePath atomically:NO];
+    archivedData = [NSKeyedArchiver archivedDataWithRootObject:rootObject requiringSecureCoding:NO error:&error];
+
+    if (!error) {
+        [archivedData writeToFile:filePath atomically:NO];
+    } else {
+        DDLogError(@"Error archiving format data: %@", error.description);
+    }
+
 
     //Store Preferences in case of crash
     [[NSUserDefaults standardUserDefaults] synchronize];
@@ -1696,7 +1717,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         iTunesApplication *iTunes;
         
         switch (show.type) {
-            case GiA_ProgrammeTypeBBC_Radio:
+            case ProgrammeTypeRadio:
                 if (!show.podcast) {
                     iTunes = [SBApplication applicationWithBundleIdentifier:@"com.apple.Music"];
                     appName = @"Music";

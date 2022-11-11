@@ -94,7 +94,7 @@
                 <binding destination="621" name="contentArray" keyPath="searchResultsArray" id="695"/>
             </connections>
         </arrayController>
-        <arrayController objectClassName="Programme" id="700" userLabel="Queue Controller" customClass="RSRTVArrayController">
+        <arrayController objectClassName="Get_iPlayer_Automator.Programme" id="700" userLabel="Queue Controller" customClass="RSRTVArrayController">
             <declaredKeys>
                 <string>pid</string>
                 <string>showName</string>
@@ -104,7 +104,7 @@
                 <string>successful</string>
                 <string>canAdd</string>
             </declaredKeys>
-            <classReference key="objectClass" className="Programme"/>
+            <classReference key="objectClass" className="Programme" moduleName="Get_iPlayer_Automator" moduleProvider="target"/>
             <connections>
                 <binding destination="621" name="contentArray" keyPath="queueArray" id="712"/>
                 <outlet property="oTableView" destination="469" id="GLB-ew-7sa"/>
@@ -193,7 +193,7 @@
                             <autoresizingMask key="autoresizingMask"/>
                             <clipView key="contentView" drawsBackground="NO" id="LYx-5P-gHI">
                                 <rect key="frame" x="1" y="1" width="309" height="133"/>
-                                <autoresizingMask key="autoresizingMask"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <textView editable="NO" importsGraphics="NO" verticallyResizable="YES" usesFontPanel="YES" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" spellingCorrection="YES" smartInsertDelete="YES" id="7Pi-tT-G0Q" userLabel="Description View">
                                         <rect key="frame" x="0.0" y="0.0" width="309" height="133"/>
@@ -229,7 +229,7 @@
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <clipView key="contentView" drawsBackground="NO" id="jHT-Hr-sFJ">
                                 <rect key="frame" x="1" y="1" width="309" height="133"/>
-                                <autoresizingMask key="autoresizingMask"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="jeg-8F-HB4" id="MRJ-oM-h7R">
                                         <rect key="frame" x="0.0" y="0.0" width="309" height="116"/>
@@ -370,7 +370,7 @@
                     </subviews>
                 </customView>
             </subviews>
-            <point key="canvasLocation" x="625.5" y="669.5"/>
+            <point key="canvasLocation" x="671" y="492"/>
         </customView>
         <arrayController objectClassName="TVFormat" id="1106" userLabel="TV Format Array Controller">
             <declaredKeys>
@@ -751,7 +751,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                         <clipView key="contentView" id="EvP-AM-m82">
                             <rect key="frame" x="1" y="1" width="753" height="130"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView identifier="SearchResults" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" typeSelect="NO" autosaveName="SearchResults" headerView="494" id="493">
                                     <rect key="frame" x="0.0" y="0.0" width="753" height="113"/>
@@ -900,7 +900,7 @@
                         </connections>
                     </button>
                     <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="788">
-                        <rect key="frame" x="342" y="493" width="118" height="17"/>
+                        <rect key="frame" x="341" y="493" width="118" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Search Results" id="789">
                             <font key="font" metaFont="system"/>
@@ -967,7 +967,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" copiesOnScroll="NO" id="qBj-Iv-0lY">
                             <rect key="frame" x="0.0" y="0.0" width="769" height="187"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView identifier="DownloadQueue" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" typeSelect="NO" autosaveName="DownloadQueue" headerView="470" id="469">
                                     <rect key="frame" x="0.0" y="0.0" width="769" height="170"/>

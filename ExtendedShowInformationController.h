@@ -7,7 +7,6 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "Programme.h"
 
 @interface ExtendedShowInformationController : NSObject {
     IBOutlet NSTableView *searchResultsTable;

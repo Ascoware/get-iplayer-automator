@@ -138,7 +138,7 @@ import CocoaLumberjackSwift
 
     @objc open class func getCurrentWebpage(completion: ([Programme]) -> Void) {
         //Get Default Browser
-        guard let browser = UserDefaults.standard.object(forKey: "DefaultBrowser") as? String else {
+        guard let browser = UserDefaults.standard.string(forKey: "DefaultBrowser") else {
             return
         }
 
@@ -236,13 +236,11 @@ import CocoaLumberjackSwift
         task.standardOutput = pipe
         task.standardError = errorPipe
 
-        if var envVariableDictionary = task.environment {
-            envVariableDictionary["HOME"] = NSString("~").expandingTildeInPath
-            envVariableDictionary["PERL_UNICODE"] = "AS"
-            envVariableDictionary["PATH"] = AppController.shared().perlEnvironmentPath
-            task.environment = envVariableDictionary
-        }
-
+        var envVariableDictionary = [String : String]()
+        envVariableDictionary["HOME"] = NSString("~").expandingTildeInPath
+        envVariableDictionary["PERL_UNICODE"] = "AS"
+        envVariableDictionary["PATH"] = AppController.shared().perlEnvironmentPath
+        task.environment = envVariableDictionary
         task.launch()
 
         let data = pipe.fileHandleForReading.readDataToEndOfFile()

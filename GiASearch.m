@@ -8,6 +8,7 @@
 
 #import "GiASearch.h"
 #import "AppController.h"
+#import <Get_iPlayer_Automator-Swift.h>
 
 @implementation GiASearch
 - (instancetype)initWithSearchTerms:(NSString *)searchTerms allowHidingOfDownloadedItems:(BOOL)allowHidingOfDownloadedItems selector:(SEL)selector withTarget:(id)target
@@ -99,16 +100,12 @@
 {
     NSArray *array = [_data componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
     NSMutableArray *resultsArray = [[NSMutableArray alloc] initWithCapacity:array.count];
-    NSDateFormatter *rawDateParser = [[NSDateFormatter alloc]init];
-    NSLocale *enUSPOSIXLocale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
+    NSISO8601DateFormatter *rawDateParser = [[NSISO8601DateFormatter alloc]init];
+    rawDateParser.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
 
     self.task = nil;
     self.pipe = nil;
     self.errorPipe = nil;
-    
-    rawDateParser.locale = enUSPOSIXLocale;
-    rawDateParser.dateFormat = @"yyyy-MM-dd'T'HH:mm:ssZZZZZ";
-    rawDateParser.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
 
     for (NSString *string in array)
     {
