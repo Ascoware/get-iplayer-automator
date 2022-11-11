@@ -8,19 +8,18 @@
 
 #import <Foundation/Foundation.h>
 
-@interface GetiPlayerArguments : NSObject {
-   //Types
-   BOOL runCacheUpdateSinceChange;
-   NSString *currentTypeArgument;
-}
+NS_ASSUME_NONNULL_BEGIN
+
+@interface GetiPlayerArguments : NSObject 
 
 + (GetiPlayerArguments *)sharedController;
 
-- (NSString *)typeArgumentForCacheUpdate:(BOOL)forCacheUpdate andIncludeITV:(BOOL)includeITV;
-- (IBAction)typeChanged:(id)sender;
-- (NSString *)cacheExpiryArgument;
+- (NSString *)typeArgumentForCacheUpdate:(BOOL)forCacheUpdate;
 
-@property (readonly) NSString *profileDirArg;
-@property (readonly) NSString *noWarningArg;
+@property (readonly, nonnull) NSString *cacheExpiryArg;
+@property (readonly, nonnull) NSString *profileDirArg;
+@property (readonly, nonnull) NSString *noWarningArg;
 
 @end
+
+NS_ASSUME_NONNULL_END

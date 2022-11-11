@@ -7,7 +7,7 @@
 //
 
 #import "NPHistoryWindowController.h"
-#import "Get_iPlayer_Automator-Swift.h"
+#import <Get_iPlayer_Automator-Swift.h>
 
 NewProgrammeHistory *sharedHistoryContoller;
 

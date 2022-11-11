@@ -7,6 +7,7 @@
 //
 
 #import "ExtendedShowInformationController.h"
+#import <Get_iPlayer_Automator-Swift.h>
 
 @implementation ExtendedShowInformationController
 - (instancetype)init
@@ -24,7 +25,7 @@
 - (IBAction)showExtendedInformationForSelectedProgramme:(id)sender {
     popover.behavior = NSPopoverBehaviorTransient;
     loadingLabel.stringValue = @"Loading Episode Info";
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"AddToLog" object:self userInfo:@{@"message": @"Retrieving Information"}];
+    DDLogDebug(@"%@: Retrieving information", self.description);
     Programme *programme = searchResultsArrayController.arrangedObjects[searchResultsTable.selectedRow];
     if (programme) {
         
@@ -47,14 +48,14 @@
             [popover showRelativeToRect:[searchResultsTable frameOfCellAtColumn:1 row:searchResultsTable.selectedRow] ofView:(NSView *)searchResultsTable preferredEdge:NSMaxYEdge];
         }
         @catch (NSException *exception) {
-            NSLog(@"%@",exception.description);
-            NSLog(@"%@",searchResultsTable);
+            DDLogError(@"%@",exception.description);
+            DDLogError(@"%@",searchResultsTable);
             return;
         }
         if (!programme.extendedMetadataRetrieved) {
             [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(informationRetrieved:) name:@"ExtendedInfoRetrieved" object:programme];
             [programme retrieveExtendedMetadata];
-            [NSTimer scheduledTimerWithTimeInterval:60 target:self selector:@selector(timeoutTimer:) userInfo:nil repeats:NO];
+            [NSTimer scheduledTimerWithTimeInterval:120 target:self selector:@selector(timeoutTimer:) userInfo:nil repeats:NO];
         }
         else {
             [self informationRetrieved:[NSNotification notificationWithName:@"" object:programme]];
@@ -65,7 +66,7 @@
 {
     Programme *programme = searchResultsArrayController.arrangedObjects[searchResultsTable.selectedRow];
     if (!programme.extendedMetadataRetrieved) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"AddToLog" object:self userInfo:@{@"message":@"Metadata Retrieval Timed Out"}];
+        DDLogInfo(@"%@: Metadata retrieval timed out", self.description);
         [programme cancelMetadataRetrieval];
         loadingLabel.stringValue = @"Programme Information Retrieval Timed Out";
     }
@@ -89,8 +90,8 @@
             else
                 self->numbersField.stringValue = @"";
             
-            if (programme.duration)
-                self->durationField.stringValue = [NSString stringWithFormat:@"Duration: %d minutes",programme.duration.intValue];
+            if (programme.duration > 0)
+                self->durationField.stringValue = [NSString stringWithFormat:@"Duration: %ld minutes",programme.duration];
             else
                 self->durationField.stringValue = @"";
             
@@ -99,13 +100,15 @@
             else
                 self->categoriesField.stringValue = @"";
             
-            if (programme.firstBroadcast)
-                self->firstBroadcastField.stringValue = [NSString stringWithFormat:@"First Broadcast: %@",(programme.firstBroadcast).description];
+            if (programme.firstBroadcast) {
+                NSString *firstBcastString = [NSDateFormatter localizedStringFromDate:programme.firstBroadcast dateStyle:NSDateFormatterMediumStyle timeStyle:NSDateFormatterNoStyle];
+                self->firstBroadcastField.stringValue = [NSString stringWithFormat:@"First Broadcast: %@", firstBcastString];
+            }
             else
                 self->firstBroadcastField.stringValue = @"";
             
-            if (programme.lastBroadcast)
-                self->lastBroadcastField.stringValue = [NSString stringWithFormat:@"Last Broadcast: %@", (programme.lastBroadcast).description];
+            if (programme.lastBroadcastString)
+                self->lastBroadcastField.stringValue = [NSString stringWithFormat:@"Last Broadcast: %@", programme.lastBroadcastString];
             else
                 self->lastBroadcastField.stringValue = @"";
             
@@ -116,20 +119,17 @@
             else
                 self->modeSizeController.content = @[];
             
-            if ([programme typeDescription])
-                self->typeField.stringValue = [NSString stringWithFormat:@"Type: %@",[programme typeDescription]];
-            else
-                self->typeField.stringValue = @"";
-            
+            self->typeField.stringValue = [NSString stringWithFormat:@"Type: %@",[programme typeDescription]];
+
             [self->retrievingInfoIndicator stopAnimation:self];
             self->infoView.alphaValue = 1.0;
             self->loadingView.alphaValue = 0.0;
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"AddToLog" object:self userInfo:@{@"message":@"Info Retrieved"}];
+            DDLogDebug(@"%@: Successfully retrieved metadata", self.description);
         }
         else {
             [self->retrievingInfoIndicator stopAnimation:self];
             self->loadingLabel.stringValue = @"Info could not be retrieved.";
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"AddToLog" object:self userInfo:@{@"message":@"Info could not be retrieved."}];
+            DDLogDebug(@"%@: Failed to retrieve metadata", self.description);
         }
     });
 }

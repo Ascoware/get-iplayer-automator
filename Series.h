@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 
 
-@interface Series : NSObject <NSCoding> {
+@interface Series : NSObject <NSSecureCoding> {
 }
 
 @property (copy) NSString *showName;

@@ -8,91 +8,69 @@
 import Foundation
 import Kanna
 import SwiftyJSON
+import CocoaLumberjackSwift
 
-public class ITVDownload : Download {
+@objc public class ITVDownload : Download {
 
-    var thumbnailURLString: String?
-
-    public override var description: String {
+    override public var description: String {
         return "ITV Download (ID=\(show.pid))"
     }
     
-    @objc public override init() {
+
+    @objc public init(programme: Programme, proxy: HTTPProxy?) {
         super.init()
-        // Nothing to do here.
-    }
-    
-    @objc public init(programme: Programme, formats: [TVFormat]?, proxy: HTTPProxy?, logger: LogController) {
-        super.init(logController: logger)
         self.proxy = proxy
         self.show = programme
         self.defaultsPrefix = "ITV_"
+        self.downloadPath = UserDefaults.standard.string(forKey: "DownloadPath") ?? ""
         self.running = true
-
-        //        guard let formats = formats, formats.count > 0 else {
-        //            print("ERROR: ITV Format List is empty")
-        //            add(toLog: "ERROR: ITV Format List is empty")
-        //            show.reasonForFailure = "ITVFormatListEmpty"
-        //            show.complete = true
-        //            show.successful = false
-        //            show.setValue("Download Failed", forKey:"status")
-        //            NotificationCenter.default.post(name:NSNotification.Name(rawValue: "DownloadFinished"), object:self.show)
-        //            return
-        //        }
         
         setCurrentProgress("Retrieving Programme Metadata... \(show.showName)")
         setPercentage(102)
         programme.status = "Initialising..."
         
-        //        formatList = formats
-        add(toLog: "Downloading \(show.showName)")
-        add(toLog: "INFO: Preparing Request for Auth Info", noTag: true)
+        DDLogInfo("Downloading \(show.showName)")
         
         DispatchQueue.main.async {
             guard let requestURL = URL(string: self.show.url) else {
                 return
             }
 
-            self.currentRequest.cancel()
+            self.currentRequest?.cancel()
             var downloadRequest = URLRequest(url:requestURL)
 
             downloadRequest.timeoutInterval = 10
-            self.session = URLSession.shared
+            var session = URLSession.shared
 
             if let proxy = self.proxy {
                 // Create an NSURLSessionConfiguration that uses the proxy
-                var proxyDict: [String: Any] = [kCFProxyTypeKey as String : kCFProxyTypeHTTP as String,
-                                                kCFNetworkProxiesHTTPEnable as String : true,
-                                                kCFNetworkProxiesHTTPProxy as String : proxy.host,
-                                                kCFStreamPropertyHTTPProxyPort as String : proxy.port,
-                                                kCFNetworkProxiesHTTPSEnable as String : true,
-                                                kCFNetworkProxiesHTTPSProxy as String : proxy.host,
-                                                kCFStreamPropertyHTTPSProxyPort as String : proxy.port]
+                var proxyDict: [AnyHashable : Any] = [kCFNetworkProxiesHTTPEnable : true,
+                                                       kCFNetworkProxiesHTTPProxy : proxy.host,
+                                                        kCFNetworkProxiesHTTPPort : proxy.port,
+                                                     kCFNetworkProxiesHTTPSEnable : true,
+                                                      kCFNetworkProxiesHTTPSProxy : proxy.host,
+                                                       kCFNetworkProxiesHTTPSPort : proxy.port]
 
                 if let user = proxy.user, let password = proxy.password {
-                    proxyDict[kCFProxyUsernameKey as String] = user
-                    proxyDict[kCFProxyPasswordKey as String] = password
+                    proxyDict[kCFProxyUsernameKey] = user
+                    proxyDict[kCFProxyPasswordKey] = password
                 }
 
                 let configuration = URLSessionConfiguration.ephemeral
                 configuration.connectionProxyDictionary = proxyDict
 
                 // Create a NSURLSession with our proxy aware configuration
-                self.session = URLSession(configuration:configuration, delegate:nil, delegateQueue:OperationQueue.main)
+                session = URLSession(configuration:configuration, delegate:nil, delegateQueue:OperationQueue.main)
             }
 
-            let message = "INFO: Requesting Metadata."
-            print(message)
-            if (self.verbose) {
-                self.add(toLog:message, noTag:true)
-            }
+            DDLogVerbose("ITV: Requesting Metadata")
 
-            self.currentRequest = self.session.dataTask(with: downloadRequest) { (data, response, error) in
+            self.currentRequest = session.dataTask(with: downloadRequest) { (data, response, error) in
                 if let httpResponse = response as? HTTPURLResponse {
                     self.metaRequestFinished(response: httpResponse, data: data, error: error)
                 }
             }
-            self.currentRequest.resume()
+            self.currentRequest?.resume()
         }
     }
 
@@ -116,20 +94,13 @@ public class ITVDownload : Download {
             
             self.show.successful = false
             self.show.complete = true
-            print(message)
-            add(toLog: message)
+            DDLogError(message)
             NotificationCenter.default.post(name: NSNotification.Name(rawValue:"DownloadFinished"), object:self.show)
-            add(toLog:"Download Failed", noTag:false)
             return
         }
         
         
-        let message = "DEBUG: Metadata response status code: \(response.statusCode)"
-        print(message)
-        
-        if verbose {
-            add(toLog: message, noTag: true)
-        }
+        DDLogDebug("DEBUG: Metadata response status code: \(response.statusCode)")
 
         let showMetadata = ITVMetadataExtractor.getShowMetadata(htmlPageContent: responseString)
         self.show.desc = showMetadata.desc
@@ -138,7 +109,7 @@ public class ITVDownload : Download {
         self.show.episodeName = showMetadata.episodeName
         self.show.thumbnailURLString = showMetadata.thumbnailURLString
 
-        add(toLog:"INFO: Metadata processed.", noTag:true)
+        DDLogInfo("INFO: Metadata processed.")
         
         //Create Download Path
         self.createDownloadPath()
@@ -165,9 +136,7 @@ public class ITVDownload : Download {
         let lines = s.components(separatedBy: .newlines)
 
         for line in lines {
-            if self.verbose && !line.isEmpty {
-                self.logger.add(toLog: line)
-            }
+            DDLogInfo(line)
 
             if line.contains("Writing video subtitles") {
                 //ITV Download (ID=2a4910a0046): [info] Writing video subtitles to: /Users/skovatch/Movies/TV Shows/LA Story/LA Story - Just Friends - 2a4910a0046.en.vtt
@@ -175,9 +144,7 @@ public class ITVDownload : Download {
                 scanner.scanUpToString("to: ")
                 scanner.scanString("to: ")
                 subtitlePath = scanner.scanUpToString("\n") ?? ""
-                if self.verbose {
-                    self.add(toLog: "Subtitle path = \(subtitlePath)")
-                }
+                DDLogDebug("Subtitle path = \(subtitlePath)")
             }
 
             if line.contains("Destination: ") {
@@ -185,9 +152,7 @@ public class ITVDownload : Download {
                 scanner.scanUpToString("Destination: ")
                 scanner.scanString("Destination: ")
                 self.show.path = scanner.scanUpToString("\n") ?? ""
-                if self.verbose {
-                    self.add(toLog: "Downloading to \(self.show.path)")
-                }
+                DDLogDebug("Downloading to \(self.show.path)")
             }
 
             // youtube-dl native download generates a percentage complete and ETA remaining
@@ -227,7 +192,7 @@ public class ITVDownload : Download {
     }
     
     public func youtubeDLTaskFinished(_ proc: Process) {
-        self.add(toLog: "youtube-dl finished downloading")
+        DDLogInfo("yt-dlp finished downloading")
 
         self.task = nil
         self.pipe = nil
@@ -245,7 +210,6 @@ public class ITVDownload : Download {
         } else {
             self.show.complete = true
             self.show.successful = false
-            self.show.status = "Download Failed"
             
             // Something went wrong inside youtube-dl.
             NotificationCenter.default.removeObserver(self)
@@ -254,29 +218,9 @@ public class ITVDownload : Download {
     }
     
     @objc public func youtubeDLFinishedDownload() {
-        if let tagOption = UserDefaults.standard.object(forKey: "TagShows") as? Bool, tagOption {
-            self.show.status = "Downloading Thumbnail..."
-            setPercentage(102)
-            setCurrentProgress("Downloading Thumbnail... -- \(show.showName)")
-            if let thumbnailURLString = thumbnailURLString {
-                add(toLog: "INFO: Downloading thumbnail", noTag: true)
-                thumbnailPath = URL(fileURLWithPath: show.path).appendingPathExtension("jpg").path
-                
-                if let thumbnailURL = URL(string: thumbnailURLString) {
-                    let downloadTask = session.downloadTask(with: thumbnailURL) { (location, _, _) in
-                        self.thumbnailRequestFinished(location)
-                    }
-                    downloadTask.resume()
-                } else {
-                    self.add(toLog: "Bad URL for thumbnail")
-                    self.thumbnailRequestFinished(nil)
-                }
-            } else {
-                self.add(toLog: "No thumbnail URL, skipping")
-                thumbnailRequestFinished(nil)
-            }
-        }
-        else {
+        if UserDefaults.standard.bool(forKey: "TagShows") {
+            tagDownloadWithMetadata()
+        } else {
             atomicParsleyFinished(nil)
         }
     }
@@ -295,25 +239,37 @@ public class ITVDownload : Download {
         task?.standardError = errorPipe
         let fh = pipe?.fileHandleForReading
         let errorFh = errorPipe?.fileHandleForReading
-        
+
+        guard let youtubeDLFolder = Bundle.main.path(forResource: "yt-dlp_macos", ofType:nil),
+              let cacertFile = Bundle.main.url(forResource: "cacert", withExtension: "pem") else {
+            return
+        }
+
+        let youtubeDLBinary = youtubeDLFolder + "/yt-dlp_macos"
         var args: [String] = [show.url,
+                              "--user-agent",
+                              "Mozilla/5.0",
                               "-f",
                               "mp4/best",
                               "-o",
                               downloadPath]
         
-        if let downloadSubs = UserDefaults.standard.object(forKey: "DownloadSubtitles") as? Bool, downloadSubs {
+        if UserDefaults.standard.bool(forKey: "DownloadSubtitles") {
             args.append("--write-sub")
             
-            if let embedSubs = UserDefaults.standard.object(forKey: "EmbedSubtitles") as? Bool, embedSubs {
+            if UserDefaults.standard.bool(forKey: "EmbedSubtitles") {
                 args.append("--embed-subs")
             } else {
                 args.append("-k")
             }
         }
 
-        if verbose {
+        if UserDefaults.standard.bool(forKey: "Verbose") {
             args.append("--verbose")
+        }
+
+        if UserDefaults.standard.bool(forKey: "TagShows") {
+            args.append("--embed-thumbnail")
         }
         
         if let proxyHost = self.proxy?.host {
@@ -333,32 +289,66 @@ public class ITVDownload : Download {
             args.append(proxyString)
         }
         
-        if self.verbose {
-            self.logDebugMessage("DEBUG: youtube-dl args:\(args)", noTag: true)
-        }
-        
-        if let executableURL = Bundle.main.url(forResource: "youtube-dl", withExtension:nil),
-           let binaryPath = Bundle.main.executableURL?.deletingLastPathComponent().path,
-           let resourcePath = Bundle.main.resourcePath
-        {
-            task?.launchPath = executableURL.path
-            task?.arguments = args
-            let extraBinaryPath = AppController.shared().extraBinariesPath
-            var envVariableDictionary = [String : String]()
-            envVariableDictionary["PATH"] = "\(binaryPath):\(extraBinaryPath):/usr/bin"
-            envVariableDictionary["PYTHONPATH"] = "\(resourcePath)"
-            task?.environment = envVariableDictionary
-            self.logDebugMessage("DEBUG: youtube-dl environment: \(envVariableDictionary)", noTag: true)
-            
-            NotificationCenter.default.addObserver(self, selector: #selector(self.youtubeDLProgress), name: FileHandle.readCompletionNotification, object: fh)
-            NotificationCenter.default.addObserver(self, selector: #selector(self.youtubeDLProgress), name: FileHandle.readCompletionNotification, object: errorFh)
-            
-            task?.terminationHandler = youtubeDLTaskFinished
-            
-            task?.launch()
-            fh?.readInBackgroundAndNotify()
-            errorFh?.readInBackgroundAndNotify()
-        }
+        DDLogVerbose("DEBUG: youtube-dl args:\(args)")
+
+        task?.launchPath = youtubeDLBinary
+        task?.arguments = args
+        let extraBinaryPath = AppController.shared().extraBinariesPath
+        var envVariableDictionary = [String : String]()
+        envVariableDictionary["PATH"] = "\(youtubeDLFolder):\(extraBinaryPath)"
+        envVariableDictionary["SSL_CERT_FILE"] = cacertFile.path
+        task?.environment = envVariableDictionary
+        DDLogVerbose("DEBUG: youtube-dl environment: \(envVariableDictionary)")
+
+        NotificationCenter.default.addObserver(self, selector: #selector(self.youtubeDLProgress), name: FileHandle.readCompletionNotification, object: fh)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.youtubeDLProgress), name: FileHandle.readCompletionNotification, object: errorFh)
+
+        task?.terminationHandler = youtubeDLTaskFinished
+
+        task?.launch()
+        fh?.readInBackgroundAndNotify()
+        errorFh?.readInBackgroundAndNotify()
     }
+
+    func createDownloadPath() {
+        var fileName = show.showName
+
+        // XBMC naming is always used on ITV shows to ensure unique names.
+        if !show.seriesName.isEmpty {
+            fileName = show.seriesName;
+        }
+
+        if show.season == 0 {
+            show.season = 1
+            if show.episode == 0 {
+                show.episode = 1
+            }
+        }
+        let format = !show.episodeName.isEmpty ? "%@.s%02lde%02ld.%@" : "%@.s%02lde%02ld"
+        fileName = String(format: format, fileName, show.season, show.episode, show.episodeName)
+
+        //Create Download Path
+        var dirName = show.seriesName
+
+        if dirName.isEmpty {
+            dirName = show.showName
+        }
+
+        downloadPath = UserDefaults.standard.string(forKey:"DownloadPath") ?? ""
+        dirName = dirName.replacingOccurrences(of: "/", with: "-").replacingOccurrences(of: ":", with: " -")
+        downloadPath = (downloadPath as NSString).appendingPathComponent(dirName)
+
+        var filepart = String(format:"%@.%%(ext)s",fileName).replacingOccurrences(of: "/", with: "-").replacingOccurrences(of: ":", with: " -")
+
+        do {
+            try FileManager.default.createDirectory(atPath: downloadPath, withIntermediateDirectories: true)
+            let dateRegex = try NSRegularExpression(pattern: "(\\d{2})[-_](\\d{2})[-_](\\d{4})")
+            filepart = dateRegex.stringByReplacingMatches(in: filepart, range: NSRange(location: 0, length: filepart.count), withTemplate: "$3-$2-$1")
+        } catch {
+            DDLogError("Failed to create download directory! ")
+        }
+        downloadPath = (downloadPath as NSString).appendingPathComponent(filepart)
+    }
+
 }
 

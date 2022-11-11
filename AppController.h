@@ -9,10 +9,7 @@
 #import <Cocoa/Cocoa.h>
 #import <Sparkle/Sparkle.h>
 #import <IOKit/pwr_mgt/IOPMLib.h>
-#import "BBCDownload.h"
 #import "Series.h"
-#import "Get iPlayer Automator-Bridging-Header.h"
-#import "Download.h"
 #import "NilToStringTransformer.h"
 #import "EmptyToStringTransformer.h"
 #import "LogController.h"
@@ -22,16 +19,19 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class Download;
+@class Programme;
+
 extern BOOL runDownloads;
 extern NSDictionary *tvFormats;
 extern NSDictionary *radioFormats;
 
-@interface AppController : NSObject <SUUpdaterDelegate, NSApplicationDelegate>
+@interface AppController : NSObject <SPUUpdaterDelegate, NSApplicationDelegate>
 //General
-@property (readonly) NSString *getiPlayerPath;
-@property (readonly) NSString *perlBinaryPath;
-@property (readonly) NSString *perlEnvironmentPath;
-@property (readonly) NSString *extraBinariesPath;
+@property (readonly, nonnull) NSString *getiPlayerPath;
+@property (readonly, nonnull) NSString *perlBinaryPath;
+@property (readonly, nonnull) NSString *perlEnvironmentPath;
+@property (readonly, nonnull) NSString *extraBinariesPath;
 @property IBOutlet NSWindow *mainWindow;
 @property IBOutlet NSApplication *application;
 @property IBOutlet NSWindow *historyWindow;
@@ -66,7 +66,7 @@ extern NSDictionary *radioFormats;
 //Queue
 @property IBOutlet NSButton *addToQueue;
 @property IBOutlet NSArrayController *queueController;
-@property NSMutableArray *queueArray;
+@property IBOutlet NSMutableArray *queueArray;
 @property IBOutlet NSTableView *queueTableView;
 @property  IBOutlet NSToolbarItem *addSeriesLinkToQueueButton;
 
@@ -85,13 +85,12 @@ extern NSDictionary *radioFormats;
 @property NSMutableArray *itvFormatList;
 @property IBOutlet NSArrayController *tvFormatController;
 @property IBOutlet NSArrayController *radioFormatController;
-@property IBOutlet NSArrayController *itvFormatController;
 @property IBOutlet NSPanel *prefsPanel;
-
+@property IBOutlet NSUserDefaultsController *preferences;
 //Scheduling a Start
 @property IBOutlet NSPanel *scheduleWindow;
 @property IBOutlet NSDatePicker *datePicker;
-@property NSTimer *interfaceTimer;
+@property (nullable) NSTimer *interfaceTimer;
 @property (nullable) NSTimer *scheduleTimer;
 @property BOOL runScheduled;
 
@@ -126,10 +125,7 @@ extern NSDictionary *radioFormats;
 //ITV Cache
 @property (assign) BOOL updatingITVIndex;
 @property (assign) BOOL updatingBBCIndex;
-@property (assign) BOOL forceITVUpdateInProgress;
-@property IBOutlet NSMenuItem          *showNewProgrammesMenuItem;
-@property IBOutlet NSTextField         *itvProgressText;
-@property IBOutlet NSMenuItem          *forceITVUpdateMenuItem;
+@property IBOutlet NSMenuItem *showNewProgrammesMenuItem;
 
 //New Programmes History
 @property NSWindow *newestProgrammesWindow;
