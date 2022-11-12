@@ -31,7 +31,6 @@
 		7FCF889624DC673C007B155A /* DownloadQueueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FCF888724DC673C007B155A /* DownloadQueueView.swift */; };
 		7FCF889724DC673C007B155A /* LogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FCF888824DC673C007B155A /* LogView.swift */; };
 		7FCF889824DC673C007B155A /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FCF888924DC673C007B155A /* MainView.swift */; };
-		7FCF889924DC673C007B155A /* LogController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FCF888A24DC673C007B155A /* LogController.swift */; };
 		7FCF889B24DC67CC007B155A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7FCF889A24DC67CC007B155A /* Assets.xcassets */; };
 		7FCF889D24DC6841007B155A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FCF889C24DC6840007B155A /* ContentView.swift */; };
 		7FCF889F24DC684C007B155A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FCF889E24DC684C007B155A /* AppDelegate.swift */; };
@@ -48,9 +47,6 @@
 		7FCF88C424DDD71F007B155A /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FCF88C324DDD71F007B155A /* main.swift */; };
 		7FCF88C824DDD77A007B155A /* GIASearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FCF88BB24DDBC50007B155A /* GIASearch.swift */; };
 		7FCF88C924DDD780007B155A /* GIPArguments.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FCF88B424DDB622007B155A /* GIPArguments.swift */; };
-		7FCF88CA24DDD7EF007B155A /* LogController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FCF888A24DC673C007B155A /* LogController.swift */; };
-		7FCF88CD24DDD813007B155A /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FCF88CC24DDD813007B155A /* Logging.swift */; };
-		7FCF88CE24DDD817007B155A /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FCF88CC24DDD813007B155A /* Logging.swift */; };
 		7FCF88D024DDD879007B155A /* TestLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FCF88CF24DDD879007B155A /* TestLogger.swift */; };
 		7FCF88D124DDD931007B155A /* Programme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FCF887F24DC673C007B155A /* Programme.swift */; };
 		7FCF88D224DDD937007B155A /* Series.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FCF887B24DC673C007B155A /* Series.swift */; };
@@ -67,6 +63,13 @@
 		7FCF88E724DF719C007B155A /* PreferencesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FCF88E524DF719C007B155A /* PreferencesView.swift */; };
 		7FCF88E924DF71B2007B155A /* PreferencePanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FCF88E824DF71B2007B155A /* PreferencePanelView.swift */; };
 		7FCF88EA24DF71B2007B155A /* PreferencePanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FCF88E824DF71B2007B155A /* PreferencePanelView.swift */; };
+		7FF6E474291EDEB1000927BE /* LogController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FF6E473291EDEB1000927BE /* LogController.swift */; };
+		7FF6E475291F2837000927BE /* CocoaLumberjackSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7FF6E46C291ED788000927BE /* CocoaLumberjackSwift.framework */; };
+		7FF6E476291F2837000927BE /* CocoaLumberjackSwift.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7FF6E46C291ED788000927BE /* CocoaLumberjackSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		7FF6E477291F2839000927BE /* CocoaLumberjack.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7FF6E46B291ED788000927BE /* CocoaLumberjack.framework */; };
+		7FF6E478291F2839000927BE /* CocoaLumberjack.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7FF6E46B291ED788000927BE /* CocoaLumberjack.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		7FF6E479291F283D000927BE /* SwiftyJSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7FF6E46D291ED788000927BE /* SwiftyJSON.framework */; };
+		7FF6E47A291F283D000927BE /* SwiftyJSON.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7FF6E46D291ED788000927BE /* SwiftyJSON.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -78,6 +81,9 @@
 			files = (
 				7FCF88B224DC6C83007B155A /* Kanna.framework in CopyFiles */,
 				7FCF88B324DC6C83007B155A /* Sparkle.framework in CopyFiles */,
+				7FF6E478291F2839000927BE /* CocoaLumberjack.framework in CopyFiles */,
+				7FF6E476291F2837000927BE /* CocoaLumberjackSwift.framework in CopyFiles */,
+				7FF6E47A291F283D000927BE /* SwiftyJSON.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -104,7 +110,6 @@
 		7F77AE712647296F00CC524F /* ITVMetadataExtractor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ITVMetadataExtractor.swift; sourceTree = "<group>"; };
 		7F77AE7726475C4D00CC524F /* FileManager+DirectoryLocations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "FileManager+DirectoryLocations.swift"; sourceTree = "<group>"; };
 		7FA4E7DA24E242B500A4B5E5 /* GetCurrentWebpage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GetCurrentWebpage.swift; sourceTree = "<group>"; };
-		7FA4E7DC24E2430200A4B5E5 /* GetExtendedBBCMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetExtendedBBCMetadata.swift; sourceTree = "<group>"; };
 		7FCF887B24DC673C007B155A /* Series.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Series.swift; sourceTree = "<group>"; };
 		7FCF887C24DC673C007B155A /* GetiPlayerTask.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GetiPlayerTask.swift; sourceTree = "<group>"; };
 		7FCF887D24DC673C007B155A /* RadioFormat.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RadioFormat.swift; sourceTree = "<group>"; };
@@ -118,7 +123,6 @@
 		7FCF888724DC673C007B155A /* DownloadQueueView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DownloadQueueView.swift; sourceTree = "<group>"; };
 		7FCF888824DC673C007B155A /* LogView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogView.swift; sourceTree = "<group>"; };
 		7FCF888924DC673C007B155A /* MainView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
-		7FCF888A24DC673C007B155A /* LogController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogController.swift; sourceTree = "<group>"; };
 		7FCF889A24DC67CC007B155A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7FCF889C24DC6840007B155A /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		7FCF889E24DC684C007B155A /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -133,7 +137,6 @@
 		7FCF88BB24DDBC50007B155A /* GIASearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GIASearch.swift; sourceTree = "<group>"; };
 		7FCF88C124DDD71F007B155A /* testSearch */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testSearch; sourceTree = BUILT_PRODUCTS_DIR; };
 		7FCF88C324DDD71F007B155A /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
-		7FCF88CC24DDD813007B155A /* Logging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
 		7FCF88CF24DDD879007B155A /* TestLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestLogger.swift; sourceTree = "<group>"; };
 		7FCF88D324DDDDF8007B155A /* testSearch.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = testSearch.entitlements; sourceTree = "<group>"; };
 		7FCF88D424DDDEA8007B155A /* testSearch.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = testSearch.entitlements; sourceTree = "<group>"; };
@@ -145,6 +148,11 @@
 		7FCF88E224DF4AC7007B155A /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
 		7FCF88E524DF719C007B155A /* PreferencesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesView.swift; sourceTree = "<group>"; };
 		7FCF88E824DF71B2007B155A /* PreferencePanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencePanelView.swift; sourceTree = "<group>"; };
+		7FF6E46B291ED788000927BE /* CocoaLumberjack.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CocoaLumberjack.framework; path = ../Carthage/Build/Mac/CocoaLumberjack.framework; sourceTree = "<group>"; };
+		7FF6E46C291ED788000927BE /* CocoaLumberjackSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CocoaLumberjackSwift.framework; path = ../Carthage/Build/Mac/CocoaLumberjackSwift.framework; sourceTree = "<group>"; };
+		7FF6E46D291ED788000927BE /* SwiftyJSON.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftyJSON.framework; path = ../Carthage/Build/Mac/SwiftyJSON.framework; sourceTree = "<group>"; };
+		7FF6E471291EDCD9000927BE /* NSScanner+Swift.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSScanner+Swift.swift"; sourceTree = "<group>"; };
+		7FF6E473291EDEB1000927BE /* LogController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -154,6 +162,9 @@
 			files = (
 				7FCF88AF24DC6BB5007B155A /* Sparkle.framework in Frameworks */,
 				7FCF88B024DC6BB5007B155A /* Kanna.framework in Frameworks */,
+				7FF6E477291F2839000927BE /* CocoaLumberjack.framework in Frameworks */,
+				7FF6E475291F2837000927BE /* CocoaLumberjackSwift.framework in Frameworks */,
+				7FF6E479291F283D000927BE /* SwiftyJSON.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -210,7 +221,6 @@
 				7FCF887D24DC673C007B155A /* RadioFormat.swift */,
 				7FCF887E24DC673C007B155A /* TVFormat.swift */,
 				7FCF887F24DC673C007B155A /* Programme.swift */,
-				7FA4E7DC24E2430200A4B5E5 /* GetExtendedBBCMetadata.swift */,
 				7FCF888024DC673C007B155A /* ITVProgramme.swift */,
 				7FCF888124DC673C007B155A /* ITVPrograms.swift */,
 				7FCF888224DC673C007B155A /* ProgramCache.swift */,
@@ -227,9 +237,9 @@
 				7FCF888424DC673C007B155A /* SearchView.swift */,
 				7FCF888524DC673C007B155A /* DownloadQueue.swift */,
 				7FCF888724DC673C007B155A /* DownloadQueueView.swift */,
+				7FF6E473291EDEB1000927BE /* LogController.swift */,
 				7FCF888824DC673C007B155A /* LogView.swift */,
 				7FCF888924DC673C007B155A /* MainView.swift */,
-				7FCF888A24DC673C007B155A /* LogController.swift */,
 				7FCF88D824DF1563007B155A /* DownloadHistoryView.swift */,
 				7FCF88DA24DF1B2F007B155A /* DownloadHistoryRow.swift */,
 				7FCF88E524DF719C007B155A /* PreferencesView.swift */,
@@ -249,6 +259,9 @@
 		7FCF88AC24DC6BB5007B155A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				7FF6E46B291ED788000927BE /* CocoaLumberjack.framework */,
+				7FF6E46C291ED788000927BE /* CocoaLumberjackSwift.framework */,
+				7FF6E46D291ED788000927BE /* SwiftyJSON.framework */,
 				7FCF88AE24DC6BB5007B155A /* Kanna.framework */,
 				7FCF88AD24DC6BB5007B155A /* Sparkle.framework */,
 			);
@@ -263,9 +276,9 @@
 				7F77AE712647296F00CC524F /* ITVMetadataExtractor.swift */,
 				7FCF88B424DDB622007B155A /* GIPArguments.swift */,
 				7FCF88BB24DDBC50007B155A /* GIASearch.swift */,
-				7FCF88CC24DDD813007B155A /* Logging.swift */,
 				7FCF88DF24DF222A007B155A /* Data.swift */,
 				7FCF88E224DF4AC7007B155A /* Preferences.swift */,
+				7FF6E471291EDCD9000927BE /* NSScanner+Swift.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -334,7 +347,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1160;
-				LastUpgradeCheck = 1250;
+				LastUpgradeCheck = 1410;
 				ORGANIZATIONNAME = "Ascoware LLC";
 				TargetAttributes = {
 					7F19DC4523769621003DD146 = {
@@ -394,9 +407,7 @@
 				7F77AE6C264711B200CC524F /* Safari.swift in Sources */,
 				7FCF888C24DC673C007B155A /* GetiPlayerTask.swift in Sources */,
 				7FCF88E924DF71B2007B155A /* PreferencePanelView.swift in Sources */,
-				7FCF88CD24DDD813007B155A /* Logging.swift in Sources */,
 				7FCF888B24DC673C007B155A /* Series.swift in Sources */,
-				7FCF889924DC673C007B155A /* LogController.swift in Sources */,
 				7FCF889424DC673C007B155A /* DownloadQueue.swift in Sources */,
 				7FCF88B524DDB622007B155A /* GIPArguments.swift in Sources */,
 				7F77AE7826475C4D00CC524F /* FileManager+DirectoryLocations.swift in Sources */,
@@ -417,6 +428,7 @@
 				7F77AE6B264711B200CC524F /* SafariScripting.swift in Sources */,
 				7FCF88D624DE20AE007B155A /* DownloadHistory.swift in Sources */,
 				7FCF888D24DC673C007B155A /* RadioFormat.swift in Sources */,
+				7FF6E474291EDEB1000927BE /* LogController.swift in Sources */,
 				7F77AE6F264711ED00CC524F /* SBApplicationProtocol.swift in Sources */,
 				7FCF889724DC673C007B155A /* LogView.swift in Sources */,
 				7FCF889324DC673C007B155A /* SearchView.swift in Sources */,
@@ -433,11 +445,9 @@
 				7FCF88D124DDD931007B155A /* Programme.swift in Sources */,
 				7FCF88E424DF4AC7007B155A /* Preferences.swift in Sources */,
 				7FCF88E724DF719C007B155A /* PreferencesView.swift in Sources */,
-				7FCF88CA24DDD7EF007B155A /* LogController.swift in Sources */,
 				7F77AE7926475C4D00CC524F /* FileManager+DirectoryLocations.swift in Sources */,
 				7FCF88D024DDD879007B155A /* TestLogger.swift in Sources */,
 				7FCF88E124DF222A007B155A /* Data.swift in Sources */,
-				7FCF88CE24DDD817007B155A /* Logging.swift in Sources */,
 				7FCF88C424DDD71F007B155A /* main.swift in Sources */,
 				7FCF88D224DDD937007B155A /* Series.swift in Sources */,
 				7FCF88C824DDD77A007B155A /* GIASearch.swift in Sources */,
@@ -493,6 +503,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -555,6 +566,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -584,6 +596,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Preview Content\"";
 				DEVELOPMENT_TEAM = L8BMU8WLEC;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -608,6 +621,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Preview Content\"";
 				DEVELOPMENT_TEAM = L8BMU8WLEC;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -630,8 +644,10 @@
 				CODE_SIGN_ENTITLEMENTS = "./Search Testing/testSearch.entitlements";
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = NO;
+				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.ascoware.GIP.testSearch;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -645,8 +661,10 @@
 				CODE_SIGN_ENTITLEMENTS = "./Search Testing/testSearch.entitlements";
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = NO;
+				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.ascoware.GIP.testSearch;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

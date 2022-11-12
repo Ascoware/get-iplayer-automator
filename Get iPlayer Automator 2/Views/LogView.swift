@@ -13,10 +13,7 @@ struct LogView: View {
     var body: some View {
         ScrollView {
             VStack {
-                ForEach(controller.log, id: \.self) { line in
-                    Text(line)
-                        .font(.custom("Monaco", size: 12))
-                }
+                Text(controller.log.textStorage?.string ?? "")                        .font(.custom("Monaco", size: 12))                
             }
         }
     }

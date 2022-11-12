@@ -7,145 +7,123 @@
 import Foundation
 import Kanna
 import SwiftyJSON
-import AppKit
+import CocoaLumberjackSwift
 
 public class ITVPrograms: NSObject, URLSessionDelegate, URLSessionTaskDelegate, URLSessionDataDelegate {
     var myQueueSize: Int = 0
     var myQueueLeft: Int = 0
     var mySession: URLSession?
-
-    var programmes = [Programme]()
+    var operationQueue: OperationQueue = OperationQueue()
     var episodes = [Programme]()
     var getITVShowRunning = false
     let currentTime = Date()
-    let logger: Logging
 
     func supportPath(_ fileName: String) -> String
     {
-        let applicationSupportDir = FileManager.default.applicationSupportDirectory
-        return applicationSupportDir.appendingPathComponent(fileName).absoluteString
+        let applicationSupportDir = FileManager.default.applicationSupportDirectory.absoluteString
+        return applicationSupportDir.appending("/").appending(fileName)
     }
 
-    public init(logger: Logging) {
-        self.logger = logger
-        getITVShowRunning = false
-    }
-
-    public func itvUpdate() {
-        /* cant run if we are already running */
-        if getITVShowRunning == true {
-            return
-        }
-        logger.addToLog("GetITVShows: ITV Cache Update Starting ")
-        getITVShowRunning = true
+    @objc public func itvUpdate() {
+        DDLogInfo("ITV Cache Update Starting")
         myQueueSize = 0
         episodes.removeAll()
-        programmes.removeAll()
 
         /* Create the NUSRLSession */
-        let defaultConfigObject = URLSessionConfiguration.default
-        let cachePath: String = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("/itvloader.cache").path
-        let myCache = URLCache(memoryCapacity: 16384, diskCapacity: 268435456, diskPath: cachePath)
-        defaultConfigObject.urlCache = myCache
+        let defaultConfigObject = URLSessionConfiguration.ephemeral
         defaultConfigObject.requestCachePolicy = .useProtocolCachePolicy
         defaultConfigObject.timeoutIntervalForResource = 30
         defaultConfigObject.timeoutIntervalForRequest = 30
-        mySession = URLSession(configuration: defaultConfigObject, delegate: self, delegateQueue: OperationQueue.main)
+        mySession = URLSession(configuration: defaultConfigObject, delegate: self, delegateQueue: nil)
 
         /* Load in all shows for itv.com */
         if let aString = URL(string: "https://www.itv.com/hub/shows") {
             mySession?.dataTask(with: aString) {(_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void in
                 if let error = error {
-                    let errorMessage = "GetITVListings (Error: \(error.localizedDescription)): Unable to retreive show listings from ITV"
-                    self.logger.addToLog(errorMessage)
+                    let errorMessage = "GetITVListings (Error: \(error.localizedDescription)): Unable to retrieve show listings from ITV"
+                    DDLogError(errorMessage)
                 }
                 guard let data = data else {
                     self.endOfRun()
                     return
                 }
 
-                if self.createProgrammes(data: data) {
-                    self.myQueueSize = self.programmes.count
-                    self.myQueueLeft = self.myQueueSize
+                let programmes = self.createProgrammes(data: data)
+                self.myQueueSize = programmes.count
+                self.myQueueLeft = self.myQueueSize
+                DDLogInfo("INFO: Found \(programmes.count) ITV programmes")
 
-                    if self.myQueueSize >= 0 {
-                        for todayProgramme in self.programmes {
-                            self.requestEpisodes(program: todayProgramme)
-                        }
-                    } else {
-                        self.writeEpisodeCacheFile()
+                if self.myQueueSize >= 0 {
+                    for todayProgramme in programmes {
+                        self.requestEpisodes(program: todayProgramme)
                     }
-
                 } else {
-                    self.endOfRun()
+                    DDLogWarn("No programmes found on www.itv.com/hub/shows")
+                    self.showAlert(message: "No programmes were found on www.itv.com/hub/shows",
+                                   informative: "Try again later. If the problem persists please file a bug.")
+                    self.writeEpisodeCacheFile()
                 }
+
             }.resume()
+        } else {
+            self.endOfRun()
         }
     }
 
-    func createProgrammes(data: Data) -> Bool {
+    func createProgrammes(data: Data) -> [Programme] {
         /* Scan itv.com/shows to create full listing of programmes (not episodes) that are available today */
-        programmes.removeAll()
+        var foundPrograms = [Programme]()
 
-        if let showsPage = try? HTML(html: data, encoding: .utf8) {
-            let shows = showsPage.xpath("//a[@class='complex-link']")
+        guard let showsPage = try? HTML(html: data, encoding: .utf8) else {
+            return foundPrograms
+        }
 
-            for show in shows {
-                guard let showPage = show.at_xpath("@href")?.text,
-                      let showPageURL = URL(string: showPage) else {
-                    continue
-                }
+        let shows = showsPage.xpath("//li[@class='cp_grid__item cp_tile-grid__item']")
 
-                let showName: String?
-                let numberEpisodes: Int
-                let productionID: String?
-                let showPageURLString: String?
+        for show in shows {
+            let showPage = show.at_xpath("//a")
+            guard let showURL = showPage?["href"],
+                  let showPageURL = URL(string: "https:" + showURL) else {
+                continue
+            }
 
-                showPageURLString = showPage
-                productionID = showPageURL.lastPathComponent
+            let numberEpisodes: Int
+            let productionID = showPageURL.lastPathComponent
+            let showName = showPage?["aria-label"]?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
 
-                showName = show.at_xpath(".//h3[@class='tout__title complex-link__target theme__target']")?.content?.trimmingCharacters(in: .whitespacesAndNewlines)
+            if let numberEpisodesString = show.at_xpath(".//span[@class='cp_basic-tile__episode-count']")?.content?.trimmingCharacters(in: .whitespacesAndNewlines) {
+                numberEpisodes = Int(numberEpisodesString) ?? 0
+            } else {
+                numberEpisodes = 0
+            }
 
-                if let numberEpisodesString = show.at_xpath(".//p[@class='tout__meta theme__meta']")?.content?.trimmingCharacters(in: .whitespacesAndNewlines) {
-                    let scanner = Scanner(string: numberEpisodesString)
-                    numberEpisodes = scanner.scanInt() ?? 0
-                } else {
-                    numberEpisodes = 0
-                }
+            if numberEpisodes > 0 {
+                // Check for duplicate show listings. This is needed because ITV lists
+                // shows with 'The' as the first word twice.
+                let existingProgram = foundPrograms.filter { $0.pid == productionID }
 
-                if numberEpisodes > 0 {
-                    // Check for duplicate show listings.
-                    let existingProgram = programmes.filter { $0.pid == productionID }
-
-                    if existingProgram.count == 0 {
-                        let seriesInfo = Programme()
-                        seriesInfo.seriesName = showName ?? ""
-                        seriesInfo.pid = productionID ?? ""
-                        seriesInfo.url = showPageURLString ?? ""
-                        programmes.append(seriesInfo)
-                    }
+                if existingProgram.count == 0 {
+                    let seriesInfo = Programme()
+                    seriesInfo.seriesName = showName
+                    seriesInfo.pid = productionID
+                    seriesInfo.url = showPageURL.absoluteString
+                    foundPrograms.append(seriesInfo)
                 }
             }
         }
 
-        /* Now we sort the programmes and drop the duplicates */
-        if programmes.count == 0 {
-            self.logger.addToLog("No programmes found on www.itv.com/hub/shows")
-            showAlert(message: "No programmes were found on www.itv.com/hub/shows",
-                      informative: "Try again later. If the problem persists please file a bug.")
-            return false
-        }
-
-        programmes.sort { $0.seriesName < $1.seriesName }
-        return true
+        foundPrograms.sort { $0.seriesName < $1.seriesName }
+        return foundPrograms
     }
 
     func requestEpisodes(program: Programme) {
-        /* Get all episodes for the programme name identified in MyProgramme */
-        if let url = URL(string: program.url) {
-            mySession?.dataTask(with: url) {(data, _, error) in
-                self.processEpisodes(program: program, pageData: data, error: error)
-            }.resume()
+        operationQueue.addOperation {
+            /* Get all episodes for the programme name identified in MyProgramme */
+            if let url = URL(string: program.url) {
+                self.mySession?.dataTask(with: url) {(data, response, error) in
+                    self.processEpisodes(program: program, pageData: data, error: error)
+                }.resume()
+            }
         }
     }
 
@@ -162,6 +140,11 @@ public class ITVPrograms: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
         var dateAiredUTC: Date? = nil
         if let dateTimeString = dateTimeString {
             dateAiredUTC = dateForTimeString(dateTimeString)
+        }
+
+        if let dateAiredUTC = dateAiredUTC, dateAiredUTC > Date() {
+            // logger?.add(toLog: "Skipping episode - \(dateAiredUTC), because it hasn't aired yet")
+            return
         }
 
         let programURL = URL(string: programInfo.url)?.deletingLastPathComponent()
@@ -222,18 +205,24 @@ public class ITVPrograms: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
         //        print("Date aired: \(dateTimeString ?? "Unknown")")
         //        print("=================")
 
-        // Make sure the URL matches the show listing -- ITV likes to sneak other shows on a program page.
-        if let showURLBase = showURL?.deletingLastPathComponent(), showURLBase.absoluteString == programURL?.absoluteString {
+        let alreadyFound = self.episodes.contains { p in
+            p.url == programURL?.absoluteString
+        }
+
+        if !alreadyFound {
             let episode = Programme()
             episode.seriesName = programInfo.seriesName
             episode.pid = productionID ?? ""
             episode.url = showURL?.absoluteString ?? ""
             episode.lastBroadcast = dateAiredUTC ?? Date()
+//            episode.lastBroadcastString = dateTimeString ?? ""
             episode.summary = description ?? ""
             episode.episodeName = episodeTitle ?? ""
             episode.season = season
             episode.episode = episodeNumber
             self.episodes.append(episode)
+        } else {
+            DDLogDebug("Skipping episode: \(showURL?.absoluteString ?? "")")
         }
 
     }
@@ -245,7 +234,9 @@ public class ITVPrograms: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
 
     fileprivate func operationCompleted() {
 //        let increment = Double(myQueueSize - 1) > 0 ? 100.0 / Double(myQueueSize - 1) : 100.0
-        //AppController.shared().itvProgressIndicator.increment(by: increment)
+        DispatchQueue.main.async {
+            //AppController.shared().itvProgressIndicator.increment(by: increment)
+        }
 
         /* Check if there is any outstanding work before processing the carried forward programme list */
         myQueueLeft -= 1
@@ -256,8 +247,7 @@ public class ITVPrograms: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
 
     func processEpisodes(program: Programme, pageData: Data?, error: Error?) {
         if let error = error {
-            let errorMessage = "GetITVListings (Error(\(error))): Unable to retreive programme episodes for \(program.url)"
-            self.logger.addToLog(errorMessage)
+            DDLogError("(Error(\(error))): Unable to retrieve programme episodes for \(program.url)")
             operationCompleted()
             return
         }
@@ -320,7 +310,7 @@ public class ITVPrograms: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
     }
 
     func writeEpisodeCacheFile() {
-        self.logger.addToLog("GetITVShows (Info): Episodes: \(episodes.count) Today Programmes: \(programmes.count) ")
+        DDLogInfo("INFO: Adding \(episodes.count) itv programmes to cache")
 
         /* Now create the cache file that used to be created by get_iplayer */
         //    my @cache_format = qw/index type name episode seriesnum episodenum pid channel available expires duration desc web thumbnail timeadded/;
@@ -336,9 +326,10 @@ public class ITVPrograms: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
         episodes.forEach { episode in
             var cacheEntry = ""
             if episode.pid.isEmpty {
-                print("WARN: Bad episode object \(episode) ")
+                DDLogWarn("WARNING: Bad episode object \(episode) ")
                 return
             }
+
             let dateAiredString = isoFormatter.string(from: episode.lastBroadcast)
 
             if episode.episodeName.isEmpty {
@@ -401,12 +392,12 @@ public class ITVPrograms: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
 
         }
     }
+
     func endOfRun() {
         /* Notify finish and invaliate the NSURLSession */
-        getITVShowRunning = false
         mySession?.finishTasksAndInvalidate()
         NotificationCenter.default.post(name: NSNotification.Name("ITVUpdateFinished"), object: nil)
-        self.logger.addToLog("GetITVShows: Update Finished")
+        DDLogInfo("INFO: ITV update finished")
     }
 
 }

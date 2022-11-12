@@ -17,7 +17,6 @@ public class AppDelegate: NSObject  {
 
     var runDownloads = false
     var runUpdate = false
-    let logger = LogController()
 
     func confirmQuit() -> Bool {
         if runDownloads {
@@ -128,7 +127,7 @@ extension AppDelegate : NSApplicationDelegate {
         window.delegate = self
 
         DispatchQueue.main.async {
-            let itvUpdater = ITVPrograms(logger: self.logger)
+            let itvUpdater = ITVPrograms()
             itvUpdater.itvUpdate()
         }
     }
@@ -151,17 +150,17 @@ extension AppDelegate : NSApplicationDelegate {
     }
 }
 
-extension AppDelegate: SUUpdaterDelegate {
-    public func updater(_ updater: SUUpdater, didFinishLoading appcast: SUAppcast) {
+extension AppDelegate: SPUUpdaterDelegate {
+    public func updater(_ updater: SPUUpdater, didFinishLoading appcast: SUAppcast) {
         //    NSLog(@"didFinishLoadingAppcast");
     }
     
-    public func updaterDidNotFindUpdate(_ updater: SUUpdater) {
+    public func updaterDidNotFindUpdate(_ updater: SPUUpdater) {
         //    NSLog(@"No update found.");
     }
-    public func updater(_ updater: SUUpdater, didFindValidUpdate item: SUAppcastItem) {
+    public func updater(_ updater: SPUUpdater, didFindValidUpdate item: SUAppcastItem) {
         let notification = NSUserNotification()
-        notification.informativeText = "Get iPlayer Automator \(item.displayVersionString ?? "update") is available."
+        notification.informativeText = "Get iPlayer Automator \(item.displayVersionString) is available."
         notification.title = "Update Available!"
         NSUserNotificationCenter.default.deliver(notification)
     }

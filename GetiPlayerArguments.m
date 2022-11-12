@@ -1,3 +1,4 @@
+//  Converted to Swift 5.7 by Swiftify v5.7.28606 - https://swiftify.com/
 //
 //  GetiPlayerArgumentsController.m
 //  Get_iPlayer GUI
@@ -6,65 +7,67 @@
 //
 //
 
-#import "GetiPlayerArguments.h"
-#import "NSFileManager+DirectoryLocations.h"
+//
+//  GetiPlayerArgumentsController.h
+//  Get_iPlayer GUI
+//
+//  Created by Thomas Willson on 8/3/14.
+//
+//
 
-static GetiPlayerArguments *sharedController = nil;
+import Foundation
 
-@implementation GetiPlayerArguments
-- (instancetype)init
-{
-   self = [super init];
-   if (self) {
-      if (!sharedController) {
-         sharedController = self;
-      }
-   }
-   return self;
-}
-+ (GetiPlayerArguments *)sharedController {
-   if (!sharedController) {
-      sharedController = [[self alloc] init];
-   }
-   return sharedController;
-}
+private var sharedController: GetiPlayerArguments? = nil
 
-- (NSString *)typeArgumentForCacheUpdate:(BOOL)forCacheUpdate
-{
-    // There's no harm in passing 'itv' as a cache type, but it will report 0 shows cached
-    // which can be confusing.
-    BOOL includeITV = !forCacheUpdate;
-
-    NSMutableString *cacheTypes = [[NSMutableString alloc] initWithString:@""];
-
-    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheBBC_TV"] isEqualTo:@YES] || !forCacheUpdate)
-        [cacheTypes appendString:@"tv,"];
-    if (([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheITV_TV"] isEqualTo:@YES] && includeITV) || !forCacheUpdate)
-        [cacheTypes appendString:@"itv,"];
-    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheBBC_Radio"] isEqualTo:@YES] || !forCacheUpdate)
-        [cacheTypes appendString:@"radio,"];
-
-    if (cacheTypes.length > 0) {
-        [cacheTypes deleteCharactersInRange:NSMakeRange(cacheTypes.length-1,1)];
-        cacheTypes = [NSMutableString stringWithFormat:@"--type=%@", cacheTypes];
+class GetiPlayerArguments: NSObject {
+    var cacheExpiryArg: String {
+        return "--expiry=9999999999"
     }
 
-    return cacheTypes;
-}
+    var profileDirArg: String {
+        return "--profile-dir=\(FileManager.default.applicationSupportDirectory)"
+    }
 
-- (NSString *)cacheExpiryArg
-{
-	return @"--expiry=9999999999";
-}
+    var noWarningArg: String {
+        return "--nocopyright"
+    }
 
-- (NSString *)profileDirArg
-{
-   return [NSString stringWithFormat:@"--profile-dir=%@", [NSFileManager defaultManager].applicationSupportDirectory];
-}
+    override init() {
+        super.init()
+        if sharedController == nil {
+            sharedController = self
+        }
+    }
 
-- (NSString *)noWarningArg
-{
-   return @"--nocopyright";
-}
+    class func sharedController() -> GetiPlayerArguments? {
+        if sharedController == nil {
+            sharedController = self.init()
+        }
+        return sharedController
+    }
 
-@end
+    func typeArgument(forCacheUpdate: Bool) -> String? {
+        // There's no harm in passing 'itv' as a cache type, but it will report 0 shows cached
+        // which can be confusing.
+        let includeITV = !forCacheUpdate
+
+        var cacheTypes = ""
+
+        if UserDefaults.standard.value(forKey: "CacheBBC_TV")?.isEqual(to: NSNumber(value: true)) ?? false || !forCacheUpdate {
+            cacheTypes += "tv,"
+        }
+        if (UserDefaults.standard.value(forKey: "CacheITV_TV")?.isEqual(to: NSNumber(value: true)) ?? false && includeITV) || !forCacheUpdate {
+            cacheTypes += "itv,"
+        }
+        if UserDefaults.standard.value(forKey: "CacheBBC_Radio")?.isEqual(to: NSNumber(value: true)) ?? false || !forCacheUpdate {
+            cacheTypes += "radio,"
+        }
+
+        if cacheTypes.count > 0 {
+            if let subRange = Range<String.Index>(NSRange(location: cacheTypes.count - 1, length: 1), in: cacheTypes) { cacheTypes.removeSubrange(subRange) }
+            cacheTypes = "--type=\(cacheTypes)"
+        }
+
+        return cacheTypes
+    }
+}

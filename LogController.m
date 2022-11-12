@@ -1,3 +1,4 @@
+//  Converted to Swift 5.7 by Swiftify v5.7.28606 - https://swiftify.com/
 //
 //  LogController.m
 //  Get_iPlayer GUI
@@ -6,105 +7,109 @@
 //
 //
 
-#import "LogController.h"
+//
+//  LogController.h
+//  Get_iPlayer GUI
+//
+//  Created by Thomas Willson on 7/9/14.
+//
+//
 
-@implementation LogController
+import Cocoa
+import CocoaLumberjack
 
-- (instancetype)init
-{
-    //Initialize Log
-    if (self = [super init]) {
-        DDFileLogger *fileLogger = [DDFileLogger new];
-        fileLogger.rollingFrequency = 60 * 60 * 24;
-        fileLogger.logFileManager.maximumNumberOfLogFiles = 1;
-        fileLogger.logFormatter = self;
-        [DDLog addLogger:fileLogger];
-        [DDLog addLogger:[DDOSLogger new]];
-        NSString *version = [NSString stringWithFormat:@"%@", [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"]];
-        DDLogInfo(@"Get iPlayer Automator %@ Initialized.", version);
-    }
-    return self;
-}
+class LogController: NSObject, DDLogFormatter {
+    @IBOutlet var log: NSTextView!
+    @IBOutlet weak var window: NSWindow!
 
--(void)awakeFromNib {
-    _log.textColor = [NSColor whiteColor];
-    _log.font = [NSFont userFixedPitchFontOfSize:12.0];
-}
-
-- (void)showLog:(id)sender
-{
-	[_window makeKeyAndOrderFront:self];
-    [_log scrollToEndOfDocument:self];
-}
-
-- (IBAction)copyLog:(id)sender
-{
-	NSString *unattributedLog = _log.string;
-	NSPasteboard *pb = [NSPasteboard generalPasteboard];
-    NSArray *types = @[NSPasteboardTypeString];
-	[pb declareTypes:types owner:self];
-    [pb setString:unattributedLog forType:NSPasteboardTypeString];
-}
-
-- (IBAction)clearLog:(id)sender
-{
-    self.log.string = @"";
-}
-
-- (nullable NSString *)formatLogMessage:(DDLogMessage *)logMessage
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        // In normal mode don't dump debug or verbose messages to the console.
-        BOOL verbose = [[NSUserDefaults standardUserDefaults] boolForKey:@"Verbose"];
-        if (!verbose && ((logMessage.flag == DDLogFlagDebug) || (logMessage.flag == DDLogFlagVerbose))) {
-            return;
+    override init() {
+        //Initialize Log
+        super.init()
+        let fileLogger = DDFileLogger()
+        fileLogger.rollingFrequency = 60 * 60 * 24
+        fileLogger.logFileManager.maximumNumberOfLogFiles = 1
+        fileLogger.logFormatter = self
+        DDLog.add(fileLogger)
+        DDLog.add(DDOSLogger())
+        var version: String? = nil
+        if let object = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") {
+            version = "\(object)"
         }
+        DDLogInfo("Get iPlayer Automator %@ Initialized.", version)
+    }
 
-        NSString *messageWithNewline = [logMessage.message stringByAppendingString:@"\r"];
-        NSMutableAttributedString *newMessage = [[NSMutableAttributedString alloc] initWithString:messageWithNewline];
+    override func awakeFromNib() {
+        log.textColor = .white
+        log.font = .userFixedPitchFont(ofSize: 12.0)
+    }
 
-        NSColor *textColor = self.log.textColor;
+    @IBAction func showLog(_ sender: Any) {
+        window.makeKeyAndOrderFront(self)
+        log.scrollToEndOfDocument(self)
+    }
 
-        switch (logMessage.flag) {
+    @IBAction func copyLog(_ sender: Any) {
+        let unattributedLog = log.string
+        let pb = NSPasteboard.general
+        let types = [.string] as? [AnyHashable]
+        if let types {
+            pb.declareTypes(types, owner: self)
+        }
+        pb.setString(unattributedLog, forType: .string)
+    }
+
+    @IBAction func clearLog(_ sender: Any) {
+        log.string = ""
+    }
+
+    func formatLogMessage(_ logMessage: DDLogMessage?) -> String? {
+        DispatchQueue.main.async(execute: { [self] in
+            // In normal mode don't dump debug or verbose messages to the console.
+            let verbose = UserDefaults.standard.bool(forKey: "Verbose")
+            if !verbose && ((logMessage?.flag == DDLogFlagDebug) || (logMessage?.flag == DDLogFlagVerbose)) {
+                return
+            }
+
+            let messageWithNewline = (logMessage?.message ?? "") + "\r"
+            let newMessage = NSMutableAttributedString(string: messageWithNewline)
+
+            var textColor = log.textColor
+
+            switch logMessage?.flag {
             case DDLogFlagWarning:
-                textColor = [NSColor yellowColor];
-                break;
+                textColor = .yellow
             case DDLogFlagError:
-                textColor = [NSColor redColor];
-                break;
+                textColor = .red
             case DDLogFlagDebug:
-                textColor = [NSColor lightGrayColor];
-                break;
+                textColor = .lightGray
             case DDLogFlagVerbose:
-                textColor = [NSColor grayColor];
-                break;
+                textColor = .gray
             default:
                 // use base color.
-                break;
-        }
-
-        [newMessage addAttribute:NSForegroundColorAttributeName
-                           value:textColor
-                           range:NSMakeRange(0, newMessage.length)];
-
-        [newMessage addAttribute:NSFontAttributeName
-                           value:self.log.font
-                           range:NSMakeRange(0, newMessage.length)];
-
-        [self.log.textStorage appendAttributedString:newMessage];
-
-        //Scroll log to bottom only if it is visible.
-        if (self.window.visible) {
-            BOOL shouldAutoScroll = ((int)NSMaxY([self.log bounds]) == (int)NSMaxY([self.log visibleRect]));
-            if (shouldAutoScroll) {
-                [self.log scrollToEndOfDocument:nil];
+                break
             }
-        }
-    });
 
-    return [logMessage message];
+            newMessage.addAttribute(
+                .foregroundColor,
+                value: textColor,
+                range: NSRange(location: 0, length: newMessage.length))
+
+            newMessage.addAttribute(
+                .font,
+                value: log.font,
+                range: NSRange(location: 0, length: newMessage.length))
+
+            log.textStorage?.append(newMessage)
+
+            //Scroll log to bottom only if it is visible.
+            if window.isVisible {
+                let shouldAutoScroll = Int(log.bounds.maxY) == Int(log.visibleRect.maxY)
+                if shouldAutoScroll {
+                    log.scrollToEndOfDocument(nil)
+                }
+            }
+        })
+
+        return logMessage?.init()
+    }
 }
-
-@end
-
-

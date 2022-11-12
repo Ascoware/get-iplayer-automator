@@ -7,18 +7,17 @@
 //
 
 import Foundation
+import CocoaLumberjackSwift
 
 class GIASearch {
     var completion: ((GIASearch)->Void)?
     var searchResults: [Programme] = []
     
     let searchTerms: [String]
-    let logger: Logging
     let allowHiding: Bool
     
-    init(searchTerms: [String], allowHiding: Bool, logger: Logging) {
+    init(searchTerms: [String], allowHiding: Bool) {
         self.searchTerms = searchTerms
-        self.logger = logger
         self.allowHiding = allowHiding
     }
         
@@ -35,11 +34,11 @@ class GIASearch {
         
         var args = [
             "--nocopyright",
-            cacheExpiryArgument,
-            typeArgumentForCacheUpdate(includeITV: true, forCacheUpdate: false),
+            cacheExpiryArg,
+            progTypeArgument(forCacheUpdate: false),
             "--listformat",
             "SearchResult|<pid>|<available>|<type>|<name>|<episode>|<channel>|<seriesnum>|<episodenum>|<desc>|<thumbnail>|<web>|<available>",
-            profileDirArgument,
+            profileDirArg,
             "--long",
             "--nopurge",
             "--search",
@@ -51,10 +50,8 @@ class GIASearch {
             args.append("--hide")
         }
 
-        args.forEach {
-            logger.addToLog($0)
-        }
-        
+        DDLogVerbose("Search args: \(args)")
+
         task.arguments = args;
         task.standardInput = Pipe()
         task.standardOutput = pipe
@@ -92,7 +89,7 @@ class GIASearch {
         resultArray.forEach {
             if !$0.hasPrefix("SearchResult|") {
                 if $0.hasPrefix("Unknown option:") || $0.hasPrefix("Option") || $0.hasPrefix("Usage") {
-                    logger.addToLog($0)
+                    DDLogInfo($0)
                 }
                 return
             }
@@ -121,7 +118,7 @@ class GIASearch {
             p.url = String(fields[11])
             
             if p.pid.count == 0 || p.showName.count == 0 || p.network.count == 0 || p.url.count == 0 {
-                logger.addToLog("WARNING: Skipped invalid search result: \($0)")
+                DDLogWarn("WARNING: Skipped invalid search result: \($0)")
             } else {
                 programsFound.append(p)
             }

@@ -27,6 +27,8 @@ struct DownloadQueueView: View {
 
 struct DownloadQueueView_Previews: PreviewProvider {
     static var previews: some View {
-        DownloadQueueView(queuedShows: DownloadQueue())
+        let dlQueue = DownloadQueue()
+        dlQueue.loadFromDisk()
+        return DownloadQueueView(queuedShows: dlQueue)
     }
 }
