@@ -121,9 +121,10 @@ import Kanna
             }
 
             completion(showList)
-        } else if url.hasPrefix("https://www.itv.com/hub/") {
-            let show = ITVMetadataExtractor.getShowMetadata(htmlPageContent: pageSource)
-            completion([show])
+// Temporary(?) removal of ITV support
+//        } else if url.hasPrefix("https://www.itv.com/hub/") {
+//            let show = ITVMetadataExtractor.getShowMetadata(htmlPageContent: pageSource)
+//            completion([show])
         } else {
             let invalidPage = NSAlert()
             invalidPage.addButton(withTitle: "OK")
