@@ -799,6 +799,8 @@
 				GCC_WARN_MISSING_PARENTHESES = YES;
 				GCC_WARN_SHADOW = NO;
 				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Get iPlayer Automator";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.video";
 				INSTALL_PATH = /Applications;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -852,6 +854,8 @@
 				GCC_PREFIX_HEADER = "GetiPlayerAutomator-Prefix.h";
 				GCC_VERSION = "";
 				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Get iPlayer Automator";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.video";
 				INSTALL_PATH = /Applications;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

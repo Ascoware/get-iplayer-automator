@@ -529,15 +529,16 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         _proxy = proxyDict[@"proxy"];
     }
 
-    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheITV_TV"] isEqualTo:@YES])
-    {
-        _updatingITVIndex = true;
-        [self.itvProgressIndicator startAnimation:self];
-        self.itvProgressIndicator.doubleValue = 0.0;
-        [self.itvProgressIndicator setHidden:false];
-
-        [newITVListing itvUpdate];
-    }
+    // Disabling until we figure out the new ITV structure
+//    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheITV_TV"] isEqualTo:@YES])
+//    {
+//        _updatingITVIndex = true;
+//        [self.itvProgressIndicator startAnimation:self];
+//        self.itvProgressIndicator.doubleValue = 0.0;
+//        [self.itvProgressIndicator setHidden:false];
+//
+//        [newITVListing itvUpdate];
+//    }
 
     _updatingBBCIndex = true;
 
