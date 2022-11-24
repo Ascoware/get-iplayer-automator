@@ -17,6 +17,7 @@ import CocoaLumberjackSwift
 }
 
 @objcMembers public class Programme : NSObject, NSSecureCoding {
+
     private var getNameRunning = false
 
     dynamic var tvNetwork: String = ""
@@ -320,13 +321,13 @@ import CocoaLumberjackSwift
         processedPID = found
 
         if !found {
-            if showName.isEmpty {
-                showName = "Retrieving Metadata..."
-                status = "Not in cache"
-            }
+            status = "Not in cache"
 
-            if self.tvNetwork != "ITV" {
+            if self.tvNetwork.hasPrefix("BBC") {
+                showName = "Retrieving Metadata..."
                 getNameFromPID()
+            } else {
+                getNameRunning = false
             }
         } else {
             getNameRunning = false
@@ -536,6 +537,14 @@ import CocoaLumberjackSwift
         extendedMetadataRetrieved = true
         NotificationCenter.default.post(name: NSNotification.Name("ExtendedInfoRetrieved"), object: self)
         processedPID = true
+    }
+
+}
+
+extension Programme : Comparable {
+
+    public static func < (lhs: Programme, rhs: Programme) -> Bool {
+        return lhs.showName < rhs.showName
     }
 
 }

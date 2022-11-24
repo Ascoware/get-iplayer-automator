@@ -781,6 +781,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
+				"DEBUG[arch=*]" = 1;
 				DEVELOPMENT_TEAM = L8BMU8WLEC;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -794,10 +795,12 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "GetiPlayerAutomator-Prefix.h";
+				GCC_PREPROCESSOR_DEFINITIONS = "GIA_DEBUG=1";
 				GCC_VERSION = "";
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_MISSING_PARENTHESES = YES;
 				GCC_WARN_SHADOW = NO;
+				GIA_DEBUG = 1;
 				INFOPLIST_FILE = Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Get iPlayer Automator";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.video";
@@ -840,6 +843,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEAD_CODE_STRIPPING = YES;
+				DEBUG = 0;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = L8BMU8WLEC;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -852,7 +856,9 @@
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "GetiPlayerAutomator-Prefix.h";
+				GCC_PREPROCESSOR_DEFINITIONS = "GIA_DEBUG=0";
 				GCC_VERSION = "";
+				GIA_DEBUG = 0;
 				INFOPLIST_FILE = Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Get iPlayer Automator";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.video";

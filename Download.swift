@@ -54,7 +54,7 @@ import CocoaLumberjackSwift
 
     // MARK: Message Processers
 
-    func safeAppend(_ array: inout [AnyHashable], key: String, value: String) {
+    func safeAppend(_ array: inout [String], key: String, value: String) {
         if !key.isEmpty, !value.isEmpty {
             array.append(key)
             // Converts any object into a string representation
@@ -75,7 +75,7 @@ import CocoaLumberjackSwift
 
         apTask.launchPath = URL(fileURLWithPath: AppController.shared().extraBinariesPath).appendingPathComponent("AtomicParsley").path
 
-        var arguments: [AnyHashable] = []
+        var arguments = [String]()
         arguments.append(show.path)
         safeAppend(&arguments, key: "--stik", value: "value=10")
         safeAppend(&arguments, key: "--TVNetwork", value: show.tvNetwork)
@@ -89,7 +89,7 @@ import CocoaLumberjackSwift
         safeAppend(&arguments, key: "--year", value: show.lastBroadcastString)
         arguments.append("--overWrite")
 
-        apTask.arguments = arguments as? [String]
+        apTask.arguments = arguments
 
         DDLogVerbose("DEBUG: AtomicParsley args:\(arguments)")
 
@@ -154,7 +154,7 @@ import CocoaLumberjackSwift
 
                 var outputURL = URL(fileURLWithPath: subtitlePath)
                 outputURL = outputURL.deletingPathExtension().appendingPathExtension("srt")
-                var args: [AnyHashable] = []
+                var args: [String] = []
 
                 // TODO: Figure out if I can bring this back. ffmpeg doesn't support it.
                 //            BOOL srtIgnoreColors = [[NSUserDefaults standardUserDefaults] boolForKey:[NSString stringWithFormat:@"%@SRTIgnoreColors", self.defaultsPrefix]];
@@ -174,7 +174,7 @@ import CocoaLumberjackSwift
 
                 let ffmpegURL = URL(fileURLWithPath: AppController.shared().extraBinariesPath).appendingPathComponent("ffmpeg").path
                 subsTask?.launchPath = ffmpegURL
-                subsTask?.arguments = args as? [String]
+                subsTask?.arguments = args
                 subsTask?.launch()
             })
         }
