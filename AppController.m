@@ -22,6 +22,7 @@ static AppController *sharedController;
 BOOL runDownloads = NO;
 BOOL runUpdate = NO;
 NSDictionary<NSString*, NSString*> *tvFormats;
+NSDictionary<NSString*, NSString*> *stvFormats;
 NSDictionary<NSString*, NSString*> *radioFormats;
 
 // New ITV Cache
@@ -269,8 +270,6 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         }
 
         [_radioFormatController addObjects:updatedRadioFormats];
-
-
     }
     @catch (NSException *e)
     {
@@ -279,15 +278,20 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         rootObject=nil;
     }
 
-    if (!tvFormats || !radioFormats) {
+    // IMPORTANT: All values in xxxFormatKeys must match the corresponding popups in the preferences. If you change those
+    // you MUST update these, and vice-versa.
         NSArray *tvFormatKeys = @[@"Full HD (1080p)", @"HD (720p)", @"SD (540p)", @"Web (396p)", @"Mobile (288p)"];
-        NSArray *tvFormatObjects = @[@"fhd",@"hd",@"sd",@"web",@"mobile"];
+    NSArray *bbcTvFormatObjects = @[@"fhd",@"hd",@"sd",@"web",@"mobile"];
+
+    NSArray *stvFormatKeys = @[@"Full HD (1080p)", @"HD (720p)", @"SD (576p)", @"Web (432p)", @"Mobile (288p)"];
+    NSArray *stvFormatObjects = @[@"1080",@"720",@"576",@"432",@"288"];
+
         NSArray *radioFormatKeys = @[@"High", @"Standard", @"Medium", @"Low"];
         NSArray *radioFormatObjects = @[@"high", @"std", @"med", @"low"];
 
-        tvFormats = [[NSDictionary alloc] initWithObjects:tvFormatObjects forKeys:tvFormatKeys];
+    tvFormats = [[NSDictionary alloc] initWithObjects:bbcTvFormatObjects forKeys:tvFormatKeys];
+    stvFormats = [[NSDictionary alloc] initWithObjects:stvFormatObjects forKeys:stvFormatKeys];
         radioFormats = [[NSDictionary alloc] initWithObjects:radioFormatObjects forKeys:radioFormatKeys];
-    }
 
     // clear obsolete formats
     NSMutableArray *tempTVFormats = [[NSMutableArray alloc] initWithArray:_tvFormatController.arrangedObjects];
@@ -1072,15 +1076,15 @@ static NSString *FORCE_RELOAD = @"ForceReload";
             {
                 if (!show.complete)
                 {
-                    if ([show.tvNetwork hasPrefix:@"ITV"]) {
+                    if ([show.tvNetwork containsString:@"BBC"]) {
+                        _currentDownload = [[BBCDownload alloc] initWithProgramme:show
+                                                                     tvFormatList:_tvFormatController.arrangedObjects
+                                                                  radioFormatList:_radioFormatController.arrangedObjects
+                                                                           proxy:_proxy];
+                    } else {
                         _currentDownload = [[ITVDownload alloc]
                                             initWithProgramme:show
                                             proxy:_proxy];
-                    } else {
-                        _currentDownload = [[BBCDownload alloc] initWithProgramme:show
-                                                                       tvFormats:_tvFormatController.arrangedObjects
-                                                                    radioFormats:_radioFormatController.arrangedObjects
-                                                                           proxy:_proxy];
                     }
                     break;
                 }
@@ -1266,14 +1270,15 @@ static NSString *FORCE_RELOAD = @"ForceReload";
             DDLogInfo(@"\nDownloading Show %lu/%lu:\n",
                                (unsigned long)([tempQueue indexOfObject:nextShow]+1),
                       (unsigned long)tempQueue.count);
-            if ([nextShow.tvNetwork hasPrefix:@"ITV"])
+            if ([nextShow.tvNetwork containsString:@"BBC"]) {
+                _currentDownload = [[BBCDownload alloc] initWithProgramme:nextShow
+                                                             tvFormatList:_tvFormatController.arrangedObjects
+                                                          radioFormatList:_radioFormatController.arrangedObjects
+                                                                    proxy:_proxy];
+            } else {
                 _currentDownload = [[ITVDownload alloc] initWithProgramme:nextShow
                                                                     proxy:_proxy];
-            else
-                _currentDownload = [[BBCDownload alloc] initWithProgramme:nextShow
-                                                                tvFormats:_tvFormatController.arrangedObjects
-                                                             radioFormats:_radioFormatController.arrangedObjects
-                                                                    proxy:_proxy];
+            }
         }
     } else {
         //Downloads must be finished.
@@ -2044,7 +2049,6 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 -(void)updateHistoryForType:(NSString *)networkName andProgFile:(NSString *)oldProgrammesFile andCacheFile:(NSString *)newCacheFile
 {
     /* Load old Programmes file */
-
     NSFileManager *fileManager = [NSFileManager defaultManager];
     BOOL firstTimeBuild = NO;
 
@@ -2056,22 +2060,18 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     NSMutableArray *oldProgrammesArray = nil;
     
     // Guard against bad data in the archive. If the un-archive fails ignore it and just make an empty array.
-    @try {
         NSData *oldProgramData = [NSData dataWithContentsOfFile:oldProgrammesFile];
         NSError *error;
         NSSet *allowedClasses = [NSSet setWithObjects: [ProgrammeHistoryObject class], [NSArray class], [NSString class], nil];
         oldProgrammesArray = [NSKeyedUnarchiver unarchivedObjectOfClasses:allowedClasses fromData:oldProgramData error:&error];
         if (error) {
             DDLogError(@"error unarchiving 'old program data': %@", error.description);
-        }
-    } @catch (NSException *exception) {
         firstTimeBuild = YES;
         oldProgrammesArray = [NSMutableArray new];
     }
 
     /* Load in todays shows cached by get_iplayer or getITVListings and create a dictionary of show names */
 
-    NSError *error;
     NSString *newCacheString = [NSString stringWithContentsOfFile:newCacheFile encoding:NSUTF8StringEncoding error:&error];
     NSArray  *newCacheArray  = [newCacheString componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
 

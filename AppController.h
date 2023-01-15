@@ -23,8 +23,9 @@ NS_ASSUME_NONNULL_BEGIN
 @class Programme;
 
 extern BOOL runDownloads;
-extern NSDictionary *tvFormats;
-extern NSDictionary *radioFormats;
+extern NSDictionary<NSString *, NSString *> *tvFormats;
+extern NSDictionary<NSString *, NSString *> *stvFormats;
+extern NSDictionary<NSString *, NSString *> *radioFormats;
 
 @interface AppController : NSObject <SPUUpdaterDelegate, NSApplicationDelegate>
 //General
@@ -85,6 +86,7 @@ extern NSDictionary *radioFormats;
 @property NSMutableArray *itvFormatList;
 @property IBOutlet NSArrayController *tvFormatController;
 @property IBOutlet NSArrayController *radioFormatController;
+
 @property IBOutlet NSPanel *prefsPanel;
 @property IBOutlet NSUserDefaultsController *preferences;
 //Scheduling a Start

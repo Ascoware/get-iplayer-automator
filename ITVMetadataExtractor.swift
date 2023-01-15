@@ -11,7 +11,7 @@ import SwiftyJSON
 
 class ITVMetadataExtractor {
 
-    static func getShowMetadata(htmlPageContent: String) -> Programme {
+    static func getShowMetadata(htmlPageContent: String) -> [Programme] {
         var episodeID = ""
         var timeAired: Date? = nil
         let longDateFormatter = DateFormatter()
@@ -97,7 +97,7 @@ class ITVMetadataExtractor {
             }
         }
 
-        return newProgram
+        return [newProgram]
     }
 
 }

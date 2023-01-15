@@ -27,6 +27,7 @@
 		7F2387362131082C00FA4588 /* SafariExtensionViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7F2387342131082C00FA4588 /* SafariExtensionViewController.xib */; };
 		7F2387392131082C00FA4588 /* script.js in Resources */ = {isa = PBXBuildFile; fileRef = 7F2387382131082C00FA4588 /* script.js */; };
 		7F23873B2131082C00FA4588 /* ToolbarItemIcon.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 7F23873A2131082C00FA4588 /* ToolbarItemIcon.pdf */; };
+		7F4545FD292C4CE0009DC35C /* STVMetadataExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F4545FC292C4CE0009DC35C /* STVMetadataExtractor.swift */; };
 		7F54B1B11FFD656C006D1325 /* ITVDownload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F340B5A1FFB063700F415A4 /* ITVDownload.swift */; };
 		7F54B1B31FFF38E8006D1325 /* Kanna.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F54B1B21FFF38E8006D1325 /* Kanna.framework */; };
 		7F54B1B41FFF38F8006D1325 /* Kanna.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7F54B1B21FFF38E8006D1325 /* Kanna.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -148,6 +149,7 @@
 		7F340B5A1FFB063700F415A4 /* ITVDownload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ITVDownload.swift; sourceTree = "<group>"; };
 		7F382EF521DD110400CCB64F /* SafeArchiver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SafeArchiver.h; sourceTree = "<group>"; };
 		7F382EF621DD110400CCB64F /* SafeArchiver.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SafeArchiver.m; sourceTree = "<group>"; };
+		7F4545FC292C4CE0009DC35C /* STVMetadataExtractor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = STVMetadataExtractor.swift; sourceTree = "<group>"; };
 		7F54B1B21FFF38E8006D1325 /* Kanna.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Kanna.framework; path = Carthage/Build/Mac/Kanna.framework; sourceTree = "<group>"; };
 		7F5B1C4A211F9E2D00BF7E99 /* Safari.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Safari.swift; sourceTree = "<group>"; };
 		7F5B1C4B211F9E2D00BF7E99 /* Chrome.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Chrome.swift; sourceTree = "<group>"; };
@@ -285,7 +287,6 @@
 		29B97314FDCFA39411CA2CEA /* Get_iPlayer GUI */ = {
 			isa = PBXGroup;
 			children = (
-				7F78C200291C42C500DAD51E /* BBCDownload.swift */,
 				7F6B2B2B20EE87D800E4BBDF /* Get iPlayer Automator.entitlements */,
 				D9CCF52E10259DED009205BE /* Features.rtf */,
 				D9F97FE9198EBA73006494A3 /* Categories */,
@@ -396,6 +397,7 @@
 				39D7C1BF1874AD9D00B78698 /* NilToStringTransformer.m */,
 				7F78C1FE291C385500DAD51E /* Download.swift */,
 				7F340B5A1FFB063700F415A4 /* ITVDownload.swift */,
+				7F78C200291C42C500DAD51E /* BBCDownload.swift */,
 				D9F97FE4198E9043006494A3 /* GetCurrentWebpage.swift */,
 				BF382ED51D73C29B00BAF106 /* GetiPlayerArguments.h */,
 				BF382ED61D73C2A400BAF106 /* GetiPlayerArguments.m */,
@@ -437,6 +439,7 @@
 				7F01382525F0A7520014703C /* ITVMetadataExtractor.swift */,
 				7FCF7262271388990086B0CD /* HistoryTableViewController.swift */,
 				7F165A0F205B92F9005BB78A /* GetITVListings.swift */,
+				7F4545FC292C4CE0009DC35C /* STVMetadataExtractor.swift */,
 				7F165A13205C1F15005BB78A /* ProgrammeHistoryEntry.swift */,
 				393D1DEC18A5BBB500F27880 /* RSRTVArrayController.h */,
 				393D1DED18A5BBB500F27880 /* RSRTVArrayController.m */,
@@ -518,7 +521,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1000;
-				LastUpgradeCheck = 1410;
+				LastUpgradeCheck = 1420;
 				ORGANIZATIONNAME = "";
 				TargetAttributes = {
 					7F23872C2131082C00FA4588 = {
@@ -618,6 +621,7 @@
 				D92687CA1087F836000E8132 /* DownloadHistoryEntry.m in Sources */,
 				7FEDA8ED24FC982200189D37 /* MicrosoftEdge.swift in Sources */,
 				DFC865E213E96BE200606599 /* ReasonForFailure.m in Sources */,
+				7F4545FD292C4CE0009DC35C /* STVMetadataExtractor.swift in Sources */,
 				39D7C1C01874AD9D00B78698 /* NilToStringTransformer.m in Sources */,
 				7F78C201291C42C500DAD51E /* BBCDownload.swift in Sources */,
 				7F5B1C55211F9EE600BF7E99 /* SBApplicationProtocol.swift in Sources */,

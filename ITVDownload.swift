@@ -12,19 +12,21 @@ import CocoaLumberjackSwift
 
 @objc public class ITVDownload : Download {
 
+    var maxResolution: String
+
     override public var description: String {
         return "ITV Download (ID=\(show.pid))"
     }
-    
 
     @objc public init(programme: Programme, proxy: HTTPProxy?) {
+        self.maxResolution = UserDefaults.standard.string(forKey: "MaxITVScreenHeight") ?? ""
         super.init()
         self.proxy = proxy
         self.show = programme
         self.defaultsPrefix = "ITV_"
         self.downloadPath = UserDefaults.standard.string(forKey: "DownloadPath") ?? ""
         self.running = true
-        
+
         setCurrentProgress("Retrieving Programme Metadata... \(show.showName)")
         setPercentage(102)
         programme.status = "Initialising..."
@@ -102,12 +104,31 @@ import CocoaLumberjackSwift
         
         DDLogDebug("DEBUG: Metadata response status code: \(response.statusCode)")
 
-        let showMetadata = ITVMetadataExtractor.getShowMetadata(htmlPageContent: responseString)
-        self.show.desc = showMetadata.desc
-        self.show.episode = showMetadata.episode
-        self.show.season = showMetadata.season
-        self.show.episodeName = showMetadata.episodeName
-        self.show.thumbnailURLString = showMetadata.thumbnailURLString
+        let showMetadata: [Programme]
+
+        if show.tvNetwork.hasPrefix("ITV") {
+            showMetadata = ITVMetadataExtractor.getShowMetadata(htmlPageContent: responseString)
+        } else {
+            showMetadata = STVMetadataExtractor.getShowMetadataFromPage(html: responseString)
+        }
+
+        if showMetadata.count == 0 {
+            DDLogError("ERROR: Metadata failure -- most likely this means the show was DRM protected and therefore not supported.")
+            self.show.complete = true
+            self.show.successful = false
+            self.show.status = "Download Failed: DRM protected"
+            self.show.reasonForFailure = "DRMProtected"
+            NotificationCenter.default.removeObserver(self)
+            NotificationCenter.default.post(name: NSNotification.Name(rawValue:"DownloadFinished"), object:self.show)
+            return
+        }
+
+        let showInfo = showMetadata[0]
+        self.show.desc = showInfo.desc
+        self.show.episode = showInfo.episode
+        self.show.season = showInfo.season
+        self.show.episodeName = showInfo.episodeName
+        self.show.thumbnailURLString = showInfo.thumbnailURLString
 
         DDLogInfo("INFO: Metadata processed.")
         
@@ -249,10 +270,19 @@ import CocoaLumberjackSwift
         var args: [String] = [show.url,
                               "--user-agent",
                               "Mozilla/5.0",
-                              "-f",
-                              "mp4/best",
                               "-o",
                               downloadPath]
+
+        var maxResolutionInt = 720
+        if let mappedFormat = stvFormats[self.maxResolution] as? String, let formatInt = Int(mappedFormat) {
+            maxResolutionInt = formatInt
+        }
+
+        if maxResolutionInt > 0 {
+            args.append("-f")
+            args.append("best[height<=\(maxResolutionInt)]")
+            hdVideo = maxResolutionInt >= 720
+        }
         
         if UserDefaults.standard.bool(forKey: "DownloadSubtitles") {
             args.append("--write-sub")

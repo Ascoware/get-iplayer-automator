@@ -18,6 +18,8 @@ import CocoaLumberjackSwift
     var subtitleURL: String?
     var downloadPath: String = ""
     var subtitlePath: String = ""
+    var hdVideo: Bool = false
+
     //Subtitle Conversion
     var subsTask: Process?
     var subsErrorPipe: Pipe?
@@ -87,6 +89,11 @@ import CocoaLumberjackSwift
         safeAppend(&arguments, key: "--description", value: show.desc)
         safeAppend(&arguments, key: "--artist", value: show.tvNetwork)
         safeAppend(&arguments, key: "--year", value: show.lastBroadcastString)
+
+        if hdVideo {
+            arguments.append("--hdvideo")
+        }
+
         arguments.append("--overWrite")
 
         apTask.arguments = arguments
