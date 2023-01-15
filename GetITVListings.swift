@@ -232,8 +232,8 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
     }
 
     func processSingleEpisode(html: String) {
-        let newProgram = ITVMetadataExtractor.getShowMetadata(htmlPageContent: html)
-        self.episodes.append(newProgram)
+        let newPrograms = ITVMetadataExtractor.getShowMetadata(htmlPageContent: html)
+        self.episodes += newPrograms
     }
 
     fileprivate func operationCompleted() {
