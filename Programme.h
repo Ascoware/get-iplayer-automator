@@ -8,7 +8,6 @@
 
 #import <Foundation/Foundation.h>
 #import "GetiPlayerArguments.h"
-#import "LogController.h"
 #import "GetiPlayerProxy.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -19,8 +18,7 @@ typedef NS_ENUM(NSInteger, GIA_ProgrammeType) {
     GIA_ProgrammeTypeITV
 };
 
-@interface Programme : NSObject <NSCoding>
-@property LogController *logger;
+@interface Programme : NSObject <NSSecureCoding>
 @property (copy) NSString *tvNetwork;
 @property (copy) NSString *showName;
 @property (copy) NSString *pid;
@@ -42,7 +40,7 @@ typedef NS_ENUM(NSInteger, GIA_ProgrammeType) {
 @property (copy) NSString *availableModes;
 @property (copy) NSString *url;
 @property (copy) NSString *desc;
-    
+
 //Extended Metadata
 @property (assign) BOOL extendedMetadataRetrieved;
 @property (assign) BOOL successfulRetrieval;
@@ -54,7 +52,7 @@ typedef NS_ENUM(NSInteger, GIA_ProgrammeType) {
 @property NSArray *modeSizes;
 @property (copy) NSString *thumbnailURLString;
 @property NSImage *thumbnail;
-    
+
 @property NSMutableString *taskOutput;
 @property (nullable) NSPipe *pipe;
 @property (nullable) NSPipe *errorPipe;

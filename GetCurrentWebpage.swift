@@ -7,6 +7,7 @@
 import ScriptingBridge
 import SwiftyJSON
 import Kanna
+import CocoaLumberjackSwift
 
 @objc public class GetCurrentWebpage : NSObject {
     
@@ -121,10 +122,21 @@ import Kanna
             }
 
             completion(showList)
-// Temporary(?) removal of ITV support
 //        } else if url.hasPrefix("https://www.itv.com/hub/") {
 //            let show = ITVMetadataExtractor.getShowMetadata(htmlPageContent: pageSource)
 //            completion([show])
+        } else if url.hasPrefix("https://player.stv.tv/episode/") {
+            let show = STVMetadataExtractor.getShowMetadataFromPage(html: pageSource)
+            if show.count == 0 {
+                let invalidPage = NSAlert()
+                invalidPage.addButton(withTitle: "OK")
+                invalidPage.messageText = "Protected content"
+                invalidPage.informativeText = "The selected program is DRM protected, so it cannot be retrieved with Get iPlayer Automator."
+                invalidPage.alertStyle = .warning
+                invalidPage.runModal()
+            } else {
+                completion(show)
+            }
         } else {
             let invalidPage = NSAlert()
             invalidPage.addButton(withTitle: "OK")
@@ -138,7 +150,7 @@ import Kanna
 
     @objc open class func getCurrentWebpage(completion: ([Programme]) -> Void) {
         //Get Default Browser
-        guard let browser = UserDefaults.standard.object(forKey: "DefaultBrowser") as? String else {
+        guard let browser = UserDefaults.standard.string(forKey: "DefaultBrowser") else {
             return
         }
 
@@ -221,28 +233,26 @@ import Kanna
         task.launchPath = AppController.shared().perlBinaryPath
         let args = [
             AppController.shared().getiPlayerPath,
-            "--nocopyright",
-            "-e60480000000000000",
+            GetiPlayerArguments.sharedController().noWarningArg,
+            GetiPlayerArguments.sharedController().cacheExpiryArg,
             "--pid-recursive-list",
             url,
-            GetiPlayerArguments.sharedController().profileDirArg ?? ""
+            GetiPlayerArguments.sharedController().profileDirArg
             ]
 
-//        for arg in args {
-//            DDLogVerbose("\(arg)");
-//        }
+        for arg in args {
+            DDLogVerbose("\(arg)");
+        }
 
         task.arguments = args
         task.standardOutput = pipe
         task.standardError = errorPipe
 
-        if var envVariableDictionary = task.environment {
-            envVariableDictionary["HOME"] = NSString("~").expandingTildeInPath
-            envVariableDictionary["PERL_UNICODE"] = "AS"
-            envVariableDictionary["PATH"] = AppController.shared().perlEnvironmentPath
-            task.environment = envVariableDictionary
-        }
-
+        var envVariableDictionary = [String : String]()
+        envVariableDictionary["HOME"] = NSString("~").expandingTildeInPath
+        envVariableDictionary["PERL_UNICODE"] = "AS"
+        envVariableDictionary["PATH"] = AppController.shared().perlEnvironmentPath
+        task.environment = envVariableDictionary
         task.launch()
 
         let data = pipe.fileHandleForReading.readDataToEndOfFile()

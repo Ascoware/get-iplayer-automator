@@ -16,8 +16,6 @@ static GetiPlayerArguments *sharedController = nil;
 {
    self = [super init];
    if (self) {
-      runCacheUpdateSinceChange = NO;
-      currentTypeArgument = nil;
       if (!sharedController) {
          sharedController = self;
       }
@@ -30,42 +28,33 @@ static GetiPlayerArguments *sharedController = nil;
    }
    return sharedController;
 }
-- (NSString *)typeArgumentForCacheUpdate:(BOOL)forCacheUpdate andIncludeITV:(BOOL)includeITV
+
+- (NSString *)typeArgumentForCacheUpdate:(BOOL)forCacheUpdate
 {
-   if (forCacheUpdate) {
-      runCacheUpdateSinceChange = YES;
-   }
-   
-	if (runCacheUpdateSinceChange || !currentTypeArgument)
-	{
-        currentTypeArgument = @"";
-        NSMutableString *cacheTypes = [[NSMutableString alloc] initWithString:@""];
+    // There's no harm in passing 'itv' as a cache type, but it will report 0 shows cached
+    // which can be confusing.
+    BOOL includeITV = !forCacheUpdate;
 
-		if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheBBC_TV"] isEqualTo:@YES] || !forCacheUpdate)
-         [cacheTypes appendString:@"tv,"];
-		if (([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheITV_TV"] isEqualTo:@YES] && includeITV) || !forCacheUpdate)
-         [cacheTypes appendString:@"itv,"];
-		if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheBBC_Radio"] isEqualTo:@YES] || !forCacheUpdate)
-         [cacheTypes appendString:@"radio,"];
+    NSMutableString *cacheTypes = [[NSMutableString alloc] initWithString:@""];
 
-        if (cacheTypes.length > 0) {
-            [cacheTypes deleteCharactersInRange:NSMakeRange(cacheTypes.length-1,1)];
-            currentTypeArgument = [NSString stringWithFormat:@"--type=%@", cacheTypes];
-        }
-	}
+    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheBBC_TV"] isEqualTo:@YES] || !forCacheUpdate)
+        [cacheTypes appendString:@"tv,"];
+    if (([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheITV_TV"] isEqualTo:@YES] && includeITV) || !forCacheUpdate)
+        [cacheTypes appendString:@"itv,"];
+    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheBBC_Radio"] isEqualTo:@YES] || !forCacheUpdate)
+        [cacheTypes appendString:@"radio,"];
 
-    return currentTypeArgument;
+    if (cacheTypes.length > 0) {
+        [cacheTypes deleteCharactersInRange:NSMakeRange(cacheTypes.length-1,1)];
+        cacheTypes = [NSMutableString stringWithFormat:@"--type=%@", cacheTypes];
+    }
+
+    return cacheTypes;
 }
 
-- (IBAction)typeChanged:(id)sender
+- (NSString *)cacheExpiryArg
 {
-    runCacheUpdateSinceChange=YES;
-}
-- (NSString *)cacheExpiryArgument
-{
-	//NSString *cacheExpiryArg = [[NSString alloc] initWithFormat:@"-e%d", ([[[NSUserDefaults standardUserDefaults] objectForKey:@"CacheExpiryTime"] intValue]*3600)];
-	//return cacheExpiryArg;
-	return @"-e60480000000000000";
+	return @"--expiry=9999999999";
 }
 
 - (NSString *)profileDirArg

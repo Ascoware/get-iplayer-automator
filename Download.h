@@ -9,14 +9,11 @@
 #import <Cocoa/Cocoa.h>
 #import "HTTPProxy.h"
 #import "Programme.h"
-#import "LogController.h"
 #import "TVFormat.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface Download : NSObject
-
-@property LogController *logger;
 
 @property Programme *show;
 
@@ -40,9 +37,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (copy) NSString *defaultsPrefix;
 @property (assign) BOOL running;
 
-//Verbose Logging
-@property (assign) BOOL verbose;
-
 //Proxy Info
 @property (nullable) HTTPProxy *proxy;
 
@@ -53,14 +47,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property NSURLSessionDataTask *currentRequest;
 
-- (instancetype)initWithLogController:(LogController *)logger;
 - (void)setCurrentProgress:(NSString *)string;
 - (void)setPercentage:(double)d;
 - (void)cancelDownload;
-
-- (void)logDebugMessage:(NSString *)message noTag:(BOOL)b;
-- (void)addToLog:(NSString *)logMessage noTag:(BOOL)b;
-- (void)addToLog:(NSString *)logMessage;
 
 - (void)processGetiPlayerOutput:(NSString *)outp;
 - (void)createDownloadPath;

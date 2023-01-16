@@ -7,18 +7,16 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import <CocoaLumberjack/CocoaLumberjack.h>
 
-@interface LogController : NSObject
+@interface LogController : NSObject<DDLogFormatter>
 
 @property IBOutlet NSTextView *log;
 @property (weak) IBOutlet NSWindow *window;
-@property NSFileHandle *fh;
 
 - (instancetype)init;
 - (IBAction)showLog:(id)sender;
 - (IBAction)copyLog:(id)sender;
 - (IBAction)clearLog:(id)sender;
-- (void)addToLog:(NSString *)string :(id)sender;
-- (void)addToLog:(NSString *)string;
 
 @end

@@ -7,7 +7,9 @@
 
 import Foundation
 
-@objc public class ProgrammeHistoryObject: NSObject, NSCoding {
+@objc public class ProgrammeHistoryObject: NSObject, NSSecureCoding {
+    public static var supportsSecureCoding: Bool = true
+
     @objc public var sortKey: TimeInterval = 0
     @objc public var programmeName: String = ""
     @objc public var dateFound: String = ""

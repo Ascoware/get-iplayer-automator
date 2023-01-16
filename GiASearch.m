@@ -8,9 +8,10 @@
 
 #import "GiASearch.h"
 #import "AppController.h"
+#import <Get_iPlayer_Automator-Swift.h>
 
 @implementation GiASearch
-- (instancetype)initWithSearchTerms:(NSString *)searchTerms allowHidingOfDownloadedItems:(BOOL)allowHidingOfDownloadedItems logController:(LogController *)logger selector:(SEL)selector withTarget:(id)target
+- (instancetype)initWithSearchTerms:(NSString *)searchTerms allowHidingOfDownloadedItems:(BOOL)allowHidingOfDownloadedItems selector:(SEL)selector withTarget:(id)target
 {
     if (!(self = [super init])) return nil;
     
@@ -22,14 +23,13 @@
 
         self.selector = selector;
         self.target = target;
-        self.logger = logger;
         
         self.task.launchPath = [[AppController sharedController] perlBinaryPath];
-        NSString *typeArg = [[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO andIncludeITV:YES];
+        NSString *typeArg = [[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO];
         NSArray *args = @[
             [[AppController sharedController] getiPlayerPath],
-            @"--nocopyright",
-            @"-e60480000000000000",
+            [[GetiPlayerArguments sharedController] noWarningArg],
+            [[GetiPlayerArguments sharedController] cacheExpiryArg],
             typeArg,
             @"--listformat",
             @"SearchResult|<pid>|<available>|<type>|<name>|<episode>|<channel>|<seriesnum>|<episodenum>|<desc>|<thumbnail>|<web>|<available>",
@@ -44,7 +44,7 @@
         }
         
         for (NSString *arg in args) {
-            [_logger addToLog: arg];
+            DDLogVerbose(@"%@", arg);
         }
         
         self.task.arguments = args;
@@ -100,16 +100,12 @@
 {
     NSArray *array = [_data componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
     NSMutableArray *resultsArray = [[NSMutableArray alloc] initWithCapacity:array.count];
-    NSDateFormatter *rawDateParser = [[NSDateFormatter alloc]init];
-    NSLocale *enUSPOSIXLocale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
+    NSISO8601DateFormatter *rawDateParser = [[NSISO8601DateFormatter alloc]init];
+    rawDateParser.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
 
     self.task = nil;
     self.pipe = nil;
     self.errorPipe = nil;
-    
-    rawDateParser.locale = enUSPOSIXLocale;
-    rawDateParser.dateFormat = @"yyyy-MM-dd'T'HH:mm:ssZZZZZ";
-    rawDateParser.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
 
     for (NSString *string in array)
     {
@@ -119,7 +115,6 @@
                 //SearchResult|<pid>|<available>|<type>|<name>|<episode>|<channel>|<seriesnum>|<episodenum>|<desc>|<thumbnail>|<web>
                 NSArray<NSString *> *fields = [string componentsSeparatedByString:@"|"];
                 Programme *p = [Programme new];
-                p.logger = _logger;
                 p.processedPID = YES;
                 p.pid = fields[1];
                 NSDate *broadcastDate = [rawDateParser dateFromString:fields[2]];
@@ -143,7 +138,7 @@
                 p.url = fields[11];
 
                 if (p.pid == nil || p.showName == nil || p.tvNetwork == nil || p.url == nil) {
-                    [_logger addToLog: [NSString stringWithFormat:@"WARNING: Skipped invalid search result: %@", string]];
+                    DDLogWarn(@"Skipped invalid search result: %@", string);
                     continue;
                 }
                 
@@ -163,7 +158,7 @@
         {
             if ([string hasPrefix:@"Unknown option:"] || [string hasPrefix:@"Option"] || [string hasPrefix:@"Usage"])
             {
-                [_logger addToLog:@"Unknown option" :self];
+                DDLogWarn(@"%@: Unknown option %@", self.description, string);
             }
         }
     }

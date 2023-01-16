@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface TVFormat : NSObject <NSCoding>
+@interface TVFormat : NSObject <NSSecureCoding>
 @property (nonnull, copy) NSString *format;
 
 -(id)initWithFormat:(NSString *)format;

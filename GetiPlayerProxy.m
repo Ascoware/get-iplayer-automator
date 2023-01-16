@@ -19,18 +19,10 @@
     return self;
 }
 
-- (instancetype)initWithLogger:(LogController *)logger {
-    if (self = [self init]) {
-        _logger = logger;
-    }
-    return self;
-}
-
 - (void)loadProxyInBackgroundForSelector:(SEL)selector withObject:(id)object onTarget:(id)target silently:(BOOL)silent
 {
     [self updateProxyLoadStatus:YES message:@"Loading proxy settings..."];
-    NSLog(@"INFO: Loading proxy settings...");
-    [_logger addToLog:@"\n\nINFO: Loading proxy settings..."];
+    DDLogVerbose(@"INFO: Loading proxy settings...");
     [_proxyDict removeAllObjects];
     _proxyDict[@"selector"] = [NSValue valueWithPointer:selector];
     _proxyDict[@"target"] = target;
@@ -41,13 +33,11 @@
     if ([proxyOption isEqualToString:@"Custom"])
     {
         NSString *customProxy = [[NSUserDefaults standardUserDefaults] valueForKey:@"CustomProxy"];
-        NSLog(@"INFO: Custom Proxy: address=[%@] length=%ld", customProxy, customProxy.length);
-        [_logger addToLog:[NSString stringWithFormat:@"INFO: Custom Proxy: address=[%@] length=%ld", customProxy, customProxy.length]];
+        DDLogDebug(@"INFO: Custom Proxy: address=[%@] length=%ld", customProxy, customProxy.length);
         NSString *proxyValue = [customProxy stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
         if (proxyValue.length == 0)
         {
-            NSLog(@"WARNING: Custom proxy setting was blank. No proxy will be used.");
-            [_logger addToLog:@"WARNING: Custom proxy setting was blank. No proxy will be used."];
+            DDLogWarn(@"WARNING: Custom proxy setting was blank. No proxy will be used.");
             if (!_currentIsSilent)
             {
                 NSAlert *alert = [[NSAlert alloc] init];
@@ -78,8 +68,7 @@
     }
     else
     {
-        NSLog(@"INFO: No proxy to load");
-        [_logger addToLog:@"INFO: No proxy to load"];
+        DDLogDebug(@"No proxy to load");
         [self finishProxyLoad];
     }
 }
@@ -89,8 +78,8 @@
 //    NSData *urlData = [request responseData];
 //    if (request.responseStatusCode != 200 || !urlData)
 //    {
-//        NSLog(@"WARNING: Provided proxy could not be retrieved. No proxy will be used.");
-//        [_logger addToLog:@"WARNING: Provided proxy could not be retrieved. No proxy will be used."];
+//        DDLogDebug(@"WARNING: Provided proxy could not be retrieved. No proxy will be used.");
+//        DDLogInfo(@"WARNING: Provided proxy could not be retrieved. No proxy will be used.");
 //        if (!_currentIsSilent)
 //        {
 //            NSError *error = request.error;
@@ -115,8 +104,8 @@
 //        NSString *proxyValue = [[[NSString alloc] initWithData:urlData encoding:NSUTF8StringEncoding].lowercaseString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 //        if (proxyValue.length == 0)
 //        {
-//            NSLog(@"WARNING: Provided proxy value was blank. No proxy will be used.");
-//            [_logger addToLog:@"WARNING: Provided proxy value was blank. No proxy will be used."];
+//            DDLogDebug(@"WARNING: Provided proxy value was blank. No proxy will be used.");
+//            DDLogInfo(@"WARNING: Provided proxy value was blank. No proxy will be used.");
 //            if (!_currentIsSilent)
 //            {
 //                NSAlert *alert = [NSAlert alertWithMessageText:@"Provided proxy value was blank.\nDownloads may fail.\nDo you wish to continue?"
@@ -155,8 +144,7 @@
 
 - (void)finishProxyLoad
 {
-    NSLog(@"INFO: Proxy load complete.");
-    [_logger addToLog:@"INFO: Proxy load complete."];
+    DDLogDebug(@"Proxy load complete.");
     if (_proxyDict[@"proxy"] && [[NSUserDefaults standardUserDefaults] boolForKey:@"TestProxy"])
     {
         [self testProxyOnLoad];
@@ -170,8 +158,7 @@
     HTTPProxy *proxy = _proxyDict[@"proxy"];
     
     if (!proxy) {
-        NSLog(@"INFO: No proxy to test");
-        [_logger addToLog:@"INFO: No proxy to test"];
+        DDLogDebug(@"No proxy to test");
         [self finishProxyTest];
         return;
     }
@@ -179,8 +166,7 @@
     
     if (!proxy.host || (proxy.host).length == 0 || [proxy.host rangeOfString:@"(null)"].location != NSNotFound)
     {
-        NSLog(@"WARNING: Invalid proxy host: address=%@ length=%ld", proxy.host, (proxy.host).length);
-        [_logger addToLog:[NSString stringWithFormat:@"WARNING: Invalid proxy host: address=%@ length=%ld", proxy.host, (proxy.host).length]];
+        DDLogWarn(@"Invalid proxy host: address=%@ length=%ld", proxy.host, (proxy.host).length);
         if (!_currentIsSilent)
         {
             NSAlert *alert = [[NSAlert alloc] init];
@@ -258,8 +244,7 @@
     
     NSString *testingMessage = @"Testing proxy (may take up to 30 seconds)...";
     [self updateProxyLoadStatus:YES message:testingMessage];
-    NSLog(@"INFO: %@", testingMessage);
-    [_logger addToLog:[NSString stringWithFormat:@"INFO: %@", testingMessage]];
+    DDLogInfo(@"%@", testingMessage);
     [task resume];
 }
 
@@ -267,8 +252,7 @@
 {
     if (response.statusCode != 200)
     {
-        NSLog(@"WARNING: Proxy failed to load test page: %@", response.URL);
-        [_logger addToLog:[NSString stringWithFormat:@"WARNING: Proxy failed to load test page: %@", response.URL]];
+        DDLogWarn(@"Proxy failed to load test page: %@", response.URL);
         if (!_currentIsSilent)
         {
             NSAlert *alert = [NSAlert new];
@@ -300,8 +284,7 @@
 
 - (void)finishProxyTest
 {
-    NSLog(@"INFO: Proxy test complete.");
-    [_logger addToLog:@"INFO: Proxy test complete."];
+    DDLogVerbose(@"INFO: Proxy test complete.");
     [self returnFromProxyLoadWithError:nil];
 }
 
@@ -309,13 +292,11 @@
 {
     if (_proxyDict[@"proxy"])
     {
-        NSLog(@"INFO: Using proxy: %@", [_proxyDict[@"proxy"] url]);
-        [_logger addToLog:[NSString stringWithFormat:@"INFO: Using proxy: %@", [_proxyDict[@"proxy"]url]]];
+        DDLogVerbose(@"Using proxy: %@", [_proxyDict[@"proxy"] url]);
     }
     else
     {
-        NSLog(@"INFO: No proxy will be used");
-        [_logger addToLog:@"INFO: No proxy will be used"];
+        DDLogVerbose(@"INFO: No proxy will be used");
     }
     [self updateProxyLoadStatus:NO message:nil];
     if (error) {

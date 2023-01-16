@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface RadioFormat : NSObject <NSCoding>
+@interface RadioFormat : NSObject <NSSecureCoding>
 @property (nonnull, copy) NSString *format;
 -(instancetype)initWithFormat:(NSString *)format;
 @end

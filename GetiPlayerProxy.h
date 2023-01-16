@@ -8,11 +8,9 @@
 
 #import <Foundation/Foundation.h>
 #import "HTTPProxy.h"
-#import "LogController.h"
 
 @interface GetiPlayerProxy : NSObject {
 }
-@property (nonatomic) LogController *logger;
 @property (nonatomic) NSMutableDictionary *proxyDict;
 @property (nonatomic) BOOL currentIsSilent;
 
@@ -23,6 +21,5 @@ enum {
 };
 
 - (void)loadProxyInBackgroundForSelector:(SEL)selector withObject:(id)object onTarget:(id)target silently:(BOOL)silent;
-- (instancetype)initWithLogger:(LogController *)logger;
 
 @end

@@ -24,6 +24,10 @@
     return self;
 }
 
++ (BOOL)supportsSecureCoding {
+    return YES;
+}
+
 - (id)description
 {
     return [NSString stringWithFormat:@"%@: %@",_pid, _showName];
@@ -65,7 +69,7 @@
             _processedPID = [coder decodeBoolForKey:@"processedPID"];
             _radio = [coder decodeBoolForKey:@"radio"];
         } @catch (NSException *e) {
-            NSLog(@"Found old format data, retrying");
+            DDLogDebug(@"Found old format data, retrying");
             _processedPID = [[coder decodeObjectForKey:@"processedPID"] boolValue];
             _radio = [[coder decodeObjectForKey:@"radio"] boolValue];
         }
@@ -88,8 +92,8 @@
 
 -(void)retrieveExtendedMetadata
 {
-    [_logger addToLog:@"Retrieving Extended Metadata" :self];
-    _getiPlayerProxy = [[GetiPlayerProxy alloc] initWithLogger:_logger];
+    DDLogInfo(@"Retrieving Extended Metadata");
+    _getiPlayerProxy = [GetiPlayerProxy new];
     [_getiPlayerProxy loadProxyInBackgroundForSelector:@selector(proxyRetrievalFinished:proxyDict:) withObject:nil onTarget:self silently:NO];
 }
 
@@ -112,8 +116,8 @@
     
     NSMutableArray *args = [NSMutableArray arrayWithArray:@[[[AppController sharedController] getiPlayerPath],
                                                             @"--nopurge",
-                                                            @"--nocopyright",
-                                                            @"-e60480000000000000",
+                                                            [[GetiPlayerArguments sharedController] noWarningArg],
+                                                            [[GetiPlayerArguments sharedController] cacheExpiryArg],
                                                             @"--info",
                                                             profileArg,
                                                             @"--pid",
@@ -133,7 +137,7 @@
     BOOL verbose = [[NSUserDefaults standardUserDefaults] boolForKey:@"Verbose"];
 
     if (verbose) {
-        NSLog(@"get metadata args: %@", args);
+        DDLogVerbose(@"get metadata args: %@", args);
     }
 
     self.metadataTask.standardOutput = self.pipe;
@@ -167,7 +171,7 @@
             [self.taskOutput appendString:s];
         }
 
-        [_logger addToLog:s :self];
+        DDLogVerbose(@"%@", s);
     }
     NSFileHandle *fh = [n.userInfo valueForKey:NSFileHandleNotificationFileHandleItem];
     [fh readInBackgroundAndNotify];
@@ -275,7 +279,7 @@
     NSString *thumbURL = [self scanField:@"thumbnail" fromList:_taskOutput];
     
     if (thumbURL) {
-        NSLog(@"URL: %@", thumbURL);
+        DDLogDebug(@"Thumbnail URL: %@", thumbURL);
         NSURLSessionDownloadTask *downloadTask = [[NSURLSession sharedSession] downloadTaskWithURL:[NSURL URLWithString:thumbURL]
                                                                                  completionHandler:^(NSURL * _Nullable location, NSURLResponse * _Nullable response, NSError * _Nullable error) {
                                                                                      NSData *thumbnailData = nil;
@@ -329,7 +333,7 @@
 {
     if (self.metadataTask.running) {
         [self.metadataTask interrupt];
-        [self.logger addToLog:@"Metadata Retrieval Cancelled" :self];
+        DDLogInfo(@"Metadata retrieval cancelled for %@", self.description);
     }
 
     self.metadataTask = nil;
@@ -386,12 +390,11 @@
         NSString *listArgument = @"--listformat=<index>|<pid>|<type>|<name>|<seriesnum>|<episode>|<channel>|<available>|<web>";
         NSString *fieldsArgument = @"--fields=index,pid";
         NSString *wantedID = _pid;
-        NSString *cacheExpiryArg = [[GetiPlayerArguments sharedController] cacheExpiryArgument];
         NSArray *args = @[[[AppController sharedController] getiPlayerPath],
-                          @"--nocopyright",
+                          [[GetiPlayerArguments sharedController] noWarningArg],
+                          [[GetiPlayerArguments sharedController] cacheExpiryArg],
                           @"--nopurge",
-                          cacheExpiryArg,
-                          [[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO andIncludeITV:YES],
+                          [[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO],
                           listArgument,
                           [GetiPlayerArguments sharedController].profileDirArg,
                           fieldsArgument,
@@ -506,8 +509,8 @@
 
 - (void)getNameFromPID
 {
-    [_logger addToLog:@"Retrieving Metadata For PID" :self];
-    _getiPlayerProxy = [[GetiPlayerProxy alloc] initWithLogger:_logger];
+    DDLogInfo(@"%@: Retrieving Metadata For PID", self.description);
+    _getiPlayerProxy = [GetiPlayerProxy new];
     [_getiPlayerProxy loadProxyInBackgroundForSelector:@selector(getNameFromPIDProxyLoadFinished:proxyDict:) withObject:nil onTarget:self silently:NO];
 }
 
@@ -533,13 +536,12 @@
         [versionArg  appendString:@"default"];
         NSString *infoArgument = @"--info";
         NSString *pidArgument = @"--pid";
-        NSString *cacheExpiryArg = [[GetiPlayerArguments sharedController] cacheExpiryArgument];
         NSMutableArray *args = [[NSMutableArray alloc] initWithObjects:
                                 [[AppController sharedController] getiPlayerPath],
-                                @"--nocopyright",
+                                [[GetiPlayerArguments sharedController] noWarningArg],
+                                [[GetiPlayerArguments sharedController] cacheExpiryArg],
                                 @"--nopurge",
                                 versionArg,
-                                cacheExpiryArg,
                                 [GetiPlayerArguments sharedController].profileDirArg,
                                 infoArgument,
                                 pidArgument,
@@ -599,7 +601,7 @@
             continue;
         }
 
-        if ([line hasPrefix:@"ERROR:"] || [line hasPrefix:@"WARN:"] || [line hasPrefix:@"Episodes:"]) {
+        if ([line hasPrefix:@"ERROR:"] || [line hasPrefix:@"WARNING:"] || [line hasPrefix:@"Episodes:"]) {
             continue;
         }
 
