@@ -79,7 +79,9 @@ import CocoaLumberjackSwift
 
         var arguments = [String]()
         arguments.append(show.path)
-        safeAppend(&arguments, key: "--stik", value: "value=10")
+        arguments.append("--overWrite")
+        safeAppend(&arguments, key: "--hdvideo", value: hdVideo ? "true" : "false")
+        safeAppend(&arguments, key: "--stik", value: "TV Show")
         safeAppend(&arguments, key: "--TVNetwork", value: show.tvNetwork)
         safeAppend(&arguments, key: "--TVShowName", value: show.seriesName)
         safeAppend(&arguments, key: "--TVSeasonNum", value: String(show.season))
@@ -89,12 +91,6 @@ import CocoaLumberjackSwift
         safeAppend(&arguments, key: "--description", value: show.desc)
         safeAppend(&arguments, key: "--artist", value: show.tvNetwork)
         safeAppend(&arguments, key: "--year", value: show.lastBroadcastString)
-
-        if hdVideo {
-            arguments.append("--hdvideo")
-        }
-
-        arguments.append("--overWrite")
 
         apTask.arguments = arguments
 
