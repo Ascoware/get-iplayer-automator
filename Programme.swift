@@ -16,6 +16,7 @@ import CocoaLumberjackSwift
     case itv
 }
 
+@objc(Programme)
 @objcMembers public class Programme : NSObject, NSSecureCoding {
 
     private var getNameRunning = false

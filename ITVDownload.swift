@@ -286,11 +286,13 @@ import CocoaLumberjackSwift
         
         if UserDefaults.standard.bool(forKey: "DownloadSubtitles") {
             args.append("--write-sub")
-            
+            args.append("--sub-format")
+            args.append("vtt")
+            args.append("--convert-subtitles")
+            args.append("srt")
+
             if UserDefaults.standard.bool(forKey: "EmbedSubtitles") {
                 args.append("--embed-subs")
-            } else {
-                args.append("-k")
             }
         }
 
