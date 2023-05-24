@@ -99,6 +99,7 @@ import CocoaLumberjackSwift
                 case "TVEpisode", "@TVEpisode", "@RadioEpisode", "RadioEpisode", "Clip":
                     let show = Programme()
                     show.pid = infoDict["identifier"].stringValue
+                    show.tvNetwork = "BBC"
                     show.seriesName = infoDict["partOfSeries"]["name"].stringValue
                     show.episodeName = infoDict["name"].stringValue
                     show.url = infoDict["url"].stringValue
@@ -126,7 +127,7 @@ import CocoaLumberjackSwift
 //            let show = ITVMetadataExtractor.getShowMetadata(htmlPageContent: pageSource)
 //            completion([show])
         } else if url.hasPrefix("https://player.stv.tv/episode/") {
-            let show = STVMetadataExtractor.getShowMetadataFromPage(html: pageSource)
+            let show = STVMetadataExtractor.getShowMetadata(url: url, html: pageSource)
             if show.count == 0 {
                 let invalidPage = NSAlert()
                 invalidPage.addButton(withTitle: "OK")

@@ -223,7 +223,7 @@ import CocoaLumberjackSwift
         if exitCode == 0 {
             self.show.complete = true
             self.show.successful = true
-            let info = ["Programme" : self.show]
+            let info = ["Programmes" : [self.show]]
             DispatchQueue.main.async {
                 NotificationCenter.default.post(name: NSNotification.Name(rawValue: "AddProgToHistory"), object:self, userInfo:info)
                 self.youtubeDLFinishedDownload()
@@ -231,6 +231,7 @@ import CocoaLumberjackSwift
         } else {
             self.show.complete = true
             self.show.successful = false
+            self.show.status = "Failed"
             
             // Something went wrong inside youtube-dl.
             NotificationCenter.default.removeObserver(self)
@@ -287,7 +288,7 @@ import CocoaLumberjackSwift
         if UserDefaults.standard.bool(forKey: "DownloadSubtitles") {
             args.append("--write-sub")
             args.append("--sub-format")
-            args.append("vtt")
+            args.append("dfxp/vtt")
             args.append("--convert-subtitles")
             args.append("srt")
 

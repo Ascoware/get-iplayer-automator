@@ -7,7 +7,6 @@
 //
 
 #import "DownloadHistoryController.h"
-#import "DownloadHistoryEntry.h"
 #import "NSFileManager+DirectoryLocations.h"
 #import "Get_iPlayer_Automator-Swift.h"
 
@@ -152,17 +151,20 @@
 {
 	[self readHistory];
 	NSDictionary *userInfo = note.userInfo;
-	Programme *prog = [userInfo valueForKey:@"Programme"];
-    NSInteger now = [[NSDate new] timeIntervalSince1970];
-    DownloadHistoryEntry *entry = [DownloadHistoryEntry new];
-    entry.pid = prog.pid;
-    entry.showName = prog.seriesName;
-    entry.episodeName = prog.episodeName;
-    entry.someNumber = [NSString stringWithFormat:@"%ld", now];
-    entry.type = @"itv";
-    entry.downloadFormat = @"flashhigh";
-    entry.downloadPath = prog.path;
-	[historyArrayController addObject:entry];
+	NSArray<Programme *> *programs = [userInfo valueForKey:@"Programmes"];
+
+    for (Programme *prog in programs) {
+        NSInteger now = [[NSDate new] timeIntervalSince1970];
+        DownloadHistoryEntry *entry = [DownloadHistoryEntry new];
+        entry.pid = prog.pid;
+        entry.showName = prog.seriesName;
+        entry.episodeName = prog.episodeName;
+        entry.someNumber = [NSString stringWithFormat:@"%ld", now];
+        entry.type = prog.typeDescription;
+        entry.downloadFormat = @"flashhigh";
+        entry.downloadPath = prog.path;
+        [historyArrayController addObject:entry];
+    }
 	[self writeHistory:self];
 }
 

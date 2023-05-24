@@ -8,10 +8,11 @@
 import Foundation
 import Kanna
 import SwiftyJSON
+import CocoaLumberjack
 
 class STVMetadataExtractor {
 
-    static func getShowMetadataFromPage(html: String) -> [Programme] {
+    static func getShowMetadata(url: String, html: String) -> [Programme] {
         let longDateFormatter = ISO8601DateFormatter()
         longDateFormatter.timeZone = TimeZone(secondsFromGMT:0)
 
@@ -20,41 +21,45 @@ class STVMetadataExtractor {
 
         // Find the "props" JSON dictionary. Then traverse the tree
         if let htmlPage = try? HTML(html: html, encoding: .utf8) {
-            if let propertiesElement = htmlPage.at_xpath("//script[@id='__NEXT_DATA__']") {
-                if let propertiesContent = propertiesElement.content {
-                    let propertiesJSON = JSON(parseJSON: propertiesContent)
-                    let propsDict = propertiesJSON["props"].dictionaryValue
-                    if let pageProps = propsDict["pageProps"] {
-                        newProgram.pid = pageProps["episodeId"].stringValue
-                        let episodesKey = "/episodes/\(newProgram.pid)"
-                        if let showData = propsDict["initialReduxState"]?["playerApiCache"][episodesKey]["results"] {
-                            let protectedMedia = showData["programme"]["drmEnabled"].boolValue
+            guard let propertiesElement = htmlPage.at_xpath("//script[@id='__NEXT_DATA__']") else {
+                DDLogError("**** No metadata found for \(url)")
+                return []
+            }
 
-                            if protectedMedia {
-                                return []
-                            }
-                            newProgram.seriesName = showData["programme"]["name"].stringValue
-                            newProgram.episodeName = showData["title"].stringValue
-                            let seriesString = showData["playerSeries"]["name"].stringValue
+            if let propertiesContent = propertiesElement.content {
+                let propertiesJSON = JSON(parseJSON: propertiesContent)
+                let propsDict = propertiesJSON["props"].dictionaryValue
+                if let pageProps = propsDict["pageProps"] {
+                    newProgram.pid = pageProps["episodeId"].stringValue
+                    let episodesKey = "/episodes/\(newProgram.pid)"
+                    if let showData = propsDict["initialReduxState"]?["playerApiCache"][episodesKey]["results"] {
+                        let protectedMedia = showData["programme"]["drmEnabled"].boolValue
 
-                            let seriesComponents = seriesString.components(separatedBy: .whitespacesAndNewlines)
-                            for item in seriesComponents {
-                                if let number = Int(item) {
-                                    newProgram.season = number
-                                }
-                            }
+                        if protectedMedia {
+                            return []
+                        }
+                        newProgram.seriesName = showData["programme"]["name"].stringValue
+                        newProgram.episodeName = showData["title"].stringValue
+                        let seriesString = showData["playerSeries"]["name"].stringValue
 
-                            newProgram.episode = showData["number"].intValue
-                            let startTime = showData["schedule"]["startTime"].stringValue
-                            newProgram.lastBroadcast = longDateFormatter.date(from: startTime)
-                            if let lastAirDate = newProgram.lastBroadcast {
-                                newProgram.lastBroadcastString = DateFormatter.localizedString(from: lastAirDate, dateStyle: .medium, timeStyle: .none)
+                        let seriesComponents = seriesString.components(separatedBy: .whitespacesAndNewlines)
+                        for item in seriesComponents {
+                            if let number = Int(item) {
+                                newProgram.season = number
                             }
                         }
-                        newProgram.url = pageProps["currentUrl"].stringValue
-                        newProgram.desc = pageProps["summary"].string ?? "None available"
-                        newProgram.thumbnailURLString = pageProps["image"].stringValue
+
+                        newProgram.episode = showData["number"].intValue
+                        let startTime = showData["schedule"]["startTime"].stringValue
+                        newProgram.lastBroadcast = longDateFormatter.date(from: startTime)
+                        if let lastAirDate = newProgram.lastBroadcast {
+                            newProgram.lastBroadcastString = DateFormatter.localizedString(from: lastAirDate, dateStyle: .medium, timeStyle: .none)
+                        }
                     }
+                    newProgram.url = pageProps["currentUrl"].stringValue
+                    let rawDesc = pageProps["summary"].string ?? "None available"
+                    newProgram.desc = rawDesc.filter { !$0.isNewline }
+                    newProgram.thumbnailURLString = pageProps["image"].stringValue
                 }
             }
         }
