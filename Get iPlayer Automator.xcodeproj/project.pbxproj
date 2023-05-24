@@ -607,10 +607,12 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Get iPlayer Automator-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "echo ${CONFIGURATION_BUILD_DIR}\necho ${UNLOCALIZED_RESOURCES_FOLDER_PATH}\n\nfor (( i=0; i<$SCRIPT_INPUT_FILE_COUNT; i++)) \ndo\n    FILE=\"SCRIPT_INPUT_FILE_$i\"\n    codesign --force --options runtime --sign \"Developer ID Application: Scott Kovatch\" \"${!FILE}\"\ndone\n";
+			shellScript = "echo ${CONFIGURATION_BUILD_DIR}\necho ${UNLOCALIZED_RESOURCES_FOLDER_PATH}\n\nfor (( i=0; i<$SCRIPT_INPUT_FILE_COUNT; i++)) \ndo\n    FILE=\"SCRIPT_INPUT_FILE_$i\"\n#    codesign --force --options runtime --sign \"Developer ID Application: Scott Kovatch\" \"${!FILE}\"\ndone\n";
+			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
 
