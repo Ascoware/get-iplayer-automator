@@ -8,11 +8,11 @@
 import Foundation
 import Kanna
 import SwiftyJSON
-import CocoaLumberjack
+import CocoaLumberjackSwift
 
 class STVMetadataExtractor {
 
-    static func getShowMetadata(url: String, html: String) -> [Programme] {
+    static func getShowMetadata(html: String) -> [Programme] {
         let longDateFormatter = ISO8601DateFormatter()
         longDateFormatter.timeZone = TimeZone(secondsFromGMT:0)
 
@@ -22,7 +22,7 @@ class STVMetadataExtractor {
         // Find the "props" JSON dictionary. Then traverse the tree
         if let htmlPage = try? HTML(html: html, encoding: .utf8) {
             guard let propertiesElement = htmlPage.at_xpath("//script[@id='__NEXT_DATA__']") else {
-                DDLogError("**** No metadata found for \(url)")
+                DDLogError("**** No metadata found")
                 return []
             }
 

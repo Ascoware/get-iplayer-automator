@@ -109,7 +109,7 @@ import CocoaLumberjackSwift
         if show.tvNetwork.hasPrefix("ITV") {
             showMetadata = ITVMetadataExtractor.getShowMetadata(htmlPageContent: responseString)
         } else {
-            showMetadata = STVMetadataExtractor.getShowMetadataFromPage(html: responseString)
+            showMetadata = STVMetadataExtractor.getShowMetadata(html: responseString)
         }
 
         if showMetadata.count == 0 {

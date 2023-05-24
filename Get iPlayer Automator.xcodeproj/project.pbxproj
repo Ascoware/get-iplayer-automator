@@ -56,6 +56,7 @@
 		7FCF7263271388990086B0CD /* HistoryTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FCF7262271388990086B0CD /* HistoryTableViewController.swift */; };
 		7FEDA8ED24FC982200189D37 /* MicrosoftEdge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FEDA8EB24FC982200189D37 /* MicrosoftEdge.swift */; };
 		7FEDA8EE24FC982200189D37 /* MicrosoftEdgeScripting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FEDA8EC24FC982200189D37 /* MicrosoftEdgeScripting.swift */; };
+		7FFC210B2A1DD26300CB3FF7 /* DownloadHistoryEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FFC210A2A1DD26300CB3FF7 /* DownloadHistoryEntry.swift */; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
@@ -67,7 +68,6 @@
 		D914BC59100C9F0100F7E68E /* ScriptingBridge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D914BC58100C9F0100F7E68E /* ScriptingBridge.framework */; };
 		D9178595101345D700B82736 /* Series.m in Sources */ = {isa = PBXBuildFile; fileRef = D9178594101345D700B82736 /* Series.m */; };
 		D92687C51087F81F000E8132 /* DownloadHistoryController.m in Sources */ = {isa = PBXBuildFile; fileRef = D92687C41087F81F000E8132 /* DownloadHistoryController.m */; };
-		D92687CA1087F836000E8132 /* DownloadHistoryEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = D92687C91087F836000E8132 /* DownloadHistoryEntry.m */; };
 		D941D9A01025DDCF0012A75F /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D941D99F1025DDCF0012A75F /* SystemConfiguration.framework */; };
 		D97D9426106DBB68006ECD39 /* TVFormat.m in Sources */ = {isa = PBXBuildFile; fileRef = D97D9423106DBB68006ECD39 /* TVFormat.m */; };
 		D97D9427106DBB68006ECD39 /* RadioFormat.m in Sources */ = {isa = PBXBuildFile; fileRef = D97D9424106DBB68006ECD39 /* RadioFormat.m */; };
@@ -175,6 +175,7 @@
 		7FEDA8EB24FC982200189D37 /* MicrosoftEdge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MicrosoftEdge.swift; sourceTree = "<group>"; };
 		7FEDA8EC24FC982200189D37 /* MicrosoftEdgeScripting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MicrosoftEdgeScripting.swift; sourceTree = "<group>"; };
 		7FF4174321FC02AE004FF8CE /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		7FFC210A2A1DD26300CB3FF7 /* DownloadHistoryEntry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DownloadHistoryEntry.swift; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* Get iPlayer Automator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Get iPlayer Automator.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BF382ED01D73C21500BAF106 /* AppController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppController.h; sourceTree = "<group>"; };
@@ -191,8 +192,6 @@
 		D921C9C1149BBF51004CB558 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = System/Library/Frameworks/CoreServices.framework; sourceTree = SDKROOT; };
 		D92687C31087F81F000E8132 /* DownloadHistoryController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DownloadHistoryController.h; sourceTree = "<group>"; };
 		D92687C41087F81F000E8132 /* DownloadHistoryController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DownloadHistoryController.m; sourceTree = "<group>"; };
-		D92687C81087F836000E8132 /* DownloadHistoryEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DownloadHistoryEntry.h; sourceTree = "<group>"; };
-		D92687C91087F836000E8132 /* DownloadHistoryEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DownloadHistoryEntry.m; sourceTree = "<group>"; };
 		D941D99F1025DDCF0012A75F /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = /System/Library/Frameworks/SystemConfiguration.framework; sourceTree = "<absolute>"; };
 		D97D9422106DBB68006ECD39 /* TVFormat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TVFormat.h; sourceTree = "<group>"; };
 		D97D9423106DBB68006ECD39 /* TVFormat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TVFormat.m; sourceTree = "<group>"; };
@@ -396,6 +395,7 @@
 				39D7C1BE1874AD9D00B78698 /* NilToStringTransformer.h */,
 				39D7C1BF1874AD9D00B78698 /* NilToStringTransformer.m */,
 				7F78C1FE291C385500DAD51E /* Download.swift */,
+				7FFC210A2A1DD26300CB3FF7 /* DownloadHistoryEntry.swift */,
 				7F340B5A1FFB063700F415A4 /* ITVDownload.swift */,
 				7F78C200291C42C500DAD51E /* BBCDownload.swift */,
 				D9F97FE4198E9043006494A3 /* GetCurrentWebpage.swift */,
@@ -408,8 +408,6 @@
 				D97D9423106DBB68006ECD39 /* TVFormat.m */,
 				D97D9425106DBB68006ECD39 /* RadioFormat.h */,
 				D97D9424106DBB68006ECD39 /* RadioFormat.m */,
-				D92687C81087F836000E8132 /* DownloadHistoryEntry.h */,
-				D92687C91087F836000E8132 /* DownloadHistoryEntry.m */,
 				DFC865E013E96BE200606599 /* ReasonForFailure.h */,
 				DFC865E113E96BE200606599 /* ReasonForFailure.m */,
 				392A41A2169735340053DEA5 /* HTTPProxy.h */,
@@ -521,8 +519,9 @@
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 1000;
-				LastUpgradeCheck = 1420;
+				LastUpgradeCheck = 1430;
 				ORGANIZATIONNAME = "";
 				TargetAttributes = {
 					7F23872C2131082C00FA4588 = {
@@ -644,11 +643,11 @@
 				D92687C51087F81F000E8132 /* DownloadHistoryController.m in Sources */,
 				7F78C1FF291C385500DAD51E /* Download.swift in Sources */,
 				7FCF7263271388990086B0CD /* HistoryTableViewController.swift in Sources */,
-				D92687CA1087F836000E8132 /* DownloadHistoryEntry.m in Sources */,
 				7FEDA8ED24FC982200189D37 /* MicrosoftEdge.swift in Sources */,
 				DFC865E213E96BE200606599 /* ReasonForFailure.m in Sources */,
 				7F4545FD292C4CE0009DC35C /* STVMetadataExtractor.swift in Sources */,
 				39D7C1C01874AD9D00B78698 /* NilToStringTransformer.m in Sources */,
+				7FFC210B2A1DD26300CB3FF7 /* DownloadHistoryEntry.swift in Sources */,
 				7F78C201291C42C500DAD51E /* BBCDownload.swift in Sources */,
 				7F5B1C55211F9EE600BF7E99 /* SBApplicationProtocol.swift in Sources */,
 				D9B6DB9A196D9AEC00161ECB /* LogController.m in Sources */,
@@ -948,6 +947,7 @@
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG = "";
 				DEFINES_MODULE = YES;
+				ENABLE_MODULE_VERIFIER = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				EXCLUDED_ARCHS = "";
@@ -962,6 +962,8 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++14";
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 				SWIFT_VERSION = 4.2;
@@ -993,6 +995,7 @@
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG = "";
 				DEFINES_MODULE = YES;
+				ENABLE_MODULE_VERIFIER = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				EXCLUDED_ARCHS = "";
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -1005,6 +1008,8 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++14";
 				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";

@@ -127,7 +127,7 @@ import CocoaLumberjackSwift
 //            let show = ITVMetadataExtractor.getShowMetadata(htmlPageContent: pageSource)
 //            completion([show])
         } else if url.hasPrefix("https://player.stv.tv/episode/") {
-            let show = STVMetadataExtractor.getShowMetadata(url: url, html: pageSource)
+            let show = STVMetadataExtractor.getShowMetadata(html: pageSource)
             if show.count == 0 {
                 let invalidPage = NSAlert()
                 invalidPage.addButton(withTitle: "OK")
