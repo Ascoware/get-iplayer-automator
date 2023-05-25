@@ -444,6 +444,9 @@ import CocoaLumberjackSwift
             return
         }
 
+        tvNetwork = scanField("channel", lines: validOutput)
+        radio = scanField("type", lines: validOutput) == "radio"
+
         let versions = info_versions.components(separatedBy: ",")
         for version in versions {
             if (version == "default") || ((version == "original") && (default_version != "default")) || (default_version == nil && (version != "signed") && (version != "audiodescribed")) {
@@ -465,6 +468,7 @@ import CocoaLumberjackSwift
             firstBroadcast = ISO8601DateFormatter().date(from: broadcast)
         }
 
+        url = scanField("web", lines: validOutput)
         seriesName = scanField("nameshort", lines: validOutput)
         episodeName = scanField("episodeshort", lines: validOutput)
         showName = scanField("longname", lines: validOutput)
@@ -473,7 +477,7 @@ import CocoaLumberjackSwift
 
         let episodeNumber = scanField("episodenum", lines: validOutput)
         episode = Int(episodeNumber) ?? 0
-
+        
         // parse mode sizes
         modeSizes.removeAll()
         for version in versions {
