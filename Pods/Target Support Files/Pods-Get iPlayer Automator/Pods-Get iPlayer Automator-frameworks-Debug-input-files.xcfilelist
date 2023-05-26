@@ -1,0 +1,6 @@
+${PODS_ROOT}/Target Support Files/Pods-Get iPlayer Automator/Pods-Get iPlayer Automator-frameworks.sh
+${BUILT_PRODUCTS_DIR}/CocoaLumberjack/CocoaLumberjack.framework
+${BUILT_PRODUCTS_DIR}/Kanna/Kanna.framework
+${PODS_ROOT}/Sparkle/Sparkle.framework
+${BUILT_PRODUCTS_DIR}/Swarm/Swarm.framework
+${BUILT_PRODUCTS_DIR}/SwiftyJSON/SwiftyJSON.framework

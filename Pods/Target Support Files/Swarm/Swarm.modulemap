@@ -1,0 +1,6 @@
+framework module Swarm {
+  umbrella header "Swarm-umbrella.h"
+
+  export *
+  module * { export * }
+}

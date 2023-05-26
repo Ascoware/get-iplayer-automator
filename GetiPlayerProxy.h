@@ -9,8 +9,16 @@
 #import <Foundation/Foundation.h>
 #import "HTTPProxy.h"
 
+@protocol GetiPlayerProxyDelegate <NSObject>
+
+- (void)proxyLoaded:(HTTPProxy *)proxy;
+
+@end
+
 @interface GetiPlayerProxy : NSObject {
 }
+
+@property (nonatomic, weak) NSObject<GetiPlayerProxyDelegate> *delegate;
 @property (nonatomic) NSMutableDictionary *proxyDict;
 @property (nonatomic) BOOL currentIsSilent;
 
@@ -23,3 +31,4 @@ enum {
 - (void)loadProxyInBackgroundForSelector:(SEL)selector withObject:(id)object onTarget:(id)target silently:(BOOL)silent;
 
 @end
+

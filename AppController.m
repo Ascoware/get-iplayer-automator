@@ -965,15 +965,18 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 - (IBAction)hidePvrShow:(id)sender
 {
     NSArray *temp_queue = _queueController.selectedObjects;
+    NSMutableArray<Programme *> *showsToHide = [NSMutableArray new];
     for (Programme *show in temp_queue)
     {
         if (show.realPID && show.addedByPVR)
         {
-            NSDictionary *info = @{@"Programme": show};
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"AddProgToHistory" object:self userInfo:info];
+            [showsToHide addObject:show];
             [_queueController removeObject:show];
         }
     }
+
+    NSDictionary *info = @{@"Programmes": showsToHide};
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"AddProgToHistory" object:self userInfo:info];
 }
 #pragma mark Download Controller
 - (IBAction)startDownloads:(id)sender
@@ -987,8 +990,14 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         DDLogError(@"NO UI: startDownloads:");
     }
     [self saveAppData]; //Save data in case of crash.
+    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])
+    {
+        _getiPlayerProxy = [GetiPlayerProxy new];
     _getiPlayerProxy = [GetiPlayerProxy new];
     [_getiPlayerProxy loadProxyInBackgroundForSelector:@selector(startDownloads:proxyDict:) withObject:sender onTarget:self silently:_runScheduled];
+    } else {
+        [self startDownloads:sender proxyDict:nil];
+    }
 }
 
 - (void)startDownloads:(id)sender proxyDict:(NSDictionary *)proxyDict
