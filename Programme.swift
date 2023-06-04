@@ -324,7 +324,7 @@ import CocoaLumberjackSwift
         if !found {
             status = "Not in cache"
 
-            if tvNetwork.isEmpty || tvNetwork.hasPrefix("BBC") {
+            if !tvNetwork.contains("ITV") && !tvNetwork.contains("STV") {
                 showName = "Retrieving Metadata..."
                 getNameFromPID()
             } else {
