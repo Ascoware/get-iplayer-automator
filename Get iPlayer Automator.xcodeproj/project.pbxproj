@@ -847,7 +847,7 @@
 					"$(PROJECT_DIR)",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
-				MARKETING_VERSION = 1.25.3;
+				MARKETING_VERSION = 1.25.4;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CODE_SIGN_FLAGS = "--no-strict";
 				OTHER_LDFLAGS = "-licucore";
@@ -906,7 +906,7 @@
 					"$(PROJECT_DIR)",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
-				MARKETING_VERSION = 1.25.3;
+				MARKETING_VERSION = 1.25.4;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CODE_SIGN_FLAGS = "--no-strict";
 				OTHER_LDFLAGS = "-licucore";

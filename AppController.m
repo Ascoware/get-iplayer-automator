@@ -1088,24 +1088,25 @@ static NSString *FORCE_RELOAD = @"ForceReload";
             [nc addObserver:self selector:@selector(nextDownload:) name:@"DownloadFinished" object:nil];
 
             tempQueue = _queueController.arrangedObjects;
-            DDLogInfo(@"\nDownloading Show %lu/%lu:\n",
-                              (unsigned long)1,
-                      (unsigned long)tempQueue.count);
 
             for (Programme *show in tempQueue)
             {
                 if (!show.complete)
                 {
-                    if ([show.tvNetwork containsString:@"BBC"]) {
-                        _currentDownload = [[BBCDownload alloc] initWithProgramme:show
-                                                                     tvFormatList:_tvFormatController.arrangedObjects
-                                                                  radioFormatList:_radioFormatController.arrangedObjects
-                                                                           proxy:_proxy];
-                    } else {
+                    if ([show.tvNetwork containsString:@"ITV"] || [show.tvNetwork containsString:@"STV"]) {
                         _currentDownload = [[ITVDownload alloc]
                                             initWithProgramme:show
                                             proxy:_proxy];
+                    } else {
+                        _currentDownload = [[BBCDownload alloc] initWithProgramme:show
+                                                                     tvFormatList:_tvFormatController.arrangedObjects
+                                                                  radioFormatList:_radioFormatController.arrangedObjects
+                                                                            proxy:_proxy];
                     }
+                    DDLogInfo(@"\nDownloading Show %lu/%lu from %@\n",
+                              (unsigned long)1,
+                              (unsigned long)tempQueue.count,
+                              show.tvNetwork);
                     break;
                 }
             }
@@ -1296,16 +1297,17 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 
     if (nextShow != nil) {
         if (!nextShow.complete) {
-            DDLogInfo(@"\nDownloading Show %lu/%lu:\n",
-                               (unsigned long)([tempQueue indexOfObject:nextShow]+1),
-                      (unsigned long)tempQueue.count);
-            if ([nextShow.tvNetwork containsString:@"BBC"]) {
+            DDLogInfo(@"\nDownloading Show %lu/%lu from %@:\n",
+                      (unsigned long)([tempQueue indexOfObject:nextShow]+1),
+                      (unsigned long)tempQueue.count,
+                      nextShow.tvNetwork);
+            if ([nextShow.tvNetwork containsString:@"ITV"] || [nextShow.tvNetwork containsString:@"STV"]) {
+                _currentDownload = [[ITVDownload alloc] initWithProgramme:nextShow
+                                                                    proxy:_proxy];
+            } else {
                 _currentDownload = [[BBCDownload alloc] initWithProgramme:nextShow
                                                              tvFormatList:_tvFormatController.arrangedObjects
                                                           radioFormatList:_radioFormatController.arrangedObjects
-                                                                    proxy:_proxy];
-            } else {
-                _currentDownload = [[ITVDownload alloc] initWithProgramme:nextShow
                                                                     proxy:_proxy];
             }
         }
