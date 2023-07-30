@@ -6,7 +6,7 @@
 //  Copyright 2009 __MyCompanyName__. All rights reserved.
 //
 
-#import <UserNotifications/UserNotifications.h>
+// #import <UserNotifications/UserNotifications.h>
 #import "AppController.h"
 #import <Sparkle/Sparkle.h>
 #import "HTTPProxy.h"
@@ -22,6 +22,7 @@ static AppController *sharedController;
 BOOL runDownloads = NO;
 BOOL runUpdate = NO;
 NSDictionary<NSString*, NSString*> *tvFormats;
+NSDictionary<NSString*, NSString*> *stvFormats;
 NSDictionary<NSString*, NSString*> *radioFormats;
 
 // New ITV Cache
@@ -269,8 +270,6 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         }
 
         [_radioFormatController addObjects:updatedRadioFormats];
-
-
     }
     @catch (NSException *e)
     {
@@ -279,15 +278,20 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         rootObject=nil;
     }
 
-    if (!tvFormats || !radioFormats) {
+    // IMPORTANT: All values in xxxFormatKeys must match the corresponding popups in the preferences. If you change those
+    // you MUST update these, and vice-versa.
         NSArray *tvFormatKeys = @[@"Full HD (1080p)", @"HD (720p)", @"SD (540p)", @"Web (396p)", @"Mobile (288p)"];
-        NSArray *tvFormatObjects = @[@"fhd",@"hd",@"sd",@"web",@"mobile"];
+    NSArray *bbcTvFormatObjects = @[@"fhd",@"hd",@"sd",@"web",@"mobile"];
+
+    NSArray *stvFormatKeys = @[@"Full HD (1080p)", @"HD (720p)", @"SD (576p)", @"Web (432p)", @"Mobile (288p)"];
+    NSArray *stvFormatObjects = @[@"1080",@"720",@"576",@"432",@"288"];
+
         NSArray *radioFormatKeys = @[@"High", @"Standard", @"Medium", @"Low"];
         NSArray *radioFormatObjects = @[@"high", @"std", @"med", @"low"];
 
-        tvFormats = [[NSDictionary alloc] initWithObjects:tvFormatObjects forKeys:tvFormatKeys];
+    tvFormats = [[NSDictionary alloc] initWithObjects:bbcTvFormatObjects forKeys:tvFormatKeys];
+    stvFormats = [[NSDictionary alloc] initWithObjects:stvFormatObjects forKeys:stvFormatKeys];
         radioFormats = [[NSDictionary alloc] initWithObjects:radioFormatObjects forKeys:radioFormatKeys];
-    }
 
     // clear obsolete formats
     NSMutableArray *tempTVFormats = [[NSMutableArray alloc] initWithArray:_tvFormatController.arrangedObjects];
@@ -424,14 +428,18 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 
 - (void)updater:(SPUStandardUpdaterController *)updater didFindValidUpdate:(SUAppcastItem *)update
 {
-    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
-
-    UNMutableNotificationContent *content = [UNMutableNotificationContent new];
-    content.title = @"Update Available!";
-    content.body = [NSString stringWithFormat:@"Get iPlayer Automator %@ is available.",update.displayVersionString];
-
-    UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:@"" content:content trigger:nil];
-    [center addNotificationRequest:request withCompletionHandler:nil];
+//    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+//
+//    UNMutableNotificationContent *content = [UNMutableNotificationContent new];
+//    content.title = @"Update Available!";
+//    content.body = [NSString stringWithFormat:@"Get iPlayer Automator %@ is available.",update.displayVersionString];
+//
+//    UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:@"" content:content trigger:nil];
+//    [center addNotificationRequest:request withCompletionHandler:nil];
+    NSUserNotification *notification = [[NSUserNotification alloc] init];
+    notification.informativeText = [NSString stringWithFormat:@"Get iPlayer Automator %@ is available.",update.displayVersionString];
+    notification.title = @"Update Available!";
+    [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
 }
 
 #pragma mark Cache Update
@@ -529,15 +537,16 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         _proxy = proxyDict[@"proxy"];
     }
 
-    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheITV_TV"] isEqualTo:@YES])
-    {
-        _updatingITVIndex = true;
-        [self.itvProgressIndicator startAnimation:self];
-        self.itvProgressIndicator.doubleValue = 0.0;
-        [self.itvProgressIndicator setHidden:false];
-
-        [newITVListing itvUpdate];
-    }
+    // Disabling until we figure out the new ITV structure
+//    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheITV_TV"] isEqualTo:@YES])
+//    {
+//        _updatingITVIndex = true;
+//        [self.itvProgressIndicator startAnimation:self];
+//        self.itvProgressIndicator.doubleValue = 0.0;
+//        [self.itvProgressIndicator setHidden:false];
+//
+//        [newITVListing itvUpdate];
+//    }
 
     _updatingBBCIndex = true;
 
@@ -682,14 +691,21 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 
     if (_didUpdate)
     {
-        UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+        // UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
 
-        UNMutableNotificationContent *content = [UNMutableNotificationContent new];
-        content.title =  @"Index Updated";
-        content.body = @"The program index was updated.";
+        // UNMutableNotificationContent *content = [UNMutableNotificationContent new];
+        // content.title =  @"Index Updated";
+        // content.body = @"The program index was updated.";
 
-        UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:@"" content:content trigger:nil];
-        [center addNotificationRequest:request withCompletionHandler:nil];
+        // UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:@"" content:content trigger:nil];
+        // [center addNotificationRequest:request withCompletionHandler:nil];
+        NSUserNotification *indexUpdated = [[NSUserNotification alloc] init];
+        indexUpdated.title = @"Index Updated";
+        indexUpdated.informativeText = @"The program index was updated.";
+        indexUpdated.identifier = @"Index Updating Completed";
+        
+        [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:indexUpdated];
+
         DDLogInfo(@"BBC Index Updated");
         _lastUpdate=[NSDate date];
         [self updateHistory];
@@ -949,15 +965,18 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 - (IBAction)hidePvrShow:(id)sender
 {
     NSArray *temp_queue = _queueController.selectedObjects;
+    NSMutableArray<Programme *> *showsToHide = [NSMutableArray new];
     for (Programme *show in temp_queue)
     {
         if (show.realPID && show.addedByPVR)
         {
-            NSDictionary *info = @{@"Programme": show};
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"AddProgToHistory" object:self userInfo:info];
+            [showsToHide addObject:show];
             [_queueController removeObject:show];
         }
     }
+
+    NSDictionary *info = @{@"Programmes": showsToHide};
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"AddProgToHistory" object:self userInfo:info];
 }
 #pragma mark Download Controller
 - (IBAction)startDownloads:(id)sender
@@ -971,8 +990,14 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         DDLogError(@"NO UI: startDownloads:");
     }
     [self saveAppData]; //Save data in case of crash.
+    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])
+    {
+        _getiPlayerProxy = [GetiPlayerProxy new];
     _getiPlayerProxy = [GetiPlayerProxy new];
     [_getiPlayerProxy loadProxyInBackgroundForSelector:@selector(startDownloads:proxyDict:) withObject:sender onTarget:self silently:_runScheduled];
+    } else {
+        [self startDownloads:sender proxyDict:nil];
+    }
 }
 
 - (void)startDownloads:(id)sender proxyDict:(NSDictionary *)proxyDict
@@ -1063,24 +1088,25 @@ static NSString *FORCE_RELOAD = @"ForceReload";
             [nc addObserver:self selector:@selector(nextDownload:) name:@"DownloadFinished" object:nil];
 
             tempQueue = _queueController.arrangedObjects;
-            DDLogInfo(@"\nDownloading Show %lu/%lu:\n",
-                              (unsigned long)1,
-                      (unsigned long)tempQueue.count);
 
             for (Programme *show in tempQueue)
             {
                 if (!show.complete)
                 {
-                    if ([show.tvNetwork hasPrefix:@"ITV"]) {
+                    if ([show.tvNetwork containsString:@"ITV"] || [show.tvNetwork containsString:@"STV"]) {
                         _currentDownload = [[ITVDownload alloc]
                                             initWithProgramme:show
                                             proxy:_proxy];
                     } else {
                         _currentDownload = [[BBCDownload alloc] initWithProgramme:show
-                                                                       tvFormats:_tvFormatController.arrangedObjects
-                                                                    radioFormats:_radioFormatController.arrangedObjects
-                                                                           proxy:_proxy];
+                                                                     tvFormatList:_tvFormatController.arrangedObjects
+                                                                  radioFormatList:_radioFormatController.arrangedObjects
+                                                                            proxy:_proxy];
                     }
+                    DDLogInfo(@"\nDownloading Show %lu/%lu from %@\n",
+                              (unsigned long)1,
+                              (unsigned long)tempQueue.count,
+                              show.tvNetwork);
                     break;
                 }
             }
@@ -1206,8 +1232,8 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     }
 
     Programme *finishedShow = note.object;
-    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
-    UNMutableNotificationContent *content = [UNMutableNotificationContent new];
+//    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+//    UNMutableNotificationContent *content = [UNMutableNotificationContent new];
 
     if (finishedShow.successful) {
         finishedShow.status = @"Processing...";
@@ -1218,11 +1244,20 @@ static NSString *FORCE_RELOAD = @"ForceReload";
             finishedShow.status = @"Download Complete";
         }
 
-        content.title = @"Download Finished";
-        content.body = [NSString stringWithFormat:@"%@ Completed Successfully",finishedShow.showName];
+        NSUserNotification *notification = [[NSUserNotification alloc] init];
+        notification.informativeText = [NSString stringWithFormat:@"%@ Completed Successfully",finishedShow.showName];
+        notification.title = @"Download Finished";
+        [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
     } else {
-        content.body = [NSString stringWithFormat:@"%@ failed. See log for details.",finishedShow.showName];
-        content.title = @"Download Failed";
+        NSUserNotification *notification = [[NSUserNotification alloc] init];
+        notification.informativeText = [NSString stringWithFormat:@"%@ failed. See log for details.",finishedShow.showName];
+        notification.title = @"Download Failed";
+        [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
+//        content.title = @"Download Finished";
+//        content.body = [NSString stringWithFormat:@"%@ Completed Successfully",finishedShow.showName];
+//    } else {
+//        content.body = [NSString stringWithFormat:@"%@ failed. See log for details.",finishedShow.showName];
+//        content.title = @"Download Failed";
 
         ReasonForFailure *showSolution = [[ReasonForFailure alloc] init];
 
@@ -1245,8 +1280,8 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         _solutionsTableView.rowHeight = 68;
     }
 
-    UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:@"" content:content trigger:nil];
-    [center addNotificationRequest:request withCompletionHandler:nil];
+//    UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:@"" content:content trigger:nil];
+//    [center addNotificationRequest:request withCompletionHandler:nil];
 
     [self saveAppData]; //Save app data in case of crash.
 
@@ -1262,17 +1297,19 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 
     if (nextShow != nil) {
         if (!nextShow.complete) {
-            DDLogInfo(@"\nDownloading Show %lu/%lu:\n",
-                               (unsigned long)([tempQueue indexOfObject:nextShow]+1),
-                      (unsigned long)tempQueue.count);
-            if ([nextShow.tvNetwork hasPrefix:@"ITV"])
+            DDLogInfo(@"\nDownloading Show %lu/%lu from %@:\n",
+                      (unsigned long)([tempQueue indexOfObject:nextShow]+1),
+                      (unsigned long)tempQueue.count,
+                      nextShow.tvNetwork);
+            if ([nextShow.tvNetwork containsString:@"ITV"] || [nextShow.tvNetwork containsString:@"STV"]) {
                 _currentDownload = [[ITVDownload alloc] initWithProgramme:nextShow
                                                                     proxy:_proxy];
-            else
+            } else {
                 _currentDownload = [[BBCDownload alloc] initWithProgramme:nextShow
-                                                                tvFormats:_tvFormatController.arrangedObjects
-                                                             radioFormats:_radioFormatController.arrangedObjects
+                                                             tvFormatList:_tvFormatController.arrangedObjects
+                                                          radioFormatList:_radioFormatController.arrangedObjects
                                                                     proxy:_proxy];
+            }
         }
     } else {
         //Downloads must be finished.
@@ -1305,13 +1342,19 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 
         tempQueue=nil;
 
-        UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
-        UNMutableNotificationContent *content = [UNMutableNotificationContent new];
-        content.title = @"Downloads Finished";
-        content.body = [NSString stringWithFormat:@"Downloads Successful = %lu\nDownload Failed = %lu",
-                        (unsigned long)downloadsSuccessful,(unsigned long)downloadsFailed];
-        UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:@"" content:content trigger:nil];
-        [center addNotificationRequest:request withCompletionHandler:nil];
+        NSUserNotification *notification = [[NSUserNotification alloc] init];
+        notification.informativeText = [NSString stringWithFormat:@"Downloads Successful = %lu\nDownload Failed = %lu",
+                                        (unsigned long)downloadsSuccessful,(unsigned long)downloadsFailed];
+        notification.title = @"Downloads Finished";
+        [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
+
+//        UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+//        UNMutableNotificationContent *content = [UNMutableNotificationContent new];
+//        content.title = @"Downloads Finished";
+//        content.body = [NSString stringWithFormat:@"Downloads Successful = %lu\nDownload Failed = %lu",
+//                        (unsigned long)downloadsSuccessful,(unsigned long)downloadsFailed];
+//        UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:@"" content:content trigger:nil];
+//        [center addNotificationRequest:request withCompletionHandler:nil];
 
         if (downloadsFailed>0) {
             [_solutionsWindow makeKeyAndOrderFront:self];
@@ -2043,7 +2086,6 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 -(void)updateHistoryForType:(NSString *)networkName andProgFile:(NSString *)oldProgrammesFile andCacheFile:(NSString *)newCacheFile
 {
     /* Load old Programmes file */
-
     NSFileManager *fileManager = [NSFileManager defaultManager];
     BOOL firstTimeBuild = NO;
 
@@ -2055,22 +2097,18 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     NSMutableArray *oldProgrammesArray = nil;
     
     // Guard against bad data in the archive. If the un-archive fails ignore it and just make an empty array.
-    @try {
         NSData *oldProgramData = [NSData dataWithContentsOfFile:oldProgrammesFile];
         NSError *error;
         NSSet *allowedClasses = [NSSet setWithObjects: [ProgrammeHistoryObject class], [NSArray class], [NSString class], nil];
         oldProgrammesArray = [NSKeyedUnarchiver unarchivedObjectOfClasses:allowedClasses fromData:oldProgramData error:&error];
         if (error) {
             DDLogError(@"error unarchiving 'old program data': %@", error.description);
-        }
-    } @catch (NSException *exception) {
         firstTimeBuild = YES;
         oldProgrammesArray = [NSMutableArray new];
     }
 
     /* Load in todays shows cached by get_iplayer or getITVListings and create a dictionary of show names */
 
-    NSError *error;
     NSString *newCacheString = [NSString stringWithContentsOfFile:newCacheFile encoding:NSUTF8StringEncoding error:&error];
     NSArray  *newCacheArray  = [newCacheString componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
 

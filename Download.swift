@@ -18,9 +18,9 @@ import CocoaLumberjackSwift
     var subtitleURL: String?
     var downloadPath: String = ""
     var subtitlePath: String = ""
+    var hdVideo: Bool = false
+
     //Subtitle Conversion
-    var subsTask: Process?
-    var subsErrorPipe: Pipe?
     var defaultsPrefix: String = ""
     var running = true
     //Proxy Info
@@ -54,7 +54,7 @@ import CocoaLumberjackSwift
 
     // MARK: Message Processers
 
-    func safeAppend(_ array: inout [AnyHashable], key: String, value: String) {
+    func safeAppend(_ array: inout [String], key: String, value: String) {
         if !key.isEmpty, !value.isEmpty {
             array.append(key)
             // Converts any object into a string representation
@@ -75,9 +75,11 @@ import CocoaLumberjackSwift
 
         apTask.launchPath = URL(fileURLWithPath: AppController.shared().extraBinariesPath).appendingPathComponent("AtomicParsley").path
 
-        var arguments: [AnyHashable] = []
+        var arguments = [String]()
         arguments.append(show.path)
-        safeAppend(&arguments, key: "--stik", value: "value=10")
+        arguments.append("--overWrite")
+        safeAppend(&arguments, key: "--hdvideo", value: hdVideo ? "true" : "false")
+        safeAppend(&arguments, key: "--stik", value: "TV Show")
         safeAppend(&arguments, key: "--TVNetwork", value: show.tvNetwork)
         safeAppend(&arguments, key: "--TVShowName", value: show.seriesName)
         safeAppend(&arguments, key: "--TVSeasonNum", value: String(show.season))
@@ -87,9 +89,8 @@ import CocoaLumberjackSwift
         safeAppend(&arguments, key: "--description", value: show.desc)
         safeAppend(&arguments, key: "--artist", value: show.tvNetwork)
         safeAppend(&arguments, key: "--year", value: show.lastBroadcastString)
-        arguments.append("--overWrite")
 
-        apTask.arguments = arguments as? [String]
+        apTask.arguments = arguments
 
         DDLogVerbose("DEBUG: AtomicParsley args:\(arguments)")
 
@@ -116,121 +117,9 @@ import CocoaLumberjackSwift
             }
         }
 
-        if UserDefaults.standard.bool(forKey: "DownloadSubtitles") {
-            // youtube-dl should try to download a subtitle file, but if there isn't one log it and continue.
-            if FileManager.default.fileExists(atPath: subtitlePath) {
-                if URL(fileURLWithPath: subtitlePath).pathExtension != "srt" {
-                    show.status = "Converting Subtitles..."
-                    setPercentage(102)
-                    setCurrentProgress("Converting Subtitles... -- \(show.showName)")
-                    DDLogInfo("INFO: Converting Subtitles...")
-                    if URL(fileURLWithPath: subtitlePath).pathExtension == "ttml" {
-                        convertTTMLToSRT()
-                    } else {
-                        convertWebVTTToSRT()
-                    }
-                } else {
-                    convertSubtitlesFinished(nil)
-                }
-            } else {
-                // If youtube-dl embeds subtitles for us it deletes the raw subtitle file. When that happens
-                // we don't know if it was subtitled or not, so don't report an error when embedding is on.
-                if !UserDefaults.standard.bool(forKey: "EmbedSubtitles") {
-                    DDLogInfo("INFO: No subtitles were found for \(show.showName)")
-                }
-                convertSubtitlesFinished(nil)
-            }
-        } else {
-            convertSubtitlesFinished(nil)
-        }
-    }
-
-    func convertWebVTTToSRT() {
-        if subtitlePath.isEmpty {
-            convertSubtitlesFinished(nil)
-        } else {
-            DispatchQueue.main.async(execute: { [self] in
-                DDLogInfo("INFO: Converting to SubRip: \(subtitlePath)")
-
-                var outputURL = URL(fileURLWithPath: subtitlePath)
-                outputURL = outputURL.deletingPathExtension().appendingPathExtension("srt")
-                var args: [AnyHashable] = []
-
-                // TODO: Figure out if I can bring this back. ffmpeg doesn't support it.
-                //            BOOL srtIgnoreColors = [[NSUserDefaults standardUserDefaults] boolForKey:[NSString stringWithFormat:@"%@SRTIgnoreColors", self.defaultsPrefix]];
-                //            if (srtIgnoreColors)
-                //            {
-                //                [args addObject:@"--srt-ignore-colors"];
-                //            }
-
-                args.append("-i")
-                args.append(subtitlePath)
-                args.append(outputURL.path)
-
-                subsTask = Process()
-                subsErrorPipe = Pipe()
-                subsTask?.standardError = subsErrorPipe
-                NotificationCenter.default.addObserver(self, selector: #selector(convertSubtitlesFinished(_:)), name: Process.didTerminateNotification, object: subsTask)
-
-                let ffmpegURL = URL(fileURLWithPath: AppController.shared().extraBinariesPath).appendingPathComponent("ffmpeg").path
-                subsTask?.launchPath = ffmpegURL
-                subsTask?.arguments = args as? [String]
-                subsTask?.launch()
-            })
-        }
-    }
-
-    func convertTTMLToSRT() {
-        if subtitlePath.isEmpty {
-            convertSubtitlesFinished(nil)
-        } else {
-            DispatchQueue.main.async(execute: { [self] in
-                DDLogInfo("INFO: Converting to SubRip: \(subtitlePath)")
-                let ttml2srtPath = Bundle.main.path(forResource: "ttml2srt.py", ofType: nil)
-                var args = [ttml2srtPath]
-
-                let srtIgnoreColors = UserDefaults.standard.bool(forKey: "\(defaultsPrefix)SRTIgnoreColors")
-                if srtIgnoreColors {
-                    args.append("--srt-ignore-colors")
-                }
-
-                args.append(subtitlePath)
-
-                subsTask = Process()
-                subsErrorPipe = Pipe()
-                subsTask?.standardError = subsErrorPipe
-                NotificationCenter.default.addObserver(self, selector: #selector(convertSubtitlesFinished(_:)), name: Process.didTerminateNotification, object: subsTask)
-
-                let pythonInstall = Bundle.main.url(forResource: "python", withExtension: nil)
-                let pythonPath = pythonInstall?.appendingPathComponent("bin/python3.11", isDirectory: false)
-
-                subsTask?.launchPath = pythonPath?.path
-                subsTask?.arguments = args.compactMap { $0 }
-                subsTask?.launch()
-            })
-        }
-    }
-
-    @objc func convertSubtitlesFinished(_ aNotification: Notification?) {
-
-        if let aNotification, let process = aNotification.object as? Process {
-            // Should not get inside this code for ITV (webvtt) subtitles.
-            if process.terminationStatus == 0 {
-                try? FileManager.default.removeItem(atPath: subtitlePath)
-                DDLogInfo("INFO: Conversion to SubRip complete")
-            } else {
-                DDLogError("ERROR: Conversion to SubRip failed: \(subtitlePath)")
-                if let errData = subsErrorPipe?.fileHandleForReading.readDataToEndOfFile(),
-                   let errString = String(data: errData, encoding: .utf8) {
-                    DDLogError("\(errString)")
-                }
-            }
-        }
         show.status = "Download Complete"
         NotificationCenter.default.removeObserver(self)
         NotificationCenter.default.post(name: NSNotification.Name("DownloadFinished"), object: show)
-        subsTask = nil
-        subsErrorPipe = nil
     }
 
     func cancel() {

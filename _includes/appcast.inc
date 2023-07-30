@@ -11,6 +11,7 @@
                         <title>{{ release.name }}</title>
                         <description><![CDATA[{{ release.body | markdownify }}]]></description>
                         <pubDate>{{ release.published_at | date_to_rfc822 }}</pubDate>
+                        <sparkle:minimumSystemVersion>10.13.0</sparkle:minimumSystemVersion>
                         {% for asset in release.assets limit:1 %}
                             {% assign build_nums = asset.name | replace_first:'Get iPlayer Automator.v','' | replace_first:'.b',',' | remove_first:'.zip' | split:',' %}
                             {% if build_nums.size == 2 %}

@@ -14,11 +14,11 @@ import CocoaLumberjackSwift
 
 
     // MARK: Overridden Methods
-    required init(programme p: Programme, tvFormats tvFormatList: [TVFormat], radioFormats radioFormatList: [RadioFormat], proxy aProxy: HTTPProxy?) {
+    required init(programme: Programme, tvFormatList: [TVFormat], radioFormatList: [RadioFormat], proxy: HTTPProxy?) {
         super.init()
         reasonForFailure = nil
-        proxy = aProxy
-        show = p
+        self.proxy = proxy
+        show = programme
         defaultsPrefix = "BBC_"
         downloadPath = UserDefaults.standard.string(forKey: "DownloadPath") ?? ""
         DDLogInfo("Downloading \(show.showName)")
@@ -28,17 +28,9 @@ import CocoaLumberjackSwift
         var formatStrings: [String] = []
 
         if show.radio {
-            for format in radioFormatList {
-                if let mappedFormat = radioFormats[format.format] as? String {
-                    formatStrings.append(mappedFormat)
-                }
-            }
+            formatStrings = radioFormatList.compactMap { radioFormats[$0.format] as? String }
         } else {
-            for format in tvFormatList {
-                if let mappedFormat = tvFormats[format.format] as? String {
-                    formatStrings.append(mappedFormat)
-                }
-            }
+            formatStrings = tvFormatList.compactMap { tvFormats[$0.format] as? String }
         }
 
         let commaSeparatedFormats = formatStrings.joined(separator: ",")
@@ -48,8 +40,8 @@ import CocoaLumberjackSwift
         //Set Proxy Arguments
         var proxyArg: String? = nil
         var partialProxyArg: String? = nil
-        if let aProxy {
-            proxyArg = "-p\(aProxy.url)"
+        if let proxy {
+            proxyArg = "-p\(proxy.url)"
             if UserDefaults.standard.bool(forKey: "AlwaysUseProxy") {
                 partialProxyArg = "--partial-proxy"
             }

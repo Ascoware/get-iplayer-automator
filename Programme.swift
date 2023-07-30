@@ -16,7 +16,9 @@ import CocoaLumberjackSwift
     case itv
 }
 
+@objc(Programme)
 @objcMembers public class Programme : NSObject, NSSecureCoding {
+
     private var getNameRunning = false
 
     dynamic var tvNetwork: String = ""
@@ -320,13 +322,13 @@ import CocoaLumberjackSwift
         processedPID = found
 
         if !found {
-            if showName.isEmpty {
-                showName = "Retrieving Metadata..."
-                status = "Not in cache"
-            }
+            status = "Not in cache"
 
-            if self.tvNetwork != "ITV" {
+            if !tvNetwork.contains("ITV") && !tvNetwork.contains("STV") {
+                showName = "Retrieving Metadata..."
                 getNameFromPID()
+            } else {
+                getNameRunning = false
             }
         } else {
             getNameRunning = false
@@ -442,6 +444,9 @@ import CocoaLumberjackSwift
             return
         }
 
+        tvNetwork = scanField("channel", lines: validOutput)
+        radio = scanField("type", lines: validOutput) == "radio"
+
         let versions = info_versions.components(separatedBy: ",")
         for version in versions {
             if (version == "default") || ((version == "original") && (default_version != "default")) || (default_version == nil && (version != "signed") && (version != "audiodescribed")) {
@@ -463,6 +468,7 @@ import CocoaLumberjackSwift
             firstBroadcast = ISO8601DateFormatter().date(from: broadcast)
         }
 
+        url = scanField("web", lines: validOutput)
         seriesName = scanField("nameshort", lines: validOutput)
         episodeName = scanField("episodeshort", lines: validOutput)
         showName = scanField("longname", lines: validOutput)
@@ -471,7 +477,7 @@ import CocoaLumberjackSwift
 
         let episodeNumber = scanField("episodenum", lines: validOutput)
         episode = Int(episodeNumber) ?? 0
-
+        
         // parse mode sizes
         modeSizes.removeAll()
         for version in versions {
@@ -536,6 +542,14 @@ import CocoaLumberjackSwift
         extendedMetadataRetrieved = true
         NotificationCenter.default.post(name: NSNotification.Name("ExtendedInfoRetrieved"), object: self)
         processedPID = true
+    }
+
+}
+
+extension Programme : Comparable {
+
+    public static func < (lhs: Programme, rhs: Programme) -> Bool {
+        return lhs.showName < rhs.showName
     }
 
 }

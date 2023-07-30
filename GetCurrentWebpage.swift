@@ -99,6 +99,7 @@ import CocoaLumberjackSwift
                 case "TVEpisode", "@TVEpisode", "@RadioEpisode", "RadioEpisode", "Clip":
                     let show = Programme()
                     show.pid = infoDict["identifier"].stringValue
+                    show.tvNetwork = "BBC"
                     show.seriesName = infoDict["partOfSeries"]["name"].stringValue
                     show.episodeName = infoDict["name"].stringValue
                     show.url = infoDict["url"].stringValue
@@ -122,9 +123,21 @@ import CocoaLumberjackSwift
             }
 
             completion(showList)
-        } else if url.hasPrefix("https://www.itv.com/hub/") {
-            let show = ITVMetadataExtractor.getShowMetadata(htmlPageContent: pageSource)
-            completion([show])
+//        } else if url.hasPrefix("https://www.itv.com/hub/") {
+//            let show = ITVMetadataExtractor.getShowMetadata(htmlPageContent: pageSource)
+//            completion([show])
+        } else if url.hasPrefix("https://player.stv.tv/episode/") {
+            let show = STVMetadataExtractor.getShowMetadata(html: pageSource)
+            if show.count == 0 {
+                let invalidPage = NSAlert()
+                invalidPage.addButton(withTitle: "OK")
+                invalidPage.messageText = "Protected content"
+                invalidPage.informativeText = "The selected program is DRM protected, so it cannot be retrieved with Get iPlayer Automator."
+                invalidPage.alertStyle = .warning
+                invalidPage.runModal()
+            } else {
+                completion(show)
+            }
         } else {
             let invalidPage = NSAlert()
             invalidPage.addButton(withTitle: "OK")
