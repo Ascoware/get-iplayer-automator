@@ -9,7 +9,6 @@
 #import <Cocoa/Cocoa.h>
 #import <Sparkle/Sparkle.h>
 #import <IOKit/pwr_mgt/IOPMLib.h>
-#import "Series.h"
 #import "NilToStringTransformer.h"
 #import "EmptyToStringTransformer.h"
 #import "LogController.h"
@@ -21,6 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class Download;
 @class Programme;
+@class Series;
 
 extern BOOL runDownloads;
 extern NSDictionary<NSString *, NSString *> *tvFormats;
