@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21223" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21223"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21701"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -26,11 +26,11 @@
                         <rect key="frame" x="17" y="387" width="656" height="53"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <view key="contentView" id="E93-rG-8OQ">
-                            <rect key="frame" x="3" y="3" width="650" height="33"/>
+                            <rect key="frame" x="4" y="5" width="648" height="31"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Gv6-d3-doF">
-                                    <rect key="frame" x="10" y="8" width="106" height="18"/>
+                                    <rect key="frame" x="10" y="6" width="106" height="18"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <buttonCell key="cell" type="check" title="Show BBC TV" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="pB3-5R-V19" userLabel="Show BBC Programmes">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -44,7 +44,7 @@
                                     </connections>
                                 </button>
                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LhV-vR-Qj2" userLabel="Show BBC Radio">
-                                    <rect key="frame" x="265" y="8" width="123" height="18"/>
+                                    <rect key="frame" x="265" y="6" width="123" height="18"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <buttonCell key="cell" type="check" title="Show BBC Radio" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="erj-6r-wCb">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -58,7 +58,7 @@
                                     </connections>
                                 </button>
                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="MJx-4J-sm5">
-                                    <rect key="frame" x="556" y="7" width="80" height="18"/>
+                                    <rect key="frame" x="556" y="5" width="80" height="18"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <buttonCell key="cell" type="check" title="Show ITV" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="MJc-VI-rfH" userLabel="Show ITV Programmes">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -87,7 +87,7 @@
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                     <tableColumns>
-                                        <tableColumn identifier="programmeNameString" editable="NO" width="398.66015625" minWidth="40" maxWidth="1000" id="qmY-Ca-Q4p">
+                                        <tableColumn identifier="programmeNameString" editable="NO" width="398.5" minWidth="40" maxWidth="1000" id="qmY-Ca-Q4p">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Programme">
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
@@ -99,7 +99,7 @@
                                             </textFieldCell>
                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                         </tableColumn>
-                                        <tableColumn identifier="networkNameString" width="216.453125" minWidth="10" maxWidth="3.4028234663852886e+38" id="qf4-6P-ZVz">
+                                        <tableColumn identifier="networkNameString" width="216.5" minWidth="10" maxWidth="3.4028234663852886e+38" id="qf4-6P-ZVz">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Network">
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>

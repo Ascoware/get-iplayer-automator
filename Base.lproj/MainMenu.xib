@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21701"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -14,7 +14,6 @@
             </connections>
         </customObject>
         <userDefaultsController representsSharedInstance="YES" id="668"/>
-        <customObject id="420" customClass="NSFontManager"/>
         <customObject id="621" customClass="AppController">
             <connections>
                 <outlet property="addSeriesLinkToQueueButton" destination="985" id="Sxz-ip-Nn7"/>
@@ -475,7 +474,7 @@
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="1002"/>
-                            <menuItem title="Preferences…" keyEquivalent="," id="129" userLabel="121">
+                            <menuItem title="Preferences…" keyEquivalent="," id="129">
                                 <connections>
                                     <action selector="makeKeyAndOrderFront:" target="547" id="911"/>
                                 </connections>
@@ -508,7 +507,7 @@
                             <menuItem isSeparatorItem="YES" id="149">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                             </menuItem>
-                            <menuItem title="Quit Get iPlayer Automator" keyEquivalent="q" id="136" userLabel="1111">
+                            <menuItem title="Quit Get iPlayer Automator" keyEquivalent="q" id="136">
                                 <connections>
                                     <action selector="terminate:" target="-3" id="449"/>
                                 </connections>
@@ -1195,7 +1194,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                         <clipView key="contentView" id="en0-B7-GvD">
                             <rect key="frame" x="1" y="1" width="566" height="147"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="sequential" columnSelection="YES" autosaveColumns="NO" headerView="526" id="525">
                                     <rect key="frame" x="0.0" y="0.0" width="566" height="130"/>
@@ -1291,7 +1290,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" id="vxe-2Q-IFs">
                             <rect key="frame" x="1" y="1" width="566" height="124"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="sequential" columnSelection="YES" autosaveColumns="NO" headerView="537" id="536">
                                     <rect key="frame" x="0.0" y="0.0" width="566" height="107"/>
@@ -2562,7 +2561,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" id="Npw-zh-ApO">
                             <rect key="frame" x="1" y="1" width="534" height="256"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView identifier="DownloadHistory" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" alternatingRowBackgroundColors="YES" columnSelection="YES" autosaveName="DownloadHistory" headerView="1218" id="1217">
                                     <rect key="frame" x="0.0" y="0.0" width="534" height="239"/>
@@ -2704,7 +2703,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" id="iPE-J7-aae">
                             <rect key="frame" x="1" y="1" width="454" height="380"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <textView editable="NO" importsGraphics="NO" richText="NO" verticallyResizable="YES" allowsCharacterPickerTouchBarItem="NO" textCompletion="NO" id="616">
                                     <rect key="frame" x="0.0" y="0.0" width="469" height="380"/>
@@ -2880,7 +2879,7 @@ Note: Only the types of shows you select in the preferences will show up here.</
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" id="YAE-Sf-t5Q">
                             <rect key="frame" x="1" y="1" width="760" height="303"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="1387" id="1389">
                                     <rect key="frame" x="0.0" y="0.0" width="760" height="286"/>
@@ -3019,19 +3018,6 @@ DQ
                 <outlet property="typeField" destination="kYy-bf-29g" id="MHz-0g-l0i"/>
             </connections>
         </customObject>
-        <menu id="Pnm-tl-9hW">
-            <items>
-                <menuItem title="Item 1" id="frs-kL-yWu">
-                    <modifierMask key="keyEquivalentModifierMask"/>
-                </menuItem>
-                <menuItem title="Item 2" id="WVt-N0-GcJ">
-                    <modifierMask key="keyEquivalentModifierMask"/>
-                </menuItem>
-                <menuItem title="Item 3" id="OZv-Hl-KOG">
-                    <modifierMask key="keyEquivalentModifierMask"/>
-                </menuItem>
-            </items>
-        </menu>
     </objects>
     <resources>
         <image name="log" width="32" height="32"/>
