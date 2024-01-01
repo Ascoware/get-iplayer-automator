@@ -1,0 +1,87 @@
+{
+   "abstract" : "Perl bindings for OpenSSL and LibreSSL",
+   "author" : [
+      "Sampo Kellomäki <sampo@iki.fi>",
+      "Florian Ragwitz <rafl@debian.org>",
+      "Mike McCauley <mikem@airspayce.com>",
+      "Chris Novakovic <chris@chrisn.me.uk>",
+      "Tuure Vartiainen <vartiait@radiatorsoftware.com>",
+      "Heikki Vatiainen <hvn@radiatorsoftware.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-SSLeay",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "helper_script",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "English" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec::Functions" : "0",
+            "Text::Wrap" : "0",
+            "constant" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Kwalitee" : "1.00",
+            "Test::Pod::Coverage" : "1.00"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "MIME::Base64" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Carp" : "0",
+            "Config" : "0",
+            "Cwd" : "0",
+            "English" : "0",
+            "File::Basename" : "0",
+            "File::Spec::Functions" : "0",
+            "Scalar::Util" : "0",
+            "SelectSaver" : "0",
+            "Socket" : "0",
+            "Storable" : "0",
+            "Test::Builder" : "0",
+            "Test::More" : "0.60_01",
+            "base" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/radiator-software/p5-net-ssleay/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/radiator-software/p5-net-ssleay.git",
+         "web" : "https://github.com/radiator-software/p5-net-ssleay"
+      }
+   },
+   "version" : "1.92",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

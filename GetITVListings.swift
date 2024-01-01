@@ -43,8 +43,7 @@ public class GetITVShows: NSObject, URLSessionDelegate, URLSessionTaskDelegate, 
         if let aString = URL(string: "https://www.itv.com/hub/shows") {
             mySession?.dataTask(with: aString) {(_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void in
                 if let error = error {
-                    let errorMessage = "GetITVListings (Error: \(error.localizedDescription)): Unable to retrieve show listings from ITV"
-                    DDLogError(errorMessage)
+                    DDLogError("GetITVListings (Error: \(error.localizedDescription)): Unable to retrieve show listings from ITV")
                 }
                 guard let data = data else {
                     self.endOfRun()

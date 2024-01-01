@@ -1,1 +1,0 @@
-{"target":"File::chdir","pathname":"D/DA/DAGOLDEN/File-chdir-0.1010.tar.gz","version":"0.1010","name":"File::chdir","provides":{"File::chdir::SCALAR":{"file":"lib/File/chdir.pm","version":"0.1010"},"File::chdir::ARRAY":{"file":"lib/File/chdir.pm","version":"0.1010"},"File::chdir":{"version":"0.1010","file":"lib/File/chdir.pm"}},"dist":"File-chdir-0.1010"}

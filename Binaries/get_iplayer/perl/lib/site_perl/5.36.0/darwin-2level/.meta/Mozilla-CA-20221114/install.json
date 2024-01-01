@@ -1,0 +1,1 @@
+{"version":"20221114","target":"Mozilla::CA","dist":"Mozilla-CA-20221114","pathname":"H/HA/HAARG/Mozilla-CA-20221114.tar.gz","name":"Mozilla::CA","provides":{"Mozilla::CA":{"version":"20221114","file":"lib/Mozilla/CA.pm"}}}

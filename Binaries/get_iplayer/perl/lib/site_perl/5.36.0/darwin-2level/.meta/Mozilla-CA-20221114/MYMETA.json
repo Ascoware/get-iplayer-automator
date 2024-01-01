@@ -1,0 +1,61 @@
+{
+   "abstract" : "Mozilla's CA cert bundle in PEM format",
+   "author" : [
+      "Gisle Aas <gisle@activestate.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown",
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mozilla-CA",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/libwww-perl/Mozilla-CA/issues"
+      },
+      "license" : [
+         "https://www.mozilla.org/media/MPL/2.0/index.txt"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/libwww-perl/Mozilla-CA.git",
+         "web" : "https://github.com/libwww-perl/Mozilla-CA"
+      }
+   },
+   "version" : "20221114",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

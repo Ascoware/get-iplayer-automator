@@ -28,31 +28,28 @@
 		7F23873B2131082C00FA4588 /* ToolbarItemIcon.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 7F23873A2131082C00FA4588 /* ToolbarItemIcon.pdf */; };
 		7F4545FD292C4CE0009DC35C /* STVMetadataExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F4545FC292C4CE0009DC35C /* STVMetadataExtractor.swift */; };
 		7F54B1B11FFD656C006D1325 /* ITVDownload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F340B5A1FFB063700F415A4 /* ITVDownload.swift */; };
-		7F54B1B31FFF38E8006D1325 /* Kanna.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F54B1B21FFF38E8006D1325 /* Kanna.framework */; };
-		7F54B1B41FFF38F8006D1325 /* Kanna.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7F54B1B21FFF38E8006D1325 /* Kanna.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7F5B1C4E211F9E2E00BF7E99 /* Safari.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F5B1C4A211F9E2D00BF7E99 /* Safari.swift */; };
 		7F5B1C4F211F9E2E00BF7E99 /* Chrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F5B1C4B211F9E2D00BF7E99 /* Chrome.swift */; };
 		7F5B1C50211F9E2E00BF7E99 /* ChromeScripting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F5B1C4C211F9E2D00BF7E99 /* ChromeScripting.swift */; };
 		7F5B1C51211F9E2E00BF7E99 /* SafariScripting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F5B1C4D211F9E2E00BF7E99 /* SafariScripting.swift */; };
 		7F5B1C54211F9EE600BF7E99 /* SBObjectProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F5B1C52211F9EE500BF7E99 /* SBObjectProtocol.swift */; };
 		7F5B1C55211F9EE600BF7E99 /* SBApplicationProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F5B1C53211F9EE500BF7E99 /* SBApplicationProtocol.swift */; };
-		7F70246029104CE200A48BE1 /* CocoaLumberjack.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F70245F29104CE100A48BE1 /* CocoaLumberjack.framework */; };
-		7F70246129105BDE00A48BE1 /* CocoaLumberjack.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7F70245F29104CE100A48BE1 /* CocoaLumberjack.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		7F70246929107E2400A48BE1 /* CocoaLumberjackSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F70246829107E2400A48BE1 /* CocoaLumberjackSwift.framework */; };
-		7F70246A29107E4400A48BE1 /* CocoaLumberjackSwift.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7F70246829107E2400A48BE1 /* CocoaLumberjackSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7F748E3423FB416B00626A77 /* get_iplayer in Resources */ = {isa = PBXBuildFile; fileRef = 7F748E3323FB416B00626A77 /* get_iplayer */; };
 		7F78C1FD291C26EA00DAD51E /* Programme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F78C1FB291B6FFC00DAD51E /* Programme.swift */; };
 		7F78C1FF291C385500DAD51E /* Download.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F78C1FE291C385500DAD51E /* Download.swift */; };
 		7F78C201291C42C500DAD51E /* BBCDownload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F78C200291C42C500DAD51E /* BBCDownload.swift */; };
-		7F90591A253B90320094099B /* SwiftyJSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F905919253B90320094099B /* SwiftyJSON.framework */; };
-		7F90591B253B9FB60094099B /* SwiftyJSON.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7F905919253B90320094099B /* SwiftyJSON.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		7F8AA5EB2B433C7B002A440E /* CocoaLumberjack.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7F96C2B92B433ACD00C91CBB /* CocoaLumberjack.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		7F96C2AB2B42843300C91CBB /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 7F96C2AA2B42843300C91CBB /* Sparkle */; };
+		7F96C2AE2B42844200C91CBB /* Kanna in Frameworks */ = {isa = PBXBuildFile; productRef = 7F96C2AD2B42844200C91CBB /* Kanna */; };
+		7F96C2B12B42845A00C91CBB /* CocoaLumberjack in Frameworks */ = {isa = PBXBuildFile; productRef = 7F96C2B02B42845A00C91CBB /* CocoaLumberjack */; };
+		7F96C2B32B42845A00C91CBB /* CocoaLumberjackSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 7F96C2B22B42845A00C91CBB /* CocoaLumberjackSwift */; };
+		7F96C2B62B42846800C91CBB /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 7F96C2B52B42846800C91CBB /* SwiftyJSON */; };
+		7F96C2B82B43314E00C91CBB /* LogController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F96C2B72B43314E00C91CBB /* LogController.swift */; };
+		7F96C2BA2B433ACD00C91CBB /* CocoaLumberjack.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F96C2B92B433ACD00C91CBB /* CocoaLumberjack.framework */; };
 		7F9FE9211EC16ED80058CB1B /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F9FE9201EC16ED80058CB1B /* libz.tbd */; };
 		7F9FE9231EC16F160058CB1B /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F9FE9221EC16F160058CB1B /* IOKit.framework */; };
-		7F9FE9241EC170E60058CB1B /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F9FE91E1EC16E3E0058CB1B /* Sparkle.framework */; };
-		7F9FE9251EC170E60058CB1B /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7F9FE91E1EC16E3E0058CB1B /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7FB49CF827AA539800E80F76 /* cacert.pem in Resources */ = {isa = PBXBuildFile; fileRef = 7FB49CF727AA539800E80F76 /* cacert.pem */; };
 		7FB49CFA27AA589500E80F76 /* yt-dlp_macos in Resources */ = {isa = PBXBuildFile; fileRef = 7FB49CF927AA589500E80F76 /* yt-dlp_macos */; };
-		7FCF7263271388990086B0CD /* HistoryTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FCF7262271388990086B0CD /* HistoryTableViewController.swift */; };
 		7FEDA8ED24FC982200189D37 /* MicrosoftEdge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FEDA8EB24FC982200189D37 /* MicrosoftEdge.swift */; };
 		7FEDA8EE24FC982200189D37 /* MicrosoftEdgeScripting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FEDA8EC24FC982200189D37 /* MicrosoftEdgeScripting.swift */; };
 		7FFC210B2A1DD26300CB3FF7 /* DownloadHistoryEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FFC210A2A1DD26300CB3FF7 /* DownloadHistoryEntry.swift */; };
@@ -72,7 +69,6 @@
 		D97D9427106DBB68006ECD39 /* RadioFormat.m in Sources */ = {isa = PBXBuildFile; fileRef = D97D9424106DBB68006ECD39 /* RadioFormat.m */; };
 		D9A4509D102FF8090011E175 /* Credits.html in Resources */ = {isa = PBXBuildFile; fileRef = D9A4509C102FF8090011E175 /* Credits.html */; };
 		D9A450A4102FFDC00011E175 /* LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = D9A450A3102FFDC00011E175 /* LICENSE.txt */; };
-		D9B6DB9A196D9AEC00161ECB /* LogController.m in Sources */ = {isa = PBXBuildFile; fileRef = D9B6DB99196D9AEC00161ECB /* LogController.m */; };
 		D9C1D0F01993BBE00034465E /* GetiPlayerProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = D9C1D0EF1993BBE00034465E /* GetiPlayerProxy.m */; };
 		D9CCF3CC1023485A009205BE /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = D9CCF3CB1023485A009205BE /* dsa_pub.pem */; };
 		D9CDC9E8186B8F2B0003A4E2 /* GetiPlayerAutomator.sdef in Resources */ = {isa = PBXBuildFile; fileRef = D9CDC9E7186B8F2B0003A4E2 /* GetiPlayerAutomator.sdef */; };
@@ -99,11 +95,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				7F70246A29107E4400A48BE1 /* CocoaLumberjackSwift.framework in Copy Frameworks */,
-				7F70246129105BDE00A48BE1 /* CocoaLumberjack.framework in Copy Frameworks */,
-				7F90591B253B9FB60094099B /* SwiftyJSON.framework in Copy Frameworks */,
-				7F54B1B41FFF38F8006D1325 /* Kanna.framework in Copy Frameworks */,
-				7F9FE9251EC170E60058CB1B /* Sparkle.framework in Copy Frameworks */,
+				7F8AA5EB2B433C7B002A440E /* CocoaLumberjack.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -148,7 +140,6 @@
 		7F382EF521DD110400CCB64F /* SafeArchiver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SafeArchiver.h; sourceTree = "<group>"; };
 		7F382EF621DD110400CCB64F /* SafeArchiver.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SafeArchiver.m; sourceTree = "<group>"; };
 		7F4545FC292C4CE0009DC35C /* STVMetadataExtractor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = STVMetadataExtractor.swift; sourceTree = "<group>"; };
-		7F54B1B21FFF38E8006D1325 /* Kanna.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Kanna.framework; path = Carthage/Build/Mac/Kanna.framework; sourceTree = "<group>"; };
 		7F5B1C4A211F9E2D00BF7E99 /* Safari.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Safari.swift; sourceTree = "<group>"; };
 		7F5B1C4B211F9E2D00BF7E99 /* Chrome.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Chrome.swift; sourceTree = "<group>"; };
 		7F5B1C4C211F9E2D00BF7E99 /* ChromeScripting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChromeScripting.swift; sourceTree = "<group>"; };
@@ -156,20 +147,17 @@
 		7F5B1C52211F9EE500BF7E99 /* SBObjectProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SBObjectProtocol.swift; sourceTree = "<group>"; };
 		7F5B1C53211F9EE500BF7E99 /* SBApplicationProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SBApplicationProtocol.swift; sourceTree = "<group>"; };
 		7F6B2B2B20EE87D800E4BBDF /* Get iPlayer Automator.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = "Get iPlayer Automator.entitlements"; path = "Get iPlayer Automator/Get iPlayer Automator.entitlements"; sourceTree = "<group>"; };
-		7F70245F29104CE100A48BE1 /* CocoaLumberjack.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CocoaLumberjack.framework; path = Carthage/Build/Mac/CocoaLumberjack.framework; sourceTree = "<group>"; };
-		7F70246829107E2400A48BE1 /* CocoaLumberjackSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CocoaLumberjackSwift.framework; path = Carthage/Build/Mac/CocoaLumberjackSwift.framework; sourceTree = "<group>"; };
 		7F70246B2911825600A48BE1 /* GetiPlayerAutomator-Prefix.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "GetiPlayerAutomator-Prefix.h"; sourceTree = "<group>"; };
 		7F748E3323FB416B00626A77 /* get_iplayer */ = {isa = PBXFileReference; lastKnownFileType = folder; path = get_iplayer; sourceTree = "<group>"; };
 		7F78C1FB291B6FFC00DAD51E /* Programme.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Programme.swift; sourceTree = "<group>"; };
 		7F78C1FE291C385500DAD51E /* Download.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Download.swift; sourceTree = "<group>"; };
 		7F78C200291C42C500DAD51E /* BBCDownload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BBCDownload.swift; sourceTree = "<group>"; };
-		7F905919253B90320094099B /* SwiftyJSON.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftyJSON.framework; path = Carthage/Build/Mac/SwiftyJSON.framework; sourceTree = "<group>"; };
-		7F9FE91E1EC16E3E0058CB1B /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = Carthage/Build/Mac/Sparkle.framework; sourceTree = "<group>"; };
+		7F96C2B72B43314E00C91CBB /* LogController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogController.swift; sourceTree = "<group>"; };
+		7F96C2B92B433ACD00C91CBB /* CocoaLumberjack.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CocoaLumberjack.framework; path = Carthage/Build/Mac/CocoaLumberjack.framework; sourceTree = "<group>"; };
 		7F9FE9201EC16ED80058CB1B /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		7F9FE9221EC16F160058CB1B /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		7FB49CF727AA539800E80F76 /* cacert.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = cacert.pem; sourceTree = "<group>"; };
 		7FB49CF927AA589500E80F76 /* yt-dlp_macos */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "yt-dlp_macos"; sourceTree = "<group>"; };
-		7FCF7262271388990086B0CD /* HistoryTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryTableViewController.swift; sourceTree = "<group>"; };
 		7FEDA8EB24FC982200189D37 /* MicrosoftEdge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MicrosoftEdge.swift; sourceTree = "<group>"; };
 		7FEDA8EC24FC982200189D37 /* MicrosoftEdgeScripting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MicrosoftEdgeScripting.swift; sourceTree = "<group>"; };
 		7FF4174321FC02AE004FF8CE /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -196,8 +184,6 @@
 		D97D9425106DBB68006ECD39 /* RadioFormat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RadioFormat.h; sourceTree = "<group>"; };
 		D9A4509C102FF8090011E175 /* Credits.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = Credits.html; sourceTree = "<group>"; };
 		D9A450A3102FFDC00011E175 /* LICENSE.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
-		D9B6DB98196D9AEC00161ECB /* LogController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LogController.h; sourceTree = "<group>"; };
-		D9B6DB99196D9AEC00161ECB /* LogController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LogController.m; sourceTree = "<group>"; };
 		D9B6DB9C196DBD4600161ECB /* GiASearch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GiASearch.h; sourceTree = "<group>"; };
 		D9C1D0EB1993B4B30034465E /* ExtendedShowInformationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtendedShowInformationController.h; sourceTree = "<group>"; };
 		D9C1D0EE1993BBE00034465E /* GetiPlayerProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GetiPlayerProxy.h; sourceTree = "<group>"; };
@@ -229,15 +215,16 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7F70246929107E2400A48BE1 /* CocoaLumberjackSwift.framework in Frameworks */,
-				7F90591A253B90320094099B /* SwiftyJSON.framework in Frameworks */,
-				7F70246029104CE200A48BE1 /* CocoaLumberjack.framework in Frameworks */,
+				7F96C2B62B42846800C91CBB /* SwiftyJSON in Frameworks */,
 				7F9FE9231EC16F160058CB1B /* IOKit.framework in Frameworks */,
+				7F96C2B32B42845A00C91CBB /* CocoaLumberjackSwift in Frameworks */,
 				7F9FE9211EC16ED80058CB1B /* libz.tbd in Frameworks */,
-				7F54B1B31FFF38E8006D1325 /* Kanna.framework in Frameworks */,
+				7F96C2AE2B42844200C91CBB /* Kanna in Frameworks */,
+				7F96C2BA2B433ACD00C91CBB /* CocoaLumberjack.framework in Frameworks */,
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
+				7F96C2AB2B42843300C91CBB /* Sparkle in Frameworks */,
+				7F96C2B12B42845A00C91CBB /* CocoaLumberjack in Frameworks */,
 				D914BC59100C9F0100F7E68E /* ScriptingBridge.framework in Frameworks */,
-				7F9FE9241EC170E60058CB1B /* Sparkle.framework in Frameworks */,
 				D941D9A01025DDCF0012A75F /* SystemConfiguration.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -258,11 +245,7 @@
 		1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				7F905919253B90320094099B /* SwiftyJSON.framework */,
-				7F54B1B21FFF38E8006D1325 /* Kanna.framework */,
-				7F9FE91E1EC16E3E0058CB1B /* Sparkle.framework */,
-				7F70246829107E2400A48BE1 /* CocoaLumberjackSwift.framework */,
-				7F70245F29104CE100A48BE1 /* CocoaLumberjack.framework */,
+				7F96C2B92B433ACD00C91CBB /* CocoaLumberjack.framework */,
 				D921C9C1149BBF51004CB558 /* CoreServices.framework */,
 				D941D99F1025DDCF0012A75F /* SystemConfiguration.framework */,
 				D914BC58100C9F0100F7E68E /* ScriptingBridge.framework */,
@@ -430,7 +413,6 @@
 				39D52EA61DAAFD450033C4ED /* NPHistoryWindowController.h */,
 				39D52EA71DAAFD450033C4ED /* NPHistoryWindowController.m */,
 				7F01382525F0A7520014703C /* ITVMetadataExtractor.swift */,
-				7FCF7262271388990086B0CD /* HistoryTableViewController.swift */,
 				7F165A0F205B92F9005BB78A /* GetITVListings.swift */,
 				7F4545FC292C4CE0009DC35C /* STVMetadataExtractor.swift */,
 				7F165A13205C1F15005BB78A /* ProgrammeHistoryEntry.swift */,
@@ -440,8 +422,7 @@
 				BF382ED11D73C23400BAF106 /* AppController.m */,
 				D92687C31087F81F000E8132 /* DownloadHistoryController.h */,
 				D92687C41087F81F000E8132 /* DownloadHistoryController.m */,
-				D9B6DB98196D9AEC00161ECB /* LogController.h */,
-				D9B6DB99196D9AEC00161ECB /* LogController.m */,
+				7F96C2B72B43314E00C91CBB /* LogController.swift */,
 				D9C1D0EB1993B4B30034465E /* ExtendedShowInformationController.h */,
 				BF382ED31D73C26800BAF106 /* ExtendedShowInformationController.m */,
 				7F165A17205C4051005BB78A /* NSScanner+Swift.swift */,
@@ -503,6 +484,13 @@
 			dependencies = (
 			);
 			name = "Get iPlayer Automator";
+			packageProductDependencies = (
+				7F96C2AA2B42843300C91CBB /* Sparkle */,
+				7F96C2AD2B42844200C91CBB /* Kanna */,
+				7F96C2B02B42845A00C91CBB /* CocoaLumberjack */,
+				7F96C2B22B42845A00C91CBB /* CocoaLumberjackSwift */,
+				7F96C2B52B42846800C91CBB /* SwiftyJSON */,
+			);
 			productInstallPath = "$(HOME)/Applications";
 			productName = "Get_iPlayer GUI";
 			productReference = 8D1107320486CEB800E47090 /* Get iPlayer Automator.app */;
@@ -516,7 +504,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 1000;
-				LastUpgradeCheck = 1430;
+				LastUpgradeCheck = 1510;
 				ORGANIZATIONNAME = "";
 				TargetAttributes = {
 					7F23872C2131082C00FA4588 = {
@@ -542,6 +530,12 @@
 				Base,
 			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* Get_iPlayer GUI */;
+			packageReferences = (
+				7F96C2A92B42843300C91CBB /* XCRemoteSwiftPackageReference "Sparkle" */,
+				7F96C2AC2B42844200C91CBB /* XCRemoteSwiftPackageReference "Kanna" */,
+				7F96C2AF2B42845A00C91CBB /* XCRemoteSwiftPackageReference "CocoaLumberjack" */,
+				7F96C2B42B42846800C91CBB /* XCRemoteSwiftPackageReference "SwiftyJSON" */,
+			);
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -638,7 +632,6 @@
 				D9CDC9EC186B90A90003A4E2 /* ASDownloadShows.m in Sources */,
 				D92687C51087F81F000E8132 /* DownloadHistoryController.m in Sources */,
 				7F78C1FF291C385500DAD51E /* Download.swift in Sources */,
-				7FCF7263271388990086B0CD /* HistoryTableViewController.swift in Sources */,
 				7FEDA8ED24FC982200189D37 /* MicrosoftEdge.swift in Sources */,
 				DFC865E213E96BE200606599 /* ReasonForFailure.m in Sources */,
 				7F4545FD292C4CE0009DC35C /* STVMetadataExtractor.swift in Sources */,
@@ -646,7 +639,6 @@
 				7FFC210B2A1DD26300CB3FF7 /* DownloadHistoryEntry.swift in Sources */,
 				7F78C201291C42C500DAD51E /* BBCDownload.swift in Sources */,
 				7F5B1C55211F9EE600BF7E99 /* SBApplicationProtocol.swift in Sources */,
-				D9B6DB9A196D9AEC00161ECB /* LogController.m in Sources */,
 				7F01382625F0A7520014703C /* ITVMetadataExtractor.swift in Sources */,
 				392628B11C999B1A0033CF84 /* EmptyToStringTransformer.m in Sources */,
 				7F78C1FD291C26EA00DAD51E /* Programme.swift in Sources */,
@@ -654,6 +646,7 @@
 				7F5B1C50211F9E2E00BF7E99 /* ChromeScripting.swift in Sources */,
 				39D52EA81DAAFD450033C4ED /* NPHistoryWindowController.m in Sources */,
 				BF382ED41D73C26800BAF106 /* ExtendedShowInformationController.m in Sources */,
+				7F96C2B82B43314E00C91CBB /* LogController.swift in Sources */,
 				7F165A10205B92F9005BB78A /* GetITVListings.swift in Sources */,
 				393D1DEE18A5BBB500F27880 /* RSRTVArrayController.m in Sources */,
 				39D7C1BD1874AD7400B78698 /* StringTrimFormatter.m in Sources */,
@@ -917,6 +910,7 @@
 		C01FCF4F08A954540054247B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
@@ -942,6 +936,7 @@
 				ENABLE_MODULE_VERIFIER = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				EXCLUDED_ARCHS = "";
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -965,6 +960,7 @@
 		C01FCF5008A954540054247B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
@@ -989,6 +985,7 @@
 				DEFINES_MODULE = YES;
 				ENABLE_MODULE_VERIFIER = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				EXCLUDED_ARCHS = "";
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1040,6 +1037,69 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		7F96C2A92B42843300C91CBB /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.5.2;
+			};
+		};
+		7F96C2AC2B42844200C91CBB /* XCRemoteSwiftPackageReference "Kanna" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/tid-kijyun/Kanna";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.2.7;
+			};
+		};
+		7F96C2AF2B42845A00C91CBB /* XCRemoteSwiftPackageReference "CocoaLumberjack" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/CocoaLumberjack/CocoaLumberjack/";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.8.2;
+			};
+		};
+		7F96C2B42B42846800C91CBB /* XCRemoteSwiftPackageReference "SwiftyJSON" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SwiftyJSON/SwiftyJSON";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		7F96C2AA2B42843300C91CBB /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7F96C2A92B42843300C91CBB /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
+		7F96C2AD2B42844200C91CBB /* Kanna */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7F96C2AC2B42844200C91CBB /* XCRemoteSwiftPackageReference "Kanna" */;
+			productName = Kanna;
+		};
+		7F96C2B02B42845A00C91CBB /* CocoaLumberjack */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7F96C2AF2B42845A00C91CBB /* XCRemoteSwiftPackageReference "CocoaLumberjack" */;
+			productName = CocoaLumberjack;
+		};
+		7F96C2B22B42845A00C91CBB /* CocoaLumberjackSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7F96C2AF2B42845A00C91CBB /* XCRemoteSwiftPackageReference "CocoaLumberjack" */;
+			productName = CocoaLumberjackSwift;
+		};
+		7F96C2B52B42846800C91CBB /* SwiftyJSON */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7F96C2B42B42846800C91CBB /* XCRemoteSwiftPackageReference "SwiftyJSON" */;
+			productName = SwiftyJSON;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 29B97313FDCFA39411CA2CEA /* Project object */;
 }

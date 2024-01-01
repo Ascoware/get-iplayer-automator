@@ -220,7 +220,6 @@ import CocoaLumberjackSwift
                 AppController.shared().getiPlayerPath,
                 GetiPlayerArguments.sharedController().noWarningArg,
                 GetiPlayerArguments.sharedController().cacheExpiryArg,
-                "--nopurge",
                 GetiPlayerArguments.sharedController().typeArgument(forCacheUpdate: false),
                 listArgument,
                 GetiPlayerArguments.sharedController().profileDirArg,
@@ -358,7 +357,6 @@ import CocoaLumberjackSwift
 
             var args = [
                 AppController.shared().getiPlayerPath,
-                "--nopurge",
                 GetiPlayerArguments.sharedController().noWarningArg,
                 GetiPlayerArguments.sharedController().cacheExpiryArg,
                 GetiPlayerArguments.sharedController().profileDirArg,

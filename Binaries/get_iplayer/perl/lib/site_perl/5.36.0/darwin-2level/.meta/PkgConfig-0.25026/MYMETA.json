@@ -1,0 +1,61 @@
+{
+   "abstract" : "Pure-Perl Core-Only replacement for pkg-config",
+   "author" : [
+      "M. Nunberg <mnunberg@haskalah.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.48, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "PkgConfig",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.56"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Test::More" : "0.94",
+            "perl" : "5.006000"
+         }
+      }
+   },
+   "provides" : {
+      "PkgConfig" : {
+         "file" : "lib/PkgConfig.pm",
+         "version" : "0.25026"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/PerlPkgConfig/perl-PkgConfig/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/PkgConfig",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/PerlPkgConfig/perl-PkgConfig.git",
+         "web" : "https://github.com/PerlPkgConfig/perl-PkgConfig"
+      },
+      "x_IRC" : "irc://irc.perl.org/#native"
+   },
+   "version" : "0.25026",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

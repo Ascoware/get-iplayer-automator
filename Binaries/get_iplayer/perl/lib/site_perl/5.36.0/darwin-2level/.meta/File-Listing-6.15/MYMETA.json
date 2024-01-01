@@ -1,0 +1,192 @@
+{
+   "abstract" : "Parse directory listing",
+   "author" : [
+      "Gisle Aas",
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "File-Listing",
+   "no_index" : {
+      "directory" : [
+         "maint"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Zilla::Plugin::Author::Plicease::Thanks" : "0",
+            "Dist::Zilla::Plugin::Author::Plicease::Upload" : "0",
+            "Dist::Zilla::Plugin::MetaNoIndex" : "0",
+            "Dist::Zilla::Plugin::RemovePrereqs" : "0",
+            "Dist::Zilla::PluginBundle::Author::Plicease" : "2.57",
+            "Perl::Critic::Policy::BuiltinFunctions::ProhibitBooleanGrep" : "0",
+            "Perl::Critic::Policy::BuiltinFunctions::ProhibitStringyEval" : "0",
+            "Perl::Critic::Policy::BuiltinFunctions::ProhibitStringySplit" : "0",
+            "Perl::Critic::Policy::BuiltinFunctions::ProhibitVoidGrep" : "0",
+            "Perl::Critic::Policy::BuiltinFunctions::ProhibitVoidMap" : "0",
+            "Perl::Critic::Policy::ClassHierarchies::ProhibitOneArgBless" : "0",
+            "Perl::Critic::Policy::CodeLayout::ProhibitHardTabs" : "0",
+            "Perl::Critic::Policy::CodeLayout::ProhibitTrailingWhitespace" : "0",
+            "Perl::Critic::Policy::CodeLayout::RequireConsistentNewlines" : "0",
+            "Perl::Critic::Policy::Community::ArrayAssignAref" : "0",
+            "Perl::Critic::Policy::Community::BarewordFilehandles" : "0",
+            "Perl::Critic::Policy::Community::ConditionalDeclarations" : "0",
+            "Perl::Critic::Policy::Community::ConditionalImplicitReturn" : "0",
+            "Perl::Critic::Policy::Community::DeprecatedFeatures" : "0",
+            "Perl::Critic::Policy::Community::DiscouragedModules" : "0",
+            "Perl::Critic::Policy::Community::DollarAB" : "0",
+            "Perl::Critic::Policy::Community::Each" : "0",
+            "Perl::Critic::Policy::Community::IndirectObjectNotation" : "0",
+            "Perl::Critic::Policy::Community::LexicalForeachIterator" : "0",
+            "Perl::Critic::Policy::Community::LoopOnHash" : "0",
+            "Perl::Critic::Policy::Community::ModPerl" : "0",
+            "Perl::Critic::Policy::Community::OpenArgs" : "0",
+            "Perl::Critic::Policy::Community::OverloadOptions" : "0",
+            "Perl::Critic::Policy::Community::POSIXImports" : "0",
+            "Perl::Critic::Policy::Community::PackageMatchesFilename" : "0",
+            "Perl::Critic::Policy::Community::PreferredAlternatives" : "0",
+            "Perl::Critic::Policy::Community::StrictWarnings" : "0",
+            "Perl::Critic::Policy::Community::Threads" : "0",
+            "Perl::Critic::Policy::Community::Wantarray" : "0",
+            "Perl::Critic::Policy::Community::WarningsSwitch" : "0",
+            "Perl::Critic::Policy::Community::WhileDiamondDefaultAssignment" : "0",
+            "Perl::Critic::Policy::ControlStructures::ProhibitLabelsWithSpecialBlockNames" : "0",
+            "Perl::Critic::Policy::ControlStructures::ProhibitMutatingListFunctions" : "0",
+            "Perl::Critic::Policy::ControlStructures::ProhibitUnreachableCode" : "0",
+            "Perl::Critic::Policy::InputOutput::ProhibitBarewordFileHandles" : "0",
+            "Perl::Critic::Policy::InputOutput::ProhibitJoinedReadline" : "0",
+            "Perl::Critic::Policy::InputOutput::ProhibitTwoArgOpen" : "0",
+            "Perl::Critic::Policy::Miscellanea::ProhibitFormats" : "0",
+            "Perl::Critic::Policy::Miscellanea::ProhibitUselessNoCritic" : "0",
+            "Perl::Critic::Policy::Modules::ProhibitConditionalUseStatements" : "0",
+            "Perl::Critic::Policy::Modules::RequireNoMatchVarsWithUseEnglish" : "0",
+            "Perl::Critic::Policy::Objects::ProhibitIndirectSyntax" : "0",
+            "Perl::Critic::Policy::RegularExpressions::ProhibitUselessTopic" : "0",
+            "Perl::Critic::Policy::Subroutines::ProhibitNestedSubs" : "0",
+            "Perl::Critic::Policy::ValuesAndExpressions::ProhibitMixedBooleanOperators" : "0",
+            "Perl::Critic::Policy::ValuesAndExpressions::ProhibitSpecialLiteralHeredocTerminator" : "0",
+            "Perl::Critic::Policy::ValuesAndExpressions::RequireUpperCaseHeredocTerminator" : "0",
+            "Perl::Critic::Policy::Variables::ProhibitPerl4PackageNames" : "0",
+            "Perl::Critic::Policy::Variables::ProhibitUnusedVariables" : "0",
+            "Software::License::Perl_5" : "0"
+         },
+         "requires" : {
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "Perl::Critic" : "0",
+            "Test2::Require::Module" : "0.000121",
+            "Test2::Tools::PerlCritic" : "0",
+            "Test2::V0" : "0.000121",
+            "Test::CPAN::Changes" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.98",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0",
+            "YAML" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "5.57",
+            "HTTP::Date" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/PerlAlien/File-Listing/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/File::Listing",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/PerlAlien/File-Listing.git",
+         "web" : "https://github.com/PerlAlien/File-Listing"
+      }
+   },
+   "version" : "6.15",
+   "x_contributors" : [
+      "Gisle Aas",
+      "Graham Ollis <plicease@cpan.org>",
+      "Adam Kennedy",
+      "Adam Sjogren",
+      "Alex Kapranoff",
+      "Alexey Tourbin",
+      "Andreas J. Koenig",
+      "Bill Mann",
+      "Bron Gondwana",
+      "DAVIDRW",
+      "Daniel Hedlund",
+      "David E. Wheeler",
+      "David Steinbrunner",
+      "Erik Esterer",
+      "FWILES",
+      "Father Chrysostomos",
+      "Gavin Peters",
+      "Graeme Thompson",
+      "Hans-H. Froehlich",
+      "Ian Kilgore",
+      "Jacob J",
+      "Mark Stosberg",
+      "Mike Schilli",
+      "Ondrej Hanak",
+      "Peter John Acklam",
+      "Peter Rabbitson",
+      "Robert Stone",
+      "Rolf Grossmann",
+      "Sean M. Burke",
+      "Simon Legner",
+      "Slaven Rezic",
+      "Spiros Denaxas",
+      "Steve Hay",
+      "Todd Lipcon",
+      "Tom Hukins",
+      "Tony Finch",
+      "Toru Yamaguchi",
+      "Ville Skyttä",
+      "Yuri Karaban",
+      "Zefram",
+      "amire80",
+      "jefflee",
+      "john9art",
+      "mschilli",
+      "murphy",
+      "phrstbrn",
+      "ruff",
+      "sasao",
+      "uid39246"
+   ],
+   "x_generated_by_perl" : "v5.35.10",
+   "x_serialization_backend" : "JSON::PP version 4.07",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
+   "x_use_unsafe_inc" : 0
+}

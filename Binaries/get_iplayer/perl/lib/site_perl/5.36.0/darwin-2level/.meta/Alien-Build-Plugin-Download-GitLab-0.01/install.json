@@ -1,0 +1,1 @@
+{"target":"Alien::Build::Plugin::Download::GitLab","dist":"Alien-Build-Plugin-Download-GitLab-0.01","pathname":"P/PL/PLICEASE/Alien-Build-Plugin-Download-GitLab-0.01.tar.gz","name":"Alien::Build::Plugin::Download::GitLab","version":"0.01","provides":{"Alien::Build::Plugin::Download::GitLab":{"file":"lib/Alien/Build/Plugin/Download/GitLab.pm","version":"0.01"}}}

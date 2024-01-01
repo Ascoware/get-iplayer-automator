@@ -1,0 +1,45 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Graham Barr <gbarr@pobox.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "TimeDate",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/atoomic/perl-TimeDate/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/atoomic/perl-TimeDate"
+      }
+   },
+   "version" : "2.33",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}
