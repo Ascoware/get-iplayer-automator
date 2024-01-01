@@ -48,7 +48,6 @@ import CocoaLumberjackSwift
         }
         //Initialize the rest of the arguments
         let noWarningArg = GetiPlayerArguments.sharedController().noWarningArg
-        let noPurgeArg = "--nopurge"
         let atomicParsleyPath = URL(fileURLWithPath: AppController.shared().extraBinariesPath).appendingPathComponent("AtomicParsley").path
         let atomicParsleyArg = "--atomicparsley=\(atomicParsleyPath)"
         let ffmpegArg = "--ffmpeg=\(URL(fileURLWithPath: AppController.shared().extraBinariesPath).appendingPathComponent("ffmpeg").path)"
@@ -79,7 +78,7 @@ import CocoaLumberjackSwift
         let profileDirArg = GetiPlayerArguments.sharedController().profileDirArg
 
         //Add Arguments that can't be NULL
-        var args = [AppController.shared().getiPlayerPath, profileDirArg, noWarningArg, noPurgeArg, atomicParsleyArg, cacheExpiryArg, downloadPathArg, subDirArg, progressArg, formatArg, getArg, searchArg, whitespaceArg, "--attempts=5", "--thumbsize=640", ffmpegArg, "--log-progress"]
+        var args = [AppController.shared().getiPlayerPath, profileDirArg, noWarningArg, atomicParsleyArg, cacheExpiryArg, downloadPathArg, subDirArg, progressArg, formatArg, getArg, searchArg, whitespaceArg, "--attempts=5", "--thumbsize=640", ffmpegArg, "--log-progress"]
 
         if let proxyArg {
             args.append(proxyArg)

@@ -34,7 +34,6 @@
             @"--listformat",
             @"SearchResult|<pid>|<available>|<type>|<name>|<episode>|<channel>|<seriesnum>|<episodenum>|<desc>|<thumbnail>|<web>|<available>",
             @"--long",
-            @"--nopurge",
             @"--search",
             searchTerms,
             [GetiPlayerArguments sharedController].profileDirArg];

@@ -572,7 +572,6 @@ static NSString *FORCE_RELOAD = @"ForceReload";
                                       cacheExpiryArg,
                                       typeArgument,
                                       @"--refresh",
-                                      @"--nopurge",
                                       [GetiPlayerArguments sharedController].profileDirArg,
                                       @".*"];
 
@@ -734,7 +733,6 @@ static NSString *FORCE_RELOAD = @"ForceReload";
             pipeTask.arguments = @[
                 _getiPlayerPath,
                 [GetiPlayerArguments sharedController].profileDirArg,
-                @"--nopurge",
                 [GetiPlayerArguments sharedController].noWarningArg,
                 [[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO],
                 [[GetiPlayerArguments sharedController] cacheExpiryArg],
@@ -1470,7 +1468,6 @@ static NSString *FORCE_RELOAD = @"ForceReload";
             NSMutableArray *autoRecordArgs = [[NSMutableArray alloc] initWithObjects:
                                               _getiPlayerPath,
                                               [GetiPlayerArguments sharedController].noWarningArg,
-                                              @"--nopurge",
                                               @"--listformat=<pid>|<type>|<name>|<episode>|<channel>|<timeadded>|<web>|<available>",
                                               cacheExpiryArg,
                                               typeArgument,

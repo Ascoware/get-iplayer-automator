@@ -96,7 +96,7 @@ import CocoaLumberjackSwift
             
             self.show.successful = false
             self.show.complete = true
-            DDLogError(message)
+            DDLogError("\(message)")
             NotificationCenter.default.post(name: NSNotification.Name(rawValue:"DownloadFinished"), object:self.show)
             return
         }
@@ -157,7 +157,7 @@ import CocoaLumberjackSwift
         let lines = s.components(separatedBy: .newlines)
 
         for line in lines {
-            DDLogInfo(line)
+            DDLogInfo("\(line)")
 
             if line.contains("Writing video subtitles") {
                 //ITV Download (ID=2a4910a0046): [info] Writing video subtitles to: /Users/skovatch/Movies/TV Shows/LA Story/LA Story - Just Friends - 2a4910a0046.en.vtt
