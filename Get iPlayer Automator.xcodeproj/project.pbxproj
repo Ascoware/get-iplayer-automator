@@ -45,7 +45,6 @@
 		7F96C2B32B42845A00C91CBB /* CocoaLumberjackSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 7F96C2B22B42845A00C91CBB /* CocoaLumberjackSwift */; };
 		7F96C2B62B42846800C91CBB /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 7F96C2B52B42846800C91CBB /* SwiftyJSON */; };
 		7F96C2B82B43314E00C91CBB /* LogController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F96C2B72B43314E00C91CBB /* LogController.swift */; };
-		7F96C2BA2B433ACD00C91CBB /* CocoaLumberjack.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F96C2B92B433ACD00C91CBB /* CocoaLumberjack.framework */; };
 		7F9FE9211EC16ED80058CB1B /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F9FE9201EC16ED80058CB1B /* libz.tbd */; };
 		7F9FE9231EC16F160058CB1B /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F9FE9221EC16F160058CB1B /* IOKit.framework */; };
 		7FB49CF827AA539800E80F76 /* cacert.pem in Resources */ = {isa = PBXBuildFile; fileRef = 7FB49CF727AA539800E80F76 /* cacert.pem */; };
@@ -220,7 +219,6 @@
 				7F96C2B32B42845A00C91CBB /* CocoaLumberjackSwift in Frameworks */,
 				7F9FE9211EC16ED80058CB1B /* libz.tbd in Frameworks */,
 				7F96C2AE2B42844200C91CBB /* Kanna in Frameworks */,
-				7F96C2BA2B433ACD00C91CBB /* CocoaLumberjack.framework in Frameworks */,
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
 				7F96C2AB2B42843300C91CBB /* Sparkle in Frameworks */,
 				7F96C2B12B42845A00C91CBB /* CocoaLumberjack in Frameworks */,
@@ -477,7 +475,7 @@
 				8D11072C0486CEB800E47090 /* Sources */,
 				D943D2721B37B19D00452FCD /* CopyFiles */,
 				8D11072E0486CEB800E47090 /* Frameworks */,
-				7F9E811629B3BBC600B435D9 /* ShellScript */,
+				7F9E811629B3BBC600B435D9 /* Run Script */,
 			);
 			buildRules = (
 			);
@@ -578,9 +576,8 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		7F9E811629B3BBC600B435D9 /* ShellScript */ = {
+		7F9E811629B3BBC600B435D9 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
 			buildActionMask = 8;
 			files = (
 			);
@@ -592,6 +589,7 @@
 				"${CONFIGURATION_BUILD_DIR}/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/get_iplayer/utils/bin/AtomicParsley",
 				"${CONFIGURATION_BUILD_DIR}/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/yt-dlp_macos/yt-dlp_macos",
 			);
+			name = "Run Script";
 			outputFileListPaths = (
 			);
 			outputPaths = (
@@ -599,7 +597,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 			shellPath = /bin/bash;
-			shellScript = "echo ${CONFIGURATION_BUILD_DIR}\necho ${UNLOCALIZED_RESOURCES_FOLDER_PATH}\n\nfor (( i=0; i<$SCRIPT_INPUT_FILE_COUNT; i++)) \ndo\n    FILE=\"SCRIPT_INPUT_FILE_$i\"\n    codesign --force --options runtime --sign \"Developer ID Application: Scott Kovatch\" \"${!FILE}\"\ndone\n";
+			shellScript = "echo ${CONFIGURATION_BUILD_DIR}\necho ${UNLOCALIZED_RESOURCES_FOLDER_PATH}\n\nfor (( i=0; i<$SCRIPT_INPUT_FILE_COUNT; i++)) \ndo\n    FILE=\"SCRIPT_INPUT_FILE_$i\"\n    codesign --force --options runtime --entitlements \"${SRCROOT}/Get iPlayer Automator/Get iPlayer Automator.entitlements\" --sign \"Developer ID Application: Scott Kovatch\" \"${!FILE}\"\ndone\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -795,15 +793,14 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_ENTITLEMENTS = "Get iPlayer Automator/Get iPlayer Automator.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				"DEBUG[arch=*]" = 1;
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=macosx*]" = L8BMU8WLEC;
+				DEVELOPMENT_TEAM = L8BMU8WLEC;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)",
@@ -834,7 +831,7 @@
 					"$(PROJECT_DIR)",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
-				MARKETING_VERSION = 1.25.4;
+				MARKETING_VERSION = 1.26.0;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CODE_SIGN_FLAGS = "--no-strict";
 				OTHER_LDFLAGS = "-licucore";
@@ -859,15 +856,14 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_ENTITLEMENTS = "Get iPlayer Automator/Get iPlayer Automator.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG = 0;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=macosx*]" = L8BMU8WLEC;
+				DEVELOPMENT_TEAM = L8BMU8WLEC;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)",
@@ -893,7 +889,7 @@
 					"$(PROJECT_DIR)",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
-				MARKETING_VERSION = 1.25.4;
+				MARKETING_VERSION = 1.26.0;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CODE_SIGN_FLAGS = "--no-strict";
 				OTHER_LDFLAGS = "-licucore";
