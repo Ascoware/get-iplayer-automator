@@ -1,0 +1,125 @@
+{
+   "abstract" : "A simple generic namespace processor",
+   "author" : [
+      "Robin Berjon <robin@knowscape.com>",
+      "Chris Prather <chris@prather.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "XML-NamespaceSupport",
+   "no_index" : {
+      "directory" : [
+         "corpus",
+         "examples",
+         "t",
+         "xt"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::Plugin::Authority" : "0",
+            "Dist::Zilla::Plugin::AutoPrereqs" : "0",
+            "Dist::Zilla::Plugin::CPANFile" : "0",
+            "Dist::Zilla::Plugin::CheckChangesHasContent" : "0",
+            "Dist::Zilla::Plugin::CheckMetaResources" : "0",
+            "Dist::Zilla::Plugin::CheckPrereqsIndexed" : "0",
+            "Dist::Zilla::Plugin::ConfirmRelease" : "0",
+            "Dist::Zilla::Plugin::CopyFilesFromBuild" : "0",
+            "Dist::Zilla::Plugin::ExecDir" : "0",
+            "Dist::Zilla::Plugin::Git::Check" : "0",
+            "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch" : "0",
+            "Dist::Zilla::Plugin::Git::Commit" : "0",
+            "Dist::Zilla::Plugin::Git::Contributors" : "0",
+            "Dist::Zilla::Plugin::Git::GatherDir" : "0",
+            "Dist::Zilla::Plugin::Git::NextVersion" : "0",
+            "Dist::Zilla::Plugin::Git::Push" : "0",
+            "Dist::Zilla::Plugin::Git::Tag" : "0",
+            "Dist::Zilla::Plugin::GithubMeta" : "0",
+            "Dist::Zilla::Plugin::InsertCopyright" : "0",
+            "Dist::Zilla::Plugin::License" : "0",
+            "Dist::Zilla::Plugin::MakeMaker" : "0",
+            "Dist::Zilla::Plugin::Manifest" : "0",
+            "Dist::Zilla::Plugin::ManifestSkip" : "0",
+            "Dist::Zilla::Plugin::MetaJSON" : "0",
+            "Dist::Zilla::Plugin::MetaNoIndex" : "0",
+            "Dist::Zilla::Plugin::MetaProvides::Package" : "0",
+            "Dist::Zilla::Plugin::MetaYAML" : "0",
+            "Dist::Zilla::Plugin::MinimumPerl" : "0",
+            "Dist::Zilla::Plugin::NextRelease" : "0",
+            "Dist::Zilla::Plugin::OurPkgVersion" : "0",
+            "Dist::Zilla::Plugin::PodWeaver" : "0",
+            "Dist::Zilla::Plugin::Prereqs::AuthorDeps" : "0",
+            "Dist::Zilla::Plugin::PromptIfStale" : "0",
+            "Dist::Zilla::Plugin::PruneCruft" : "0",
+            "Dist::Zilla::Plugin::RunExtraTests" : "0",
+            "Dist::Zilla::Plugin::ShareDir" : "0",
+            "Dist::Zilla::Plugin::TestRelease" : "0",
+            "Dist::Zilla::Plugin::UploadToCPAN" : "0",
+            "Software::License::Perl_5" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "constant" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "XML::NamespaceSupport" : {
+         "file" : "lib/XML/NamespaceSupport.pm",
+         "version" : "1.12"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/perigrin/xml-namespacesupport/issues"
+      },
+      "homepage" : "https://github.com/perigrin/xml-namespacesupport",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/perigrin/xml-namespacesupport.git",
+         "web" : "https://github.com/perigrin/xml-namespacesupport"
+      }
+   },
+   "version" : "1.12",
+   "x_authority" : "cpan:PERIGRIN",
+   "x_contributors" : [
+      "Chris Prather <cprather@hdpublishing.com>",
+      "David Steinbrunner <dsteinbrunner@pobox.com>",
+      "Paul Cochrane <paul@liekut.de>",
+      "Paulo Custodio <pauloscustodio@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

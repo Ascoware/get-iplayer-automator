@@ -1,11 +1,9 @@
-#!/bin/sh
-exec "$(dirname "$0")"/perl -x "$0" "$@"
-#!perl
+#!/usr/bin/env perl
 #
 # The world's most insecure web-based PVR manager and streaming proxy for get_iplayer
 # ** WARNING ** Never run this in an untrusted environment or facing the internet
 #
-#    Copyright (C) 2009-2010 Phil Lewis
+#    Copyright (C) 2008-2010 Phil Lewis, 2010- get_iplayer contributors
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -20,14 +18,13 @@ exec "$(dirname "$0")"/perl -x "$0" "$@"
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-# Author: Phil Lewis
-# Email: iplayer2 (at sign) linuxcentre.net
+# Authors: Phil Lewis, get_iplayer contributors
 # Web: https://github.com/get-iplayer/get_iplayer/wiki
 # License: GPLv3 (see LICENSE.txt)
 #
 
-my $VERSION = 3.27;
-my $VERSION_TEXT = "3.27.0-$^O";
+my $VERSION = 3.34;
+my $VERSION_TEXT = "3.34.0-$^O";
 $VERSION_TEXT = sprintf("v%.2f", $VERSION) unless $VERSION_TEXT;
 
 use CGI qw(-utf8 :all);
@@ -43,20 +40,17 @@ use IO::Handle;
 use IPC::Open3;
 use LWP::ConnCache;
 #use LWP::Debug qw(+);
+use Unicode::Normalize;
 use LWP::UserAgent;
 use PerlIO::encoding;
 use strict;
+use constant FB_EMPTY => sub { '' };
 use constant IS_WIN32 => $^O eq 'MSWin32' ? 1 : 0;
 use constant DEFAULT_THUMBNAIL => "https://ichef.bbci.co.uk/images/ic/480xn/p01tqv8z.png";
 $PerlIO::encoding::fallback = XMLCREF;
 # suppress Perl 5.22/CGI 4 warning
 $CGI::LIST_CONTEXT_WARN = 0;
 $| = 1;
-
-my $fh;
-# Send log messages to this fh
-my $se = *STDERR;
-binmode $se, ':utf8';
 
 my $opt_cmdline;
 $opt_cmdline->{debug} = 0;
@@ -69,9 +63,13 @@ GetOptions(
 	"port|p=n"			=> \$opt_cmdline->{port},
 	"getiplayer|get_iplayer|g=s"	=> \$opt_cmdline->{getiplayer},
 	"ffmpeg=s"			=> \$opt_cmdline->{ffmpeg},
-	"encodinglocalefs|encoding-locale-fs=s"	=> \$opt_cmdline->{encodinglocalefs},
 	"debug"				=> \$opt_cmdline->{debug},
 	"baseurl|base-url|b=s"		=> \$opt_cmdline->{baseurl},
+	"encodinglocale|encoding-locale=s"	=> \$opt_cmdline->{encodinglocale},
+	"encodinglocalefs|encoding-locale-fs=s"	=> \$opt_cmdline->{encodinglocalefs},
+	"encodingconsoleout|encoding-console-out=s"	=> \$opt_cmdline->{encodingconsoleout},
+	"encodingconsolein|encoding-console-in=s"	=> \$opt_cmdline->{encodingconsolein},
+	"encodingwebrequest|encoding-webrequest=s"	=> \$opt_cmdline->{encodingwebrequest},
 ) || die usage();
 
 # Display usage if old method of invocation is used or --help
@@ -80,31 +78,74 @@ usage() if $opt_cmdline->{help} || @ARGV;
 
 # Usage
 sub usage {
-	my $text = "get_iplayer Web PVR Manager $VERSION_TEXT, ";
+	my $text = "get_iplayer Web PVR Manager $VERSION_TEXT\n";
 	$text .= <<'EOF';
-Copyright (C) 2009-2010 Phil Lewis
+  Copyright (C) 2008-2010 Phil Lewis, 2010- get_iplayer contributors
   This program comes with ABSOLUTELY NO WARRANTY; This is free software,
   and you are welcome to redistribute it under certain conditions;
   See the GPLv3 for details.
 
 Options:
- --listen,-l        Use the built-in web server and listen on this interface address (default: 0.0.0.0)
- --port,-p          Use the built-in web server and listen on this TCP port
- --getiplayer,-g    Path to the get_iplayer script
- --ffmpeg           Path to the ffmpeg binary
- --encodinglocalefs Encoding for file names (default: Linux/Unix/OSX = UTF-8, Windows = cp1252)
- --debug            Debug mode
- --baseurl,-b       Base URL for link generation. Set to full proxy URL if running behind reverse proxy.
- --help,-h          This help text
+ --listen,-l          Use the built-in web server and listen on this interface address (default: 0.0.0.0)
+ --port,-p            Use the built-in web server and listen on this TCP port
+ --getiplayer,-g      Path to the get_iplayer script
+ --ffmpeg             Path to the ffmpeg binary (for streaming)
+ --debug              Debug mode
+ --baseurl,-b         Base URL for link generation. Set to full proxy URL if running behind reverse proxy.
+ --help,-h            This help text
+ --encodinglocale     Encoding for command line (default: Linux/Unix/OSX = UTF-8, Windows = cp1252)
+ --encodinglocalefs   Encoding for file names (default: Linux/Unix/OSX = UTF-8, Windows = cp1252)
+ --encodingconsoleout Encoding for STDOUT/STDERR (default: Linux/Unix/OSX = UTF-8, Windows = cp850)
+ --encodingconsolein  Encoding for STDIN (default: Linux/Unix/OSX = UTF-8, Windows = cp850)
+ --encodingwebrequest Encoding for requests to get_iplayer (default: Linux/Unix/OSX = UTF-8, Windows = UTF-8)
 EOF
 	print $text;
 	exit 1;
 }
 
 
+# fallback encodings
+$opt_cmdline->{encodinglocale} = $opt_cmdline->{encodinglocalefs} = default_encodinglocale();
+$opt_cmdline->{encodingconsoleout} = $opt_cmdline->{encodingconsolein} = default_encodingconsoleout();
+$opt_cmdline->{encodingwebrequest} = default_encodingwebrequest();
+# attempt to automatically determine encodings
+eval {
+	require Encode::Locale;
+};
+if (!$@) {
+	# set encodings unless already set by PERL_UNICODE or perl -C
+	$opt_cmdline->{encodinglocale} = $Encode::Locale::ENCODING_LOCALE unless (${^UNICODE} & 32);
+	$opt_cmdline->{encodinglocalefs} = $Encode::Locale::ENCODING_LOCALE_FS unless (${^UNICODE} & 32);
+	$opt_cmdline->{encodingconsoleout} = $Encode::Locale::ENCODING_CONSOLE_OUT unless (${^UNICODE} & 6);
+	$opt_cmdline->{encodingconsolein} = $Encode::Locale::ENCODING_CONSOLE_IN unless (${^UNICODE} & 1);
+}
+binmode(STDOUT, ":encoding($opt_cmdline->{encodingconsoleout})");
+binmode(STDERR, ":encoding($opt_cmdline->{encodingconsoleout})");
+binmode(STDIN, ":encoding($opt_cmdline->{encodingconsolein})");
+
+my $fh;
+# Send log messages to this fh
+my $se = *STDERR;
+binmode $se, ":encoding($opt_cmdline->{encodingconsoleout})";
+
+for my $key ( keys %{$opt_cmdline} ) {
+	# decode @ARGV unless already decoded by PERL_UNICODE or perl -C
+	unless ( ${^UNICODE} & 32 ) {
+		$opt_cmdline->{$key} = decode_cl($opt_cmdline->{$key});
+	}
+	# compose UTF-8 args if necessary
+	if ( $opt_cmdline->{encodinglocale} =~ /UTF-?8/i ) {
+		$opt_cmdline->{$key} = NFKC($opt_cmdline->{$key});
+	}
+}
+
 # Some defaults
 my $default_modes = 'default';
 $opt_cmdline->{listen} = '0.0.0.0' if ! $opt_cmdline->{listen};
+$opt_cmdline->{baseurl} .= "/" if $opt_cmdline->{baseurl} && $opt_cmdline->{baseurl} !~ m{/$};
+$opt_cmdline->{ffmpeg} = encode_fs($opt_cmdline->{ffmpeg}) || 'ffmpeg';
+$opt_cmdline->{getiplayer} = encode_fs($opt_cmdline->{getiplayer}) if $opt_cmdline->{getiplayer};
+
 # Search for get_iplayer
 if ( ! $opt_cmdline->{getiplayer} ) {
 	for ( './get_iplayer', './get_iplayer.cmd', './get_iplayer.pl', '/usr/bin/get_iplayer', '/usr/local/bin/get_iplayer' ) {
@@ -115,9 +156,14 @@ if ( ( ! $opt_cmdline->{getiplayer} ) || ! -f $opt_cmdline->{getiplayer} ) {
 	print "ERROR: Cannot find get_iplayer, please specify its location using the --getiplayer option.\n";
 	exit 2;
 }
-$opt_cmdline->{encodinglocalefs} ||= (IS_WIN32 ? 'cp1252' : 'utf8');
-$opt_cmdline->{ffmpeg} ||= 'ffmpeg';
-$opt_cmdline->{baseurl} .= "/" if $opt_cmdline->{baseurl} && $opt_cmdline->{baseurl} !~ m{/$};
+
+my @gip_cmd_base = (
+	decode_fs($opt_cmdline->{getiplayer}),
+	'--encoding-webrequest='.$opt_cmdline->{encodingwebrequest},
+	'--encoding-console-out=UTF-8',
+	'--nocopyright',
+	'--expiry=999999999',
+);
 
 # Path to get_iplayer (+ set HOME env var cos apache seems to not set it)
 my $home = $ENV{HOME};
@@ -295,7 +341,7 @@ if ( $opt_cmdline->{port} > 0 ) {
 				next;
 			}
 			# Child
-			binmode $se, IS_WIN32 ? ":encoding(cp1252)" : ':encoding(UTF-8)';
+			binmode $se, ":encoding($opt_cmdline->{encodingconsoleout})";
 			$client->autoflush(1);
 			my %request = ();
 			my $query_string;
@@ -414,6 +460,44 @@ if ( $opt_cmdline->{port} > 0 ) {
 
 exit 0;
 
+
+sub default_encodinglocale {
+	return 'UTF-8' if (${^UNICODE} & 32);
+	return (IS_WIN32 ? 'cp1252' : 'UTF-8');
+}
+
+sub default_encodingconsoleout {
+	return 'UTF-8' if (${^UNICODE} & 6);
+	return (IS_WIN32 ? 'cp850' : 'UTF-8');
+}
+
+sub default_encodingwebrequest {
+	return 'UTF-8';
+}
+
+sub encode_fs {
+	return encode($opt_cmdline->{encodinglocalefs}, shift, FB_EMPTY);
+}
+
+sub decode_fs {
+	return decode($opt_cmdline->{encodinglocalefs}, shift, FB_EMPTY);
+}
+
+sub encode_cl {
+	return encode($opt_cmdline->{encodinglocale}, shift, FB_EMPTY);
+}
+
+sub decode_cl {
+	return decode($opt_cmdline->{encodinglocale}, shift, FB_EMPTY);
+}
+
+sub encode_wr {
+	return encode($opt_cmdline->{encodingwebrequest}, shift, FB_EMPTY);
+}
+
+sub decode_wr {
+	return decode($opt_cmdline->{encodingwebrequest}, shift, FB_EMPTY);
+}
 
 
 sub cleanup {
@@ -624,10 +708,7 @@ sub pvr_run {
 	}
 	print $se "INFO: Starting PVR Run\n";
 	my @cmd = (
-		$opt_cmdline->{getiplayer},
-		'--encoding-locale=UTF-8',
-		'--encoding-console-out=UTF-8',
-		'--nocopyright',
+		@gip_cmd_base,
 		'--hash',
 		'--pvr',
 	);
@@ -717,11 +798,7 @@ sub record_now {
 		next if ! ($type && $pid );
 		my $comment = "$name - $episode";
 		my @cmd = (
-			$opt_cmdline->{getiplayer},
-			'--encoding-locale=UTF-8',
-			'--encoding-console-out=UTF-8',
-			'--nocopyright',
-			'--expiry=999999999',
+			@gip_cmd_base,
 			'--hash',
 			'--webrequest',
 			get_iplayer_webrequest_args(
@@ -817,8 +894,8 @@ sub build_ffmpeg_args {
 				push @cmd_vopts, ( '-vn' );
 		}
 		@cmd = (
-			$opt_cmdline->{ffmpeg},
-			'-i', $filename,
+			decode_fs($opt_cmdline->{ffmpeg}),
+			'-i', decode_fs($filename),
 			@cmd_vopts,
 			@cmd_aopts,
 			'-ac', 2,
@@ -844,13 +921,9 @@ sub create_playlist_m3u_single {
 
 	print $se "INFO: Getting playlist for type '$type' using modes '$modes' and bitrate '$bitrate'\n";
 	my @cmd = (
-		$opt_cmdline->{getiplayer},
-		'--encoding-locale=UTF-8',
-		'--encoding-console-out=UTF-8',
-		'--nocopyright',
-		'--expiry=999999999',
+		@gip_cmd_base,
 		'--webrequest',
-		get_iplayer_webrequest_args( 'history=1', 'skipdeleted=1', 'nopurge=1', "type=$type", 'listformat=ENTRY|<pid>|<name>|<episode>|<desc>|<filename>|<mode>', "fields=$searchfields", "search=$searchterm", "versionlist=$versionlist" ),
+		get_iplayer_webrequest_args( 'history=1', 'skipdeleted=1', "type=$type", 'listformat=ENTRY|<pid>|<name>|<episode>|<desc>|<filename>|<mode>', "fields=$searchfields", "search=$searchterm", "versionlist=$versionlist" ),
 	);
 
 	my @out = get_cmd_output( @cmd );
@@ -1012,6 +1085,7 @@ sub run_cmd_unix {
 
 	print $se "INFO: Command: ".(join ' ', @cmd)."\n"; # if $opt->{verbose};
 
+	@cmd = map { encode_cl($_) } @cmd;
 	#print $se "INFO: open3( 0, \">&".fileno($fh_child_out).", \">&".fileno($fh_child_err).", <cmd> )\n";
 	# Don't use NULL for the 1st arg of open3 otherwise we end up with a messed up STDIN once it returns
 	my $procid = open3( 0, ">&".fileno($fh_child_out), ">&".fileno($fh_child_err), @cmd );
@@ -1043,7 +1117,8 @@ sub run_cmd {
 	my $from = new IO::Handle;
 	my $err = new IO::Handle;
 	my @cmd = ( @_ );
-	my $direct = grep(/$opt_cmdline->{ffmpeg}/, @cmd);
+	my $ffmpeg = decode_fs($opt_cmdline->{ffmpeg});
+	my $direct = grep(/$ffmpeg/, @cmd);
 	my $is_hls = grep(/modes%3Dhl(s|x)/, @cmd);
 	my $stdout_raw = $direct;
 	my $rtn;
@@ -1072,6 +1147,7 @@ sub run_cmd {
 		exit 0;
 	};
 
+	@cmd = map { encode_cl($_) } @cmd;
 	# Don't use NULL for the 1st arg of open3 otherwise we end up with a messed up STDIN once it returns
 	$procid = open3( gensym, $from, $err, @cmd ) || print $se "ERROR: Could not execute command: $!\n";
 
@@ -1212,6 +1288,7 @@ sub run_cmd_win32 {
 	# Redirect $fh_child_out to STDOUT
 	open(STDOUT, ">&", $fh_child_out ) || die "can't dup client to stdout";
 
+	@cmd = map { encode_cl($_) } @cmd;
 	$rtn = system( @cmd );
 
 	# Interpret return code
@@ -1243,6 +1320,7 @@ sub run_cmd_autorefresh {
 
 	my $buf;
 	my $bytes;
+	@cmd = map { encode_cl($_) } @cmd;
 	open( CMD, ( join ' ', @cmd ).'|' ) || die "can't open pipe: $!\n";
 	binmode CMD, ':utf8';
 	while ( $bytes = read( CMD, $buf, $size ) ) {
@@ -1302,13 +1380,14 @@ sub get_cmd_output {
 		exit 0;
 	};
 
+	@cmd = map { encode_cl($_) } @cmd;
 	#print $se "INFO: open3( 0, \">&".fileno($fh_child_out).", \">&".fileno($fh_child_err).", <cmd> )\n";
 	# Don't use NULL for the 1st arg of open3 otherwise we end up with a messed up STDIN once it returns
 	$procid = open3( gensym, $from, $error, @cmd );
 	# Wait for child to complete
 
 	my $childpid = fork();
-	binmode $se, IS_WIN32 ? ":encoding(cp1252)" : ':encoding(UTF-8)';
+	binmode $se, ":encoding($opt_cmdline->{encodingconsoleout})";
 	# Child
 	if ( $childpid == 0 ) {
 		binmode $error, ':utf8';
@@ -1353,8 +1432,10 @@ sub get_cmd_output_win32 {
 	}
 
 	print $se "DEBUG: Command: ".( join ' ', @cmd )."\n";
-	open( CMD, ( join ' ', @cmd ).'|' ) || print $se "ERROR: echo failed: $!\n";
+	@cmd = map { encode_cl($_) } @cmd;
+	open( CMD, ( join ' ', @cmd ).'|' ) || print $se "ERROR: open failed: $!\n";
 	binmode CMD, ':utf8';
+	my @out;
 	my @out = <CMD>;
 	close CMD;
 
@@ -1391,11 +1472,7 @@ sub interpret_return_code {
 sub get_pvr_list {
 	my $pvrsearch;
 	my $out = join "\n", get_cmd_output(
-		$opt_cmdline->{getiplayer},
-		'--encoding-locale=UTF-8',
-		'--encoding-console-out=UTF-8',
-		'--nocopyright',
-		'--expiry=999999999',
+		@gip_cmd_base,
 		'--pvrlist',
 	);
 	# Remove text before first pvrsearch entry
@@ -1702,11 +1779,7 @@ sub pvr_del {
 	for my $name (@record) {
 		chomp();
 		my @cmd = (
-			$opt_cmdline->{getiplayer},
-			'--encoding-locale=UTF-8',
-			'--encoding-console-out=UTF-8',
-			'--nocopyright',
-			'--expiry=999999999',
+			@gip_cmd_base,
 			'--webrequest',
 			get_iplayer_webrequest_args( "pvrdel=$name" ),
 		);
@@ -1736,13 +1809,9 @@ sub show_info {
 	# Queue all selected '<type>|<pid>' entries in the PVR
 	chomp();
 	my @cmd = (
-		$opt_cmdline->{getiplayer},
-		'--encoding-locale=UTF-8',
-		'--encoding-console-out=UTF-8',
-		'--nocopyright',
-		'--expiry=999999999',
+		@gip_cmd_base,
 		'--webrequest',
-		get_iplayer_webrequest_args( 'nopurge=1', "type=$type", "future=$opt->{FUTURE}->{current}", "history=$opt->{HISTORY}->{current}", "skipdeleted=$opt->{HIDEDELETED}->{current}", 'info=1', 'fields=pid', "search=$pid" ),
+		get_iplayer_webrequest_args( "type=$type", "future=$opt->{FUTURE}->{current}", "history=$opt->{HISTORY}->{current}", "skipdeleted=$opt->{HIDEDELETED}->{current}", 'info=1', 'fields=pid', "search=$pid" ),
 	);
 	print $fh p("Command: ".( join ' ', @cmd ) ) if $opt_cmdline->{debug};
 	my @cmdout = get_cmd_output( @cmd );
@@ -1798,13 +1867,9 @@ sub get_direct_filename {
 
 	# Get the 'filename' entry from --history --info for this pid
 	my @cmd = (
-		$opt_cmdline->{getiplayer},
-		'--encoding-locale=UTF-8',
-		'--encoding-console-out=UTF-8',
-		'--nocopyright',
-		'--expiry=999999999',
+		@gip_cmd_base,
 		'--webrequest',
-		get_iplayer_webrequest_args( 'nopurge=1', "history=$history", 'fields=pid', "search=$pid", "type=$type", 'listformat=filename: <pid>|<filename>|<mode>' ),
+		get_iplayer_webrequest_args( "history=$history", 'fields=pid', "search=$pid", "type=$type", 'listformat=filename: <pid>|<filename>|<mode>' ),
 	);
 	print $se "Command: ".( join ' ', @cmd )."\n"; # if $opt_cmdline->{debug};
 	my @cmdout = get_cmd_output( @cmd );
@@ -1814,10 +1879,7 @@ sub get_direct_filename {
 	my $match = ( grep /^filename:/, @cmdout )[0];
 	my $filename;
 	$filename = $1 if $match =~ m{^filename: .+?\|\s*(.+?)\|$mode\s*$};
-	if ( $filename && $opt_cmdline->{encodinglocalefs} !~ /UTF-?8/i ) {
-		$filename = encode($opt_cmdline->{encodinglocalefs}, $filename, sub { '' });
-	}
-	return search_absolute_path( $filename );
+	return search_absolute_path( encode_fs($filename) );
 }
 
 
@@ -1847,10 +1909,6 @@ sub search_absolute_path {
 	# Try using CWD
 	if ( -f abs_path($filename) ) {
 		$abs_path = abs_path($filename);
-		# repair abs_path decomposition of UTF-8 filename
-		if ( $abs_path && $opt_cmdline->{encodinglocalefs} =~ /UTF-?8/i ) {
-			$abs_path = decode($opt_cmdline->{encodinglocalefs}, $abs_path, sub { '' });
-		}
 
 	# else try dir of get_iplayer
 	} elsif ( -f dirname( abs_path( $opt_cmdline->{getiplayer} ) ).'/'.$filename ) {
@@ -1858,7 +1916,7 @@ sub search_absolute_path {
 
 	# else try dir current output dir option
 	} elsif ( $opt->{OUTPUT}->{current} && -f abs_path( $opt->{OUTPUT}->{current} ).'/'.$filename ) {
-		$abs_path = abs_path( $opt->{OUTPUT}->{current} ).'/'.$filename;
+		$abs_path = abs_path( encode_fs($opt->{OUTPUT}->{current}) ).'/'.$filename;
 
 	# Else just return the relative path
 	} else {
@@ -1909,11 +1967,7 @@ sub pvr_queue {
 		$comment =~ s/^_*//g;
 		$comment =~ s/_*$//g;
 		my @cmd = (
-			$opt_cmdline->{getiplayer},
-			'--encoding-locale=UTF-8',
-			'--encoding-console-out=UTF-8',
-			'--nocopyright',
-			'--expiry=999999999',
+			@gip_cmd_base,
 			'--webrequest',
 			get_iplayer_webrequest_args(
 				'pvrqueue=1',
@@ -2052,7 +2106,7 @@ sub get_iplayer_webrequest_args {
 	my @cmdopts;
 	print $se 'DEBUG: get_iplayer options: "'.join('" "', @_)."\"\n";
 	for (@_) {
-		push @cmdopts, CGI::escape($_);
+		push @cmdopts, CGI::escape(encode_wr($_));
 	}
 	my $cmdline = join('?', @cmdopts);
 	return $cmdline;
@@ -2071,11 +2125,7 @@ sub pvr_add {
 
 	# Remove a few options from leaking into a PVR search
 	my @cmd = (
-		$opt_cmdline->{getiplayer},
-		'--encoding-locale=UTF-8',
-		'--encoding-console-out=UTF-8',
-		'--nocopyright',
-		'--expiry=999999999',
+		@gip_cmd_base,
 		'--webrequest',
 		get_iplayer_webrequest_args( "pvradd=$searchname", build_cmd_options( grep !/^(HISTORY|HIDEDELETED|SINCE|BEFORE|HIDE|FORCE|FUTURE)$/, @params ) ),
 	);
@@ -2127,11 +2177,7 @@ sub pvr_save {
 	# Delete the original pvr entry
 	my $searchname = $cgi->param( 'PVRSEARCH' );
 	my @cmd = (
-		$opt_cmdline->{getiplayer},
-		'--encoding-locale=UTF-8',
-		'--encoding-console-out=UTF-8',
-		'--nocopyright',
-		'--expiry=999999999',
+		@gip_cmd_base,
 		'--webrequest',
 		get_iplayer_webrequest_args( "pvrdel=$searchname" ),
 	);
@@ -2143,11 +2189,7 @@ sub pvr_save {
 
 	# Add the new pvr entry
 	@cmd = (
-		$opt_cmdline->{getiplayer},
-		'--encoding-locale=UTF-8',
-		'--encoding-console-out=UTF-8',
-		'--nocopyright',
-		'--expiry=999999999',
+		@gip_cmd_base,
 		'--webrequest',
 		get_iplayer_webrequest_args( "pvradd=$newsearchname", @params ),
 		'--',
@@ -2308,13 +2350,10 @@ sub refresh {
 	}
 	print $se "INFO: Refreshing\n";
 	my @cmd = (
-		$opt_cmdline->{getiplayer},
-		'--encoding-locale=UTF-8',
-		'--encoding-console-out=UTF-8',
-		'--nocopyright',
+		@gip_cmd_base,
 		'--refresh',
 		'--webrequest',
-		get_iplayer_webrequest_args( 'nopurge=1', "type=$typelist", "refreshfuture=$refreshfuture" ),
+		get_iplayer_webrequest_args( "type=$typelist", "refreshfuture=$refreshfuture" ),
 	);
 	print $fh '<pre>';
 	run_cmd_autorefresh( $fh, $se, 1, @cmd );
@@ -2445,9 +2484,6 @@ sub search_progs {
 
 		# Grey-out history lines which files have been deleted or where the history doesn't have a filename mentioned
 		if ( $opt->{HISTORY}->{current} && ! $opt->{HIDEDELETED}->{current} ) {
-			if ( $prog{$pid}->{filename} && $opt_cmdline->{encodinglocalefs} !~ /UTF-?8/i ) {
-				$prog{$pid}->{filename} = encode($opt_cmdline->{encodinglocalefs}, $prog{$pid}->{filename}, sub { '' });
-			}
 			if ( ( ! $prog{$pid}->{filename} ) || ! -f $prog{$pid}->{filename} ) {
 					$search_class = 'search darker';
 			}
@@ -2577,6 +2613,8 @@ sub search_progs {
 					$category );
 				}
 				push @row, td( {-class=>$search_class}, @cats );
+			} elsif ( /^filename$/ ) {
+				push @row, td( {-class=>$search_class}, label( { -class=>$search_class, -title=>"Click for full info", -onClick=>"BackupFormVars(form1); form1.NEXTPAGE.value='show_info'; form1.INFO.value='".encode_entities("$prog{$pid}->{type}|$pid")."'; form1.target='_blank'; form1.submit(); RestoreFormVars(form1); form1.target='';" }, decode_fs($prog{$pid}->{$_}) ) );
 			# Every other column type
 			} else {
 				push @row, td( {-class=>$search_class}, label( { -class=>$search_class, -title=>"Click for full info", -onClick=>"BackupFormVars(form1); form1.NEXTPAGE.value='show_info'; form1.INFO.value='".encode_entities("$prog{$pid}->{type}|$pid")."'; form1.target='_blank'; form1.submit(); RestoreFormVars(form1); form1.target='';" }, $prog{$pid}->{$_} ) );
@@ -2884,7 +2922,7 @@ sub get_progs {
 	my $fields;
 	$fields .= "|<$_>" for @headings;
 
-	my ( @webrequest_args ) = ( build_cmd_options( grep !/^(PVRHOLDOFF)$/, @params ), 'nopurge=1', "listformat=ENTRY${fields}" );
+	my ( @webrequest_args ) = ( build_cmd_options( grep !/^(PVRHOLDOFF)$/, @params ), "listformat=ENTRY${fields}" );
 	# Page params
 	if ( $opt->{PAGENO}->{current} && $opt->{PAGESIZE}->{current} ) {
 		push @webrequest_args, ( "page=$opt->{PAGENO}->{current}", "pagesize=$opt->{PAGESIZE}->{current}" );
@@ -2895,11 +2933,7 @@ sub get_progs {
 	push @webrequest_args, "sortmatches=$opt->{SORT}->{current}" if $opt->{SORT}->{current} && $opt->{SORT}->{current} ne 'name';
 	# Run command
 	my @list = get_cmd_output(
-		$opt_cmdline->{getiplayer},
-		'--encoding-locale=UTF-8',
-		'--encoding-console-out=UTF-8',
-		'--nocopyright',
-		'--expiry=999999999',
+		@gip_cmd_base,
 		'--webrequest',
 		get_iplayer_webrequest_args( @webrequest_args ),
 	);
@@ -2925,7 +2959,9 @@ sub get_progs {
 		my $search_class = 'search';
 
 		# get the real path if file is defined
-		$record->{filename} = search_absolute_path( $record->{filename} ) if $record->{filename} && $record->{filename} ne "<filename>";
+		if ( $record->{filename} && $record->{filename} ne "<filename>" ) {
+			$record->{filename} = search_absolute_path( encode_fs($record->{filename}) );
+		}
 
 		# store record in the prog global hash (prog => pid)
 		$prog{ $record->{'pid'} } = $record;
@@ -3065,7 +3101,7 @@ sub process_params {
 
 	$opt->{URL} = {
 		title	=> 'Quick URL', # Title
-		tooltip	=> "Enter your URL for Recording (then click 'Record' or 'Play')", # Tooltip
+		tooltip	=> "Enter your URL for recording (then click 'Record' or 'Queue')", # Tooltip
 		webvar	=> 'URL', # webvar
 		type	=> 'text', # type
 		default	=> '', # default
@@ -3132,8 +3168,8 @@ sub process_params {
 	};
 
 	$opt->{MODES} = {
-		title	=> 'Recording Modes', # Title
-		tooltip	=> 'Comma separated list of recording modes which should be tried in order. Default is "best" for HD TV (if available, with fallback to SD TV). Set to "better" (without quotes) for best available SD TV.  Set to "good" (without quotes) for lower-quality SD TV.', # Tooltip
+		title	=> 'Recording Quality', # Title
+		tooltip	=> 'Comma separated list of recording quality settings which should be tried in order. Must be one or more of: fhd,hd,sd,web,mobile,1080p,720p,540p,396p,288p,high,std,med,low,320k,128k,96k,48k,default', # Tooltip
 		webvar	=> 'MODES', # webvar
 		optkey	=> 'modes', # option
 		type	=> 'text', # type
@@ -3261,8 +3297,8 @@ sub process_params {
 	};
 
 	$opt->{FPS25} = {
-		title	=> 'Use only 25fps streams',
-		tooltip	=> "Use only 25fps media streams. HD video not available.",
+		title	=> 'Prefer lower-bitrate TV streams',
+		tooltip	=> "Prefer lower-bitrate TV streams",
 		webvar	=> 'FPS25',
 		optkey	=> 'fps25',
 		type	=> 'radioboolean',
@@ -3377,7 +3413,7 @@ sub process_params {
 		save	=> 1,
 	};
 
-	my %vsize_labels = ( ''=>'Native', '1280x720'=>'1280x720', '960x540'=>'960x540', '832x468'=>'832x468', '704x396'=>'704x396', '640x360'=>'640x360', '512x288'=>'512x288', '448x252'=>'448x252', '384x216'=>'384x216', '256x144'=>'256x144', '192x108'=>'192x108' );
+	my %vsize_labels = ( ''=>'Native', '1920x1080'=>'1920x1080', '1280x720'=>'1280x720', '960x540'=>'960x540', '832x468'=>'832x468', '704x396'=>'704x396', '640x360'=>'640x360', '512x288'=>'512x288', '448x252'=>'448x252', '384x216'=>'384x216', '256x144'=>'256x144', '192x108'=>'192x108' );
 	$opt->{VSIZE} = {
 		title	=> 'Remote Streaming Video Size', # Title
 		tooltip	=> "Video size '<width>x<height>' to transcode remotely played files - specify 'Native' for native size", # Tooltip
@@ -3925,6 +3961,10 @@ sub insert_stylesheet {
 	table.info > tbody > tr > th {
 		border: 1px solid #333;
 		padding: 4px 8px;
+	}
+
+	table.info > tbody > tr > td {
+		word-break: break-all
 	}
 
 	table.searchhead {

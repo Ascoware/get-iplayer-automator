@@ -1,0 +1,321 @@
+% use re qw(regexp_pattern);
+<!DOCTYPE html>
+<!-- Request ID: <%= $c->req->request_id %> -->
+<html>
+  <head>
+    % my $title = stash('exception') ? 'Server Error' : 'Page Not Found';
+    <title><%= $title %> (<%= app->mode %> mode)</title>
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="-1">
+    %= javascript '/mojo/jquery/jquery.js'
+    %= javascript '/mojo/highlight.js/highlight.min.js'
+    %= javascript '/mojo/highlight.js/mojolicious.min.js'
+    %= javascript '/mojo/bootstrap/bootstrap.js'
+    %= stylesheet '/mojo/bootstrap/bootstrap.css'
+    %= stylesheet '/mojo/highlight.js/highlight-mojo-dark.css'
+    %= stylesheet 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css'
+    %= stylesheet '/mojo/mojo.css'
+    <script>
+      hljs.initHighlightingOnLoad();
+      $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+      });
+    </script>
+  </head>
+  <body class="d-flex flex-column h-100">
+    <header>
+      <nav class="navbar navbar-expand-lg navbar-dark mojobar">
+        <a href="https://mojolicious.org" id="mojobar-brand" class="navbar-brand">
+          <picture>
+            <img src="<%= url_for '/mojo/logo-white.png' %>"
+              srcset="<%= url_for '/mojo/logo-white-2x.png' %> 2x">
+          </picture>
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav"
+          aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div id="navbarNav" class="collapse navbar-collapse">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="false">
+                Documentation
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <a class="dropdown-item" href="https://docs.mojolicious.org">Overview</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="https://docs.mojolicious.org/Mojolicious/Guides/Tutorial">Tutorial</a>
+                <a class="dropdown-item" href="https://docs.mojolicious.org/Mojolicious/Guides/Growing">Growing</a>
+                <a class="dropdown-item" href="https://docs.mojolicious.org/Mojolicious/Guides/Routing">Routing</a>
+                <a class="dropdown-item" href="https://docs.mojolicious.org/Mojolicious/Guides/Rendering">Rendering</a>
+                <a class="dropdown-item" href="https://docs.mojolicious.org/Mojolicious/Guides/Testing">Testing</a>
+                <a class="dropdown-item" href="https://docs.mojolicious.org/Mojolicious/Guides/Cookbook">Cookbook</a>
+                <a class="dropdown-item" href="https://docs.mojolicious.org/Mojolicious/Guides/Contributing">Contributing</a>
+                <a class="dropdown-item" href="https://docs.mojolicious.org/Mojolicious/Guides/FAQ">FAQ</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="https://docs.mojolicious.org#API">API</a>
+              </div>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="communityDropdown" role="button" data-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="false">
+                Community
+              </a>
+              <div class="dropdown-menu" aria-labelledby="communityDropdown">
+                <a class="dropdown-item" href="https://matrix.to/#/#mojo:matrix.org">Matrix</a>
+                <a class="dropdown-item" href="https://web.libera.chat/#mojo">IRC</a>
+                <a class="dropdown-item" href="https://forum.mojolicious.org">Forum</a>
+                <a class="dropdown-item" href="https://fosstodon.org/@mojolicious">Mastodon</a>
+                <a class="dropdown-item" href="https://www.linkedin.com/groups/8963713/">LinkedIn</a>
+                <a class="dropdown-item" href="https://github.com/mojolicious/mojo/wiki">Wiki</a>
+                <a class="dropdown-item" href="https://metacpan.org/release/Mojolicious/">CPAN</a>
+              </div>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://github.com/mojolicious/mojo/">Contribute on GitHub</a>
+            </li>
+          </ul>
+          <form action="https://www.google.com/cse" target="_blank" class="form-inline my-2 my-lg-0">
+            %= hidden_field cx => '014527573091551588235:pwfplkjpgbi'
+            %= hidden_field ie => 'UTF-8'
+            %= search_field 'q', placeholder => 'Search...'
+          </form>
+        </div>
+      </nav>
+    </header>
+    <script>
+      function mojoDrawer(handle, drawer) {
+        $(handle).on('click', function () {
+          $(drawer).slideToggle('slow');
+          const text = $(handle + ' div.tap').text();
+          text = text == "tap for more" ? "tap for less" : "tap for more";
+          $(handle + ' div.tap').text(text);
+        });
+        $(drawer).toggle();
+      }
+      $(function () {
+        mojoDrawer('#trace', '#frames');
+        mojoDrawer('#more', '#infos');
+      });
+    </script>
+    <div class="container flex-grow-1">
+      <div class="row flex-wrap">
+        <main class="col-sm-12 col-md-8 col-lg-10 py-md-3 pl-md-5">
+          <div class="row mojo-divider">
+            % my $kv = begin
+              % my ($key, $value) = @_;
+              <tr>
+                <td class="key text-right"><%= $key %>:</td>
+                <td class="value"><pre><%= $value %></pre></td>
+              </tr>
+            % end
+            % if (my $exception = stash 'exception') {
+              <div class="alert alert-danger wide" role="alert">
+                <h2>Server Error</h2>
+                This application is in <b>development</b> mode and will show internal information to help you with
+                debugging.
+              </div>
+              % my $cv = begin
+                % my ($key, $value, $i) = @_;
+                %= tag 'tr', $i ? (class => 'important') : (), begin
+                  <td class="text-right"><%= $key %></td>
+                  <td class="context-value wide">
+                    <pre><code><%= $value %></code></pre>
+                  </td>
+                % end
+              % end
+              <div id="showcase" class="box code no-bottom-border no-top-border border-radius-top">
+                <pre id="error" class="error"><%= $exception->message %></pre>
+                <div id="context" class="more">
+                  <table class="wide">
+                    % for my $line (@{$exception->lines_before}) {
+                      %= $cv->($line->[0], $line->[1])
+                    % }
+                    % if (defined $exception->line->[1]) {
+                      %= $cv->($exception->line->[0], $exception->line->[1], 1)
+                    % }
+                    % for my $line (@{$exception->lines_after}) {
+                      %= $cv->($line->[0], $line->[1])
+                    % }
+                  </table>
+                </div>
+                % if (defined $exception->line->[2]) {
+                  <div id="insight" class="more">
+                    <table class="wide">
+                      % for my $line (@{$exception->lines_before}) {
+                        %= $cv->($line->[0], $line->[2])
+                      % }
+                      %= $cv->($exception->line->[0], $exception->line->[2], 1)
+                      % for my $line (@{$exception->lines_after}) {
+                        %= $cv->($line->[0], $line->[2])
+                      % }
+                    </table>
+                  </div>
+                  <div class="tap">tap for more</div>
+                  <script>
+                    let current = '#context';
+                    function mojoShowcase() {
+                      $('#showcase').on('click', function () {
+                        $(this).unbind('click');
+                        $(current).slideToggle('slow', function () {
+                          current = current == '#context' ? '#insight' : '#context';
+                          $(current).slideToggle('slow', function () {
+                            mojoShowcase();
+                          });
+                        });
+                      });
+                    }
+                    mojoShowcase();
+                    $('#insight').toggle();
+                  </script>
+                % }
+              </div>
+              <div id="trace" class="box no-padding more no-top-border border-radius-bottom">
+                % if (@{$exception->frames}) {
+                  <div id="frames" class="more">
+                    <table class="striped wide">
+                      % for my $frame (@{$exception->frames}) {
+                        <tr>
+                          <td class="value">
+                            <pre>File "<%= $frame->[1] %>", line <%= $frame->[2] %>, in "<%= $frame->[0] %>"</pre>
+                          </td>
+                        </tr>
+                      % }
+                    </table>
+                  </div>
+                  <div class="tap">tap for more</div>
+                % }
+              </div>
+            % }
+            % else {
+              <div class="alert alert-warning wide" role="alert">
+                <h2>Page Not Found</h2>
+                This application is in <b>development</b> mode and will show internal information to help you with
+                debugging.
+              </div>
+              <div id="routes" class="box no-padding border-radius-both">
+                <div class="padded-content">
+                  <p>
+                    None of these routes could generate a response for your
+                    <code><%= $c->req->method %></code> request for
+                    <code><%= $c->req->url->path->to_route %></code>, maybe you need
+                    to add a new one?
+                  </p>
+                </div>
+                % my $walk = begin
+                  % my ($walk, $route, $depth) = @_;
+                  % my $pattern = $route->pattern;
+                  % my $unparsed = $pattern->unparsed || '/';
+                  % $unparsed = "+$unparsed" if $depth;
+                  % $pattern->match('/', $route->is_endpoint && !$route->partial);
+                  % my $regex = (regexp_pattern $pattern->regex)[0];
+                  <tr data-toggle="tooltip" data-placement="left" data-html="true"
+                    title="<b>Regex:</b> <code><%= $regex %></code>">
+                    <td class="value">
+                      <pre><%= '  ' x $depth %><%= $unparsed %></pre>
+                    </td>
+                    <td class="value">
+                      <pre><%= uc(join ',', @{$route->methods // []}) || '*' %></pre>
+                    </td>
+                    <td class="value">
+                      % my $name = $route->name;
+                      % my $class = $route->has_custom_name ? 'badge-success' : 'badge-secondary';
+                      <span class="badge <%= $class %>"><%= $name %></span>
+                    </td>
+                  </tr>
+                  % $depth++;
+                  %= $walk->($walk, $_, $depth) for @{$route->children};
+                  % $depth--;
+                % end
+                <table class="striped-grey wide">
+                  <thead>
+                    <tr>
+                      <th>Pattern</th>
+                      <th>Methods</th>
+                      <th>Name</th>
+                    </tr>
+                  </thead>
+                  %= $walk->($walk, $_, 0) for @{app->routes->children};
+                </table>
+              </div>
+            % }
+          </div>
+          <div class="row mojo-divider">
+            <div id="request" class="box no-padding no-bottom-border border-radius-top">
+              <table class="striped fixed-table wide">
+                % my $req = $c->req;
+                %= $kv->('Request ID' => $req->request_id)
+                %= $kv->(Method => $req->method)
+                % my $url = $req->url;
+                %= $kv->(URL => $url->to_string)
+                %= $kv->('Base URL' => $url->base->to_string)
+                %= $kv->(Parameters => dumper $req->params->to_hash)
+                %= $kv->(Stash => dumper $snapshot)
+                %= $kv->(Session => dumper session)
+                %= $kv->(Version => $req->version)
+                % for my $name (sort @{$c->req->headers->names}) {
+                  % my $value = $c->req->headers->header($name);
+                  %= $kv->($name, $value)
+                % }
+              </table>
+            </div>
+            <div id="more" class="box no-padding more no-top-border border-radius-bottom">
+              <div id="infos">
+                <table class="striped fixed-table wide">
+                  %= $kv->(Perl => "$^V ($^O)")
+                  % my $version  = $Mojolicious::VERSION;
+                  % my $codename = $Mojolicious::CODENAME;
+                  %= $kv->(Mojolicious => "$version ($codename)")
+                  %= $kv->(Home => app->home)
+                  %= $kv->('Template paths' => dumper app->renderer->paths)
+                  %= $kv->('Template classes' => dumper app->renderer->classes)
+                  %= $kv->('Static paths' => dumper app->static->paths)
+                  %= $kv->('Static classes' => dumper app->static->classes)
+                  %= $kv->(Include => dumper \@INC)
+                  %= $kv->(Config => dumper app->config)
+                  %= $kv->(Moniker => app->moniker)
+                  %= $kv->(Name => $0)
+                  %= $kv->(Executable => $^X)
+                  %= $kv->(PID => $$)
+                  %= $kv->(Time => scalar localtime(time))
+                </table>
+              </div>
+              <div class="tap tap-border-top">tap for more</div>
+            </div>
+          </div>
+          <div class="row">
+            % if (@{app->log->history}) {
+                % my $log = join '', map { scalar app->log->format->(@$_) } @{app->log->history};
+                <pre class="mojo-terminal"><code class="nohighlight"><%= $log %></code></pre>
+            % }
+            % else {
+              <div class="alert alert-warning wide" role="alert">
+                The application log appears to be empty, perhaps the log level <b><%= app->log->level %></b> is too
+                high?
+              </div>
+            % }
+          </div>
+        </main>
+      </div>
+    </div>
+    <footer>
+      <div class="container-fluid p-3 mojo-footer">
+        <div class="row">
+          <div class="col-sm align-self-center text-center mojo-free">
+            <b>Free</b> and <b>Open Source</b>.
+          </div>
+          <div class="col-sm align-self-center text-center mojo-copy">
+              <i class="far fa-copyright"></i> 2008-2022 Sebastian Riedel and the
+              <a href="https://docs.mojolicious.org/Mojolicious#AUTHORS">Mojolicious contributors</a>.
+          </div>
+          <div class="col-sm align-self-center text-center mojo-social">
+            <a alt="GitHub" href="https://github.com/mojolicious/mojo"><i class="fab fa-github-alt"></i></a>
+            <a alt="Mastodon" href="https://fosstodon.org/@mojolicious"><i class="fab fa-mastodon"></i></a>
+            <a alt="LinkedIn" href="https://www.linkedin.com/groups/8963713/"><i class="fab fa-linkedin"></i></a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

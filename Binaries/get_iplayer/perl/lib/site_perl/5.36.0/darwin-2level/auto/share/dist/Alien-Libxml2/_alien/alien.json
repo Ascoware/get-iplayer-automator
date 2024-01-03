@@ -1,0 +1,17 @@
+{
+   "alien_build_version" : "2.76",
+   "cflags" : "-I//include/libxml2",
+   "cflags_static" : "-I//include/libxml2",
+   "install_type" : "system",
+   "legacy" : {
+      "finished_installing" : 1,
+      "install_type" : "system",
+      "original_prefix" : "/Users/nobody/dev/get_iplayer_macos/build-x86_64/perl-gip-5.36.0.1-macos-10.10/lib/site_perl/5.36.0/darwin-2level/auto/share/dist/Alien-Libxml2",
+      "version" : "2.10.3"
+   },
+   "libs" : "-L//lib -lxml2 -L/Users/nobody/dev/get_iplayer_macos/build-x86_64/conan/user_home/.conan/data/zlib/1.2.13/_/_/package/8a659aeafbc64e1549799b2ee77375f43ddc5111/lib -lz -lpthread -liconv -lcharset -lz",
+   "libs_static" : "-L//lib -lxml2 -L/Users/nobody/dev/get_iplayer_macos/build-x86_64/conan/user_home/.conan/data/zlib/1.2.13/_/_/package/8a659aeafbc64e1549799b2ee77375f43ddc5111/lib -lz -lpthread -liconv -lcharset -lz",
+   "perl_module_version" : "0.19",
+   "prefix" : "/Users/nobody/dev/get_iplayer_macos/build-x86_64/perl-gip-5.36.0.1-macos-10.10/lib/site_perl/5.36.0/darwin-2level/auto/share/dist/Alien-Libxml2",
+   "version" : "2.10.3"
+}

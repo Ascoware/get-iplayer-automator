@@ -1,0 +1,165 @@
+{
+   "abstract" : "HTML parser class",
+   "author" : [
+      "Gisle Aas <gaas@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "HTML-Parser",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.52"
+         },
+         "suggests" : {
+            "JSON::PP" : "2.27300"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "0",
+            "Dist::Zilla::Plugin::MinimumPerl" : "0",
+            "Dist::Zilla::PluginBundle::Starter" : "v4.0.0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.4",
+            "Test::CPAN::Meta" : "0",
+            "Test::CheckManifest" : "1.29",
+            "Test::Kwalitee" : "1.22",
+            "Test::More" : "0.88",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::Spelling::CommonMistakes" : "1.000",
+            "Test::Spelling" : "0.12",
+            "Test::Version" : "2.00"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "HTML::Tagset" : "0",
+            "HTTP::Headers" : "0",
+            "IO::File" : "0",
+            "URI" : "0",
+            "URI::URL" : "0",
+            "XSLoader" : "0",
+            "strict" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "Config" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "FileHandle" : "0",
+            "IO::File" : "0",
+            "SelectSaver" : "0",
+            "Test" : "0",
+            "Test::More" : "0",
+            "URI" : "0",
+            "strict" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "HTML::Entities" : {
+         "file" : "lib/HTML/Entities.pm",
+         "version" : "3.80"
+      },
+      "HTML::Filter" : {
+         "file" : "lib/HTML/Filter.pm",
+         "version" : "3.80",
+         "x_deprecated" : 1
+      },
+      "HTML::HeadParser" : {
+         "file" : "lib/HTML/HeadParser.pm",
+         "version" : "3.80"
+      },
+      "HTML::LinkExtor" : {
+         "file" : "lib/HTML/LinkExtor.pm",
+         "version" : "3.80"
+      },
+      "HTML::Parser" : {
+         "file" : "lib/HTML/Parser.pm",
+         "version" : "3.80"
+      },
+      "HTML::PullParser" : {
+         "file" : "lib/HTML/PullParser.pm",
+         "version" : "3.80"
+      },
+      "HTML::TokeParser" : {
+         "file" : "lib/HTML/TokeParser.pm",
+         "version" : "3.80"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/libwww-perl/HTML-Parser/issues"
+      },
+      "homepage" : "https://github.com/libwww-perl/HTML-Parser",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/libwww-perl/HTML-Parser.git",
+         "web" : "https://github.com/libwww-perl/HTML-Parser"
+      }
+   },
+   "version" : "3.80",
+   "x_contributors" : [
+      "Antonio Radici <antonio@dyne.org>",
+      "Barbie <barbie@missbarbell.co.uk>",
+      "bulk88 <bulk88@hotmail.com>",
+      "Chase Whitener <capoeirab@cpan.org>",
+      "Chip Salzenberg <chip@pobox.com>",
+      "Damyan Ivanov <dmn@debian.org>",
+      "David Steinbrunner <dsteinbrunner@pobox.com>",
+      "François Perrad <francois.perrad@gadz.org>",
+      "Gisle Aas <gisle@aas.no>",
+      "Graham Knop <haarg@haarg.org>",
+      "Jacques Germishuys <jacquesg@striata.com>",
+      "James Raspass <jraspass@gmail.com>",
+      "Jess Robinson <castaway@desert-island.me.uk>",
+      "Jon Jensen <jon@endpoint.com>",
+      "Michal Josef Špaček <mspacek@redhat.com>",
+      "Mike South <msouth@gmail.com>",
+      "Nicholas Clark <nick@ccl4.org>",
+      "Nicolas R <nicolas@atoomic.org>",
+      "Olaf Alders <olaf@wundersolutions.com>",
+      "Salvatore Bonaccorso <salvatore.bonaccorso@gmail.com>",
+      "Todd Rinaldo <toddr@cpan.org>",
+      "Ville Skyttä <ville.skytta@iki.fi>",
+      "Yves Orton <demerphq@gmail.com>",
+      "Zefram <zefram@fysh.org>"
+   ],
+   "x_generated_by_perl" : "v5.36.0",
+   "x_serialization_backend" : "JSON::PP version 4.07",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}

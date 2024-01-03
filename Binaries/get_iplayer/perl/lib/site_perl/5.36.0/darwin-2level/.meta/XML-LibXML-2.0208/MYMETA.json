@@ -1,0 +1,102 @@
+{
+   "abstract" : "Interface to Gnome libxml2 xml parsing and DOM library",
+   "author" : [
+      "Petr Pajas <PAJAS@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "dom",
+      "html",
+      "libxml",
+      "object oriented",
+      "oop",
+      "parse",
+      "parser",
+      "parsing",
+      "pullparser",
+      "sax",
+      "sgml",
+      "xml",
+      "xpath",
+      "XPath",
+      "xs"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "XML-LibXML",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Base::Wrapper" : "0",
+            "Alien::Libxml2" : "0.14",
+            "Config" : "0",
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "DynaLoader" : "0",
+            "Encode" : "0",
+            "Exporter" : "5.57",
+            "IO::Handle" : "0",
+            "Scalar::Util" : "0",
+            "Tie::Hash" : "0",
+            "XML::NamespaceSupport" : "1.07",
+            "XML::SAX" : "0.11",
+            "XML::SAX::Base" : "0",
+            "XML::SAX::DocumentLocator" : "0",
+            "XML::SAX::Exception" : "0",
+            "base" : "0",
+            "constant" : "0",
+            "overload" : "0",
+            "parent" : "0",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Config" : "0",
+            "Errno" : "0",
+            "IO::File" : "0",
+            "IO::Handle" : "0",
+            "POSIX" : "0",
+            "Scalar::Util" : "0",
+            "Test::More" : "0",
+            "locale" : "0",
+            "utf8" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/shlomif/perl-XML-LibXML.git",
+         "web" : "https://github.com/shlomif/perl-XML-LibXML"
+      }
+   },
+   "version" : "2.0208",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}
