@@ -269,7 +269,7 @@ import CocoaLumberjackSwift
                 }
 
                 let program = Programme()
-                let outputParts = line.components(separatedBy:",")
+                let outputParts = line.components(separatedBy:"|")
                 program.episodeName = outputParts[0].trimmingCharacters(in: .whitespaces)
                 program.tvNetwork = outputParts[1].trimmingCharacters(in: .whitespaces)
                 program.pid = outputParts[2].trimmingCharacters(in: .whitespaces)
