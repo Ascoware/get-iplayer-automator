@@ -1,12 +1,15 @@
 ## What is it?
-The goal of Get iPlayer Automator is to allow iTunes and your Mac to become the hub for your British Television experience regardless of where in the world you are. Get iPlayer Automator allows you to download and watch BBC and ITV shows on your Mac. Series-Link/PVR functionality ensures you will never miss your favourite shows. Programmes are fully tagged and added to iTunes automatically upon completion. It is simple and easy to use, and runs on any machine running Mac OS X 10.9 or later. And since the shows are in iTunes, it is extremely easy to transfer them to your iPod, iPhone, or Apple TV allowing you to enjoy your shows on the go or on your television.
-
-The current release is 1.19.2. [Download it here.](https://github.com/Ascoware/get-iplayer-automator/releases)
+Get iPlayer Automator allows you to let Apple's TV app and your Mac to become the hub for your British television experience regardless of where in the world you are.  Get iPlayer Automator allows you to download and watch BBC and STV (Scottish version of ITV) shows on your Mac. Series-Link/PVR functionality ensures you will never miss your favourite shows. Programmes are fully tagged and added to TV.app or Music.app automatically upon completion. It is simple and easy to use, and runs on any machine running Mac OS X 10.10 or later.  And since the shows are in TV or Music, it is extremely easy to transfer them to your iPhone or Apple TV allowing you to enjoy your shows on the go or on your television.
+The current release is 1.26.1. [Download it here.](https://github.com/Ascoware/get-iplayer-automator/releases)
 
 ### What if I find a bug?
 [Start here.](https://github.com/Ascoware/get-iplayer-automator/wiki/Reporting-Issues)
 
 #### Version history
+This list is only updated periodically. It's easier to look the Github release notes for information about bug fixes than it is for me to update this document.
+
+##### v1.26.1 
+Fix broken perl install
 
 ##### v1.19.2
 Fix metadata parsing of ITV pages due to changes on ITV's end.
