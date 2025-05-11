@@ -33,105 +33,6 @@ import CocoaLumberjackSwift
         
         DDLogInfo("Downloading \(show.showName)")
         
-        DispatchQueue.main.async {
-            guard let requestURL = URL(string: self.show.url) else {
-                return
-            }
-
-            self.currentRequest?.cancel()
-            var downloadRequest = URLRequest(url:requestURL)
-
-            downloadRequest.timeoutInterval = 10
-            var session = URLSession.shared
-
-            if let proxy = self.proxy {
-                // Create an NSURLSessionConfiguration that uses the proxy
-                var proxyDict: [AnyHashable : Any] = [kCFNetworkProxiesHTTPEnable : true,
-                                                       kCFNetworkProxiesHTTPProxy : proxy.host,
-                                                        kCFNetworkProxiesHTTPPort : proxy.port,
-                                                     kCFNetworkProxiesHTTPSEnable : true,
-                                                      kCFNetworkProxiesHTTPSProxy : proxy.host,
-                                                       kCFNetworkProxiesHTTPSPort : proxy.port]
-
-                if let user = proxy.user, let password = proxy.password {
-                    proxyDict[kCFProxyUsernameKey] = user
-                    proxyDict[kCFProxyPasswordKey] = password
-                }
-
-                let configuration = URLSessionConfiguration.ephemeral
-                configuration.connectionProxyDictionary = proxyDict
-
-                // Create a NSURLSession with our proxy aware configuration
-                session = URLSession(configuration:configuration, delegate:nil, delegateQueue:OperationQueue.main)
-            }
-
-            DDLogVerbose("ITV: Requesting Metadata")
-
-            self.currentRequest = session.dataTask(with: downloadRequest) { (data, response, error) in
-                if let httpResponse = response as? HTTPURLResponse {
-                    self.metaRequestFinished(response: httpResponse, data: data, error: error)
-                }
-            }
-            self.currentRequest?.resume()
-        }
-    }
-
-
-    func metaRequestFinished(response: HTTPURLResponse, data: Data?, error: Error?) {
-        guard self.running else {
-            return
-        }
-        
-        guard response.statusCode != 0 || response.statusCode == 200, let data = data, let responseString = String(data:data, encoding:.utf8) else {
-            var message: String = ""
-            
-            if response.statusCode == 0 {
-                message = "ERROR: No response received (probably a proxy issue): \(error?.localizedDescription ?? "Unknown error")"
-                self.show.reasonForFailure = "Internet_Connection"
-                self.show.status = "Failed: Bad Proxy"
-            } else {
-                message = "ERROR: Could not retrieve programme metadata: \(error?.localizedDescription ?? "Unknown error")"
-                self.show.status = "Download Failed"
-            }
-            
-            self.show.successful = false
-            self.show.complete = true
-            DDLogError("\(message)")
-            NotificationCenter.default.post(name: NSNotification.Name(rawValue:"DownloadFinished"), object:self.show)
-            return
-        }
-        
-        
-        DDLogDebug("DEBUG: Metadata response status code: \(response.statusCode)")
-
-        let showMetadata: [Programme]
-
-        if show.tvNetwork.hasPrefix("ITV") {
-            showMetadata = ITVMetadataExtractor.getShowMetadata(htmlPageContent: responseString)
-        } else {
-            showMetadata = STVMetadataExtractor.getShowMetadata(html: responseString)
-        }
-
-        if showMetadata.count == 0 {
-            DDLogError("ERROR: Metadata failure -- most likely this means the show was DRM protected and therefore not supported.")
-            self.show.complete = true
-            self.show.successful = false
-            self.show.status = "Download Failed: DRM protected"
-            self.show.reasonForFailure = "DRMProtected"
-            NotificationCenter.default.removeObserver(self)
-            NotificationCenter.default.post(name: NSNotification.Name(rawValue:"DownloadFinished"), object:self.show)
-            return
-        }
-
-        let showInfo = showMetadata[0]
-        self.show.desc = showInfo.desc
-        self.show.episode = showInfo.episode
-        self.show.season = showInfo.season
-        self.show.episodeName = showInfo.episodeName
-        self.show.thumbnailURLString = showInfo.thumbnailURLString
-
-        DDLogInfo("INFO: Metadata processed.")
-        
         //Create Download Path
         self.createDownloadPath()
         
@@ -240,6 +141,10 @@ import CocoaLumberjackSwift
     }
     
     @objc public func youtubeDLFinishedDownload() {
+        let downloadedShow = [show]
+        let programHistoryInfo = ["Programmes": downloadedShow]
+        NotificationCenter.default.post(name: Notification.Name("AddProgToHistory"), object: self, userInfo: programHistoryInfo)
+
         if UserDefaults.standard.bool(forKey: "TagShows") {
             tagDownloadWithMetadata()
         } else {

@@ -73,13 +73,14 @@ import CocoaLumberjackSwift
     }
 
     var typeDescription: String {
-        let dic = [
-            NSNumber(value: ProgrammeType.tv.rawValue): "BBC TV",
-            NSNumber(value: ProgrammeType.radio.rawValue): "BBC Radio",
-            NSNumber(value: ProgrammeType.itv.rawValue): "ITV"
-        ]
-
-        return dic[NSNumber(value: type.rawValue)] ?? "Unknown"
+        switch type {
+        case .tv:
+            "BBC TV"
+        case .radio:
+            "BBC Radio"
+        case .itv:
+            "ITV"
+        }
     }
 
     public override init() {
@@ -96,54 +97,67 @@ import CocoaLumberjackSwift
     }
 
     public func encode(with coder: NSCoder) {
+        coder.encode(tvNetwork, forKey: "tvNetwork")
         coder.encode(showName, forKey: "showName")
         coder.encode(pid, forKey: "pid")
-        coder.encode(tvNetwork, forKey: "tvNetwork")
         coder.encode(status, forKey: "status")
-        coder.encode(path, forKey: "path")
         coder.encode(seriesName, forKey: "seriesName")
         coder.encode(episodeName, forKey: "episodeName")
+        coder.encode(complete, forKey: "complete")
+        coder.encode(successful, forKey: "successful")
         coder.encode(timeadded, forKey: "timeadded")
-        coder.encode(processedPID, forKey: "processedPID")
-        coder.encode(radio, forKey: "radio")
-        coder.encode(realPID, forKey: "realPID")
-        coder.encode(url, forKey: "url")
+        coder.encode(path, forKey: "path")
         coder.encode(season, forKey: "season")
         coder.encode(episode, forKey: "episode")
+        coder.encode(processedPID, forKey: "processedPID")
+        coder.encode(radio, forKey: "radio")
+        coder.encode(podcast, forKey: "podcast")
+        coder.encode(realPID, forKey: "realPID")
+        coder.encode(subtitlePath, forKey: "subtitlePath")
+        coder.encode(reasonForFailure, forKey: "reasonForFailure")
+        coder.encode(availableModes, forKey: "availableModes")
+        coder.encode(url, forKey: "url")
+        coder.encode(desc, forKey: "desc")
+        coder.encode(duration, forKey: "duration")
+        coder.encode(categories, forKey: "categories")
+        coder.encode(firstBroadcast, forKey: "firstBroadcast")
         coder.encode(lastBroadcast, forKey: "lastBroadcast")
         coder.encode(lastBroadcastString, forKey: "lastBroadcastString")
+        coder.encode(modeSizes, forKey: "modeSizes")
+        coder.encode(thumbnailURLString, forKey: "thumbnailURLString")
+        coder.encode(addedByPVR, forKey: "addedByPVR")
     }
 
     public required init?(coder: NSCoder) {
         super.init()
-        pid = coder.decodeObject(forKey: "pid") as? String ?? ""
-        showName = coder.decodeObject(forKey: "showName") as? String ?? ""
         tvNetwork = coder.decodeObject(forKey: "tvNetwork") as? String ?? ""
+        showName = coder.decodeObject(forKey: "showName") as? String ?? ""
+        pid = coder.decodeObject(forKey: "pid") as? String ?? ""
         status = coder.decodeObject(forKey: "status") as? String ?? ""
-        complete = false
-        successful = false
-        path = coder.decodeObject(forKey: "path") as? String ?? ""
         seriesName = coder.decodeObject(forKey: "seriesName") as? String ?? ""
         episodeName = coder.decodeObject(forKey: "episodeName") as? String ?? ""
-        if let decodeObject = coder.decodeObject(forKey: "timeadded") as? NSNumber {
-            timeadded = decodeObject
-        }
-
-        processedPID = coder.decodeBool(forKey: "processedPID")
-        radio = coder.decodeBool(forKey: "radio")
-
-        realPID = coder.decodeObject(forKey: "realPID") as? String ?? ""
-        url = coder.decodeObject(forKey: "url") as? String ?? ""
-        subtitlePath = ""
-        reasonForFailure = ""
-        availableModes = ""
-        desc = ""
-        getNameRunning = false
-        addedByPVR = false
+        complete = coder.decodeBool(forKey: "complete")
+        successful = coder.decodeBool(forKey: "successful")
+        timeadded = coder.decodeObject(forKey: "timeadded") as? NSNumber ?? 0
+        path = coder.decodeObject(forKey: "path") as? String ?? ""
         season = coder.decodeInteger(forKey: "season")
         episode = coder.decodeInteger(forKey: "episode")
+        processedPID = coder.decodeBool(forKey: "processedPID")
+        radio = coder.decodeBool(forKey: "radio")
+        realPID = coder.decodeObject(forKey: "realPID") as? String ?? ""
+
+        subtitlePath = coder.decodeObject(forKey: "subtitlePath") as? String ?? ""
+        reasonForFailure = coder.decodeObject(forKey: "reasonForFailure") as? String ?? ""
+        availableModes = coder.decodeObject(forKey: "availableModes") as? String ?? ""
+        url = coder.decodeObject(forKey: "url") as? String ?? ""
+        desc = coder.decodeObject(forKey: "desc") as? String ?? ""
+        duration = coder.decodeInteger(forKey: "duration")
+        categories = coder.decodeObject(forKey: "categories") as? String ?? ""
+        firstBroadcast = coder.decodeObject(forKey: "firstBroadcast") as? Date ?? Date()
         lastBroadcast = coder.decodeObject(forKey: "lastBroadcast") as? Date ?? Date()
         lastBroadcastString = coder.decodeObject(forKey: "lastBroadcastString") as? String ?? ""
+        thumbnailURLString = coder.decodeObject(forKey: "thumbnailURLString") as? String ?? ""
+        addedByPVR = coder.decodeBool(forKey: "addedByPVR")
     }
 
     func retrieveExtendedMetadata() {
