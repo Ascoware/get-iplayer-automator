@@ -76,6 +76,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     defaultValues[@"DownloadSubtitles"] = @NO;
     defaultValues[@"EmbedSubtitles"] = @YES;
     defaultValues[@"AlwaysUseProxy"] = @NO;
+    defaultValues[@"TryPartialProxy"] = @NO;
     defaultValues[@"XBMC_naming"] = @NO;
     defaultValues[@"KeepSeriesFor"] = @"30";
     defaultValues[@"RemoveOldSeries"] = @NO;
@@ -347,66 +348,59 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 {
     return YES;
 }
+
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
 {
-    if (runDownloads)
-    {
-        NSAlert *downloadAlert = [NSAlert new];
-        downloadAlert.messageText = @"Are you sure you wish to quit?";
-        [downloadAlert addButtonWithTitle:@"No"];
-        [downloadAlert addButtonWithTitle:@"Yes"];
-        downloadAlert.informativeText = @"You are currently downloading shows. If you quit, they will be cancelled.";
-        NSInteger response = [downloadAlert runModal];
-        if (response == NSAlertFirstButtonReturn) return NSTerminateCancel;
-    }
-    else if (runUpdate)
-    {
-        NSAlert *updateAlert = [NSAlert new];
-        updateAlert.messageText = @"Are you sure?";
-        [updateAlert addButtonWithTitle:@"No"];
-        [updateAlert addButtonWithTitle:@"Yes"];
-        updateAlert.informativeText = @"Get iPlayer Automator is currently updating the cache. If you proceed with quiting, some series-link information will be lost. It is not recommended to quit during an update. Are you sure you wish to quit?";
-        NSInteger response = [updateAlert runModal];
-        if (response == NSAlertFirstButtonReturn) return NSTerminateCancel;
-    }
-
-    return NSTerminateNow;
+    NSApplicationTerminateReply terminateReply = (self.confirmedQuit || [self confirmQuit]) ? NSTerminateNow : NSTerminateCancel;
+    return terminateReply;
 }
+
 - (BOOL)windowShouldClose:(id)sender
 {
-    if ([sender isEqualTo:_mainWindow])
-    {
-        if (runUpdate)
-        {
-            NSAlert *updateAlert = [NSAlert new];
-            updateAlert.messageText = @"Are you sure?";
-            [updateAlert addButtonWithTitle:@"No"];
-            [updateAlert addButtonWithTitle:@"Yes"];
-            updateAlert.informativeText = @"Get iPlayer Automator is currently updating the cache. If you proceed with quiting, some series-link information will be lost. It is not recommended to quit during an update. Are you sure you wish to quit?";
-            NSInteger response = [updateAlert runModal];
-            if (response == NSAlertFirstButtonReturn) return NO;
-            else return YES;
-        }
-        else if (runDownloads)
-        {
-            NSAlert *downloadAlert = [NSAlert new];
-            downloadAlert.messageText = @"Are you sure you wish to quit?";
-            [downloadAlert addButtonWithTitle:@"No"];
-            [downloadAlert addButtonWithTitle:@"Yes"];
-            downloadAlert.informativeText = @"You are currently downloading shows. If you quit, they will be cancelled.";
-            NSInteger response = [downloadAlert runModal];
-            if (response == NSAlertFirstButtonReturn) return NO;
-            else return YES;
+    BOOL shouldClose = YES;
 
-        }
-        return YES;
+    if ([sender isEqualTo:_mainWindow]) {
+        shouldClose = [self confirmQuit];
+        self.confirmedQuit = shouldClose;
     }
-    else return YES;
+
+    return shouldClose;
 }
+
+- (BOOL)confirmQuit
+{
+    BOOL confirmation = YES;
+    NSAlert *alert;
+
+    if (runUpdate || runDownloads) {
+        alert = [NSAlert new];
+        alert.messageText = @"Are you sure you want to quit?";
+        [alert addButtonWithTitle:@"No"];
+        [alert addButtonWithTitle:@"Yes"];
+    }
+
+    if (runUpdate)
+    {
+        alert.informativeText = @"Get iPlayer Automator is currently updating the cache. If you proceed with quiting, some series-link information will be lost. It is not recommended to quit during an update. Are you sure you wish to quit?";
+    }
+    else if (runDownloads)
+    {
+        alert.informativeText = @"You are currently downloading shows. If you quit, they will be cancelled.";
+    }
+
+    if (alert) {
+        NSInteger response = [alert runModal];
+        confirmation = (response != NSAlertFirstButtonReturn);
+    }
+
+    return confirmation;
+}
+
 - (void)windowWillClose:(NSNotification *)note
 {
     if ([note.object isEqualTo:_mainWindow]) [_application terminate:self];
 }
+
 - (void)applicationWillTerminate:(NSNotification *)aNotification
 {
     //End Downloads if Running
@@ -538,15 +532,15 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     }
 
     // Disabling until we figure out the new ITV structure
-//    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheITV_TV"] isEqualTo:@YES])
-//    {
-//        _updatingITVIndex = true;
-//        [self.itvProgressIndicator startAnimation:self];
-//        self.itvProgressIndicator.doubleValue = 0.0;
-//        [self.itvProgressIndicator setHidden:false];
-//
-//        [newITVListing itvUpdate];
-//    }
+    //    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheITV_TV"] isEqualTo:@YES])
+    //    {
+    //        _updatingITVIndex = true;
+    //        [self.itvProgressIndicator startAnimation:self];
+    //        self.itvProgressIndicator.doubleValue = 0.0;
+    //        [self.itvProgressIndicator setHidden:false];
+    //
+    //        [newITVListing itvUpdate];
+    //    }
 
     _updatingBBCIndex = true;
 
@@ -568,16 +562,20 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         return;
     }
 
-    NSArray *getiPlayerUpdateArgs = @[_getiPlayerPath,
-                                      cacheExpiryArg,
-                                      typeArgument,
-                                      @"--refresh",
-                                      [GetiPlayerArguments sharedController].profileDirArg,
-                                      @".*"];
+    NSMutableArray *getiPlayerUpdateArgs = [NSMutableArray arrayWithArray:
+                                                @[_getiPlayerPath,
+                                                  cacheExpiryArg,
+                                                  typeArgument,
+                                                  @"--refresh",
+                                                  [GetiPlayerArguments sharedController].profileDirArg,
+                                                  @".*"]
+    ];
 
-    if (_proxy && [[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])
-    {
-        getiPlayerUpdateArgs = [getiPlayerUpdateArgs arrayByAddingObject:[[NSString alloc] initWithFormat:@"-p%@", _proxy.url]];
+    if (_proxy) {
+        [getiPlayerUpdateArgs addObject: [NSString stringWithFormat:@"-p%@", _proxy.url]];
+        if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"TryPartialProxy"] boolValue]) {
+            [getiPlayerUpdateArgs addObject:@"--partial-proxy"];
+        }
     }
 
     DDLogInfo(@"Updating Programme Index Feeds...\n");
@@ -590,7 +588,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     self.getiPlayerUpdateTask.standardOutput = _getiPlayerUpdatePipe;
     self.getiPlayerUpdateTask.standardError =_getiPlayerUpdatePipe;
 
-        for (NSString *arg in getiPlayerUpdateArgs) {
+    for (NSString *arg in getiPlayerUpdateArgs) {
         DDLogVerbose(@"%@", arg);
     }
 
@@ -991,8 +989,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])
     {
         _getiPlayerProxy = [GetiPlayerProxy new];
-    _getiPlayerProxy = [GetiPlayerProxy new];
-    [_getiPlayerProxy loadProxyInBackgroundForSelector:@selector(startDownloads:proxyDict:) withObject:sender onTarget:self silently:_runScheduled];
+        [_getiPlayerProxy loadProxyInBackgroundForSelector:@selector(startDownloads:proxyDict:) withObject:sender onTarget:self silently:_runScheduled];
     } else {
         [self startDownloads:sender proxyDict:nil];
     }
@@ -1868,6 +1865,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     [sharedDefaults removeObjectForKey:@"DownloadSubtitles"];
     [sharedDefaults removeObjectForKey:@"EmbedSubtitles"];
     [sharedDefaults removeObjectForKey:@"AlwaysUseProxy"];
+    [sharedDefaults removeObjectForKey:@"TryPartialProxy"];
     [sharedDefaults removeObjectForKey:@"XBMC_naming"];
     [sharedDefaults removeObjectForKey:@"KeepSeriesFor"];
     [sharedDefaults removeObjectForKey:@"RemoveOldSeries"];

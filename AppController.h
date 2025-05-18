@@ -37,6 +37,7 @@ extern NSDictionary<NSString *, NSString *> *radioFormats;
 @property IBOutlet NSApplication *application;
 @property IBOutlet NSWindow *historyWindow;
 @property (assign) IOPMAssertionID powerAssertionID;
+@property BOOL confirmedQuit;
 
 //Update Components
 @property (nullable) NSTask *getiPlayerUpdateTask;

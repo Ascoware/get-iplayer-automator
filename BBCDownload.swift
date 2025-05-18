@@ -42,7 +42,7 @@ import CocoaLumberjackSwift
         var partialProxyArg: String? = nil
         if let proxy {
             proxyArg = "-p\(proxy.url)"
-            if UserDefaults.standard.bool(forKey: "AlwaysUseProxy") {
+            if UserDefaults.standard.bool(forKey: "TryPartialProxy") {
                 partialProxyArg = "--partial-proxy"
             }
         }
