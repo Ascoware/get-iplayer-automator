@@ -401,7 +401,7 @@ import CocoaLumberjackSwift
             if let httpProxy = proxyDict["proxy"] as? HTTPProxy {
                 args.append("-p\(httpProxy.url)")
 
-                if UserDefaults.standard.bool(forKey: "AlwaysUseProxy") == false {
+                if UserDefaults.standard.bool(forKey: "TryPartialProxy") {
                     args.append("--partial-proxy")
                 }
             }

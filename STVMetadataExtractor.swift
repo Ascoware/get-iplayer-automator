@@ -10,9 +10,14 @@ import Kanna
 import SwiftyJSON
 import CocoaLumberjackSwift
 
+enum STVMetadataError: Error {
+    case noMetadataFound
+    case drmProtectedError
+}
+
 class STVMetadataExtractor {
 
-    static func getShowMetadata(html: String) -> [Programme] {
+    static func getShowMetadata(html: String) throws -> [Programme] {
         let longDateFormatter = ISO8601DateFormatter()
         longDateFormatter.timeZone = TimeZone(secondsFromGMT:0)
 
@@ -23,7 +28,7 @@ class STVMetadataExtractor {
         if let htmlPage = try? HTML(html: html, encoding: .utf8) {
             guard let propertiesElement = htmlPage.at_xpath("//script[@id='__NEXT_DATA__']") else {
                 DDLogError("**** No metadata found")
-                return []
+                throw STVMetadataError.noMetadataFound
             }
 
             if let propertiesContent = propertiesElement.content {
@@ -33,11 +38,18 @@ class STVMetadataExtractor {
                     newProgram.pid = pageProps["episodeId"].stringValue
                     let episodesKey = "/episodes/\(newProgram.pid)"
                     if let showData = propsDict["initialReduxState"]?["playerApiCache"][episodesKey]["results"] {
+                        if showData.isEmpty {
+                            DDLogError("**** No metadata found")
+                            throw STVMetadataError.noMetadataFound
+                        }
+                        
                         let protectedMedia = showData["programme"]["drmEnabled"].boolValue
 
                         if protectedMedia {
-                            return []
+                            DDLogError("**** DRM protected media - bailing out")
+                            throw STVMetadataError.drmProtectedError
                         }
+
                         newProgram.seriesName = showData["programme"]["name"].stringValue
                         newProgram.episodeName = showData["title"].stringValue
                         let seriesString = showData["playerSeries"]["name"].stringValue
