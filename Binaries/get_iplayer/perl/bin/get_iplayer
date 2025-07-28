@@ -23,7 +23,7 @@
 #
 #
 package main;
-my $version = 3.34;
+my $version = 3.36;
 my $version_text;
 $version_text = sprintf("v%.2f", $version) unless $version_text;
 #
@@ -52,7 +52,7 @@ use IO::Socket;
 use IPC::Open3;
 use LWP::ConnCache;
 use LWP::UserAgent;
-use open IN => ':crlf:utf8', OUT => ':utf8';
+use open IN => ':crlf :utf8', OUT => ':utf8';
 use PerlIO::encoding;
 use POSIX qw(strftime);
 use POSIX qw(:termios_h);
@@ -83,7 +83,7 @@ my $opt_format = {
 	# Recording
 	attempts	=> [ 1, "attempts=n", 'Recording', '--attempts <number>', "Number of attempts to make or resume a failed connection.  --attempts is applied per-stream. Programmes have multiple streams available for each recording quality."],
 	audioonly		=> [ 1, "audioonly|audio-only!", 'Recording', '--audio-only', "Only download audio stream for TV programme. Produces .m4a file. Implies --force."],
-	downloadabortonfail	=> [ 1, "downloadabortonfail|download-abort-onfail|download-abort-onfail!", 'Recording', '--download-abort-onfail', "Exit immediately if any stream fails to download. Use to avoid repeated failed download attempts if connection is dropped or access is blocked."],
+	downloadabortonfail	=> [ 1, "downloadabortonfail|download-abort-on-fail|download-abort-onfail!", 'Recording', '--download-abort-onfail', "Exit immediately if any stream fails to download. Use to avoid repeated failed download attempts if connection is dropped or access is blocked."],
 	excludeformat	=> [ 1, "excludeformat|exclude-format=s", 'Recording', '--exclude-format <format>,<format>,...', "Comma-separated list of media stream formats to ignore when recording. Valid values: hls,dash."],
 	excludesupplier	=> [ 1, "excludecdn|exclude-cdn|excludesupplier|exclude-supplier=s", 'Recording', '--exclude-supplier <supplier>,<supplier>,...', "Comma-separated list of media stream suppliers (CDNs) to skip. Possible values: akamai,limelight,bidi,cloudfront. Synonym: --exclude-cdn."],
 	force		=> [ 1, "force|force-download!", 'Recording', '--force', "Ignore programme history (unsets --hide option also)."],
@@ -101,15 +101,21 @@ my $opt_format = {
 	_url		=> [ 2, "", 'Recording', '--url <url>,<url>,...', "Record the PIDs contained in the specified iPlayer episode URLs. Alias for --pid."],
 	pid		=> [ 2, "pid|url=s@", 'Recording', '--pid <pid>,<pid>,...', "Record arbitrary PIDs that do not necessarily appear in the index."],
 	pidindex	=> [ 1, "pidrefresh|pid-refresh|pidindex|pid-index!", 'Recording', '--pid-index', "Update (if necessary) and use programme index cache with --pid. Cache is not searched for programme by default with --pid. Synonym: --pid-refresh."],
-	pidrecursive	=> [ 1, "pidrecursive|pid-recursive!", 'Recording', '--pid-recursive', "Record all related episodes if value of --pid is a series or brand PID.  Requires --pid."],
-	pidrecursivelist	=> [ 1, "pidrecursivelist|pid-recursive-list!", 'Recording', '--pid-recursive-list', "If value of --pid is a series or brand PID, list available episodes but do not download. Implies --pid-recursive. Requires --pid."],
-	pidrecursivetype	=> [ 1, "pidrecursivetype|pid-recursive-type=s", 'Recording', '--pid-recursive-type <type>', "Download only programmes of <type> (radio or tv) with --pid-recursive. Requires --pid-recursive."],
 	proxy		=> [ 0, "proxy|p=s", 'Recording', '--proxy, -p <url>', "Web proxy URL, e.g., http://username:password\@server:port or http://server:port.  Value of http_proxy environment variable (if present) will be used unless --proxy is specified. Used for both HTTP and HTTPS. Overridden by --no-proxy."],
 	start		=> [ 1, "start=s", 'Recording', '--start <secs|hh:mm:ss>', "Recording/streaming start offset (actual start may be several seconds earlier for HLS and DASH streams)"],
 	stop		=> [ 1, "stop=s", 'Recording', '--stop <secs|hh:mm:ss>', "Recording/streaming stop offset (actual stop may be several seconds later for HLS and DASH streams)"],
 	subsrequired	=> [ 1, "subsrequired|subtitlesrequired|subs-required|subtitles-required!", 'Recording', '--subtitles-required', "Do not download TV programme if subtitles are not available."],
 	test		=> [ 1, "test|t!", 'Recording', '--test, -t', "Test only - no recording (only shows search results with --pvr and --pid-recursive)"],
 	versionlist	=> [ 1, "versionlist|versions|version-list=s", 'Recording', '--versions <versions>', "Version of programme to record. List is processed from left to right and first version found is downloaded. Example: '--versions=audiodescribed,default' will prefer audiodescribed programmes if available. Versions: 'default,audiodescribed,signed,combined'. Default: 'default'."],
+
+	# Recursive Recording
+	pidrecursive	=> [ 1, "pidrecursive|pid-recursive!", 'Recursive Recording', '--pid-recursive', "Record all related episodes if value of --pid is a series or brand PID.  Requires --pid."],
+	pidrecursivechannel	=> [ 1, "pidrecursivechannel|pid-recursive-channel=s", 'Recursive Recording', '--pid-recursive-channel <channel>[,<channel>,...]', "Filter episode list to include only programmes where <channel> (regex or comma-separated list of substrings) appears in channel name. Requires --pid-recursive."],
+	pidrecursiveexcludechannel	=> [ 1, "pidrecursiveexcludechannel|pid-recursive-exclude-channel=s", 'Recursive Recording', '--pid-recursive-exclude-channel <channel>[,<channel>,...]', "Filter episode list to exclude all programmes where <channel> (regex or comma-separated list of substrings) appears in channel name. Requires --pid-recursive."],
+	pidrecursiveexclude	=> [ 1, "pidrecursiveexclude|pid-recursive-exclude=s", 'Recursive Recording', '--pid-recursive-exclude <exclude>[,<exclude>,...]', "Filter episode list to exclude all programmes where <exclude> (regex or comma-separated list of substrings) appears in series name or episode title. Requires --pid-recursive."],
+	pidrecursivelist	=> [ 1, "pidrecursivelist|pid-recursive-list!", 'Recursive Recording', '--pid-recursive-list', "If value of --pid is a series or brand PID, list available episodes but do not download. Implies --pid-recursive. Requires --pid."],
+	pidrecursivesearch	=> [ 1, "pidrecursivesearch|pid-recursive-searche=s", 'Recursive Recording', '--pid-recursive-search <search>[,<searchl>,...]', "Filter episode list to include only programmes where <search> (regex or comma-separated list of substrings) appears in series name or episode title. Requires --pid-recursive."],
+	pidrecursivetype	=> [ 1, "pidrecursivetype|pid-recursive-type=s", 'Recursive Recording', '--pid-recursive-type <type>', " Filter episode list to include only programmes of type <type> (radio or tv). Requires --pid-recursive."],
 
 	# Search
 	availablebefore		=> [ 1, "availablebefore|available-before=n", 'Search', '--available-before <hours>', "Limit search to programmes that became available before <hours> hours ago"],
@@ -818,12 +824,12 @@ sub release_check {
 		} else {
 			main::logger "INFO: You have the latest release ($version_text)\n";
 		}
-		if (! open (relchk, "> $relchk_file") ) {
+		if (! open (RELCHK, "> $relchk_file") ) {
 			main::logger "ERROR: Cannot write to release check file: $relchk_file\n";
 			return 1;
 		}
-		print relchk "$relchk_msg\n";
-		close relchk;
+		print RELCHK "$relchk_msg\n";
+		close RELCHK;
 	}
 }
 
@@ -1004,6 +1010,8 @@ sub find_pid_matches {
 			get_links( $prog, $index_prog, $t, 0, $now );
 		}
 	}
+	my $ep_hash;
+	my $ep_index;
 	for my $ep ( @ep_list ) {
 			my $this;
 			if ( $prog->{$ep->{pid}}->{pid} ) {
@@ -1011,7 +1019,12 @@ sub find_pid_matches {
 			} else {
 				$this = $ep;
 			}
+			$this->{index} = ++$ep_index;
+			$ep_hash->{$this->{pid}} = $this;
 			push @match_list, $this;
+	}
+	if ( $opt->{pidrecursive} ) {
+		@match_list = get_pid_recursive_matches($ep_hash);
 	}
 	if ( @match_list ) {
 		my $show_type = keys %ep_types > 1;
@@ -1022,13 +1035,76 @@ sub find_pid_matches {
 		for my $ep ( @match_list ) {
 			my $ep_desc = " - $ep->{desc}" if $opt->{long} && $ep->{desc};
 			my $ep_type = "$ep->{type}, " if $show_type;
-			main::logger "${ep_type}$ep->{name} - $ep->{episode}|$ep->{channel}|$ep->{pid}${ep_desc}\n";
+			main::logger "${ep_type}$ep->{name} - $ep->{episode}, $ep->{channel}, $ep->{pid}${ep_desc}\n";
 		}
 	}
 	main::logger "INFO: ".(scalar @match_list)." total programmes\n";
 	# return empty list if not downloading
 	if ( $opt->{pidrecursivelist} ) {
 		return;
+	}
+	return @match_list;
+}
+
+sub get_pid_recursive_matches {
+	my $prog = shift;
+	my $download_regex = $opt->{pidrecursivesearch} || ".*";
+	my %download_hash;
+	my ( $channel_regex, $channel_exclude_regex, $exclude_regex, $type_regex );
+	if ( $opt->{pidrecursivechannel} ) {
+		$channel_regex = '('.(join '|', ( split /,/, $opt->{pidrecursivechannel} ) ).')';
+	} else {
+		$channel_regex = '.*';
+	}
+	if ( $opt->{pidrecursiveexcludechannel} ) {
+		$channel_exclude_regex = '('.(join '|', ( split /,/, $opt->{pidrecursiveexcludechannel} ) ).')';
+	} else {
+		$channel_exclude_regex = '^_ROGUE_VALUE_$';
+	}
+	if ( $opt->{pidrecursiveexclude} ) {
+		$exclude_regex = '('.(join '|', ( split /,/, $opt->{pidrecursiveexclude} ) ).')';
+	} else {
+		$exclude_regex = '^_ROGUE_VALUE_$';
+	}
+	if ( $opt->{pidrecursivetype} ) {
+		$type_regex = '('.(join '|', ( split /,/, $opt->{pidrecursivetype} ) ).')';
+	} else {
+		$type_regex = '.*';
+	}
+	if ( $opt->{verbose} ) {
+		main::logger "DEBUG: Recursive download_regex = $download_regex\n";
+		main::logger "DEBUG: Recursive channel_regex = $channel_regex\n";
+		main::logger "DEBUG: Recursive channel_exclude_regex = $channel_exclude_regex\n";
+		main::logger "DEBUG: Recursive exclude_regex = $exclude_regex\n";
+		main::logger "DEBUG: Recursive type_regex = $type_regex\n";
+		main::logger "\n";
+	}
+	# Determine fields to search
+	my @searchfields = ( 'name', 'episode' );
+	# Loop through each prog object
+	for my $this ( values %{ $prog } ) {
+		# Only include programmes matching channels and category regexes
+		if ( $this->{channel} =~ /$channel_regex/i
+			&& $this->{channel} !~ /$channel_exclude_regex/i
+			&& $this->{type} =~ /$type_regex/i
+		) {
+			# Add included matches
+			my @compund_fields;
+			push @compund_fields, $this->{$_} for @searchfields;
+			$download_hash{ $this->{index} } = $this if (join ' ', @compund_fields) =~ /$download_regex/i;
+		}
+	}
+	# Remove excluded matches
+	for my $field ( @searchfields ) {
+		for my $index ( keys %download_hash ) {
+			my $this = $download_hash{$index};
+			delete $download_hash{$index} if $this->{ $field } =~ /$exclude_regex/i;
+		}
+	}
+	my @match_list;
+	# Add all matching prog objects to array
+	for my $index ( sort {$a <=> $b} keys %download_hash ) {
+		push @match_list, $download_hash{$index};
 	}
 	return @match_list;
 }
@@ -1118,7 +1194,7 @@ sub find_matches {
 
 		# Else assume this is a programme name regex
 		} elsif ( $_ ) {
-			logger "INFO: Search term '$_' is a substring\n" if $opt->{verbose};
+			logger "INFO: Search term '$_' is a substring or regular expression\n" if $opt->{verbose};
 			push @match_list, get_regex_matches( $prog, $_ );
 		}
 	}
@@ -1230,11 +1306,6 @@ sub download_other {
 			main::logger "ERROR: Could not get programme metadata\n" if $opt->{verbose};
 			next;
 		}
-		main::logger "INFO: Processing $this->{type}: '$this->{name} - $this->{episode} ($this->{pid})'\n";
-		if ( $opt->{pidrecursive} && $opt->{pidrecursivetype} && $opt->{pidrecursivetype} ne $this->{type} ) {
-			main::logger "INFO: --pid-recursive-type=$opt->{pidrecursivetype} excluded $this->{type}: '$this->{name} - $this->{episode} ($this->{pid})'\n";
-			next;
-		};
 		# Search versions for versionlist versions
 		my @versions = $this->generate_version_list;
 		# Use first version in list if a version list is not specified
@@ -1432,17 +1503,17 @@ sub get_regex_matches {
 	if ( $opt->{excludechannel} ) {
 		$channel_exclude_regex = '('.(join '|', ( split /,/, $opt->{excludechannel} ) ).')';
 	} else {
-		$channel_exclude_regex = '^ROGUE$';
+		$channel_exclude_regex = '^_ROGUE_VALUE_$';
 	}
 	if ( $opt->{excludecategory} ) {
 		$category_exclude_regex = '('.(join '|', ( split /,/, $opt->{excludecategory} ) ).')';
 	} else {
-		$category_exclude_regex = '^ROGUE$';
+		$category_exclude_regex = '^_ROGUE_VALUE_$';
 	}
 	if ( $opt->{exclude} ) {
 		$exclude_regex = '('.(join '|', ( split /,/, $opt->{exclude} ) ).')';
 	} else {
-		$exclude_regex = '^ROGUE$';
+		$exclude_regex = '^_ROGUE_VALUE_$';
 	}
 	my $now = time();
 	my $since = $now - ($opt->{since} * 3600) if defined $opt->{since};
@@ -1944,7 +2015,7 @@ sub request_url_retry {
 		$is4xx = 0;
 		$res = $ua->request( HTTP::Request->new( GET => $url ) );
 		if ( ! $res->is_success ) {
-			$is4xx = $res->code() == 403 || $res->code() == 404;
+			$is4xx = $res->code() >= 400 && $res->code() < 500;
 			if ( $opt->{verbose} || ! ( $is4xx && $ok4xx ) ) {
 				logger "\nWARNING: $failmsg ($i/$retries): $url\n";
 				logger "WARNING: Response: ${\$res->code()} ${\$res->message()}\n";
@@ -2279,7 +2350,7 @@ sub StringUtils::sanitize_path {
 		$string =~ s/$mac_bad//g if IS_MACOS;
 	} else {
 		# use ISO8601 dates
-		$string =~ s|(\d\d)[/_](\d\d)[/_](20\d\d)|$3-$2-$1|g;
+		$string =~ s|\b(\d\d)[/_](\d\d)[/_](\d\d\d\d)\b|$3-$2-$1|g;
 		# ASCII-fy some punctuation
 		$string = StringUtils::convert_punctuation($string);
 		# Remove diacritical marks
@@ -2577,7 +2648,7 @@ sub usage {
 		'This applies even if the base option name already begins with "no-", e.g., --no-no-tag or --no-no-artwork',
 	);
 	push @man,
-		'.TH GET_IPLAYER "1" "October 2023" "Phil Lewis" "get_iplayer Manual"',
+		'.TH GET_IPLAYER "1" "May 2025" "Phil Lewis" "get_iplayer Manual"',
 		'.SH NAME', 'get_iplayer - Stream Recording tool and PVR for BBC iPlayer and BBC Sounds',
 		'.SH SYNOPSIS',
 		'\fBget_iplayer\fR [<options>] [<regex|index> ...]',
@@ -2636,7 +2707,7 @@ sub usage {
 	push @dump, "    ".join(" ", @negate);
 	# Build the help usage text
 	# Each section
-	for my $section ( 'Search', 'Display', 'Recording', 'Download', 'Output', 'PVR', 'Config', 'External Program', 'Tagging', 'Misc', 'Deprecated' ) {
+	for my $section ( 'Search', 'Display', 'Recording', 'Recursive Recording', 'Output', 'PVR', 'Config', 'External Program', 'Tagging', 'Misc', 'Deprecated' ) {
 		next if not defined $section_name{$section};
 		my @lines;
 		my @manlines;
@@ -2996,7 +3067,7 @@ sub load {
 sub display {
 	my $this = shift;
 	my $title = shift || 'Options';
-	my $excluderegex = shift || 'ROGUEVALUE';
+	my $excluderegex = shift || '_ROGUE_VALUE_';
 	my $regex = $this->excludeopts;
 	main::logger "$title:\n";
 	for ( sort keys %{$this} ) {
@@ -3236,7 +3307,7 @@ sub list_progs {
 
 		# Else assume this is a programme name regex
 		} else {
-			main::logger "INFO: Search term '$_' is a substring\n" if $opt->{verbose};
+			main::logger "INFO: Search term '$_' is a substring or regular expression\n" if $opt->{verbose};
 			push @match_list, main::get_regex_matches( $prog, $_ );
 		}
 	}
@@ -3357,7 +3428,7 @@ sub channels_filtered {
 	my %group_channels;
 	# include/exclude matching channels as required
 	my $include_regex = '.*';
-	my $exclude_regex = '^ROGUEVALUE$';
+	my $exclude_regex = '^_ROGUE_VALUE_$';
 	# Create a regex from any comma separated values
 	$exclude_regex = '('.(join '|', ( split /,/, $opt->{refreshexclude} ) ).')' if $opt->{refreshexclude};
 	$include_regex = '('.(join '|', ( split /,/, $opt->{refreshinclude} ) ).')' if $opt->{refreshinclude};
@@ -3372,7 +3443,7 @@ sub channels_filtered {
 	$use_group_channels = 1 if ! $use_group_channels && $exclude_groups;
 	for my $channel ( keys %channels ) {
 		if ( $use_group_channels ) {
-			if ( $exclude_regex ne '^ROGUEVALUE$' && $group_channels{$channel} =~ /$exclude_regex/i ) {
+			if ( $exclude_regex ne '^_ROGUE_VALUE_$' && $group_channels{$channel} =~ /$exclude_regex/i ) {
 				delete $group_channels{$channel};
 			}
 			if ( $include_regex ne '.*' && $channels{$channel} =~ /$include_regex/i ) {
@@ -3748,11 +3819,6 @@ sub download_retry_loop {
 		return 1;
 	}
 
-	if ( $opt->{pidrecursive} && $opt->{pidrecursivetype} && $opt->{pidrecursivetype} ne $prog->{type} ) {
-		main::logger "INFO: --pid-recursive-type=$opt->{pidrecursivetype} excluded $prog->{type}: '$prog->{name} - $prog->{episode} ($prog->{pid})'\n";
-		return 0;
-	};
-
 	# Look up version pids for this prog - this does nothing if above get_metadata has alredy completed
 	if ( keys %{ $prog->{verpids} } == 0 ) {
 		if ( $prog->get_verpids( $ua ) ) {
@@ -3987,7 +4053,7 @@ sub tag_file {
 	my $prog = shift;
 	if ( $opt->{tagonly} ) {
 		if ( $opt->{tagonlyfilename} ) {
-			$prog->{filename} = $opt->{tagonlyfilename};
+			$prog->{filename} = main::encode_fs($opt->{tagonlyfilename});
 			(undef, undef, $prog->{ext}) = fileparse($prog->{filename}, qr/\.[^.]*/);
 			$prog->{ext} =~ s/^\.//;
 		}
@@ -5042,18 +5108,16 @@ sub get_verpids_json {
 			$prog->{channel} ||= $smp->{masterBrandName};
 			$prog->{descshort} ||= $smp->{summary};
 			$prog->{guidance} ||= "Yes" if $prog->{guidance};
-			unless ( $prog->{thumbnail} ) {
-				my $recipe = $prog->thumb_url_recipe();
-				my $thumbnail = $smp->{holdingImageURL};
-				$thumbnail =~ s/\$recipe/$recipe/;
-				if ( ! $thumbnail ) {
-					$thumbnail = $doc->{holdingImage};
-					$thumbnail =~ s/\b\d+x\d+\b/$recipe/;
-				}
-				if ( $thumbnail ) {
-					$thumbnail = "https:".$thumbnail unless $thumbnail =~ /^http/;
-					$prog->{thumbnail} = $thumbnail;
-				}
+			my $recipe = $prog->thumb_url_recipe();
+			my $thumbnail = $smp->{holdingImageURL};
+			$thumbnail =~ s/\$recipe/$recipe/;
+			if ( ! $thumbnail ) {
+				$thumbnail = $doc->{holdingImage};
+				$thumbnail =~ s/\b\d+x\d+\b/$recipe/;
+			}
+			if ( $thumbnail ) {
+				$thumbnail = "https:".$thumbnail unless $thumbnail =~ /^http/;
+				$prog->{thumbnail} = $thumbnail;
 			}
 			my $kind = $smp->{items}->[0]->{kind};
 			if ( $kind eq "radioProgramme" && $prog->{type} ne 'radio') {
@@ -5208,11 +5272,11 @@ sub parse_title {
 	my $prog = shift;
 	return unless $prog->{title};
 	my ( $name, $episode );
-	$prog->{title} =~ s/,\s+(Series.+?),/: $1:/;
-	$prog->{title} =~ s/,\s+(Episode.+?)/: $1/;
-	$prog->{title} =~ s/^(.+?),\s+(.+)$/$1: $2/ unless $prog->{title} =~ /: Series/;
-	$prog->{title} =~ s/^(.+?),\s+(.+)$/$1: $2/ unless $prog->{title} =~ /: Episode/;
-	if ( $prog->{title} =~ m{^(.+?Series.*?):\s+(.+?)$} ) {
+	$prog->{title} =~ s/,\s+((Series|Cyfres|Season).+?),/: $1:/;
+	$prog->{title} =~ s/,\s+((Episode|Pennod).+?)/: $1/;
+	$prog->{title} =~ s/^(.+?),\s+(.+)$/$1: $2/ unless $prog->{title} =~ /: (Series|Cyfres|Season)/;
+	$prog->{title} =~ s/^(.+?),\s+(.+)$/$1: $2/ unless $prog->{title} =~ /: (Episode|Pennod)/;
+	if ( $prog->{title} =~ m{^(.+?(Series|Cyfres|Season).*?):\s+(.+?)$} ) {
 		( $name, $episode ) = ( $1, $2 );
 	} elsif ( $prog->{title} =~ m{^(.+):\s+(.+)$} ) {
 		( $name, $episode ) = ( $1, $2 );
@@ -5221,12 +5285,12 @@ sub parse_title {
 	}
 	my ($seriesnum, $episodenum);
 	# Extract the seriesnum
-	my $regex = 'Series\s+'.main::regex_numbers();
+	my $regex = '(Series|Cyfres|Season)\s+'.main::regex_numbers();
 	if ( "$name $episode" =~ m{$regex}i ) {
 		$seriesnum = main::convert_words_to_number( $1 );
 	}
 	# Extract the episode num
-	my $regex_1 = 'Episode\s+'.main::regex_numbers();
+	my $regex_1 = '(Episode|Pennod)\s+'.main::regex_numbers();
 	my $regex_2 = '^'.main::regex_numbers().'\.\s+';
 	if ( "$name $episode" =~ m{$regex_1}i ) {
 		$episodenum = main::convert_words_to_number( $1 );
@@ -5235,8 +5299,6 @@ sub parse_title {
 	}
 	# insert episode number in $episode
 	$episode = Programme::bbciplayer::insert_episode_number($episode, $episodenum);
-	# minimum episode number = 1 if not a film and series number == 0
-	$episodenum = 1 if ( $seriesnum == 0 && $episodenum == 0 && $prog->{type} eq 'tv' );
 	# minimum series number = 1 if episode number != 0
 	$seriesnum = 1 if ( $seriesnum == 0 && $episodenum != 0 );
 	$prog->{name} ||= $name;
@@ -5354,7 +5416,7 @@ sub get_metadata {
 				# the Doctor Who fudge
 				my ($seriesnum2, $episodenum2);
 				# Extract the seriesnum
-				my $regex = '(?:Series|Cyfres)\s+'.main::regex_numbers();
+				my $regex = '(?:Series|Cyfres|Season)\s+'.main::regex_numbers();
 				if ( "$name $episode" =~ m{$regex}i ) {
 					$seriesnum2 = main::convert_words_to_number( $1 );
 				}
@@ -5433,10 +5495,10 @@ sub get_metadata {
 	$prog->{episodeshort} =~ s/(^|:(\s+))\d+[a-z]?\.\s+/$1/i;
 	my $no_number = $prog->{episodeshort};
 	$prog->{episodeshort} =~ s/:?\s*(Episode|Pennod)\s+.+?(:\s*|$)//i;
-	$prog->{episodeshort} =~ s/:?\s*(Series|Cyfres)\s+.+?(:\s*|$)//i;
+	$prog->{episodeshort} =~ s/:?\s*(Series|Cyfres|Season)\s+.+?(:\s*|$)//i;
 	$prog->{episodeshort} = $no_number if $prog->{episodeshort} eq '';
 	$prog->{nameshort} = $prog->{brand};
-	$prog->{nameshort} =~ s/:?\s*(Series|Cyfres)\s+\d.*?(:\s*|$)//i;
+	$prog->{nameshort} =~ s/:?\s*(Series|Cyfres|Season)\s+\d.*?(:\s*|$)//i;
 	$prog->{firstbcast} = $firstbcast;
 	$prog->{firstbcastrel} = Programme::get_time_string( $firstbcast, time() );
 	($prog->{firstbcastdate} = $firstbcast) =~ s/T.*$//;
@@ -5590,7 +5652,7 @@ sub fetch_pid_info {
 			$prog_episode = $doc->{display_title}->{subtitle};
 			$prog_channel = $doc->{ownership}->{service}->{title};
 			$prog_desc = $doc->{short_synopsis};
-			if ( $prog_episode =~ s/((?:Series|Cyfres) \d+)[, :]+// ) {
+			if ( $prog_episode =~ s/((?:Series|Cyfres|Season) \d+)[, :]+// ) {
 				$prog_name .= ": $1";
 			}
 			for my $ancestor ($parent, $grandparent, $greatgrandparent) {
@@ -5653,7 +5715,7 @@ sub fetch_episodes_recursive {
 				my $prog_name = $name2 ? "$title: $name2" : $title;
 				my $prog_desc = $episode->findvalue('.//*[contains(@class,"programme__synopsis")]/*');
 				unless ( $name2 ) {
-					if ( $prog_episode =~ s/((?:Series|Cyfres) \d+(\s+Reversions)?)[, :]+// ) {
+					if ( $prog_episode =~ s/((?:Series|Cyfres|Season) \d+(\s+Reversions)?)[, :]+// ) {
 						$prog_name .= ": $1";
 					}
 				}
@@ -5685,7 +5747,12 @@ sub fetch_episodes_recursive {
 				my $dom = XML::LibXML->load_html(string => $html, recover => 1, suppress_errors => 1);
 				if ( ! $check_series_nav ) {
 					my @hrefs = $dom->findnodes('//*[contains(@class,"series-nav")]//a/@href');
-					push @urls, "https://www.bbc.co.uk".$_->findvalue('.') for @hrefs;
+					for my $href (@hrefs) {
+						my $href_path = $href->findvalue('.');
+						my ($sid) = $href_path =~ /seriesId=([a-z0-9]+)/i;
+						next if $sid && $sid !~ REGEX_PID;
+						push @urls, "https://www.bbc.co.uk".$href_path;
+					}
 					$has_series_nav = @hrefs;
 					$check_series_nav = 1;
 				}
@@ -5715,7 +5782,7 @@ sub fetch_episodes_recursive {
 						my $prog_name = $name2 ? "$title: $name2" : $title;
 						my $prog_desc = $episode->findvalue('.//*[contains(@class,"content-item-root__meta-label")][1]');
 						unless ( $name2 ) {
-							if ( $prog_episode =~ s/((?:Series|Cyfres) \d+(\s+Reversions)?)[, :]+// ) {
+							if ( $prog_episode =~ s/((?:Series|Cyfres|Season) \d+(\s+Reversions)?)[, :]+// ) {
 								$prog_name .= ": $1";
 							}
 						}
@@ -6391,7 +6458,7 @@ sub get_stream_data {
 	if ( grep /^ll$/, @exclude_supplier ) {
 		push @exclude_supplier, 'limelight';
 	}
-	my $exclude_regex = '^ROGUEVALUE$';
+	my $exclude_regex = '^_ROGUE_VALUE_$';
 	if ( @exclude_supplier ) {
 		$exclude_regex = '_('.(join('|', @exclude_supplier)).')';
 	}
@@ -6952,7 +7019,6 @@ sub channels_schedule {
 		'national' => {
 			'p00fzl6b' => 'BBC Four', # bbcfour/programmes/schedules
 			'p00fzl6g' => 'BBC News', # bbcnews/programmes/schedules
-			'p00fzl6n' => 'BBC One', # bbcone/programmes/schedules/hd
 			'p00fzl73' => 'BBC Parliament', # bbcparliament/programmes/schedules
 			'p00fzl95' => 'BBC Three', # bbcthree/programmes/schedules
 			'p015pksy' => 'BBC Two', # bbctwo/programmes/schedules/hd
@@ -7097,7 +7163,7 @@ sub get_links_schedule {
 			main::logger "WARNING: Please download and run latest installer or install the Mojolicious Perl module for concurrent indexing of $prog_type programmes.\n";
 			main::logger "ERROR: Failed to load Mojo::UserAgent:\n$@" if $opt->{verbose};
 		} else {
-			main::logger "\nINFO: Indexing $prog_type programmes (concurrent)".($future ? " [future]\n" : "\n");
+			main::logger "\nINFO: Indexing $prog_type programme schedules".($future ? " [future]\n" : "\n");
 			my @mojo_urls;
 			my %mojo_channel_ids;
 			my %mojo_channels;
@@ -7119,7 +7185,7 @@ sub get_links_schedule {
 	}
 	my $ua = main::create_ua( 'desktop', 1 );
 	$ua->timeout(60);
-	main::logger "\nINFO: Indexing $prog_type programmes (sequential)".($future ? " [future]\n" : "\n");
+	main::logger "\nINFO: Indexing $prog_type programme schedules (fallback)".($future ? " [future]\n" : "\n");
 	for my $channel_id ( @channel_list ) {
 		for my $schedule_date ( @schedule_dates ) {
 			my ($url, $rc);
@@ -7308,7 +7374,7 @@ sub get_links_schedule_lwp {
 	my $limit = shift;
 	my $now = shift || time();
 	my $rc_lwp;
-	main::logger "\INFO: Downloading $channel schedule page: $url\n" if $opt->{verbose};
+	main::logger "\nINFO: Downloading $channel schedule page: $url\n" if $opt->{verbose};
 	my $html = main::request_url_retry($ua, $url, 3, '.', "Failed to download $channel schedule page");
 	return 1 unless $html;
 	my $rc = $self->get_links_schedule_json($html, $prog, $prog_type, $channel_id, $channel, $future, $limit, $now, $url);
@@ -7409,7 +7475,7 @@ sub get_links_schedule_html {
 			}
 		}
 		# Extract the seriesnum
-		my $regex = '(?:Series|Cyfres)\s+'.main::regex_numbers();
+		my $regex = '(?:Series|Cyfres|Season)\s+'.main::regex_numbers();
 		$seriesnum = main::convert_words_to_number( $1 ) if "$name $episode" =~ m{$regex}i;
 		# /programmes page
 		$web = "https://www.bbc.co.uk/programmes/${pid}";
@@ -7535,7 +7601,7 @@ sub get_links_schedule_json {
 		# Extract the seriesnum
 		$seriesnum = $entry->{partOfSeason}->{position};
 		if ( ! $seriesnum ) {
-			my $regex = '(?:Series|Cyfres)\s+'.main::regex_numbers();
+			my $regex = '(?:Series|Cyfres|Season)\s+'.main::regex_numbers();
 			$seriesnum = main::convert_words_to_number( $1 ) if "$name $episode" =~ m{$regex}i;
 		}
 		# /programmes page
@@ -7979,7 +8045,6 @@ sub channels_schedule {
 			'p00fzl8v' => 'BBC Radio 2', # radio2/programmes/schedules
 			'p00fzl8t' => 'BBC Radio 3', # radio3/programmes/schedules
 			'p00fzl7j' => 'BBC Radio 4', # radio4/programmes/schedules/fm
-			'p00fzl7k' => 'BBC Radio 4', # radio4/programmes/schedules/lw
 			'p00fzl7l' => 'BBC Radio 4 Extra', # radio4extra/programmes/schedules
 			'p02zbmb3' => 'BBC World Service', # worldserviceradio/programmes/schedules/uk
 			'p02jf21y' => 'CBeebies Radio', # cbeebies_radio/programmes/schedules
