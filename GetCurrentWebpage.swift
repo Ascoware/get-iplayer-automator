@@ -127,16 +127,29 @@ import CocoaLumberjackSwift
 //            let show = ITVMetadataExtractor.getShowMetadata(htmlPageContent: pageSource)
 //            completion([show])
         } else if url.hasPrefix("https://player.stv.tv/episode/") {
-            let show = STVMetadataExtractor.getShowMetadata(html: pageSource)
-            if show.count == 0 {
-                let invalidPage = NSAlert()
-                invalidPage.addButton(withTitle: "OK")
-                invalidPage.messageText = "Protected content"
-                invalidPage.informativeText = "The selected program is DRM protected, so it cannot be retrieved with Get iPlayer Automator."
-                invalidPage.alertStyle = .warning
-                invalidPage.runModal()
-            } else {
+            do {
+                let show = try STVMetadataExtractor.getShowMetadata(html: pageSource)
                 completion(show)
+            } catch (let error) {
+                switch error {
+                case STVMetadataError.noMetadataFound:
+                    let invalidPage = NSAlert()
+                    invalidPage.addButton(withTitle: "OK")
+                    invalidPage.messageText = "Programme not available"
+                    invalidPage.informativeText = "No programme information was found on this page. This could be because the program is not available in your country."
+                    invalidPage.alertStyle = .warning
+                    invalidPage.runModal()
+
+                case STVMetadataError.drmProtectedError:
+                    let invalidPage = NSAlert()
+                    invalidPage.addButton(withTitle: "OK")
+                    invalidPage.messageText = "Protected content"
+                    invalidPage.informativeText = "The selected programme is DRM protected, so it cannot be retrieved with Get iPlayer Automator."
+                    invalidPage.alertStyle = .warning
+                    invalidPage.runModal()
+                default:
+                    DDLogError("Got some other error: \(error)")
+                }
             }
         } else {
             let invalidPage = NSAlert()
@@ -161,7 +174,13 @@ import CocoaLumberjackSwift
         browserNotOpen.messageText = "\(browser) is not open."
         browserNotOpen.informativeText = "Please ensure your browser is running and has at least one window open."
         browserNotOpen.alertStyle = .warning
-        
+
+        let errorGettingHTML = NSAlert()
+        errorGettingHTML.addButton(withTitle: "OK")
+        errorGettingHTML.messageText = "Couldn't get web page content."
+        errorGettingHTML.informativeText = "Something went wrong when trying to get the web page content. Check your browser settings."
+        errorGettingHTML.alertStyle = .warning
+
         //Get URL
         switch (browser) {
         case "Safari":
@@ -190,7 +209,6 @@ import CocoaLumberjackSwift
                let source = tab.source {
                 extractMetadata(url: url, tabTitle: name, pageSource: source, completion: completion)
             }
-            break
 
         case "Chrome", "Microsoft Edge", "Vivaldi", "Brave":
             // All WebKit browsers have the same AppleScript support.
@@ -207,15 +225,21 @@ import CocoaLumberjackSwift
             }
 
             let orderedWindows = chromeWindows.sorted { $0.index! < $1.index! }
-            if let frontWindow = orderedWindows.first,
-               let tab = frontWindow.activeTab,
-               let url = tab.URL,
-               let title = tab.title,
-               let source = tab.executeJavascript?("document.documentElement.outerHTML") as? String {
-                extractMetadata(url: url, tabTitle: title, pageSource: source, completion: completion)
+            guard let frontWindow = orderedWindows.first,
+                  let tab = frontWindow.activeTab,
+                  let url = tab.URL,
+                  let title = tab.title,
+                  let source = tab.executeJavascript?("document.documentElement.outerHTML") as? String else {
+                errorGettingHTML.runModal()
+                return
             }
 
-            break
+            if source.isEmpty {
+                errorGettingHTML.runModal()
+                return
+            }
+
+            extractMetadata(url: url, tabTitle: title, pageSource: source, completion: completion)
 
         default:
             let unsupportedBrowser = NSAlert()

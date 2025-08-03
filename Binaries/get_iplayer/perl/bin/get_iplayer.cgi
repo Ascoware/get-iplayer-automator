@@ -23,8 +23,8 @@
 # License: GPLv3 (see LICENSE.txt)
 #
 
-my $VERSION = 3.34;
-my $VERSION_TEXT = "3.34.0-$^O";
+my $VERSION = 3.36;
+my $VERSION_TEXT;
 $VERSION_TEXT = sprintf("v%.2f", $VERSION) unless $VERSION_TEXT;
 
 use CGI qw(-utf8 :all);
@@ -157,13 +157,15 @@ if ( ( ! $opt_cmdline->{getiplayer} ) || ! -f $opt_cmdline->{getiplayer} ) {
 	exit 2;
 }
 
-my @gip_cmd_base = (
+my @gip_cmd_refresh = (
 	decode_fs($opt_cmdline->{getiplayer}),
 	'--encoding-webrequest='.$opt_cmdline->{encodingwebrequest},
 	'--encoding-console-out=UTF-8',
 	'--nocopyright',
-	'--expiry=999999999',
 );
+
+my @gip_cmd_base = @gip_cmd_refresh;
+push @gip_cmd_base, '--expiry=999999999';
 
 # Path to get_iplayer (+ set HOME env var cos apache seems to not set it)
 my $home = $ENV{HOME};
@@ -708,7 +710,7 @@ sub pvr_run {
 	}
 	print $se "INFO: Starting PVR Run\n";
 	my @cmd = (
-		@gip_cmd_base,
+		@gip_cmd_refresh,
 		'--hash',
 		'--pvr',
 	);
@@ -2350,7 +2352,7 @@ sub refresh {
 	}
 	print $se "INFO: Refreshing\n";
 	my @cmd = (
-		@gip_cmd_base,
+		@gip_cmd_refresh,
 		'--refresh',
 		'--webrequest',
 		get_iplayer_webrequest_args( "type=$typelist", "refreshfuture=$refreshfuture" ),
