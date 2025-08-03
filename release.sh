@@ -7,8 +7,6 @@ INFOPLIST_FILE="Info.plist"
 rm -rf Archive/*
 rm -rf Product/*
 
-carthage bootstrap --platform macOS --configuration Release --no-use-binaries
-
 xcodebuild clean -project "$PROJECT_NAME.xcodeproj" -configuration Release -alltargets
 
 xcodebuild archive -project "$PROJECT_NAME.xcodeproj" -scheme "$PROJECT_NAME" -archivePath "Archive/$PROJECT_NAME.xcarchive"
