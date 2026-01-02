@@ -47,10 +47,10 @@ import CocoaLumberjackSwift
             }
         }
         //Initialize the rest of the arguments
-        let noWarningArg = GetiPlayerArguments.sharedController().noWarningArg
-        let atomicParsleyPath = URL(fileURLWithPath: AppController.shared().extraBinariesPath).appendingPathComponent("AtomicParsley").path
+        let noWarningArg = GetiPlayerArguments.shared.noWarningArg
+        let atomicParsleyPath = URL(fileURLWithPath: ApplicationPaths.extraBinariesPath).appendingPathComponent("AtomicParsley").path
         let atomicParsleyArg = "--atomicparsley=\(atomicParsleyPath)"
-        let ffmpegArg = "--ffmpeg=\(URL(fileURLWithPath: AppController.shared().extraBinariesPath).appendingPathComponent("ffmpeg").path)"
+        let ffmpegArg = "--ffmpeg=\(URL(fileURLWithPath: ApplicationPaths.extraBinariesPath).appendingPathComponent("ffmpeg").path)"
         let downloadPathArg = "--output=\(downloadPath)"
         let subDirArg = "--subdir"
         let progressArg = "--logprogress"
@@ -74,11 +74,11 @@ import CocoaLumberjackSwift
         }
 
         //We don't want this to refresh now!
-        let cacheExpiryArg = GetiPlayerArguments.sharedController().cacheExpiryArg
-        let profileDirArg = GetiPlayerArguments.sharedController().profileDirArg
+        let cacheExpiryArg = GetiPlayerArguments.shared.cacheExpiryArg
+        let profileDirArg = GetiPlayerArguments.shared.profileDirArg
 
         //Add Arguments that can't be NULL
-        var args = [AppController.shared().getiPlayerPath, profileDirArg, noWarningArg, atomicParsleyArg, cacheExpiryArg, downloadPathArg, subDirArg, progressArg, formatArg, getArg, searchArg, whitespaceArg, "--attempts=5", "--thumbsize=640", ffmpegArg, "--log-progress"]
+        var args = [ApplicationPaths.getiPlayerPath, profileDirArg, noWarningArg, atomicParsleyArg, cacheExpiryArg, downloadPathArg, subDirArg, progressArg, formatArg, getArg, searchArg, whitespaceArg, "--attempts=5", "--thumbsize=640", ffmpegArg, "--log-progress"]
 
         if let proxyArg {
             args.append(proxyArg)
@@ -140,14 +140,14 @@ import CocoaLumberjackSwift
         errorPipe = Pipe()
 
         task?.arguments = args
-        task?.launchPath = AppController.shared().perlBinaryPath
+        task?.launchPath = ApplicationPaths.perlBinaryPath
         task?.standardOutput = pipe
         task?.standardError = errorPipe
 
         var envVariableDictionary = [String: String]()
         envVariableDictionary["HOME"] = (("~") as NSString).expandingTildeInPath
         envVariableDictionary["PERL_UNICODE"] = "AS"
-        envVariableDictionary["PATH"] = AppController.shared().perlEnvironmentPath
+        envVariableDictionary["PATH"] = ApplicationPaths.perlEnvironmentPath
         task?.environment = envVariableDictionary
 
 

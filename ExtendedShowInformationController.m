@@ -7,7 +7,7 @@
 //
 
 #import "ExtendedShowInformationController.h"
-#import <Get_iPlayer_Automator-Swift.h>
+#import "Get_iPlayer_Automator-Swift.h"
 
 @implementation ExtendedShowInformationController
 - (instancetype)init

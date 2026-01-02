@@ -13,10 +13,8 @@
 
 #if (GIA_DEBUG==1)
     static DDLogLevel ddLogLevel = DDLogLevelVerbose;
-    #define GIA_DEBUG_PROFILE @"_debug"
 #else
     static DDLogLevel ddLogLevel = DDLogLevelDebug;
-    #define GIA_DEBUG_PROFILE @""
 #endif
 
 #endif /* GetiPlayerAutomator_Header_h */

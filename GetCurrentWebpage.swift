@@ -255,14 +255,14 @@ import CocoaLumberjackSwift
         let pipe = Pipe()
         let errorPipe = Pipe();
 
-        task.launchPath = AppController.shared().perlBinaryPath
+        task.launchPath = ApplicationPaths.perlBinaryPath
         let args = [
-            AppController.shared().getiPlayerPath,
-            GetiPlayerArguments.sharedController().noWarningArg,
-            GetiPlayerArguments.sharedController().cacheExpiryArg,
+            ApplicationPaths.getiPlayerPath,
+            GetiPlayerArguments.shared.noWarningArg,
+            GetiPlayerArguments.shared.cacheExpiryArg,
             "--pid-recursive-list",
             url,
-            GetiPlayerArguments.sharedController().profileDirArg
+            GetiPlayerArguments.shared.profileDirArg
             ]
 
         for arg in args {
@@ -276,7 +276,7 @@ import CocoaLumberjackSwift
         var envVariableDictionary = [String : String]()
         envVariableDictionary["HOME"] = NSString("~").expandingTildeInPath
         envVariableDictionary["PERL_UNICODE"] = "AS"
-        envVariableDictionary["PATH"] = AppController.shared().perlEnvironmentPath
+        envVariableDictionary["PATH"] = ApplicationPaths.perlEnvironmentPath
         task.environment = envVariableDictionary
         task.launch()
 

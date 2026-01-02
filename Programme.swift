@@ -163,7 +163,9 @@ import CocoaLumberjackSwift
     func retrieveExtendedMetadata() {
         DDLogInfo("Retrieving Extended Metadata")
         getiPlayerProxy = GetiPlayerProxy()
-        getiPlayerProxy?.loadInBackground(for: #selector(getRemoteMetadata(_:proxyDict:)), with: nil, onTarget: self, silently: false)
+        getiPlayerProxy?.loadProxyInBackground(silently: false) { proxyDict in
+            self.getRemoteMetadata(proxyDict: proxyDict)
+        }
     }
 
     // Look for 'field:' at the beginning of a line in 'lines'. If found, and 'secondField' is empty, return the rest
@@ -231,17 +233,17 @@ import CocoaLumberjackSwift
             let fieldsArgument = "--fields=index,pid"
             let wantedID = pid
             let args = [
-                AppController.shared().getiPlayerPath,
-                GetiPlayerArguments.sharedController().noWarningArg,
-                GetiPlayerArguments.sharedController().cacheExpiryArg,
-                GetiPlayerArguments.sharedController().typeArgument(forCacheUpdate: false),
+                ApplicationPaths.getiPlayerPath,
+                GetiPlayerArguments.shared.noWarningArg,
+                GetiPlayerArguments.shared.cacheExpiryArg,
+                GetiPlayerArguments.shared.typeArgument(forCacheUpdate: false),
                 listArgument,
-                GetiPlayerArguments.sharedController().profileDirArg,
+                GetiPlayerArguments.shared.profileDirArg,
                 fieldsArgument,
                 wantedID
             ]
             getNameTask.arguments = args
-            getNameTask.launchPath = AppController.shared().perlBinaryPath
+            getNameTask.launchPath = ApplicationPaths.perlBinaryPath
 
             getNameTask.standardOutput = getNamePipe
             let getNameFh = getNamePipe.fileHandleForReading
@@ -249,7 +251,7 @@ import CocoaLumberjackSwift
             var envVariableDictionary = [String : String]()
             envVariableDictionary["HOME"] = (("~") as NSString).expandingTildeInPath
             envVariableDictionary["PERL_UNICODE"] = "AS"
-            envVariableDictionary["PATH"] = AppController.shared().perlEnvironmentPath
+            envVariableDictionary["PATH"] = ApplicationPaths.perlEnvironmentPath
             getNameTask.environment = envVariableDictionary
             getNameTask.launch()
 
@@ -351,18 +353,21 @@ import CocoaLumberjackSwift
     func getNameFromPID() {
         DDLogInfo("Retrieving Metadata For PID \(pid)")
         getiPlayerProxy = GetiPlayerProxy()
-        getiPlayerProxy?.loadInBackground(for: #selector(getRemoteMetadata(_:proxyDict:)), with: nil, onTarget: self, silently: false)
+        getiPlayerProxy?.loadProxyInBackground(silently: false) { proxyDict in
+            self.getRemoteMetadata(proxyDict: proxyDict)
+        }
     }
 
-    @objc func getRemoteMetadata(_ sender: Any?, proxyDict: [AnyHashable : Any]) {
+    @objc func getRemoteMetadata(proxyDict: [String: Any]) {
         performSelector(inBackground: #selector(getRemoteMetadataThreadWithProxy(proxyDict:)), with: proxyDict)
     }
 
-    @objc func getRemoteMetadataThreadWithProxy(proxyDict: [AnyHashable : Any]) {
+    @objc func getRemoteMetadataThreadWithProxy(proxyDict: [String: Any]) {
         autoreleasepool {
             getiPlayerProxy = nil
 
-            if let error = proxyDict["error"] as? NSError, error.code == kProxyLoadCancelled {
+            if let error = proxyDict["error"] as? NSError,
+               error.code == ProxyLoadError.cancelled.rawValue {
                 return
             }
 
@@ -370,10 +375,10 @@ import CocoaLumberjackSwift
             let metadataPipe = Pipe()
 
             var args = [
-                AppController.shared().getiPlayerPath,
-                GetiPlayerArguments.sharedController().noWarningArg,
-                GetiPlayerArguments.sharedController().cacheExpiryArg,
-                GetiPlayerArguments.sharedController().profileDirArg,
+                ApplicationPaths.getiPlayerPath,
+                GetiPlayerArguments.shared.noWarningArg,
+                GetiPlayerArguments.shared.cacheExpiryArg,
+                GetiPlayerArguments.shared.profileDirArg,
                 "--info",
                 "--pid",
                 pid]
@@ -412,14 +417,14 @@ import CocoaLumberjackSwift
             }
 
             metadataTask.arguments = args
-            metadataTask.launchPath = AppController.shared().perlBinaryPath
+            metadataTask.launchPath = ApplicationPaths.perlBinaryPath
             metadataTask.standardOutput = metadataPipe
             let getNameFh = metadataPipe.fileHandleForReading
 
             var envVariableDictionary = [String : String]()
             envVariableDictionary["HOME"] = (("~") as NSString).expandingTildeInPath
             envVariableDictionary["PERL_UNICODE"] = "AS"
-            envVariableDictionary["PATH"] = AppController.shared().perlEnvironmentPath
+            envVariableDictionary["PATH"] = ApplicationPaths.perlEnvironmentPath
             metadataTask.environment = envVariableDictionary
 
             metadataTask.launch()

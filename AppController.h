@@ -9,11 +9,6 @@
 #import <Cocoa/Cocoa.h>
 #import <Sparkle/Sparkle.h>
 #import <IOKit/pwr_mgt/IOPMLib.h>
-#import "NilToStringTransformer.h"
-#import "EmptyToStringTransformer.h"
-#import "GiASearch.h"
-#import "GetiPlayerArguments.h"
-#import "GetiPlayerProxy.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -21,6 +16,14 @@ NS_ASSUME_NONNULL_BEGIN
 @class Programme;
 @class Series;
 @class LogController;
+@class GiASearch;
+@class GetiPlayerProxy;
+@class HTTPProxy;
+@class GetITVShows;
+@class NPHistoryTableViewController;
+@class NewProgrammeHistory;
+
+//@class NilToStringTransformer;
 
 extern BOOL runDownloads;
 extern NSDictionary<NSString *, NSString *> *tvFormats;
@@ -29,10 +32,10 @@ extern NSDictionary<NSString *, NSString *> *radioFormats;
 
 @interface AppController : NSObject <SPUUpdaterDelegate, NSApplicationDelegate>
 //General
-@property (readonly, nonnull) NSString *getiPlayerPath;
-@property (readonly, nonnull) NSString *perlBinaryPath;
-@property (readonly, nonnull) NSString *perlEnvironmentPath;
-@property (readonly, nonnull) NSString *extraBinariesPath;
+//@property (readonly, nonnull) NSString *getiPlayerPath;
+//@property (readonly, nonnull) NSString *perlBinaryPath;
+//@property (readonly, nonnull) NSString *perlEnvironmentPath;
+//@property (readonly, nonnull) NSString *extraBinariesPath;
 @property IBOutlet NSWindow *mainWindow;
 @property IBOutlet NSApplication *application;
 @property IBOutlet NSWindow *historyWindow;
@@ -104,13 +107,13 @@ extern NSDictionary<NSString *, NSString *> *radioFormats;
 @property NSDictionary *solutionsDictionary;
 
 //PVR list editing
-@property NilToStringTransformer *nilToEmptyStringTransformer;
-@property NilToStringTransformer *nilToAsteriskTransformer;
+//@property NilToStringTransformer *nilToEmptyStringTransformer;
+//@property NilToStringTransformer *nilToAsteriskTransformer;
 
 // Format preferences
-@property EmptyToStringTransformer *tvFormatTransformer;
-@property EmptyToStringTransformer *radioFormatTransformer;
-@property EmptyToStringTransformer *itvFormatTransformer;
+//@property EmptyToStringTransformer *tvFormatTransformer;
+//@property EmptyToStringTransformer *radioFormatTransformer;
+//@property EmptyToStringTransformer *itvFormatTransformer;
 
 //Verbose Logging
 @property (assign) BOOL verbose;

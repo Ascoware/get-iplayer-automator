@@ -231,7 +231,7 @@ import CocoaLumberjackSwift
 
         task?.launchPath = youtubeDLBinary
         task?.arguments = args
-        let extraBinaryPath = AppController.shared().extraBinariesPath
+        let extraBinaryPath = ApplicationPaths.extraBinariesPath
         var envVariableDictionary = [String : String]()
         envVariableDictionary["PATH"] = "\(youtubeDLFolder):\(extraBinaryPath)"
         envVariableDictionary["SSL_CERT_FILE"] = cacertFile.path

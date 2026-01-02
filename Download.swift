@@ -73,7 +73,7 @@ import CocoaLumberjackSwift
 
         let apTask = Process()
 
-        apTask.launchPath = URL(fileURLWithPath: AppController.shared().extraBinariesPath).appendingPathComponent("AtomicParsley").path
+        apTask.launchPath = URL(fileURLWithPath: ApplicationPaths.extraBinariesPath).appendingPathComponent("AtomicParsley").path
 
         var arguments = [String]()
         arguments.append(show.path)

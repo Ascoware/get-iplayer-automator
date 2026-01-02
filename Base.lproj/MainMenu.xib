@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="23727" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="24112" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="23727"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="24112"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -64,7 +64,7 @@
                 <outlet property="updaterDelegate" destination="621" id="FZt-83-3o4"/>
             </connections>
         </customObject>
-        <customObject id="1203" customClass="DownloadHistoryController">
+        <customObject id="1203" customClass="DownloadHistoryController" customModule="Get_iPlayer_Automator">
             <connections>
                 <outlet property="cancelButton" destination="1227" id="1247"/>
                 <outlet property="historyArrayController" destination="1204" id="1244"/>
@@ -94,7 +94,7 @@
                 <binding destination="621" name="contentArray" keyPath="searchResultsArray" id="695"/>
             </connections>
         </arrayController>
-        <arrayController objectClassName="Get_iPlayer_Automator.Programme" id="700" userLabel="Queue Controller" customClass="RSRTVArrayController">
+        <arrayController objectClassName="Get_iPlayer_Automator.Programme" id="700" userLabel="Queue Controller" customClass="RSRTVArrayController" customModule="Get_iPlayer_Automator">
             <declaredKeys>
                 <string>pid</string>
                 <string>showName</string>
@@ -124,7 +124,7 @@
                 <binding destination="621" name="contentArray" keyPath="pvrSearchResultsArray" id="975"/>
             </connections>
         </arrayController>
-        <arrayController objectClassName="Series" id="952" userLabel="PVR Queue Controller" customClass="RSRTVArrayController">
+        <arrayController objectClassName="Series" id="952" userLabel="PVR Queue Controller" customClass="RSRTVArrayController" customModule="Get_iPlayer_Automator" customModuleProvider="target">
             <declaredKeys>
                 <string>showName</string>
             </declaredKeys>
@@ -193,7 +193,7 @@
                             <autoresizingMask key="autoresizingMask"/>
                             <clipView key="contentView" drawsBackground="NO" id="LYx-5P-gHI">
                                 <rect key="frame" x="1" y="1" width="309" height="133"/>
-                                <autoresizingMask key="autoresizingMask"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <textView editable="NO" importsGraphics="NO" verticallyResizable="YES" usesFontPanel="YES" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" spellingCorrection="YES" smartInsertDelete="YES" id="7Pi-tT-G0Q" userLabel="Description View">
                                         <rect key="frame" x="0.0" y="0.0" width="309" height="133"/>
@@ -229,7 +229,7 @@
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <clipView key="contentView" drawsBackground="NO" id="jHT-Hr-sFJ">
                                 <rect key="frame" x="1" y="1" width="309" height="133"/>
-                                <autoresizingMask key="autoresizingMask"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="jeg-8F-HB4" id="MRJ-oM-h7R">
                                         <rect key="frame" x="0.0" y="0.0" width="309" height="116"/>
@@ -751,7 +751,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                         <clipView key="contentView" id="EvP-AM-m82">
                             <rect key="frame" x="1" y="1" width="753" height="130"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView identifier="SearchResults" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" typeSelect="NO" autosaveName="SearchResults" headerView="494" id="493">
                                     <rect key="frame" x="0.0" y="0.0" width="753" height="113"/>
@@ -967,7 +967,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" copiesOnScroll="NO" id="qBj-Iv-0lY">
                             <rect key="frame" x="0.0" y="0.0" width="769" height="187"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView identifier="DownloadQueue" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" typeSelect="NO" autosaveName="DownloadQueue" headerView="470" id="469">
                                     <rect key="frame" x="0.0" y="0.0" width="769" height="170"/>
@@ -1161,7 +1161,7 @@
             <connections>
                 <outlet property="delegate" destination="621" id="667"/>
             </connections>
-            <point key="canvasLocation" x="342.5" y="165.5"/>
+            <point key="canvasLocation" x="700" y="-154"/>
         </window>
         <window title="PVR Manager" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="PVRManagerWindow" animationBehavior="default" id="517" userLabel="PVR Manager" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
@@ -1330,9 +1330,6 @@
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                <connections>
-                                                    <outlet property="formatter" destination="S9t-eO-Bm7" id="owF-Rj-gxH"/>
-                                                </connections>
                                             </textFieldCell>
                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                             <connections>
@@ -2577,7 +2574,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" id="Npw-zh-ApO">
                             <rect key="frame" x="1" y="1" width="534" height="256"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView identifier="DownloadHistory" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" alternatingRowBackgroundColors="YES" columnSelection="YES" autosaveName="DownloadHistory" headerView="1218" id="1217">
                                     <rect key="frame" x="0.0" y="0.0" width="534" height="239"/>
@@ -2703,7 +2700,7 @@
                     </button>
                 </subviews>
             </view>
-            <point key="canvasLocation" x="357" y="247"/>
+            <point key="canvasLocation" x="290" y="374"/>
         </window>
         <window title="Log" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="LogWindow" animationBehavior="default" id="611" userLabel="Log">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
@@ -2994,7 +2991,7 @@ DQ
             </view>
             <point key="canvasLocation" x="725" y="262"/>
         </window>
-        <customFormatter id="S9t-eO-Bm7" customClass="StringTrimFormatter"/>
+        <customFormatter id="S9t-eO-Bm7" customClass="StringTrimFormatter" customModule="Get_iPlayer_Automator" customModuleProvider="target"/>
         <viewController id="QMk-Wb-aLD" userLabel="Show Popover View Controller">
             <connections>
                 <outlet property="view" destination="xHi-rn-7il" id="Kbd-n4-9m7"/>
@@ -3011,7 +3008,7 @@ DQ
                 <outlet property="window" destination="611" id="eFL-bH-0H9"/>
             </connections>
         </customObject>
-        <customObject id="EFr-RW-vJP" customClass="GetiPlayerArguments"/>
+        <customObject id="EFr-RW-vJP" customClass="GetiPlayerArguments" customModule="Get_iPlayer_Automator"/>
         <customObject id="GOW-LV-QLu" customClass="ExtendedShowInformationController">
             <connections>
                 <outlet property="categoriesField" destination="EBr-eb-LVj" id="zoZ-JC-glQ"/>
