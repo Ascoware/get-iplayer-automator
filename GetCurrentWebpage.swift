@@ -11,7 +11,7 @@ import CocoaLumberjackSwift
 
 @objc public class GetCurrentWebpage : NSObject {
     
-    private class func extractMetadata(url: String, tabTitle: String, pageSource: String, completion: ([Programme]) -> Void) {
+    private class func extractMetadata(url: String, tabTitle: String, pageSource: String, completion: @escaping ([Programme]) -> Void) {
         if url.hasPrefix("https://www.bbc.co.uk/iplayer/episode/") {
             // PID is always the second-to-last element in the URL.
             let show = Programme()
@@ -123,9 +123,6 @@ import CocoaLumberjackSwift
             }
 
             completion(showList)
-//        } else if url.hasPrefix("https://www.itv.com/hub/") {
-//            let show = ITVMetadataExtractor.getShowMetadata(htmlPageContent: pageSource)
-//            completion([show])
         } else if url.hasPrefix("https://player.stv.tv/episode/") {
             do {
                 let show = try STVMetadataExtractor.getShowMetadata(html: pageSource)
@@ -162,7 +159,7 @@ import CocoaLumberjackSwift
 
     }
 
-    @objc open class func getCurrentWebpage(completion: ([Programme]) -> Void) {
+    @objc open class func getCurrentWebpage(completion: @escaping ([Programme]) -> Void) {
         //Get Default Browser
         guard let browser = UserDefaults.standard.string(forKey: "DefaultBrowser") else {
             return
@@ -206,8 +203,15 @@ import CocoaLumberjackSwift
                let tab = frontWindow.currentTab,
                let url = tab.URL,
                let name = tab.name,
-               let source = tab.source {
-                extractMetadata(url: url, tabTitle: name, pageSource: source, completion: completion)
+               let pageURL = URL(string: url) {
+                var request = URLRequest(url: pageURL)
+                request.addValue("Mozilla/5.0", forHTTPHeaderField: "User-Agent")
+                URLSession.shared.dataTask(with: request) { data, _, _ in
+                    guard let data = data, let html = String(data: data, encoding: .utf8) else { return }
+                    DispatchQueue.main.async {
+                        GetCurrentWebpage.extractMetadata(url: url, tabTitle: name, pageSource: html, completion: completion)
+                    }
+                }.resume()
             }
 
         case "Chrome", "Microsoft Edge", "Vivaldi", "Brave":
@@ -228,18 +232,23 @@ import CocoaLumberjackSwift
             guard let frontWindow = orderedWindows.first,
                   let tab = frontWindow.activeTab,
                   let url = tab.URL,
-                  let title = tab.title,
-                  let source = tab.executeJavascript?("document.documentElement.outerHTML") as? String else {
+                  let title = tab.title else {
                 errorGettingHTML.runModal()
                 return
             }
 
-            if source.isEmpty {
-                errorGettingHTML.runModal()
-                return
+            if let pageURL = URL(string: url) {
+                // Fetch the page source directly — the browser DOM after React hydration
+                // differs from the server HTML that contains the metadata we need.
+                var request = URLRequest(url: pageURL)
+                request.addValue("Mozilla/5.0", forHTTPHeaderField: "User-Agent")
+                URLSession.shared.dataTask(with: request) { data, _, _ in
+                    guard let data = data, let html = String(data: data, encoding: .utf8) else { return }
+                    DispatchQueue.main.async {
+                        GetCurrentWebpage.extractMetadata(url: url, tabTitle: title, pageSource: html, completion: completion)
+                    }
+                }.resume()
             }
-
-            extractMetadata(url: url, tabTitle: title, pageSource: source, completion: completion)
 
         default:
             let unsupportedBrowser = NSAlert()
@@ -248,6 +257,21 @@ import CocoaLumberjackSwift
             unsupportedBrowser.informativeText = "Get iPlayer Automator only works with Safari and Chrome. We shouldn't be here; please file a bug."
             unsupportedBrowser.runModal()
         }
+    }
+
+    @objc open class func processSharedPage(completion: @escaping ([Programme]) -> Void) {
+        guard let containerURL = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: "group.com.ascoware.get-iplayer-automator") else { return }
+
+        let fileURL = containerURL.appendingPathComponent("pending_page.json")
+        guard let data = try? Data(contentsOf: fileURL),
+              let payload = try? JSONSerialization.jsonObject(with: data) as? [String: String],
+              let url = payload["url"],
+              let html = payload["html"] else { return }
+
+        let title = payload["title"] ?? ""
+        try? FileManager.default.removeItem(at: fileURL)
+        extractMetadata(url: url, tabTitle: title, pageSource: html, completion: completion)
     }
 
     private class func searchForPIDs(url: String) -> [Programme] {

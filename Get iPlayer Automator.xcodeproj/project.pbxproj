@@ -13,16 +13,16 @@
 		39D52EA81DAAFD450033C4ED /* NPHistoryWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D52EA71DAAFD450033C4ED /* NPHistoryWindowController.swift */; };
 		39FD5E9619D370BD006BC47B /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 39FD5E9519D370BD006BC47B /* Images.xcassets */; };
 		7F01382625F0A7520014703C /* ITVMetadataExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F01382525F0A7520014703C /* ITVMetadataExtractor.swift */; };
+		7F0CB4EB2F8AE71C00B6C8EC /* Get iPlayer Programme.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 7F23872D2131082C00FA4588 /* Get iPlayer Programme.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		7F0CB50F2F8B004600B6C8EC /* Send To GiA.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 7F0CB4F72F8B004600B6C8EC /* Send To GiA.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		7F0CB5292F8B007F00B6C8EC /* Send To GiA Safari.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 7F0CB5182F8B007F00B6C8EC /* Send To GiA Safari.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		7F0CB5312F8B04F400B6C8EC /* ToolbarItemIcon.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 7F0CB5302F8B04F400B6C8EC /* ToolbarItemIcon.pdf */; };
 		7F165A10205B92F9005BB78A /* GetITVListings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F165A0F205B92F9005BB78A /* GetITVListings.swift */; };
 		7F165A14205C1F15005BB78A /* ProgrammeHistoryEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F165A13205C1F15005BB78A /* ProgrammeHistoryEntry.swift */; };
 		7F165A16205C1F8C005BB78A /* NewProgrammeHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F165A15205C1F8C005BB78A /* NewProgrammeHistory.swift */; };
 		7F165A18205C4051005BB78A /* NSScanner+Swift.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F165A17205C4051005BB78A /* NSScanner+Swift.swift */; };
 		7F21033C2E11E06B0055A623 /* ReasonForFailure.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFC865E013E96BE200606599 /* ReasonForFailure.swift */; };
 		7F2387312131082C00FA4588 /* SafariExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F2387302131082C00FA4588 /* SafariExtensionHandler.swift */; };
-		7F2387332131082C00FA4588 /* SafariExtensionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F2387322131082C00FA4588 /* SafariExtensionViewController.swift */; };
-		7F2387362131082C00FA4588 /* SafariExtensionViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7F2387342131082C00FA4588 /* SafariExtensionViewController.xib */; };
-		7F2387392131082C00FA4588 /* script.js in Resources */ = {isa = PBXBuildFile; fileRef = 7F2387382131082C00FA4588 /* script.js */; };
-		7F23873B2131082C00FA4588 /* ToolbarItemIcon.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 7F23873A2131082C00FA4588 /* ToolbarItemIcon.pdf */; };
 		7F2507C02E1F51DD001C9523 /* Chrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F2507BE2E1F51DD001C9523 /* Chrome.swift */; };
 		7F2507C12E1F51DD001C9523 /* Safari.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F2507BF2E1F51DD001C9523 /* Safari.swift */; };
 		7F2507C42E1F51F9001C9523 /* SBApplicationProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F2507C22E1F51F9001C9523 /* SBApplicationProtocol.swift */; };
@@ -69,7 +69,44 @@
 		DFFF196713E96288007B52AC /* ReasonsForFailure.plist in Resources */ = {isa = PBXBuildFile; fileRef = DFFF196613E96288007B52AC /* ReasonsForFailure.plist */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		7F0CB4EC2F8AE71C00B6C8EC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7F23872C2131082C00FA4588;
+			remoteInfo = "Get iPlayer Programme";
+		};
+		7F0CB50D2F8B004600B6C8EC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7F0CB4F62F8B004600B6C8EC;
+			remoteInfo = "Send To GiA";
+		};
+		7F0CB5272F8B007F00B6C8EC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7F0CB5172F8B007F00B6C8EC;
+			remoteInfo = "Send To GiA Safari";
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXCopyFilesBuildPhase section */
+		7F0CB4EE2F8AE71C00B6C8EC /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				7F0CB4EB2F8AE71C00B6C8EC /* Get iPlayer Programme.appex in Embed Foundation Extensions */,
+				7F0CB50F2F8B004600B6C8EC /* Send To GiA.appex in Embed Foundation Extensions */,
+				7F0CB5292F8B007F00B6C8EC /* Send To GiA Safari.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D943D2721B37B19D00452FCD /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -98,17 +135,17 @@
 		39D52EA71DAAFD450033C4ED /* NPHistoryWindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NPHistoryWindowController.swift; sourceTree = "<group>"; };
 		39FD5E9519D370BD006BC47B /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = "Get iPlayer Automator/Images.xcassets"; sourceTree = "<group>"; };
 		7F01382525F0A7520014703C /* ITVMetadataExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ITVMetadataExtractor.swift; sourceTree = "<group>"; };
+		7F0CB4E92F8ADFB500B6C8EC /* Get iPlayer Automator.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Get iPlayer Automator.entitlements"; sourceTree = "<group>"; };
+		7F0CB4F72F8B004600B6C8EC /* Send To GiA.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Send To GiA.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7F0CB5182F8B007F00B6C8EC /* Send To GiA Safari.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Send To GiA Safari.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7F0CB5302F8B04F400B6C8EC /* ToolbarItemIcon.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = ToolbarItemIcon.pdf; sourceTree = "<group>"; };
 		7F165A0F205B92F9005BB78A /* GetITVListings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GetITVListings.swift; sourceTree = "<group>"; };
 		7F165A13205C1F15005BB78A /* ProgrammeHistoryEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgrammeHistoryEntry.swift; sourceTree = "<group>"; };
 		7F165A15205C1F8C005BB78A /* NewProgrammeHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewProgrammeHistory.swift; sourceTree = "<group>"; };
 		7F165A17205C4051005BB78A /* NSScanner+Swift.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSScanner+Swift.swift"; sourceTree = "<group>"; };
 		7F23872D2131082C00FA4588 /* Get iPlayer Programme.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Get iPlayer Programme.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7F2387302131082C00FA4588 /* SafariExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariExtensionHandler.swift; sourceTree = "<group>"; };
-		7F2387322131082C00FA4588 /* SafariExtensionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariExtensionViewController.swift; sourceTree = "<group>"; };
-		7F2387352131082C00FA4588 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/SafariExtensionViewController.xib; sourceTree = "<group>"; };
 		7F2387372131082C00FA4588 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		7F2387382131082C00FA4588 /* script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = script.js; sourceTree = "<group>"; };
-		7F23873A2131082C00FA4588 /* ToolbarItemIcon.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = ToolbarItemIcon.pdf; sourceTree = "<group>"; };
 		7F23873C2131082C00FA4588 /* Get_iPlayer_Programme.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Get_iPlayer_Programme.entitlements; sourceTree = "<group>"; };
 		7F2507BE2E1F51DD001C9523 /* Chrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Chrome.swift; sourceTree = "<group>"; };
 		7F2507BF2E1F51DD001C9523 /* Safari.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Safari.swift; sourceTree = "<group>"; };
@@ -124,7 +161,6 @@
 		7F340B591FFB063700F415A4 /* Get iPlayer Automator-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Get iPlayer Automator-Bridging-Header.h"; sourceTree = "<group>"; };
 		7F340B5A1FFB063700F415A4 /* ITVDownload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ITVDownload.swift; sourceTree = "<group>"; };
 		7F4545FC292C4CE0009DC35C /* STVMetadataExtractor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = STVMetadataExtractor.swift; sourceTree = "<group>"; };
-		7F6B2B2B20EE87D800E4BBDF /* Get iPlayer Automator.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = "Get iPlayer Automator.entitlements"; path = "Get iPlayer Automator/Get iPlayer Automator.entitlements"; sourceTree = "<group>"; };
 		7F70246B2911825600A48BE1 /* GetiPlayerAutomator-Prefix.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "GetiPlayerAutomator-Prefix.h"; sourceTree = "<group>"; };
 		7F748E3323FB416B00626A77 /* get_iplayer */ = {isa = PBXFileReference; lastKnownFileType = folder; path = get_iplayer; sourceTree = "<group>"; };
 		7F78C1FB291B6FFC00DAD51E /* Programme.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Programme.swift; sourceTree = "<group>"; };
@@ -164,6 +200,20 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		7F0CB4F42F8B004600B6C8EC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7F0CB5152F8B007F00B6C8EC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		7F23872A2131082C00FA4588 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -201,6 +251,8 @@
 			children = (
 				8D1107320486CEB800E47090 /* Get iPlayer Automator.app */,
 				7F23872D2131082C00FA4588 /* Get iPlayer Programme.appex */,
+				7F0CB4F72F8B004600B6C8EC /* Send To GiA.appex */,
+				7F0CB5182F8B007F00B6C8EC /* Send To GiA Safari.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -208,7 +260,7 @@
 		29B97314FDCFA39411CA2CEA /* Get_iPlayer GUI */ = {
 			isa = PBXGroup;
 			children = (
-				7F6B2B2B20EE87D800E4BBDF /* Get iPlayer Automator.entitlements */,
+				7F0CB4E92F8ADFB500B6C8EC /* Get iPlayer Automator.entitlements */,
 				D9CCF52E10259DED009205BE /* Features.rtf */,
 				D9F97FE9198EBA73006494A3 /* Categories */,
 				080E96DDFE201D6D7F000001 /* Classes */,
@@ -216,6 +268,7 @@
 				29B97317FDCFA39411CA2CEA /* Resources */,
 				7F23872F2131082C00FA4588 /* Get iPlayer Programme */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
+				7F0CB4EA2F8AE71C00B6C8EC /* Frameworks */,
 			);
 			name = "Get_iPlayer GUI";
 			sourceTree = "<group>";
@@ -250,15 +303,19 @@
 			name = Resources;
 			sourceTree = "<group>";
 		};
+		7F0CB4EA2F8AE71C00B6C8EC /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		7F23872F2131082C00FA4588 /* Get iPlayer Programme */ = {
 			isa = PBXGroup;
 			children = (
+				7F0CB5302F8B04F400B6C8EC /* ToolbarItemIcon.pdf */,
 				7F2387302131082C00FA4588 /* SafariExtensionHandler.swift */,
-				7F2387322131082C00FA4588 /* SafariExtensionViewController.swift */,
-				7F2387342131082C00FA4588 /* SafariExtensionViewController.xib */,
 				7F2387372131082C00FA4588 /* Info.plist */,
-				7F2387382131082C00FA4588 /* script.js */,
-				7F23873A2131082C00FA4588 /* ToolbarItemIcon.pdf */,
 				7F23873C2131082C00FA4588 /* Get_iPlayer_Programme.entitlements */,
 			);
 			path = "Get iPlayer Programme";
@@ -361,6 +418,44 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		7F0CB4F62F8B004600B6C8EC /* Send To GiA */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7F0CB5112F8B004600B6C8EC /* Build configuration list for PBXNativeTarget "Send To GiA" */;
+			buildPhases = (
+				7F0CB4F32F8B004600B6C8EC /* Sources */,
+				7F0CB4F42F8B004600B6C8EC /* Frameworks */,
+				7F0CB4F52F8B004600B6C8EC /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Send To GiA";
+			packageProductDependencies = (
+			);
+			productName = "Send To GiA";
+			productReference = 7F0CB4F72F8B004600B6C8EC /* Send To GiA.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		7F0CB5172F8B007F00B6C8EC /* Send To GiA Safari */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7F0CB52B2F8B007F00B6C8EC /* Build configuration list for PBXNativeTarget "Send To GiA Safari" */;
+			buildPhases = (
+				7F0CB5142F8B007F00B6C8EC /* Sources */,
+				7F0CB5152F8B007F00B6C8EC /* Frameworks */,
+				7F0CB5162F8B007F00B6C8EC /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Send To GiA Safari";
+			packageProductDependencies = (
+			);
+			productName = "Send To GiA Safari";
+			productReference = 7F0CB5182F8B007F00B6C8EC /* Send To GiA Safari.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		7F23872C2131082C00FA4588 /* Get iPlayer Programme */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 7F2387422131082C00FA4588 /* Build configuration list for PBXNativeTarget "Get iPlayer Programme" */;
@@ -388,10 +483,14 @@
 				D943D2721B37B19D00452FCD /* CopyFiles */,
 				8D11072E0486CEB800E47090 /* Frameworks */,
 				7F9E811629B3BBC600B435D9 /* Run Script */,
+				7F0CB4EE2F8AE71C00B6C8EC /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				7F0CB4ED2F8AE71C00B6C8EC /* PBXTargetDependency */,
+				7F0CB50E2F8B004600B6C8EC /* PBXTargetDependency */,
+				7F0CB5282F8B007F00B6C8EC /* PBXTargetDependency */,
 			);
 			name = "Get iPlayer Automator";
 			packageProductDependencies = (
@@ -413,13 +512,18 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastSwiftUpdateCheck = 1000;
-				LastUpgradeCheck = 1640;
+				LastSwiftUpdateCheck = 2640;
+				LastUpgradeCheck = 2640;
 				ORGANIZATIONNAME = "";
 				TargetAttributes = {
+					7F0CB4F62F8B004600B6C8EC = {
+						CreatedOnToolsVersion = 26.4;
+					};
+					7F0CB5172F8B007F00B6C8EC = {
+						CreatedOnToolsVersion = 26.4;
+					};
 					7F23872C2131082C00FA4588 = {
 						CreatedOnToolsVersion = 10.0;
-						ProvisioningStyle = Automatic;
 					};
 					8D1107260486CEB800E47090 = {
 						LastSwiftMigration = "";
@@ -451,18 +555,32 @@
 			targets = (
 				8D1107260486CEB800E47090 /* Get iPlayer Automator */,
 				7F23872C2131082C00FA4588 /* Get iPlayer Programme */,
+				7F0CB4F62F8B004600B6C8EC /* Send To GiA */,
+				7F0CB5172F8B007F00B6C8EC /* Send To GiA Safari */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		7F0CB4F52F8B004600B6C8EC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7F0CB5162F8B007F00B6C8EC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		7F23872B2131082C00FA4588 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7F23873B2131082C00FA4588 /* ToolbarItemIcon.pdf in Resources */,
-				7F2387362131082C00FA4588 /* SafariExtensionViewController.xib in Resources */,
-				7F2387392131082C00FA4588 /* script.js in Resources */,
+				7F0CB5312F8B04F400B6C8EC /* ToolbarItemIcon.pdf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -509,17 +627,30 @@
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 			shellPath = /bin/bash;
-			shellScript = "echo ${CONFIGURATION_BUILD_DIR}\necho ${UNLOCALIZED_RESOURCES_FOLDER_PATH}\n\nfor (( i=0; i<$SCRIPT_INPUT_FILE_COUNT; i++)) \ndo\n    FILE=\"SCRIPT_INPUT_FILE_$i\"\n    codesign --force --options runtime --entitlements \"${SRCROOT}/Get iPlayer Automator/Get iPlayer Automator.entitlements\" --sign \"Developer ID Application: Scott Kovatch\" \"${!FILE}\"\ndone\n";
+			shellScript = "echo ${CONFIGURATION_BUILD_DIR}\necho ${UNLOCALIZED_RESOURCES_FOLDER_PATH}\n\nfor (( i=0; i<$SCRIPT_INPUT_FILE_COUNT; i++)) \ndo\n    FILE=\"SCRIPT_INPUT_FILE_$i\"\n    codesign --force --options runtime --entitlements \"${SRCROOT}/Get iPlayer Automator/Get iPlayer Automator.entitlements\" --sign \"Developer ID Application: Scott Kovatch (L8BMU8WLEC)\" \"${!FILE}\"\ndone\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		7F0CB4F32F8B004600B6C8EC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7F0CB5142F8B007F00B6C8EC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		7F2387292131082C00FA4588 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7F2387332131082C00FA4588 /* SafariExtensionViewController.swift in Sources */,
 				7F2387312131082C00FA4588 /* SafariExtensionHandler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -571,6 +702,24 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		7F0CB4ED2F8AE71C00B6C8EC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7F23872C2131082C00FA4588 /* Get iPlayer Programme */;
+			targetProxy = 7F0CB4EC2F8AE71C00B6C8EC /* PBXContainerItemProxy */;
+		};
+		7F0CB50E2F8B004600B6C8EC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7F0CB4F62F8B004600B6C8EC /* Send To GiA */;
+			targetProxy = 7F0CB50D2F8B004600B6C8EC /* PBXContainerItemProxy */;
+		};
+		7F0CB5282F8B007F00B6C8EC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7F0CB5172F8B007F00B6C8EC /* Send To GiA Safari */;
+			targetProxy = 7F0CB5272F8B007F00B6C8EC /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin PBXVariantGroup section */
 		089C165CFE840E0CC02AAC07 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
@@ -588,17 +737,245 @@
 			name = MainMenu.xib;
 			sourceTree = "<group>";
 		};
-		7F2387342131082C00FA4588 /* SafariExtensionViewController.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				7F2387352131082C00FA4588 /* Base */,
-			);
-			name = SafariExtensionViewController.xib;
-			sourceTree = "<group>";
-		};
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		7F0CB5122F8B004600B6C8EC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = L8BMU8WLEC;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Send To GiA/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Send To GiA";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.4;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.ascoware.get-iplayer-automator.Send-To-GiA";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		7F0CB5132F8B004600B6C8EC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = L8BMU8WLEC;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Send To GiA/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Send To GiA";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.4;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.ascoware.get-iplayer-automator.Send-To-GiA";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		7F0CB52C2F8B007F00B6C8EC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = L8BMU8WLEC;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Send To GiA Safari/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Send To GiA Safari";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.4;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.ascoware.get-iplayer-automator.Send-To-GiA-Safari";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		7F0CB52D2F8B007F00B6C8EC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = L8BMU8WLEC;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Send To GiA Safari/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Send To GiA Safari";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.4;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.ascoware.get-iplayer-automator.Send-To-GiA-Safari";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 		7F2387402131082C00FA4588 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -615,11 +992,12 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = "Get iPlayer Programme/Get_iPlayer_Programme.entitlements";
-				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = L8BMU8WLEC;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -638,8 +1016,10 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.ascoware.getiPlayerAutomator.Get-iPlayer-Programme";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.ascoware.get-iplayer-automator.safari-extension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				REGISTER_APP_GROUPS = YES;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
@@ -664,11 +1044,12 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = "Get iPlayer Programme/Get_iPlayer_Programme.entitlements";
-				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = L8BMU8WLEC;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -683,8 +1064,10 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.ascoware.getiPlayerAutomator.Get-iPlayer-Programme";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.ascoware.get-iplayer-automator.safari-extension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				REGISTER_APP_GROUPS = YES;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 4.2;
@@ -700,17 +1083,18 @@
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
-				CODE_SIGN_ENTITLEMENTS = "Get iPlayer Automator/Get iPlayer Automator.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "Get iPlayer Automator.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = L8BMU8WLEC;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)",
 					"$(PROJECT_DIR)",
-					"$(PROJECT_DIR)/Carthage/Build/Mac",
 					"$(PROJECT_DIR)/Binaries",
 				);
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -736,10 +1120,11 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MARKETING_VERSION = 1.27.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.ascoware.getiPlayerAutomator;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.ascoware.get-iplayer-automator";
 				PRODUCT_NAME = "Get iPlayer Automator";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				REGISTER_APP_GROUPS = YES;
 				SDKROOT = macosx;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = GIA_DEBUG;
 				SWIFT_OBJC_BRIDGING_HEADER = "Get iPlayer Automator-Bridging-Header.h";
@@ -757,16 +1142,17 @@
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
-				CODE_SIGN_ENTITLEMENTS = "Get iPlayer Automator/Get iPlayer Automator.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "Get iPlayer Automator.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = L8BMU8WLEC;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)",
 					"$(PROJECT_DIR)",
-					"$(PROJECT_DIR)/Carthage/Build/Mac",
 					"$(PROJECT_DIR)/Binaries",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -788,10 +1174,11 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MARKETING_VERSION = 1.27.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.ascoware.getiPlayerAutomator;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.ascoware.get-iplayer-automator";
 				PRODUCT_NAME = "Get iPlayer Automator";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				REGISTER_APP_GROUPS = YES;
 				SDKROOT = macosx;
 				SWIFT_OBJC_BRIDGING_HEADER = "Get iPlayer Automator-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -826,7 +1213,10 @@
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = L8BMU8WLEC;
 				ENABLE_MODULE_VERIFIER = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = "DEBUG=1";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -840,6 +1230,7 @@
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++14";
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 			};
@@ -873,6 +1264,9 @@
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = L8BMU8WLEC;
 				ENABLE_MODULE_VERIFIER = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = "";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -885,6 +1279,8 @@
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++14";
 				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
@@ -892,6 +1288,24 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		7F0CB5112F8B004600B6C8EC /* Build configuration list for PBXNativeTarget "Send To GiA" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7F0CB5122F8B004600B6C8EC /* Debug */,
+				7F0CB5132F8B004600B6C8EC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7F0CB52B2F8B007F00B6C8EC /* Build configuration list for PBXNativeTarget "Send To GiA Safari" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7F0CB52C2F8B007F00B6C8EC /* Debug */,
+				7F0CB52D2F8B007F00B6C8EC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		7F2387422131082C00FA4588 /* Build configuration list for PBXNativeTarget "Get iPlayer Programme" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

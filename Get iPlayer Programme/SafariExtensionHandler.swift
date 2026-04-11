@@ -8,45 +8,88 @@
 import SafariServices
 
 class SafariExtensionHandler: SFSafariExtensionHandler {
-    
-    override func messageReceived(withName messageName: String, from page: SFSafariPage, userInfo: [String : Any]?) {
-        // This method will be called when a content script provided by your extension calls safari.extension.dispatchMessage("message").
-        page.getPropertiesWithCompletionHandler { properties in
-            DDLogDebug("The extension received a message (\(messageName)) from a script injected into (\(String(describing: properties?.url))) with userInfo (\(userInfo ?? [:]))")
-        }
-    }
-    
-    override func messageReceivedFromContainingApp(withName messageName: String, userInfo: [String : Any]? = nil) {
-        DDLogDebug("Got a message!! \(messageName)" )
-    }
-    
+
     override func toolbarItemClicked(in window: SFSafariWindow) {
-        // This method will be called when your toolbar item is clicked.
-        DDLogDebug("The extension's toolbar item was clicked")
-        
-        window.getActiveTab() { tab in
-            if let tab = tab {
-                tab.getActivePage() { page in
-                    if let page = page {
-                        page.getPropertiesWithCompletionHandler { pageProperties in
-                            if let properties = pageProperties {
-                                let showURL = properties.url?.absoluteString
-                                print (showURL ?? "(null)")
-                            }
+        print("[GiA Extension] toolbarItemClicked called")
+        window.getActiveTab { tab in
+            tab?.getActivePage { page in
+                page?.getPropertiesWithCompletionHandler { properties in
+                    guard let url = properties?.url else { return }
+                    let title = properties?.title ?? ""
+
+                    print("[GiA Extension] Button clicked for URL: \(url.absoluteString)")
+
+                    var request = URLRequest(url: url)
+                    request.addValue("Mozilla/5.0", forHTTPHeaderField: "User-Agent")
+                    URLSession.shared.dataTask(with: request) { data, _, error in
+                        if let error = error {
+                            print("[GiA Extension] URLSession error: \(error)")
+                            return
                         }
-                    }
+                        guard let data = data,
+                              let html = String(data: data, encoding: .utf8) else {
+                            print("[GiA Extension] Failed to decode HTML")
+                            return
+                        }
+                        print("[GiA Extension] Fetched \(html.count) chars of HTML")
+
+                        // Write payload to shared App Group container
+                        let payload: [String: String] = [
+                            "url": url.absoluteString,
+                            "title": title,
+                            "html": html
+                        ]
+                        if let containerURL = FileManager.default.containerURL(
+                            forSecurityApplicationGroupIdentifier: "group.com.ascoware.get-iplayer-automator"),
+                           let jsonData = try? JSONSerialization.data(withJSONObject: payload) {
+                            let fileURL = containerURL.appendingPathComponent("pending_page.json")
+                            try? jsonData.write(to: fileURL)
+                            print("[GiA Extension] Wrote payload to \(fileURL.path)")
+                        } else {
+                            print("[GiA Extension] Failed to write payload — check App Group entitlement")
+                        }
+
+                        // Launch app if not running, then post Darwin notification
+                        DispatchQueue.main.async {
+                            NSWorkspace.shared.launchApplication(
+                                withBundleIdentifier: "com.ascoware.getiPlayerAutomator",
+                                options: .default,
+                                additionalEventParamDescriptor: nil,
+                                launchIdentifier: nil)
+                        }
+                        let notificationName = CFNotificationName(
+                            "com.ascoware.get-iplayer-automator.newpage" as CFString)
+                        CFNotificationCenterPostNotification(
+                            CFNotificationCenterGetDarwinNotifyCenter(),
+                            notificationName,
+                            nil, nil, true)
+                        print("[GiA Extension] Darwin notification posted")
+                    }.resume()
                 }
             }
         }
     }
-    
+
+    static let supportedURLPrefixes = [
+        "https://www.bbc.co.uk/iplayer/episode/",
+        "https://www.bbc.co.uk/iplayer/episodes/",
+        "https://www.bbc.co.uk/radio/play/",
+        "https://www.bbc.co.uk/sounds/play/",
+        "https://www.bbc.co.uk/programmes/",
+        "https://player.stv.tv/episode/",
+    ]
+
     override func validateToolbarItem(in window: SFSafariWindow, validationHandler: @escaping ((Bool, String) -> Void)) {
-        // This is called when Safari's state changed in some way that would require the extension's toolbar item to be validated again.
-        validationHandler(true, "")
+        window.getActiveTab { tab in
+            tab?.getActivePage { page in
+                page?.getPropertiesWithCompletionHandler { properties in
+                    let url = properties?.url?.absoluteString ?? ""
+                    let supported = Self.supportedURLPrefixes.contains { url.hasPrefix($0) }
+                    validationHandler(supported, "")
+                }
+            }
+        }
     }
-    
-    override func popoverViewController() -> SFSafariExtensionViewController {
-        return SafariExtensionViewController.shared
-    }
+
 
 }

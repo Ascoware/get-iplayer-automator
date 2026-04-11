@@ -26,6 +26,15 @@ NewProgrammeHistory           *sharedHistoryController;
 
 static NSString *FORCE_RELOAD = @"ForceReload";
 
+static void newPageFromExtensionCallback(CFNotificationCenterRef center, void *observer,
+                                         CFStringRef name, const void *object,
+                                         CFDictionaryRef userInfo) {
+    AppController *controller = (__bridge AppController *)observer;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [controller handlePageFromExtension];
+    });
+}
+
 @implementation AppController
 #pragma mark Overriden Methods
 
@@ -150,13 +159,13 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     
     _runScheduled=NO;
 //
-//    _nilToEmptyStringTransformer = [[NilToStringTransformer alloc] init];
-//    _nilToAsteriskTransformer = [[NilToStringTransformer alloc] initWithString:@"*"];
+    _nilToEmptyStringTransformer = [[NilToStringTransformer alloc] init];
+    _nilToAsteriskTransformer = [[NilToStringTransformer alloc] initWithString:@"*"];
 //    _tvFormatTransformer = [[EmptyToStringTransformer alloc] initWithString:@"Please select..."];
 //    _radioFormatTransformer = [[EmptyToStringTransformer alloc] initWithString:@"Please select..."];
 //    _itvFormatTransformer = [[EmptyToStringTransformer alloc] initWithString:@"Please select..."];
-//    [NSValueTransformer setValueTransformer:_nilToEmptyStringTransformer forName:@"NilToEmptyStringTransformer"];
-//    [NSValueTransformer setValueTransformer:_nilToAsteriskTransformer forName:@"NilToAsteriskTransformer"];
+    [NSValueTransformer setValueTransformer:_nilToEmptyStringTransformer forName:@"NilToEmptyStringTransformer"];
+    [NSValueTransformer setValueTransformer:_nilToAsteriskTransformer forName:@"NilToAsteriskTransformer"];
 //    [NSValueTransformer setValueTransformer:_tvFormatTransformer forName:@"TVFormatTransformer"];
 //    [NSValueTransformer setValueTransformer:_radioFormatTransformer forName:@"RadioFormatTransformer"];
 //    [NSValueTransformer setValueTransformer:_itvFormatTransformer forName:@"ITVFormatTransformer"];
@@ -336,6 +345,20 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     if ([fileManager fileExistsAtPath:infoPath]) [fileManager removeItemAtPath:infoPath error:nil];
 
     [self updateCache:nil];
+
+    // Register for Darwin notification from Safari extension
+    CFNotificationCenterAddObserver(
+        CFNotificationCenterGetDarwinNotifyCenter(),
+        (__bridge void *)self,
+        newPageFromExtensionCallback,
+        CFSTR("com.ascoware.get-iplayer-automator.newpage"),
+        NULL,
+        CFNotificationSuspensionBehaviorDeliverImmediately);
+}
+
+- (void)applicationDidBecomeActive:(NSNotification *)notification {
+    // Pick up any page the Safari extension queued before the app was running
+    [self handlePageFromExtension];
 }
 
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)application
@@ -734,7 +757,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
                 [ApplicationPaths getiPlayerPath],
                 [GetiPlayerArguments shared].profileDirArg,
                 [GetiPlayerArguments shared].noWarningArg,
-                [[GetiPlayerArguments shared] typeArgumentForCacheUpdate:NO],
+                [[GetiPlayerArguments shared] typeArgumentForCacheUpdate:YES],
                 [[GetiPlayerArguments shared] cacheExpiryArg],
                 @"--listformat=<pid>|<type>|<name>|<seriesnum>|<episode>|<channel>|<web>|<available>",
                 show.showName];
@@ -930,6 +953,26 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     };
 
     [GetCurrentWebpage getCurrentWebpageWithCompletion: callback];
+}
+
+- (void)handlePageFromExtension {
+    void(^callback)(NSArray<Programme*>*) = ^(NSArray<Programme*>* programs) {
+        for (Programme *p in programs) {
+            NSArray *tempQueue = self.queueController.arrangedObjects;
+            BOOL foundIt = NO;
+            for (Programme *show in tempQueue) {
+                if ([show.pid isEqualToString:p.pid]) {
+                    foundIt = YES;
+                }
+            }
+            if (!foundIt) {
+                p.status = @"Processing...";
+                [p performSelectorInBackground:@selector(getName) withObject:nil];
+                [self.queueController addObject:p];
+            }
+        }
+    };
+    [GetCurrentWebpage processSharedPageWithCompletion:callback];
 }
 
 - (IBAction)removeFromQueue:(id)sender
@@ -1474,7 +1517,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
                 series.tvNetwork = @"*";
             }
             NSString *cacheExpiryArg = [[GetiPlayerArguments shared] cacheExpiryArg];
-            NSString *typeArgument = [[GetiPlayerArguments shared] typeArgumentForCacheUpdate:NO];
+            NSString *typeArgument = [[GetiPlayerArguments shared] typeArgumentForCacheUpdate:YES];
 
             NSMutableArray *autoRecordArgs = [[NSMutableArray alloc] initWithObjects:
                                               [ApplicationPaths getiPlayerPath],
@@ -1748,8 +1791,8 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 }
 - (NSString *)escapeSpecialCharactersInString:(NSString *)string
 {
-    NSArray *characters = @[@"+", @"-", @"&", @"!", @"(", @")", @"{" ,@"}",
-                            @"[", @"]", @"^", @"~", @"*", @"?", @":", @"\""];
+    // Escape Perl regex metacharacters. Backslash must be first to avoid double-escaping.
+    NSArray *characters = @[@"\\", @".", @"^", @"$", @"*", @"+", @"?", @"(", @")", @"[", @"]", @"{", @"}", @"|"];
     for (NSString *character in characters)
         string = [string stringByReplacingOccurrencesOfString:character withString:[NSString stringWithFormat:@"\\%@",character]];
 

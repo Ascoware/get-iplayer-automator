@@ -107,8 +107,8 @@ extern NSDictionary<NSString *, NSString *> *radioFormats;
 @property NSDictionary *solutionsDictionary;
 
 //PVR list editing
-//@property NilToStringTransformer *nilToEmptyStringTransformer;
-//@property NilToStringTransformer *nilToAsteriskTransformer;
+@property NSValueTransformer *nilToEmptyStringTransformer;
+@property NSValueTransformer *nilToAsteriskTransformer;
 
 // Format preferences
 //@property EmptyToStringTransformer *tvFormatTransformer;
@@ -159,6 +159,7 @@ extern NSDictionary<NSString *, NSString *> *radioFormats;
 //Queue
 - (IBAction)addToQueue:(id)sender;
 - (IBAction)getCurrentWebpage:(id)sender;
+- (void)handlePageFromExtension;
 - (IBAction)removeFromQueue:(id)sender;
 
 //Download Controller
