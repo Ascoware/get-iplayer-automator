@@ -337,12 +337,15 @@ import CocoaLumberjackSwift
         processedPID = found
 
         if !found {
-            status = "Not in cache"
-
             if !tvNetwork.contains("ITV") && !tvNetwork.contains("STV") {
+                status = "Not in cache"
                 showName = "Retrieving Metadata..."
                 getNameFromPID()
             } else {
+                // STV/ITV shows are not in the BBC cache; this is expected.
+                // Mark as processed so downloads can start without a redundant cache lookup.
+                processedPID = true
+                status = runDownloads.boolValue ? "Waiting…" : "Available"
                 getNameRunning = false
             }
         } else {

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="24112" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="24506" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="24112"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="24506"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -142,7 +142,7 @@
                     <rect key="frame" x="97" y="152" width="352" height="40"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <subviews>
-                        <progressIndicator horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" maxValue="100" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="iln-Um-uzN" userLabel="Retreiving Info Indicator">
+                        <progressIndicator wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" maxValue="100" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="iln-Um-uzN" userLabel="Retreiving Info Indicator">
                             <rect key="frame" x="319" y="13" width="16" height="16"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         </progressIndicator>
@@ -193,7 +193,7 @@
                             <autoresizingMask key="autoresizingMask"/>
                             <clipView key="contentView" drawsBackground="NO" id="LYx-5P-gHI">
                                 <rect key="frame" x="1" y="1" width="309" height="133"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <autoresizingMask key="autoresizingMask"/>
                                 <subviews>
                                     <textView editable="NO" importsGraphics="NO" verticallyResizable="YES" usesFontPanel="YES" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" spellingCorrection="YES" smartInsertDelete="YES" id="7Pi-tT-G0Q" userLabel="Description View">
                                         <rect key="frame" x="0.0" y="0.0" width="309" height="133"/>
@@ -229,7 +229,7 @@
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <clipView key="contentView" drawsBackground="NO" id="jHT-Hr-sFJ">
                                 <rect key="frame" x="1" y="1" width="309" height="133"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <autoresizingMask key="autoresizingMask"/>
                                 <subviews>
                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="jeg-8F-HB4" id="MRJ-oM-h7R">
                                         <rect key="frame" x="0.0" y="0.0" width="309" height="116"/>
@@ -394,7 +394,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" utility="YES" HUD="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="146" width="420" height="225"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1200"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1204"/>
             <view key="contentView" id="1149">
                 <rect key="frame" x="0.0" y="0.0" width="420" height="225"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -701,7 +701,7 @@
         <window title="Get iPlayer Automator" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" frameAutosaveName="mainWindow" animationBehavior="default" id="371" userLabel="Main Window">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <rect key="contentRect" x="254" y="117" width="807" height="557"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1200"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1204"/>
             <value key="minSize" type="size" width="640" height="500"/>
             <view key="contentView" id="372">
                 <rect key="frame" x="0.0" y="0.0" width="807" height="557"/>
@@ -742,7 +742,7 @@
                             <action selector="getCurrentWebpage:" target="621" id="842"/>
                         </connections>
                     </button>
-                    <progressIndicator horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" minValue="16" maxValue="100" doubleValue="16" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="489">
+                    <progressIndicator wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" minValue="16" maxValue="100" doubleValue="16" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="489">
                         <rect key="frame" x="730" y="521" width="16" height="16"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                     </progressIndicator>
@@ -750,11 +750,11 @@
                         <rect key="frame" x="19" y="338" width="770" height="147"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                         <clipView key="contentView" id="EvP-AM-m82">
-                            <rect key="frame" x="1" y="1" width="753" height="130"/>
+                            <rect key="frame" x="1" y="1" width="768" height="145"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView identifier="SearchResults" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" typeSelect="NO" autosaveName="SearchResults" headerView="494" id="493">
-                                    <rect key="frame" x="0.0" y="0.0" width="753" height="113"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="751" height="111"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <size key="intercellSpacing" width="3" height="2"/>
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -843,15 +843,15 @@
                             </subviews>
                         </clipView>
                         <scroller key="horizontalScroller" verticalHuggingPriority="750" horizontal="YES" id="492">
-                            <rect key="frame" x="1" y="131" width="753" height="15"/>
+                            <rect key="frame" x="1" y="129" width="751" height="17"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="491">
-                            <rect key="frame" x="754" y="18" width="15" height="113"/>
+                            <rect key="frame" x="752" y="18" width="17" height="111"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <tableHeaderView key="headerView" id="494">
-                            <rect key="frame" x="0.0" y="0.0" width="753" height="17"/>
+                            <rect key="frame" x="0.0" y="0.0" width="751" height="17"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </tableHeaderView>
                     </scrollView>
@@ -875,7 +875,7 @@
                             <action selector="makeKeyAndOrderFront:" target="782" id="784"/>
                         </connections>
                     </button>
-                    <progressIndicator verticalHuggingPriority="750" fixedFrame="YES" maxValue="100" bezeled="NO" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="505">
+                    <progressIndicator wantsLayer="YES" verticalHuggingPriority="750" fixedFrame="YES" maxValue="100" bezeled="NO" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="505">
                         <rect key="frame" x="20" y="12" width="769" height="20"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                     </progressIndicator>
@@ -1167,7 +1167,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="60" width="623" height="450"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1200"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1204"/>
             <value key="minSize" type="size" width="623" height="450"/>
             <view key="contentView" id="518">
                 <rect key="frame" x="0.0" y="0.0" width="623" height="450"/>
@@ -1185,7 +1185,7 @@
                             <action selector="pvrSearch:" target="621" id="951"/>
                         </connections>
                     </textField>
-                    <progressIndicator horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" minValue="16" maxValue="100" doubleValue="16" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="521">
+                    <progressIndicator wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" minValue="16" maxValue="100" doubleValue="16" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="521">
                         <rect key="frame" x="270" y="411" width="16" height="16"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     </progressIndicator>
@@ -1193,11 +1193,11 @@
                         <rect key="frame" x="20" y="226" width="583" height="164"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                         <clipView key="contentView" id="en0-B7-GvD">
-                            <rect key="frame" x="1" y="1" width="566" height="147"/>
+                            <rect key="frame" x="1" y="1" width="581" height="162"/>
                             <autoresizingMask key="autoresizingMask"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="sequential" columnSelection="YES" autosaveColumns="NO" headerView="526" id="525">
-                                    <rect key="frame" x="0.0" y="0.0" width="566" height="130"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="564" height="128"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <size key="intercellSpacing" width="3" height="2"/>
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1261,15 +1261,15 @@
                             </subviews>
                         </clipView>
                         <scroller key="horizontalScroller" verticalHuggingPriority="750" horizontal="YES" id="524">
-                            <rect key="frame" x="1" y="148" width="566" height="15"/>
+                            <rect key="frame" x="1" y="146" width="564" height="17"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="523">
-                            <rect key="frame" x="567" y="18" width="15" height="130"/>
+                            <rect key="frame" x="565" y="18" width="17" height="128"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <tableHeaderView key="headerView" id="526">
-                            <rect key="frame" x="0.0" y="0.0" width="566" height="17"/>
+                            <rect key="frame" x="0.0" y="0.0" width="564" height="17"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </tableHeaderView>
                     </scrollView>
@@ -1289,11 +1289,11 @@
                         <rect key="frame" x="20" y="37" width="583" height="126"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" id="vxe-2Q-IFs">
-                            <rect key="frame" x="1" y="1" width="566" height="124"/>
+                            <rect key="frame" x="1" y="1" width="564" height="124"/>
                             <autoresizingMask key="autoresizingMask"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="sequential" columnSelection="YES" autosaveColumns="NO" headerView="537" id="536">
-                                    <rect key="frame" x="0.0" y="0.0" width="566" height="107"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="564" height="107"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <size key="intercellSpacing" width="3" height="2"/>
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1353,11 +1353,11 @@
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <scroller key="verticalScroller" verticalHuggingPriority="750" horizontal="NO" id="534">
-                            <rect key="frame" x="567" y="18" width="15" height="107"/>
+                            <rect key="frame" x="565" y="18" width="17" height="107"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <tableHeaderView key="headerView" id="537">
-                            <rect key="frame" x="0.0" y="0.0" width="566" height="17"/>
+                            <rect key="frame" x="0.0" y="0.0" width="564" height="17"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </tableHeaderView>
                     </scrollView>
@@ -1430,7 +1430,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" utility="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="16" width="497" height="633"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1200"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1204"/>
             <view key="contentView" id="548">
                 <rect key="frame" x="0.0" y="0.0" width="497" height="633"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1923,11 +1923,11 @@
                                             <rect key="frame" x="17" y="415" width="417" height="142"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <clipView key="contentView" id="iNe-PX-Coi">
-                                                <rect key="frame" x="1" y="1" width="400" height="125"/>
+                                                <rect key="frame" x="1" y="1" width="415" height="140"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="1079" id="1078">
-                                                        <rect key="frame" x="0.0" y="0.0" width="400" height="108"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="398" height="106"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <size key="intercellSpacing" width="3" height="2"/>
                                                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1978,15 +1978,15 @@
                                                 </subviews>
                                             </clipView>
                                             <scroller key="horizontalScroller" verticalHuggingPriority="750" horizontal="YES" id="1077">
-                                                <rect key="frame" x="1" y="126" width="400" height="15"/>
+                                                <rect key="frame" x="1" y="124" width="398" height="17"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
                                             <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="1076">
-                                                <rect key="frame" x="401" y="18" width="15" height="108"/>
+                                                <rect key="frame" x="399" y="18" width="17" height="106"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
                                             <tableHeaderView key="headerView" id="1079">
-                                                <rect key="frame" x="0.0" y="0.0" width="400" height="17"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="398" height="17"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </tableHeaderView>
                                         </scrollView>
@@ -1994,11 +1994,11 @@
                                             <rect key="frame" x="17" y="187" width="417" height="174"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <clipView key="contentView" id="Yo1-zO-Vaa">
-                                                <rect key="frame" x="1" y="1" width="400" height="157"/>
+                                                <rect key="frame" x="1" y="1" width="415" height="172"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="1086" id="1087">
-                                                        <rect key="frame" x="0.0" y="0.0" width="400" height="140"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="398" height="138"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <size key="intercellSpacing" width="3" height="2"/>
                                                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -2044,15 +2044,15 @@
                                                 </subviews>
                                             </clipView>
                                             <scroller key="horizontalScroller" verticalHuggingPriority="750" horizontal="YES" id="1088">
-                                                <rect key="frame" x="1" y="158" width="400" height="15"/>
+                                                <rect key="frame" x="1" y="156" width="398" height="17"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
                                             <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="1089">
-                                                <rect key="frame" x="401" y="18" width="15" height="140"/>
+                                                <rect key="frame" x="399" y="18" width="17" height="138"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
                                             <tableHeaderView key="headerView" id="1086">
-                                                <rect key="frame" x="0.0" y="0.0" width="400" height="17"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="398" height="17"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </tableHeaderView>
                                         </scrollView>
@@ -2178,11 +2178,11 @@
                                             <rect key="frame" x="1" y="402" width="452" height="155"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="dss-T9-HWQ">
-                                                <rect key="frame" x="4" y="5" width="444" height="135"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="452" height="143"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Wk6-ae-0Ab">
-                                                        <rect key="frame" x="12" y="99" width="81" height="18"/>
+                                                        <rect key="frame" x="12" y="107" width="81" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC One" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="e6W-Fp-His">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2194,7 +2194,7 @@
                                                         </connections>
                                                     </button>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="EQj-uS-ifA">
-                                                        <rect key="frame" x="123" y="99" width="81" height="18"/>
+                                                        <rect key="frame" x="123" y="107" width="81" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC Two" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="zhN-8d-7Aq">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2206,7 +2206,7 @@
                                                         </connections>
                                                     </button>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kTz-fz-PyE">
-                                                        <rect key="frame" x="227" y="99" width="91" height="18"/>
+                                                        <rect key="frame" x="227" y="107" width="91" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC Three" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="wbk-x4-9tX">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2218,7 +2218,7 @@
                                                         </connections>
                                                     </button>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DEf-zb-63x">
-                                                        <rect key="frame" x="334" y="99" width="84" height="18"/>
+                                                        <rect key="frame" x="334" y="107" width="84" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC Four" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="W7T-y8-dSe">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2230,11 +2230,11 @@
                                                         </connections>
                                                     </button>
                                                     <box verticalHuggingPriority="750" fixedFrame="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="Wha-sr-x29">
-                                                        <rect key="frame" x="15" y="87" width="419" height="5"/>
+                                                        <rect key="frame" x="15" y="95" width="419" height="5"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                     </box>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ZiX-yu-Iok">
-                                                        <rect key="frame" x="248" y="59" width="58" height="18"/>
+                                                        <rect key="frame" x="248" y="67" width="58" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="CBBC" bezelStyle="regularSquare" imagePosition="left" inset="2" id="HKZ-dZ-UA6">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2246,7 +2246,7 @@
                                                         </connections>
                                                     </button>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wC5-OD-X8R">
-                                                        <rect key="frame" x="347" y="59" width="80" height="18"/>
+                                                        <rect key="frame" x="347" y="67" width="80" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="CBeebies" bezelStyle="regularSquare" imagePosition="left" inset="2" id="t1o-go-rn7">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2258,7 +2258,7 @@
                                                         </connections>
                                                     </button>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Gr2-CY-l5j">
-                                                        <rect key="frame" x="12" y="58" width="86" height="18"/>
+                                                        <rect key="frame" x="12" y="66" width="86" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC News" bezelStyle="regularSquare" imagePosition="left" inset="2" id="6gb-yG-qRl">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2270,7 +2270,7 @@
                                                         </connections>
                                                     </button>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mVv-B8-5yS">
-                                                        <rect key="frame" x="123" y="58" width="116" height="18"/>
+                                                        <rect key="frame" x="123" y="66" width="116" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC Parliament" bezelStyle="regularSquare" imagePosition="left" inset="2" id="SkP-JZ-c30">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2282,7 +2282,7 @@
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mkl-VJ-70y">
-                                                        <rect key="frame" x="12" y="16" width="185" height="18"/>
+                                                        <rect key="frame" x="12" y="24" width="185" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Show Regional TV Stations" bezelStyle="regularSquare" imagePosition="left" inset="2" id="JWz-Nq-Lfe">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2294,7 +2294,7 @@
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="O34-I7-gSd">
-                                                        <rect key="frame" x="253" y="16" width="165" height="18"/>
+                                                        <rect key="frame" x="253" y="24" width="165" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Show Local TV Stations" bezelStyle="regularSquare" imagePosition="left" inset="2" id="TgA-Lg-dXc">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2312,11 +2312,11 @@
                                             <rect key="frame" x="1" y="179" width="452" height="219"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="cZc-eP-6d4">
-                                                <rect key="frame" x="4" y="5" width="444" height="199"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="452" height="207"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HJk-bU-Rxk">
-                                                        <rect key="frame" x="12" y="173" width="96" height="18"/>
+                                                        <rect key="frame" x="12" y="181" width="96" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC Radio 1" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="1JW-iw-ETU">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2328,7 +2328,7 @@
                                                         </connections>
                                                     </button>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6Lw-33-guR" userLabel="BBC Radio 2">
-                                                        <rect key="frame" x="154" y="173" width="106" height="18"/>
+                                                        <rect key="frame" x="154" y="181" width="106" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC Radio 2" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="4f6-Ln-1Bq">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2340,7 +2340,7 @@
                                                         </connections>
                                                     </button>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8jP-di-hni">
-                                                        <rect key="frame" x="299" y="173" width="105" height="18"/>
+                                                        <rect key="frame" x="299" y="181" width="105" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC Radio 3" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="jhb-jr-N7a">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2352,7 +2352,7 @@
                                                         </connections>
                                                     </button>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4lJ-eV-Tty">
-                                                        <rect key="frame" x="12" y="135" width="109" height="18"/>
+                                                        <rect key="frame" x="12" y="143" width="109" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC Radio 4" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="hNr-CF-J0S">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2364,7 +2364,7 @@
                                                         </connections>
                                                     </button>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9ma-sa-of7">
-                                                        <rect key="frame" x="154" y="135" width="133" height="18"/>
+                                                        <rect key="frame" x="154" y="143" width="133" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC Radio 4 Extra" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Uwz-Vs-tux">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2376,7 +2376,7 @@
                                                         </connections>
                                                     </button>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tZy-hd-UhF">
-                                                        <rect key="frame" x="299" y="135" width="138" height="18"/>
+                                                        <rect key="frame" x="299" y="143" width="138" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC Radio 6 Music" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Vjh-iO-Mds">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2388,11 +2388,11 @@
                                                         </connections>
                                                     </button>
                                                     <box verticalHuggingPriority="750" fixedFrame="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="bVl-5G-Xmc">
-                                                        <rect key="frame" x="14" y="36" width="419" height="5"/>
+                                                        <rect key="frame" x="14" y="44" width="419" height="5"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                     </box>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YWn-u3-Kmr" userLabel="BBC World Service">
-                                                        <rect key="frame" x="12" y="93" width="136" height="18"/>
+                                                        <rect key="frame" x="12" y="101" width="136" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC World Service" bezelStyle="regularSquare" imagePosition="left" inset="2" id="ZUN-Md-u59">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2408,7 +2408,7 @@
                                                         </connections>
                                                     </button>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="e2T-sc-7gQ">
-                                                        <rect key="frame" x="154" y="93" width="126" height="18"/>
+                                                        <rect key="frame" x="154" y="101" width="126" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC Radio 5 Live" bezelStyle="regularSquare" imagePosition="left" inset="2" id="rak-Wt-HaP">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2420,7 +2420,7 @@
                                                         </connections>
                                                     </button>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2k2-DB-89d">
-                                                        <rect key="frame" x="299" y="93" width="121" height="18"/>
+                                                        <rect key="frame" x="299" y="101" width="121" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC Radio 1Xtra" bezelStyle="regularSquare" imagePosition="left" inset="2" id="2jG-m4-i4e">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2432,7 +2432,7 @@
                                                         </connections>
                                                     </button>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bqc-BZ-buH">
-                                                        <rect key="frame" x="12" y="56" width="204" height="18"/>
+                                                        <rect key="frame" x="12" y="64" width="204" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC Radio 5 Live Sports Extra" bezelStyle="regularSquare" imagePosition="left" inset="2" id="5h4-0M-nCM">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2444,7 +2444,7 @@
                                                         </connections>
                                                     </button>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gxa-Sy-vru">
-                                                        <rect key="frame" x="261" y="56" width="177" height="18"/>
+                                                        <rect key="frame" x="261" y="64" width="177" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC Radio Asian Network" bezelStyle="regularSquare" imagePosition="left" inset="2" id="3DI-gT-BDA">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2456,11 +2456,11 @@
                                                         </connections>
                                                     </button>
                                                     <box verticalHuggingPriority="750" fixedFrame="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="LdH-mP-1ip">
-                                                        <rect key="frame" x="14" y="118" width="419" height="5"/>
+                                                        <rect key="frame" x="14" y="126" width="419" height="5"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                     </box>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Owy-ED-RS0" userLabel="Show Regional Radio Programmes">
-                                                        <rect key="frame" x="12" y="10" width="202" height="18"/>
+                                                        <rect key="frame" x="12" y="18" width="202" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Show Regional Radio Stations" bezelStyle="regularSquare" imagePosition="left" inset="2" id="VSC-t4-Xdt" userLabel="Show Regional Stations">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2472,7 +2472,7 @@
                                                         </connections>
                                                     </button>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hnU-Bj-KCY" userLabel="Show Local Radio Programmes">
-                                                        <rect key="frame" x="249" y="10" width="182" height="18"/>
+                                                        <rect key="frame" x="249" y="18" width="182" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Show Local Radio Stations" bezelStyle="regularSquare" imagePosition="left" inset="2" id="f1V-QT-BjD" userLabel="Show Local Stations">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2490,11 +2490,11 @@
                                             <rect key="frame" x="1" y="90" width="456" height="85"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="gQ1-Wk-QjY">
-                                                <rect key="frame" x="4" y="5" width="448" height="65"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="456" height="73"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ID4-f2-23a" userLabel="Ignore Radio All News">
-                                                        <rect key="frame" x="11" y="7" width="341" height="18"/>
+                                                        <rect key="frame" x="11" y="15" width="341" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Ignore all radio programmes with &quot;news&quot; in the title" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="idt-2N-NKM">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2506,7 +2506,7 @@
                                                         </connections>
                                                     </button>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Hc3-nT-3zv" userLabel="Ignore TV All News">
-                                                        <rect key="frame" x="11" y="39" width="341" height="18"/>
+                                                        <rect key="frame" x="11" y="47" width="341" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Ignore all TV programmes with &quot;news&quot; in the title" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="O3S-RU-Vau">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2563,7 +2563,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="159" width="584" height="351"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1200"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1204"/>
             <value key="minSize" type="size" width="584" height="351"/>
             <view key="contentView" id="1213">
                 <rect key="frame" x="0.0" y="0.0" width="584" height="351"/>
@@ -2573,11 +2573,11 @@
                         <rect key="frame" x="20" y="73" width="551" height="258"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" id="Npw-zh-ApO">
-                            <rect key="frame" x="1" y="1" width="534" height="256"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <rect key="frame" x="1" y="1" width="532" height="256"/>
+                            <autoresizingMask key="autoresizingMask"/>
                             <subviews>
                                 <tableView identifier="DownloadHistory" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" alternatingRowBackgroundColors="YES" columnSelection="YES" autosaveName="DownloadHistory" headerView="1218" id="1217">
-                                    <rect key="frame" x="0.0" y="0.0" width="534" height="239"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="532" height="239"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <size key="intercellSpacing" width="3" height="2"/>
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -2649,11 +2649,11 @@
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="1215">
-                            <rect key="frame" x="535" y="18" width="15" height="239"/>
+                            <rect key="frame" x="533" y="18" width="17" height="239"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <tableHeaderView key="headerView" id="1218">
-                            <rect key="frame" x="0.0" y="0.0" width="534" height="17"/>
+                            <rect key="frame" x="0.0" y="0.0" width="532" height="17"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </tableHeaderView>
                     </scrollView>
@@ -2706,7 +2706,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="109" width="469" height="401"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1200"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1204"/>
             <view key="contentView" id="612">
                 <rect key="frame" x="0.0" y="0.0" width="469" height="401"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -2715,15 +2715,15 @@
                         <rect key="frame" x="-1" y="20" width="471" height="382"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" id="iPE-J7-aae">
-                            <rect key="frame" x="1" y="1" width="454" height="380"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                            <rect key="frame" x="1" y="1" width="452" height="380"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <textView editable="NO" importsGraphics="NO" richText="NO" verticallyResizable="YES" allowsCharacterPickerTouchBarItem="NO" textCompletion="NO" id="616">
-                                    <rect key="frame" x="0.0" y="0.0" width="469" height="380"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="452" height="380"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
-                                    <size key="minSize" width="454" height="380"/>
+                                    <size key="minSize" width="452" height="380"/>
                                     <size key="maxSize" width="989" height="10000000"/>
                                     <color key="insertionPointColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 </textView>
@@ -2735,7 +2735,7 @@
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <scroller key="verticalScroller" verticalHuggingPriority="750" horizontal="NO" id="614">
-                            <rect key="frame" x="455" y="1" width="15" height="380"/>
+                            <rect key="frame" x="453" y="1" width="17" height="380"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                     </scrollView>
@@ -2769,7 +2769,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="300" width="397" height="198"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1200"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1204"/>
             <view key="contentView" id="883">
                 <rect key="frame" x="0.0" y="0.0" width="397" height="198"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -2794,7 +2794,7 @@ Please Note: The searchable/downloadable types will not be updated until the cac
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="419" width="397" height="68"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1200"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1204"/>
             <view key="contentView" id="896">
                 <rect key="frame" x="0.0" y="0.0" width="397" height="68"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -2816,7 +2816,7 @@ Please Note: The searchable/downloadable types will not be updated until the cac
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" utility="YES" HUD="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="690" y="385" width="432" height="244"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1200"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1204"/>
             <view key="contentView" id="783">
                 <rect key="frame" x="0.0" y="0.0" width="432" height="244"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -2843,7 +2843,7 @@ Note 2: Due to the way search is currently implemented, BBC shows older than 7 d
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" utility="YES" HUD="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="690" y="368" width="432" height="295"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1200"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1204"/>
             <view key="contentView" id="1258">
                 <rect key="frame" x="0.0" y="0.0" width="432" height="295"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -2870,7 +2870,7 @@ Note: Only the types of shows you select in the preferences will show up here.</
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="240" width="480" height="270"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1200"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1204"/>
             <view key="contentView" id="1272">
                 <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -2881,7 +2881,7 @@ Note: Only the types of shows you select in the preferences will show up here.</
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="269" y="337" width="802" height="400"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1200"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1204"/>
             <value key="minSize" type="size" width="400" height="150"/>
             <view key="contentView" id="1375">
                 <rect key="frame" x="0.0" y="0.0" width="802" height="400"/>
