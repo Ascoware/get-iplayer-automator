@@ -198,6 +198,7 @@ Archive
 *.p8
 
 ####
-# Make sure we don't commit any binaries.
-Binaries/
+# Generated binaries — built at release time via Makefile.
+Binaries/get_iplayer/
+Binaries/yt-dlp_macos
 
