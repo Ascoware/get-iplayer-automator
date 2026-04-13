@@ -19,7 +19,7 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>20260412002</string>
+	<string>20260412003</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.video</string>
 	<key>LSMinimumSystemVersion</key>
@@ -43,9 +43,9 @@
 	<string>NO</string>
 	<key>SUEnableAutomaticChecks</key>
 	<string>YES</string>
-	<key>SUPublicEDKey</key>
-	<string>sAIG8Dk79oUt4qjqwKS1jU29GqdVDwxdvAWdPSygK94=</string>
 	<key>SUFeedURL</key>
 	<string>https://ascoware.github.io/get-iplayer-automator/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>sAIG8Dk79oUt4qjqwKS1jU29GqdVDwxdvAWdPSygK94=</string>
 </dict>
 </plist>

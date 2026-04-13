@@ -733,7 +733,7 @@
 					"$(PROJECT_DIR)",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
-				MARKETING_VERSION = 1.28.0;
+				MARKETING_VERSION = 1.28.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ascoware.getiPlayerAutomator;
 				PRODUCT_NAME = "Get iPlayer Automator";
 				PROVISIONING_PROFILE = "";
@@ -784,7 +784,7 @@
 					"$(PROJECT_DIR)",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
-				MARKETING_VERSION = 1.28.0;
+				MARKETING_VERSION = 1.28.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ascoware.getiPlayerAutomator;
 				PRODUCT_NAME = "Get iPlayer Automator";
 				PROVISIONING_PROFILE = "";
