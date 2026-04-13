@@ -191,3 +191,17 @@ Carthage
 # Generated output files
 Product
 Archive
+
+### 
+# Auth keys
+
+*.p8
+
+####
+# Generated binaries — built at release time via Makefile.
+Binaries/get_iplayer/
+Binaries/yt-dlp_macos
+
+####
+# Claude-related
+.claude/

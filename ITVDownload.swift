@@ -167,12 +167,10 @@ import CocoaLumberjackSwift
         let fh = pipe?.fileHandleForReading
         let errorFh = errorPipe?.fileHandleForReading
 
-        guard let youtubeDLFolder = Bundle.main.path(forResource: "yt-dlp_macos", ofType:nil),
+        guard let youtubeDLBinary = Bundle.main.path(forResource: "yt-dlp_macos", ofType: nil),
               let cacertFile = Bundle.main.url(forResource: "cacert", withExtension: "pem") else {
             return
         }
-
-        let youtubeDLBinary = youtubeDLFolder + "/yt-dlp_macos"
         var args: [String] = [show.url,
                               "--user-agent",
                               "Mozilla/5.0",
@@ -231,9 +229,9 @@ import CocoaLumberjackSwift
 
         task?.launchPath = youtubeDLBinary
         task?.arguments = args
-        let extraBinaryPath = AppController.shared().extraBinariesPath
+        let extraBinaryPath = ApplicationPaths.extraBinariesPath
         var envVariableDictionary = [String : String]()
-        envVariableDictionary["PATH"] = "\(youtubeDLFolder):\(extraBinaryPath)"
+        envVariableDictionary["PATH"] = "\(extraBinaryPath)"
         envVariableDictionary["SSL_CERT_FILE"] = cacertFile.path
         task?.environment = envVariableDictionary
         DDLogVerbose("DEBUG: youtube-dl environment: \(envVariableDictionary)")

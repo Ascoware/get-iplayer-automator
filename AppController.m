@@ -9,13 +9,7 @@
 // #import <UserNotifications/UserNotifications.h>
 #import "AppController.h"
 #import <Sparkle/Sparkle.h>
-#import "HTTPProxy.h"
-#import "NSFileManager+DirectoryLocations.h"
 #import "iTunes.h"
-#import "ReasonForFailure.h"
-#import "NPHistoryWindowController.h"
-#import "TVFormat.h"
-#import "RadioFormat.h"
 #import "Get_iPlayer_Automator-Swift.h"
 
 static AppController *sharedController;
@@ -147,25 +141,25 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     [[NSFileManager defaultManager] changeCurrentDirectoryPath:appSupportDirectory];
 
     //Initialize Arguments
-    NSString *getiPlayerInstallation = [[NSString alloc] initWithString:[NSBundle mainBundle].bundlePath];
-    getiPlayerInstallation = [getiPlayerInstallation stringByAppendingString:@"/Contents/Resources/get_iplayer"];
-    _extraBinariesPath = [getiPlayerInstallation stringByAppendingPathComponent:@"utils/bin"];
-    _getiPlayerPath = [getiPlayerInstallation stringByAppendingPathComponent:@"perl/bin/get_iplayer"];
-    _perlBinaryPath = [getiPlayerInstallation stringByAppendingPathComponent:@"perl/bin/perl"];
-    _perlEnvironmentPath = [getiPlayerInstallation stringByAppendingPathComponent:@"perl/lib"];
+//    NSString *getiPlayerInstallation = [[NSString alloc] initWithString:[NSBundle mainBundle].bundlePath];
+//    getiPlayerInstallation = [getiPlayerInstallation stringByAppendingString:@"/Contents/Resources/get_iplayer"];
+//    _extraBinariesPath = [getiPlayerInstallation stringByAppendingPathComponent:@"utils/bin"];
+//    [ApplicationPaths getiPlayerPath] = [getiPlayerInstallation stringByAppendingPathComponent:@"perl/bin/get_iplayer"];
+//    [ApplicationPaths perlBinaryPath] = [getiPlayerInstallation stringByAppendingPathComponent:@"perl/bin/perl"];
+//    [ApplicationPaths perlEnvironmentPath] = [getiPlayerInstallation stringByAppendingPathComponent:@"perl/lib"];
     
     _runScheduled=NO;
-
-    _nilToEmptyStringTransformer = [[NilToStringTransformer alloc] init];
-    _nilToAsteriskTransformer = [[NilToStringTransformer alloc] initWithString:@"*"];
-    _tvFormatTransformer = [[EmptyToStringTransformer alloc] initWithString:@"Please select..."];
-    _radioFormatTransformer = [[EmptyToStringTransformer alloc] initWithString:@"Please select..."];
-    _itvFormatTransformer = [[EmptyToStringTransformer alloc] initWithString:@"Please select..."];
-    [NSValueTransformer setValueTransformer:_nilToEmptyStringTransformer forName:@"NilToEmptyStringTransformer"];
-    [NSValueTransformer setValueTransformer:_nilToAsteriskTransformer forName:@"NilToAsteriskTransformer"];
-    [NSValueTransformer setValueTransformer:_tvFormatTransformer forName:@"TVFormatTransformer"];
-    [NSValueTransformer setValueTransformer:_radioFormatTransformer forName:@"RadioFormatTransformer"];
-    [NSValueTransformer setValueTransformer:_itvFormatTransformer forName:@"ITVFormatTransformer"];
+//
+//    _nilToEmptyStringTransformer = [[NilToStringTransformer alloc] init];
+//    _nilToAsteriskTransformer = [[NilToStringTransformer alloc] initWithString:@"*"];
+//    _tvFormatTransformer = [[EmptyToStringTransformer alloc] initWithString:@"Please select..."];
+//    _radioFormatTransformer = [[EmptyToStringTransformer alloc] initWithString:@"Please select..."];
+//    _itvFormatTransformer = [[EmptyToStringTransformer alloc] initWithString:@"Please select..."];
+//    [NSValueTransformer setValueTransformer:_nilToEmptyStringTransformer forName:@"NilToEmptyStringTransformer"];
+//    [NSValueTransformer setValueTransformer:_nilToAsteriskTransformer forName:@"NilToAsteriskTransformer"];
+//    [NSValueTransformer setValueTransformer:_tvFormatTransformer forName:@"TVFormatTransformer"];
+//    [NSValueTransformer setValueTransformer:_radioFormatTransformer forName:@"RadioFormatTransformer"];
+//    [NSValueTransformer setValueTransformer:_itvFormatTransformer forName:@"ITVFormatTransformer"];
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(itvUpdateFinished) name:@"ITVUpdateFinished" object:nil];
     newITVListing =  [[GetITVShows alloc] init];
@@ -367,6 +361,11 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     return shouldClose;
 }
 
+- (BOOL)applicationSupportsSecureRestorableState:(NSApplication *)app
+{
+    return YES;
+}
+
 - (BOOL)confirmQuit
 {
     BOOL confirmation = YES;
@@ -458,7 +457,10 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])
     {
         _getiPlayerProxy = [GetiPlayerProxy new];
-        [_getiPlayerProxy loadProxyInBackgroundForSelector:@selector(updateCache:proxyDict:) withObject:sender onTarget:self silently:_runScheduled];
+        [_getiPlayerProxy loadProxyInBackgroundWithSilently:_runScheduled
+                                                 completion:^(NSDictionary<NSString *,id> * _Nonnull proxyDict) {
+            [self updateCache:sender proxyDict:proxyDict];
+        }];
     }
     else
     {
@@ -486,7 +488,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         DDLogError(@"%@", e.description);
         DDLogError(@"UI setup failed before updating cache with proxy. Please file a bug and mention the exception description above.");
     }
-    if (proxyDict && [proxyDict[@"error"] code] == kProxyLoadCancelled) {
+    if (proxyDict && [proxyDict[@"error"] code] == ProxyLoadErrorCancelled) {
         [_stopButton setEnabled:NO];
         return;
     }
@@ -554,7 +556,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         cacheExpiryArg = [[NSString alloc] initWithFormat:@"--expiry=%d", ([[[NSUserDefaults standardUserDefaults] objectForKey:@"CacheExpiryTime"] intValue]*3600)];
     }
 
-    NSString *typeArgument = [[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:YES];
+    NSString *typeArgument = [[GetiPlayerArguments shared] typeArgumentForCacheUpdate:YES];
 
     if (typeArgument.length == 0) {
         _updatingBBCIndex = false;
@@ -563,16 +565,16 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     }
 
     NSMutableArray *getiPlayerUpdateArgs = [NSMutableArray arrayWithArray:
-                                                @[_getiPlayerPath,
+                                                @[[ApplicationPaths getiPlayerPath],
                                                   cacheExpiryArg,
                                                   typeArgument,
                                                   @"--refresh",
-                                                  [GetiPlayerArguments sharedController].profileDirArg,
+                                                  [GetiPlayerArguments shared].profileDirArg,
                                                   @".*"]
     ];
 
     if (_proxy) {
-        [getiPlayerUpdateArgs addObject: [NSString stringWithFormat:@"-p%@", _proxy.url]];
+        [getiPlayerUpdateArgs addObject: [NSString stringWithFormat:@"-p%@", [_proxy url]]];
         if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"TryPartialProxy"] boolValue]) {
             [getiPlayerUpdateArgs addObject:@"--partial-proxy"];
         }
@@ -582,7 +584,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     _currentProgress.stringValue = @"Updating Programme Index Feeds...";
 
     self.getiPlayerUpdateTask = [NSTask new];
-    self.getiPlayerUpdateTask.launchPath = _perlBinaryPath;
+    self.getiPlayerUpdateTask.launchPath = [ApplicationPaths perlBinaryPath];
     self.getiPlayerUpdateTask.arguments = getiPlayerUpdateArgs;
     self.getiPlayerUpdatePipe = [NSPipe new];
     self.getiPlayerUpdateTask.standardOutput = _getiPlayerUpdatePipe;
@@ -608,7 +610,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:self.getiPlayerUpdateTask.environment];
     envVariableDictionary[@"HOME"] = (@"~").stringByExpandingTildeInPath;
     envVariableDictionary[@"PERL_UNICODE"] = @"AS";
-    envVariableDictionary[@"PATH"] = _perlEnvironmentPath;
+    envVariableDictionary[@"PATH"] = [ApplicationPaths perlEnvironmentPath];
 
     _updatingBBCIndex = true;
     self.getiPlayerUpdateTask.environment = envVariableDictionary;
@@ -727,20 +729,20 @@ static NSString *FORCE_RELOAD = @"ForceReload";
             NSFileHandle *readHandle2 = newPipe.fileHandleForReading;
             pipeTask.standardOutput = newPipe;
             pipeTask.standardError = newPipe;
-            pipeTask.launchPath = _perlBinaryPath;
+            pipeTask.launchPath = [ApplicationPaths perlBinaryPath];
             pipeTask.arguments = @[
-                _getiPlayerPath,
-                [GetiPlayerArguments sharedController].profileDirArg,
-                [GetiPlayerArguments sharedController].noWarningArg,
-                [[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO],
-                [[GetiPlayerArguments sharedController] cacheExpiryArg],
+                [ApplicationPaths getiPlayerPath],
+                [GetiPlayerArguments shared].profileDirArg,
+                [GetiPlayerArguments shared].noWarningArg,
+                [[GetiPlayerArguments shared] typeArgumentForCacheUpdate:NO],
+                [[GetiPlayerArguments shared] cacheExpiryArg],
                 @"--listformat=<pid>|<type>|<name>|<seriesnum>|<episode>|<channel>|<web>|<available>",
                 show.showName];
             NSMutableString *taskData = [[NSMutableString alloc] initWithString:@""];
             NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:pipeTask.environment];
             envVariableDictionary[@"HOME"] = (@"~").stringByExpandingTildeInPath;
             envVariableDictionary[@"PERL_UNICODE"] = @"AS";
-            envVariableDictionary[@"PATH"] = _perlBinaryPath;
+            envVariableDictionary[@"PATH"] = [ApplicationPaths perlBinaryPath];
             pipeTask.environment = envVariableDictionary;
             [pipeTask launch];
             NSData *someData;
@@ -852,10 +854,14 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         [_searchField setEnabled:NO];
         [_searchIndicator startAnimation:nil];
         [_resultsController removeObjectsAtArrangedObjectIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, [_resultsController.arrangedObjects count])]];
+
+        void(^callback)(NSArray<Programme *> * _Nonnull) = ^(NSArray<Programme*> * _Nonnull results) {
+            [self searchFinished:results];
+        };
+
         _currentSearch = [[GiASearch alloc] initWithSearchTerms:_searchField.stringValue
-                                  allowHidingOfDownloadedItems:YES
-                                                      selector:@selector(searchFinished:)
-                                                    withTarget:self];
+                                   allowHidingOfDownloadedItems:YES
+                                                     completion:callback];
     }
 }
 - (void)searchFinished:(NSArray *)results
@@ -989,7 +995,10 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"AlwaysUseProxy"] boolValue])
     {
         _getiPlayerProxy = [GetiPlayerProxy new];
-        [_getiPlayerProxy loadProxyInBackgroundForSelector:@selector(startDownloads:proxyDict:) withObject:sender onTarget:self silently:_runScheduled];
+        [_getiPlayerProxy loadProxyInBackgroundWithSilently:_runScheduled
+                                                 completion:^(NSDictionary<NSString *,id> * _Nonnull proxyDict) {
+            [self startDownloads:sender proxyDict:proxyDict];
+        }];
     } else {
         [self startDownloads:sender proxyDict:nil];
     }
@@ -1006,7 +1015,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     @catch (NSException *e) {
         DDLogError(@"NO UI: startDownloads:proxyError:");
     }
-    if (proxyDict && [proxyDict[@"error"] code] == kProxyLoadCancelled) {
+    if (proxyDict && [proxyDict[@"error"] code] == ProxyLoadErrorCancelled) {
         [_startButton setEnabled:YES];
         [_stopButton setEnabled:NO];
         return;
@@ -1370,10 +1379,15 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     {
         [_pvrSearchField setEnabled:NO];
         [_pvrResultsController removeObjectsAtArrangedObjectIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, [_pvrResultsController.arrangedObjects count])]];
+        
+        void(^callback)(NSArray<Programme *> * _Nonnull) = ^(NSArray<Programme*> * _Nonnull results) {
+            [self pvrSearchFinished:results];
+        };
+
         _currentPVRSearch = [[GiASearch alloc] initWithSearchTerms:_pvrSearchField.stringValue
-                                     allowHidingOfDownloadedItems:NO 
-                                                         selector:@selector(pvrSearchFinished:)
-                                                       withTarget:self];
+                                      allowHidingOfDownloadedItems:NO
+                                                        completion:callback];
+
         [_pvrSearchIndicator startAnimation:nil];
     }
 }
@@ -1459,16 +1473,16 @@ static NSString *FORCE_RELOAD = @"ForceReload";
             } else if (series.tvNetwork.length == 0) {
                 series.tvNetwork = @"*";
             }
-            NSString *cacheExpiryArg = [[GetiPlayerArguments sharedController] cacheExpiryArg];
-            NSString *typeArgument = [[GetiPlayerArguments sharedController] typeArgumentForCacheUpdate:NO];
+            NSString *cacheExpiryArg = [[GetiPlayerArguments shared] cacheExpiryArg];
+            NSString *typeArgument = [[GetiPlayerArguments shared] typeArgumentForCacheUpdate:NO];
 
             NSMutableArray *autoRecordArgs = [[NSMutableArray alloc] initWithObjects:
-                                              _getiPlayerPath,
-                                              [GetiPlayerArguments sharedController].noWarningArg,
+                                              [ApplicationPaths getiPlayerPath],
+                                              [GetiPlayerArguments shared].noWarningArg,
                                               @"--listformat=<pid>|<type>|<name>|<episode>|<channel>|<timeadded>|<web>|<available>",
                                               cacheExpiryArg,
                                               typeArgument,
-                                              [GetiPlayerArguments sharedController].profileDirArg,
+                                              [GetiPlayerArguments shared].profileDirArg,
                                               @"--hide",
                                               [self escapeSpecialCharactersInString:series.showName],
                                               nil];
@@ -1477,14 +1491,14 @@ static NSString *FORCE_RELOAD = @"ForceReload";
             NSPipe *autoRecordPipe = [[NSPipe alloc] init];
             NSFileHandle *readHandle = autoRecordPipe.fileHandleForReading;
 
-            autoRecordTask.launchPath = _perlBinaryPath;
+            autoRecordTask.launchPath = [ApplicationPaths perlBinaryPath];
             autoRecordTask.arguments = autoRecordArgs;
             autoRecordTask.standardOutput = autoRecordPipe;
             NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:autoRecordTask.environment];
             envVariableDictionary[@"HOME"] = (@"~").stringByExpandingTildeInPath;
             envVariableDictionary[@"PERL_UNICODE"] = @"AS";
 
-            envVariableDictionary[@"PATH"] = _perlEnvironmentPath;
+            envVariableDictionary[@"PATH"] = [ApplicationPaths perlEnvironmentPath];
             autoRecordTask.environment = envVariableDictionary;
             [autoRecordTask launch];
             [autoRecordTask waitUntilExit];
@@ -1748,11 +1762,10 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         NSString *path = show.path;
         NSString *ext = path.pathExtension;
         NSString *appName = nil;
-        
-        // Thankfully, TV.app supports the same AppleEvents as iTunes. Use TV.app if present, but if not
-        // try iTunes.app.
+
+        // Prepare everything on background thread
         iTunesApplication *iTunes;
-        
+
         switch (show.type) {
             case ProgrammeTypeRadio:
                 if (!show.podcast) {
@@ -1760,7 +1773,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
                     appName = @"Music";
                 }
                 break;
-                
+
             default:
                 iTunes = [SBApplication applicationWithBundleIdentifier:@"com.apple.TV"];
                 appName = @"TV";
@@ -1772,64 +1785,69 @@ static NSString *FORCE_RELOAD = @"ForceReload";
             appName = @"iTunes";
         }
 
-        // In this case it's a podcast and we're on Catalina or later. Can't do much with it, unfortuantely.
         if (iTunes == nil) {
             show.status = @"Complete: No media app available";
             return;
         }
-        
+
         DDLogInfo(@"Adding %@ to %@", show.showName, appName);
         NSArray *fileToAdd = @[[NSURL fileURLWithPath:path]];
 
-        // Music and TV will not store the track if the app isn't fully up and running when the add command is received.
-        // Launch the app and schedule the add for two seconds after launch.
-        if (!iTunes.running) [iTunes activate];
+        BOOL needsActivation = !iTunes.running;
 
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-        @try
-        {
-            if ([ext isEqualToString:@"mov"] || [ext isEqualToString:@"mp4"] || [ext isEqualToString:@"mp3"] || [ext isEqualToString:@"m4a"])
-            {
-                iTunesTrack *track = [iTunes add:fileToAdd to:nil];
-                DDLogVerbose(@"Track exists = %@", ([track exists] ? @"YES" : @"NO"));
-                if ([track exists] && ([ext isEqualToString:@"mov"] || [ext isEqualToString:@"mp4"]))
-                {
-                    if ([ext isEqualToString:@"mov"])
-                    {
-                        track.name = show.episodeName;
-                        track.episodeID = show.episodeName;
-                        track.show = show.seriesName;
-                        track.artist = show.tvNetwork;
-                        if (show.season>0) track.seasonNumber = show.season;
-                        if (show.episode>0) track.episodeNumber = show.episode;
+        // Launch if needed - this is safe to do from background
+        if (needsActivation) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [iTunes activate];
+            });
+        }
+
+        // Calculate delay
+        NSTimeInterval delay = needsActivation ? 2.0 : 0.0;
+
+        // Sleep on background thread if needed
+        if (delay > 0) {
+            [NSThread sleepForTimeInterval:delay];
+        }
+
+        // Now do the actual add operation on main thread
+        dispatch_async(dispatch_get_main_queue(), ^{
+            @try {
+                if ([ext isEqualToString:@"mov"] || [ext isEqualToString:@"mp4"] ||
+                    [ext isEqualToString:@"mp3"] || [ext isEqualToString:@"m4a"]) {
+
+                    iTunesTrack *track = [iTunes add:fileToAdd to:nil];
+                    DDLogVerbose(@"Track exists = %@", ([track exists] ? @"YES" : @"NO"));
+
+                    if ([track exists] && ([ext isEqualToString:@"mov"] || [ext isEqualToString:@"mp4"])) {
+                        if ([ext isEqualToString:@"mov"]) {
+                            track.name = show.episodeName;
+                            track.episodeID = show.episodeName;
+                            track.show = show.seriesName;
+                            track.artist = show.tvNetwork;
+                            if (show.season > 0) track.seasonNumber = show.season;
+                            if (show.episode > 0) track.episodeNumber = show.episode;
+                        }
+                        [track setUnplayed:YES];
+                        show.status = [NSString stringWithFormat:@"Complete & in %@", appName];
+                    } else if ([track exists] && ([ext isEqualToString:@"mp3"] || [ext isEqualToString:@"m4a"])) {
+                        track.bookmarkable = YES;
+                        track.unplayed = YES;
+                        show.status = [NSString stringWithFormat:@"Complete & in %@", appName];
+                    } else {
+                        DDLogWarn(@"Media app did not accept file.");
+                        DDLogWarn(@"Try dragging the file from the Finder into TV or Music.");
+                        show.status = [NSString stringWithFormat:@"Complete: Not in %@", appName];
                     }
-                    [track setUnplayed:YES];
-                    show.status = [NSString stringWithFormat:@"Complete & in %@", appName];
-                }
-                else if ([track exists] && ([ext isEqualToString:@"mp3"] || [ext isEqualToString:@"m4a"]))
-                {
-                    [track setBookmarkable:YES];
-                    [track setUnplayed:YES];
-                    show.status = [NSString stringWithFormat:@"Complete & in %@", appName];
-                }
-                else
-                {
-                    DDLogWarn(@"Media app did not accept file.");
-                    DDLogWarn(@"Try dragging the file from the Finder into TV or iTunes.");
-                    show.status = [NSString stringWithFormat:@"Complete: Not in %@", appName];
+                } else {
+                    DDLogWarn(@"Can't add %@ file to %@ -- incompatible format.", ext, appName);
+                    show.status = @"Download Complete";
                 }
             }
-            else
-            {
-                DDLogWarn(@"Can't add %@ file to %@ -- incompatible format.", ext, appName);
-                show.status = @"Download Complete";
+            @catch (NSException *e) {
+                DDLogError(@"Unable to add %@ to %@", show, appName);
+                show.status = [NSString stringWithFormat:@"Complete: Not in %@", appName];
             }
-        }
-        @catch (NSException *e)
-        {
-            DDLogError(@"Unable to add %@ to %@", show, appName);
-            show.status = [NSString stringWithFormat:@"Complete: Not in %@", appName];
-        }
         });
     }
 }

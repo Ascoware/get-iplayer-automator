@@ -2,6 +2,7 @@
 //  DownloadHistoryEntry.swift
 //  Get iPlayer Automator
 //
+import Foundation
 
 @objcMembers public class DownloadHistoryEntry : NSObject {
     var pid: String = ""

@@ -162,6 +162,22 @@ import CocoaLumberjackSwift
 
     }
 
+    private class func fetchPageSource(urlString: String) -> String? {
+        guard let url = URL(string: urlString) else { return nil }
+        var request = URLRequest(url: url, timeoutInterval: 15)
+        request.setValue("Mozilla/5.0", forHTTPHeaderField: "User-Agent")
+        var result: String? = nil
+        let semaphore = DispatchSemaphore(value: 0)
+        URLSession.shared.dataTask(with: request) { data, _, _ in
+            if let data = data {
+                result = String(data: data, encoding: .utf8)
+            }
+            semaphore.signal()
+        }.resume()
+        semaphore.wait()
+        return result
+    }
+
     @objc open class func getCurrentWebpage(completion: ([Programme]) -> Void) {
         //Get Default Browser
         guard let browser = UserDefaults.standard.string(forKey: "DefaultBrowser") else {
@@ -186,7 +202,7 @@ import CocoaLumberjackSwift
         case "Safari":
             var safariRunning: SafariApplication? = nil
             let safariTechPreview = SBApplication(bundleIdentifier: "com.apple.SafariTechnologyPreview")
-            
+
             if safariTechPreview?.isRunning ?? false {
                 safariRunning = safariTechPreview
             } else {
@@ -195,7 +211,7 @@ import CocoaLumberjackSwift
                     safariRunning = safariDefault
                 }
             }
-            
+
             guard let safari = safariRunning, let safariWindows = safari.windows?().compactMap({ $0 as? SafariWindow }) else {
                 browserNotOpen.runModal()
                 return
@@ -205,8 +221,8 @@ import CocoaLumberjackSwift
             if let frontWindow = orderedWindows.first,
                let tab = frontWindow.currentTab,
                let url = tab.URL,
-               let name = tab.name,
-               let source = tab.source {
+               let name = tab.name {
+                let source = fetchPageSource(urlString: url) ?? tab.source ?? ""
                 extractMetadata(url: url, tabTitle: name, pageSource: source, completion: completion)
             }
 
@@ -228,11 +244,14 @@ import CocoaLumberjackSwift
             guard let frontWindow = orderedWindows.first,
                   let tab = frontWindow.activeTab,
                   let url = tab.URL,
-                  let title = tab.title,
-                  let source = tab.executeJavascript?("document.documentElement.outerHTML") as? String else {
+                  let title = tab.title else {
                 errorGettingHTML.runModal()
                 return
             }
+
+            let source = fetchPageSource(urlString: url)
+                ?? (tab.executeJavascript?("document.documentElement.outerHTML") as? String)
+                ?? ""
 
             if source.isEmpty {
                 errorGettingHTML.runModal()
@@ -255,14 +274,14 @@ import CocoaLumberjackSwift
         let pipe = Pipe()
         let errorPipe = Pipe();
 
-        task.launchPath = AppController.shared().perlBinaryPath
+        task.launchPath = ApplicationPaths.perlBinaryPath
         let args = [
-            AppController.shared().getiPlayerPath,
-            GetiPlayerArguments.sharedController().noWarningArg,
-            GetiPlayerArguments.sharedController().cacheExpiryArg,
+            ApplicationPaths.getiPlayerPath,
+            GetiPlayerArguments.shared.noWarningArg,
+            GetiPlayerArguments.shared.cacheExpiryArg,
             "--pid-recursive-list",
             url,
-            GetiPlayerArguments.sharedController().profileDirArg
+            GetiPlayerArguments.shared.profileDirArg
             ]
 
         for arg in args {
@@ -276,7 +295,7 @@ import CocoaLumberjackSwift
         var envVariableDictionary = [String : String]()
         envVariableDictionary["HOME"] = NSString("~").expandingTildeInPath
         envVariableDictionary["PERL_UNICODE"] = "AS"
-        envVariableDictionary["PATH"] = AppController.shared().perlEnvironmentPath
+        envVariableDictionary["PATH"] = ApplicationPaths.perlEnvironmentPath
         task.environment = envVariableDictionary
         task.launch()
 

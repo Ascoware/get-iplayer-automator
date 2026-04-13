@@ -8,6 +8,29 @@
 
 @class ChromeApplication, ChromeWindow, ChromeTab, ChromeBookmarkFolder, ChromeBookmarkItem;
 
+@protocol ChromeGenericMethods
+
+- (void) saveIn:(NSURL *)in_ as:(NSString *)as;  // Save an object.
+- (void) close;  // Close a window.
+- (void) delete;  // Delete an object.
+- (SBObject *) duplicateTo:(SBObject *)to withProperties:(NSDictionary *)withProperties;  // Copy object(s) and put the copies at a new location.
+- (SBObject *) moveTo:(SBObject *)to;  // Move object(s) to a new location.
+- (void) print;  // Print an object.
+- (void) reload;  // Reload a tab.
+- (void) goBack;  // Go Back (If Possible).
+- (void) goForward;  // Go Forward (If Possible).
+- (void) selectAll;  // Select all.
+- (void) cutSelection;  // Cut selected text (If Possible).
+- (void) copySelection;  // Copy text.
+- (void) pasteSelection;  // Paste text (If Possible).
+- (void) undo;  // Undo the last change.
+- (void) redo;  // Redo the last change.
+- (void) stop;  // Stop the current tab from loading.
+- (void) viewSource;  // View the HTML source of the tab.
+- (id) executeJavascript:(NSString *)javascript;  // Execute a piece of javascript.
+
+@end
+
 
 
 /*
@@ -17,25 +40,26 @@
 // The application's top-level scripting object.
 @interface ChromeApplication : SBApplication
 
-@property (nonatomic, readonly, copy) SBElementArray *windows;
+- (SBElementArray<ChromeWindow *> *) windows;
 
 @property (copy, readonly) NSString *name;  // The name of the application.
 @property (readonly) BOOL frontmost;  // Is this the frontmost (active) application?
 @property (copy, readonly) NSString *version;  // The version of the application.
 
-- (void) open:(NSArray *)x;  // Open a document.
+- (void) open:(NSArray<NSURL *> *)x;  // Open a document.
 - (void) quit;  // Quit the application.
 - (BOOL) exists:(id)x;  // Verify if an object exists.
 
 @end
 
 // A window.
-@interface ChromeWindow : SBObject
+@interface ChromeWindow : SBObject <ChromeGenericMethods>
 
-@property (nonatomic, readonly, copy) SBElementArray *tabs;
+- (SBElementArray<ChromeTab *> *) tabs;
 
+@property (copy) NSString *givenName;  // The given name of the window.
 @property (copy, readonly) NSString *name;  // The full title of the window.
-@property (nonatomic, readonly) NSInteger id;  // The unique identifier of the window.
+- (NSString *) id;  // The unique identifier of the window.
 @property NSInteger index;  // The index of the window, ordered front to back.
 @property NSRect bounds;  // The bounding rectangle of the window.
 @property (readonly) BOOL closeable;  // Whether the window has a close box.
@@ -49,26 +73,6 @@
 @property (copy) NSString *mode;  // Represents the mode of the window which can be 'normal' or 'incognito', can be set only once during creation of the window.
 @property NSInteger activeTabIndex;  // The index of the active tab.
 
-- (void) saveIn:(NSURL *)in_ as:(NSString *)as;  // Save an object.
-- (void) close;  // Close a window.
-- (void) delete;  // Delete an object.
-- (SBObject *) duplicateTo:(SBObject *)to withProperties:(NSDictionary *)withProperties;  // Copy object(s) and put the copies at a new location.
-- (SBObject *) moveTo:(SBObject *)to;  // Move object(s) to a new location.
-- (void) print;  // Print an object.
-- (void) reload;  // Reload a tab.
-- (void) goBack;  // Go Back (If Possible).
-- (void) goForward;  // Go Forward (If Possible).
-- (void) selectAll;  // Select all.
-- (void) cutSelection;  // Cut selected text (If Possible).
-- (void) copySelection;  // Copy text.
-- (void) pasteSelection;  // Paste text (If Possible).
-- (void) undo;  // Undo the last change.
-- (void) redo;  // Redo the last change.
-- (void) stop;  // Stop the current tab from loading.
-- (void) viewSource;  // View the HTML source of the tab.
-- (id) executeJavascript:(NSString *)javascript;  // Execute a piece of javascript.
-- (void) enterPresentationMode;  // Enter presentation mode in window.
-- (void) exitPresentationMode;  // Exit presentation mode in window.
 
 @end
 
@@ -81,7 +85,7 @@
 // The application's top-level scripting object.
 @interface ChromeApplication (ChromiumSuite)
 
-@property (nonatomic, readonly, copy) SBElementArray *bookmarkFolders;
+- (SBElementArray<ChromeBookmarkFolder *> *) bookmarkFolders;
 
 @property (copy, readonly) ChromeBookmarkFolder *bookmarksBar;  // The bookmarks bar bookmark folder.
 @property (copy, readonly) ChromeBookmarkFolder *otherBookmarks;  // The other bookmarks bookmark folder.
@@ -89,103 +93,37 @@
 @end
 
 // A tab.
-@interface ChromeTab : SBObject
+@interface ChromeTab : SBObject <ChromeGenericMethods>
 
-@property (nonatomic, readonly) NSInteger id;  // Unique ID of the tab.
+- (NSString *) id;  // Unique ID of the tab.
 @property (copy, readonly) NSString *title;  // The title of the tab.
 @property (copy) NSString *URL;  // The url visible to the user.
 @property (readonly) BOOL loading;  // Is loading?
 
-- (void) saveIn:(NSURL *)in_ as:(NSString *)as;  // Save an object.
-- (void) close;  // Close a window.
-- (void) delete;  // Delete an object.
-- (SBObject *) duplicateTo:(SBObject *)to withProperties:(NSDictionary *)withProperties;  // Copy object(s) and put the copies at a new location.
-- (SBObject *) moveTo:(SBObject *)to;  // Move object(s) to a new location.
-- (void) print;  // Print an object.
-- (void) reload;  // Reload a tab.
-- (void) goBack;  // Go Back (If Possible).
-- (void) goForward;  // Go Forward (If Possible).
-- (void) selectAll;  // Select all.
-- (void) cutSelection;  // Cut selected text (If Possible).
-- (void) copySelection;  // Copy text.
-- (void) pasteSelection;  // Paste text (If Possible).
-- (void) undo;  // Undo the last change.
-- (void) redo;  // Redo the last change.
-- (void) stop;  // Stop the current tab from loading.
-- (void) viewSource;  // View the HTML source of the tab.
-- (id) executeJavascript:(NSString *)javascript;  // Execute a piece of javascript.
-- (void) enterPresentationMode;  // Enter presentation mode in window.
-- (void) exitPresentationMode;  // Exit presentation mode in window.
 
 @end
 
 // A bookmarks folder that contains other bookmarks folder and bookmark items.
-@interface ChromeBookmarkFolder : SBObject
+@interface ChromeBookmarkFolder : SBObject <ChromeGenericMethods>
 
-@property (nonatomic, readonly, copy) SBElementArray *bookmarkFolders;
-@property (nonatomic, readonly, copy) SBElementArray *bookmarkItems;
+- (SBElementArray<ChromeBookmarkFolder *> *) bookmarkFolders;
+- (SBElementArray<ChromeBookmarkItem *> *) bookmarkItems;
 
-@property (nonatomic, readonly, copy) NSNumber *id;  // Unique ID of the bookmark folder.
+- (NSString *) id;  // Unique ID of the bookmark folder.
 @property (copy) NSString *title;  // The title of the folder.
-@property (copy, readonly) NSNumber *index;  // Returns the index with respect to its parent bookmark folder
+@property (copy, readonly) NSNumber *index;  // Returns the index with respect to its parent bookmark folder.
 
-- (void) saveIn:(NSURL *)in_ as:(NSString *)as;  // Save an object.
-- (void) close;  // Close a window.
-- (void) delete;  // Delete an object.
-- (SBObject *) duplicateTo:(SBObject *)to withProperties:(NSDictionary *)withProperties;  // Copy object(s) and put the copies at a new location.
-- (SBObject *) moveTo:(SBObject *)to;  // Move object(s) to a new location.
-- (void) print;  // Print an object.
-- (void) reload;  // Reload a tab.
-- (void) goBack;  // Go Back (If Possible).
-- (void) goForward;  // Go Forward (If Possible).
-- (void) selectAll;  // Select all.
-- (void) cutSelection;  // Cut selected text (If Possible).
-- (void) copySelection;  // Copy text.
-- (void) pasteSelection;  // Paste text (If Possible).
-- (void) undo;  // Undo the last change.
-- (void) redo;  // Redo the last change.
-- (void) stop;  // Stop the current tab from loading.
-- (void) viewSource;  // View the HTML source of the tab.
-- (id) executeJavascript:(NSString *)javascript;  // Execute a piece of javascript.
-- (void) enterPresentationMode;  // Enter presentation mode in window.
-- (void) exitPresentationMode;  // Exit presentation mode in window.
 
 @end
 
 // An item consists of an URL and the title of a bookmark
-@interface ChromeBookmarkItem : SBObject
+@interface ChromeBookmarkItem : SBObject <ChromeGenericMethods>
 
-@property (nonatomic, readonly) NSInteger id;  // Unique ID of the bookmark item.
+- (NSString *) id;  // Unique ID of the bookmark item.
 @property (copy) NSString *title;  // The title of the bookmark item.
 @property (copy) NSString *URL;  // The URL of the bookmark.
-@property (copy, readonly) NSNumber *index;  // Returns the index with respect to its parent bookmark folder
+@property (copy, readonly) NSNumber *index;  // Returns the index with respect to its parent bookmark folder.
 
-- (void) saveIn:(NSURL *)in_ as:(NSString *)as;  // Save an object.
-- (void) close;  // Close a window.
-- (void) delete;  // Delete an object.
-- (SBObject *) duplicateTo:(SBObject *)to withProperties:(NSDictionary *)withProperties;  // Copy object(s) and put the copies at a new location.
-- (SBObject *) moveTo:(SBObject *)to;  // Move object(s) to a new location.
-- (void) print;  // Print an object.
-- (void) reload;  // Reload a tab.
-- (void) goBack;  // Go Back (If Possible).
-- (void) goForward;  // Go Forward (If Possible).
-- (void) selectAll;  // Select all.
-- (void) cutSelection;  // Cut selected text (If Possible).
-- (void) copySelection;  // Copy text.
-- (void) pasteSelection;  // Paste text (If Possible).
-- (void) undo;  // Undo the last change.
-- (void) redo;  // Redo the last change.
-- (void) stop;  // Stop the current tab from loading.
-- (void) viewSource;  // View the HTML source of the tab.
-- (id) executeJavascript:(NSString *)javascript;  // Execute a piece of javascript.
-- (void) enterPresentationMode;  // Enter presentation mode in window.
-- (void) exitPresentationMode;  // Exit presentation mode in window.
-
-@end
-
-@interface ChromeWindow (ChromiumSuite)
-
-@property (readonly) BOOL presenting;  // Whether the window is in presentation mode.
 
 @end
 

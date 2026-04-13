@@ -2,6 +2,95 @@
 Get iPlayer Automator allows you to let Apple's TV app and your Mac to become the hub for your British television experience regardless of where in the world you are.  Get iPlayer Automator allows you to download and watch BBC and STV (Scottish version of ITV) shows on your Mac. Series-Link/PVR functionality ensures you will never miss your favourite shows. Programmes are fully tagged and added to TV.app or Music.app automatically upon completion. It is simple and easy to use, and runs on any machine running Mac OS X 10.10 or later.  And since the shows are in TV or Music, it is extremely easy to transfer them to your iPhone or Apple TV allowing you to enjoy your shows on the go or on your television.
 The current release is 1.26.1. [Download it here.](https://github.com/Ascoware/get-iplayer-automator/releases)
 
+---
+
+## Building and releasing
+
+### Prerequisites
+
+Three sibling repositories must be checked out at the same level:
+
+```
+~/src/
+  get-iplayer-automator/   ← this repo
+  get_iplayer_macos/       ← build system for Perl/dylibs/utils
+  get_iplayer/             ← upstream get_iplayer source
+```
+
+App dependencies are managed via Swift Package Manager and resolved automatically when you open the project in Xcode.
+
+### 1. Populate Binaries/
+
+`Binaries/` is not tracked in git. Run the Makefile before building the app:
+
+```sh
+# Full build — ~30 min on first run (compiles Perl, OpenSSL, libxml2, ffmpeg, AtomicParsley)
+make binaries
+
+# Individual targets (useful when only one thing has changed)
+make install-perl    # rebuild Perl 5.40 + dylibs (universal arm64+x86_64)
+make install-utils   # rebuild AtomicParsley + ffmpeg (universal)
+make gip             # re-fetch and re-patch get_iplayer scripts only (fast)
+make yt-dlp          # download latest yt-dlp standalone binary from GitHub
+```
+
+To pin a specific yt-dlp release:
+```sh
+make yt-dlp YT_DLP_URL=https://github.com/yt-dlp/yt-dlp/releases/download/YYYY.MM.DD/yt-dlp_macos
+```
+
+To use a specific get_iplayer tag:
+```sh
+make gip GIP_TAG=v3.36
+```
+
+### 2. Bump the build number
+
+```sh
+./bump_build.sh
+```
+
+This increments the `CFBundleVersion` in `Info.plist` (format: `YYYYMMDDNNN`). Commit `Info.plist` if you want the build number tracked.
+
+### 3. Build, notarize, and package
+
+```sh
+./release.sh
+```
+
+This script:
+1. Archives the app with `xcodebuild`
+2. Exports the archive using `ExportOptions.plist`
+3. Zips the app as `Product/Get iPlayer Automator.v<version>.b<build>.zip`
+4. Notarizes via `xcrun notarytool` (uses the keychain profile `get-iplayer-automator-notary`)
+5. Staples the notarization ticket and re-zips
+
+The notarytool keychain profile must be set up in advance:
+```sh
+xcrun notarytool store-credentials "get-iplayer-automator-notary" \
+  --apple-id <your-apple-id> --team-id <team-id>
+```
+
+### 4. Upload to GitHub
+
+Upload `Product/Get iPlayer Automator.v<version>.b<build>.zip` as a GitHub release asset.
+
+### Custom get_iplayer changes
+
+Local modifications to the `get_iplayer` script are maintained as `get_iplayer_custom.patch`. If you need to update the patch after making new changes to `Binaries/get_iplayer/perl/bin/get_iplayer`:
+
+```sh
+cp ../get_iplayer/get_iplayer /tmp/get_iplayer_upstream
+diff -u /tmp/get_iplayer_upstream Binaries/get_iplayer/perl/bin/get_iplayer \
+  | sed 's|^--- /tmp/get_iplayer_upstream\t|--- get_iplayer\t|
+         s|^+++ Binaries/get_iplayer/perl/bin/get_iplayer\t|+++ get_iplayer\t|' \
+  | grep -v '^[+-]#!' \
+  | grep -v '^[+-]my \$version_text\|^[+-]my \$VERSION_TEXT' \
+  > get_iplayer_custom.patch
+```
+
+---
+
 ### What if I find a bug?
 [Start here.](https://github.com/Ascoware/get-iplayer-automator/wiki/Reporting-Issues)
 
@@ -38,7 +127,7 @@ Removed unnecessary recoding of DASH streams (#256)
 Set MOJO_INSECURE option that may fix 500 errors when downloading (#233, #254)
 
 ##### 1.16.1
-Get iPlayer Automator is now ready for use on macOS Catalina (10.15)! TV programs will be added to TV.app, and radio programs will be added to Music.app. Due to a bug in macOS shows tagged as podcasts will open in Music.app but can't be played. Also, because it was ported from iOS, Podcasts.app is not scriptable and cannot accept externally created m4a files. As a result, if you use the "Tag radio programmes as podcasts" your only option right now is to use QuickTime Player.app, or turn off this checkbox and play them through Music.app. We hope this bug is fixed in a future version of macOS. 
+Get iPlayer Automator is now ready for use on macOS Catalina (10.15)! TV programs will be added to TV.app, and radio programs will be added to Music.app. Due to a bug in macOS shows tagged as podcasts will open in Music.app but can't be played. Also, because it was ported from iOS, Podcasts.app is not scriptable and cannot accept externally created m4a files. As a result, if you use the "Tag radio programmes as podcasts" your only option right now is to use QuickTime Player.app, or turn off this checkbox and play them through Music.app. We hope this bug is fixed in a future version of macOS.
 
 ##### 1.16
 Updated to get_iplayer 3.22. See the release notes for more information.

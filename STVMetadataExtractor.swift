@@ -35,42 +35,43 @@ class STVMetadataExtractor {
                 let propertiesJSON = JSON(parseJSON: propertiesContent)
                 let propsDict = propertiesJSON["props"].dictionaryValue
                 if let pageProps = propsDict["pageProps"] {
-                    newProgram.pid = pageProps["episodeId"].stringValue
-                    let episodesKey = "/episodes/\(newProgram.pid)"
-                    if let showData = propsDict["initialReduxState"]?["playerApiCache"][episodesKey]["results"] {
-                        if showData.isEmpty {
-                            DDLogError("**** No metadata found")
-                            throw STVMetadataError.noMetadataFound
-                        }
-                        
-                        let protectedMedia = showData["programme"]["drmEnabled"].boolValue
+                    let episodeInfo = pageProps["episodeInfo"]
+                    // episodeInfo.episodeId is a JSON string; pageProps.episodeId is an integer — use the string version
+                    newProgram.pid = episodeInfo["episodeId"].stringValue
 
+                    // Primary metadata from episodeInfo — always present on first page load
+                    newProgram.seriesName = episodeInfo["name"].stringValue
+                    newProgram.episodeName = episodeInfo["title"].stringValue
+                    let startTime = episodeInfo["startTime"].stringValue
+                    newProgram.lastBroadcast = longDateFormatter.date(from: startTime)
+                    if let lastAirDate = newProgram.lastBroadcast {
+                        newProgram.lastBroadcastString = DateFormatter.localizedString(from: lastAirDate, dateStyle: .medium, timeStyle: .none)
+                    }
+
+                    // episodeInfo.summary is the episode description; pageProps.summary is the series description
+                    let rawDesc = episodeInfo["summary"].string ?? pageProps["summary"].string ?? "None available"
+                    newProgram.desc = rawDesc.filter { !$0.isNewline }
+
+                    // Supplement with playerApiCache if available (series/episode numbers and DRM check)
+                    let episodesKey = "/episodes/\(newProgram.pid)"
+                    if let showData = propsDict["initialReduxState"]?["playerApiCache"][episodesKey]["results"],
+                       !showData.isEmpty {
+                        let protectedMedia = showData["programme"]["drmEnabled"].boolValue
                         if protectedMedia {
                             DDLogError("**** DRM protected media - bailing out")
                             throw STVMetadataError.drmProtectedError
                         }
 
-                        newProgram.seriesName = showData["programme"]["name"].stringValue
-                        newProgram.episodeName = showData["title"].stringValue
                         let seriesString = showData["playerSeries"]["name"].stringValue
-
-                        let seriesComponents = seriesString.components(separatedBy: .whitespacesAndNewlines)
-                        for item in seriesComponents {
+                        for item in seriesString.components(separatedBy: .whitespacesAndNewlines) {
                             if let number = Int(item) {
                                 newProgram.season = number
                             }
                         }
-
                         newProgram.episode = showData["number"].intValue
-                        let startTime = showData["schedule"]["startTime"].stringValue
-                        newProgram.lastBroadcast = longDateFormatter.date(from: startTime)
-                        if let lastAirDate = newProgram.lastBroadcast {
-                            newProgram.lastBroadcastString = DateFormatter.localizedString(from: lastAirDate, dateStyle: .medium, timeStyle: .none)
-                        }
                     }
+
                     newProgram.url = pageProps["currentUrl"].stringValue
-                    let rawDesc = pageProps["summary"].string ?? "None available"
-                    newProgram.desc = rawDesc.filter { !$0.isNewline }
                     newProgram.thumbnailURLString = pageProps["image"].stringValue
                 }
             }
