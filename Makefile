@@ -87,6 +87,7 @@ gip: $(PERL_BIN)/get_iplayer
 # ── Download yt-dlp standalone binary ─────────────────────────────────────
 
 $(YT_DLP_BIN):
+	@rm -rf $(YT_DLP_BIN)
 	@curl -L -o $(YT_DLP_BIN) $(YT_DLP_URL)
 	@chmod +x $(YT_DLP_BIN)
 	@echo "downloaded yt-dlp"
