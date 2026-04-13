@@ -5,6 +5,14 @@ PROJECT_DIR=$(pwd)
 INFOPLIST_FILE="Info.plist"
 PUBLISH=0
 
+# Sparkle sign_update tool (from SPM artifacts)
+SIGN_UPDATE=$(find ~/Library/Developer/Xcode/DerivedData -name "sign_update" \
+    -path "*/artifacts/sparkle/Sparkle/bin/*" 2>/dev/null | head -1)
+if [ -z "$SIGN_UPDATE" ]; then
+    echo "ERROR: Sparkle sign_update tool not found. Build the project in Xcode first."
+    exit 1
+fi
+
 for arg in "$@"; do
     case "$arg" in
         --publish) PUBLISH=1 ;;
@@ -42,6 +50,13 @@ mv tmp-"$PROJECT_NAME.app" "$PROJECT_NAME.app"
 
 ditto -c -k --keepParent -rsrc "$PROJECT_NAME.app" "$ARCHIVE_NAME"
 
+# ── Sign the zip for Sparkle ───────────────────────────────────────────────
+
+SIGN_OUTPUT=$("$SIGN_UPDATE" "$ARCHIVE_NAME")
+ED_SIGNATURE=$(echo "$SIGN_OUTPUT" | grep -o 'sparkle:edSignature="[^"]*"' | cut -d'"' -f2)
+ZIP_LENGTH=$(echo "$SIGN_OUTPUT" | grep -o 'length="[^"]*"' | cut -d'"' -f2)
+echo "Sparkle signature: $ED_SIGNATURE  length: $ZIP_LENGTH"
+
 # ── Optional publish step ──────────────────────────────────────────────────
 
 if [ "$PUBLISH" -eq 1 ]; then
@@ -66,6 +81,9 @@ if [ "$PUBLISH" -eq 1 ]; then
     git push origin "$TAG"
 
     # Create draft release and upload zip
+    ENCODED_ARCHIVE=$(python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1]))" "$ARCHIVE_NAME")
+    DOWNLOAD_URL="https://github.com/${REPO}/releases/download/${TAG}/${ENCODED_ARCHIVE}"
+
     gh release create "$TAG" \
         --repo "$REPO" \
         --title "$TAG: $RELEASE_TITLE" \
@@ -73,7 +91,41 @@ if [ "$PUBLISH" -eq 1 ]; then
         --draft \
         "Product/$ARCHIVE_NAME"
 
+    # ── Update appcast on gh-pages ─────────────────────────────────────────
+    PUB_DATE=$(date -u "+%a, %d %b %Y %H:%M:%S +0000")
+    NEW_ITEM="        <item>
+            <title>${TAG}</title>
+            <pubDate>${PUB_DATE}</pubDate>
+            <sparkle:minimumSystemVersion>10.13.0</sparkle:minimumSystemVersion>
+            <enclosure
+                url=\"${DOWNLOAD_URL}\"
+                sparkle:version=\"${CFBundleVersion}\"
+                sparkle:shortVersionString=\"${CFBundleShortVersionString}\"
+                sparkle:edSignature=\"${ED_SIGNATURE}\"
+                length=\"${ZIP_LENGTH}\"
+                type=\"application/octet-stream\" />
+        </item>"
+
+    git checkout gh-pages
+    for APPCAST in appcast.xml appcast_pre.xml; do
+        # Insert new item after <channel> opening tags (before first <item>)
+        python3 - "$APPCAST" "$NEW_ITEM" <<'PYEOF'
+import sys, re
+path, item = sys.argv[1], sys.argv[2]
+content = open(path).read()
+# Insert before the first <item>
+updated = content.replace('<item>', item + '\n        <item>', 1)
+open(path, 'w').write(updated)
+PYEOF
+    done
+
+    git add appcast.xml appcast_pre.xml
+    git commit -m "release: ${TAG}"
+    git push origin gh-pages
+    git checkout master
+
     echo ""
     echo "Draft release created: https://github.com/${REPO}/releases"
-    echo "Review and publish it at the URL above."
+    echo "Appcast updated on gh-pages."
+    echo "Review and publish the draft release at the URL above."
 fi

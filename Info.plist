@@ -43,6 +43,8 @@
 	<string>NO</string>
 	<key>SUEnableAutomaticChecks</key>
 	<string>YES</string>
+	<key>SUPublicEDKey</key>
+	<string>sAIG8Dk79oUt4qjqwKS1jU29GqdVDwxdvAWdPSygK94=</string>
 	<key>SUFeedURL</key>
 	<string>https://ascoware.github.io/get-iplayer-automator/appcast.xml</string>
 </dict>
