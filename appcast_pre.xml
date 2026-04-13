@@ -1,4 +1,20 @@
----
-release_only: false
----
-{%include appcast.inc %}
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <channel>
+        <title>Get iPlayer Automator</title>
+        <description>Most recent changes with links to updates.</description>
+        <language>en</language>
+        <item>
+            <title>v1.28.0</title>
+            <pubDate>Sat, 12 Apr 2026 00:00:00 +0000</pubDate>
+            <sparkle:minimumSystemVersion>10.13.0</sparkle:minimumSystemVersion>
+            <enclosure
+                url="https://github.com/Ascoware/get-iplayer-automator/releases/download/v1.28.0/Get%20iPlayer%20Automator.v1.28.0.b20260412002.zip"
+                sparkle:version="20260412002"
+                sparkle:shortVersionString="1.28.0"
+                sparkle:edSignature="aozove5t+ARlifojs0inXfX0NXrH4At5KmrjuuZBm5aIRPVVsq8F0yMEh0LUYGX/DW5TZtYmOkuQblEAoptCCQ=="
+                length="118575448"
+                type="application/octet-stream" />
+        </item>
+    </channel>
+</rss>
