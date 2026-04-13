@@ -20,6 +20,12 @@ for arg in "$@"; do
     esac
 done
 
+# ── Populate Binaries/ ────────────────────────────────────────────────────
+
+make binaries
+
+# ── Build ─────────────────────────────────────────────────────────────────
+
 rm -rf Archive/*
 rm -rf Product/*
 
