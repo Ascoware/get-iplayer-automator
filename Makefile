@@ -49,7 +49,7 @@ install-perl: perl-libs
 rpath-fixup:
 	@echo "Fixing bundle rpaths for macOS app context..."
 	@find $(PERL_LIB) -name "*.bundle" | while IFS= read -r b; do \
-	  if ! otool -L "$$b" | grep -q "@rpath"; then continue; fi; \
+	  if ! otool -L "$$b" | grep -q "@rpath\|/opt/local\|/usr/local/lib\|/opt/homebrew"; then continue; fi; \
 	  arm64_tmp=$$(mktemp) && x86_tmp=$$(mktemp); \
 	  lipo -thin arm64  -output "$$arm64_tmp" "$$b" && \
 	  lipo -thin x86_64 -output "$$x86_tmp"  "$$b" || { rm -f "$$arm64_tmp" "$$x86_tmp"; continue; }; \
@@ -60,6 +60,11 @@ rpath-fixup:
 	        install_name_tool -delete_rpath "$$rp" "$$slice" 2>/dev/null || true; \
 	      done; \
 	    install_name_tool -add_rpath "$(BUNDLE_RPATH)" "$$slice" 2>/dev/null || true; \
+	    otool -L "$$slice" | awk '/\/(opt\/local|usr\/local\/lib|opt\/homebrew)\// {print $$1}' | \
+	      while IFS= read -r abslib; do \
+	        libname=$$(basename "$$abslib"); \
+	        install_name_tool -change "$$abslib" "@rpath/$$libname" "$$slice" 2>/dev/null || true; \
+	      done; \
 	  done; \
 	  chmod +w "$$b"; \
 	  lipo -create "$$arm64_tmp" "$$x86_tmp" -output "$$b"; \
