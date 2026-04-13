@@ -231,7 +231,7 @@ import CocoaLumberjackSwift
         task?.arguments = args
         let extraBinaryPath = ApplicationPaths.extraBinariesPath
         var envVariableDictionary = [String : String]()
-        envVariableDictionary["PATH"] = "\(youtubeDLFolder):\(extraBinaryPath)"
+        envVariableDictionary["PATH"] = "\(extraBinaryPath)"
         envVariableDictionary["SSL_CERT_FILE"] = cacertFile.path
         task?.environment = envVariableDictionary
         DDLogVerbose("DEBUG: youtube-dl environment: \(envVariableDictionary)")

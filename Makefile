@@ -32,8 +32,43 @@ utils:
 
 # ── Install Perl + dylibs + utils into Binaries/ ───────────────────────────
 
+BUNDLE_RPATH      := @executable_path/../Resources/get_iplayer/perl/dylib
+PERL_LIB          := Binaries/get_iplayer/perl/lib
+
 install-perl: perl-libs
 	$(MAKE) -C $(GIP_MACOS) perl-install
+	@$(MAKE) rpath-fixup
+
+# Fix .bundle rpaths for the macOS app context.
+#
+# relocatable-perl sets @executable_path/../dylib which works when perl is the
+# process (e.g. the .pkg installer).  In the macOS app, @executable_path is the
+# app binary (Contents/MacOS/), so we need the full Resources-relative path.
+#
+# arm64 and x86_64 slices can have different rpaths (arm64 native build vs
+# x86_64 Rosetta build), so we thin each bundle, fix per-arch, then relipo.
+rpath-fixup:
+	@echo "Fixing bundle rpaths for macOS app context..."
+	@find $(PERL_LIB) -name "*.bundle" | while IFS= read -r b; do \
+	  if ! otool -L "$$b" | grep -q "@rpath"; then continue; fi; \
+	  arm64_tmp=$$(mktemp) && x86_tmp=$$(mktemp); \
+	  lipo -thin arm64  -output "$$arm64_tmp" "$$b" && \
+	  lipo -thin x86_64 -output "$$x86_tmp"  "$$b" || { rm -f "$$arm64_tmp" "$$x86_tmp"; continue; }; \
+	  chmod +w "$$arm64_tmp" "$$x86_tmp"; \
+	  for slice in "$$arm64_tmp" "$$x86_tmp"; do \
+	    otool -l "$$slice" | awk '/LC_RPATH/{f=1} f && /^ +path /{print $$2; f=0}' | \
+	      while IFS= read -r rp; do \
+	        install_name_tool -delete_rpath "$$rp" "$$slice" 2>/dev/null || true; \
+	      done; \
+	    install_name_tool -add_rpath "$(BUNDLE_RPATH)" "$$slice" 2>/dev/null || true; \
+	  done; \
+	  chmod +w "$$b"; \
+	  lipo -create "$$arm64_tmp" "$$x86_tmp" -output "$$b"; \
+	  chmod -w "$$b"; \
+	  rm -f "$$arm64_tmp" "$$x86_tmp"; \
+	  echo "  fixed $$(basename $$b)"; \
+	done
+	@echo "rpath fixup done"
 
 install-utils: utils
 	$(MAKE) -C $(GIP_MACOS) utils-install
@@ -64,4 +99,4 @@ yt-dlp: $(YT_DLP_BIN)
 binaries: install-perl install-utils gip yt-dlp
 	@echo "Binaries/ ready"
 
-.PHONY: perl-libs utils install-perl install-utils gip yt-dlp binaries
+.PHONY: perl-libs utils install-perl rpath-fixup install-utils gip yt-dlp binaries
