@@ -196,5 +196,8 @@ Archive
 # Auth keys
 
 *.p8
-Binaries/get_iplayer/
-Binaries/yt-dlp_macos
+
+####
+# Make sure we don't commit any binaries.
+Binaries/
+
