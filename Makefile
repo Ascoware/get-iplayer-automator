@@ -32,21 +32,20 @@ utils:
 
 # ── Install Perl + dylibs + utils into Binaries/ ───────────────────────────
 
-BUNDLE_RPATH      := @executable_path/../Resources/get_iplayer/perl/dylib
+BUNDLE_RPATH      := @executable_path/../dylib
 PERL_LIB          := Binaries/get_iplayer/perl/lib
 
 install-perl: perl-libs
 	$(MAKE) -C $(GIP_MACOS) perl-install
 	@$(MAKE) rpath-fixup
 
-# Fix .bundle rpaths for the macOS app context.
+# Ensure .bundle rpath is @executable_path/../dylib on both arch slices.
 #
-# relocatable-perl sets @executable_path/../dylib which works when perl is the
-# process (e.g. the .pkg installer).  In the macOS app, @executable_path is the
-# app binary (Contents/MacOS/), so we need the full Resources-relative path.
-#
-# arm64 and x86_64 slices can have different rpaths (arm64 native build vs
-# x86_64 Rosetta build), so we thin each bundle, fix per-arch, then relipo.
+# relocatable-perl sets this correctly for the x86_64 build.  The arm64 slice
+# (built natively) sometimes ends up with a stale absolute Conan build path
+# instead.  arm64 and x86_64 can diverge, so we thin each bundle, normalise
+# the rpath per-arch, then relipo.  @executable_path is the perl binary at
+# Contents/Resources/get_iplayer/perl/bin/, so ../dylib resolves correctly.
 rpath-fixup:
 	@echo "Fixing bundle rpaths for macOS app context..."
 	@find $(PERL_LIB) -name "*.bundle" | while IFS= read -r b; do \
