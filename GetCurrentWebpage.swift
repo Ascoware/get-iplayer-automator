@@ -11,7 +11,7 @@ import CocoaLumberjackSwift
 
 @objc public class GetCurrentWebpage : NSObject {
     
-    private class func extractMetadata(url: String, tabTitle: String, pageSource: String, completion: @escaping ([Programme]) -> Void) {
+    private class func extractMetadata(url: String, tabTitle: String, pageSource: String, completion: ([Programme]) -> Void) {
         if url.hasPrefix("https://www.bbc.co.uk/iplayer/episode/") {
             // PID is always the second-to-last element in the URL.
             let show = Programme()
@@ -162,7 +162,23 @@ import CocoaLumberjackSwift
 
     }
 
-    @objc open class func getCurrentWebpage(completion: @escaping ([Programme]) -> Void) {
+    private class func fetchPageSource(urlString: String) -> String? {
+        guard let url = URL(string: urlString) else { return nil }
+        var request = URLRequest(url: url, timeoutInterval: 15)
+        request.setValue("Mozilla/5.0", forHTTPHeaderField: "User-Agent")
+        var result: String? = nil
+        let semaphore = DispatchSemaphore(value: 0)
+        URLSession.shared.dataTask(with: request) { data, _, _ in
+            if let data = data {
+                result = String(data: data, encoding: .utf8)
+            }
+            semaphore.signal()
+        }.resume()
+        semaphore.wait()
+        return result
+    }
+
+    @objc open class func getCurrentWebpage(completion: ([Programme]) -> Void) {
         //Get Default Browser
         guard let browser = UserDefaults.standard.string(forKey: "DefaultBrowser") else {
             return
@@ -174,6 +190,12 @@ import CocoaLumberjackSwift
         browserNotOpen.messageText = "\(browser) is not open."
         browserNotOpen.informativeText = "Please ensure your browser is running and has at least one window open."
         browserNotOpen.alertStyle = .warning
+
+        let errorGettingHTML = NSAlert()
+        errorGettingHTML.addButton(withTitle: "OK")
+        errorGettingHTML.messageText = "Couldn't get web page content."
+        errorGettingHTML.informativeText = "Something went wrong when trying to get the web page content. Check your browser settings."
+        errorGettingHTML.alertStyle = .warning
 
         //Get URL
         switch (browser) {
@@ -198,17 +220,10 @@ import CocoaLumberjackSwift
             let orderedWindows = safariWindows.sorted { $0.index! < $1.index! }
             if let frontWindow = orderedWindows.first,
                let tab = frontWindow.currentTab,
-               let urlString = tab.URL,
-               let name = tab.name,
-               let pageURL = URL(string: urlString) {
-                Task { @MainActor in
-                    var request = URLRequest(url: pageURL)
-                    request.addValue("Mozilla/5.0", forHTTPHeaderField: "User-Agent")
-                    if let (data, _) = try? await URLSession.shared.data(for: request),
-                       let html = String(data: data, encoding: .utf8) {
-                        extractMetadata(url: urlString, tabTitle: name, pageSource: html, completion: completion)
-                    }
-                }
+               let url = tab.URL,
+               let name = tab.name {
+                let source = fetchPageSource(urlString: url) ?? tab.source ?? ""
+                extractMetadata(url: url, tabTitle: name, pageSource: source, completion: completion)
             }
 
         case "Chrome", "Microsoft Edge", "Vivaldi", "Brave":
@@ -226,20 +241,24 @@ import CocoaLumberjackSwift
             }
 
             let orderedWindows = chromeWindows.sorted { $0.index! < $1.index! }
-            if let frontWindow = orderedWindows.first,
-               let tab = frontWindow.activeTab,
-               let urlString = tab.URL,
-               let title = tab.title,
-               let pageURL = URL(string: urlString) {
-                Task { @MainActor in
-                    var request = URLRequest(url: pageURL)
-                    request.addValue("Mozilla/5.0", forHTTPHeaderField: "User-Agent")
-                    if let (data, _) = try? await URLSession.shared.data(for: request),
-                       let html = String(data: data, encoding: .utf8) {
-                        extractMetadata(url: urlString, tabTitle: title, pageSource: html, completion: completion)
-                    }
-                }
+            guard let frontWindow = orderedWindows.first,
+                  let tab = frontWindow.activeTab,
+                  let url = tab.URL,
+                  let title = tab.title else {
+                errorGettingHTML.runModal()
+                return
             }
+
+            let source = fetchPageSource(urlString: url)
+                ?? (tab.executeJavascript?("document.documentElement.outerHTML") as? String)
+                ?? ""
+
+            if source.isEmpty {
+                errorGettingHTML.runModal()
+                return
+            }
+
+            extractMetadata(url: url, tabTitle: title, pageSource: source, completion: completion)
 
         default:
             let unsupportedBrowser = NSAlert()
