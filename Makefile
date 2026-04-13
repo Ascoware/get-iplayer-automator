@@ -1,9 +1,10 @@
-# Populate Binaries/get_iplayer/ before building a release:
+# Populate Binaries/ before building a release:
 #
 #   make binaries          — full build (slow, ~30 min first time)
 #   make gip               — re-fetch get_iplayer only (fast)
 #   make install-perl      — rebuild Perl + dylibs only
 #   make install-utils     — rebuild AtomicParsley + ffmpeg only
+#   make yt-dlp            — download yt-dlp standalone binary
 #
 # Prerequisites in sibling repos:
 #   ../get_iplayer_macos   — build system
@@ -15,6 +16,9 @@ GIP_REPO    := ../get_iplayer
 GIP_TAG     ?= master
 GIP_SCRIPTS := get_iplayer get_iplayer.cgi
 PERL_BIN    := Binaries/get_iplayer/perl/bin
+
+YT_DLP_URL  ?= https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_macos
+YT_DLP_BIN  := Binaries/yt-dlp_macos
 
 # ── Heavy build (delegated to get_iplayer_macos) ───────────────────────────
 
@@ -46,9 +50,18 @@ $(PERL_BIN)/get_iplayer: get_iplayer_custom.patch
 
 gip: $(PERL_BIN)/get_iplayer
 
+# ── Download yt-dlp standalone binary ─────────────────────────────────────
+
+$(YT_DLP_BIN):
+	@curl -L -o $(YT_DLP_BIN) $(YT_DLP_URL)
+	@chmod +x $(YT_DLP_BIN)
+	@echo "downloaded yt-dlp"
+
+yt-dlp: $(YT_DLP_BIN)
+
 # ── Top-level target ───────────────────────────────────────────────────────
 
-binaries: install-perl install-utils gip
-	@echo "Binaries/get_iplayer/ ready"
+binaries: install-perl install-utils gip yt-dlp
+	@echo "Binaries/ ready"
 
-.PHONY: perl-libs utils install-perl install-utils gip binaries
+.PHONY: perl-libs utils install-perl install-utils gip yt-dlp binaries

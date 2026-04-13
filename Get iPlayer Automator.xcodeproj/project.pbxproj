@@ -132,7 +132,7 @@
 		7F78C200291C42C500DAD51E /* BBCDownload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BBCDownload.swift; sourceTree = "<group>"; };
 		7F96C2B72B43314E00C91CBB /* LogController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogController.swift; sourceTree = "<group>"; };
 		7FB49CF727AA539800E80F76 /* cacert.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = cacert.pem; sourceTree = "<group>"; };
-		7FB49CF927AA589500E80F76 /* yt-dlp_macos */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "yt-dlp_macos"; sourceTree = "<group>"; };
+		7FB49CF927AA589500E80F76 /* yt-dlp_macos */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = "yt-dlp_macos"; sourceTree = "<group>"; };
 		7FC063BF2E11C9A5001CA77A /* HistoryDisplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryDisplay.swift; sourceTree = "<group>"; };
 		7FE696542E4136FE0006D9D1 /* ASDownloadShows.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ASDownloadShows.swift; sourceTree = "<group>"; };
 		7FF4174321FC02AE004FF8CE /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -499,7 +499,7 @@
 				"${CONFIGURATION_BUILD_DIR}/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/get_iplayer/perl/bin/perl",
 				"${CONFIGURATION_BUILD_DIR}/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/get_iplayer/utils/bin/ffmpeg",
 				"${CONFIGURATION_BUILD_DIR}/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/get_iplayer/utils/bin/AtomicParsley",
-				"${CONFIGURATION_BUILD_DIR}/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/yt-dlp_macos/yt-dlp_macos",
+				"${CONFIGURATION_BUILD_DIR}/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/yt-dlp_macos",
 			);
 			name = "Run Script";
 			outputFileListPaths = (
