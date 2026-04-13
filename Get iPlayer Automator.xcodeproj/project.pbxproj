@@ -709,7 +709,7 @@
 					"$(inherited)",
 					"$(SRCROOT)",
 					"$(PROJECT_DIR)",
-						"$(PROJECT_DIR)/Binaries",
+					"$(PROJECT_DIR)/Binaries",
 				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -764,7 +764,7 @@
 					"$(inherited)",
 					"$(SRCROOT)",
 					"$(PROJECT_DIR)",
-						"$(PROJECT_DIR)/Binaries",
+					"$(PROJECT_DIR)/Binaries",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "GetiPlayerAutomator-Prefix.h";
