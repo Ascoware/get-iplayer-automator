@@ -17,11 +17,7 @@ Three sibling repositories must be checked out at the same level:
   get_iplayer/             ← upstream get_iplayer source
 ```
 
-CocoaPods is required for app dependencies. If the `Pods/` directory is missing or stale:
-
-```sh
-pod install
-```
+App dependencies are managed via Swift Package Manager and resolved automatically when you open the project in Xcode.
 
 ### 1. Populate Binaries/
 
