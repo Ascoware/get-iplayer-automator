@@ -87,8 +87,9 @@ if [ "$PUBLISH" -eq 1 ]; then
     git push origin "$TAG"
 
     # Create draft release and upload zip
-    ENCODED_ARCHIVE=$(python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1]))" "$ARCHIVE_NAME")
-    DOWNLOAD_URL="https://github.com/${REPO}/releases/download/${TAG}/${ENCODED_ARCHIVE}"
+    # GitHub replaces spaces with dots in asset filenames
+    DOTTED_ARCHIVE="${ARCHIVE_NAME// /.}"
+    DOWNLOAD_URL="https://github.com/${REPO}/releases/download/${TAG}/${DOTTED_ARCHIVE}"
 
     gh release create "$TAG" \
         --repo "$REPO" \
