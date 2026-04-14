@@ -23,7 +23,6 @@ NS_ASSUME_NONNULL_BEGIN
 @class NPHistoryTableViewController;
 @class NewProgrammeHistory;
 
-//@class NilToStringTransformer;
 
 extern BOOL runDownloads;
 extern NSDictionary<NSString *, NSString *> *tvFormats;
@@ -106,14 +105,6 @@ extern NSDictionary<NSString *, NSString *> *radioFormats;
 @property IBOutlet NSTableView *solutionsTableView;
 @property NSDictionary *solutionsDictionary;
 
-//PVR list editing
-//@property NilToStringTransformer *nilToEmptyStringTransformer;
-//@property NilToStringTransformer *nilToAsteriskTransformer;
-
-// Format preferences
-//@property EmptyToStringTransformer *tvFormatTransformer;
-//@property EmptyToStringTransformer *radioFormatTransformer;
-//@property EmptyToStringTransformer *itvFormatTransformer;
 
 //Verbose Logging
 @property (assign) BOOL verbose;

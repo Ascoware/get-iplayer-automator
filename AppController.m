@@ -149,17 +149,10 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 //    [ApplicationPaths perlEnvironmentPath] = [getiPlayerInstallation stringByAppendingPathComponent:@"perl/lib"];
     
     _runScheduled=NO;
-//
-//    _nilToEmptyStringTransformer = [[NilToStringTransformer alloc] init];
-//    _nilToAsteriskTransformer = [[NilToStringTransformer alloc] initWithString:@"*"];
-//    _tvFormatTransformer = [[EmptyToStringTransformer alloc] initWithString:@"Please select..."];
-//    _radioFormatTransformer = [[EmptyToStringTransformer alloc] initWithString:@"Please select..."];
-//    _itvFormatTransformer = [[EmptyToStringTransformer alloc] initWithString:@"Please select..."];
-//    [NSValueTransformer setValueTransformer:_nilToEmptyStringTransformer forName:@"NilToEmptyStringTransformer"];
-//    [NSValueTransformer setValueTransformer:_nilToAsteriskTransformer forName:@"NilToAsteriskTransformer"];
-//    [NSValueTransformer setValueTransformer:_tvFormatTransformer forName:@"TVFormatTransformer"];
-//    [NSValueTransformer setValueTransformer:_radioFormatTransformer forName:@"RadioFormatTransformer"];
-//    [NSValueTransformer setValueTransformer:_itvFormatTransformer forName:@"ITVFormatTransformer"];
+    [NSValueTransformer setValueTransformer:[[NilToStringTransformer alloc] init] forName:@"NilToEmptyStringTransformer"];
+    [NSValueTransformer setValueTransformer:[[NilToStringTransformer alloc] initWithString:@"*"] forName:@"NilToAsteriskTransformer"];
+    [NSValueTransformer setValueTransformer:[[EmptyToStringTransformer alloc] initWithString:@"Please select..."] forName:@"TVFormatTransformer"];
+    [NSValueTransformer setValueTransformer:[[EmptyToStringTransformer alloc] initWithString:@"Please select..."] forName:@"RadioFormatTransformer"];
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(itvUpdateFinished) name:@"ITVUpdateFinished" object:nil];
     newITVListing =  [[GetITVShows alloc] init];
