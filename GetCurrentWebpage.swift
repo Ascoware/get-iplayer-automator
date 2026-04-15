@@ -123,9 +123,6 @@ import CocoaLumberjackSwift
             }
 
             completion(showList)
-//        } else if url.hasPrefix("https://www.itv.com/hub/") {
-//            let show = ITVMetadataExtractor.getShowMetadata(htmlPageContent: pageSource)
-//            completion([show])
         } else if url.hasPrefix("https://player.stv.tv/episode/") {
             do {
                 let show = try STVMetadataExtractor.getShowMetadata(html: pageSource)

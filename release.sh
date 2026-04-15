@@ -103,7 +103,7 @@ if [ "$PUBLISH" -eq 1 ]; then
     NEW_ITEM="        <item>
             <title>${TAG}</title>
             <pubDate>${PUB_DATE}</pubDate>
-            <sparkle:minimumSystemVersion>10.13.0</sparkle:minimumSystemVersion>
+            <sparkle:minimumSystemVersion>10.14.0</sparkle:minimumSystemVersion>
             <enclosure
                 url=\"${DOWNLOAD_URL}\"
                 sparkle:version=\"${CFBundleVersion}\"

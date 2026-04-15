@@ -62,6 +62,10 @@ import CocoaLumberjackSwift
     var getiPlayerProxy: GetiPlayerProxy?
     var addedByPVR = false
 
+    // Tracked so cancelMetadataRetrieval() can interrupt a slow get_iplayer --info run.
+    var metadataTask: Process?
+    var pipe: Pipe?
+
     var type: ProgrammeType {
         if radio {
             return .radio
@@ -198,14 +202,12 @@ import CocoaLumberjackSwift
     }
 
     func cancelMetadataRetrieval() {
-//        if metadataTask?.isRunning ?? false {
-//            metadataTask?.interrupt()
-//            DDLogInfo("Metadata retrieval cancelled for \(description)");
-//        }
-//
-//        taskOutput = ""
-//        metadataTask = nil
-//        pipe = nil
+        if metadataTask?.isRunning ?? false {
+            metadataTask?.interrupt()
+            DDLogInfo("Metadata retrieval cancelled for \(description)")
+        }
+        metadataTask = nil
+        pipe = nil
     }
 
     public override func isEqual(_ object: Any?) -> Bool {
@@ -374,8 +376,8 @@ import CocoaLumberjackSwift
                 return
             }
 
-            let metadataTask = Process()
-            let metadataPipe = Pipe()
+            metadataTask = Process()
+            pipe = Pipe()
 
             var args = [
                 ApplicationPaths.getiPlayerPath,
@@ -419,24 +421,26 @@ import CocoaLumberjackSwift
                 DDLogVerbose("\(arg)")
             }
 
-            metadataTask.arguments = args
-            metadataTask.launchPath = ApplicationPaths.perlBinaryPath
-            metadataTask.standardOutput = metadataPipe
-            let getNameFh = metadataPipe.fileHandleForReading
+            metadataTask?.arguments = args
+            metadataTask?.launchPath = ApplicationPaths.perlBinaryPath
+            metadataTask?.standardOutput = pipe
+            let getNameFh = pipe?.fileHandleForReading
 
             var envVariableDictionary = [String : String]()
             envVariableDictionary["HOME"] = (("~") as NSString).expandingTildeInPath
             envVariableDictionary["PERL_UNICODE"] = "AS"
             envVariableDictionary["PATH"] = ApplicationPaths.perlEnvironmentPath
-            metadataTask.environment = envVariableDictionary
+            metadataTask?.environment = envVariableDictionary
 
-            metadataTask.launch()
-            let data = getNameFh.readDataToEndOfFile()
+            metadataTask?.launch()
+            let data = getNameFh?.readDataToEndOfFile()
 
-            if let stringData = String(data: data, encoding: .utf8) {
+            if let data, let stringData = String(data: data, encoding: .utf8) {
                 processMetadataTaskOutput(stringData)
             }
 
+            metadataTask = nil
+            pipe = nil
             getNameRunning = false
         }
     }

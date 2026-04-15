@@ -1,16 +1,14 @@
 //
-//  ITVDownload.swift
+//  STVDownload.swift
 //  Get iPlayer Automator
 //
 //  Created by Scott Kovatch on 1/1/18.
 //
 
 import Foundation
-import Kanna
-import SwiftyJSON
 import CocoaLumberjackSwift
 
-@objc public class ITVDownload : Download {
+@objc public class STVDownload : Download {
 
     var maxResolution: String
 

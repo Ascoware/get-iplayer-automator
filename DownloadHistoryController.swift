@@ -22,11 +22,17 @@ import CocoaLumberjackSwift
         NotificationCenter.default.addObserver(self, selector: #selector(addToHistory(_:)), name: NSNotification.Name("AddProgToHistory"), object: nil)
     }
 
+    private var historyFilePath: String? {
+        guard let dir = FileManager.default.applicationSupportDirectory() else { return nil }
+        return (dir as NSString).appendingPathComponent("download_history")
+    }
+
     func readHistory() {
         DDLogVerbose("Read History")
-        guard let historyFilePath = FileManager.default.applicationSupportDirectory()?.appending("/download_history") else
-        {
-            return
+        guard let historyFilePath = historyFilePath else { return }
+
+        if let existing = historyArrayController.content as? [Any], !existing.isEmpty {
+            historyArrayController.remove(contentsOf: existing)
         }
 
         guard let historyFile = FileHandle(forReadingAtPath: historyFilePath) else { return }
@@ -55,7 +61,7 @@ import CocoaLumberjackSwift
             DDLogVerbose("Write History to File")
             guard let currentHistory = historyArrayController.arrangedObjects as? [DownloadHistoryEntry] else { return }
             let historyString = currentHistory.map { $0.entryString }.joined(separator: "\n") + "\n"
-            guard let historyPath = FileManager.default.applicationSupportDirectory()?.appending("download_history") else {
+            guard let historyPath = historyFilePath else {
                 return
             }
             guard let historyData = historyString.data(using: .utf8) else { return }

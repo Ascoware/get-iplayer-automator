@@ -6,7 +6,7 @@
 //  Copyright 2009 __MyCompanyName__. All rights reserved.
 //
 
-// #import <UserNotifications/UserNotifications.h>
+#import <UserNotifications/UserNotifications.h>
 #import "AppController.h"
 #import <Sparkle/Sparkle.h>
 #import "iTunes.h"
@@ -19,8 +19,6 @@ NSDictionary<NSString*, NSString*> *tvFormats;
 NSDictionary<NSString*, NSString*> *stvFormats;
 NSDictionary<NSString*, NSString*> *radioFormats;
 
-// New ITV Cache
-GetITVShows                   *newITVListing;
 NPHistoryTableViewController *npHistoryTableViewController;
 NewProgrammeHistory           *sharedHistoryController;
 
@@ -140,13 +138,6 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     NSString *appSupportDirectory = [[NSFileManager defaultManager] applicationSupportDirectory];
     [[NSFileManager defaultManager] changeCurrentDirectoryPath:appSupportDirectory];
 
-    //Initialize Arguments
-//    NSString *getiPlayerInstallation = [[NSString alloc] initWithString:[NSBundle mainBundle].bundlePath];
-//    getiPlayerInstallation = [getiPlayerInstallation stringByAppendingString:@"/Contents/Resources/get_iplayer"];
-//    _extraBinariesPath = [getiPlayerInstallation stringByAppendingPathComponent:@"utils/bin"];
-//    [ApplicationPaths getiPlayerPath] = [getiPlayerInstallation stringByAppendingPathComponent:@"perl/bin/get_iplayer"];
-//    [ApplicationPaths perlBinaryPath] = [getiPlayerInstallation stringByAppendingPathComponent:@"perl/bin/perl"];
-//    [ApplicationPaths perlEnvironmentPath] = [getiPlayerInstallation stringByAppendingPathComponent:@"perl/lib"];
     
     _runScheduled=NO;
     [NSValueTransformer setValueTransformer:[[NilToStringTransformer alloc] init] forName:@"NilToEmptyStringTransformer"];
@@ -154,9 +145,12 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     [NSValueTransformer setValueTransformer:[[EmptyToStringTransformer alloc] initWithString:@"Please select..."] forName:@"TVFormatTransformer"];
     [NSValueTransformer setValueTransformer:[[EmptyToStringTransformer alloc] initWithString:@"Please select..."] forName:@"RadioFormatTransformer"];
 
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(itvUpdateFinished) name:@"ITVUpdateFinished" object:nil];
-    newITVListing =  [[GetITVShows alloc] init];
-
+    [[UNUserNotificationCenter currentNotificationCenter] requestAuthorizationWithOptions:(UNAuthorizationOptionAlert | UNAuthorizationOptionSound)
+                                                                        completionHandler:^(BOOL granted, NSError * _Nullable error) {
+        if (!granted) {
+            DDLogInfo(@"Notification permission not granted");
+        }
+    }];
 
     return self;
 }
@@ -414,18 +408,11 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 
 - (void)updater:(SPUStandardUpdaterController *)updater didFindValidUpdate:(SUAppcastItem *)update
 {
-//    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
-//
-//    UNMutableNotificationContent *content = [UNMutableNotificationContent new];
-//    content.title = @"Update Available!";
-//    content.body = [NSString stringWithFormat:@"Get iPlayer Automator %@ is available.",update.displayVersionString];
-//
-//    UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:@"" content:content trigger:nil];
-//    [center addNotificationRequest:request withCompletionHandler:nil];
-    NSUserNotification *notification = [[NSUserNotification alloc] init];
-    notification.informativeText = [NSString stringWithFormat:@"Get iPlayer Automator %@ is available.",update.displayVersionString];
-    notification.title = @"Update Available!";
-    [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
+    UNMutableNotificationContent *content = [UNMutableNotificationContent new];
+    content.title = @"Update Available!";
+    content.body = [NSString stringWithFormat:@"Get iPlayer Automator %@ is available.", update.displayVersionString];
+    UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:[[NSUUID UUID] UUIDString] content:content trigger:nil];
+    [[UNUserNotificationCenter currentNotificationCenter] addNotificationRequest:request withCompletionHandler:nil];
 }
 
 #pragma mark Cache Update
@@ -525,17 +512,6 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     if (proxyDict) {
         _proxy = proxyDict[@"proxy"];
     }
-
-    // Disabling until we figure out the new ITV structure
-    //    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheITV_TV"] isEqualTo:@YES])
-    //    {
-    //        _updatingITVIndex = true;
-    //        [self.itvProgressIndicator startAnimation:self];
-    //        self.itvProgressIndicator.doubleValue = 0.0;
-    //        [self.itvProgressIndicator setHidden:false];
-    //
-    //        [newITVListing itvUpdate];
-    //    }
 
     _updatingBBCIndex = true;
 
@@ -647,21 +623,9 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     [self getiPlayerUpdateFinished];
 }
 
-- (void)itvUpdateFinished
-{
-    // ITV Cache Update Finished - turn off progress display and process data
-    _updatingITVIndex = false;
-    _didUpdate = YES;
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.itvProgressIndicator stopAnimation:self];
-        [self.itvProgressIndicator setHidden:true];
-        [self getiPlayerUpdateFinished];
-    });
-}
-
 - (void)getiPlayerUpdateFinished
 {
-    if (_updatingITVIndex || _updatingBBCIndex)
+    if (_updatingBBCIndex)
         return;
 
     runUpdate=NO;
@@ -683,20 +647,11 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 
     if (_didUpdate)
     {
-        // UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
-
-        // UNMutableNotificationContent *content = [UNMutableNotificationContent new];
-        // content.title =  @"Index Updated";
-        // content.body = @"The program index was updated.";
-
-        // UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:@"" content:content trigger:nil];
-        // [center addNotificationRequest:request withCompletionHandler:nil];
-        NSUserNotification *indexUpdated = [[NSUserNotification alloc] init];
-        indexUpdated.title = @"Index Updated";
-        indexUpdated.informativeText = @"The program index was updated.";
-        indexUpdated.identifier = @"Index Updating Completed";
-        
-        [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:indexUpdated];
+        UNMutableNotificationContent *content = [UNMutableNotificationContent new];
+        content.title = @"Index Updated";
+        content.body = @"The program index was updated.";
+        UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:@"IndexUpdatingCompleted" content:content trigger:nil];
+        [[UNUserNotificationCenter currentNotificationCenter] addNotificationRequest:request withCompletionHandler:nil];
 
         DDLogInfo(@"BBC Index Updated");
         _lastUpdate=[NSDate date];
@@ -1091,7 +1046,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
                 if (!show.complete)
                 {
                     if ([show.tvNetwork containsString:@"ITV"] || [show.tvNetwork containsString:@"STV"]) {
-                        _currentDownload = [[ITVDownload alloc]
+                        _currentDownload = [[STVDownload alloc]
                                             initWithProgramme:show
                                             proxy:_proxy];
                     } else {
@@ -1229,9 +1184,8 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     }
 
     Programme *finishedShow = note.object;
-//    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
-//    UNMutableNotificationContent *content = [UNMutableNotificationContent new];
 
+    UNMutableNotificationContent *content = [UNMutableNotificationContent new];
     if (finishedShow.successful) {
         finishedShow.status = @"Processing...";
 
@@ -1241,20 +1195,11 @@ static NSString *FORCE_RELOAD = @"ForceReload";
             finishedShow.status = @"Download Complete";
         }
 
-        NSUserNotification *notification = [[NSUserNotification alloc] init];
-        notification.informativeText = [NSString stringWithFormat:@"%@ Completed Successfully",finishedShow.showName];
-        notification.title = @"Download Finished";
-        [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
+        content.title = @"Download Finished";
+        content.body = [NSString stringWithFormat:@"%@ Completed Successfully", finishedShow.showName];
     } else {
-        NSUserNotification *notification = [[NSUserNotification alloc] init];
-        notification.informativeText = [NSString stringWithFormat:@"%@ failed. See log for details.",finishedShow.showName];
-        notification.title = @"Download Failed";
-        [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
-//        content.title = @"Download Finished";
-//        content.body = [NSString stringWithFormat:@"%@ Completed Successfully",finishedShow.showName];
-//    } else {
-//        content.body = [NSString stringWithFormat:@"%@ failed. See log for details.",finishedShow.showName];
-//        content.title = @"Download Failed";
+        content.title = @"Download Failed";
+        content.body = [NSString stringWithFormat:@"%@ failed. See log for details.", finishedShow.showName];
 
         ReasonForFailure *showSolution = [[ReasonForFailure alloc] init];
 
@@ -1277,8 +1222,8 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         _solutionsTableView.rowHeight = 68;
     }
 
-//    UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:@"" content:content trigger:nil];
-//    [center addNotificationRequest:request withCompletionHandler:nil];
+    UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:[[NSUUID UUID] UUIDString] content:content trigger:nil];
+    [[UNUserNotificationCenter currentNotificationCenter] addNotificationRequest:request withCompletionHandler:nil];
 
     [self saveAppData]; //Save app data in case of crash.
 
@@ -1299,7 +1244,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
                       (unsigned long)tempQueue.count,
                       nextShow.tvNetwork);
             if ([nextShow.tvNetwork containsString:@"ITV"] || [nextShow.tvNetwork containsString:@"STV"]) {
-                _currentDownload = [[ITVDownload alloc] initWithProgramme:nextShow
+                _currentDownload = [[STVDownload alloc] initWithProgramme:nextShow
                                                                     proxy:_proxy];
             } else {
                 _currentDownload = [[BBCDownload alloc] initWithProgramme:nextShow
@@ -1339,19 +1284,12 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 
         tempQueue=nil;
 
-        NSUserNotification *notification = [[NSUserNotification alloc] init];
-        notification.informativeText = [NSString stringWithFormat:@"Downloads Successful = %lu\nDownload Failed = %lu",
-                                        (unsigned long)downloadsSuccessful,(unsigned long)downloadsFailed];
-        notification.title = @"Downloads Finished";
-        [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
-
-//        UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
-//        UNMutableNotificationContent *content = [UNMutableNotificationContent new];
-//        content.title = @"Downloads Finished";
-//        content.body = [NSString stringWithFormat:@"Downloads Successful = %lu\nDownload Failed = %lu",
-//                        (unsigned long)downloadsSuccessful,(unsigned long)downloadsFailed];
-//        UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:@"" content:content trigger:nil];
-//        [center addNotificationRequest:request withCompletionHandler:nil];
+        UNMutableNotificationContent *content = [UNMutableNotificationContent new];
+        content.title = @"Downloads Finished";
+        content.body = [NSString stringWithFormat:@"Downloads Successful = %lu\nDownload Failed = %lu",
+                        (unsigned long)downloadsSuccessful, (unsigned long)downloadsFailed];
+        UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:[[NSUUID UUID] UUIDString] content:content trigger:nil];
+        [[UNUserNotificationCenter currentNotificationCenter] addNotificationRequest:request withCompletionHandler:nil];
 
         if (downloadsFailed>0) {
             [_solutionsWindow makeKeyAndOrderFront:self];

@@ -19,7 +19,6 @@ NS_ASSUME_NONNULL_BEGIN
 @class GiASearch;
 @class GetiPlayerProxy;
 @class HTTPProxy;
-@class GetITVShows;
 @class NPHistoryTableViewController;
 @class NewProgrammeHistory;
 
@@ -119,14 +118,12 @@ extern NSDictionary<NSString *, NSString *> *radioFormats;
 @property IBOutlet NSMenuItem *forceCacheUpdateMenuItem;
 @property IBOutlet NSMenuItem *checkForCacheUpdateMenuItem;
 
-//ITV Cache
-@property (assign) BOOL updatingITVIndex;
+//BBC Cache
 @property (assign) BOOL updatingBBCIndex;
 @property IBOutlet NSMenuItem *showNewProgrammesMenuItem;
 
 //New Programmes History
 @property NSWindow *newestProgrammesWindow;
-@property IBOutlet NSProgressIndicator *itvProgressIndicator;
 
 //Update
 - (void)getiPlayerUpdateFinished;
@@ -172,7 +169,6 @@ extern NSDictionary<NSString *, NSString *> *radioFormats;
 
 -(void)updateHistory;
 -(void)updateHistoryForType:(NSString *)chanelType andProgFile:(NSString *)oldProgrammesFile andCacheFile:(NSString *)newCacheFile;
--(void)itvUpdateFinished;
 
 @end
 
