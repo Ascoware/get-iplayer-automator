@@ -109,7 +109,7 @@ public class RSRTVArrayController: NSArrayController, NSTableViewDelegate, NSTab
                 insertIndex -= 1
             }
                 let object = objects[removeIndex]
-                removeObject(removeIndex)
+                remove(atArrangedObjectIndex: removeIndex)
                 insert(object, atArrangedObjectIndex: insertIndex)
                 }
     }
