@@ -1952,11 +1952,7 @@
                                                                 </popUpButtonCell>
                                                                 <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                                 <connections>
-                                                                    <binding destination="1106" name="value" keyPath="arrangedObjects.format" id="i4B-ih-pN8">
-                                                                        <dictionary key="options">
-                                                                            <string key="NSValueTransformerName">TVFormatTransformer</string>
-                                                                        </dictionary>
-                                                                    </binding>
+                                                                    <binding destination="1106" name="selectedValue" keyPath="arrangedObjects.format" id="i4B-ih-pN8"/>
                                                                 </connections>
                                                             </tableColumn>
                                                         </tableColumns>
@@ -2018,11 +2014,7 @@
                                                                 </popUpButtonCell>
                                                                 <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                                 <connections>
-                                                                    <binding destination="1134" name="value" keyPath="arrangedObjects.format" id="v9Y-bx-WrT">
-                                                                        <dictionary key="options">
-                                                                            <string key="NSValueTransformerName">RadioFormatTransformer</string>
-                                                                        </dictionary>
-                                                                    </binding>
+                                                                    <binding destination="1134" name="selectedValue" keyPath="arrangedObjects.format" id="v9Y-bx-WrT"/>
                                                                 </connections>
                                                             </tableColumn>
                                                         </tableColumns>
