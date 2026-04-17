@@ -140,7 +140,7 @@ import CocoaLumberjackSwift
         errorPipe = Pipe()
 
         task?.arguments = args
-        task?.launchPath = ApplicationPaths.perlBinaryPath
+        task?.executableURL = URL(fileURLWithPath: ApplicationPaths.perlBinaryPath)
         task?.standardOutput = pipe
         task?.standardError = errorPipe
 
@@ -174,7 +174,17 @@ import CocoaLumberjackSwift
             name: Process.didTerminateNotification,
             object: task)
 
-        task?.launch()
+        do {
+            try task?.run()
+        } catch {
+            DDLogError("BBC download task failed to launch: \(error)")
+            show.complete = true
+            show.successful = false
+            show.status = "Failed: Could not launch get_iplayer"
+            NotificationCenter.default.removeObserver(self)
+            NotificationCenter.default.post(name: NSNotification.Name("DownloadFinished"), object: show)
+            return
+        }
 
         //Prepare UI
         setCurrentProgress("Starting download...")

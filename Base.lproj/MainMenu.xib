@@ -1714,7 +1714,7 @@
                                         <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bGk-Hx-Mhw">
                                             <rect key="frame" x="225" y="326" width="83" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="ITV TV" bezelStyle="regularSquare" imagePosition="left" alignment="left" enabled="NO" inset="2" id="7pT-vJ-dMF">
+                                            <buttonCell key="cell" type="check" title="STV TV" bezelStyle="regularSquare" imagePosition="left" alignment="left" enabled="NO" inset="2" id="7pT-vJ-dMF">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
@@ -1952,7 +1952,7 @@
                                                                 </popUpButtonCell>
                                                                 <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                                 <connections>
-                                                                    <binding destination="1106" name="selectedValue" keyPath="arrangedObjects.format" id="i4B-ih-pN8">
+                                                                    <binding destination="1106" name="value" keyPath="arrangedObjects.format" id="i4B-ih-pN8">
                                                                         <dictionary key="options">
                                                                             <string key="NSValueTransformerName">TVFormatTransformer</string>
                                                                         </dictionary>
@@ -2018,7 +2018,7 @@
                                                                 </popUpButtonCell>
                                                                 <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                                 <connections>
-                                                                    <binding destination="1134" name="selectedValue" keyPath="arrangedObjects.format" id="v9Y-bx-WrT">
+                                                                    <binding destination="1134" name="value" keyPath="arrangedObjects.format" id="v9Y-bx-WrT">
                                                                         <dictionary key="options">
                                                                             <string key="NSValueTransformerName">RadioFormatTransformer</string>
                                                                         </dictionary>
@@ -2113,7 +2113,7 @@
                                                 <binding destination="668" name="value" keyPath="values.Use25FPSStreams" id="Lw5-cC-i4J"/>
                                             </connections>
                                         </button>
-                                        <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6h1-SH-3nc" userLabel="ITV resolution popup">
+                                        <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6h1-SH-3nc" userLabel="STV resolution popup">
                                             <rect key="frame" x="14" y="117" width="182" height="25"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <popUpButtonCell key="cell" type="push" title="Full HD (1080p)" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="cut-Wf-Dit" id="6ge-yl-pn0">
@@ -2146,7 +2146,7 @@
                                         <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qVc-V9-iAc">
                                             <rect key="frame" x="16" y="149" width="182" height="16"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" lineBreakMode="clipping" title="Maximum ITV/STV Resolution" id="1rU-vF-P2j">
+                                            <textFieldCell key="cell" lineBreakMode="clipping" title="Maximum STV Resolution" id="1rU-vF-P2j">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>

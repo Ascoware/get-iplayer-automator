@@ -73,7 +73,7 @@ import CocoaLumberjackSwift
 
         let apTask = Process()
 
-        apTask.launchPath = URL(fileURLWithPath: ApplicationPaths.extraBinariesPath).appendingPathComponent("AtomicParsley").path
+        apTask.executableURL = URL(fileURLWithPath: ApplicationPaths.extraBinariesPath).appendingPathComponent("AtomicParsley")
 
         var arguments = [String]()
         arguments.append(show.path)
@@ -102,7 +102,13 @@ import CocoaLumberjackSwift
 
         DDLogInfo("INFO: Beginning AtomicParsley Tagging.")
 
-        apTask.launch()
+        do {
+            try apTask.run()
+        } catch {
+            DDLogError("AtomicParsley task failed to launch: \(error)")
+            atomicParsleyFinished(nil)
+            return
+        }
         setCurrentProgress("Tagging the Programme... -- \(show.showName)")
     }
 

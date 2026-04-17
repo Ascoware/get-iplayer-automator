@@ -13,7 +13,7 @@ import CocoaLumberjackSwift
     var maxResolution: String
 
     override public var description: String {
-        return "ITV Download (ID=\(show.pid))"
+        return "STV Download (ID=\(show.pid))"
     }
 
     @objc public init(programme: Programme, proxy: HTTPProxy?) {
@@ -59,7 +59,7 @@ import CocoaLumberjackSwift
             DDLogInfo("\(line)")
 
             if line.contains("Writing video subtitles") {
-                //ITV Download (ID=2a4910a0046): [info] Writing video subtitles to: /Users/skovatch/Movies/TV Shows/LA Story/LA Story - Just Friends - 2a4910a0046.en.vtt
+                //STV Download (ID=2a4910a0046): [info] Writing video subtitles to: /Users/skovatch/Movies/TV Shows/LA Story/LA Story - Just Friends - 2a4910a0046.en.vtt
                 let scanner = Scanner(string: line)
                 scanner.scanUpToString("to: ")
                 scanner.scanString("to: ")
@@ -165,10 +165,11 @@ import CocoaLumberjackSwift
         let fh = pipe?.fileHandleForReading
         let errorFh = errorPipe?.fileHandleForReading
 
-        guard let youtubeDLBinary = Bundle.main.path(forResource: "yt-dlp_macos", ofType: nil),
+        guard let youtubeDLFolder = Bundle.main.path(forResource: "yt-dlp_macos", ofType: nil),
               let cacertFile = Bundle.main.url(forResource: "cacert", withExtension: "pem") else {
             return
         }
+        let youtubeDLBinary = youtubeDLFolder + "/yt-dlp_macos"
         var args: [String] = [show.url,
                               "--user-agent",
                               "Mozilla/5.0",
@@ -225,7 +226,7 @@ import CocoaLumberjackSwift
         
         DDLogVerbose("DEBUG: youtube-dl args:\(args)")
 
-        task?.launchPath = youtubeDLBinary
+        task?.executableURL = URL(fileURLWithPath: youtubeDLBinary)
         task?.arguments = args
         let extraBinaryPath = ApplicationPaths.extraBinariesPath
         var envVariableDictionary = [String : String]()
@@ -239,7 +240,18 @@ import CocoaLumberjackSwift
 
         task?.terminationHandler = youtubeDLTaskFinished
 
-        task?.launch()
+        do {
+            try task?.run()
+        } catch {
+            DDLogError("STV download task failed to launch: \(error)")
+            show.complete = true
+            show.successful = false
+            show.status = "Failed: Could not launch yt-dlp"
+            NotificationCenter.default.removeObserver(self)
+            NotificationCenter.default.post(name: NSNotification.Name("DownloadFinished"), object: show)
+            return
+        }
+
         fh?.readInBackgroundAndNotify()
         errorFh?.readInBackgroundAndNotify()
     }
@@ -247,7 +259,7 @@ import CocoaLumberjackSwift
     func createDownloadPath() {
         var fileName = show.showName
 
-        // XBMC naming is always used on ITV shows to ensure unique names.
+        // XBMC naming is always used on STV shows to ensure unique names.
         if !show.seriesName.isEmpty {
             fileName = show.seriesName;
         }

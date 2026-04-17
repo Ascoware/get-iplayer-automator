@@ -13,7 +13,7 @@ import CocoaLumberjackSwift
 @objc enum ProgrammeType : Int {
     case tv
     case radio
-    case itv
+    case stv
 }
 
 @objc(Programme)
@@ -69,8 +69,8 @@ import CocoaLumberjackSwift
     var type: ProgrammeType {
         if radio {
             return .radio
-        } else if tvNetwork.hasPrefix("ITV") {
-            return .itv
+        } else if tvNetwork.hasPrefix("STV") {
+            return .stv
         } else {
             return .tv
         }
@@ -82,8 +82,8 @@ import CocoaLumberjackSwift
             "BBC TV"
         case .radio:
             "BBC Radio"
-        case .itv:
-            "ITV"
+        case .stv:
+            "STV"
         }
     }
 
@@ -245,7 +245,7 @@ import CocoaLumberjackSwift
                 wantedID
             ]
             getNameTask.arguments = args
-            getNameTask.launchPath = ApplicationPaths.perlBinaryPath
+            getNameTask.executableURL = URL(fileURLWithPath: ApplicationPaths.perlBinaryPath)
 
             getNameTask.standardOutput = getNamePipe
             let getNameFh = getNamePipe.fileHandleForReading
@@ -255,7 +255,14 @@ import CocoaLumberjackSwift
             envVariableDictionary["PERL_UNICODE"] = "AS"
             envVariableDictionary["PATH"] = ApplicationPaths.perlEnvironmentPath
             getNameTask.environment = envVariableDictionary
-            getNameTask.launch()
+
+            do {
+                try getNameTask.run()
+            } catch {
+                DDLogError("getName task failed to launch: \(error)")
+                getNameRunning = false
+                return
+            }
 
             let data = getNameFh.readDataToEndOfFile()
             if let stringData = String(data: data, encoding: .utf8) {
@@ -339,12 +346,12 @@ import CocoaLumberjackSwift
         processedPID = found
 
         if !found {
-            if !tvNetwork.contains("ITV") && !tvNetwork.contains("STV") {
+            if !tvNetwork.contains("STV") {
                 status = "Not in cache"
                 showName = "Retrieving Metadata..."
                 getNameFromPID()
             } else {
-                // STV/ITV shows are not in the BBC cache; this is expected.
+                // STV shows are not in the BBC cache; this is expected.
                 // Mark as processed so downloads can start without a redundant cache lookup.
                 processedPID = true
                 status = runDownloads.boolValue ? "Waiting…" : "Available"
@@ -369,6 +376,7 @@ import CocoaLumberjackSwift
 
     @objc func getRemoteMetadataThreadWithProxy(proxyDict: [String: Any]) {
         autoreleasepool {
+            defer { getNameRunning = false }
             getiPlayerProxy = nil
 
             if let error = proxyDict["error"] as? NSError,
@@ -422,7 +430,7 @@ import CocoaLumberjackSwift
             }
 
             metadataTask?.arguments = args
-            metadataTask?.launchPath = ApplicationPaths.perlBinaryPath
+            metadataTask?.executableURL = URL(fileURLWithPath: ApplicationPaths.perlBinaryPath)
             metadataTask?.standardOutput = pipe
             let getNameFh = pipe?.fileHandleForReading
 
@@ -432,7 +440,12 @@ import CocoaLumberjackSwift
             envVariableDictionary["PATH"] = ApplicationPaths.perlEnvironmentPath
             metadataTask?.environment = envVariableDictionary
 
-            metadataTask?.launch()
+            do {
+                try metadataTask?.run()
+            } catch {
+                DDLogError("metadata task failed to launch: \(error)")
+                return
+            }
             let data = getNameFh?.readDataToEndOfFile()
 
             if let data, let stringData = String(data: data, encoding: .utf8) {
@@ -441,7 +454,6 @@ import CocoaLumberjackSwift
 
             metadataTask = nil
             pipe = nil
-            getNameRunning = false
         }
     }
 

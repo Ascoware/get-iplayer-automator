@@ -165,7 +165,6 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     _searchResultsTable.doubleAction = @selector(addToQueue:);
 
     _tvFormatList = [NSMutableArray array];
-    _itvFormatList = [NSMutableArray array];
     _radioFormatList = [NSMutableArray array];
 
     //Read Queue & Series-Link from File
@@ -562,7 +561,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     _currentProgress.stringValue = @"Updating Programme Index Feeds...";
 
     self.getiPlayerUpdateTask = [NSTask new];
-    self.getiPlayerUpdateTask.launchPath = [ApplicationPaths perlBinaryPath];
+    self.getiPlayerUpdateTask.executableURL = [NSURL fileURLWithPath:[ApplicationPaths perlBinaryPath]];
     self.getiPlayerUpdateTask.arguments = getiPlayerUpdateArgs;
     self.getiPlayerUpdatePipe = [NSPipe new];
     self.getiPlayerUpdateTask.standardOutput = _getiPlayerUpdatePipe;
@@ -592,7 +591,13 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 
     _updatingBBCIndex = true;
     self.getiPlayerUpdateTask.environment = envVariableDictionary;
-    [self.getiPlayerUpdateTask launch];
+    NSError *updateLaunchError = nil;
+    if (![self.getiPlayerUpdateTask launchAndReturnError:&updateLaunchError]) {
+        DDLogError(@"Cache update task failed to launch: %@", updateLaunchError.localizedDescription);
+        _updatingBBCIndex = false;
+        [self getiPlayerUpdateFinished];
+        return;
+    }
 }
 
 - (void)dataReady:(NSNotification *)n
@@ -693,7 +698,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
             NSFileHandle *readHandle2 = newPipe.fileHandleForReading;
             pipeTask.standardOutput = newPipe;
             pipeTask.standardError = newPipe;
-            pipeTask.launchPath = [ApplicationPaths perlBinaryPath];
+            pipeTask.executableURL = [NSURL fileURLWithPath:[ApplicationPaths perlBinaryPath]];
             pipeTask.arguments = @[
                 [ApplicationPaths getiPlayerPath],
                 [GetiPlayerArguments shared].profileDirArg,
@@ -708,7 +713,11 @@ static NSString *FORCE_RELOAD = @"ForceReload";
             envVariableDictionary[@"PERL_UNICODE"] = @"AS";
             envVariableDictionary[@"PATH"] = [ApplicationPaths perlBinaryPath];
             pipeTask.environment = envVariableDictionary;
-            [pipeTask launch];
+            NSError *pipeLaunchError = nil;
+            if (![pipeTask launchAndReturnError:&pipeLaunchError]) {
+                DDLogError(@"Queue name lookup task failed to launch: %@", pipeLaunchError.localizedDescription);
+                continue;
+            }
             NSData *someData;
             while ((someData = readHandle2.availableData) && someData.length) {
                 [taskData appendString:[[NSString alloc] initWithData:someData
@@ -1458,7 +1467,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
             NSPipe *autoRecordPipe = [[NSPipe alloc] init];
             NSFileHandle *readHandle = autoRecordPipe.fileHandleForReading;
 
-            autoRecordTask.launchPath = [ApplicationPaths perlBinaryPath];
+            autoRecordTask.executableURL = [NSURL fileURLWithPath:[ApplicationPaths perlBinaryPath]];
             autoRecordTask.arguments = autoRecordArgs;
             autoRecordTask.standardOutput = autoRecordPipe;
             NSMutableDictionary *envVariableDictionary = [NSMutableDictionary dictionaryWithDictionary:autoRecordTask.environment];
@@ -1467,7 +1476,11 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 
             envVariableDictionary[@"PATH"] = [ApplicationPaths perlEnvironmentPath];
             autoRecordTask.environment = envVariableDictionary;
-            [autoRecordTask launch];
+            NSError *autoRecordLaunchError = nil;
+            if (![autoRecordTask launchAndReturnError:&autoRecordLaunchError]) {
+                DDLogError(@"Auto-record task failed to launch: %@", autoRecordLaunchError.localizedDescription);
+                continue;
+            }
             [autoRecordTask waitUntilExit];
 
             NSData *data = [readHandle readDataToEndOfFile];
@@ -1842,7 +1855,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     [sharedDefaults removeObjectForKey:@"AddCompletedToiTunes"];
     [sharedDefaults removeObjectForKey:@"DefaultBrowser"];
     [sharedDefaults removeObjectForKey:@"CacheBBC_TV"];
-    [sharedDefaults removeObjectForKey:@"CacheITV_TV"];
+
     [sharedDefaults removeObjectForKey:@"CacheBBC_Radio"];
     [sharedDefaults removeObjectForKey:@"CacheExpiryTime"];
     [sharedDefaults removeObjectForKey:@"Verbose"];
@@ -2036,18 +2049,15 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 -(void)updateHistory
 {
 
-    NSArray *files = @[@"tv", @"radio", @"itv"];
-    NSArray *types = @[@"BBC TV", @"BBC Radio", @"ITV"];
-    NSMutableArray *active = [NSMutableArray arrayWithObjects:@false, @false, @false, nil];
+    NSArray *files = @[@"tv", @"radio"];
+    NSArray *types = @[@"BBC TV", @"BBC Radio"];
+    NSMutableArray *active = [NSMutableArray arrayWithObjects:@false, @false, nil];
 
     if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheBBC_TV"] boolValue])
         active[0]=@true;
 
     if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheBBC_Radio"] boolValue])
         active[1]=@true;
-
-    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"CacheITV_TV"] boolValue])
-        active[2]=@true;
 
     NSString *filePath = [[NSFileManager defaultManager] applicationSupportDirectory];
 
@@ -2087,7 +2097,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         oldProgrammesArray = [NSMutableArray new];
     }
 
-    /* Load in todays shows cached by get_iplayer or getITVListings and create a dictionary of show names */
+    /* Load in todays shows cached by get_iplayer and create a dictionary of show names */
 
     NSString *newCacheString = [NSString stringWithContentsOfFile:newCacheFile encoding:NSUTF8StringEncoding error:&error];
     NSArray  *newCacheArray  = [newCacheString componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
