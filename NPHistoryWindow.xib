@@ -61,7 +61,7 @@
                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="MJx-4J-sm5">
                                     <rect key="frame" x="564" y="13" width="80" height="18"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
-                                    <buttonCell key="cell" type="check" title="Show ITV" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="MJc-VI-rfH" userLabel="Show ITV Programmes">
+                                    <buttonCell key="cell" type="check" title="Show STV" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="MJc-VI-rfH" userLabel="Show STV Programmes">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="system"/>
                                     </buttonCell>

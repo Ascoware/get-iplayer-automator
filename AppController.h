@@ -85,7 +85,6 @@ extern NSDictionary<NSString *, NSString *> *radioFormats;
 //Preferences
 @property NSMutableArray *tvFormatList;
 @property NSMutableArray *radioFormatList;
-@property NSMutableArray *itvFormatList;
 @property IBOutlet NSArrayController *tvFormatController;
 @property IBOutlet NSArrayController *radioFormatController;
 

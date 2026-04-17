@@ -31,12 +31,12 @@
         
         if (![programme.tvNetwork containsString:@"BBC"])
         {
-            NSAlert *notNewITV = [[NSAlert alloc] init];
-            [notNewITV addButtonWithTitle:@"OK"];
-            notNewITV.messageText = [NSString stringWithFormat:@"This feature is not available for ITV programmes"];
-            notNewITV.alertStyle = NSAlertStyleWarning;
-            [notNewITV runModal];
-            notNewITV = nil;
+            NSAlert *notSTV = [[NSAlert alloc] init];
+            [notSTV addButtonWithTitle:@"OK"];
+            notSTV.messageText = @"This feature is not available for STV programmes";
+            notSTV.alertStyle = NSAlertStyleWarning;
+            [notSTV runModal];
+            notSTV = nil;
             return;
         }
         

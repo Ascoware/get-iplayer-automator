@@ -92,7 +92,7 @@ NewProgrammeHistory *sharedHistoryContoller;
     
     for (ProgrammeHistoryObject *np in programmeHistoryArray )  {
         
-        if ( [self showITVProgramme:np] || [self showBBCTVProgramme:np] || [self showBBCRadioProgramme:np] )  {
+        if ( [self showSTVProgramme:np] || [self showBBCTVProgramme:np] || [self showBBCRadioProgramme:np] )  {
                                                                                                             
             if ( [np.dateFound isNotEqualTo:displayDate] ) {
                 
@@ -132,12 +132,12 @@ NewProgrammeHistory *sharedHistoryContoller;
     return;
 }
 
--(BOOL)showITVProgramme:(ProgrammeHistoryObject *)np
+-(BOOL)showSTVProgramme:(ProgrammeHistoryObject *)np
 {
     if ( [[[NSUserDefaults standardUserDefaults] valueForKey:@"ShowITV"]isEqualTo:@NO] )
         return NO;
-    
-    if ( ![np.networkName isEqualToString:@"ITV"] )
+
+    if ( ![np.networkName isEqualToString:@"STV"] && ![np.networkName isEqualToString:@"ITV"] )
         return NO;
 
     if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"IgnoreAllTVNews"]isEqualTo:@YES]) {

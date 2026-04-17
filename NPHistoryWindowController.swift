@@ -57,7 +57,7 @@ public class NPHistoryTableViewController: NSWindowController, NSTableViewDataSo
 
         let programHistory = NewProgrammeHistory.sharedInstance().programmeHistoryArray
         for np in programHistory {
-            if showITVProgramme(np) || showBBCTVProgramme(np) || showBBCRadioProgramme(np) {
+            if showSTVProgramme(np) || showBBCTVProgramme(np) || showBBCRadioProgramme(np) {
                 if np.dateFound != displayDate {
                     displayDate = np.dateFound
                     headerDate = dayNames[np.dateFound] ?? "On : \(displayDate ?? "")"
@@ -84,10 +84,10 @@ public class NPHistoryTableViewController: NSWindowController, NSTableViewDataSo
         historyTable?.reloadData()
     }
 
-    func showITVProgramme(_ np: ProgrammeHistoryObject) -> Bool {
+    func showSTVProgramme(_ np: ProgrammeHistoryObject) -> Bool {
         let defaults = UserDefaults.standard
         if defaults.bool(forKey: "ShowITV") == false { return false }
-        if np.networkName != "ITV" { return false }
+        if np.networkName != "STV" && np.networkName != "ITV" { return false }
         if defaults.bool(forKey: "IgnoreAllTVNews") == true,
            np.programmeName.range(of: "news", options: .caseInsensitive) != nil {
             return false

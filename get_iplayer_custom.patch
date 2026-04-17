@@ -10,56 +10,20 @@
  		}
  	}
  	main::logger "INFO: ".(scalar @match_list)." total programmes\n";
-@@ -1683,8 +1684,8 @@
- sub progclass {
- 	my $prog_type = shift;
- 	if ( not defined $prog_type ) {
--		return ('tv', 'radio');
--	} elsif ( $prog_type =~ /^(tv|radio)$/ ) {
-+		return ('itv', 'tv', 'radio');
-+    } elsif ( $prog_type =~ /^(itv|tv|radio)$/ ) {
- 		return "Programme::$prog_type";
- 	} else {
- 		main::logger "ERROR: Programme type '$prog_type' does not exist\n";
-@@ -1695,7 +1696,7 @@
- # return true if valid prog type
- sub is_prog_type {
- 	my $prog_type = shift;
--	return 1 if $prog_type =~ /^(tv|radio)$/;
-+	return 1 if $prog_type =~ /^(itv|tv|radio)$/;
- 	return 0;
- }
- 
 @@ -6953,6 +6954,7 @@
  		return 'stop';
  	}
- 
+
 +    main::logger "INFO: Wrote file $prog->{filename}\n";
  	return 0;
  }
- 
-@@ -7995,6 +7997,15 @@
- 	return 0;
- }
- 
-+package Programme::itv;
-+use base 'Programme::tv';
-+
-+sub get_links {
-+	shift;
-+	# Do nothing here, as Get IPlayer Automator will do it.
-+	return 0;
-+}
-+
- ################### Radio Programme class #################
- package Programme::radio;
- 
+
 @@ -8796,6 +8807,8 @@
  			$prev_sequence - $start_sequence + 1
  		) if $opt->{verbose};
  	}
 +
 +    main::logger "INFO: Finished downloading to file: $file_tmp\n";
- 
+
  	return 0;
  }

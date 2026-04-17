@@ -15,7 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 typedef NS_ENUM(NSInteger, GIA_ProgrammeType) {
     GiA_ProgrammeTypeBBC_TV,
     GiA_ProgrammeTypeBBC_Radio,
-    GIA_ProgrammeTypeITV
+    GIA_ProgrammeTypeSTV
 };
 
 @interface Programme : NSObject <NSSecureCoding>
