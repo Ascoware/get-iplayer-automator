@@ -4,7 +4,19 @@
         <title>Get iPlayer Automator</title>
         <description>Most recent changes with links to updates.</description>
         <language>en</language>
-                <item>
+                        <item>
+            <title>v1.28.3</title>
+            <pubDate>Sun, 19 Apr 2026 17:37:46 +0000</pubDate>
+            <sparkle:minimumSystemVersion>10.14.0</sparkle:minimumSystemVersion>
+            <enclosure
+                url="https://github.com/Ascoware/get-iplayer-automator/releases/download/v1.28.3/Get.iPlayer.Automator.v1.28.3.b20260419001.zip"
+                sparkle:version="20260419001"
+                sparkle:shortVersionString="1.28.3"
+                sparkle:edSignature="lGNcx//n/1a2GEqNluyApcXZ2esh/5sZd6GSLCd0j50SqlIRRTfr2wB73B5FxnYAhHBSxbD7LQ0O4Z0MI6hmDA=="
+                length="118531819"
+                type="application/octet-stream" />
+        </item>
+        <item>
             <title>v1.28.2</title>
             <pubDate>Wed, 15 Apr 2026 02:28:17 +0000</pubDate>
             <sparkle:minimumSystemVersion>10.14.0</sparkle:minimumSystemVersion>
