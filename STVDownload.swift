@@ -151,7 +151,27 @@ import CocoaLumberjackSwift
     }
     
     
+    private func isAlreadyDownloaded() -> Bool {
+        guard let dir = FileManager.default.applicationSupportDirectory() else { return false }
+        let historyPath = (dir as NSString).appendingPathComponent("download_history")
+        guard let historyData = FileManager.default.contents(atPath: historyPath),
+              let historyString = String(data: historyData, encoding: .utf8) else { return false }
+        return historyString.components(separatedBy: .newlines).contains { line in
+            line.components(separatedBy: "|").first == show.pid
+        }
+    }
+
     private func launchYoutubeDL() {
+        if isAlreadyDownloaded() {
+            DDLogInfo("\(show.showName) is already in download history, skipping")
+            show.complete = true
+            show.successful = false
+            show.status = "Failed: In download history"
+            show.reasonForFailure = "InHistory"
+            NotificationCenter.default.post(name: NSNotification.Name("DownloadFinished"), object: show)
+            return
+        }
+
         setCurrentProgress("Downloading \(show.showName)")
         setPercentage(102)
         show.status = "Downloading..."
