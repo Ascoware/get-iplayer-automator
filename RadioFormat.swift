@@ -1,5 +1,6 @@
 import Foundation
 
+@objc(RadioFormat)
 class RadioFormat: NSObject, NSSecureCoding {
     static var supportsSecureCoding: Bool { true }
 

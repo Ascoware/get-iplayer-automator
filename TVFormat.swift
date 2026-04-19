@@ -1,5 +1,6 @@
 import Foundation
 
+@objc(TVFormat)
 class TVFormat: NSObject, NSSecureCoding {
     static var supportsSecureCoding: Bool { true }
 

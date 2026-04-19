@@ -389,7 +389,7 @@
                 <binding destination="621" name="contentArray" keyPath="radioFormatList" id="1140"/>
             </connections>
         </arrayController>
-        <window title="Pick a time..." allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="ScheduleStartWindow" animationBehavior="default" id="1148" userLabel="Delayed Start" customClass="NSPanel">
+        <window title="Pick a time..." allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="ScheduleStartWindow" animationBehavior="default" id="1148" userLabel="Delayed Start" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" utility="YES" HUD="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="146" width="420" height="225"/>
@@ -697,7 +697,7 @@
             </items>
             <point key="canvasLocation" x="158" y="-258"/>
         </menu>
-        <window title="Get iPlayer Automator" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" frameAutosaveName="mainWindow" animationBehavior="default" id="371" userLabel="Main Window">
+        <window title="Get iPlayer Automator" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" frameAutosaveName="mainWindow" animationBehavior="default" id="371" userLabel="Main Window">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <rect key="contentRect" x="254" y="117" width="807" height="557"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1204"/>
@@ -750,7 +750,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                         <clipView key="contentView" id="EvP-AM-m82">
                             <rect key="frame" x="1" y="1" width="751" height="128"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <autoresizingMask key="autoresizingMask"/>
                             <subviews>
                                 <tableView identifier="SearchResults" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" typeSelect="NO" autosaveName="SearchResults" headerView="494" id="493">
                                     <rect key="frame" x="0.0" y="0.0" width="751" height="111"/>
@@ -953,7 +953,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" copiesOnScroll="NO" id="qBj-Iv-0lY">
                             <rect key="frame" x="0.0" y="0.0" width="769" height="187"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <autoresizingMask key="autoresizingMask"/>
                             <subviews>
                                 <tableView identifier="DownloadQueue" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" typeSelect="NO" autosaveName="DownloadQueue" headerView="470" id="469">
                                     <rect key="frame" x="0.0" y="0.0" width="769" height="170"/>
@@ -1149,7 +1149,7 @@
             </connections>
             <point key="canvasLocation" x="700" y="-154"/>
         </window>
-        <window title="PVR Manager" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="PVRManagerWindow" animationBehavior="default" id="517" userLabel="PVR Manager" customClass="NSPanel">
+        <window title="PVR Manager" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" hidesOnDeactivate="YES" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="PVRManagerWindow" animationBehavior="default" id="517" userLabel="PVR Manager" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="60" width="623" height="450"/>
@@ -1412,7 +1412,7 @@
             </view>
             <point key="canvasLocation" x="380.5" y="1118"/>
         </window>
-        <window title="Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="PreferencesWindow" animationBehavior="default" id="547" userLabel="Preferences" customClass="NSPanel">
+        <window title="Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="PreferencesWindow" animationBehavior="default" id="547" userLabel="Preferences" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" utility="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="16" width="497" height="633"/>
@@ -1910,7 +1910,7 @@
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <clipView key="contentView" id="iNe-PX-Coi">
                                                 <rect key="frame" x="1" y="1" width="398" height="123"/>
-                                                <autoresizingMask key="autoresizingMask"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="1079" id="1078">
                                                         <rect key="frame" x="0.0" y="0.0" width="398" height="106"/>
@@ -1952,7 +1952,11 @@
                                                                 </popUpButtonCell>
                                                                 <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                                 <connections>
-                                                                    <binding destination="1106" name="selectedValue" keyPath="arrangedObjects.format" id="i4B-ih-pN8"/>
+                                                                    <binding destination="1106" name="selectedValue" keyPath="arrangedObjects.format" id="i4B-ih-pN8">
+                                                                        <dictionary key="options">
+                                                                            <string key="NSValueTransformerName">TVFormatTransformer</string>
+                                                                        </dictionary>
+                                                                    </binding>
                                                                 </connections>
                                                             </tableColumn>
                                                         </tableColumns>
@@ -1977,7 +1981,7 @@
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <clipView key="contentView" id="Yo1-zO-Vaa">
                                                 <rect key="frame" x="1" y="1" width="398" height="155"/>
-                                                <autoresizingMask key="autoresizingMask"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="1086" id="1087">
                                                         <rect key="frame" x="0.0" y="0.0" width="398" height="138"/>
@@ -2014,7 +2018,11 @@
                                                                 </popUpButtonCell>
                                                                 <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                                 <connections>
-                                                                    <binding destination="1134" name="selectedValue" keyPath="arrangedObjects.format" id="v9Y-bx-WrT"/>
+                                                                    <binding destination="1134" name="selectedValue" keyPath="arrangedObjects.format" id="v9Y-bx-WrT">
+                                                                        <dictionary key="options">
+                                                                            <string key="NSValueTransformerName">RadioFormatTransformer</string>
+                                                                        </dictionary>
+                                                                    </binding>
                                                                 </connections>
                                                             </tableColumn>
                                                         </tableColumns>
@@ -2537,7 +2545,7 @@
             </view>
             <point key="canvasLocation" x="-22.5" y="-230.5"/>
         </window>
-        <window title="Download History" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="DownloadHistoryWindow" animationBehavior="default" id="1212" userLabel="Download History">
+        <window title="Download History" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="DownloadHistoryWindow" animationBehavior="default" id="1212" userLabel="Download History">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="159" width="584" height="351"/>
@@ -2680,7 +2688,7 @@
             </view>
             <point key="canvasLocation" x="290" y="374"/>
         </window>
-        <window title="Log" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="LogWindow" animationBehavior="default" id="611" userLabel="Log">
+        <window title="Log" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="LogWindow" animationBehavior="default" id="611" userLabel="Log">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="109" width="469" height="401"/>
@@ -2743,7 +2751,7 @@
             </view>
             <point key="canvasLocation" x="82.5" y="111.5"/>
         </window>
-        <window title="Cache Info" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="CacheInfoWindow" animationBehavior="default" titlebarAppearsTransparent="YES" id="882" userLabel="Help Panel: CacheInfo" customClass="NSPanel">
+        <window title="Cache Info" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="CacheInfoWindow" animationBehavior="default" titlebarAppearsTransparent="YES" id="882" userLabel="Help Panel: CacheInfo" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="300" width="397" height="198"/>
@@ -2768,7 +2776,7 @@ Please Note: The searchable/downloadable types will not be updated until the cac
             </view>
             <point key="canvasLocation" x="131.5" y="141"/>
         </window>
-        <window title="Cache Refresh Info" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="CacheRefreshInfoWindow" animationBehavior="default" titlebarAppearsTransparent="YES" id="895" userLabel="Help Panel: CacheRefresh" customClass="NSPanel">
+        <window title="Cache Refresh Info" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="CacheRefreshInfoWindow" animationBehavior="default" titlebarAppearsTransparent="YES" id="895" userLabel="Help Panel: CacheRefresh" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="419" width="397" height="68"/>
@@ -2790,7 +2798,7 @@ Please Note: The searchable/downloadable types will not be updated until the cac
             </view>
             <point key="canvasLocation" x="131.5" y="361"/>
         </window>
-        <window title="Search Help" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="SearchHelpWindow" animationBehavior="default" id="782" userLabel="Help Panel: Search" customClass="NSPanel">
+        <window title="Search Help" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="SearchHelpWindow" animationBehavior="default" id="782" userLabel="Help Panel: Search" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" utility="YES" HUD="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="690" y="385" width="432" height="244"/>
@@ -2817,7 +2825,7 @@ Note 2: Due to the way search is currently implemented, BBC shows older than 7 d
             </view>
             <point key="canvasLocation" x="767" y="352"/>
         </window>
-        <window title="PVR Manager Help" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="PVRManagerHelpWindow" animationBehavior="default" id="1257" userLabel="Help Panel: PVR Manager" customClass="NSPanel">
+        <window title="PVR Manager Help" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="PVRManagerHelpWindow" animationBehavior="default" id="1257" userLabel="Help Panel: PVR Manager" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" utility="YES" HUD="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="690" y="368" width="432" height="295"/>
@@ -2844,7 +2852,7 @@ Note: Only the types of shows you select in the preferences will show up here.</
             </view>
             <point key="canvasLocation" x="-874" y="442"/>
         </window>
-        <window title="Show Name" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="ShowNameWindow" animationBehavior="default" id="1271" userLabel="Show Name Dialog Box">
+        <window title="Show Name" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="ShowNameWindow" animationBehavior="default" id="1271" userLabel="Show Name Dialog Box">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="240" width="480" height="270"/>
@@ -2855,7 +2863,7 @@ Note: Only the types of shows you select in the preferences will show up here.</
             </view>
             <point key="canvasLocation" x="590" y="-190"/>
         </window>
-        <window title="Failed Download Solutions" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="FailedDownloadSolutionsWindow" animationBehavior="default" id="1374">
+        <window title="Failed Download Solutions" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="FailedDownloadSolutionsWindow" animationBehavior="default" id="1374">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="269" y="337" width="802" height="400"/>

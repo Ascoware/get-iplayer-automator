@@ -225,11 +225,24 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         NSData *fileContents = [NSData dataWithContentsOfFile:filePath];
         NSSet *allowedClasses = [NSSet setWithObjects: [NSMutableDictionary class], [NSArray class], [RadioFormat class], [TVFormat class], [NSString class], nil];
         NSError *error;
+
+        // Before @objc() annotations were added, Swift exported these classes under module-qualified
+        // ObjC names (e.g. "Get_iPlayer_Automator.TVFormat"). Register substitutions so old archives
+        // still decode correctly.
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+        [NSKeyedUnarchiver setClass:[TVFormat class] forClassName:@"Get_iPlayer_Automator.TVFormat"];
+        [NSKeyedUnarchiver setClass:[RadioFormat class] forClassName:@"Get_iPlayer_Automator.RadioFormat"];
+#pragma clang diagnostic pop
+
         rootObject = [NSKeyedUnarchiver unarchivedObjectOfClasses:allowedClasses fromData:fileContents error:&error];
         NSArray *archivedTVFormats = [rootObject valueForKey:@"tvFormats"];
         NSMutableArray *updatedTVFormats = [NSMutableArray array];
 
-        for (TVFormat *fmt in archivedTVFormats) {
+        for (id item in archivedTVFormats) {
+            if (![item isKindOfClass:[TVFormat class]]) continue;
+            TVFormat *fmt = (TVFormat *)item;
+            if (fmt.format.length == 0) continue;
             NSString *updatedValue = newTvFormatMapping[fmt.format];
             if (updatedValue) {
                 [updatedTVFormats addObject:[[TVFormat alloc] initWithFormat:updatedValue]];
@@ -243,7 +256,10 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         NSArray *archivedRadioFormats = [rootObject valueForKey:@"radioFormats"];
         NSMutableArray *updatedRadioFormats = [NSMutableArray array];
 
-        for (RadioFormat *fmt in archivedRadioFormats) {
+        for (id item in archivedRadioFormats) {
+            if (![item isKindOfClass:[RadioFormat class]]) continue;
+            RadioFormat *fmt = (RadioFormat *)item;
+            if (fmt.format.length == 0) continue;
             NSString *updatedValue = newRadioFormatMapping[fmt.format];
             if (updatedValue) {
                 [updatedRadioFormats addObject:[[RadioFormat alloc] initWithFormat:updatedValue]];
