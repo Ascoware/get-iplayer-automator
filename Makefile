@@ -21,8 +21,7 @@ PERL_DYLIB  := Binaries/get_iplayer/perl/dylib
 UTILS_BIN   := Binaries/get_iplayer/utils/bin
 
 YT_DLP_URL  ?= https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_macos
-YT_DLP_DIR  := Binaries/yt-dlp_macos
-YT_DLP_BIN  := $(YT_DLP_DIR)/yt-dlp_macos
+YT_DLP_BIN  := Binaries/yt-dlp_macos
 
 # ── Build get_iplayer_macos and export outputs ─────────────────────────────
 
@@ -69,8 +68,6 @@ gip: $(PERL_BIN)/get_iplayer
 # ── Download yt-dlp standalone binary ─────────────────────────────────────
 
 $(YT_DLP_BIN):
-	@mkdir -p $(YT_DLP_DIR)
-	@rm -f $(YT_DLP_BIN)
 	@curl -L -o $(YT_DLP_BIN) $(YT_DLP_URL)
 	@chmod +x $(YT_DLP_BIN)
 	@echo "downloaded yt-dlp"

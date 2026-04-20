@@ -185,11 +185,10 @@ import CocoaLumberjackSwift
         let fh = pipe?.fileHandleForReading
         let errorFh = errorPipe?.fileHandleForReading
 
-        guard let youtubeDLFolder = Bundle.main.path(forResource: "yt-dlp_macos", ofType: nil),
+        guard let youtubeDLBinary = Bundle.main.path(forResource: "yt-dlp_macos", ofType: nil),
               let cacertFile = Bundle.main.url(forResource: "cacert", withExtension: "pem") else {
             return
         }
-        let youtubeDLBinary = youtubeDLFolder + "/yt-dlp_macos"
         var args: [String] = [show.url,
                               "--user-agent",
                               "Mozilla/5.0",

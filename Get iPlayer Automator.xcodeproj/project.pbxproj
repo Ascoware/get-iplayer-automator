@@ -408,7 +408,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 1000;
-				LastUpgradeCheck = 1640;
+				LastUpgradeCheck = 2650;
 				ORGANIZATIONNAME = "";
 				TargetAttributes = {
 					7F23872C2131082C00FA4588 = {
@@ -502,7 +502,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 			shellPath = /bin/bash;
-			shellScript = "echo ${CONFIGURATION_BUILD_DIR}\necho ${UNLOCALIZED_RESOURCES_FOLDER_PATH}\n\nfor (( i=0; i<$SCRIPT_INPUT_FILE_COUNT; i++)) \ndo\n    FILE=\"SCRIPT_INPUT_FILE_$i\"\n    codesign --force --options runtime --entitlements \"${SRCROOT}/Get iPlayer Automator/Get iPlayer Automator.entitlements\" --sign \"Developer ID Application: Scott Kovatch\" \"${!FILE}\"\ndone\n";
+			shellScript = "IDENTITY=\"Developer ID Application: Scott Kovatch\"\nENTITLEMENTS=\"${SRCROOT}/Get iPlayer Automator/Get iPlayer Automator.entitlements\"\n\nfor (( i=0; i<$SCRIPT_INPUT_FILE_COUNT; i++))\ndo\n    FILE=\"SCRIPT_INPUT_FILE_$i\"\n    codesign --force --options runtime --entitlements \"$ENTITLEMENTS\" --sign \"$IDENTITY\" \"${!FILE}\"\ndone\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -725,7 +725,7 @@
 					"$(PROJECT_DIR)",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
-				MARKETING_VERSION = 1.28.3;
+				MARKETING_VERSION = 1.28.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ascoware.getiPlayerAutomator;
 				PRODUCT_NAME = "Get iPlayer Automator";
 				PROVISIONING_PROFILE = "";
@@ -776,7 +776,7 @@
 					"$(PROJECT_DIR)",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
-				MARKETING_VERSION = 1.28.3;
+				MARKETING_VERSION = 1.28.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ascoware.getiPlayerAutomator;
 				PRODUCT_NAME = "Get iPlayer Automator";
 				PROVISIONING_PROFILE = "";
@@ -815,7 +815,9 @@
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = L8BMU8WLEC;
 				ENABLE_MODULE_VERIFIER = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = "DEBUG=1";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -829,6 +831,7 @@
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++14";
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 			};
@@ -862,6 +865,8 @@
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = L8BMU8WLEC;
 				ENABLE_MODULE_VERIFIER = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = "";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -874,6 +879,8 @@
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++14";
 				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
