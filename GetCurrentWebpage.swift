@@ -11,7 +11,7 @@ import CocoaLumberjackSwift
 
 @objc public class GetCurrentWebpage : NSObject {
     
-    private class func extractMetadata(url: String, tabTitle: String, pageSource: String, completion: ([Programme]) -> Void) {
+    private class func extractMetadata(url: String, tabTitle: String, pageSource: String, completion: @escaping ([Programme]) -> Void) {
         if url.hasPrefix("https://www.bbc.co.uk/iplayer/episode/") {
             // PID is always the second-to-last element in the URL.
             let show = Programme()
@@ -148,6 +148,34 @@ import CocoaLumberjackSwift
                     DDLogError("Got some other error: \(error)")
                 }
             }
+        } else if url.hasPrefix("https://player.stv.tv/summary/") {
+            DispatchQueue.global(qos: .userInitiated).async {
+                do {
+                    let episodes = try STVMetadataExtractor.getSeriesEpisodes(html: pageSource)
+                    DispatchQueue.main.async { completion(episodes) }
+                } catch {
+                    DispatchQueue.main.async {
+                        switch error {
+                        case STVMetadataError.noMetadataFound:
+                            let alert = NSAlert()
+                            alert.addButton(withTitle: "OK")
+                            alert.messageText = "Series not available"
+                            alert.informativeText = "No episode information was found on this page. The series may not be available in your region."
+                            alert.alertStyle = .warning
+                            alert.runModal()
+                        case STVMetadataError.drmProtectedError:
+                            let alert = NSAlert()
+                            alert.addButton(withTitle: "OK")
+                            alert.messageText = "Protected content"
+                            alert.informativeText = "This series is DRM protected and cannot be retrieved with Get iPlayer Automator."
+                            alert.alertStyle = .warning
+                            alert.runModal()
+                        default:
+                            DDLogError("STV series extraction error: \(error)")
+                        }
+                    }
+                }
+            }
         } else {
             let invalidPage = NSAlert()
             invalidPage.addButton(withTitle: "OK")
@@ -159,23 +187,7 @@ import CocoaLumberjackSwift
 
     }
 
-    private class func fetchPageSource(urlString: String) -> String? {
-        guard let url = URL(string: urlString) else { return nil }
-        var request = URLRequest(url: url, timeoutInterval: 15)
-        request.setValue("Mozilla/5.0", forHTTPHeaderField: "User-Agent")
-        var result: String? = nil
-        let semaphore = DispatchSemaphore(value: 0)
-        URLSession.shared.dataTask(with: request) { data, _, _ in
-            if let data = data {
-                result = String(data: data, encoding: .utf8)
-            }
-            semaphore.signal()
-        }.resume()
-        semaphore.wait()
-        return result
-    }
-
-    @objc open class func getCurrentWebpage(completion: ([Programme]) -> Void) {
+    @objc open class func getCurrentWebpage(completion: @escaping ([Programme]) -> Void) {
         //Get Default Browser
         guard let browser = UserDefaults.standard.string(forKey: "DefaultBrowser") else {
             return
@@ -249,12 +261,10 @@ import CocoaLumberjackSwift
             let source = fetchPageSource(urlString: url)
                 ?? (tab.executeJavascript?("document.documentElement.outerHTML") as? String)
                 ?? ""
-
             if source.isEmpty {
                 errorGettingHTML.runModal()
                 return
             }
-
             extractMetadata(url: url, tabTitle: title, pageSource: source, completion: completion)
 
         default:
@@ -264,6 +274,26 @@ import CocoaLumberjackSwift
             unsupportedBrowser.informativeText = "Get iPlayer Automator only works with Safari and Chrome. We shouldn't be here; please file a bug."
             unsupportedBrowser.runModal()
         }
+    }
+
+    private class func fetchPageSource(urlString: String) -> String? {
+        guard let url = URL(string: urlString) else { return nil }
+
+        var request = URLRequest(url: url)
+        request.setValue("Mozilla/5.0", forHTTPHeaderField: "User-Agent")
+
+        var result: String? = nil
+        let semaphore = DispatchSemaphore(value: 0)
+
+        URLSession.shared.dataTask(with: request) { data, _, _ in
+            if let data = data {
+                result = String(data: data, encoding: .utf8)
+            }
+            semaphore.signal()
+        }.resume()
+
+        semaphore.wait()
+        return result
     }
 
     private class func searchForPIDs(url: String) -> [Programme] {

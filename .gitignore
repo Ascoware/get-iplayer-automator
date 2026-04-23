@@ -165,6 +165,7 @@ xcuserdata
 # pull your cahnges to other's repo
 #
 *.xccheckout
+xcshareddata/
 
 ####
 # Xcode xcuserstate

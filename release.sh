@@ -99,6 +99,7 @@ if [ "$PUBLISH" -eq 1 ]; then
         "Product/$ARCHIVE_NAME"
 
     # ── Update appcast on gh-pages ─────────────────────────────────────────
+    git stash
     PUB_DATE=$(date -u "+%a, %d %b %Y %H:%M:%S +0000")
     NEW_ITEM="        <item>
             <title>${TAG}</title>
@@ -130,6 +131,7 @@ PYEOF
     git commit -m "release: ${TAG}"
     git push origin gh-pages
     git checkout master
+    git stash pop
 
     echo ""
     echo "Draft release created: https://github.com/${REPO}/releases"

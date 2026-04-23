@@ -96,4 +96,73 @@ class STVMetadataExtractor {
         return [newProgram]
     }
 
+    static func getSeriesEpisodes(html: String) throws -> [Programme] {
+        guard let htmlPage = try? HTML(html: html, encoding: .utf8),
+              let propertiesElement = htmlPage.at_xpath("//script[@id='__NEXT_DATA__']"),
+              let propertiesContent = propertiesElement.content else {
+            throw STVMetadataError.noMetadataFound
+        }
+
+        let json = JSON(parseJSON: propertiesContent)
+        let data = json["props"]["pageProps"]["data"]
+
+        // Programme-level DRM check
+        if data["programmeData"]["drmEnabled"].boolValue {
+            throw STVMetadataError.drmProtectedError
+        }
+
+        let showName = data["programmeHeader"]["name"].stringValue
+        guard !showName.isEmpty else {
+            throw STVMetadataError.noMetadataFound
+        }
+
+        // Find the standard episode tab (type=episode, accessibility=null — excludes audio-described tab)
+        guard let episodeTab = data["tabs"].array?.first(where: {
+            $0["type"].stringValue == "episode" && $0["accessibility"].type == .null
+        }) else {
+            throw STVMetadataError.noMetadataFound
+        }
+
+        var programmes: [Programme] = []
+
+        for episode in episodeTab["data"].arrayValue {
+            guard let link = episode["link"].string, !link.isEmpty else { continue }
+            let episodeURLString = "https://player.stv.tv" + link
+
+            guard let episodeHTML = fetchHTML(urlString: episodeURLString) else {
+                DDLogWarn("Failed to fetch episode page: \(episodeURLString)")
+                continue
+            }
+
+            do {
+                let progs = try getShowMetadata(html: episodeHTML)
+                programmes.append(contentsOf: progs)
+            } catch {
+                DDLogWarn("Failed to extract metadata from \(episodeURLString): \(error)")
+            }
+        }
+
+        return programmes
+    }
+
+    private static func fetchHTML(urlString: String) -> String? {
+        guard let url = URL(string: urlString) else { return nil }
+
+        var request = URLRequest(url: url)
+        request.setValue("Mozilla/5.0", forHTTPHeaderField: "User-Agent")
+
+        var result: String? = nil
+        let semaphore = DispatchSemaphore(value: 0)
+
+        URLSession.shared.dataTask(with: request) { data, _, _ in
+            if let data = data {
+                result = String(data: data, encoding: .utf8)
+            }
+            semaphore.signal()
+        }.resume()
+
+        semaphore.wait()
+        return result
+    }
+
 }
