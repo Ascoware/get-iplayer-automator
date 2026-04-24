@@ -11,7 +11,7 @@ import CocoaLumberjackSwift
 
 @objc public class GetCurrentWebpage : NSObject {
     
-    private class func extractMetadata(url: String, tabTitle: String, pageSource: String, completion: @escaping ([Programme]) -> Void) {
+    class func extractMetadata(url: String, tabTitle: String, pageSource: String, completion: @escaping ([Programme]) -> Void) {
         if url.hasPrefix("https://www.bbc.co.uk/iplayer/episode/") {
             // PID is always the second-to-last element in the URL.
             let show = Programme()
@@ -185,6 +185,25 @@ import CocoaLumberjackSwift
             invalidPage.runModal()
         }
 
+    }
+
+    @objc public class func processExtensionPayload(completion: @escaping ([Programme]) -> Void) {
+        guard let containerURL = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: "group.com.ascoware.get-iplayer-automator") else {
+            DDLogError("[GiA] processExtensionPayload: no App Group container")
+            return
+        }
+        let fileURL = containerURL.appendingPathComponent("pending_page.json")
+        guard let data = try? Data(contentsOf: fileURL),
+              let payload = try? JSONSerialization.jsonObject(with: data) as? [String: String],
+              let url = payload["url"] else {
+            DDLogError("[GiA] processExtensionPayload: missing or unreadable pending_page.json")
+            return
+        }
+        let title = payload["title"] ?? ""
+        let html  = payload["html"]  ?? ""
+        try? FileManager.default.removeItem(at: fileURL)
+        extractMetadata(url: url, tabTitle: title, pageSource: html, completion: completion)
     }
 
     @objc open class func getCurrentWebpage(completion: @escaping ([Programme]) -> Void) {

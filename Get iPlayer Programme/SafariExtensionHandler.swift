@@ -52,7 +52,7 @@ class SafariExtensionHandler: SFSafariExtensionHandler {
                         // Launch app if not running, then post Darwin notification
                         DispatchQueue.main.async {
                             NSWorkspace.shared.launchApplication(
-                                withBundleIdentifier: "com.ascoware.getiPlayerAutomator",
+                                withBundleIdentifier: "com.ascoware.get-iplayer-automator",
                                 options: .default,
                                 additionalEventParamDescriptor: nil,
                                 launchIdentifier: nil)

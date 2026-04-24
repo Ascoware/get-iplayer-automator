@@ -147,6 +147,7 @@ extern NSDictionary<NSString *, NSString *> *radioFormats;
 - (IBAction)addToQueue:(id)sender;
 - (IBAction)getCurrentWebpage:(id)sender;
 - (IBAction)removeFromQueue:(id)sender;
+- (void)handleExtensionNewPage;
 
 //Download Controller
 - (IBAction)startDownloads:(id)sender;

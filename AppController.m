@@ -13,6 +13,13 @@
 #import "Get_iPlayer_Automator-Swift.h"
 
 static AppController *sharedController;
+
+static void extensionNewPageCallback(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo) {
+    AppController *controller = (__bridge AppController *)observer;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [controller handleExtensionNewPage];
+    });
+}
 BOOL runDownloads = NO;
 BOOL runUpdate = NO;
 NSDictionary<NSString*, NSString*> *tvFormats;
@@ -339,7 +346,44 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     infoPath = infoPath.stringByExpandingTildeInPath;
     if ([fileManager fileExistsAtPath:infoPath]) [fileManager removeItemAtPath:infoPath error:nil];
 
+    // Register for Safari extension Darwin notification
+    CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(),
+                                    (__bridge const void *)(self),
+                                    extensionNewPageCallback,
+                                    CFSTR("com.ascoware.get-iplayer-automator.newpage"),
+                                    NULL,
+                                    CFNotificationSuspensionBehaviorDeliverImmediately);
+
     [self updateCache:nil];
+}
+
+- (void)handleExtensionNewPage
+{
+    void(^callback)(NSArray<Programme*>* _Nonnull) = ^void (NSArray<Programme*>* programs){
+        dispatch_async(dispatch_get_main_queue(), ^{
+            for (Programme *p in programs) {
+                NSArray *tempQueue = self.queueController.arrangedObjects;
+                BOOL foundIt = NO;
+                for (Programme *show in tempQueue) {
+                    if ([show.pid isEqualToString:p.pid]) {
+                        foundIt = YES;
+                    }
+                }
+                if (!foundIt) {
+                    p.status = @"Processing...";
+                    [p performSelectorInBackground:@selector(getName) withObject:nil];
+                    [self.queueController addObject:p];
+                }
+            }
+        });
+    };
+    [GetCurrentWebpage processExtensionPayloadWithCompletion:callback];
+}
+
+- (void)applicationDidBecomeActive:(NSNotification *)notification
+{
+    // Pick up any page the Safari extension wrote before the app was running
+    [self handleExtensionNewPage];
 }
 
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)application
@@ -410,6 +454,10 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     if (runDownloads)
         [_currentDownload cancel];
 
+    CFNotificationCenterRemoveObserver(CFNotificationCenterGetDarwinNotifyCenter(),
+                                       (__bridge const void *)(self),
+                                       CFSTR("com.ascoware.get-iplayer-automator.newpage"),
+                                       NULL);
     [self saveAppData];
 }
 
