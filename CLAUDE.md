@@ -78,4 +78,4 @@ A custom patch (`get_iplayer_custom.patch`) modifies the upstream Perl script to
 
 ## Tests
 
-No automated test suite exists. CI (`.github/workflows/objective-c-xcode.yml`) runs `release.sh` on push/PR to master.
+No automated test suite exists. There is no CI — releases are built locally via `./release.sh`.
