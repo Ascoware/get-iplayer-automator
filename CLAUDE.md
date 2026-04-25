@@ -31,9 +31,12 @@ make yt-dlp       # Download yt-dlp standalone binary
 
 ### Release
 ```sh
-./bump_build.sh   # Increment build number
-./release.sh      # xcodebuild archive → notarize → staple → zip
+./release.sh                   # bump build number → archive → notarize → staple → zip
+./release.sh --minor           # also bump MARKETING_VERSION patch (z) component
+./release.sh --major           # also bump middle (y) component, reset z to 0
+./release.sh --publish         # create draft GitHub release + update appcast
 ```
+Marketing version and build number live in `Version.xcconfig` (shared by the app and Safari extension via `baseConfigurationReference`).
 
 ## Architecture
 
@@ -75,4 +78,4 @@ A custom patch (`get_iplayer_custom.patch`) modifies the upstream Perl script to
 
 ## Tests
 
-No automated test suite exists. CI (`.github/workflows/objective-c-xcode.yml`) runs `bump_build.sh` + `release.sh` on push/PR to master.
+No automated test suite exists. CI (`.github/workflows/objective-c-xcode.yml`) runs `release.sh` on push/PR to master.

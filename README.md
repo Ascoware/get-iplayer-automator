@@ -44,26 +44,21 @@ To use a specific get_iplayer tag:
 make gip GIP_TAG=v3.36
 ```
 
-### 2. Bump the build number
-
-```sh
-./bump_build.sh
-```
-
-This increments the `CFBundleVersion` in `Info.plist` (format: `YYYYMMDDNNN`). Commit `Info.plist` if you want the build number tracked.
-
-### 3. Build, notarize, and package
+### 2. Build, notarize, and package
 
 ```sh
 ./release.sh
 ```
 
 This script:
-1. Archives the app with `xcodebuild`
-2. Exports the archive using `ExportOptions.plist`
-3. Zips the app as `Product/Get iPlayer Automator.v<version>.b<build>.zip`
-4. Notarizes via `xcrun notarytool` (uses the keychain profile `get-iplayer-automator-notary`)
-5. Staples the notarization ticket and re-zips
+1. Bumps `CURRENT_PROJECT_VERSION` (CFBundleVersion) in `Version.xcconfig` to a fresh `YYYYMMDDhhmm` timestamp
+2. Archives the app with `xcodebuild`
+3. Exports the archive using `ExportOptions.plist`
+4. Zips the app as `Product/Get iPlayer Automator.v<version>.b<build>.zip`
+5. Notarizes via `xcrun notarytool` (uses the keychain profile `get-iplayer-automator-notary`)
+6. Staples the notarization ticket and re-zips
+
+Pass `--minor` to bump the patch component of `MARKETING_VERSION` (e.g. 1.29.0 → 1.29.1) or `--major` to bump the middle component and reset the patch (1.29.0 → 1.30.0); the two flags are mutually exclusive. When either is used, `Version.xcconfig` is committed after a successful export so the bump is tied to the release tag.
 
 The notarytool keychain profile must be set up in advance:
 ```sh
@@ -71,9 +66,9 @@ xcrun notarytool store-credentials "get-iplayer-automator-notary" \
   --apple-id <your-apple-id> --team-id <team-id>
 ```
 
-### 4. Upload to GitHub
+### 3. Upload to GitHub
 
-Upload `Product/Get iPlayer Automator.v<version>.b<build>.zip` as a GitHub release asset.
+Upload `Product/Get iPlayer Automator.v<version>.b<build>.zip` as a GitHub release asset, or run `./release.sh --publish` to create a draft release and update the appcast automatically.
 
 ### Custom get_iplayer changes
 

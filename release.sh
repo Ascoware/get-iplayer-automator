@@ -4,6 +4,7 @@ PROJECT_NAME="Get iPlayer Automator"
 PROJECT_DIR=$(pwd)
 INFOPLIST_FILE="Info.plist"
 PUBLISH=0
+BUMP=""
 
 # Sparkle sign_update tool (from SPM artifacts)
 SIGN_UPDATE=$(find ~/Library/Developer/Xcode/DerivedData -name "sign_update" \
@@ -16,9 +17,38 @@ fi
 for arg in "$@"; do
     case "$arg" in
         --publish) PUBLISH=1 ;;
+        --minor|--major)
+            if [ -n "$BUMP" ]; then
+                echo "ERROR: --minor and --major are mutually exclusive"
+                exit 1
+            fi
+            BUMP="${arg#--}" ;;
         *) echo "Unknown argument: $arg"; exit 1 ;;
     esac
 done
+
+# ── Version bump ──────────────────────────────────────────────────────────
+# x.y.z scheme. --minor bumps z; --major bumps y and resets z to 0.
+NEW_VERSION=""
+if [ -n "$BUMP" ]; then
+    CURRENT=$(awk -F' = ' '$1=="MARKETING_VERSION" {print $2}' Version.xcconfig)
+    if ! [[ "$CURRENT" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        echo "ERROR: MARKETING_VERSION '$CURRENT' is not in x.y.z form"
+        exit 1
+    fi
+    IFS=. read -r X Y Z <<< "$CURRENT"
+    case "$BUMP" in
+        minor) Z=$((Z + 1)) ;;
+        major) Y=$((Y + 1)); Z=0 ;;
+    esac
+    NEW_VERSION="${X}.${Y}.${Z}"
+    sed -i '' -E "s/^MARKETING_VERSION = .*/MARKETING_VERSION = ${NEW_VERSION}/" Version.xcconfig
+    echo "Bumped MARKETING_VERSION: ${CURRENT} → ${NEW_VERSION}"
+fi
+
+# Bump CFBundleVersion (CURRENT_PROJECT_VERSION) to a fresh build timestamp.
+BUILD_STRING=$(date +'%Y%m%d%H%M')
+sed -i '' -E "s/^CURRENT_PROJECT_VERSION = .*/CURRENT_PROJECT_VERSION = ${BUILD_STRING}/" Version.xcconfig
 
 # ── Populate Binaries/ ────────────────────────────────────────────────────
 
@@ -34,6 +64,17 @@ xcodebuild clean -project "$PROJECT_NAME.xcodeproj" -configuration Release -allt
 xcodebuild archive -project "$PROJECT_NAME.xcodeproj" -scheme "$PROJECT_NAME" -archivePath "Archive/$PROJECT_NAME.xcarchive"
 
 xcodebuild -exportArchive -allowProvisioningUpdates -archivePath "Archive/$PROJECT_NAME.xcarchive" -exportPath "Product/$PROJECT_NAME" -exportOptionsPlist ExportOptions.plist
+
+if [ ! -d "Product/${PROJECT_NAME}/${PROJECT_NAME}.app" ]; then
+    echo "ERROR: export failed; aborting"
+    exit 1
+fi
+
+# Commit the bumped version on the same SHA the release tag will point at.
+if [ -n "$NEW_VERSION" ]; then
+    git add Version.xcconfig
+    git commit -m "Bump version to ${NEW_VERSION}"
+fi
 
 cd "Product/${PROJECT_NAME}"
 CFBundleVersion=$(/usr/libexec/PlistBuddy -c "Print CFBundleVersion" "$PROJECT_NAME.app/Contents/${INFOPLIST_FILE}")

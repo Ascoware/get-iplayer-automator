@@ -24,5 +24,4 @@ jobs:
         env:
           scheme: ${{ 'default' }}
         run: |
-          ./bump_build.sh
           ./release.sh
