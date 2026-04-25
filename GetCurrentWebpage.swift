@@ -149,9 +149,12 @@ import CocoaLumberjackSwift
                 }
             }
         } else if url.hasPrefix("https://player.stv.tv/summary/") {
+            // The selected series is encoded in the URL fragment, e.g.
+            // .../summary/all31-kingdom#all31-kingdom-series-3
+            let selectedSeriesId = URLComponents(string: url)?.fragment
             DispatchQueue.global(qos: .userInitiated).async {
                 do {
-                    let episodes = try STVMetadataExtractor.getSeriesEpisodes(html: pageSource)
+                    let episodes = try STVMetadataExtractor.getSeriesEpisodes(html: pageSource, selectedSeriesId: selectedSeriesId)
                     DispatchQueue.main.async { completion(episodes) }
                 } catch {
                     DispatchQueue.main.async {
