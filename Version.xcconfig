@@ -2,5 +2,5 @@
 // stays in sync. Edited by bump_build.sh and release.sh — keep this format
 // (one setting per line, no trailing inline comments) so the sed scripts work.
 
-MARKETING_VERSION = 1.29.0
-CURRENT_PROJECT_VERSION = 202604231639
+MARKETING_VERSION = 1.29.1
+CURRENT_PROJECT_VERSION = 202604251056
