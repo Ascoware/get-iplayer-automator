@@ -142,9 +142,46 @@ if [ "$PUBLISH" -eq 1 ]; then
     # ── Update appcast on gh-pages ─────────────────────────────────────────
     git stash
     PUB_DATE=$(date -u "+%a, %d %b %Y %H:%M:%S +0000")
+
+    # Convert release notes to HTML for Sparkle's update alert. Lines starting
+    # with "- " or "* " become <li>; blank-line-separated runs of plain text
+    # become <p>. CDATA wraps the result so XML-special characters survive.
+    NOTES_HTML=$(printf '%s\n' "$RELEASE_NOTES" | python3 -c '
+import sys, html, re
+lines = [l.rstrip() for l in sys.stdin]
+out, buf, in_list = [], [], False
+def flush_para():
+    if buf:
+        out.append("<p>" + " ".join(html.escape(b) for b in buf) + "</p>")
+        buf.clear()
+def close_list():
+    global in_list
+    if in_list:
+        out.append("</ul>")
+        in_list = False
+for line in lines:
+    m = re.match(r"^\s*[-*]\s+(.*)", line)
+    if m:
+        flush_para()
+        if not in_list:
+            out.append("<ul>")
+            in_list = True
+        out.append("<li>" + html.escape(m.group(1)) + "</li>")
+    elif line.strip() == "":
+        flush_para()
+        close_list()
+    else:
+        close_list()
+        buf.append(line)
+flush_para()
+close_list()
+print("".join(out))
+')
+
     NEW_ITEM="        <item>
             <title>${TAG}</title>
             <pubDate>${PUB_DATE}</pubDate>
+            <description><![CDATA[${NOTES_HTML}]]></description>
             <sparkle:minimumSystemVersion>10.14.0</sparkle:minimumSystemVersion>
             <enclosure
                 url=\"${DOWNLOAD_URL}\"

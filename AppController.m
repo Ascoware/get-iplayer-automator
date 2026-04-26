@@ -117,6 +117,22 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 
     NSUserDefaults *stdDefaults = [NSUserDefaults standardUserDefaults];
 
+    // Migrate preferences from the legacy bundle identifier. The bundle ID changed
+    // from com.ascoware.getiPlayerAutomator to com.ascoware.get-iplayer-automator in 1.29,
+    // which orphaned every user's settings. Keys are unchanged, so we can copy them across.
+    if (![stdDefaults boolForKey:@"MigratedFromLegacyBundleID"]) {
+        NSDictionary *oldPrefs = CFBridgingRelease(CFPreferencesCopyMultiple(NULL,
+                                                                             CFSTR("com.ascoware.getiPlayerAutomator"),
+                                                                             kCFPreferencesCurrentUser,
+                                                                             kCFPreferencesAnyHost));
+        for (NSString *key in oldPrefs) {
+            if (![stdDefaults objectForKey:key]) {
+                [stdDefaults setObject:oldPrefs[key] forKey:key];
+            }
+        }
+        [stdDefaults setBool:YES forKey:@"MigratedFromLegacyBundleID"];
+    }
+
     [stdDefaults registerDefaults:defaultValues];
     defaultValues = nil;
     
