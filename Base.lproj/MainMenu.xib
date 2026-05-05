@@ -750,7 +750,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                         <clipView key="contentView" id="EvP-AM-m82">
                             <rect key="frame" x="1" y="1" width="751" height="128"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView identifier="SearchResults" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" typeSelect="NO" autosaveName="SearchResults" headerView="494" id="493">
                                     <rect key="frame" x="0.0" y="0.0" width="751" height="111"/>
@@ -876,7 +876,7 @@
                     </button>
                     <progressIndicator wantsLayer="YES" verticalHuggingPriority="750" fixedFrame="YES" maxValue="100" bezeled="NO" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="505">
                         <rect key="frame" x="20" y="12" width="769" height="20"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                     </progressIndicator>
                     <textField focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="508">
                         <rect key="frame" x="18" y="37" width="581" height="17"/>
@@ -953,7 +953,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" copiesOnScroll="NO" id="qBj-Iv-0lY">
                             <rect key="frame" x="0.0" y="0.0" width="769" height="187"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView identifier="DownloadQueue" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" typeSelect="NO" autosaveName="DownloadQueue" headerView="470" id="469">
                                     <rect key="frame" x="0.0" y="0.0" width="769" height="170"/>
@@ -1147,7 +1147,7 @@
             <connections>
                 <outlet property="delegate" destination="621" id="667"/>
             </connections>
-            <point key="canvasLocation" x="700" y="-154"/>
+            <point key="canvasLocation" x="699.5" y="-154.5"/>
         </window>
         <window title="PVR Manager" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" hidesOnDeactivate="YES" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="PVRManagerWindow" animationBehavior="default" id="517" userLabel="PVR Manager" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
@@ -1180,7 +1180,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                         <clipView key="contentView" id="en0-B7-GvD">
                             <rect key="frame" x="1" y="1" width="564" height="145"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="sequential" columnSelection="YES" autosaveColumns="NO" headerView="526" id="525">
                                     <rect key="frame" x="0.0" y="0.0" width="564" height="128"/>
@@ -1276,7 +1276,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" id="vxe-2Q-IFs">
                             <rect key="frame" x="1" y="1" width="564" height="124"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="sequential" columnSelection="YES" autosaveColumns="NO" headerView="537" id="536">
                                     <rect key="frame" x="0.0" y="0.0" width="564" height="107"/>
@@ -1910,7 +1910,7 @@
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <clipView key="contentView" id="iNe-PX-Coi">
                                                 <rect key="frame" x="1" y="1" width="398" height="123"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <autoresizingMask key="autoresizingMask"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="1079" id="1078">
                                                         <rect key="frame" x="0.0" y="0.0" width="398" height="106"/>
@@ -1981,7 +1981,7 @@
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <clipView key="contentView" id="Yo1-zO-Vaa">
                                                 <rect key="frame" x="1" y="1" width="398" height="155"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <autoresizingMask key="autoresizingMask"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="1086" id="1087">
                                                         <rect key="frame" x="0.0" y="0.0" width="398" height="138"/>
