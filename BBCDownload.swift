@@ -132,7 +132,6 @@ import CocoaLumberjackSwift
 
         if UserDefaults.standard.bool(forKey: "TagRadioAsPodcast") {
             args.append("--tag-podcast-radio")
-            show.podcast = true
         }
 
         task = Process()

@@ -35,7 +35,6 @@ import CocoaLumberjackSwift
     dynamic var episode: Int = 0
     var processedPID = false
     var radio = false
-    var podcast = false
     var realPID: String = ""
     var subtitlePath: String = ""
     var reasonForFailure: String = ""
@@ -115,7 +114,6 @@ import CocoaLumberjackSwift
         coder.encode(episode, forKey: "episode")
         coder.encode(processedPID, forKey: "processedPID")
         coder.encode(radio, forKey: "radio")
-        coder.encode(podcast, forKey: "podcast")
         coder.encode(realPID, forKey: "realPID")
         coder.encode(subtitlePath, forKey: "subtitlePath")
         coder.encode(reasonForFailure, forKey: "reasonForFailure")

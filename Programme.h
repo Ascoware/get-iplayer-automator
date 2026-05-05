@@ -33,7 +33,6 @@ typedef NS_ENUM(NSInteger, GIA_ProgrammeType) {
 @property (assign) NSInteger episode;
 @property (assign) BOOL processedPID;
 @property (assign) BOOL radio;
-@property (assign) BOOL podcast;
 @property (copy) NSString *realPID;
 @property (copy) NSString *subtitlePath;
 @property (copy) NSString *reasonForFailure;

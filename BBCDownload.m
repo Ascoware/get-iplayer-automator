@@ -173,7 +173,6 @@
         
         if ([[NSUserDefaults standardUserDefaults] boolForKey:@"TagRadioAsPodcast"]) {
             [args addObject:@"--tag-podcast-radio"];
-            self.show.podcast = YES;
         }
 
         self.task = [NSTask new];

@@ -1828,10 +1828,8 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 
         switch (show.type) {
             case ProgrammeTypeRadio:
-                if (!show.podcast) {
-                    iTunes = [SBApplication applicationWithBundleIdentifier:@"com.apple.Music"];
-                    appName = @"Music";
-                }
+                iTunes = [SBApplication applicationWithBundleIdentifier:@"com.apple.Music"];
+                appName = @"Music";
                 break;
 
             default:
