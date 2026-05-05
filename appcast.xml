@@ -4,7 +4,20 @@
         <title>Get iPlayer Automator</title>
         <description>Most recent changes with links to updates.</description>
         <language>en</language>
-                                <item>
+                                        <item>
+            <title>v1.29.4</title>
+            <pubDate>Tue, 05 May 2026 23:19:06 +0000</pubDate>
+            <description><![CDATA[<ul><li>Fixed main window layout that could lead to elements disappearing</li><li>Removed special checking for podcasts -- podcast app has long since disappeared. All radio programs go to Music.app.</li></ul>]]></description>
+            <sparkle:minimumSystemVersion>10.14.0</sparkle:minimumSystemVersion>
+            <enclosure
+                url="https://github.com/Ascoware/get-iplayer-automator/releases/download/v1.29.4/Get.iPlayer.Automator.v1.29.4.b202605051609.zip"
+                sparkle:version="202605051609"
+                sparkle:shortVersionString="1.29.4"
+                sparkle:edSignature="/ZrdokUi/52fGEyM4d9tHLLXNY2+EuigkRKyo9QGsZf24jgi+XHVfC4otnV5OSRz0Qv/w5LKiwv5fdemuzpNAQ=="
+                length="118903290"
+                type="application/octet-stream" />
+        </item>
+        <item>
             <title>v1.29.3</title>
             <pubDate>Sun, 26 Apr 2026 17:32:11 +0000</pubDate>
             <description><![CDATA[<ul><li>If you had run a version of Get iPlayer Automator prior to 1.29.0, your settings were lost after running that new version because the bundle identifier changed. Those old settings will be migrated to the new identifier.</li></ul>]]></description>
