@@ -18,7 +18,7 @@
 		7F21033C2E11E06B0055A623 /* ReasonForFailure.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFC865E013E96BE200606599 /* ReasonForFailure.swift */; };
 		7F2387312131082C00FA4588 /* SafariExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F2387302131082C00FA4588 /* SafariExtensionHandler.swift */; };
 		7F23873B2131082C00FA4588 /* ToolbarItemIcon.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 7F23873A2131082C00FA4588 /* ToolbarItemIcon.pdf */; };
-		7F23873E2131082C00FA4588 /* Get iPlayer Programme.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 7F23872D2131082C00FA4588 /* Get iPlayer Programme.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		7F23873E2131082C00FA4588 /* Get iPlayer Programme.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 7F23872D2131082C00FA4588 /* Get iPlayer Programme.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		7F2507C02E1F51DD001C9523 /* Chrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F2507BE2E1F51DD001C9523 /* Chrome.swift */; };
 		7F2507C12E1F51DD001C9523 /* Safari.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F2507BF2E1F51DD001C9523 /* Safari.swift */; };
 		7F2507C42E1F51F9001C9523 /* SBApplicationProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F2507C22E1F51F9001C9523 /* SBApplicationProtocol.swift */; };
@@ -76,15 +76,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		D943D2721B37B19D00452FCD /* Embed App Extensions */ = {
+		D943D2721B37B19D00452FCD /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				7F23873E2131082C00FA4588 /* Get iPlayer Programme.appex in Embed App Extensions */,
+				7F23873E2131082C00FA4588 /* Get iPlayer Programme.appex in Embed Foundation Extensions */,
 			);
-			name = "Embed App Extensions";
+			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		D9CCF443102349ED009205BE /* Copy Frameworks */ = {
@@ -101,11 +101,11 @@
 
 /* Begin PBXFileReference section */
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		7F0000000000000000000001 /* Version.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Version.xcconfig; sourceTree = "<group>"; };
 		392A41A3169735340053DEA5 /* HTTPProxy.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; path = HTTPProxy.swift; sourceTree = "<group>"; };
 		393D1DED18A5BBB500F27880 /* RSRTVArrayController.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; path = RSRTVArrayController.swift; sourceTree = "<group>"; };
 		39D52EA71DAAFD450033C4ED /* NPHistoryWindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NPHistoryWindowController.swift; sourceTree = "<group>"; };
 		39FD5E9519D370BD006BC47B /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = "Get iPlayer Automator/Images.xcassets"; sourceTree = "<group>"; };
+		7F0000000000000000000001 /* Version.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Version.xcconfig; sourceTree = "<group>"; };
 		7F165A13205C1F15005BB78A /* ProgrammeHistoryEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgrammeHistoryEntry.swift; sourceTree = "<group>"; };
 		7F165A15205C1F8C005BB78A /* NewProgrammeHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewProgrammeHistory.swift; sourceTree = "<group>"; };
 		7F165A17205C4051005BB78A /* NSScanner+Swift.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSScanner+Swift.swift"; sourceTree = "<group>"; };
@@ -385,7 +385,7 @@
 				D9CCF443102349ED009205BE /* Copy Frameworks */,
 				8D1107290486CEB800E47090 /* Resources */,
 				8D11072C0486CEB800E47090 /* Sources */,
-				D943D2721B37B19D00452FCD /* Embed App Extensions */,
+				D943D2721B37B19D00452FCD /* Embed Foundation Extensions */,
 				8D11072E0486CEB800E47090 /* Frameworks */,
 				7F9E811629B3BBC600B435D9 /* Run Script */,
 			);
@@ -415,7 +415,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 1000;
-				LastUpgradeCheck = 2650;
+				LastUpgradeCheck = 2660;
 				ORGANIZATIONNAME = "";
 				TargetAttributes = {
 					7F23872C2131082C00FA4588 = {
@@ -616,7 +616,7 @@
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = L8BMU8WLEC;
-				ENABLE_HARDENED_RUNTIME = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -637,6 +637,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.ascoware.get-iplayer-automator.safari-extension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				REGISTER_APP_GROUPS = YES;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
@@ -685,6 +686,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.ascoware.get-iplayer-automator.safari-extension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				REGISTER_APP_GROUPS = YES;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 4.2;
@@ -707,7 +709,7 @@
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = L8BMU8WLEC;
-				ENABLE_HARDENED_RUNTIME = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
 				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
 				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
@@ -842,6 +844,7 @@
 				ENABLE_MODULE_VERIFIER = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = "DEBUG=1";
@@ -891,6 +894,7 @@
 				DEVELOPMENT_TEAM = L8BMU8WLEC;
 				ENABLE_MODULE_VERIFIER = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = "";
