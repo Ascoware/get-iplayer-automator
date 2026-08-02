@@ -4,7 +4,20 @@
         <title>Get iPlayer Automator</title>
         <description>Most recent changes with links to updates.</description>
         <language>en</language>
-                                        <item>
+                                                <item>
+            <title>v1.29.5</title>
+            <pubDate>Sun, 02 Aug 2026 18:05:32 +0000</pubDate>
+            <description><![CDATA[<ul><li>STV updated their program web pages again, so the metadata retrieval ncode needed an update.</li></ul>]]></description>
+            <sparkle:minimumSystemVersion>10.14.0</sparkle:minimumSystemVersion>
+            <enclosure
+                url="https://github.com/Ascoware/get-iplayer-automator/releases/download/v1.29.5/Get.iPlayer.Automator.v1.29.5.b202608021044.zip"
+                sparkle:version="202608021044"
+                sparkle:shortVersionString="1.29.5"
+                sparkle:edSignature="4YckO+AiBiJc7we6Jh5f1E+WHEv/mnqpD671Vmom3Ktv/8neDEFfkTgSHs0qk99g2cgcAYjGShiEw4FUGUB5BA=="
+                length="118907546"
+                type="application/octet-stream" />
+        </item>
+        <item>
             <title>v1.29.4</title>
             <pubDate>Tue, 05 May 2026 23:19:06 +0000</pubDate>
             <description><![CDATA[<ul><li>Fixed main window layout that could lead to elements disappearing</li><li>Removed special checking for podcasts -- podcast app has long since disappeared. All radio programs go to Music.app.</li></ul>]]></description>
