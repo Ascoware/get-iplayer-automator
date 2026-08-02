@@ -124,28 +124,34 @@ import CocoaLumberjackSwift
 
             completion(showList)
         } else if url.hasPrefix("https://player.stv.tv/episode/") {
-            do {
-                let show = try STVMetadataExtractor.getShowMetadata(html: pageSource)
-                completion(show)
-            } catch (let error) {
-                switch error {
-                case STVMetadataError.noMetadataFound:
-                    let invalidPage = NSAlert()
-                    invalidPage.addButton(withTitle: "OK")
-                    invalidPage.messageText = "Programme not available"
-                    invalidPage.informativeText = "No programme information was found on this page. This could be because the program is not available in your country."
-                    invalidPage.alertStyle = .warning
-                    invalidPage.runModal()
+            // getShowMetadata now makes a synchronous call to the STV player API, so run it
+            // off the main thread and marshal the result/alerts back.
+            DispatchQueue.global(qos: .userInitiated).async {
+                do {
+                    let show = try STVMetadataExtractor.getShowMetadata(html: pageSource)
+                    DispatchQueue.main.async { completion(show) }
+                } catch (let error) {
+                    DispatchQueue.main.async {
+                        switch error {
+                        case STVMetadataError.noMetadataFound:
+                            let invalidPage = NSAlert()
+                            invalidPage.addButton(withTitle: "OK")
+                            invalidPage.messageText = "Programme not available"
+                            invalidPage.informativeText = "No programme information was found on this page. This could be because the program is not available in your country."
+                            invalidPage.alertStyle = .warning
+                            invalidPage.runModal()
 
-                case STVMetadataError.drmProtectedError:
-                    let invalidPage = NSAlert()
-                    invalidPage.addButton(withTitle: "OK")
-                    invalidPage.messageText = "Protected content"
-                    invalidPage.informativeText = "The selected programme is DRM protected, so it cannot be retrieved with Get iPlayer Automator."
-                    invalidPage.alertStyle = .warning
-                    invalidPage.runModal()
-                default:
-                    DDLogError("Got some other error: \(error)")
+                        case STVMetadataError.drmProtectedError:
+                            let invalidPage = NSAlert()
+                            invalidPage.addButton(withTitle: "OK")
+                            invalidPage.messageText = "Protected content"
+                            invalidPage.informativeText = "The selected programme is DRM protected, so it cannot be retrieved with Get iPlayer Automator."
+                            invalidPage.alertStyle = .warning
+                            invalidPage.runModal()
+                        default:
+                            DDLogError("Got some other error: \(error)")
+                        }
+                    }
                 }
             }
         } else if url.hasPrefix("https://player.stv.tv/summary/") {
