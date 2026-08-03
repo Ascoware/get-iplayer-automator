@@ -66,13 +66,17 @@ $(PERL_BIN)/get_iplayer: get_iplayer_custom.patch
 gip: $(PERL_BIN)/get_iplayer
 
 # ── Download yt-dlp standalone binary ─────────────────────────────────────
+# Always fetch the latest release. yt-dlp warns when it is >90 days old and
+# ships frequently, so we re-download on every build rather than caching a
+# stale binary. Download to a temp file and swap in place so a failed fetch
+# leaves the existing binary intact.
 
-$(YT_DLP_BIN):
-	@curl -L -o $(YT_DLP_BIN) $(YT_DLP_URL)
-	@chmod +x $(YT_DLP_BIN)
-	@echo "downloaded yt-dlp"
-
-yt-dlp: $(YT_DLP_BIN)
+yt-dlp:
+	@echo "downloading latest yt-dlp…"
+	@curl -fL --retry 3 -o $(YT_DLP_BIN).tmp $(YT_DLP_URL)
+	@chmod +x $(YT_DLP_BIN).tmp
+	@mv $(YT_DLP_BIN).tmp $(YT_DLP_BIN)
+	@echo "downloaded yt-dlp ($$($(YT_DLP_BIN) --version 2>/dev/null))"
 
 # ── Top-level targets ──────────────────────────────────────────────────────
 
