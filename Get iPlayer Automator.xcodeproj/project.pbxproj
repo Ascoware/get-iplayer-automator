@@ -952,7 +952,7 @@
 			repositoryURL = "https://github.com/sparkle-project/Sparkle";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 2.9.0;
+				minimumVersion = 2.9.5;
 			};
 		};
 		7F96C2AC2B42844200C91CBB /* XCRemoteSwiftPackageReference "Kanna" */ = {
@@ -960,7 +960,7 @@
 			repositoryURL = "https://github.com/tid-kijyun/Kanna";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 5.2.7;
+				minimumVersion = 6.1.0;
 			};
 		};
 		7F96C2AF2B42845A00C91CBB /* XCRemoteSwiftPackageReference "CocoaLumberjack" */ = {
@@ -968,7 +968,7 @@
 			repositoryURL = "https://github.com/CocoaLumberjack/CocoaLumberjack/";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 3.8.2;
+				minimumVersion = 3.9.1;
 			};
 		};
 		7F96C2B42B42846800C91CBB /* XCRemoteSwiftPackageReference "SwiftyJSON" */ = {
@@ -976,7 +976,7 @@
 			repositoryURL = "https://github.com/SwiftyJSON/SwiftyJSON";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 5.0.1;
+				minimumVersion = 5.0.2;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
