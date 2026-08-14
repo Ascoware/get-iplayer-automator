@@ -4,7 +4,20 @@
         <title>Get iPlayer Automator</title>
         <description>Most recent changes with links to updates.</description>
         <language>en</language>
-                                                <item>
+                                                        <item>
+            <title>v1.29.6</title>
+            <pubDate>Fri, 14 Aug 2026 02:17:54 +0000</pubDate>
+            <description><![CDATA[<ul><li>Add support for Radio 1 Anthems, Radio 1 Dance, Radio 3 Unwind, and Radio 6 IndieF Forever</li></ul>]]></description>
+            <sparkle:minimumSystemVersion>10.14.0</sparkle:minimumSystemVersion>
+            <enclosure
+                url="https://github.com/Ascoware/get-iplayer-automator/releases/download/v1.29.6/Get.iPlayer.Automator.v1.29.6.b202608131913.zip"
+                sparkle:version="202608131913"
+                sparkle:shortVersionString="1.29.6"
+                sparkle:edSignature="QtrazlSpdx+mqeVfSBvs++q3aK70cJfdGfKGwpuhwisqmRvr7fKQXU1dNxglqDN3fxj5X9jnOiSz//+UCWczBQ=="
+                length="120447656"
+                type="application/octet-stream" />
+        </item>
+        <item>
             <title>v1.29.5</title>
             <pubDate>Sun, 02 Aug 2026 18:05:32 +0000</pubDate>
             <description><![CDATA[<ul><li>STV updated their program web pages again, so the metadata retrieval ncode needed an update.</li></ul>]]></description>
