@@ -144,13 +144,17 @@ public class NPHistoryTableViewController: NSWindowController, NSTableViewDataSo
         }
         let channelChecks: [(String, String)] = [
             ("BBC Radio 1Xtra", "Radio1Xtra"),
+            ("BBC Radio 1 Anthems", "Radio1Anthems"),
+            ("BBC Radio 1 Dance", "Radio1Dance"),
             ("BBC Radio 1", "Radio1"),
             ("BBC Radio 2", "Radio2"),
+            ("BBC Radio 3 Unwind", "Radio3Unwind"),
             ("BBC Radio 3", "Radio3"),
             ("BBC Radio 4 Extra", "Radio4Extra"),
             ("BBC Radio 4", "Radio4"),
             ("BBC Radio 5 live", "Radio5Live"),
             ("BBC 5 live sports extra", "Radio5LiveSportsExtra"),
+            ("BBC Radio 6 Indie Forever", "Radio6IndieForever"),
             ("BBC Radio 6 Music", "Radio6Music"),
             ("BBC Asian Network", "RadioAsianNetwork"),
             ("BBC World Service", "BBCWorldService")

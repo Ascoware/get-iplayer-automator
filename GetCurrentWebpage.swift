@@ -206,7 +206,7 @@ import CocoaLumberjackSwift
         guard let data = try? Data(contentsOf: fileURL),
               let payload = try? JSONSerialization.jsonObject(with: data) as? [String: String],
               let url = payload["url"] else {
-            DDLogError("[GiA] processExtensionPayload: missing or unreadable pending_page.json")
+            // Not an error if there's no extension payload.
             return
         }
         let title = payload["title"] ?? ""

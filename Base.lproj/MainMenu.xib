@@ -2295,14 +2295,14 @@
                                             </view>
                                         </box>
                                         <box fixedFrame="YES" borderType="line" title="BBC Radio: New Programmes Station Filter" translatesAutoresizingMaskIntoConstraints="NO" id="utW-FN-7tD">
-                                            <rect key="frame" x="1" y="179" width="452" height="219"/>
+                                            <rect key="frame" x="1" y="103" width="452" height="295"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="cZc-eP-6d4">
-                                                <rect key="frame" x="0.0" y="0.0" width="452" height="207"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="452" height="283"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HJk-bU-Rxk">
-                                                        <rect key="frame" x="12" y="181" width="96" height="18"/>
+                                                        <rect key="frame" x="12" y="257" width="96" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC Radio 1" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="1JW-iw-ETU">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2314,7 +2314,7 @@
                                                         </connections>
                                                     </button>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6Lw-33-guR" userLabel="BBC Radio 2">
-                                                        <rect key="frame" x="154" y="181" width="106" height="18"/>
+                                                        <rect key="frame" x="154" y="257" width="106" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC Radio 2" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="4f6-Ln-1Bq">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2326,7 +2326,7 @@
                                                         </connections>
                                                     </button>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8jP-di-hni">
-                                                        <rect key="frame" x="299" y="181" width="105" height="18"/>
+                                                        <rect key="frame" x="299" y="257" width="105" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC Radio 3" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="jhb-jr-N7a">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2338,7 +2338,7 @@
                                                         </connections>
                                                     </button>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4lJ-eV-Tty">
-                                                        <rect key="frame" x="12" y="143" width="109" height="18"/>
+                                                        <rect key="frame" x="12" y="219" width="109" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC Radio 4" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="hNr-CF-J0S">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2350,7 +2350,7 @@
                                                         </connections>
                                                     </button>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9ma-sa-of7">
-                                                        <rect key="frame" x="154" y="143" width="133" height="18"/>
+                                                        <rect key="frame" x="154" y="219" width="133" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC Radio 4 Extra" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Uwz-Vs-tux">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2362,7 +2362,7 @@
                                                         </connections>
                                                     </button>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tZy-hd-UhF">
-                                                        <rect key="frame" x="299" y="143" width="138" height="18"/>
+                                                        <rect key="frame" x="299" y="219" width="138" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC Radio 6 Music" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Vjh-iO-Mds">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2378,7 +2378,7 @@
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                     </box>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YWn-u3-Kmr" userLabel="BBC World Service">
-                                                        <rect key="frame" x="12" y="101" width="136" height="18"/>
+                                                        <rect key="frame" x="12" y="177" width="136" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC World Service" bezelStyle="regularSquare" imagePosition="left" inset="2" id="ZUN-Md-u59">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2394,7 +2394,7 @@
                                                         </connections>
                                                     </button>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="e2T-sc-7gQ">
-                                                        <rect key="frame" x="154" y="101" width="126" height="18"/>
+                                                        <rect key="frame" x="154" y="177" width="126" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC Radio 5 Live" bezelStyle="regularSquare" imagePosition="left" inset="2" id="rak-Wt-HaP">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2406,7 +2406,7 @@
                                                         </connections>
                                                     </button>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2k2-DB-89d">
-                                                        <rect key="frame" x="299" y="101" width="121" height="18"/>
+                                                        <rect key="frame" x="299" y="177" width="121" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC Radio 1Xtra" bezelStyle="regularSquare" imagePosition="left" inset="2" id="2jG-m4-i4e">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2418,7 +2418,7 @@
                                                         </connections>
                                                     </button>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bqc-BZ-buH">
-                                                        <rect key="frame" x="12" y="64" width="204" height="18"/>
+                                                        <rect key="frame" x="12" y="140" width="204" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC Radio 5 Live Sports Extra" bezelStyle="regularSquare" imagePosition="left" inset="2" id="5h4-0M-nCM">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2430,7 +2430,7 @@
                                                         </connections>
                                                     </button>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gxa-Sy-vru">
-                                                        <rect key="frame" x="261" y="64" width="177" height="18"/>
+                                                        <rect key="frame" x="261" y="140" width="177" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="BBC Radio Asian Network" bezelStyle="regularSquare" imagePosition="left" inset="2" id="3DI-gT-BDA">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2442,7 +2442,7 @@
                                                         </connections>
                                                     </button>
                                                     <box verticalHuggingPriority="750" fixedFrame="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="LdH-mP-1ip">
-                                                        <rect key="frame" x="14" y="126" width="419" height="5"/>
+                                                        <rect key="frame" x="14" y="202" width="419" height="5"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                     </box>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Owy-ED-RS0" userLabel="Show Regional Radio Programmes">
@@ -2469,11 +2469,59 @@
                                                             <binding destination="668" name="value" keyPath="values.ShowLocalRadioStations" id="GZm-BE-hmu"/>
                                                         </connections>
                                                     </button>
+                                                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="An1-tH-e01">
+                                                        <rect key="frame" x="12" y="102" width="168" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="BBC Radio 1 Anthems" bezelStyle="regularSquare" imagePosition="left" inset="2" id="An1-tH-c01">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="An1-tH-a01"/>
+                                                            <binding destination="668" name="value" keyPath="values.Radio1Anthems" id="An1-tH-b01"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Dn1-cE-e02">
+                                                        <rect key="frame" x="249" y="102" width="138" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="BBC Radio 1 Dance" bezelStyle="regularSquare" imagePosition="left" inset="2" id="Dn1-cE-c02">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="Dn1-cE-a02"/>
+                                                            <binding destination="668" name="value" keyPath="values.Radio1Dance" id="Dn1-cE-b02"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Uw3-nD-e03">
+                                                        <rect key="frame" x="12" y="64" width="163" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="BBC Radio 3 Unwind" bezelStyle="regularSquare" imagePosition="left" inset="2" id="Uw3-nD-c03">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="Uw3-nD-a03"/>
+                                                            <binding destination="668" name="value" keyPath="values.Radio3Unwind" id="Uw3-nD-b03"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="In6-dF-e04">
+                                                        <rect key="frame" x="249" y="64" width="190" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="BBC Radio 6 Indie Forever" bezelStyle="regularSquare" imagePosition="left" inset="2" id="In6-dF-c04">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="changeNewProgrmmeDisplayFilter:" target="621" id="In6-dF-a04"/>
+                                                            <binding destination="668" name="value" keyPath="values.Radio6IndieForever" id="In6-dF-b04"/>
+                                                        </connections>
+                                                    </button>
                                                 </subviews>
                                             </view>
                                         </box>
                                         <box fixedFrame="YES" title="Ignore News Programmes" translatesAutoresizingMaskIntoConstraints="NO" id="IcO-uY-vt0">
-                                            <rect key="frame" x="1" y="90" width="456" height="85"/>
+                                            <rect key="frame" x="1" y="14" width="456" height="85"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="gQ1-Wk-QjY">
                                                 <rect key="frame" x="0.0" y="0.0" width="456" height="73"/>

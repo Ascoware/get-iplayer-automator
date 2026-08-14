@@ -13,17 +13,32 @@
 @@ -6953,6 +6954,7 @@
  		return 'stop';
  	}
-
+ 
 +    main::logger "INFO: Wrote file $prog->{filename}\n";
  	return 0;
  }
-
-@@ -8796,6 +8807,8 @@
- 			$prev_sequence - $start_sequence + 1
+ 
+@@ -8030,10 +8032,14 @@
+ 			'p00fzl7g' => 'BBC Radio 5 live', # 5live/programmes/schedules
+ 			'p00fzl7h' => 'BBC Radio 5 live sports extra', # 5livesportsextra/programmes/schedules
+ 			'p00fzl65' => 'BBC Radio 6 Music', # 6music/programmes/schedules
++			'p0nkl37k' => 'BBC Radio 6 Indie Forever', # sounds/schedules/bbc_radio_six_indie_forever
+ 			'p00fzl68' => 'BBC Asian Network', # asiannetwork/programmes/schedules
+ 			'p00fzl86' => 'BBC Radio 1', # radio1/programmes/schedules
++			'p0hyc2r0' => 'BBC Radio 1 Anthems', # sounds/schedules/bbc_radio_one_anthems
++			'p080kbtk' => 'BBC Radio 1 Dance', # sounds/schedules/bbc_radio_one_dance
+ 			'p00fzl8v' => 'BBC Radio 2', # radio2/programmes/schedules
+ 			'p00fzl8t' => 'BBC Radio 3', # radio3/programmes/schedules
++			'p0hyc31m' => 'BBC Radio 3 Unwind', # sounds/schedules/bbc_radio_three_unwind
+ 			'p00fzl7j' => 'BBC Radio 4', # radio4/programmes/schedules/fm
+ 			'p00fzl7l' => 'BBC Radio 4 Extra', # radio4extra/programmes/schedules
+ 			'p02zbmb3' => 'BBC World Service', # worldserviceradio/programmes/schedules/uk
+@@ -8797,6 +8803,8 @@
  		) if $opt->{verbose};
  	}
-+
+ 
 +    main::logger "INFO: Finished downloading to file: $file_tmp\n";
-
++
  	return 0;
  }
+ 
