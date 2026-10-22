@@ -4,7 +4,20 @@
         <title>Get iPlayer Automator</title>
         <description>Most recent changes with links to updates.</description>
         <language>en</language>
-                                                        <item>
+                                                                <item>
+            <title>v1.29.9</title>
+            <pubDate>Thu, 22 Oct 2026 22:21:30 +0000</pubDate>
+            <description><![CDATA[<ul><li>Requires macOS 12 or later.</li><li>Fixed repeated &quot;Invalid Output!&quot; alerts after updating the programme index while BBC schedule pages are unavailable (#527).</li><li>Improved logging when the programme index can&#x27;t be updated.</li></ul>]]></description>
+            <sparkle:minimumSystemVersion>12.0</sparkle:minimumSystemVersion>
+            <enclosure
+                url="https://github.com/Ascoware/get-iplayer-automator/releases/download/v1.29.9/Get.iPlayer.Automator.v1.29.9.b202610221514.zip"
+                sparkle:version="202610221514"
+                sparkle:shortVersionString="1.29.9"
+                sparkle:edSignature="BpYZmVubaIQ+qAbR7GPDfQsJo2FxyVjtq2HqNzjc+PDBnPbMhFERqmO9Hrbb5MWIVgcWZskSZPYbkA8InKEACg=="
+                length="115709979"
+                type="application/octet-stream" />
+        </item>
+        <item>
             <title>v1.29.6</title>
             <pubDate>Fri, 14 Aug 2026 02:17:54 +0000</pubDate>
             <description><![CDATA[<ul><li>Add support for Radio 1 Anthems, Radio 1 Dance, Radio 3 Unwind, and Radio 6 IndieF Forever</li></ul>]]></description>
