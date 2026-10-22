@@ -9,6 +9,7 @@
 
 import Foundation
 import CocoaLumberjackSwift
+import Sweep
 
 @objc enum ProgrammeType : Int {
     case tv
@@ -178,22 +179,15 @@ import CocoaLumberjackSwift
         var value: String? = nil
 
         for line in lines {
-            if line.hasPrefix("\(field):") {
-                let scanner = Scanner(string: line)
-                scanner.scanUpTo("\(field):", into: nil)
-                scanner.scanString("\(field):", into: nil)
-                scanner.scanCharacters(from: .whitespaces, into: nil)
-                value = scanner.scanUpToCharactersFromSet(set: .newlines)
+            guard line.hasPrefix("\(field):") else { continue }
 
-                if !secondField.isEmpty, let lineRemainder = value, lineRemainder.hasPrefix(secondField) {
-                    let remainder = Scanner(string: lineRemainder)
-                    remainder.scanUpTo("\(secondField):", into: nil)
-                    remainder.scanString("\(secondField):", into: nil)
-                    remainder.scanCharacters(from: .whitespaces, into: nil)
-                    value = remainder.scanUpToCharactersFromSet(set: .newlines)
-                    break
-                }
+            value = line.firstSubstring(between: .prefix("\(field):"), and: .end)
+                .map { String($0).trimmingCharacters(in: .whitespaces) }
 
+            if !secondField.isEmpty, let lineRemainder = value, lineRemainder.hasPrefix(secondField) {
+                value = lineRemainder.firstSubstring(between: .prefix("\(secondField):"), and: .end)
+                    .map { String($0).trimmingCharacters(in: .whitespaces) }
+                break
             }
         }
         return value ?? ""

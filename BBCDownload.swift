@@ -8,6 +8,7 @@
 
 import Foundation
 import CocoaLumberjackSwift
+import Sweep
 
 @objc class BBCDownload: Download {
     var reasonForFailure: String?
@@ -305,24 +306,14 @@ import CocoaLumberjackSwift
             }
 
             if output.hasPrefix("INFO: Downloading subtitles") {
-                let scanner = Scanner(string: output)
-                var srtPath: String?
-                scanner.scanString("INFO: Downloading Subtitles to \'", into: nil)
-                srtPath = scanner.scanUpToString(".srt\'")
-                srtPath = URL(fileURLWithPath: srtPath ?? "").appendingPathExtension("srt").path
-                show.subtitlePath = srtPath ?? ""
+                if let srtPath = output.firstSubstring(between: "INFO: Downloading Subtitles to \'", and: ".srt\'") {
+                    show.subtitlePath = URL(fileURLWithPath: String(srtPath)).appendingPathExtension("srt").path
+                }
             } else if output.hasPrefix("INFO: Wrote file ") {
-                let scanner = Scanner(string: output)
-                scanner.scanString("INFO: Wrote file ", into: nil)
-                let path = scanner.scanUpToCharactersFromSet(set: .newlines)
-                show.path = path ?? ""
-            } else if output.hasPrefix("INFO: No specified modes") && output.hasSuffix("--quality=)") {
+                show.path = String(output.dropFirst("INFO: Wrote file ".count)).trimmingCharacters(in: .whitespacesAndNewlines)
+            } else if output.hasPrefix("INFO: Available qualities:") {
                 reasonForFailure = "Specified_Modes"
-                let modeScanner = Scanner(string: output)
-                modeScanner.scanUpTo("--quality=", into: nil)
-                modeScanner.scanString("--quality=", into: nil)
-                let availableModes = modeScanner.scanUpToString(")")
-                show.availableModes = availableModes ?? ""
+                show.availableModes = String(output.dropFirst("INFO: Available qualities:".count)).trimmingCharacters(in: .whitespaces)
             } else if output.hasSuffix("use --force to override") {
                 reasonForFailure = "InHistory"
             } else if output.contains("Permission denied") {
@@ -339,12 +330,8 @@ import CocoaLumberjackSwift
             } else if output.hasPrefix("WARNING: If you use a VPN") || output.hasSuffix("blocked by the BBC") {
                 reasonForFailure = "proxy"
             } else if output.hasPrefix("WARNING: No programmes are available for this pid with version(s):") || output.hasPrefix("INFO: No versions of this programme were selected") {
-                let versionScanner = Scanner(string: output)
-                versionScanner.scanUpTo("available versions:", into: nil)
-                versionScanner.scanString("available versions:", into: nil)
-                versionScanner.scanCharacters(from: .whitespaces, into: nil)
-                let availableVersions = versionScanner.scanUpToString(")")
-                if (availableVersions as NSString?)?.range(of: "audiodescribed").location != NSNotFound || (availableVersions as NSString?)?.range(of: "signed").location != NSNotFound {
+                if let availableVersions = output.firstSubstring(between: "available versions:", and: ")"),
+                   availableVersions.contains("audiodescribed") || availableVersions.contains("signed") {
                     reasonForFailure = "AudioDescribedOnly"
                 }
             } else if output.hasPrefix("INFO: Downloading thumbnail") {
@@ -354,39 +341,21 @@ import CocoaLumberjackSwift
             } else if output.hasPrefix("INFO:") || output.hasPrefix("WARNING:") || output.hasPrefix("ERROR:") || output.hasSuffix("default") || output.hasPrefix(show.pid) {
                 // Do nothing! This ensures we don't process any other info messages
             } else if output.hasSuffix("[audio+video]") || output.hasSuffix("[audio]") || output.hasSuffix("[video]") {
-                //Process iPhone/Radio Downloads Status Message
-                let scanner = Scanner(string: output)
-                var percentage: Decimal?
-                var h: Decimal?
-                var m: Decimal?
-                var s: Decimal?
-                scanner.scanUpToCharacters(
-                    from: .decimalDigits,
-                    into: nil)
-                percentage = scanner.scanDecimal()
-                setPercentage(NSDecimalNumber(decimal: percentage ?? .zero).doubleValue)
+                // Process the download progress status message, e.g.
+                //   " 40.9% of ~2440.24 MB @1.2 Mb/s ETA: 00:03:56 (hd1/un) [audio+video]"
+                let trimmed = output.trimmingCharacters(in: .whitespaces)
+                var percentage: Double?
+                if let percentEnd = trimmed.firstIndex(of: "%") {
+                    percentage = Double(trimmed[..<percentEnd])
+                }
 
-                // Jump ahead to the ETA field.
-                scanner.scanUpTo("ETA: ", into: nil)
-                scanner.scanString("ETA: ", into: nil)
-                scanner.scanUpToCharacters(
-                    from: .decimalDigits,
-                    into: nil)
-                h = scanner.scanDecimal()
-                scanner.scanUpToCharacters(
-                    from: .decimalDigits,
-                    into: nil)
-                m = scanner.scanDecimal()
-                scanner.scanUpToCharacters(
-                    from: .decimalDigits,
-                    into: nil)
-                s = scanner.scanDecimal()
-                scanner.scanUpToCharacters(
-                    from: .decimalDigits,
-                    into: nil)
+                if let percentage {
+                    setPercentage(percentage)
+                }
 
-                let eta = String(format: "%.2ld:%.2ld:%.2ld remaining", NSDecimalNumber(decimal: h ?? .zero).intValue, NSDecimalNumber(decimal: m ?? .zero).intValue, NSDecimalNumber(decimal: s ?? .zero).intValue)
-                setCurrentProgress(eta)
+                if let eta = output.firstSubstring(between: "ETA: ", and: " (") {
+                    setCurrentProgress("\(eta) remaining")
+                }
 
                 var format = "Video downloaded: %ld%%"
 
@@ -399,7 +368,7 @@ import CocoaLumberjackSwift
                 }
 
                 if let percentage {
-                    show.status = String(format: format, NSDecimalNumber(decimal: percentage).intValue)
+                    show.status = String(format: format, Int(percentage))
                 }
             }
         }

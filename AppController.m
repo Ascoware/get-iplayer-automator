@@ -493,18 +493,11 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 
 - (void)updater:(SPUStandardUpdaterController *)updater didFindValidUpdate:(SUAppcastItem *)update
 {
-    if (@available(macOS 10.14, *)) {
-        UNMutableNotificationContent *content = [UNMutableNotificationContent new];
-        content.title = @"Update Available!";
-        content.body = [NSString stringWithFormat:@"Get iPlayer Automator %@ is available.", update.displayVersionString];
-        UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:[[NSUUID UUID] UUIDString] content:content trigger:nil];
-        [[UNUserNotificationCenter currentNotificationCenter] addNotificationRequest:request withCompletionHandler:nil];
-    } else {
-        NSUserNotification *notification = [[NSUserNotification alloc] init];
-        notification.title = @"Update Available!";
-        notification.informativeText = [NSString stringWithFormat:@"Get iPlayer Automator %@ is available.", update.displayVersionString];
-        [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
-    }
+    UNMutableNotificationContent *content = [UNMutableNotificationContent new];
+    content.title = @"Update Available!";
+    content.body = [NSString stringWithFormat:@"Get iPlayer Automator %@ is available.", update.displayVersionString];
+    UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:[[NSUUID UUID] UUIDString] content:content trigger:nil];
+    [[UNUserNotificationCenter currentNotificationCenter] addNotificationRequest:request withCompletionHandler:nil];
 }
 
 #pragma mark Cache Update
@@ -745,18 +738,11 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 
     if (_didUpdate)
     {
-        if (@available(macOS 10.14, *)) {
-            UNMutableNotificationContent *content = [UNMutableNotificationContent new];
-            content.title = @"Index Updated";
-            content.body = @"The program index was updated.";
-            UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:@"IndexUpdatingCompleted" content:content trigger:nil];
-            [[UNUserNotificationCenter currentNotificationCenter] addNotificationRequest:request withCompletionHandler:nil];
-        } else {
-            NSUserNotification *notification = [[NSUserNotification alloc] init];
-            notification.title = @"Index Updated";
-            notification.informativeText = @"The program index was updated.";
-            [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
-        }
+        UNMutableNotificationContent *content = [UNMutableNotificationContent new];
+        content.title = @"Index Updated";
+        content.body = @"The program index was updated.";
+        UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:@"IndexUpdatingCompleted" content:content trigger:nil];
+        [[UNUserNotificationCenter currentNotificationCenter] addNotificationRequest:request withCompletionHandler:nil];
 
         DDLogInfo(@"BBC Index Updated");
         _lastUpdate=[NSDate date];
@@ -1333,18 +1319,11 @@ static NSString *FORCE_RELOAD = @"ForceReload";
         _solutionsTableView.rowHeight = 68;
     }
 
-    if (@available(macOS 10.14, *)) {
-        UNMutableNotificationContent *content = [UNMutableNotificationContent new];
-        content.title = notificationTitle;
-        content.body = notificationBody;
-        UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:[[NSUUID UUID] UUIDString] content:content trigger:nil];
-        [[UNUserNotificationCenter currentNotificationCenter] addNotificationRequest:request withCompletionHandler:nil];
-    } else {
-        NSUserNotification *notification = [[NSUserNotification alloc] init];
-        notification.title = notificationTitle;
-        notification.informativeText = notificationBody;
-        [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
-    }
+    UNMutableNotificationContent *content = [UNMutableNotificationContent new];
+    content.title = notificationTitle;
+    content.body = notificationBody;
+    UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:[[NSUUID UUID] UUIDString] content:content trigger:nil];
+    [[UNUserNotificationCenter currentNotificationCenter] addNotificationRequest:request withCompletionHandler:nil];
 
     [self saveAppData]; //Save app data in case of crash.
 
@@ -1407,18 +1386,12 @@ static NSString *FORCE_RELOAD = @"ForceReload";
 
         NSString *downloadsBody = [NSString stringWithFormat:@"Downloads Successful = %lu\nDownload Failed = %lu",
                                     (unsigned long)downloadsSuccessful, (unsigned long)downloadsFailed];
-        if (@available(macOS 10.14, *)) {
-            UNMutableNotificationContent *content = [UNMutableNotificationContent new];
-            content.title = @"Downloads Finished";
-            content.body = downloadsBody;
-            UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:[[NSUUID UUID] UUIDString] content:content trigger:nil];
-            [[UNUserNotificationCenter currentNotificationCenter] addNotificationRequest:request withCompletionHandler:nil];
-        } else {
-            NSUserNotification *notification = [[NSUserNotification alloc] init];
-            notification.title = @"Downloads Finished";
-            notification.informativeText = downloadsBody;
-            [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
-        }
+
+        UNMutableNotificationContent *content = [UNMutableNotificationContent new];
+        content.title = @"Downloads Finished";
+        content.body = downloadsBody;
+        UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:[[NSUUID UUID] UUIDString] content:content trigger:nil];
+        [[UNUserNotificationCenter currentNotificationCenter] addNotificationRequest:request withCompletionHandler:nil];
 
         if (downloadsFailed>0) {
             [_solutionsWindow makeKeyAndOrderFront:self];

@@ -40,7 +40,8 @@ import CocoaLumberjackSwift
 
         do {
             let data = try Data(contentsOf: historyFile)
-            if let unarchivedHistory = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? [ProgrammeHistoryObject] {
+            let allowedClasses: [AnyClass] = [NSArray.self, ProgrammeHistoryObject.self, NSString.self]
+            if let unarchivedHistory = try NSKeyedUnarchiver.unarchivedObject(ofClasses: allowedClasses, from: data) as? [ProgrammeHistoryObject] {
                 programmeHistoryArray = unarchivedHistory
             }
         } catch {

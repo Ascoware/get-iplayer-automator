@@ -8,6 +8,7 @@ import ScriptingBridge
 import SwiftyJSON
 import Kanna
 import CocoaLumberjackSwift
+import Sweep
 
 @objc public class GetCurrentWebpage : NSObject {
     
@@ -19,9 +20,8 @@ import CocoaLumberjackSwift
                 show.pid = nsUrl.deletingLastPathComponent().lastPathComponent
             }
 
-            let nameScanner = Scanner(string: tabTitle)
-            nameScanner.scanString("BBC iPlayer - ")
-            show.showName = nameScanner.scanUpToString( " - ") ?? ""
+            let strippedTitle = tabTitle.hasPrefix("BBC iPlayer - ") ? String(tabTitle.dropFirst("BBC iPlayer - ".count)) : tabTitle
+            show.showName = strippedTitle.firstSubstring(between: .start, and: " - ").map(String.init) ?? strippedTitle
             show.tvNetwork = "BBC"
             completion([show])
             return
@@ -40,9 +40,8 @@ import CocoaLumberjackSwift
                 }
             }
 
-            let nameScanner = Scanner(string: tabTitle)
-            nameScanner.scanString("BBC iPlayer - ")
-            show.showName = nameScanner.scanUpToString( " - ") ?? ""
+            let strippedTitle = tabTitle.hasPrefix("BBC iPlayer - ") ? String(tabTitle.dropFirst("BBC iPlayer - ".count)) : tabTitle
+            show.showName = strippedTitle.firstSubstring(between: .start, and: " - ").map(String.init) ?? strippedTitle
             show.tvNetwork = "BBC"
             completion([show])
             return

@@ -7,6 +7,7 @@
 
 import Foundation
 import CocoaLumberjackSwift
+import Sweep
 
 @objc public class STVDownload : Download {
 
@@ -60,49 +61,36 @@ import CocoaLumberjackSwift
 
             if line.contains("Writing video subtitles") {
                 //STV Download (ID=2a4910a0046): [info] Writing video subtitles to: /Users/skovatch/Movies/TV Shows/LA Story/LA Story - Just Friends - 2a4910a0046.en.vtt
-                let scanner = Scanner(string: line)
-                scanner.scanUpToString("to: ")
-                scanner.scanString("to: ")
-                subtitlePath = scanner.scanUpToString("\n") ?? ""
-                DDLogDebug("Subtitle path = \(subtitlePath)")
+                if let path = line.firstSubstring(between: "subtitles to: ", and: .end) {
+                    subtitlePath = String(path)
+                    DDLogDebug("Subtitle path = \(subtitlePath)")
+                }
             }
 
             if line.contains("Destination: ") {
-                let scanner = Scanner(string: line)
-                scanner.scanUpToString("Destination: ")
-                scanner.scanString("Destination: ")
-                self.show.path = scanner.scanUpToString("\n") ?? ""
-                DDLogDebug("Downloading to \(self.show.path)")
+                if let path = line.firstSubstring(between: "Destination: ", and: .end) {
+                    self.show.path = String(path)
+                    DDLogDebug("Downloading to \(self.show.path)")
+                }
             }
 
             // youtube-dl native download generates a percentage complete and ETA remaining
-            var progress: String? = nil
-            var remaining: String? = nil
-
             if line.contains("[download]") {
-                let scanner = Scanner(string: line)
-                scanner.scanUpToString("[download]")
-                scanner.scanString("[download]")
-                progress = scanner.scanUpToString("%")?.trimmingCharacters(in: .whitespaces)
-                scanner.scanUpToString("ETA ")
-                scanner.scanString("ETA ")
-                remaining = scanner.scanUpToCharactersFromSet(set: .whitespacesAndNewlines)
+                let progress = line.firstSubstring(between: "[download]", and: "%")?.trimmingCharacters(in: .whitespaces)
+                let remaining = line.firstSubstring(between: ["ETA "], and: [" ", .end]).map(String.init)
 
-                if let progress = progress, let progressVal = Double(progress) {
+                if let progress, let progressVal = Double(progress) {
                     setPercentage(progressVal)
                     show.status = "Downloaded \(progress)%"
                 }
 
-                if let remaining = remaining {
+                if let remaining {
                     setCurrentProgress("Downloading \(show.showName) -- \(remaining) until done")
                 }
             }
 
             if line.hasSuffix("has already been downloaded") {
-                let scanner = Scanner(string: line)
-                scanner.scanUpToString("[download]")
-                scanner.scanString("[download]")
-                self.show.path = scanner.scanUpToString("has already been downloaded")?.trimmingCharacters(in: .whitespaces) ?? ""
+                self.show.path = line.firstSubstring(between: "[download]", and: "has already been downloaded")?.trimmingCharacters(in: .whitespaces) ?? ""
             }
 
             if line.hasPrefix("WARNING: Failed to download m3u8 information") {
