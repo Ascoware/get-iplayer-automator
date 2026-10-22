@@ -31,6 +31,11 @@ NewProgrammeHistory           *sharedHistoryController;
 
 static NSString *FORCE_RELOAD = @"ForceReload";
 
+// Schedule page counts for the current index update, summarised in the log when it finishes.
+static NSUInteger indexPagesFetched = 0;
+static NSUInteger indexPagesFailed = 0;
+static NSString *firstFailedIndexPage = nil;
+
 @implementation AppController
 #pragma mark Overriden Methods
 
@@ -560,6 +565,9 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     _runSinceChange=YES;
     runUpdate=YES;
     _didUpdate=NO;
+    indexPagesFetched = 0;
+    indexPagesFailed = 0;
+    firstFailedIndexPage = nil;
     [_mainWindow setDocumentEdited:YES];
 
     NSMutableArray *finishedShows = [NSMutableArray new];
@@ -693,10 +701,19 @@ static NSString *FORCE_RELOAD = @"ForceReload";
                 NSString *infoMessage = [[NSString alloc] initWithFormat:@"Updating Programme Indexes: %@", actualMessage];
                 _currentProgress.stringValue = infoMessage;
             } else if ([line hasPrefix:@"WARNING:"]) {
-                DDLogWarn(@"%@", s);
+                DDLogWarn(@"%@", line);
+                // e.g. "WARNING: Failed to parse BBC One schedule page: https://www.bbc.co.uk/schedules/..."
+                NSRange urlRange = [line rangeOfString:@"schedule page: "];
+                if ([line hasPrefix:@"WARNING: Failed to parse"] && urlRange.location != NSNotFound) {
+                    indexPagesFailed++;
+                    if (!firstFailedIndexPage) {
+                        firstFailedIndexPage = [line substringFromIndex:NSMaxRange(urlRange)];
+                    }
+                }
             } else if ([line hasPrefix:@"ERROR:"]) {
-                DDLogError(@"%@", s);
+                DDLogError(@"%@", line);
             } else if ([line isEqualToString:@"."]) {
+                indexPagesFetched++;
                 NSMutableString *infomessage = [[NSMutableString alloc] initWithFormat:@"%@.", _currentProgress.stringValue];
                 if ([infomessage hasSuffix:@".........."]) [infomessage deleteCharactersInRange:NSMakeRange(infomessage.length-9, 9)];
                 _currentProgress.stringValue = infomessage;
@@ -735,6 +752,13 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     [_forceCacheUpdateMenuItem setEnabled:YES];
     [_checkForCacheUpdateMenuItem setEnabled:YES];
     [_showNewProgrammesMenuItem setEnabled:YES];
+
+    if (indexPagesFailed > 0) {
+        DDLogError(@"Programme index: %lu of %lu BBC schedule pages could not be read. "
+                   @"If most or all failed, the BBC schedule site is probably down or has changed. "
+                   @"Try opening %@ in a browser.",
+                   (unsigned long)indexPagesFailed, (unsigned long)indexPagesFetched, firstFailedIndexPage);
+    }
 
     if (_didUpdate)
     {
@@ -798,16 +822,31 @@ static NSString *FORCE_RELOAD = @"ForceReload";
             NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
             dateFormatter.dateFormat = @"yyyy-MM-dd'T'HH:mm:ssZZZZZ";
 
+            if ([string containsString:@"INFO: Indexing"]) {
+                DDLogWarn(@"Queue name lookup for '%@': programme index was empty, so get_iplayer re-indexed during the lookup.", show.showName);
+            }
+
             for (NSString *string in array)
             {
+                if ([string hasPrefix:@"Unknown option:"] || [string hasPrefix:@"Option"] || [string hasPrefix:@"Usage"])
+                {
+                    DDLogError(@"Queue name lookup: get_iplayer rejected its arguments: %@", string);
+                    break;
+                }
                 if (![string isEqualToString:@"Matches:"] && ![string hasPrefix:@"INFO:"] && ![string hasPrefix:@"WARNING:"]
-                    && ![string hasPrefix:@"reading"]
+                    && ![string hasPrefix:@"reading"] && ![string hasPrefix:@"."] && ![string hasPrefix:@"Added:"]
                     && string.length >0)
                 {
+                    // Skip anything that isn't a listformat line, such as progress output
+                    // printed when get_iplayer re-indexes an empty cache mid-search.
+                    NSArray *matchElements = [string componentsSeparatedByString:@"|"];
+                    if (matchElements.count != 8)
+                    {
+                        DDLogWarn(@"Queue name lookup: skipping line with %lu fields (expected 8): %@", (unsigned long)matchElements.count, string);
+                        continue;
+                    }
                     @try
                     {
-                        NSArray *matchElements = [string componentsSeparatedByString:@"|"];
-
                         Programme *p = [[Programme alloc] init];
                         NSString *temp_pid, *temp_showName, *temp_tvNetwork, *season, *temp_type, *url, *temp_date;
                         temp_pid = matchElements[0];
@@ -841,20 +880,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
                         }
                     }
                     @catch (NSException *e) {
-                        NSAlert *searchException = [[NSAlert alloc] init];
-                        [searchException addButtonWithTitle:@"OK"];
-                        searchException.messageText = [NSString stringWithFormat:@"Invalid Output!"];
-                        searchException.informativeText = @"Please check your query. Your query must not alter the output format of Get_iPlayer. (getiPlayerUpdateFinished)";
-                        searchException.alertStyle = NSAlertStyleWarning;
-                        [searchException runModal];
-                        searchException = nil;
-                    }
-                }
-                else
-                {
-                    if ([string hasPrefix:@"Unknown option:"] || [string hasPrefix:@"Option"] || [string hasPrefix:@"Usage"])
-                    {
-                        NSLog(@"Unknown Option");
+                        DDLogError(@"Queue name lookup: failed to parse line '%@': %@", string, e.reason);
                     }
                 }
             }
@@ -1600,12 +1626,22 @@ static NSString *FORCE_RELOAD = @"ForceReload";
     NSArray *array = [autoRecordData2 componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
     for (NSString *string in array)
     {
+        if ([string hasPrefix:@"Unknown option:"] || [string hasPrefix:@"Option"] || [string hasPrefix:@"Usage"])
+        {
+            DDLogError(@"Series-Link: get_iplayer rejected its arguments: %@", string);
+            return NO;
+        }
         if (![string isEqualToString:@"Matches:"] && ![string hasPrefix:@"INFO:"] && ![string hasPrefix:@"WARNING:"] && string.length>0 && ![string hasPrefix:@"."] && ![string hasPrefix:@"Added:"]
             && ![string hasPrefix:@"reading"] )
         {
+            NSArray *matchElements = [string componentsSeparatedByString:@"|"];
+            if (matchElements.count != 8)
+            {
+                DDLogWarn(@"Series-Link: skipping line with %lu fields (expected 8): %@", (unsigned long)matchElements.count, string);
+                continue;
+            }
             @try {
-                NSArray *matchElements = [string componentsSeparatedByString:@"|"];
-                
+
                 NSString *temp_pid, *temp_tvNetwork, *temp_type, *url, *temp_date, *temp_timeAdded;
                 NSString *series_Name, *episode_Name;
 
@@ -1669,22 +1705,7 @@ static NSString *FORCE_RELOAD = @"ForceReload";
                 }
             }
             @catch (NSException *e) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    NSAlert *searchException = [[NSAlert alloc] init];
-                    [searchException addButtonWithTitle:@"OK"];
-                    searchException.messageText = [NSString stringWithFormat:@"Invalid Output!"];
-                    searchException.informativeText = @"Please check your query. Your query must not alter the output format of Get_iPlayer. (processAutoRecordData)";
-                    searchException.alertStyle = NSAlertStyleWarning;
-                    [searchException runModal];
-                    searchException = nil;
-                });
-            }
-        }
-        else
-        {
-            if ([string hasPrefix:@"Unknown option:"] || [string hasPrefix:@"Option"] || [string hasPrefix:@"Usage"])
-            {
-                return NO;
+                DDLogError(@"Series-Link: failed to parse line '%@': %@", string, e.reason);
             }
         }
     }
