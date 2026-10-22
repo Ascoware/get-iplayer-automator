@@ -79,6 +79,12 @@ fi
 cd "Product/${PROJECT_NAME}"
 CFBundleVersion=$(/usr/libexec/PlistBuddy -c "Print CFBundleVersion" "$PROJECT_NAME.app/Contents/${INFOPLIST_FILE}")
 CFBundleShortVersionString=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$PROJECT_NAME.app/Contents/${INFOPLIST_FILE}")
+# Xcode sets this from MACOSX_DEPLOYMENT_TARGET; Sparkle hides the update from older Macs.
+LSMinimumSystemVersion=$(/usr/libexec/PlistBuddy -c "Print LSMinimumSystemVersion" "$PROJECT_NAME.app/Contents/${INFOPLIST_FILE}")
+if [ -z "$LSMinimumSystemVersion" ]; then
+    echo "ERROR: LSMinimumSystemVersion missing from Info.plist; aborting"
+    exit 1
+fi
 
 ARCHIVE_NAME="$PROJECT_NAME.v${CFBundleShortVersionString}.b${CFBundleVersion}.zip"
 ditto -c -k --keepParent -rsrc "$PROJECT_NAME.app" "../$ARCHIVE_NAME"
@@ -182,7 +188,7 @@ print("".join(out))
             <title>${TAG}</title>
             <pubDate>${PUB_DATE}</pubDate>
             <description><![CDATA[${NOTES_HTML}]]></description>
-            <sparkle:minimumSystemVersion>10.14.0</sparkle:minimumSystemVersion>
+            <sparkle:minimumSystemVersion>${LSMinimumSystemVersion}</sparkle:minimumSystemVersion>
             <enclosure
                 url=\"${DOWNLOAD_URL}\"
                 sparkle:version=\"${CFBundleVersion}\"
