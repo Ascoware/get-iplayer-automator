@@ -10,6 +10,38 @@
  		}
  	}
  	main::logger "INFO: ".(scalar @match_list)." total programmes\n";
+@@ -6244,15 +6245,27 @@
+ 	my @video_medias;
+ 	for my $set ( $xpc->findnodes('mpd:AdaptationSet', $period) ) {
+ 		my $content_type = $set->findvalue('@contentType');
+-		my ($template) = $xpc->findnodes('mpd:SegmentTemplate', $set);
++		my ($set_template) = $xpc->findnodes('mpd:SegmentTemplate', $set);
+ 		for my $repr ( $xpc->findnodes('mpd:Representation', $set) ) {
+ 			my $bitrate = int($repr->findvalue('@bandwidth')/1000.0);
+ 			next if $min_bitrate && $bitrate < $min_bitrate;
+ 			next if $max_bitrate && $bitrate > $max_bitrate;
+-			if ( ! $template ) {
+-				($template) = $xpc->findnodes('mpd:SegmentTemplate', $repr);
++			my ($template) = $set_template || $xpc->findnodes('mpd:SegmentTemplate', $repr);
++			# DASH SegmentTimeline support adapted from get_iplayer PR #525 (cooperised).
++			my $duration = $template ? $template->findvalue('@duration') : 0;
++			if ( $template && ! $duration ) {
++				my @lengths = map { $_->findvalue('@d') } $xpc->findnodes('mpd:SegmentTimeline/mpd:S', $template);
++				my $last = pop @lengths if @lengths > 1;
++				$duration = $lengths[0] if @lengths && ! grep { $_ != $lengths[0] } @lengths;
++				$duration = 0 if defined $last && ( ! $duration || $last <= 0 || $last > $duration );
++			}
++			my $timescale = $template ? $template->findvalue('@timescale') : '';
++			$timescale = 1 if $template && $timescale eq '';
++			if ( ! $duration || ! $timescale || $duration <= 0 || $timescale <= 0 ) {
++				main::logger "WARNING: Cannot determine DASH segment duration - skipping manifest\n";
++				return;
+ 			}
+-			my $segment_duration = $template->findvalue('@duration') / $template->findvalue('@timescale');
++			my $segment_duration = $duration / $timescale;
+ 			my $num_segments = int($programme_duration / $segment_duration);
+ 			$num_segments++ if $segment_duration * $num_segments < $programme_duration;
+ 			my $repr_media = {};
 @@ -6953,6 +6954,7 @@
  		return 'stop';
  	}
