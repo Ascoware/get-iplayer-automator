@@ -4,7 +4,20 @@
         <title>Get iPlayer Automator</title>
         <description>Most recent changes with links to updates.</description>
         <language>en</language>
-                                                                <item>
+                                                                        <item>
+            <title>v1.29.10</title>
+            <pubDate>Thu, 12 Nov 2026 01:47:44 +0000</pubDate>
+            <description><![CDATA[<ul><li>Changes in DASH streams of BBC programs caused gan exception in get_iplayer. Fixed by pipicking up contributed fix.</li></ul>]]></description>
+            <sparkle:minimumSystemVersion>12.0</sparkle:minimumSystemVersion>
+            <enclosure
+                url="https://github.com/Ascoware/get-iplayer-automator/releases/download/v1.29.10/Get.iPlayer.Automator.v1.29.10.b202611111741.zip"
+                sparkle:version="202611111741"
+                sparkle:shortVersionString="1.29.10"
+                sparkle:edSignature="k05MP4RsPC9t0Wu6xpbE9qVo7lRuXMxEhFC3nh0WDaVrpLKPM3LYBIh2HwEwxXk/i85EoQy/YiE+NCPtnuIuAw=="
+                length="116066634"
+                type="application/octet-stream" />
+        </item>
+        <item>
             <title>v1.29.9</title>
             <pubDate>Thu, 22 Oct 2026 22:21:30 +0000</pubDate>
             <description><![CDATA[<ul><li>Requires macOS 12 or later.</li><li>Fixed repeated &quot;Invalid Output!&quot; alerts after updating the programme index while BBC schedule pages are unavailable (#527).</li><li>Improved logging when the programme index can&#x27;t be updated.</li></ul>]]></description>
